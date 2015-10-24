@@ -1,12 +1,30 @@
+OPAQ - Operational prediction of air quality
+
+Bino Maiheu, (c) VITO 2013-2015
+Stijn Van Looy, (c) VITO 2013-2014
+
+
+OPAQ is a toolbox for operational prediction of air quality, both forecast as well as mapping.
+The package uses the GNU autotools built system, when checking out, please first run the
+autogen.sh script to add the build structure. After that just ./configure; make; make install. 
+
+
 Prerequisites : 
 
+OPAQ used a number of 3th party libraries for matrix algebra, logging and storage. 
 - Log4cxx
 - Eigen3, the configure script checks for eigen3/Eigen/Dense
 - HDF5, note that we need the H5Cpp bindinges for OPAQ, so be sure this is installed !
 
-Under Ubunutu : 
+Under Ubunutu, you can install the development sources with : 
 
-sudo apt-get install libeigen3-dev libhdf5-dev libhdf5-serial-dev libhdf5-7 liblog4cxx10 liblog4cxx10-dev
+sudo apt-get install libeigen3-dev libhdf5-dev libhdf5-serial-dev libhdf5-7 \
+                     liblog4cxx10 liblog4cxx10-dev
 
+OPAQ was tested with 
+- log4cxx 0.10.0
+- Eigen 3.2.0
+- HDF5 1.8, note that the C++ bindings need to be present, this is checked inthe configure script
 
-usg --with-Eigen to specify a non-default path to Eigen, utested with 3.2.0
+Note that with some configuation options in the configure script such as --with-Eigen, 
+you can specify a non-default path to Eigen. 
