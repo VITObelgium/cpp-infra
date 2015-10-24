@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config>
+	<begin_offset>0</begin_offset>
+	<end_offset>48</end_offset>
+	<meteo_parameter>P01</meteo_parameter>
+	<output_size>5</output_size>
+</config>

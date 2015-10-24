@@ -1,0 +1,36 @@
+<?xml version="1.0" ?>
+<runconfig>
+	
+  <!-- pollutant to use: can be overridden by command line arguments,
+       in that case the value provided here is ignored -->
+  <pollutant>pm10</pollutant>
+  
+  <!-- base times to use: can be overridden by command line arguments,
+       in that case the value provided here is ignored -->
+  <basetimes>
+    <basetime>2013-03-01 00:00:00</basetime>
+    <basetime>2013-03-02 00:00:00</basetime>
+  </basetimes>
+  
+  <!-- AQNetworkProvider to use -->
+  <network>
+    <component>net</component>
+  </network>
+  
+  <!-- Forecast model or ensemble to use -->
+  <forecast>
+    <model>
+      <!-- model component to use -->
+      <component>ovl</component>
+      <input>
+	<!-- Data provider to use for the input values: observations -->
+	<values>obs</values>
+	<!-- Data provider to use for the meteo -->
+	<meteo>meteo</meteo>
+      </input>
+      <!-- Data store to use for the model output -->
+      <output>forecasts</output>
+    </model>
+  </forecast>
+  
+</runconfig>

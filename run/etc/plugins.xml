@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<plugins>
+  <!-- adding the root path for the location of the plugins -->
+  <pluginpath>/home/bino/local/lib/opaq</pluginpath>
+
+  <!-- give list of plugin components... -->
+  <plugin>
+    <name>meteoPlugin</name>
+    <lib>ECMWFMeteoProvider.so</lib>
+  </plugin>
+
+  <plugin>
+    <name>obsPlugin</name>
+    <lib>AsciiObsProvider.so</lib>
+  </plugin>
+
+  <plugin>
+    <name>netPlugin</name>
+    <lib>XMLAQNetProvider.so</lib>
+  </plugin>
+
+  <plugin>
+    <name>forecastsPlugin</name>
+    <lib>Hdf5ForecastsStore.so</lib>
+  </plugin>
+
+  <plugin>
+    <name>ffnetPlugin</name>
+    <lib>FeedForwardModel.so</lib>
+  </plugin>
+
+</plugins>

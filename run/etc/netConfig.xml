@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<config>
+  <network>
+    <station name="YZC001" x="-4413"  y="-43597" meteo="119_32">pm10,pm25,so2,no2,o3,co</station>
+    <station name="YZC002" x="-1089"  y="-44339" meteo="119_32">pm10,pm25,so2,no2,o3,co</station>
+    <station name="YZC003" x="875"    y="-46031" meteo="119_32">pm10,pm25,so2,no2,o3,co</station>
+    <station name="YZC004" x="-5861"  y="-47329" meteo="119_32">pm10,pm25,so2,no2,o3,co</station>
+    <station name="YZC005" x="9448"   y="-42333" meteo="119_32">pm10,so2,no2</station>
+    <station name="YZC006" x="9120"   y="-41036" meteo="119_32">pm10,so2,no2</station>
+    <station name="YZC007" x="-26871" y="-58136" meteo="119_32">pm10,so2,no2</station>
+    <station name="YZC008" x="-30340" y="-57547" meteo="119_32">pm10,so2,no2</station>
+    <station name="YZC009" x="-1401"  y="-2944"  meteo="119_32">pm10,so2,no2</station>
+    <station name="YZC010" x="-11366" y="48688"  meteo="119_33">pm10,so2,no2</station>
+  </network>
+</config>

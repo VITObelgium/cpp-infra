@@ -1,0 +1,10 @@
+<?xml version="1.0" ?>
+<opaq>
+  <!-- Master OPAQ configuration settings -->
+  <pollutants ref="etc/pollutants.xml" />
+  <plugins    ref="etc/plugins.xml" />
+  <components ref="etc/components.xml" />
+
+  <!-- Run configuration -->
+  <runconfig  ref="etc/runconfig.xml" />
+</opaq>

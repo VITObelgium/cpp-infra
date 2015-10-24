@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<config>
+  <range>
+    <begin_offset>-4</begin_offset>
+    <end_offset>12</end_offset>
+  </range>
+  <parameters>
+    <parameter id="P01" nodata="-999" />
+    <parameter id="P02" nodata="-999" />
+    <parameter id="P03" nodata="-999" />
+    <parameter id="P04" nodata="-999" />
+    <parameter id="P05" nodata="-999" />
+    <parameter id="P06" nodata="-999" />
+    <parameter id="P07" nodata="-999" />
+    <parameter id="P08" nodata="-999" />
+    <parameter id="P09" nodata="-999" />
+    <parameter id="P10" nodata="-999" />
+    <parameter id="P11" nodata="-999" />
+    <parameter id="P12" nodata="-999" />
+    <parameter id="P13" nodata="-999" />
+    <parameter id="P14" nodata="-999" />
+    <parameter id="P15" nodata="-999" />
+  </parameters>
+  <file_pattern>./meteo/FNL_%METEO%_%PARAMETER%.txt.gz</file_pattern>
+</config>

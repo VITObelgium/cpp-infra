@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+ <!-- Output the log message to system console.
+   -->
+ <appender name="appxConsoleAppender" class="org.apache.log4j.ConsoleAppender">    
+   <param name="Target" value="System.out"/>
+       <layout class="org.apache.log4j.PatternLayout">
+           <param name="ConversionPattern" value="%d %-5p (%-25c): %m%n"/>
+       </layout>
+ </appender>
+
+
+ <root>
+       <priority value="all" />
+       <appender-ref ref="appxConsoleAppender"/>
+ </root>
+
+</log4j:configuration>

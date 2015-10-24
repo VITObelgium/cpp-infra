@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<components>
+  <component>
+    <name>meteo</name>
+    <plugin>meteoPlugin</plugin>
+    <config ref="etc/meteoConfig.xml" />
+  </component>
+  <component>
+    <name>obs</name>
+    <plugin>obsPlugin</plugin>
+    <config ref="etc/obsConfig.xml" />
+  </component>
+  <component>
+    <name>net</name>
+    <plugin>netPlugin</plugin>
+    <config ref="etc/netConfig.xml" />
+  </component>
+  <component>
+    <name>forecasts</name>
+    <plugin>forecastsPlugin</plugin>
+    <config ref="etc/forecastsConfig.xml" />
+  </component>
+  <component>
+    <name>ovl</name>
+    <plugin>ffnetPlugin</plugin>
+    <config ref="etc/FeedForwardModel.xml" />
+  </component>
+  
+</components>
