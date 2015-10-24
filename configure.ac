@@ -76,7 +76,7 @@ dnl
 dnl TODO clean this up !
 dnl ===============================================
 LOG4CXX_PATH="/usr"
-LOG4CXX_INC_PATH="/usr/include"
+LOG4CXX_INCLUDE="/usr/include"
 LOG4CXX_LIB_PATH="/usr/lib"
 AC_ARG_WITH(log4cxx,[  --with-log4cxx[=dir]        add Log4cxx installation path (default /usr)],,)
 if test "$with_log4cxx" != "no" -a "$with_log4cxx" != "" ; then
