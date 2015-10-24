@@ -1,4 +1,4 @@
-SUBDIRS = . src
+SUBDIRS = . src run
 
 if DEBUG
 AM_CFLAGS = -g -DDEBUG
