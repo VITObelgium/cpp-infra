@@ -1,0 +1,111 @@
+/**
+   \page p_plugindev Developing new plugins
+
+   The adaptability of OPAQ is achieved by implementing it as a simple, yet powerful plugin framework. 
+   All components in OPAQ are plugin-based. A plugin is a shared library that is loaded by OPAQ at runtime.
+   The concepts of OPAQ plugins and components are somewhat analogous to those of classes and instances.
+   A plugin is the analogue of a class, while a component is the analogue of an instance. OPAQ will load 
+   each plugin only once, but it can create several components using the same plugin. This explains the 
+   way in which plugins and components are configured in the OPAQ configuration file. Each plugin is given 
+   a unique name. Each component is also given a unique name, and the plugin from which it must be created 
+   is specified as well. Each component (~instance) constructed from the same plugin (~class) is characterized
+   by its unique configuration.
+
+   \section p_plugindev_writing Writing your own plugins
+
+   Writing a model for OPAQ comes down to writing an OPAQ plugin. This means you have to implement 2 items.
+
+   - A class that extends the OPAQ::Component abstract class. This comes down to implementing the pure 
+     virtual method OPAQ::Component::configure(TiXmlElement* configuration);
+
+   - A factory method that creates a new instance of your class and returns a pointer to that new instance.
+     The factory method must have the signature OPAQ::Component * factory (); and it must use "C" linkage, 
+     that is the linker may not mangle the function name of the factory method.
+
+   This last item is easily handled via the OPAQ_REGISTER_PLUGIN macro. 
+   
+   All other methods are specific for each plugin and are thus not of any concern to the plugin framework. 
+   It is however important to note that the plugin framework only loads OPAQ::Component classes, which 
+   are casted to the appropriate types by the users of the components. This means that all methods that 
+   your plugin offers to the user must be implemented as virtual methods to enable late binding. If not, 
+   the linker cannot link the code of the user of your plugin. The reason for this is that the code of the 
+   user of your plugin is not linked against your plugin, which is a shared library that is loaded at runtime,
+   not at link time.
+
+   An example implementation of a plugin is given below.
+   
+   The header file might look like this. The configure method is the pure virtual method declared in the 
+   OPAQ::Component parent class. The virtual (!) echo method is the "service" offered by this plugin.
+
+   \code
+   #ifndef EXAMPLECOMPONENT_H_
+   #define EXAMPLECOMPONENT_H_
+
+   #include "Component.h"
+   #include <string>
+
+   namespace OPAQ {
+
+   class ExampleComponent: public OPAQ::Component {
+   public:
+     ExampleComponent();
+     virtual ~ExampleComponent();
+
+     void configure(TiXmlElement* configuration);
+
+     virtual std::string echo (std::string message);
+   };
+
+   } 
+   #endif 
+   \endcode
+
+   The cpp file might look like this. This plugin does not need any configuration, so the implementation 
+   of the configure method remains empty. The echo method simply returns whatever it received. Important 
+   is the factory method:
+
+   - It is declared 'extern "C"', which tells the compiler to use 'C' linkage.
+   - It returns a pointer to an OPAQ::Component instance.
+   - It creates a new OPAQ::ExampleComponent (that is the exact type you implemented) instance using the new keyword.
+
+   \code
+   #include "ExampleComponent.h"
+
+   namespace OPAQ {
+
+   ExampleComponent::ExampleComponent() {}
+
+   ExampleComponent::~ExampleComponent() {}
+
+   void ExampleComponent::configure(TiXmlElement* configuration) {}
+
+   std::string ExampleComponent::echo(std::string message) {
+       return message;
+   }
+
+   } 
+
+   extern "C" {
+     OPAQ::Component * factory () {
+       return new OPAQ::ExampleComponent();
+     }
+   }
+   \endcode
+
+   The last part can be replaced by the easy macro
+
+   \code
+   OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent)
+   \endcode
+
+   \section p_plugindev_using Using other components
+
+   Each component can use other components. For that purpose, the plugin framework offers a getter method 
+   with a single argument; the name of the component, and which returns a pointer to the component instance 
+   with the given name.
+  
+  This allows keeping the OPAQ framework simple while also allowing the implementation of arbitrary complex 
+  components. Note that when using this mechanism, one has to be very careful with the configuration of the 
+  components and the casting of the component pointer returned by the getter method to the appropriate type.
+
+*/

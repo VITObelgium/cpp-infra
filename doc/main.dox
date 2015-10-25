@@ -1,0 +1,66 @@
+/**
+ * \defgroup common Common Routines
+ * \defgroup confighandler Configuration Handling routines
+ * \defgroup engine OPAQ Engine 
+ * \defgroup pfw Plugin Framework
+ * \defgroup main Main routine
+ */
+
+/**
+   \mainpage OPAQ - Operational Prediction of Air Quality
+   \author    Stijn Van Looy (stijn.vanlooy@vito.be)
+   \author    Bino Maiheu (bino.maiheu@vito.be)
+   \copyright OPAQ is the property of VITO/LIBOVITO, all rights reserved. 
+
+    <em><b>Contact</b> : Bino Maiheu, VITO nv - Environmental Modelling Unit, Boeretang 200, 2400 Mol - Belgium</em>
+
+    OPAQ stands for Operational Prediction of Air Quality and is a software 
+    framework that is intended to streamline the development, the configuration and the deployment of
+    statistical models for the prediction of air quality. It provides an API that 
+    handles the input and output data, the configuration and execution of the models, and the 
+    combining of several models in chains and/or ensembles in a well-defined way, thereby allowing 
+    the developer of (new) models to focus on the model algorithm only. The behavior of OPAQ can 
+    be (re)configured and new models and data handlers can be plugged into the framework without 
+    modification or recompilation of the code, which will ease the integration and deployment of 
+    OPAQ in a wide range of operational environments.
+
+   The framework consists out of a number of different modules, being : 
+
+   - a plugin handling framework (<b>pfw</b>)
+     - Offers a pool of OPAQ components.
+      - dynamically loads plugins from shared libraries
+      - creates configured OPAQ components from plugins
+      - memory management: clean up unregistered components
+   - a set of common API classes (<b>common</b>)
+      - tools for representaion pollutants, grid, gridcells, etc..
+      - a representation of the air quality station network
+      - common tools for XML parsing, string handling etc..
+   - a configuration handler (<b>confighandler</b>)
+     - parses and validates the OPAQ configuration, 
+     - initializes components
+     - uses the plugin framework
+   - the opaq workflow engine (<b>engine</b>)
+     - runs the OPAQ workflow
+     - uses the plugin framework
+   - and finally the main opaq sources (<b>main</b>)
+     - implements the command line tool
+     - uses the configuration handler and engine components
+
+   These 5 modules make up the core of OPAQ. To provide functionality, a number of standard plugins 
+   have been implemented as well. These are however kept in a separate subversion repository and
+   are not document here as such. The following sections describe each of the different modules in 
+   somewhat more detail. 
+
+   \image html opaq_overview_400px.png "OPAQ Overview" 
+   \image latex opaq_overview.eps "OPAQ Overview" width=12cm
+
+
+   The functionality however of OPAQ is provided by the plugins, these have to be 
+   - Implemented by the user
+   - Loaded by the plugin framework
+   - Can use the plugin framework itself to access other OPAQ components.
+   - Can use the common tools
+   - An arbitrary number of plugins can be loaded by the plugin framework
+ 
+*/
+

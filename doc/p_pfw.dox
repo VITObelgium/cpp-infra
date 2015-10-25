@@ -1,0 +1,59 @@
+/**
+   \page p_pfw The plugin framework
+   
+   As OPAQ is a modular system at it's core, having an abstract engine and a plugin handling framework for
+   functionality.The plugin framework provides a generic abstract base class (OPAQ::Component) from which new plugins 
+   can be derived. The base class provides an OPAQ::Component::configure method which takes a TiXmlElement
+   pointer as input. A plugin should therefore at least implement this configure method. Every more advanced
+   component, such as Forecast or Mapping models, datahandlers etc.. are in essence derived from this
+   base component class and can therefore all contain a configure section in the master OPAQ configuration
+   file. 
+
+   In this master XML configuration file, each plugin (.so file) is listed under the plugins section. 
+   Example : 
+\verbatim
+<plugins>
+  <plugin>
+    <name>XMLAQNetProviderPlugin</name>
+    <lib>plugins/libXMLAQNetProvider.so</lib>
+  </plugin>
+  <plugin>
+    <name>OVLDataProviderPlugin</name>
+    <lib>plugins/libOVLDataProvider.so</lib>
+  </plugin>
+</plugins>
+\endverbatim
+
+  so in this example we list an XMLAQNetProviderPlugin as pluging name, which refers to the .so file found
+  in the <b>lib</b> XML tag in the configuration section. Each .so file , which contains a OPAQ::Component
+  derived class and is compiled separately as an OPAQ plugin can such be labelled. In a following section
+  in the OPAQ configuration file, we can add a configuration to each of the plugins, turning them into 
+  useable components within the OPAQ framework. This is configured under 
+
+\verbatim
+ <components>
+  <component>
+    <name>XMLNetworkProvider</name>
+    <plugin>XMLAQNetProviderPlugin</plugin>
+    <config>
+      <missing_value>-9999</missing_value>
+      <network>
+        <station name="40AB01" x="147285" y="219017" meteo="">pm10,no2</station>
+        <station name="40AB02" x="146729" y="225661" meteo="">pm10,no2</station>
+        <station name="40AL01" x="151150" y="214030" meteo="">pm10</station>
+        <station name="40AL02" x="140660" y="221640" meteo="">pm10,no2</station>
+
+      </network>
+    </config>
+  </component>
+
+  <component>
+    <name>...</name>
+    <plugin>...</plugin>
+    <config>
+           ....
+    </config>
+  </component>
+</components>
+\endverbatim
+*/

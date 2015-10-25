@@ -1,0 +1,48 @@
+/**
+   \page p_requirements Key requirements and design choices
+
+   Here we list a number of key requirements which are guiding the development of OPAQ.
+
+   \section p_req_functional Functional requirements
+   - The framework consists of configurable components:
+     - Models:
+       - Forecast models (extrapolating historical time series at a station into the future)
+       - Mapping models (interpolating values at stations over a domain covering these stations)
+       .
+     - Data handlers:
+       - Data providers (input)
+       - Data stores (output)
+       - Data movers (moving data from one component to another)
+       - Ensemble mergers (merging the outputs of ensemble members in the ensemble output)
+       .
+     .
+   - The core workflow of the framework consists of 1 or 2 modelling steps:
+     - A forecast model only
+     - A mapping model only
+     - A forecast model followed by a mapping model 
+     .
+   - Each model in the core workflow can consist of an ensemble of models of the same type.
+     - The core workflow can be run for a configurable number of time steps. 
+     - The core workflow can be run for a configurable pollutant.
+     - The time steps and the pollutant to run for can be specified as command line arguments.
+     .
+   .
+
+   \section p_req_nonfunc Non-functional requirements
+   - Following actions require no modification of the framework code nor do they require recompilation of 
+     the framework:
+     - Configuration of components
+     - Integration of new components
+     - Configuration of the core workflow
+     .
+   - The configuration of the workflow and the components must be
+     - Easy (minimize the requirement of extra tools to get the configuration right)
+     - Uniform (strive for a common configuration format for all components)
+     - Generic (allow future configuration parameters and constructs)
+     .
+   - The framework is platform independent. (less important)
+
+
+   \section s_design Design choices
+   OPAQ is implemented in C++ and the code will be built using the GNU Compiler Collection (gcc). 
+ */

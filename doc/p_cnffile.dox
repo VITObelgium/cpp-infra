@@ -1,0 +1,15 @@
+/**
+   \page p_cnf_file The OPAQ configuration file
+   
+   OPAQ uses a deployment-specific master configuration file which tells the framework what is available
+   in terms of plugins, components...
+
+   It is possible to include external XML files in the configuration tags for configuring OPAQ components via: 
+\verbatim
+<config ref="some_external_file.xml">
+</config>
+\endverbatim
+
+   This is off course optional and a user can choose to put the acutal XML configuration inside the "<config>" element
+   in the master file as well. 
+*/
