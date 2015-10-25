@@ -1,0 +1,47 @@
+
+#ignore object files
+*.[oa]
+*.lo
+*.la
+.deps
+.libs
+
+# emacs temp files
+*~
+
+opaq-*.tar.gz
+Makefile.in
+Makefile
+
+# the runfiles
+run/data
+run/networks
+
+# some of the autoconf generated stuff...
+aclocal.m4
+autom4te.cache/
+compile
+config.guess
+config.h
+config.h.in
+config.log
+config.status
+config.sub
+configure
+depcomp
+install-sh
+libtool
+ltmain.sh
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+missing
+stamp-h1
+test-driver
+
+
+#binaries
+src/opaq_core/opaq
+src/plugins/forecast/tools/ffsim/opaq_ffsim
