@@ -43,7 +43,7 @@ namespace OPAQ {
     if (!handle)
       throw FailedToLoadPluginException ("Failed to load library with name '" + pluginName
 					 + "' from file with name '" + filename + "': " + dlerror());
-    factory = dlsym(handle, "factory");
+    factory = (Component* (*)() ) dlsym(handle, "factory");
     if ((error = dlerror()) != NULL) {
       throw FailedToLoadPluginException ("Failed to fetch factory symbol from library with name '"
 					 + pluginName + "' in file with name '" + filename + "': " + error);
