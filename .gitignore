@@ -45,3 +45,9 @@ test-driver
 #binaries
 src/opaq_core/opaq
 src/plugins/forecast/tools/ffsim/opaq_ffsim
+src/opaq_core/tools/.dirstamp
+run/ovl_forecastdb.h5
+RemoteSystemTempFiles/
+.cproject
+.metadata/
+.project
