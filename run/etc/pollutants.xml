@@ -1,11 +1,11 @@
 <?xml version="1.0" ?>
 <pollutants>
-	    <pollutant id="81102" name="pm10" unit="ug/m3">Particulate Matter with diameter below 10 micron</pollutant>
-	    <pollutant id="81104" name="pm25" unit="ug/m3">Particulate Matter with diameter below 2.5 micron</pollutant>
-	    <pollutant id="42602" name="no2" unit="ug/m3">Nitrogen dioxide</pollutant>
-	    <pollutant id="42401" name="so2" unit="ug/m3">Sulphur dioxide</pollutant>
-	    <pollutant id="42101" name="co" unit="mg/m3">Carbon monoxide</pollutant>
-	    <pollutant id="44201" name="o3" unit="ug/m3">Ozone</pollutant>
-	    <pollutant id="45201" name="bzn" unit="ug/m3">Benzene</pollutant>
-	    <pollutant id="99000" name="AQI" unit="1">Chinese Air Quality Index</pollutant>
+  <pollutant id="81102" name="pm10" unit="ug/m3">Particulate Matter with diameter below 10 micron</pollutant>
+  <pollutant id="81104" name="pm25" unit="ug/m3">Particulate Matter with diameter below 2.5 micron</pollutant>
+  <pollutant id="42602" name="no2" unit="ug/m3">Nitrogen dioxide</pollutant>
+  <pollutant id="42401" name="so2" unit="ug/m3">Sulphur dioxide</pollutant>
+  <pollutant id="42101" name="co" unit="mg/m3">Carbon monoxide</pollutant>
+  <pollutant id="44201" name="o3" unit="ug/m3">Ozone</pollutant>
+  <pollutant id="45201" name="bzn" unit="ug/m3">Benzene</pollutant>
+  <pollutant id="99000" name="AQI" unit="1">Chinese Air Quality Index</pollutant>
 </pollutants>
