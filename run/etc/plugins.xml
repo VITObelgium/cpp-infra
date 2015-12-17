@@ -20,13 +20,23 @@
   </plugin>
 
   <plugin>
-    <name>forecastsPlugin</name>
-    <lib>Hdf5ForecastsStore.so</lib>
+    <name>h5dbPlugin</name>
+    <lib>Hdf5Buffer.so</lib>
   </plugin>
 
   <plugin>
-    <name>ffnetPlugin</name>
-    <lib>FeedForwardModel.so</lib>
+    <name>simpleAsciiForecastOutputPlugin</name>
+    <lib>SimpleAscForecastOutputWriter.so</lib>
   </plugin>
 
+  <plugin>
+    <name>OVL_model1</name>
+    <lib>OVL_IRCEL_model1.so</lib>
+  </plugin>
+
+  <plugin>
+    <name>OVL_model2</name>
+    <lib>OVL_IRCEL_model2.so</lib>
+  </plugin>
+  
 </plugins>

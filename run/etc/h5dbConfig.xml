@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<config>
+  <filename>opaq_fcdb.h5</filename>
+  <!-- typically a negative number to start filling the file with -9999 before the first basetime 
+       having a number >= 1 will not work since we cannot have startimes > the basetime -->
+  <offset>-20</offset>
+</config>
