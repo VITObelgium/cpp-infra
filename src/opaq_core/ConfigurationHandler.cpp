@@ -127,11 +127,14 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   // Parsing plugins section
   TiXmlDocument pluginsDoc;
   TiXmlElement * pluginsElement = XmlTools::getElement(rootElement, "plugins", &pluginsDoc);
+  std::string pluginPath = XmlTools::getText( pluginsElement, "pluginpath" );
+
   TiXmlElement * pluginElement = pluginsElement->FirstChildElement("plugin");
   while (pluginElement) {
     Config::Plugin plugin;
     plugin.setName(XmlTools::getText(pluginElement, "name"));
-    plugin.setLib(XmlTools::getText(pluginElement, "lib"));
+    std::string fullname = pluginPath + "/" + XmlTools::getText(pluginElement, "lib");
+    plugin.setLib( fullname );
     opaqRun.getPlugins().push_back(plugin);
     pluginElement = pluginElement->NextSiblingElement("plugin");
   }
