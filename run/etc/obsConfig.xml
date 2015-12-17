@@ -4,22 +4,8 @@
     <begin_offset>-36</begin_offset>
     <end_offset>72</end_offset>
   </range>
- 
-  <!-- 
-       dates in the rows, the hourly values start at the column given below 
-       for RIO file format this is 5
-       for LIBOVITO file format this is 2
-  -->
-  <start_column>2</start_column>
 
-  <!-- specify time resolution in minutes in the datafile -->
-  <time_interval>60</time_interval>
+  <clear_on_new_basetime>false</clear_on_new_basetime>
 
-  <!-- scaling the input data, the value is multiplied to the input values
-       inside OPAQ we work with µg/m3, so if input values are in mg/m3, you
-       need to put in 1000 -->
-  <scale>1000.</scale>
-
-  <!-- file pattern for the input -->
-  <file_pattern>./data/%POL%_%STATION%.txt</file_pattern>
+  <file_pattern>./data/obs/%POL%_data_rio.txt</file_pattern>
 </config>

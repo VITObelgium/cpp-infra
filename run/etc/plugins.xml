@@ -11,7 +11,7 @@
 
   <plugin>
     <name>obsPlugin</name>
-    <lib>AsciiObsProvider.so</lib>
+    <lib>RioObsProvider.so</lib>
   </plugin>
 
   <plugin>

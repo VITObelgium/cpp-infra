@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
   <!-- specify the networks -->
-  <ffnetfile_pattern>networks/%model%/%mcid%/%pol%/ffnet_%station%_%pol%_day%fc_hor%.xml</ffnetfile_pattern>
+  <ffnetfile_pattern>
+    networks/%pol%/09UT/day%fc_hor%/ffnet_%station%_%pol%_dayavg_model1_09UT-day%fc_hor%.xml
+  </ffnetfile_pattern>
   
   <!-- missing value -->
   <missing_value>-9999</missing_value>

@@ -20,6 +20,23 @@
     <parameter id="P13" nodata="-999" />
     <parameter id="P14" nodata="-999" />
     <parameter id="P15" nodata="-999" />
+    <parameter id="P16" nodata="-999" />
+    <parameter id="P17" nodata="-999" />
+    <parameter id="P18" nodata="-999" />
+    <parameter id="P19" nodata="-999" />
+    <parameter id="P20" nodata="-999" />
+    <parameter id="P21" nodata="-999" />
+    <parameter id="P22" nodata="-999" />
+    <parameter id="P23" nodata="-999" />
+    <parameter id="P24" nodata="-999" />
+    <parameter id="P25" nodata="-999" />
+    <parameter id="P26" nodata="-999" />
+    <parameter id="P27" nodata="-999" />
+    <parameter id="P28" nodata="-999" />
+    <parameter id="P29" nodata="-999" />
+    <parameter id="P30" nodata="-999" />
+    <parameter id="P31" nodata="-999" />
+    <parameter id="P32" nodata="-999" />
   </parameters>
-  <file_pattern>./meteo/FNL_%METEO%_%PARAMETER%.txt.gz</file_pattern>
+  <file_pattern>./meteo/BEL_%METEO%_%PARAMETER%.txt.gz</file_pattern>
 </config>
