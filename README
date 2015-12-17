@@ -9,7 +9,8 @@ The package uses the GNU autotools built system, when checking out, please first
 autogen.sh script to add the build structure. After that just ./configure; make; make install. 
 
 
-Prerequisites : 
+Prerequisites  
+*************
 
 OPAQ used a number of 3th party libraries for matrix algebra, logging and storage. 
 - Log4cxx
@@ -27,4 +28,13 @@ OPAQ was tested with
 - HDF5 1.8, note that the C++ bindings need to be present, this is checked inthe configure script
 
 Note that with some configuation options in the configure script such as --with-Eigen, 
-you can specify a non-default path to Eigen. 
+you can specify a non-default path to Eigen.
+
+
+Compilation & debugging
+*********************** 
+OPAQ uses the GNU autotools, which should make the compilation process fairly straight forward. There is a
+debugging configuration, which enables debugging symbols and turns of optimization. Turn it on using
+
+./configure --enable-debug=yes 
+

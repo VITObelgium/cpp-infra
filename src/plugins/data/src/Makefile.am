@@ -1,13 +1,16 @@
 if DEBUG
-DBGFLAGS = -g -DDEBUG
-endif
-
-AM_CXXFLAGS = -Wall -Wno-unused -O3 -fPIC -std=c++11 -fpermissive \
+AM_CXXFLAGS = -g -O0 -DDEBUG -Wall -Wno-unused -fPIC -std=c++11 -fpermissive \
               -I$(top_srcdir)/src/opaq_core $(HDF5_CPPFLAGS) \
               -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
               -I$(top_srcdir)/src/depend/gzstream-1.5 \
               -I$(LOG4CXX_INCLUDE)
-
+else
+AM_CXXFLAGS = -fPIC -std=c++11 -fpermissive \
+              -I$(top_srcdir)/src/opaq_core $(HDF5_CPPFLAGS) \
+              -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
+              -I$(top_srcdir)/src/depend/gzstream-1.5 \
+              -I$(LOG4CXX_INCLUDE)
+endif
 
 AM_LDFLAGS = -avoid-version -module -shared -export-dynamic
 

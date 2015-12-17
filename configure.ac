@@ -9,6 +9,9 @@ AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([foreign tar-ustar subdir-objects])
 
+#start with empty compiler flags
+${CFLAGS=""}
+${CXXFLAGS=""}
 
 # Checks for programs.
 AC_PROG_CXX

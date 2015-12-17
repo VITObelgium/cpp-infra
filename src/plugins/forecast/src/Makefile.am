@@ -1,15 +1,20 @@
 if DEBUG
-DBGFLAGS = -g -DDEBUG
-endif
-
-AM_CXXFLAGS = -Wall -Wno-unused -O3 -fPIC -std=c++11 -msse2 -fpermissive \
+AM_CXXFLAGS = -g -O0 -DDEBUG -Wall -Wno-unused -fPIC -std=c++11 -msse2 -fpermissive \
               -I$(top_srcdir)/src/opaq_core \
               $(HDF5_CPPFLAGS) \
               -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
               -I$(top_srcdir)/src/depend/gzstream-1.5 \
               -I$(LOG4CXX_INCLUDE) \
               -I$(EIGEN_PATH)
-
+else
+AM_CXXFLAGS = -O3 -fPIC -std=c++11 -msse2 -fpermissive \
+              -I$(top_srcdir)/src/opaq_core \
+              $(HDF5_CPPFLAGS) \
+              -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
+              -I$(top_srcdir)/src/depend/gzstream-1.5 \
+              -I$(LOG4CXX_INCLUDE) \
+              -I$(EIGEN_PATH)
+endif
 
 AM_LDFLAGS = -avoid-version -module -shared -export-dynamic
 
@@ -32,6 +37,6 @@ pkglib_LTLIBRARIES = OVL_IRCEL_model1.la\
 
 OVL_IRCEL_model1_la_SOURCES = $(MPL_FeedForwardSources) OVL_IRCEL_model1.cpp OVL_IRCEL_model1.h
 OVL_IRCEL_model1_la_LIBADD  = $(top_srcdir)/src/opaq_core/libopaq.la
-                            
+
 OVL_IRCEL_model2_la_SOURCES = $(MPL_FeedForwardSources) OVL_IRCEL_model2.cpp OVL_IRCEL_model2.h
 OVL_IRCEL_model2_la_LIBADD  = $(top_srcdir)/src/opaq_core/libopaq.la

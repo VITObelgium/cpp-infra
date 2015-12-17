@@ -1,16 +1,21 @@
 if DEBUG
-DBGFLAGS = -g -DDEBUG
-endif
-
-AM_CXXFLAGS = -Wall -Wno-unused -O3 -fPIC -fpermissive -std=c++11 \
-           $(HDF5_CPPFLAGS) \
+# enable debugging symbols and no optimization
+AM_CXXFLAGS = -g -O0 -DDEBUG -Wall -Wno-unused -fPIC -fpermissive -std=c++11 $(HDF5_CPPFLAGS) \
            -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
            -I$(top_srcdir)/src/depend/gzstream-1.5 \
            -I$(LOG4CXX_INCLUDE)
+else
+#include optimization
+AM_CXXFLAGS = -O3 -fPIC -fpermissive -std=c++11 $(HDF5_CPPFLAGS) \
+           -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
+           -I$(top_srcdir)/src/depend/gzstream-1.5 \
+           -I$(LOG4CXX_INCLUDE)
+endif
 
 AM_LDFLAGS  = -L$(top_srcdir)/src/depend/gzstream-1.5 -lgzstream \
               -L$(top_srcdir)/src/depend/TinyXML-2.6.2 -ltinyxml \
               $(LOG4CXX) $(HDF5_LDFLAGS) $(HDF5_LIBS)
+
 
 libopaq_la_LDFLAGS = $(AM_LDFLAGS) -release $(VERSION)
 
