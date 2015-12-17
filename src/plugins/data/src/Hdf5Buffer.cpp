@@ -5,8 +5,6 @@
  *      Author: Stijn.VanLooy@vito.be
  */
 
-#include <opaq/common.h>
-
 #include "Hdf5Buffer.h"
 
 namespace OPAQ {
@@ -382,9 +380,9 @@ void Hdf5Buffer::_createFile(const std::string & filename) {
     att.write( Hdf5Tools::stringType, ss.str().substr(0,10) );
     att.close();    
 
-    att = rootGroup.createAttribute( "OPAQ_VERSION", Hdf5Tools::stringType, att_space);
-    att.write( Hdf5Tools::stringType, OPAQ::Version );
-    att.close();
+//    att = rootGroup.createAttribute( "OPAQ_VERSION", Hdf5Tools::stringType, att_space);
+//    att.write( Hdf5Tools::stringType, OPAQ_VERSION );
+//    att.close();
 
     att = rootGroup.createAttribute( "H5FORECASTSTORE_VERSION", Hdf5Tools::stringType, att_space);
     att.write( Hdf5Tools::stringType, Hdf5BufferVersion );

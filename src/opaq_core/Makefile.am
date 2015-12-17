@@ -2,7 +2,7 @@ if DEBUG
 DBGFLAGS = -g -DDEBUG
 endif
 
-AM_CXXFLAGS = -Wall -Wno-unused -O3 -fPIC -fpermissive \
+AM_CXXFLAGS = -Wall -Wno-unused -O3 -fPIC -fpermissive -std=c++11 \
            $(HDF5_CPPFLAGS) \
            -I$(top_srcdir)/src/depend/TinyXML-2.6.2 -DTIXML_USE_STL \
            -I$(top_srcdir)/src/depend/gzstream-1.5 \
@@ -26,7 +26,6 @@ ConfigurationHandler.cpp\
 DateTime.cpp\
 Engine.cpp\
 ForecastHorizon.cpp\
-ForecastHorizonsCollector.cpp\
 Grid.cpp\
 Model.cpp\
 Point.cpp\
@@ -35,15 +34,15 @@ PollutantManager.cpp\
 Station.cpp\
 TimeInterval.cpp\
 config/Component.cpp\
-config/Ensemble.cpp\
 config/OpaqRun.cpp\
 config/Plugin.cpp\
-config/Singleton.cpp\
-config/Stage.cpp\
-data/DataMerger.cpp\
+config/ForecastStage.cpp\
+config/MappingStage.cpp\
+data/DataBuffer.cpp\
 data/DataProvider.cpp\
 data/DataStore.cpp\
 data/GridProvider.cpp\
+data/ForecastOutputWriter.cpp\
 tools/AQNetworkTools.cpp\
 tools/DateTimeTools.cpp\
 tools/FileTools.cpp\

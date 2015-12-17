@@ -5,6 +5,8 @@
 #include "Exceptions.h"
 
 namespace OPAQ {
+
+  class ComponentManager; 
   
   /**
      \brief The base class for an OPAQ component
@@ -14,6 +16,13 @@ namespace OPAQ {
      configure function, which each of the dauther classes need to implement.
   */
   class Component {
+
+    /**
+       Declare the component manager as a friend as it has to be able to 
+       set the name of the component via private setName method
+    */
+    friend class ComponentManager; 
+    
   public:
     Component(); 
     virtual ~Component(); 
@@ -24,6 +33,12 @@ namespace OPAQ {
      * @throws BadConfigurationException if the component failed to configure using the provided configuration
      */
     virtual void configure (TiXmlElement * configuration) throw (BadConfigurationException) = 0;
+
+    const std::string & getName( void ){ return name; }
+
+  private:
+    void setName( const std::string & componentName ){ name = componentName; }
+    std::string name; //!< the component name (from the XML) 
     
   };
   

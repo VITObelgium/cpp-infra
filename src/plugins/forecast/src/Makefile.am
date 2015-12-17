@@ -14,7 +14,7 @@ AM_CXXFLAGS = -Wall -Wno-unused -O3 -fPIC -std=c++11 -msse2 -fpermissive \
 AM_LDFLAGS = -avoid-version -module -shared -export-dynamic
 
 # The general forecast model sources, used by the different plugins 
-MPL_FeedForwardSources = MPL_FeedForwardModel.cpp \
+MPL_FeedForwardSources = MLP_FeedForwardModel.cpp \
                          MLP_FeedForwardModel.h \
                          Tune.cpp \
                          Tune.h \

@@ -188,6 +188,7 @@ namespace OPAQ {
 
     /**
        Convert the datetime to a string for easy output
+       Format is YYYY-MM-DD HH:MM:SS
     */
     std::string toString() const {
       std::ostringstream s;
@@ -195,6 +196,19 @@ namespace OPAQ {
       return s.str();
     }
     
+    /**
+       Convert only the date and not full datetime to string for easy output
+       format is YYYY-MM-DD
+    */
+    std::string dateToString() const {
+      std::ostringstream s;
+      DateTime d( this->getYear(), this->getMonth(), this->getDay() );
+      s << std::setw(4) << d._year << "-" << std::setw(2) << std::setfill('0')
+       << d._month << std::setw(1) << "-" << std::setw(2)
+       << std::setfill('0') << d._day;
+      return s.str();
+    }
+
     /** A friendly output streamer */
     friend std::ostream& operator<<(std::ostream& os, const DateTime& d);
 

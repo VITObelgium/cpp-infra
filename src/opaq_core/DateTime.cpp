@@ -10,7 +10,14 @@
 
 namespace OPAQ {
 
-DateTime::DateTime() {}
+DateTime::DateTime() {
+    _year  = 0;
+    _month = 0;
+    _day   = 0;
+    _hour  = 0;
+    _min   = 0;
+    _sec   = 0;
+}
 
 const DateTime DateTime::operator+ (const TimeInterval &timeInterval) const {
 	DateTime out = *this;

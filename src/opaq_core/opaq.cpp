@@ -33,7 +33,20 @@ void print_usage( void ) {
 }
 
 void print_welcome( log4cxx::LoggerPtr logger ) {
-  logger->info("Welcome to OPAQ - v." + OPAQ_VERSION);
+
+  std::cout << "  ______   .______      ___       ______      " << std::endl;
+  std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
+  std::cout << "|  |  |  | |  |_)  |  /  ^  \\   |  |  |  |    " << std::endl;
+  std::cout <<   "|  |  |  | |   ___/  /  /_\\  \\  |  |  |  |    " << std::endl;
+  std::cout <<   "|  `--'  | |  |     /  _____  \\ |  `--'  '--. " << std::endl;
+  std::cout <<   " \\______/  | _|    /__/     \\__\\ \\_____\\_____\\" << std::endl;
+  std::cout  << std::endl;
+  std::cout <<   "Welcome to OPAQ - v." << OPAQ_VERSION  << std::endl;
+  std::cout <<   "Created by Bino Maiheu, Stijn van Looy"  << std::endl;
+  std::cout <<   "Copyright VITO (c) 2015, all rights reserved"  << std::endl;
+  std::cout <<   "Contact: bino.maiheu@vito.be"  << std::endl;
+  std::cout  << std::endl;
+
 }
 
 
@@ -108,9 +121,13 @@ int main (int argc, char* argv[]) {
   
   // overwrite a few of the standard run options by the command line options here...
   // 1. pollutant
+
+  //TODO do not run for a single pollutant, but for all --> accomodate multi-pollutant models
   if ( pol.size() > 0 ) ch.getOpaqRun()->setPollutantName( pol );
   else pol = ch.getOpaqRun()->getPollutantName();
   logger->info("Requested pollutant ....... : " + pol);
+
+
   // 2. base times
   if (basetime.size() > 0) {
 	  std::vector<OPAQ::DateTime> * basetimes = &(ch.getOpaqRun()->getBaseTimes());
@@ -128,7 +145,7 @@ int main (int argc, char* argv[]) {
 		  baseTime.addDays(1);
 	  }
   }
-  std::vector<OPAQ::DateTime> * basetimes = &(ch.getOpaqRun()->getBaseTimes());
+  std::vector<OPAQ::DateTime> *basetimes = &(ch.getOpaqRun()->getBaseTimes());
   logger->info("Requested base times:");
   std::vector<OPAQ::DateTime>::iterator it = basetimes->begin();
   while (it != basetimes->end()) {

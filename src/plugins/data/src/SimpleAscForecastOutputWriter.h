@@ -6,8 +6,7 @@
 #ifndef SIMPLEASCFORECASTOUTPUTWRITER_H_
 #define SIMPLEASCFORECASTOUTPUTWRITER_H_
 
-#include <opaq/pfw.h>
-#include <opaq/common.h>
+#include <opaq.h>
 
 namespace OPAQ {
 

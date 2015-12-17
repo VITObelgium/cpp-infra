@@ -6,7 +6,6 @@
 
 namespace nnet {
 
-
   // class to scale from original data x to normalised data y
   // base class implements an empty scaler, i.e. no normalisation
   // derived classes implement scaling functionality
@@ -45,11 +44,11 @@ namespace nnet {
     int apply( Eigen::Ref<Eigen::VectorXd> x );
     int reverse( Eigen::Ref<Eigen::VectorXd> y );
   private:
+    double   _ymean;
+    double   _ystd;
     Eigen::VectorXd _xmean;
     Eigen::VectorXd _xstd;
 
-    double   _ymean;
-    double   _ystd;
   };
     
   
@@ -62,11 +61,10 @@ namespace nnet {
     int apply( Eigen::Ref<Eigen::VectorXd> x );
     int reverse( Eigen::Ref<Eigen::VectorXd> y );
   private:
-    Eigen::VectorXd _xmin;
-    Eigen::VectorXd _xmax;
-
     double   _ymin;
     double   _ymax;
+    Eigen::VectorXd _xmin;
+    Eigen::VectorXd _xmax;
   };
   
   

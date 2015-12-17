@@ -71,21 +71,4 @@ int StringTools::find (char * list [], unsigned int listSize, const std::string 
 	return -1;	// not found
 }
 
-
-char* StringTools::trim( char *str ) {
-
-  char *end;
-  // Trim leading space
-  while(isspace(*str)) str++;
-  if(*str == 0) return str;
-  // Trim trailing space
-  end = str + strlen(str) - 1;
-  while(end > str && isspace(*end)) end--;
-  // Write new null terminator
-  *(end+1) = 0;
-  
-  return str;
-}
-
-
 } /* namespace test */

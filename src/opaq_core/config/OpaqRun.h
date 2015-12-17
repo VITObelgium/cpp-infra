@@ -12,12 +12,14 @@
 #include <tinyxml.h>
 #include <vector>
 
-#include "../Logger.h"
 #include "Component.h"
-#include "Stage.h"
+#include "ForecastStage.h"
+#include "MappingStage.h"
 #include "Plugin.h"
+#include "../Logger.h"
 #include "../Pollutant.h"
 #include "../DateTime.h"
+#include "../ForecastHorizon.h"
 
 namespace OPAQ {
 
@@ -38,6 +40,7 @@ namespace OPAQ {
 
       /** Returns a list of available plugins */
       std::vector<OPAQ::Config::Plugin>    & getPlugins() { return plugins; }
+
       /** Returns a list of available components */
       std::vector<OPAQ::Config::Component> & getComponents() { return components; }
 
@@ -47,15 +50,17 @@ namespace OPAQ {
 
       /** Returns a list of basetimes */
       std::vector<OPAQ::DateTime> & getBaseTimes() { return baseTimes; }
+
       /** Returns the nework provider */
       OPAQ::Config::Component *getNetworkProvider() const { return networkProvider; }
       /** Returns the grid provider */
       OPAQ::Config::Component *getGridProvider() const { return gridProvider; }
     
-      /** Retrieve the forecast stage object */
-      OPAQ::Config::Stage* getForecastStage() const { return forecastStage;  }
+      /** Retrieve the forecast configuration object */
+      OPAQ::Config::ForecastStage* getForecastStage() const { return forecastStage;  }
+
       /** Retrieve the mapping stage object */
-      OPAQ::Config::Stage* getMappingStage() const { return mappingStage; }
+      OPAQ::Config::MappingStage* getMappingStage() const { return mappingStage; }
 
       /** Set the requested pollutant name for this run */
       void setPollutantName( std::string & name ) {
@@ -76,9 +81,10 @@ namespace OPAQ {
       void setGridProvider (OPAQ::Config::Component * component) {this->gridProvider = component; }
 
       /** Set the forecast stage */
-      void setForecastStage(OPAQ::Config::Stage* forecastStage) { this->forecastStage = forecastStage;  }
+      void setForecastStage(OPAQ::Config::ForecastStage* forecastStage) { this->forecastStage = forecastStage;  }
+
       /** Set the mapping stage */
-      void setMappingStage(OPAQ::Config::Stage* mappingStage) { this->mappingStage = mappingStage; }
+      void setMappingStage(OPAQ::Config::MappingStage* mappingStage) { this->mappingStage = mappingStage; }
 
 
 private:
@@ -89,12 +95,12 @@ private:
       bool pollutantSet;
 
       std::vector<OPAQ::DateTime> baseTimes;
+
       OPAQ::Config::Component *networkProvider; //!< the network provider
       OPAQ::Config::Component *gridProvider;	//!< the grid provider
 
-      OPAQ::Config::Stage *forecastStage; //!< this defines the forecast stage in the OPAQ run
-      OPAQ::Config::Stage *mappingStage;  //!< this defines the mapping stage in the OPAQ run
-
+      OPAQ::Config::ForecastStage *forecastStage; //!< this defines the forecast configuration in the OPAQ run
+      OPAQ::Config::MappingStage  *mappingStage;  //!< this defines the mapping configuration in the OPAQ run
 
     };
 

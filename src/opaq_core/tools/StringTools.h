@@ -8,9 +8,6 @@
 #ifndef STRINGTOOLS_H_
 #define STRINGTOOLS_H_
 
-#include <ctype.h>
-#include <string.h>
-
 #include <string>
 #include <vector>
 
@@ -18,20 +15,17 @@ namespace OPAQ {
 
 class StringTools {
 public:
-  StringTools();
-  virtual ~StringTools();
-  
-  static bool replace(std::string& str, const std::string& from, const std::string& to);
-  static void replaceAll(std::string& str, const std::string& from, const std::string& to);
-  static std::vector<std::string> tokenize(const std::string &source,
-					   const char *delimiter = " \t\n\r\f", 
-					   const int delimiterCount = 5, bool keepEmpty = false);
-  static int find (char * list [], unsigned int listSize, const std::string & item);
-  
-  static char *trim( char *str );
+	StringTools();
+	virtual ~StringTools();
 
- private:
-  static size_t findFirstDelimiter (const std::string& str, const char *delimiter, const int delimiterCount, size_t prev);
+	static bool replace(std::string& str, const std::string& from, const std::string& to);
+	static void replaceAll(std::string& str, const std::string& from, const std::string& to);
+	static std::vector<std::string> tokenize(const std::string &source,
+			const char *delimiter = " \t\n\r\f", const int delimiterCount = 5, bool keepEmpty = false);
+	static int find (char * list [], unsigned int listSize, const std::string & item);
+
+private:
+	static size_t findFirstDelimiter (const std::string& str, const char *delimiter, const int delimiterCount, size_t prev);
 };
 
 } /* namespace test */

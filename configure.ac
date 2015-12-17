@@ -147,12 +147,12 @@ AC_OUTPUT(Makefile \
 	src/depend/gzstream-1.5/Makefile\
 	src/opaq_core/Makefile\
 	src/plugins/Makefile\
-        src/plugins/data/Makefile\
-        src/plugins/data/src/Makefile
-        src/plugins/forecast/Makefile\
-        src/plugins/forecast/src/Makefile\
-        src/plugins/forecast/tools/Makefile\
-        src/plugins/forecast/tools/ffsim/Makefile\
-        run/Makefile
+	src/plugins/data/Makefile\
+	src/plugins/data/src/Makefile
+	src/plugins/forecast/Makefile\
+	src/plugins/forecast/src/Makefile\
+	src/plugins/forecast/tools/Makefile\
+	src/plugins/forecast/tools/ffsim/Makefile\
+	run/Makefile
 )
 

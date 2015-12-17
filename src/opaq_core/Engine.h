@@ -12,17 +12,16 @@
 #include <tinyxml.h>
 
 #include <config/OpaqRun.h>
-#include <config/Singleton.h>
-#include <config/Ensemble.h>
+#include <config/ForecastStage.h>
+#include <config/MappingStage.h>
 
 #include <data/GridProvider.h>
 #include <data/DataProvider.h>
 #include <data/DataStore.h>
-#include <data/DataMerger.h>
+#include <data/ForecastOutputWriter.h>
 
 #include <Model.h>
 #include <AQNetworkProvider.h>
-#include <ForecastHorizonsCollector.h>
 #include <Logger.h>
 #include <PollutantManager.h>
 #include <ComponentManager.h>
@@ -58,10 +57,23 @@ namespace OPAQ {
   private:
     LOGGER_DEC();
     
+    /*
     void runStage(Config::Stage * stage, AQNetworkProvider * aqNetworkProvider,
 		  GridProvider * gridProvider, DateTime & baseTime,
 		  Pollutant * pollutant, ForecastHorizon * forecastHorizon,
 		  ForecastHorizonsCollector * fhCollector);
+    void runStage(Config::Stage * stage, AQNetworkProvider * aqNetworkProvider,
+		  GridProvider * gridProvider, DateTime & baseTime,
+		  Pollutant * pollutant, ForecastHorizon * forecastHorizon );
+
+    */
+
+    void runForecastStage( Config::ForecastStage *cnf, 
+			   AQNetworkProvider     *net, 
+			   Pollutant             *pol,
+			   DateTime              &baseTime );
+      
+
     void loadPlugins(std::vector<Config::Plugin> * plugins);
     void initComponents(std::vector<Config::Component> & components);
     

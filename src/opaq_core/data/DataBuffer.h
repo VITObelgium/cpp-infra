@@ -8,7 +8,7 @@
 #ifndef OPAQ_DATA_BUFFER_H_
 #define OPAQ_DATA_BUFFER_H_
 
-#include <opaq/pfw.h>
+#include <Component.h>
 #include <vector>
 #include "DataProvider.h"
 #include "../ForecastHorizon.h"

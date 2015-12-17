@@ -14,10 +14,9 @@
 #include <tools/FileTools.h>
 #include <tools/DateTimeTools.h>
 #include <config/OpaqRun.h>
-#include <config/Singleton.h>
-#include <config/Ensemble.h>
+#include <config/ForecastStage.h>
+#include <config/MappingStage.h>
 #include <PollutantManager.h>
-
 
 namespace OPAQ {
 
@@ -74,7 +73,9 @@ private:
     void clearConfig();
     OPAQ::Config::Plugin*    findPlugin (std::string & pluginName);
     OPAQ::Config::Component* findComponent (std::string & componentName);
-    OPAQ::Config::Stage*     parseStage (TiXmlElement * element);
+
+    Config::ForecastStage * parseForecastStage(TiXmlElement * element);
+    Config::MappingStage  * parseMappingStage(TiXmlElement * element);
     
     LOGGER_DEC();
 };

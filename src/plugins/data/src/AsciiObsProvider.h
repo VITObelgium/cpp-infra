@@ -8,12 +8,10 @@
 #ifndef ASCOBSPROVIDER_H_
 #define ASCOBSPROVIDER_H_
 
+#include <opaq.h>
 #include <fstream>
 #include <algorithm> 	// std::transform
 #include <string>
-
-// OPAQ includes
-#include "opaq.h"
 
 namespace OPAQ {
 
@@ -68,6 +66,14 @@ namespace OPAQ {
 					  const TimeInterval & endOffset, 
 					  const std::string & pollutant,
 					  const std::string & station);
+
+    virtual std::vector<double> getValues(const std::string & modelName, 
+					  const TimeInterval & beginOffset,
+					  const TimeInterval & endOffset, 
+					  const std::string & pollutant,
+					  const std::string & station){
+      throw RunTimeException( "AsciiObsProvider not quited for model data, only observations" );
+    }
     
     /**
      * The forecastHorizon parameter will be ignored.
@@ -77,6 +83,15 @@ namespace OPAQ {
 					  const std::string & pollutant,
 					  const std::string & station,
 					  const ForecastHorizon & forecastHorizon);
+
+    virtual std::vector<double> getValues(const std::string & modelName, 
+					  const TimeInterval & beginOffset,
+					  const TimeInterval & endOffset, 
+					  const std::string & pollutant,
+					  const std::string & station,
+					  const ForecastHorizon & forecastHorizon) {
+      throw RunTimeException( "AsciiObsProvider not quited for model data, only observations" );
+    }
     
     /**
      * The forecastHorizon parameter will be ignored

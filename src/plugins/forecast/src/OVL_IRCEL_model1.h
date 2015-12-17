@@ -1,12 +1,12 @@
 #ifndef __OVL_IRCEL_model1_H
 #define __OVL_IRCEL_model1_H
 
-#include <opaq/common.h>
-#include "FeedForwardModel.h"
+#include <opaq.h>
+#include "MLP_FeedForwardModel.h"
 
 namespace OPAQ {
 
-  class OVL_IRCEL_model1 : public OPAQ::FeedForwardModel {
+  class OVL_IRCEL_model1 : public OPAQ::MLP_FeedForwardModel {
 
   public:
     OVL_IRCEL_model1();

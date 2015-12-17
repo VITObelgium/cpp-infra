@@ -13,7 +13,7 @@
 
 // we can e.g. define namespaces per client for the plugin implementation...
 namespace OPAQ {
-
+  
   class XMLAQNetProvider : public OPAQ::AQNetworkProvider {
   public:
     XMLAQNetProvider();

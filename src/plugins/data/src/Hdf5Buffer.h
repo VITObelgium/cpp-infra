@@ -6,14 +6,7 @@
 #ifndef Hdf5Buffer_H_
 #define Hdf5Buffer_H_
 
-#include <opaq/common/Version.h>
-#include <opaq/common/data/DataBuffer.h>
-#include <opaq/common/DateTime.h>
-#include <opaq/common/tools/DateTimeTools.h>
-#include <opaq/common/tools/FileTools.h>
-#include <opaq/common/tools/Hdf5Tools.h>
-#include <opaq/common/Logger.h>
-
+#include <opaq.h>
 #include <H5Cpp.h>
 
 namespace OPAQ {

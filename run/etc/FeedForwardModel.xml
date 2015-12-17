@@ -1,28 +1,25 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
   <!-- specify the networks -->
-  <ffnetfile_pattern>networks/%model%/%pol%/ffnet_%station%_%pol%_day%fc_hor%.xml</ffnetfile_pattern>
+  <ffnetfile_pattern>
+    networks/%pol%/09UT/day%fc_hor%/ffnet_%station%_%pol%_%agg_str%_%model%_09UT-day%fc_hor%.xml
+  </ffnetfile_pattern>
 
   <!-- specify the maximum forecasthorizon, up to day+X -->
-  <max_fc_hor>2</max_fc_hor>
+  <max_fc_hor>4</max_fc_hor>
 
   <!-- missing value -->
   <missing_value>-9999</missing_value>
 
   <!-- morning aggregation time -->
-  <mor_agg>7</mor_agg>
+  <mor_agg>9</mor_agg>
 
   <!-- selected tune configuration to run with -->
-  <tune_selection>RMSE</tune_selection>
+  <tune_selection>rmse</tune_selection>
 
   <!-- list of available tunes, specifying the model input feature tag -->
-
-
-  <!-- TODO : STILL NEED TO PUT IN THE DEPENDENCE ON THE FORECAST HORIZON HERE -->
-
-
   <tunelist>
-    <tune name="RMSE">
+    <tune name="rmse">
       <pollutant name="pm10">
 	<station name="YZC001"><features>model-2-7CST</features><rtc></rtc></station>
 	<station name="YZC002"><features>model-2-7CST</features><rtc></rtc></station>

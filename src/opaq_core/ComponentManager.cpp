@@ -43,6 +43,7 @@ namespace OPAQ {
     if (!handle)
       throw FailedToLoadPluginException ("Failed to load library with name '" + pluginName
 					 + "' from file with name '" + filename + "': " + dlerror());
+    //BM funky function handle casting going on here :-)
     factory = (Component* (*)() ) dlsym(handle, "factory");
     if ((error = dlerror()) != NULL) {
       throw FailedToLoadPluginException ("Failed to fetch factory symbol from library with name '"
@@ -68,7 +69,10 @@ namespace OPAQ {
 
     // 2. find the factory method for the plugin, create an instance and configure it
     Component * component = createComponent(pluginName, configuration);
-    
+
+    // 2.1 store the component name in the component, to be returned by getName(); 
+    component->setName( componentName );
+
     // 3. store the instance in the instance map
     instanceMap.insert(std::make_pair(componentName, component));
     // 4. and return it

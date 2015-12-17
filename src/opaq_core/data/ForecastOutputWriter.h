@@ -9,7 +9,7 @@
 
 #include <string>
 
-#include <opaq/pfw.h>
+#include <Component.h>
 #include "DataBuffer.h"
 #include "../AQNetworkProvider.h"
 #include "../DateTime.h"

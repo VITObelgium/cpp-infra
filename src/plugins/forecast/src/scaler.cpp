@@ -87,7 +87,7 @@ namespace nnet {
 
   // MAP MINMAX IMPLEMENTATION
   mapminmax::mapminmax( TiXmlElement *cnf, int size, double ymin, double ymax ) : 
-    scaler(), _ymax(ymax), _ymin(ymin) {
+    scaler(), _ymin(ymin), _ymax(ymax) {
 
     std::string xmin_str, xmax_str;
 
