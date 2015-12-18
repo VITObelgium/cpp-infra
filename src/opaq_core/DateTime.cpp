@@ -5,6 +5,8 @@
  *      Author: Stijn.VanLooy@vito.be
  */
 
+#include <time.h>
+
 #include "DateTime.h"
 #include "TimeInterval.h"
 
@@ -30,5 +32,20 @@ const DateTime DateTime::operator- (const TimeInterval &timeInterval) const {
 	out.addSeconds(- timeInterval.getSeconds());
 	return out;
 }
+
+bool DateTime::isValid() const {
+
+	struct tm t;
+	t.tm_year = _year - 1900;
+	t.tm_mon  = _month-1;
+	t.tm_mday = _day;
+	t.tm_hour = _hour;
+	t.tm_min  = _min;
+	t.tm_sec  = _sec;
+
+	if ( mktime( &t ) < 0 ) return false;
+	return true;
+}
+
 
 }
