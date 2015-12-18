@@ -43,6 +43,11 @@ namespace OPAQ {
     }
     
     /**
+     * Checks whether the date/time is actually valid
+     */
+    bool isValid() const;
+
+    /**
        Given a julian day number, the year, month and day are set. 
 
        JD = NNNNNNNN is the julian date from an epoch
