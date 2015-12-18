@@ -113,15 +113,23 @@ public:
 	// given timestamp (as the at that time most recent value)
 	T valueAt( const DateTime& dt ) const throw(OutOfBoundsException);
 
+	// subset the timeseries, returns a new timeseries with the subset of the
+	// object
+	TimeSeries<T> select( const DateTime& t1, const DateTime& t2 ) const;
+
+
 protected:
 	std::vector<T>        _values;
 	std::vector<DateTime> _datetimes;
 };
 
 // empty constructor
-template <class T> TimeSeries<T>::TimeSeries(){}
+template <class T>
+TimeSeries<T>::TimeSeries(){}
+
 // copy constructor
-template <class T> TimeSeries<T>::TimeSeries( const TimeSeries<T>& ts ) {
+template <class T>
+TimeSeries<T>::TimeSeries( const TimeSeries<T>& ts ) {
 	_datetimes = std::vector<DateTime>( ts.size() );
 	_values    = std::vector<T>( ts.size() );
 	for ( unsigned int i=0; i<ts.size(); ++i ) {
@@ -130,7 +138,8 @@ template <class T> TimeSeries<T>::TimeSeries( const TimeSeries<T>& ts ) {
 	}
 }
 // assignement operator
-template <class T> TimeSeries<T> TimeSeries<T>::operator= ( const TimeSeries<T>& ts ) {
+template <class T>
+TimeSeries<T> TimeSeries<T>::operator= ( const TimeSeries<T>& ts ) {
 	if ( this == &ts ) return *this;
 	clear(); // clear the current object, will be set to new ts
 	_datetimes = std::vector<DateTime>( ts.size() );
@@ -142,7 +151,8 @@ template <class T> TimeSeries<T> TimeSeries<T>::operator= ( const TimeSeries<T>&
 }
 
 // insert function
-template <class T>  void TimeSeries<T>::insert( const DateTime& dt, const T& val )
+template <class T>
+void TimeSeries<T>::insert( const DateTime& dt, const T& val )
 		throw( OutOfBoundsException ) {
 
 	if ( ! dt.isValid() ) throw OPAQ::OutOfBoundsException( "invalid datetime given" );
@@ -173,7 +183,8 @@ template <class T>  void TimeSeries<T>::insert( const DateTime& dt, const T& val
 	return;
 }
 
-template <class T> void TimeSeries<T>::merge( const TimeSeries<T>& ts, bool overwrite ) {
+template <class T>
+void TimeSeries<T>::merge( const TimeSeries<T>& ts, bool overwrite ) {
 
 	for ( unsigned int i = 0; i < ts.size(); i++ ) {
 		if ( ! contains( ts.datetime(i) ) )
@@ -188,7 +199,8 @@ template <class T> void TimeSeries<T>::merge( const TimeSeries<T>& ts, bool over
 
 
 // remove function
-template <class T> void TimeSeries<T>::remove( const DateTime& dt ) {
+template <class T>
+void TimeSeries<T>::remove( const DateTime& dt ) {
 	if ( ! dt.isValid() ) return;
 	int i = index( dt );
 	if ( i >= 0 ) {
@@ -198,7 +210,8 @@ template <class T> void TimeSeries<T>::remove( const DateTime& dt ) {
 	return;
 }
 
-template <class T> void TimeSeries<T>::removeRange( const DateTime& dt1, const DateTime& dt2, bool with_ends ) {
+template <class T>
+void TimeSeries<T>::removeRange( const DateTime& dt1, const DateTime& dt2, bool with_ends ) {
 	if ( ! dt1.isValid() ) return;
 	if ( ! dt2.isValid() ) return;
 
@@ -225,7 +238,8 @@ template <class T> void TimeSeries<T>::removeRange( const DateTime& dt1, const D
 	return;
 }
 
-template <class T> void TimeSeries<T>::removeBefore( const DateTime &t ) {
+template <class T>
+void TimeSeries<T>::removeBefore( const DateTime &t ) {
 	if ( ! t.isValid() ) return;
 	int idx = indexOfLastBefore( t );
 	if ( idx < 0 ) {
@@ -235,7 +249,8 @@ template <class T> void TimeSeries<T>::removeBefore( const DateTime &t ) {
 	return;
 }
 
-template <class T> void TimeSeries<T>::removeAfter( const DateTime &t ) {
+template <class T>
+void TimeSeries<T>::removeAfter( const DateTime &t ) {
 	if ( ! t.isValid() ) return;
 	int idx = indexOfFirstAfter( t );
 	if ( idx < 0 ) {
@@ -245,7 +260,8 @@ template <class T> void TimeSeries<T>::removeAfter( const DateTime &t ) {
 	return;
 }
 
-template <class T> T TimeSeries<T>::valueAt( const DateTime& dt ) const
+template <class T>
+T TimeSeries<T>::valueAt( const DateTime& dt ) const
 		throw(OutOfBoundsException) {
 
 	if ( isEmpty() ) throw OPAQ::OutOfBoundsException( "empty timeseries" );
@@ -254,7 +270,20 @@ template <class T> T TimeSeries<T>::valueAt( const DateTime& dt ) const
 	return _values[ indexOfLastBefore( dt ) ];
 }
 
-template <class T> std::ostream& operator << (std::ostream& os, const TimeSeries<T>& ts ) {
+
+template <class T>
+TimeSeries<T> TimeSeries<T>::select( const DateTime& t1, const DateTime& t2 ) const {
+	TimeSeries<T> ts;
+	for ( unsigned int i = 0; i < size(); i++ ) {
+		if ( ( _datetimes[i] >= t1 ) && ( _datetimes[i] <= t2 ) ) ts.insert( _datetimes[i], _values[i] );
+		if ( _datetimes[i] > t2 ) break;
+	}
+	return ts;
+}
+
+
+template <class T>
+std::ostream& operator << (std::ostream& os, const TimeSeries<T>& ts ) {
    if ( ts.isEmpty() ) return os;
    for (unsigned int i=0; i<ts.size(); i++) {
       os << "[" << ts.datetime(i) << "] "  << ts.value(i)  << std::endl;
