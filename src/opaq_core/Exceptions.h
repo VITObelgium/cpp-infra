@@ -46,6 +46,8 @@ EXCEPTION(ElementNotFoundException);
 
 EXCEPTION(RunTimeException)
 
+EXCEPTION(OutOfBoundsException)
+
 } /* namespace opaq */
 
 #endif /* EXCEPTIONS_H_ */
