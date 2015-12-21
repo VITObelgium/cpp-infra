@@ -6,7 +6,7 @@
   <!-- give list of plugin components... -->
   <plugin>
     <name>meteoPlugin</name>
-    <lib>ECMWFMeteoProvider.so</lib>
+    <lib>IRCELMeteoProvider.so</lib>
   </plugin>
 
   <plugin>
