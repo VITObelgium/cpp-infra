@@ -30,6 +30,9 @@ public:
 	size_t size() const { return _datetimes.size(); }
 	bool   isEmpty() const { return ( _datetimes.size() == 0 ); }
 
+	const std::vector<T>& values( void ) { return _values; }
+	const std::vector<OPAQ::DateTime>& datetimes( void ) { return _datetimes; }
+
 	// ======================
 	// insert functionality
 	// ======================
