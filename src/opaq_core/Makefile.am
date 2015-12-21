@@ -32,6 +32,7 @@ DateTime.cpp\
 Engine.cpp\
 ForecastHorizon.cpp\
 Grid.cpp\
+Math.cpp\
 Model.cpp\
 Point.cpp\
 Pollutant.cpp\
@@ -45,6 +46,7 @@ config/ForecastStage.cpp\
 config/MappingStage.cpp\
 data/DataBuffer.cpp\
 data/DataProvider.cpp\
+data/MeteoProvider.cpp\
 data/DataStore.cpp\
 data/GridProvider.cpp\
 data/ForecastOutputWriter.cpp\
@@ -64,10 +66,11 @@ nobase_otherinclude_HEADERS = $(shell find . -type f -name '*.h')
 # see: http://www.gnu.org/savannah-checkouts/gnu/automake/manual/html_node/Sources.html
 BUILT_SOURCES = opaq.h
 opaq.h:
-	HEADERS=$(shell find . -type f -name *.h)
 	echo '#ifndef OPAQ_H_' > opaq.h
 	echo '#define OPAQ_H_' >> opaq.h
-	/bin/bash -c 'for header in $(HEADERS); do echo "#include \"$$header\"" >> opaq.h; done'
+	for header in $(shell find * -type f -name '*.h' -print); do \
+          echo "#include \"$$header\"" >> opaq.h; \
+        done
 	echo '#endif' >> opaq.h
 
 # the opaq binary
