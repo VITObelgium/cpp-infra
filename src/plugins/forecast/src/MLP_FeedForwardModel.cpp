@@ -149,7 +149,7 @@ namespace OPAQ {
    * Computes the mean of the array, taking into account the missing values..
    * just a helper routine
    */
-  double MLP_FeedForwardModel::mean_missing(std::vector<double> & list, double noData) {
+  double MLP_FeedForwardModel::mean_missing( const std::vector<double> & list, double noData) {
     double out = 0;
     int noDataCount = 0;
     auto it = list.begin();
@@ -168,7 +168,7 @@ namespace OPAQ {
    * Computes the max of the array, taking into account the missing values..
    * just a helper routine
    */
-  double MLP_FeedForwardModel::max_missing(std::vector<double> & list, double noData) {
+  double MLP_FeedForwardModel::max_missing( const std::vector<double> & list, double noData) {
     double out = std::numeric_limits<double>::min();
     auto it = list.begin();
 
@@ -183,7 +183,7 @@ namespace OPAQ {
    * Computes the min of the array, taking into account the missing values..
    * just a helper routine
    */
-  double MLP_FeedForwardModel::min_missing(std::vector<double> & list, double noData) {
+  double MLP_FeedForwardModel::min_missing( const std::vector<double> & list, double noData) {
     double out = std::numeric_limits<double>::max();
     auto it = list.begin();
 
