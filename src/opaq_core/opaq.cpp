@@ -37,10 +37,10 @@ void print_welcome( log4cxx::LoggerPtr logger ) {
   std::cout << "  ______   .______      ___       ______      " << std::endl;
   std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
   std::cout << "|  |  |  | |  |_)  |  /  ^  \\   |  |  |  |    " << std::endl;
-  std::cout <<   "|  |  |  | |   ___/  /  /_\\  \\  |  |  |  |    " << std::endl;
-  std::cout <<   "|  `--'  | |  |     /  _____  \\ |  `--'  '--. " << std::endl;
-  std::cout <<   " \\______/  | _|    /__/     \\__\\ \\_____\\_____\\" << std::endl;
-  std::cout  << std::endl;
+  std::cout << "|  |  |  | |   ___/  /  /_\\  \\  |  |  |  |    " << std::endl;
+  std::cout << "|  `--'  | |  |     /  _____  \\ |  `--'  '--. " << std::endl;
+  std::cout << " \\______/  | _|    /__/     \\__\\ \\_____\\_____\\" << std::endl;
+  std::cout << std::endl;
   std::cout <<   "Welcome to OPAQ - v." << OPAQ_VERSION  << std::endl;
   std::cout <<   "Created by Bino Maiheu, Stijn van Looy"  << std::endl;
   std::cout <<   "Copyright VITO (c) 2015, all rights reserved"  << std::endl;
@@ -93,7 +93,7 @@ int main (int argc, char* argv[]) {
       return 1;
       break;
     }
-   } /* while loop persing command line options */
+   } /* while loop parsing command line options */
 
    // initialize logging framework
    bool loggingViaConfigFile = initLogger(log_config);
@@ -106,13 +106,13 @@ int main (int argc, char* argv[]) {
    if (loggingViaConfigFile) {
 	   logger->info("Configured logging using " + log_config);
    } else {
-	   logger->info("log4cxx config file not found; falling back to console logger");
+	   logger->info("log4cxx configuration file not found; falling back to console logger");
    }
 
-   logger->info("Using OPAQ config in .... : " + config_file);
+   logger->info("Using OPAQ configuration in .... : " + config_file);
 
   /* -----------------------------------------------------------------------------------
-     Starting initialisation
+     Starting initialization
      --------------------------------------------------------------------------------- */
 
   // Parse configuration
@@ -147,12 +147,7 @@ int main (int argc, char* argv[]) {
   }
   std::vector<OPAQ::DateTime> *basetimes = &(ch.getOpaqRun()->getBaseTimes());
   logger->info("Requested base times:");
-  std::vector<OPAQ::DateTime>::iterator it = basetimes->begin();
-  while (it != basetimes->end()) {
-	  std::stringstream ss;
-	  ss << " " << *it++;
-	  logger->info(ss.str());
-  }
+  for ( auto it = basetimes->begin(); it != basetimes->end(); it++ ) logger->info( it->toString() );
   
   // validate configuration
   ch.validateConfiguration();
