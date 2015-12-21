@@ -39,6 +39,11 @@ namespace OPAQ {
       _year(yyyy), _month(mm), _day(dd), _hour(hour), _min(min), _sec(sec) {
     }
 
+    /** Construct a datetime from a given string, format should be YYYY-MM-DD HH:MM:SS, the
+     * HH:MM:SS can be omitted
+     */
+    DateTime( const std::string& s );
+
     ~DateTime() {
     }
     
