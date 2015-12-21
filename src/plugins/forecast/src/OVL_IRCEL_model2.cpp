@@ -1,7 +1,5 @@
 #include "OVL_IRCEL_model2.h"
 
-#define pi 3.141592654
-
 // a list of meteo variable names relevant for this model
 // we should acutally better put this in the config file and allow the user
 // to configure the ff model feature vector from the configuration
@@ -81,49 +79,55 @@ namespace OPAQ {
   /* ============================================================================
      Construct sample for the OVL_IRCEL_model2 configuration
      ========================================================================== */
-  int OVL_IRCEL_model2::makeSample( double *sample, OPAQ::Station *st, OPAQ::Pollutant *pol, 
-				    const OPAQ::DateTime &baseTime, 
-				    const OPAQ::DateTime &fcTime, 
-				    const OPAQ::ForecastHorizon &fc_hor ) {
+  int OVL_IRCEL_model2::makeSample( double *sample,
+		  	  	  	  	  	  	    OPAQ::Station *st,
+									OPAQ::Pollutant *pol,
+				    				const OPAQ::DateTime &baseTime,
+									const OPAQ::DateTime &fcTime,
+									const OPAQ::ForecastHorizon &fc_hor ) {
     
     int have_sample = 0; // return code, 0 for success
+    OPAQ::DateTime t1, t2;
 
     // -----------------------
     // Getting data providers --> stored in main model...
     // -----------------------
-    DataProvider *obs   = getInputProvider();
-    DataProvider *meteo = getMeteoProvider();
-    // AQNetwork    *net   = getAQNetworkProvider()->getAQNetwork();
+    DataProvider *obs    = getInputProvider();
+    MeteoProvider *meteo = getMeteoProvider();
     
     // -----------------------
     // Get the meteo input
     // -----------------------
-    // we shift the meteo basetime to the forecast timebase, i.e. dayN ! 
-    meteo->setBaseTime( fcTime );
-        
     // BLH for dayN, offsets relative from fcTime (set by setBaseTime in the meteo provider)
-    TimeInterval dayNbegin(0);
-    TimeInterval dayNend(18*3600); // 1x meteto TimeResultion aftrekken : - getTimeResolution();
-    std::vector<double> blh  = meteo->getValues( dayNbegin, dayNend, st->getMeteoId(), p_blh );
-    std::vector<double> cc   = meteo->getValues( dayNbegin, dayNend, st->getMeteoId(), p_cc );
+    t1 = fcTime + OPAQ::TimeInterval(0);
+    t2 = fcTime + OPAQ::TimeInterval(24*3600) - meteo->getTimeResolution();
+
+    TimeSeries<double> blh  = meteo->getValues( t1, t2, st->getMeteoId(), p_blh );
+    TimeSeries<double> cc   = meteo->getValues( t1, t2, st->getMeteoId(), p_cc );
     
+    t1 = fcTime - TimeInterval(12*3600); // dayN-1 : 12:00 to end, including 12:00
+    t2 = fcTime + TimeInterval(12*3600) - meteo->getTimeResolution(); // day N : 00:00 to 12:00 (excluding)
     
-    TimeInterval dayNm1Half(-12*3600);  // dayN-1 : 12:00 and 18:00
-    TimeInterval dayNHalf(6*3600);      // dayN   : 00:00 and 06:00
-    std::vector<double> wsp  = meteo->getValues( dayNm1Half, dayNHalf, st->getMeteoId(), p_wsp10m );
-    std::vector<double> wdir = meteo->getValues( dayNm1Half, dayNHalf, st->getMeteoId(), p_wdir10m );
+    TimeSeries<double> wsp  = meteo->getValues( t1, t2, st->getMeteoId(), p_wsp10m );
+    TimeSeries<double> wdir = meteo->getValues( t1, t2, st->getMeteoId(), p_wdir10m );
     
+
+    // do we have enough meteo info ?
+
     // calculate the windspeed u and v components from the wsp and wdir
     std::vector<double> u,v;
+
     u.resize(wsp.size());
     v.resize(wsp.size());
+
     for ( unsigned int ii=0; ii< u.size(); ii++ ) {
-      if ( ( wdir[ii] == meteo->getNoData( p_wdir10m ) ) || 
-	   ( wsp[ii]  == meteo->getNoData( p_wsp10m ) ) ) {
-	have_sample++;
+    	if ( ( wdir.value(ii) == meteo->getNoData( p_wdir10m ) ) ||
+    		 ( wsp.value(ii)  == meteo->getNoData( p_wsp10m ) ) ) {
+    		// increase the error count
+    		have_sample++;
       } else {
-	u[ii] = wsp[ii] * cos(pi*wdir[ii]/180);
-	v[ii] = wsp[ii] * sin(pi*wdir[ii]/180);
+    	  u[ii] = wsp.value(ii) * cos( OPAQ::Math::Pi * wdir.value(ii) / 180. );
+    	  v[ii] = wsp.value(ii) * sin( OPAQ::Math::Pi * wdir.value(ii) / 180. );
       }
     }
 
@@ -169,8 +173,8 @@ namespace OPAQ {
     // from climatology ?? or don't run forecast...
     sample[0] = log(1 + mean_missing( xx_morn, obs->getNoData() ) );     // PMMOR
     sample[1] = log(1 + mean_missing( xx_yest, obs->getNoData() ) );     // PMYEST
-    sample[2] = log(1 + mean_missing(blh,meteo->getNoData( p_blh ) ) );  // BLH
-    sample[3] = log(1 + mean_missing(cc, meteo->getNoData( p_cc  ) ) );  // MCC
+    sample[2] = log(1 + mean_missing(blh.values(),meteo->getNoData( p_blh ) ) );  // BLH
+    sample[3] = log(1 + mean_missing(cc.values(), meteo->getNoData( p_cc  ) ) );  // MCC
     sample[4] = mean_missing( u, -999 ); // wdir x
     sample[5] = mean_missing( v, -999 ); // wdir y
     sample[6] = weekend;                 // weekend
