@@ -1,15 +1,6 @@
 #include <opaq.h>
 #include "OVL_IRCEL_model1.h"
 
-#define pi 3.141592654
-
-void print_par( std::string title, const std::vector<double> &x ) {
-  std::cout << title;
-  for ( std::vector<double>::const_iterator it = x.begin(); it != x.end() ; ++it ) std::cout << " " << *it;
-  std::cout << std::endl;
-  return;
-}
-
 // a list of meteo variable names relevant for this model
 // we should acutally better put this in the config file and allow the user
 // to configure the ff model feature vector from the configuration
@@ -31,6 +22,7 @@ namespace OPAQ {
 
   OVL_IRCEL_model1::OVL_IRCEL_model1() {
     missing_value = -9999; // set default missing value, overwritting in xml config
+    mor_agg       = 9;
   }
 
   OVL_IRCEL_model1::~OVL_IRCEL_model1() {};
@@ -89,26 +81,26 @@ namespace OPAQ {
 				    const OPAQ::DateTime &baseTime, 
 				    const OPAQ::DateTime &fcTime, 
 				    const OPAQ::ForecastHorizon &fc_hor ) {
-    
-    int have_sample = 0; // return code, 0 for success
+
+	OPAQ::DateTime t1, t2;
+	int have_sample = 0; // return code, 0 for success
 
     // -----------------------
     // Getting data providers --> stored in main model...
     // -----------------------
     DataProvider *obs   = getInputProvider();
-    DataProvider *meteo = getMeteoProvider();
-    // AQNetwork    *net   = getAQNetworkProvider()->getAQNetwork();
+    MeteoProvider *meteo = getMeteoProvider();
     
     // -----------------------
     // Get the meteo input
     // -----------------------
-    // we shift the meteo basetime to the forecast timebase, i.e. dayN ! 
-    meteo->setBaseTime( fcTime );
-        
+
     // BLH for dayN, offsets relative from fcTime (set by setBaseTime in the meteo provider)
-    TimeInterval dayNbegin(0);
-    TimeInterval dayNend(18*3600); // 1x meteto TimeResultion aftrekken : - getTimeResolution();
-    std::vector<double> blh  = meteo->getValues( dayNbegin, dayNend, st->getMeteoId(), p_blh );
+    t1 = fcTime + OPAQ::TimeInterval(0);
+    t2 = fcTime + OPAQ::TimeInterval(24*3600) - meteo->getTimeResolution();
+    TimeSeries<double> blh  = meteo->getValues( t1, t2, st->getMeteoId(), p_blh );
+
+    // TODO check the number of
     
     // -----------------------------
     // get the morning concentration
@@ -129,7 +121,7 @@ namespace OPAQ {
     // from climatology ?? or don't run forecast...
     
     sample[0] = log(1 + mean_missing( xx_morn, obs->getNoData() ) );     // PMMOR
-    sample[1] = log(1 + mean_missing(blh,meteo->getNoData( p_blh ) ) );  // BLH
+    sample[1] = log(1 + mean_missing(blh.values(),meteo->getNoData( p_blh ) ) );  // BLH
     
     return have_sample;
   }
