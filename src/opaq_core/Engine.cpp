@@ -32,13 +32,11 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   obs->setBaseTime(baseTime);
   
   // Get meteo data provider (can be missing)
-  DataProvider *meteo = NULL;
+  MeteoProvider *meteo = NULL;
   try {
     Config::Component * component = cnf->getMeteo();
     std::string name = component->getName();
-    meteo = cm->getComponent<DataProvider>(name);
-    meteo->setAQNetworkProvider( net );
-    meteo->setBaseTime(baseTime);
+    meteo = cm->getComponent<MeteoProvider>(name);
   } catch (NullPointerException & e) {}
   
   // Get databuffer (can't be missing)
