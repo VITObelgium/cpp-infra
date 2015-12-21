@@ -5,6 +5,7 @@
  *      Author: Stijn.VanLooy@vito.be
  */
 
+#include <string.h>
 #include <time.h>
 
 #include "DateTime.h"
@@ -19,6 +20,22 @@ DateTime::DateTime() {
     _hour  = 0;
     _min   = 0;
     _sec   = 0;
+}
+
+
+DateTime::DateTime( const std::string& s ) {
+
+	struct tm t;
+
+	memset( &t, 0, sizeof(struct tm) );
+	strptime( s.c_str(), "%Y-%m-%d %H:%M%S", &t );
+
+	_year  = t.tm_year + 1900;
+	_month = t.tm_mon + 1;
+	_day   = t.tm_mday;
+	_hour  = t.tm_hour;
+	_min   = t.tm_min;
+	_sec   = t.tm_sec;
 }
 
 const DateTime DateTime::operator+ (const TimeInterval &timeInterval) const {
@@ -36,6 +53,7 @@ const DateTime DateTime::operator- (const TimeInterval &timeInterval) const {
 bool DateTime::isValid() const {
 
 	struct tm t;
+	memset( &t, 0, sizeof(struct tm) );
 	t.tm_year = _year - 1900;
 	t.tm_mon  = _month-1;
 	t.tm_mday = _day;
