@@ -13,6 +13,7 @@
 #include <Component.h>
 
 #include "data/DataProvider.h"
+#include "data/MeteoProvider.h"
 #include "data/DataBuffer.h"
 #include "data/GridProvider.h"
 #include "Pollutant.h"
@@ -48,7 +49,7 @@ public:
   virtual void setInputProvider(DataProvider * input) {
     this->input = input;
   }
-  virtual void setMeteoProvider(DataProvider * meteo) {
+  virtual void setMeteoProvider(MeteoProvider * meteo) {
     this->meteo = meteo;
   }
   virtual void setBuffer(DataBuffer * buffer) {
@@ -77,7 +78,7 @@ public:
     if (input == NULL) throw NullPointerException();
     return input;
   }
-  virtual DataProvider * getMeteoProvider() throw (NullPointerException) {
+  virtual MeteoProvider * getMeteoProvider() throw (NullPointerException) {
     if (meteo == NULL) throw NullPointerException();
     return meteo;
   }
@@ -95,7 +96,7 @@ private:
   AQNetworkProvider * aqNetworkProvider;
   GridProvider * gridProvider;
   DataProvider * input;
-  DataProvider * meteo;
+  MeteoProvider * meteo;
   DataBuffer   * buffer;
 };
 
