@@ -20,10 +20,15 @@ namespace OPAQ {
     TimeInterval();
     virtual ~TimeInterval();
     
+    enum Unit { Seconds, Minutes, Hours, Days };
+
     /** Construct a time interval from a number of seconds given */
     TimeInterval(long seconds) {
       this->_seconds = seconds;
     }
+
+    /** Construct a time interval with some units given */
+    TimeInterval( long value, TimeInterval::Unit unit );
 
     /** Construct a time interval from a begin date and an end date.
 	Both begin and end date are given by a OPAQ::DateTime object
