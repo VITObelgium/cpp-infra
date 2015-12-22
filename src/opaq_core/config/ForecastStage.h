@@ -14,7 +14,7 @@
 
 #include "Component.h"
 #include "../Exceptions.h"
-#include "../ForecastHorizon.h"
+#include "../TimeInterval.h"
 
 namespace OPAQ {
 
@@ -63,21 +63,14 @@ public:
     this->outputWriter = ow;
   }
 
-
-  OPAQ::Config::Component* getMerger() const { return merger; }
-  void setMerger(OPAQ::Config::Component* merger) { this->merger = merger; }
-
   // returns a list of models used in the forecast...
   std::vector<OPAQ::Config::Component*> & getModels() { return models; }
 
   /** Set the requested forecast horizon */
-  void setHorizon( int ndays ) {
-    OPAQ::ForecastHorizon f( 24*ndays );
-    fcHor = f;
-  }
+  void setHorizon( const OPAQ::TimeInterval& f ) { fcHor = f; }
 
   /** Returns the requested (max) forecast horizon for the forecasts */
-  OPAQ::ForecastHorizon & getHorizon() { return fcHor; }
+  OPAQ::TimeInterval& getHorizon() { return fcHor; }
 
 protected:
 
@@ -85,8 +78,6 @@ protected:
 private:
   // vector of models to run in the forecast
   std::vector<OPAQ::Config::Component *> models;
-
-  OPAQ::Config::Component * merger;
 
   // input data provider components
   OPAQ::Config::Component *values;
@@ -98,7 +89,7 @@ private:
   // output writer component
   OPAQ::Config::Component *outputWriter;
   
-  OPAQ::ForecastHorizon    fcHor;           //!< requested max forecast horizon
+  OPAQ::TimeInterval   fcHor;           //!< requested max forecast horizon
 };
 
 } /* namespace Config */
