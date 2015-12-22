@@ -68,17 +68,13 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
   }
 
 
-  /*
-    std::string mergerName = XmlTools::getText(ensembleElement, "merger");
-    ensemble->setMerger(findComponent(mergerName));
-  */
-
   try {
     int fc_hor_max = atoi( XmlTools::getText(element, "horizon").c_str() );
-    fcStage->setHorizon( fc_hor_max );
+    TimeInterval fc_hor( fc_hor_max, TimeInterval::Days );
+    fcStage->setHorizon( fc_hor );
   } catch ( ElementNotFoundException & e ) {
     logger->warn( "no forecast <horizon> given in forecast run configuration, using default 2" );
-    fcStage->setHorizon( 2 );
+    fcStage->setHorizon( TimeInterval( 2, TimeInterval::Days ) );
   }
 
   return fcStage;
