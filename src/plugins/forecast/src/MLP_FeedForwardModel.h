@@ -35,7 +35,7 @@ protected:
     virtual int makeSample( double *sample, OPAQ::Station *st, OPAQ::Pollutant *pol, 
 			    const OPAQ::DateTime &baseTime, 
 			    const OPAQ::DateTime &fcTime, 
-			    const OPAQ::ForecastHorizon &fc_hor ) = 0;
+			    const OPAQ::TimeInterval &fc_hor ) = 0;
     
     virtual std::string getFFNetFile( const std::string &pol_name, 
 				      const std::string &st_name, 
