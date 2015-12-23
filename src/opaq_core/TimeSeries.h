@@ -9,6 +9,7 @@
 #define SRC_OPAQ_CORE_TIMESERIES_H_
 
 #include <iostream>
+#include <fstream>
 #include <algorithm>
 #include "Exceptions.h"
 #include "DateTime.h"
@@ -30,8 +31,8 @@ public:
 	size_t size() const { return _datetimes.size(); }
 	bool   isEmpty() const { return ( _datetimes.size() == 0 ); }
 
-	const std::vector<T>& values( void ) { return _values; }
-	const std::vector<OPAQ::DateTime>& datetimes( void ) { return _datetimes; }
+	const std::vector<T>& values( void ) const { return _values; }
+	const std::vector<OPAQ::DateTime>& datetimes( void ) const { return _datetimes; }
 
 	// ======================
 	// insert functionality
@@ -120,6 +121,16 @@ public:
 	// object
 	TimeSeries<T> select( const DateTime& t1, const DateTime& t2 ) const;
 
+
+	// write the timeseries to a file
+	void write( std::string fname ) {
+	  std::ofstream fs;
+	  fs.open( fname, std::ios::out | std::ios::trunc ); // open for output & truncate if exists
+	  fs << *this;
+	  fs.close();
+	  return;
+	}
+	
 
 protected:
 	std::vector<T>        _values;
