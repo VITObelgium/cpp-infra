@@ -57,9 +57,6 @@ namespace OPAQ {
       return _seconds / 86400.0;
     }
 
-    /** A friendly output streamer */
-    friend std::ostream& operator<<(std::ostream& os, const TimeInterval& d);
-
     /**
      * operator+ overloaded
      */
@@ -70,20 +67,31 @@ namespace OPAQ {
 	 */
 	const TimeInterval operator-(const TimeInterval &other) const;
 
+    /**
+	 * operator!= overloaded
+	 */
+	bool operator!=(const TimeInterval &other) const;
+
+    /**
+	 * operator== overloaded
+	 */
+	bool operator==(const TimeInterval &other) const;
+
+
+	/** A friendly output streamer */
+	friend std::ostream& operator<<(std::ostream& os, const TimeInterval& d);
+
+	/**
+	 * operator* overloaded for multiplication with integer & unsigned integers
+	 */
+	friend TimeInterval operator*(int lhs, const TimeInterval& rhs );
+	friend TimeInterval operator*(const TimeInterval& lhs, int rhs );
+	friend TimeInterval operator*(unsigned int lhs, const TimeInterval& rhs );
+	friend TimeInterval operator*(const TimeInterval& lhs, unsigned int rhs );
+
   private:
     long _seconds;
   };
-  
-  inline std::ostream& operator<<(std::ostream& os, const TimeInterval& d) {
-    long days = d.getDays();
-    long hours = d.getHours() - (days * 24);
-    long minutes = d.getMinutes() - (days * 24 * 60) - (hours * 60);
-    long seconds = d.getSeconds() - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
-    os << days << " days, " << std::setw(2) << std::setfill('0') << hours
-       << std::setw(1) << ":" << std::setw(2) << minutes
-       << std::setw(1) << ":" << std::setw(2) << seconds;
-    return os;
-  }
-  
+
 } /* namespace OPAQ */
 #endif /* TIMEINTERVAL_H_ */
