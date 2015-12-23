@@ -22,6 +22,7 @@ libopaq_la_LDFLAGS = $(AM_LDFLAGS) -release $(VERSION)
 lib_LTLIBRARIES = libopaq.la
 
 libopaq_la_SOURCES =\
+Aggregation.cpp\
 AQNetwork.cpp\
 AQNetworkProvider.cpp\
 Cell.cpp\
@@ -30,7 +31,6 @@ ComponentManager.cpp\
 ConfigurationHandler.cpp\
 DateTime.cpp\
 Engine.cpp\
-ForecastHorizon.cpp\
 Grid.cpp\
 Math.cpp\
 Model.cpp\
@@ -44,10 +44,9 @@ config/OpaqRun.cpp\
 config/Plugin.cpp\
 config/ForecastStage.cpp\
 config/MappingStage.cpp\
-data/DataBuffer.cpp\
+data/ForecastBuffer.cpp\
 data/DataProvider.cpp\
 data/MeteoProvider.cpp\
-data/DataStore.cpp\
 data/GridProvider.cpp\
 data/ForecastOutputWriter.cpp\
 tools/AQNetworkTools.cpp\
