@@ -1,5 +1,6 @@
 #ifndef OPAQ_H_
 #define OPAQ_H_
+#include "Aggregation.h"
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
 #include "Cell.h"
@@ -12,15 +13,13 @@
 #include "config/Plugin.h"
 #include "ConfigurationHandler.h"
 #include "data/ForecastOutputWriter.h"
-#include "data/DataBuffer.h"
 #include "data/DataProvider.h"
 #include "data/GridProvider.h"
-#include "data/DataStore.h"
 #include "data/MeteoProvider.h"
+#include "data/ForecastBuffer.h"
 #include "DateTime.h"
 #include "Engine.h"
 #include "Exceptions.h"
-#include "ForecastHorizon.h"
 #include "Grid.h"
 #include "Logger.h"
 #include "Math.h"
