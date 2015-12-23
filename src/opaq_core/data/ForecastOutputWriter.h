@@ -10,10 +10,9 @@
 #include <string>
 
 #include <Component.h>
-#include "DataBuffer.h"
+#include "ForecastBuffer.h"
 #include "../AQNetworkProvider.h"
 #include "../DateTime.h"
-#include "../ForecastHorizon.h"
 
 
 namespace OPAQ {
@@ -28,22 +27,22 @@ namespace OPAQ {
 
     // some setters
     void setAQNetworkProvider( AQNetworkProvider *n ) { _net = n; }
-    void setBuffer( DataBuffer *buf ) { _buf = buf; }
-    void setForecastHorizon( OPAQ::ForecastHorizon *fc ) { _fcHor = fc; }
-    void setModelNames( std::vector<std::string> *list ) { _modelNames = list; }
+    void setBuffer( ForecastBuffer *buf ) { _buf = buf; }
+    void setForecastHorizon( OPAQ::TimeInterval *fc ) { _fcHor = fc; } // TODO : should not be a pointer... clear this up !!
+    void setModelNames( std::vector<std::string> *list ) { _modelNames = list; } // TODO : should not be a pointer... clearn this up !!
 
 
   protected:
-    DataBuffer*               getBuffer( void ) { return _buf; }
+    ForecastBuffer*           getBuffer( void ) { return _buf; }
     OPAQ::AQNetworkProvider*  getAQNetworkProvider( void ) { return _net; }
-    OPAQ::ForecastHorizon*    getForecastHorizon( void ) { return _fcHor; }
+    OPAQ::TimeInterval*       getForecastHorizon( void ) { return _fcHor; }
     std::vector<std::string>* getModelNames( void ) { return _modelNames; }
 
 
   private:
     OPAQ::AQNetworkProvider  *_net;
-    OPAQ::DataBuffer         *_buf;
-    OPAQ::ForecastHorizon    *_fcHor;
+    OPAQ::ForecastBuffer     *_buf;
+    OPAQ::TimeInterval       *_fcHor;
     std::vector<std::string> *_modelNames;
   };
 
