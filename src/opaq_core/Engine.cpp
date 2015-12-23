@@ -13,9 +13,9 @@ LOGGER_DEF(OPAQ::Engine)
 
 
 void Engine::runForecastStage( Config::ForecastStage *cnf, 
-			       AQNetworkProvider     *net, 
-			       Pollutant             *pol,
-			       DateTime              &baseTime ) {
+							   AQNetworkProvider     *net,
+							   Pollutant             *pol,
+							   DateTime              &baseTime ) {
 
   std::string name; 
 
@@ -23,13 +23,12 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   ComponentManager *cm = ComponentManager::getInstance();
   
   // Get max forecast horizon
-  ForecastHorizon forecastHorizon = cnf->getHorizon();
+  TimeInterval forecastHorizon = cnf->getHorizon();
 
   // Get observation data provider
   name = cnf->getValues()->getName();
   DataProvider *obs = cm->getComponent<DataProvider>(name);
   obs->setAQNetworkProvider( net );
-  obs->setBaseTime(baseTime);
   
   // Get meteo data provider (can be missing)
   MeteoProvider *meteo = NULL;
@@ -39,15 +38,13 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     meteo = cm->getComponent<MeteoProvider>(name);
   } catch (NullPointerException & e) {}
   
-  // Get databuffer (can't be missing)
+  // Get data buffer (can't be missing)
   name = cnf->getBuffer()->getName();
-  DataBuffer *buffer = cm->getComponent<DataBuffer>(name);
-  buffer->setBaseTime(baseTime);
+  ForecastBuffer *buffer = cm->getComponent<ForecastBuffer>(name);
   buffer->setAQNetworkProvider( net );
   
   // Get the forecast models to run
-  std::vector<Config::Component*>::iterator it =
-    cnf->getModels().begin();
+  std::vector<Config::Component*>::iterator it = cnf->getModels().begin();
 
   // Vector to store which models we have run (will be passed on to outputwriter)
   std::vector<std::string> modelNames;
@@ -81,8 +78,6 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   // an ensemble merger should basically be a model as well, but one which is
   // aware of the other models and should give back exactly what to map
   
-
-
   // Prepare and run the forecast output writer for 
   // this basetime & pollutant
   name = cnf->getOutputWriter()->getName();
@@ -97,181 +92,6 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
 
   return;
 }
-
-/*
-  void Engine::runStage(Config::Stage * stage, AQNetworkProvider * aqNetworkProvider,
-		      GridProvider * gridProvider, DateTime & baseTime, Pollutant * pollutant,
-		      ForecastHorizon * forecastHorizon ) {
-
-  ComponentManager * cm = ComponentManager::getInstance();
-
-  if (stage->isEnsemble()) {
-    Config::Ensemble * ensemble = (Config::Ensemble *) stage;
-    
-    // get input values data provider (can't be missing)
-    std::string name = ensemble->getValues()->getName();
-    DataProvider * values = cm->getComponent<DataProvider>(name);
-    values->setAQNetworkProvider(aqNetworkProvider);
-    values->setBaseTime(baseTime);
-    
-    // get meteo data provider (can be missing)
-    DataProvider * meteo = NULL;
-    try {
-      Config::Component * component = ensemble->getMeteo();
-      std::string name = component->getName();
-      meteo = cm->getComponent<DataProvider>(name);
-      meteo->setAQNetworkProvider(aqNetworkProvider);
-      meteo->setBaseTime(baseTime);
-    } catch (NullPointerException & e) {}
-    
-    // get historical forecasts data provider (can be missing)
-    DataProvider * historicalForecasts = NULL;
-    try {
-      Config::Component * component = ensemble->getHistoricalForecasts();
-      std::string name = component->getName();
-      historicalForecasts = cm->getComponent<DataProvider>(name);
-      historicalForecasts->setAQNetworkProvider(aqNetworkProvider);
-      historicalForecasts->setBaseTime(baseTime);
-    } catch (NullPointerException & e) {}
-    
-    
-    // get ensemble merger (can't be missing)
-    //name = ensemble->getMerger()->getName();
-    //DataMerger * merger = cm->getComponent<DataMerger>(name);
-    //merger->setBaseTime(baseTime);
-    //merger->setGridProvider(gridProvider);
-    
-    
-    
-    // get ensemble output store (can't be missing)
-    name = ensemble->getOutput()->getName();
-    DataBuffer *buffer = cm->getComponent<DataStore>(name);
-    buffer->setBaseTime(baseTime);
-    buffer->setGridProvider(gridProvider);
-    
-    std::vector<Config::Component*>::iterator it =
-      ensemble->getModels().begin();
-    while (it != ensemble->getModels().end()) {
-      // get mode
-      name = (*it++)->getName();
-      Model * model = cm->getComponent<Model>(name);
-      
-      // set ins and outs
-      model->setBaseTime(baseTime);
-      model->setPollutant(*pollutant);
-      model->setAQNetworkProvider(aqNetworkProvider);
-      model->setGridProvider(gridProvider);
-      model->setForecastHorizon(forecastHorizon);
-      model->setInputProvider(values);
-      model->setMeteoProvider(meteo);
-      model->setHistoricalForecastsProvider(historicalForecasts);
-
-      //model->setOutputStore(merger);
-      model->setOutputStore(buffer);
-      
-      // run the model up till the requested forecast horizon...
-      model->run();
-
-
-      // each model will dump it's data in the datastore
-    }
-
-    // run ensemble merger on the datastore
-    
-    
-
-    // HERE we need an output writer...
-    // optionally...
-    // outputWriter->setPollutant( *pollutant );
-    // outputWriter->setBaseTime( baseTime );
-    // outputWriter->setDataBuffer( buffer )
-    
-    // the configuration of the output writer contains what to 
-    // dump to the output...
-    // outputWriter->write( *pollutant, model, baseTime )
-      
-
-
-    
-    //if (fhCollector != NULL) {
-    //  // collect forecast horizons during forecast stage
-    //  fhCollector->setDataStore(output);
-    //  merger->merge(fhCollector);
-    //} else {
-    //  // no need to do this during mapping stage
-    //  merger->merge(output);
-    //}
-    
-
-  } else {
-    // singleton model
-    Config::Singleton * singleton = (Config::Singleton *) stage;
-    
-    // get input values data provider (can't be missing)
-    std::string name = singleton->getValues()->getName();
-    DataProvider * input = cm->getComponent<DataProvider>(name);
-    input->setAQNetworkProvider(aqNetworkProvider);
-    input->setBaseTime(baseTime);
-    
-    // get meteo data provider (can be missing)
-    DataProvider * meteo = NULL;
-    try {
-      Config::Component * component = singleton->getMeteo();
-      std::string name = component->getName();
-      meteo = cm->getComponent<DataProvider>(name);
-      meteo->setAQNetworkProvider(aqNetworkProvider);
-      meteo->setBaseTime(baseTime);
-    } catch (NullPointerException & e) {}
-    
-    // get historical forecasts data provider (can be missing)
-    DataProvider * historicalForecasts = NULL;
-    try {
-      Config::Component * component = singleton->getHistoricalForecasts();
-      std::string name = component->getName();
-      historicalForecasts = cm->getComponent<DataProvider>(name);
-      historicalForecasts->setAQNetworkProvider(aqNetworkProvider);
-      historicalForecasts->setBaseTime(baseTime);
-    } catch (NullPointerException & e) {}
-    
-    // get ensemble output store (can't be missing)
-    name = singleton->getOutput()->getName();
-    DataBuffer * output = cm->getComponent<DataStore>(name);
-    output->setBaseTime(baseTime);
-    output->setGridProvider(gridProvider);
-    
-    // get model
-    name = singleton->getModel()->getName();
-    Model * model = cm->getComponent<Model>(name);
-    
-    // set ins and outs
-    model->setBaseTime(baseTime);
-    model->setPollutant(*pollutant);
-    model->setAQNetworkProvider(aqNetworkProvider);
-    model->setGridProvider(gridProvider);
-    model->setForecastHorizon(forecastHorizon);
-    model->setInputProvider(input);
-    model->setMeteoProvider(meteo);
-    model->setHistoricalForecastsProvider(historicalForecasts);
-
-    
-    //if (fhCollector != NULL) {
-    //  // collect forecast horizons during forecast stage
-    //  fhCollector->setDataStore(output);
-    //  model->setOutputStore(fhCollector);
-    //} else {
-    //  // no need to do this during mapping stage
-    //  model->setOutputStore(output);
-    //}
-    
-    
-    // run the model
-    model->run();
-  }
-  
-}
- 
-*/
-
 
 /* =============================================================================
    MAIN WORKFLOW OF OPAQ
@@ -328,7 +148,7 @@ void Engine::run(Config::OpaqRun * config) {
   std::vector<DateTime> baseTimes = config->getBaseTimes();
   
   // Get the requested forecast horizon
-  OPAQ::ForecastHorizon fcHorMax = forecastStage->getHorizon();  
+  OPAQ::TimeInterval fcHorMax = forecastStage->getHorizon();
 
   logger->info("Starting OPAQ workflow...");
   std::cout << "Starting OPAQ workflow..." << std::endl;
