@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <math.h>
 
+#include <ctime>
+
 namespace OPAQ {
 
 	// forward declaration to avoid circular header references
@@ -205,7 +207,9 @@ namespace OPAQ {
       s << (*this);
       return s.str();
     }
-    
+
+
+
     /**
        Convert only the date and not full datetime to string for easy output
        format is YYYY-MM-DD
