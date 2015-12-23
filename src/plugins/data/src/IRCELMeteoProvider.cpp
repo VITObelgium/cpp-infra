@@ -59,11 +59,11 @@ void IRCELMeteoProvider::configure(TiXmlElement * configuration)
 	int res = atoi( resEl->GetText() );
 	if ( ( res != 1 ) && ( res != 2 ) && ( res != 3 ) && ( res != 4 ) && ( res != 6 ) && ( res != 8 ) )
 		throw BadConfigurationException( "invalid resolution, valid values are 1, 2, 3, 4, 6 and 8 hours !" );
-	_timeResolution = OPAQ::TimeInterval( 3600*res );
+	_timeResolution = OPAQ::TimeInterval( res, TimeInterval::Hours );
 	_nsteps = 24/res;
 
 	// -- parse start time
-	TiXmlElement *dateEl = configuration->FirstChildElement( "start_date" );
+	TiXmlElement *dateEl = configuration->FirstChildElement( "buffer_start" );
 	if ( dateEl ) {
 		_bufferStartDate = OPAQ::DateTime( dateEl->GetText() );
 		_bufferStartReq  = true;
@@ -95,9 +95,6 @@ OPAQ::TimeSeries<double> IRCELMeteoProvider::getValues(	const DateTime& t1,
 
 	_checkConfig();
 
-	OPAQ::TimeSeries<double> values;
-	values.clear();
-
 	// do we have the data in the buffer for this meteo ID ?
 	auto meteoIt = _buffer.find( meteoId );
 	if ( meteoIt == _buffer.end() ) {
@@ -108,7 +105,10 @@ OPAQ::TimeSeries<double> IRCELMeteoProvider::getValues(	const DateTime& t1,
 	}
 
 	// no data available for this meteoId: return empty vector
-	if ( meteoIt == _buffer.end() ) return values;
+	if ( meteoIt == _buffer.end() ) {
+		OPAQ::TimeSeries<double> empty;	empty.clear();
+		return empty;
+	}
 
 	// get buffered data
 	OPAQ::TimeSeries<double> ts = _getTimeSeries( meteoId, paramId );
