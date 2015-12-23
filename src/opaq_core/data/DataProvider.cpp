@@ -9,7 +9,10 @@
 
 namespace OPAQ {
 
-DataProvider::DataProvider() {}
+DataProvider::DataProvider() {
+	_AQNetworkProvider = 0;
+	_currentModel      = "";
+}
 
 DataProvider::~DataProvider() {}
 
