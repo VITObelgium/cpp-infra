@@ -14,10 +14,11 @@
 
 #include "data/DataProvider.h"
 #include "data/MeteoProvider.h"
-#include "data/DataBuffer.h"
+#include "data/ForecastBuffer.h"
 #include "data/GridProvider.h"
-#include "Pollutant.h"
+
 #include "AQNetworkProvider.h"
+#include "Pollutant.h"
 
 namespace OPAQ {
 
@@ -36,11 +37,10 @@ public:
   virtual void setPollutant(Pollutant & pollutant) {
     this->pollutant = pollutant;
   }
-  virtual void setForecastHorizon(ForecastHorizon * forecastHorizon) {
+  virtual void setForecastHorizon(TimeInterval * forecastHorizon) {
     this->forecastHorizon = forecastHorizon;
   }
-  virtual void setAQNetworkProvider(
-				    AQNetworkProvider * aqNetworkProvider) {
+  virtual void setAQNetworkProvider( AQNetworkProvider *aqNetworkProvider) {
     this->aqNetworkProvider = aqNetworkProvider;
   }
   virtual void setGridProvider(GridProvider * gridProvider) {
@@ -52,7 +52,7 @@ public:
   virtual void setMeteoProvider(MeteoProvider * meteo) {
     this->meteo = meteo;
   }
-  virtual void setBuffer(DataBuffer * buffer) {
+  virtual void setBuffer(ForecastBuffer * buffer) {
     this->buffer = buffer;
   }
   
@@ -62,7 +62,7 @@ public:
   virtual const Pollutant & getPollutant() {
     return pollutant;
   }
-  virtual ForecastHorizon * getForecastHorizon() throw (NullPointerException) {
+  virtual TimeInterval * getForecastHorizon() throw (NullPointerException) {
     if (forecastHorizon == NULL) throw NullPointerException();
     return forecastHorizon;
   }
@@ -82,7 +82,7 @@ public:
     if (meteo == NULL) throw NullPointerException();
     return meteo;
   }
-  virtual DataBuffer * getBuffer() throw (NullPointerException) {
+  virtual ForecastBuffer * getBuffer() throw (NullPointerException) {
     if (buffer == NULL) throw NullPointerException();
     return buffer;
   }
@@ -92,12 +92,12 @@ public:
 private:
   DateTime baseTime;
   Pollutant pollutant;
-  ForecastHorizon * forecastHorizon;
+  TimeInterval * forecastHorizon;
   AQNetworkProvider * aqNetworkProvider;
   GridProvider * gridProvider;
   DataProvider * input;
   MeteoProvider * meteo;
-  DataBuffer   * buffer;
+  ForecastBuffer   * buffer;
 };
 
 } /* namespace opaq */
