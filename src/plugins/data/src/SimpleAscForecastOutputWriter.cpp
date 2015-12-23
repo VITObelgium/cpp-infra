@@ -35,7 +35,7 @@ namespace OPAQ {
 
 
   void SimpleAscForecastOutputWriter::write( OPAQ::Pollutant *pol, 
-					     const OPAQ::DateTime &baseTime ) {
+					     	 	 	 	 	 const OPAQ::DateTime &baseTime ) {
 
     std::string fname = _filename; 
 
@@ -68,6 +68,7 @@ namespace OPAQ {
 
     OPAQ::AQNetwork *net = getAQNetworkProvider()->getAQNetwork();
     std::vector<Station *> stations = net->getStations();
+    /*
     
     // set the basetime in the buffer
     getBuffer()->setBaseTime( baseTime );
@@ -107,7 +108,7 @@ namespace OPAQ {
 	    fprintf( fp, " %f", val[0] );
 	  }
 
-	} /* while ( modelIt != getModelNames()->end() ) */
+	} // while ( modelIt != getModelNames()->end() )
 
 	fprintf( fp, "\n" );
 	
@@ -116,6 +117,8 @@ namespace OPAQ {
 
     } 
     
+	*/
+
     fclose(fp);
 
     return;
