@@ -15,16 +15,15 @@ endif
 AM_LDFLAGS = -avoid-version -module -shared -export-dynamic
 
 # the plugins
-pkglib_LTLIBRARIES = AsciiObsProvider.la \
-	IRCELMeteoProvider.la \
-	Hdf5Buffer.la \
-	RioObsProvider.la \
-	XMLAQNetProvider.la \
-	XmlGridProvider.la \
-	SimpleAscForecastOutputWriter.la
+pkglib_LTLIBRARIES = IRCELMeteoProvider.la \
+		     Hdf5Buffer.la \
+		     RioObsProvider.la \
+		     XMLAQNetProvider.la \
+		     XmlGridProvider.la \
+		     SimpleAscForecastOutputWriter.la
 
-AsciiObsProvider_la_SOURCES = AsciiObsProvider.cpp AsciiObsProvider.h
-AsciiObsProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
+#AsciiObsProvider_la_SOURCES = AsciiObsProvider.cpp AsciiObsProvider.h
+#AsciiObsProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
 
 #ECMWFMeteoProvider_la_SOURCES = ECMWFMeteoProvider.cpp ECMWFMeteoProvider.h
 #ECMWFMeteoProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
