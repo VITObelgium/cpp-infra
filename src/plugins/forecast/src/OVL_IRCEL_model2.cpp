@@ -84,7 +84,7 @@ namespace OPAQ {
 									OPAQ::Pollutant *pol,
 				    				const OPAQ::DateTime &baseTime,
 									const OPAQ::DateTime &fcTime,
-									const OPAQ::ForecastHorizon &fc_hor ) {
+									const OPAQ::TimeInterval &fc_hor ) {
     
     int have_sample = 0; // return code, 0 for success
     OPAQ::DateTime t1, t2;
@@ -112,7 +112,8 @@ namespace OPAQ {
     TimeSeries<double> wdir = meteo->getValues( t1, t2, st->getMeteoId(), p_wdir10m );
     
 
-    // do we have enough meteo info ?
+    // TODO do we have enough meteo info ?
+    std::cout << "TODO : check what is returned by the meteo getter" << std::endl;
 
     // calculate the windspeed u and v components from the wsp and wdir
     std::vector<double> u,v;
@@ -144,15 +145,17 @@ namespace OPAQ {
     // get the concentrations
     // -----------------------
     // basetime for the observation data provider is not changes
-    TimeInterval begYest(-24*3600);
-    TimeInterval endYest(-3600); //= - obs->getTimeResolution(); 
+    t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - TimeInterval( 1, TimeInterval::Days );
+    t2 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - obs->getTimeResolution();
     // 1x meteto TimeResultion aftrekken : - getTimeResolution();
-    std::vector<double> xx_yest = obs->getValues( begYest, endYest, pol->getName(), st->getName() );
+    OPAQ::TimeSeries<double> xx_yest = obs->getValues( t1, t2, st->getName(), pol->getName() );
     
-    TimeInterval begMor(0);
-    TimeInterval endMor((this->mor_agg-1)*3600); // met mor_agg uur of eentje aftrekken ????
-    std::vector<double> xx_morn = obs->getValues( begMor, endMor, pol->getName(), st->getName() );
     
+    t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY );
+    t2 = t1 + OPAQ::TimeInterval( this->mor_agg-1, TimeInterval::Hours );// met mor_agg uur of eentje aftrekken ????
+
+    OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st->getName(), pol->getName() ); // no aggregation
+
     /*
     printPar( "Retrieved pollutant info yesterday : ", xx_yest );
     printPar( "Retrieved pollutant info morning   : ", xx_morn );
@@ -171,8 +174,8 @@ namespace OPAQ {
     
     // add some more checks for missing values,  if sample not complete... either estimate value
     // from climatology ?? or don't run forecast...
-    sample[0] = log(1 + mean_missing( xx_morn, obs->getNoData() ) );     // PMMOR
-    sample[1] = log(1 + mean_missing( xx_yest, obs->getNoData() ) );     // PMYEST
+    sample[0] = log(1 + mean_missing( xx_morn.values(), obs->getNoData() ) );     // PMMOR
+    sample[1] = log(1 + mean_missing( xx_yest.values(), obs->getNoData() ) );     // PMYEST
     sample[2] = log(1 + mean_missing(blh.values(),meteo->getNoData( p_blh ) ) );  // BLH
     sample[3] = log(1 + mean_missing(cc.values(), meteo->getNoData( p_cc  ) ) );  // MCC
     sample[4] = mean_missing( u, -999 ); // wdir x
