@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<config>
+  <network>
+    <station name="40AB01" type="4" x="147285" y="219017" lon="4.32984796481247" lat="51.2810136905197" meteo="431_5136" desc="Antwerpen">pm10,bc</station>
+    <station name="40AB02" type="4" x="146729" y="225661" lon="4.32182021518486" lat="51.3407274941436" meteo="431_5136" desc="Berendrecht">pm10</station>
+    <station name="40AL01" type="2" x="151150" y="214030" lon="4.38522368489264" lat="51.2361942021347" meteo="431_5120" desc="Linkeroever">pm10,bc</station>
+    <station name="40AL02" type="4" x="140660" y="221640" lon="4.23483275356762" lat="51.3045207925805" meteo="416_5136" desc="Doel (Engelsesteenweg)">pm25,pm10</station>
+    <station name="40AL03" type="4" x="138320" y="216020" lon="4.20146039554634" lat="51.2539648829037" meteo="416_5120" desc="Beveren">pm25</station>
+    <station name="42M802" type="4" x="153884" y="216790" lon="4.42439900737739" lat="51.2609897097004" meteo="448_5120" desc="Antwerpen (Luchtbal)">pm10,no2,so2,bc</station>
+    <station name="42R801" type="3" x="154407" y="211080" lon="4.43182104741115" lat="51.2096625331407" meteo="448_5120" desc="Borgerhout">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="42R802" type="3" x="154390" y="211050" lon="4.43157741313105" lat="51.2093930114249" meteo="448_5120" desc="Borgerhout (Straatkant)">pm25,pm10,no2,bc</station>
+    <station name="42R811" type="2" x="158560" y="215807" lon="4.49136202838409" lat="51.2521034140774" meteo="448_5120" desc="Schoten">pm10,no2,o3,so2</station>
+    <station name="42R815" type="4" x="147446" y="211639" lon="4.33220643274275" lat="51.2146988186069" meteo="431_5120" desc="Zwijndrecht">pm10,no2,so2,bc</station>
+  </network>
+</config>
