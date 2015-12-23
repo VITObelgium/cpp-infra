@@ -25,7 +25,7 @@ namespace OPAQ {
     virtual int makeSample( double *sample, OPAQ::Station *st, OPAQ::Pollutant *pol, 
 			    const OPAQ::DateTime &baseTime, 
 			    const OPAQ::DateTime &fcTime, 
-			    const OPAQ::ForecastHorizon &fc_hor );
+			    const OPAQ::TimeInterval &fc_hor );
 
   private:
     std::string pattern;       //!< feed forward network file pattern
