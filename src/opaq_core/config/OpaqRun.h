@@ -19,7 +19,6 @@
 #include "../Logger.h"
 #include "../Pollutant.h"
 #include "../DateTime.h"
-#include "../ForecastHorizon.h"
 
 namespace OPAQ {
 
