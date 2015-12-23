@@ -1,11 +1,9 @@
 <?xml version="1.0" ?>
 <config>
-  <range>
-    <begin_offset>-36</begin_offset>
-    <end_offset>72</end_offset>
-  </range>
+	<!-- specify resolution of base data in minutes, for standard hourly RIO data this is 
+		 60 minutes in other words -->
+	<resolution>60</resolution>
 
-  <clear_on_new_basetime>false</clear_on_new_basetime>
-
-  <file_pattern>./data/obs/%POL%_data_rio.txt</file_pattern>
+	<!-- the file parttern for the observation files -->
+  	<file_pattern>./data/obs/%POL%_data_rio.txt</file_pattern>
 </config>
