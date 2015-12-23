@@ -20,6 +20,12 @@
   </component>
 
   <component>
+    <name>netDebug</name>
+    <plugin>netPlugin</plugin>
+    <config ref="etc/netConfigDebug.xml" />
+  </component>
+
+  <component>
     <!-- Use HDF5 forecast data buffer to provide and store the forecasted data -->
     <name>h5db</name>
     <plugin>h5dbPlugin</plugin>
