@@ -11,7 +11,7 @@
 
 namespace OPAQ {
 
-class Hdf5Buffer: public OPAQ::DataBuffer {
+class Hdf5Buffer: public OPAQ::ForecastBuffer {
 public:
   Hdf5Buffer();
   virtual ~Hdf5Buffer();
@@ -21,9 +21,16 @@ public:
   static const std::string START_DATE_NAME;        // attribute that holds the start date
   static const std::string FORECAST_DATASET_NAME;
   static const std::string BASETIME_DATASET_NAME;
+  static const std::string DIMENSIONS_NAME;
+  static const std::string DIMENSIONS;
+  static const std::string DESCRIPTION_NAME;
+  static const std::string DESCRIPTION;
+  static const std::string MODELS_DATASET_NAME;
+  static const std::string STATION_DATASET_NAME;
 
-  
+  // ==================================================
   // OPAQ::Component methods
+  // ==================================================
   /**
    * <!-- created if it does not exist, appended if it does -->
    * <filename>/path/to/datafile.h5</filename>
@@ -39,30 +46,62 @@ public:
   virtual void configure(TiXmlElement * configuration)
     throw (BadConfigurationException);
 
-
+  // ==================================================
   // OPAQ::DataProvider methods
-  virtual void setBaseTime(const DateTime & baseTime)
-    throw (BadConfigurationException);
-
-  virtual void setAQNetworkProvider(AQNetworkProvider * aqNetworkProvider);
-
+  // ==================================================
   /**
    * Returns the time resolution of the Hdf5Buffer, this returns
    * a TimeInterval object of 1 day. 
    */
   virtual TimeInterval getTimeResolution();
 
+  virtual TimeInterval getBaseTimeResolution();
+
   virtual double getNoData();
-  virtual double getNoData(const std::string & id);
 
-  
-  virtual std::pair<const TimeInterval, const TimeInterval> getRange();
+  virtual OPAQ::TimeSeries<double> getValues( const DateTime& t1,
+  		  	  	  	  	  	  	  	  	  	  const DateTime& t2,
+  											  const std::string& stationId,
+  											  const std::string& pollutantId,
+											  OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None );
 
-  virtual std::pair<const TimeInterval, const TimeInterval> getRange(
-			      const ForecastHorizon & forecastHorizon);
+  // the current model is already set by the DataProvider parent class
 
-  virtual unsigned int size();
+  // ==================================================
+  // OPAQ::ForecastBuffer methods
+  // ==================================================
+  /**
+   * Fill the Hdf5 file with the values given by the current basetime & the forecast
+   * horizon
+   */
+  virtual void setValues( const DateTime &baseTime,
+ 		  	  	  	  	  const OPAQ::TimeSeries<double>& forecast,
+ 						  const std::string& stationId,
+ 						  const std::string& pollutantId,
+ 						  OPAQ::Aggregation::Type aggr );
 
+  /**
+   * This routine retrieves the forecasted values for a specific base time
+   * as a function of forecast horizon, given by the vector of time intervals
+   */
+  virtual OPAQ::TimeSeries<double> getValues( const DateTime &baseTime,
+ 											  const std::vector<OPAQ::TimeInterval>& fc_hor,
+ 											  const std::string& stationId,
+ 											  const std::string& pollutantId,
+ 											  OPAQ::Aggregation::Type aggr );
+
+  /**
+   * This one gives the forecasts between the forecast times1 and 2 for a given fixed time lag (the
+   * fc_hor. This routine can be used to e.g. retieve the archived day+2 forecasts for a given period
+   * to e.g. calculate real time corrections
+   */
+   virtual OPAQ::TimeSeries<double> getValues( const OPAQ::TimeInterval fc_hor,
+           	  	  	  	  	  	  	  	  	  const DateTime &fcTime1,
+ 											  const DateTime &fcTime2,
+ 											  const std::string& stationId,
+ 											  const std::string& pollutantId,
+ 											  OPAQ::Aggregation::Type aggr );
+/*
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
 					const TimeInterval & endOffset, 
 					const std::string & parameter,
@@ -92,7 +131,7 @@ public:
   virtual std::vector<double> getValues(const std::string & parameter,
 					const TimeInterval & offset = TimeInterval(0),
 					const ForecastHorizon & forecastHorizon = ForecastHorizon(0));
-  
+*/
 
   // OPAQ::DataBuffer methods
   virtual void setNoData(double noData);
@@ -102,15 +141,14 @@ public:
    * . forecast horizons that don't lie on exact day boundaries
    * . number of values != number of forecast horizons
    */
+
+  /*
   virtual void setValues(const std::string &modelName,
 			 const std::vector<double> & values,
 			 const std::vector<ForecastHorizon> & forecastHorizons,
 			 const std::string & parameter, const std::string & station);
+   */
 
-  virtual void setValues(const std::string &modelName,
-			 const std::vector<double> & values,
-			 const std::string & id,
-			 const ForecastHorizon & forecastHorizon = ForecastHorizon(0));
 
 private:
   std::string _filename;  //!< filename for the buffer file
@@ -121,6 +159,9 @@ private:
   double   _noData;
   int      _offset;
 
+  TimeInterval _baseTimeResolution; //! the time resolution at which to store basetimes
+  TimeInterval _fcTimeResolution;   //! the time resolution at which to store the forecast values
+
   DateTime _startDate; //!< the start stored in the file (cannot add values before it)
 
   DateTime _baseTime;  //!< the basetime against which to offset the intervals given by the 
@@ -130,8 +171,6 @@ private:
   bool     _configured;  //!< Flag, true if the OPAQ::Component configuration went well
   bool     _baseTimeSet; //!< Flag, true if a basetime was given to the 
   
-  AQNetworkProvider *_aqNet;
-
 private:
   void _closeFile();
   
@@ -146,7 +185,7 @@ private:
    */
   void _checkIfExistsAndOpen();
 
-  void _calcStartDateAndOpenFile() throw (BadConfigurationException);
+  void _createOrOpenFile() throw (BadConfigurationException);
   
   void _createFile(const std::string & filename);
   
