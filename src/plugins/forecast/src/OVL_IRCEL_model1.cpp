@@ -79,9 +79,8 @@ namespace OPAQ {
   /* ============================================================================
      Construct sample for the OVL_IRCEL_model1 configuration
      ========================================================================== */
-  int OVL_IRCEL_model1::makeSample( double *sample, OPAQ::Station *st, OPAQ::Pollutant *pol, 
-				    const OPAQ::DateTime &baseTime, 
-				    const OPAQ::DateTime &fcTime, 
+  int OVL_IRCEL_model1::makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
+				    const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
 				    const OPAQ::TimeInterval &fc_hor ) {
 
 	OPAQ::DateTime t1, t2;
@@ -100,7 +99,7 @@ namespace OPAQ {
     // BLH for dayN, offsets relative from fcTime (set by setBaseTime in the meteo provider)
     t1 = fcTime + OPAQ::TimeInterval(0);
     t2 = fcTime + OPAQ::TimeInterval(24, TimeInterval::Hours ) - meteo->getTimeResolution();
-    TimeSeries<double> blh  = meteo->getValues( t1, t2, st->getMeteoId(), p_blh );
+    TimeSeries<double> blh  = meteo->getValues( t1, t2, st.getMeteoId(), p_blh );
 
     // write some debugging output to a file ...
     /*
@@ -124,7 +123,7 @@ namespace OPAQ {
     t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY );
     t2 = t1 + OPAQ::TimeInterval( this->mor_agg-1, TimeInterval::Hours );// met mor_agg uur of eentje aftrekken ????
 
-    OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st->getName(), pol->getName() ); // no aggregation
+    OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName() ); // no aggregation
     
 
     // -----------------------
