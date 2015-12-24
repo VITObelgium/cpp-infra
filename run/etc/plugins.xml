@@ -38,5 +38,10 @@
     <name>OVL_model2</name>
     <lib>OVL_IRCEL_model2.so</lib>
   </plugin>
+
+  <plugin>
+    <name>OVL</name>
+    <lib>OVL.so</lib>
+  </plugin>
   
 </plugins>
