@@ -70,6 +70,9 @@ public:
   // ==================================================
   // OPAQ::ForecastBuffer methods
   // ==================================================
+
+  virtual std::vector<std::string> getModelNames( const std::string& pollutantId, OPAQ::Aggregation::Type aggr );
+
   /**
    * Fill the Hdf5 file with the values given by the current basetime & the forecast
    * horizon
@@ -80,15 +83,32 @@ public:
  						  const std::string& pollutantId,
  						  OPAQ::Aggregation::Type aggr );
 
+
+
+  // =======================================================================
+  // TODO : ADD METHOD AS A FUNCTION OF MODEL AS WELL TO USE IN THE OUTPUT WRITER !!!
+  // =======================================================================
+
   /**
-   * This routine retrieves the forecasted values for a specific base time
-   * as a function of forecast horizon, given by the vector of time intervals
+   * Return all the model values for a given baseTime and forecast horizon. The given current model
+   * which is set in the DataProvider parent class is ignored here...
    */
-  virtual OPAQ::TimeSeries<double> getValues( const DateTime &baseTime,
- 											  const std::vector<OPAQ::TimeInterval>& fc_hor,
- 											  const std::string& stationId,
- 											  const std::string& pollutantId,
- 											  OPAQ::Aggregation::Type aggr );
+  virtual std::vector<double> getModelValues( const DateTime &baseTime,
+		                                      const OPAQ::TimeInterval& fc_hor,
+										      const std::string& stationId,
+										      const std::string& pollutantId,
+										      OPAQ::Aggregation::Type aggr );
+
+
+  /**
+    * This routine retrieves the forecasted values for a specific base time
+    * as a function of forecast horizon, given by the vector of time intervals
+    */
+   virtual OPAQ::TimeSeries<double> getValues( const DateTime &baseTime,
+  											  const std::vector<OPAQ::TimeInterval>& fc_hor,
+  											  const std::string& stationId,
+  											  const std::string& pollutantId,
+  											  OPAQ::Aggregation::Type aggr );
 
   /**
    * This one gives the forecasts between the forecast times1 and 2 for a given fixed time lag (the
