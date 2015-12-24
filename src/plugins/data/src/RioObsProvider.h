@@ -55,7 +55,7 @@ private:
   std::string         _pattern;
   bool                _configured;
 
-  int                 _nvalues; //< number of values on a line
+  unsigned int        _nvalues; //< number of values on a line
 
   // order of the map :
   // pollutant -> ( aggregation -> ( station -> data ) )
