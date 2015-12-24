@@ -21,6 +21,7 @@ class SimpleAscForecastOutputWriter : public OPAQ::ForecastOutputWriter {
 
   static const std::string BASETIME_PLACEHOLDER;
   static const std::string POLLUTANT_PLACEHOLDER;
+  static const std::string AGGREGATION_PLACEHOLDER;
 
   // OPAQ::Component methods
   virtual void configure(TiXmlElement * configuration)
@@ -28,7 +29,7 @@ class SimpleAscForecastOutputWriter : public OPAQ::ForecastOutputWriter {
 
 
   // OPAQ::ForecastOutputWriter methods
-  virtual void write( OPAQ::Pollutant *pol, const OPAQ::DateTime &baseTime );
+  virtual void write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime );
 
 private:
   std::string _filename;
