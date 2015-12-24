@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <iostream>
+#include <iterator>
+#include <vector>
+#include <string>
+
 #include "SimpleAscForecastOutputWriter.h"
 
 namespace OPAQ {
@@ -8,8 +13,10 @@ namespace OPAQ {
   LOGGER_DEF(SimpleAscForecastOutputWriter);
 
 
-  const std::string SimpleAscForecastOutputWriter::BASETIME_PLACEHOLDER = "%BASETIME%";
-  const std::string SimpleAscForecastOutputWriter::POLLUTANT_PLACEHOLDER = "%POL%";
+  const std::string SimpleAscForecastOutputWriter::BASETIME_PLACEHOLDER = "%basetime%";
+  const std::string SimpleAscForecastOutputWriter::POLLUTANT_PLACEHOLDER = "%pol%";
+  const std::string SimpleAscForecastOutputWriter::AGGREGATION_PLACEHOLDER = "%aggr%";
+
 
   SimpleAscForecastOutputWriter::SimpleAscForecastOutputWriter(){
   }
@@ -34,32 +41,34 @@ namespace OPAQ {
   }
 
 
-  void SimpleAscForecastOutputWriter::write( OPAQ::Pollutant *pol, 
+  void SimpleAscForecastOutputWriter::write( OPAQ::Pollutant *pol,
+		  	  	  	  	  	  	  	  	  	 OPAQ::Aggregation::Type aggr,
 					     	 	 	 	 	 const OPAQ::DateTime &baseTime ) {
 
     std::string fname = _filename; 
 
     if ( ! getBuffer() )            throw RunTimeException( "No databuffer set" );
-    if ( ! getModelNames() )        throw RunTimeException( "No model list available" ); 
-    if ( ! getForecastHorizon() )   throw RunTimeException( "Forecast horizon not set" );
-    if ( ! getAQNetworkProvider() ) throw RunTimeException("No AQ network set");
+    if ( ! getAQNetworkProvider() ) throw RunTimeException( "No AQ network set" );
 
     // translate the filename
-    StringTools::replaceAll(fname, BASETIME_PLACEHOLDER, baseTime.dateToString() );
     StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol->getName() );
+    StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, OPAQ::Aggregation::getName( aggr ) );
+    StringTools::replaceAll(fname, BASETIME_PLACEHOLDER, baseTime.dateToString() );
 
-    // TODO : what to do if file exists...
     logger->info( "writing output file " + fname );
     FILE *fp = fopen( fname.c_str(), "w" );
-    if ( ! fp )throw RunTimeException( "Unable to open output file " + fname );
+    if ( ! fp ) throw RunTimeException( "Unable to open output file " + fname );
     
     // print header
     fprintf( fp, "# OPAQ Forecast\n" );
     fprintf( fp, "# Pollutant: %s\n", pol->getName().c_str() );
     fprintf( fp, "# BASETIME STATION FCTIME" );
 
-    std::vector<std::string>::iterator modelIt = getModelNames()->begin(); 
-    while ( modelIt != getModelNames()->end() ) {
+    // get the results for the models for this baseTime/fcTime combination
+    std::vector<std::string> modelNames = getBuffer()->getModelNames( pol->getName(), aggr );
+
+    auto modelIt = modelNames.begin();
+    while ( modelIt != modelNames.end() ) {
       std::string modelName = *modelIt++;
       fprintf( fp, " %s", modelName.c_str() );
     }
@@ -68,56 +77,37 @@ namespace OPAQ {
 
     OPAQ::AQNetwork *net = getAQNetworkProvider()->getAQNetwork();
     std::vector<Station *> stations = net->getStations();
-    /*
-    
-    // set the basetime in the buffer
-    getBuffer()->setBaseTime( baseTime );
 
     // loop over stations
-    int fcHorMax = getForecastHorizon()->getDays();
+    int fcHorMax = getForecastHorizon().getDays();
     std::vector<Station *>::iterator stationIt = stations.begin();
     while( stationIt != stations.end() ) {
-      Station *station = *stationIt++;
+    	Station *station = *stationIt++;
 
-      // loop over the different forecast horizons
-      for ( int fc_hor=0; fc_hor <= fcHorMax; fc_hor++ ) {
-	OPAQ::ForecastHorizon fcHor(fc_hor*24);
-	OPAQ::DateTime fcTime = baseTime + fcHor; 
+    	// loop over the different forecast horizons
+    	for ( int fc_hor=0; fc_hor <= fcHorMax; fc_hor++ ) {
+    		OPAQ::TimeInterval fcHor( fc_hor, TimeInterval::Days );
+    		OPAQ::DateTime fcTime = baseTime + fcHor;
 
-	fprintf( fp, "%s %s %s", baseTime.dateToString().c_str(), 
-		 station->getName().c_str(), fcTime.dateToString().c_str() );
+    		fprintf( fp, "%s\t%s\t%s", baseTime.dateToString().c_str(),
+    				station->getName().c_str(), fcTime.dateToString().c_str() );
 	
-	// loop over the different models
-	std::vector<std::string>::iterator modelIt = getModelNames()->begin(); 
-	while ( modelIt != getModelNames()->end() ) {
-	  std::string modelName = *modelIt++;
-	  std::vector<double> val;
+    		try {
+    			std::vector<double> modelVals = getBuffer()->getModelValues( baseTime, fcHor, station->getName(), pol->getName(), aggr );
+    			if ( modelVals.size() != modelNames.size() )
+    				throw RunTimeException( "data size doesn't match the number of models..." );
 
-	  try {
-	    val = getBuffer()->getValues( modelName, TimeInterval(0), TimeInterval(0),
-							      pol->getName(), station->getName(), fcHor ); 
-	  } catch ( OPAQ::NotAvailableException & err ) {
-	    fprintf( fp, " %f", getBuffer()->getNoData() );
-	    continue;
-	  }
+    			for( auto it=modelVals.begin(); it != modelVals.end(); ++it ) fprintf( fp, "\t%.2f", *it );
+    			fprintf( fp, "\n" );
 
-	  // expecting one value...
-	  if ( val.size() != 1 ) {
-	    throw RunTimeException( "Hmm, more than one value returned... " );
-	  } else {
-	    fprintf( fp, " %f", val[0] );
-	  }
+    		} catch ( OPAQ::NotAvailableException & err ) {
+				for ( unsigned int i = 0; i<modelNames.size(); i++ ) fprintf( fp, "\t%f", getBuffer()->getNoData() );
+				fprintf( fp, "\n" );
+				continue;
+    		}
+    	} // loop over forecast horizons
+    } // loop over stations
 
-	} // while ( modelIt != getModelNames()->end() )
-
-	fprintf( fp, "\n" );
-	
-      }
-      
-
-    } 
-    
-	*/
 
     fclose(fp);
 
