@@ -22,9 +22,8 @@ namespace OPAQ {
 				      const std::string &st_name, 
 				      int fc_hor );
 
-    virtual int makeSample( double *sample, OPAQ::Station *st, OPAQ::Pollutant *pol, 
-			    const OPAQ::DateTime &baseTime, 
-			    const OPAQ::DateTime &fcTime, 
+    virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
+			    const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
 			    const OPAQ::TimeInterval &fc_hor );
 
   private:
