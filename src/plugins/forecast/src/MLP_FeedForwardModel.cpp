@@ -12,6 +12,66 @@ LOGGER_DEF(OPAQ::MLP_FeedForwardModel);
 MLP_FeedForwardModel::MLP_FeedForwardModel() {}
 MLP_FeedForwardModel::~MLP_FeedForwardModel() {}
 
+
+// need to create a routine which can be re-used by the OVL model without having to make use of the
+// run( ) method, as this will require updating the buffers, as we want OVL to be a standalone plugin,
+// we should make it independent of the output of the other models --> so run them twice !!!
+double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::Station& station,
+									  OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
+									  const OPAQ::TimeInterval& fc_hor ) {
+
+	// Return the neural network filename, should be implemented in the daugher class
+	std::string fname = getFFNetFile( pol.getName(), station.getName(), fc_hor.getDays() );
+
+	// Read in the network file
+	TiXmlDocument nnet_xml( fname.c_str() );
+	if ( ! nnet_xml.LoadFile() ) {
+		logger->error( "   unable to load ffnet from: " + fname );
+		return this->getMissingValue();
+	}
+
+	// construct the neural network object
+	nnet::feedforwardnet *net;
+	try {
+		net = new nnet::feedforwardnet( nnet_xml.RootElement() );
+	} catch ( const char *msg ) {
+		logger->error( "   unable to construct ffnet in " + fname );
+		return this->getMissingValue();
+	}
+
+	DateTime fcTime = baseTime + fc_hor;
+
+	// construct the input feature vector, output is single pointer value
+	// not really nice, but let's leave it for the moment...
+	double *input_sample = new double[ net->inputSize() ];
+	double *output;
+
+	// call abstract method to generate the sample
+	if ( this->makeSample( input_sample, station, pol, baseTime, fcTime, fc_hor ) ) {
+		logger->error( "   input sample incomplete, setting missing value" );
+		return this->getMissingValue();
+	}
+
+	// for ( int ii=0; ii< net->inputSize(); ++ii )
+	//   std::cout << "input_sample["<<ii<<"] = " << input_sample[ii] << std::endl;
+
+	// simulate the network
+	net->sim( input_sample );
+
+	// retrieve the output & reset the logtransform
+	net->getOutput( &output );
+	double out = exp(output[0])-1;
+
+	if ( std::isnan(out) || std::isinf( out ) ) out = this->getMissingValue();
+
+	delete [] input_sample;
+	delete net;
+
+	return out;
+}
+
+
+
 /* ============================================================================
 
      Implementation of the model run method
@@ -55,78 +115,13 @@ void MLP_FeedForwardModel::run() {
 		for ( int fc_hor=0; fc_hor <= fcHorMax; fc_hor++ ) {
 
 			OPAQ::TimeInterval fcHor( fc_hor, TimeInterval::Days );
-
-			// Setting correct timing for this particular forecast
-			DateTime fcTime = baseTime;
-			fcTime.addDays( fc_hor );
+			DateTime fcTime = baseTime + fcHor;
 			logger->trace( " -- basetime: "   + baseTime.dateToString() +
-					", horizon : day+" + std::to_string(fc_hor) +
-					", dayN is : "     + fcTime.dateToString() );
+					       ", horizon : day+" + std::to_string(fc_hor) +
+					       ", dayN is : "     + fcTime.dateToString() );
 
-			// Return the neural network filename, should be implemented in the daugher class
-			std::string fname = getFFNetFile( pol.getName(), station->getName(), fc_hor );
-
-			// Read in the network file
-			TiXmlDocument nnet_xml( fname.c_str() );
-			if ( ! nnet_xml.LoadFile() ) {
-				logger->error( "   unable to load ffnet from: " + fname );
-				fc.insert( fcTime, this->getMissingValue() );
-				continue;
-			}
-
-			// construct the neural network object
-			nnet::feedforwardnet *net;
-			try {
-				net = new nnet::feedforwardnet( nnet_xml.RootElement() );
-			} catch ( const char *msg ) {
-				logger->error( "   unable to construct ffnet in " + fname );
-				fc.insert( fcTime, this->getMissingValue() );
-				continue;
-			}
-
-			//std::cout << "Loaded network : " << std::endl;
-			//std::cout << *net << std::endl;
-
-			// construct the input feature vector, output is single pointer value
-			// not really nice, but let's leave it for the moment...
-			double *input_sample = new double[ net->inputSize() ];
-			double *output;
-
-			// call abstract method to generate the sample
-			if ( this->makeSample( input_sample, station, &pol, baseTime, fcTime, fcHor ) ) {
-				logger->error( "   input sample incomplete, setting missing value" );
-				fc.insert( fcTime, this->getMissingValue() );
-				continue;
-			}
-
-
-			// TODO : HAVE THE MODEL DUMP THE INPUT SOMEWHERE FOR FUTURE REFEFENCE !!, i.e. create .inp files wchich ffsim can read for later testing
-
-
-
-
-			// for ( int ii=0; ii< net->inputSize(); ++ii )
-			//   std::cout << "input_sample["<<ii<<"] = " << input_sample[ii] << std::endl;
-
-			// simulate the network
-			net->sim( input_sample );
-
-			// retrieve the output & reset the logtransform
-			net->getOutput( &output );
-			double out = exp(output[0])-1;
-
-			if ( std::isnan(out) || std::isinf( out ) ) out = this->getMissingValue();
-
-			// perform real time correction ?
-
-
-			fc.insert( fcTime, out );
-
-			delete [] input_sample;
-			delete net;
+			fc.insert( fcTime, fcValue( pol, *station, OPAQ::Aggregation::DayAvg, baseTime, fcHor ) );
 		}
-
-		// TODO set aggregation in the model !!!
 
 		// now we have all the forecast values for this particular station, set the output values...
 		buffer->setCurrentModel( this->getName() );
