@@ -28,6 +28,11 @@ public:
     // OPAQ::Model methods --> run for this particular fcTime...
     virtual void run();
     
+    // Some helper routines, make them public
+    static double mean_missing( const std::vector<double> & list, double noData );
+    static double max_missing( const std::vector<double> & list, double noData );
+    static double min_missing( const std::vector<double> & list, double noData );
+
 protected:
     // Pure virtual method for the model to create it's input sample, the 
     // derived models are the actual plugins and they need to implement this particular
@@ -43,10 +48,6 @@ protected:
     
     virtual int getMissingValue( void ) = 0;
 
-    // Some helper routines...
-    double mean_missing( const std::vector<double> & list, double noData );
-    double max_missing( const std::vector<double> & list, double noData );
-    double min_missing( const std::vector<double> & list, double noData );
     void   printPar( std::string title, const std::vector<double> &x );
 
   private:    
