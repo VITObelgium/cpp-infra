@@ -13,6 +13,7 @@
 #include "ForecastBuffer.h"
 #include "../AQNetworkProvider.h"
 #include "../DateTime.h"
+#include "../Aggregation.h"
 
 
 namespace OPAQ {
@@ -23,27 +24,22 @@ namespace OPAQ {
     ForecastOutputWriter();
     virtual  ~ForecastOutputWriter();
 
-    virtual void write( Pollutant *pol, const DateTime &baseTime ) = 0;
+    virtual void write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr, const DateTime &baseTime ) = 0;
 
     // some setters
     void setAQNetworkProvider( AQNetworkProvider *n ) { _net = n; }
     void setBuffer( ForecastBuffer *buf ) { _buf = buf; }
-    void setForecastHorizon( OPAQ::TimeInterval *fc ) { _fcHor = fc; } // TODO : should not be a pointer... clear this up !!
-    void setModelNames( std::vector<std::string> *list ) { _modelNames = list; } // TODO : should not be a pointer... clearn this up !!
-
+    void setForecastHorizon( const OPAQ::TimeInterval& fc ) { _fcHor = fc; }
 
   protected:
     ForecastBuffer*           getBuffer( void ) { return _buf; }
     OPAQ::AQNetworkProvider*  getAQNetworkProvider( void ) { return _net; }
-    OPAQ::TimeInterval*       getForecastHorizon( void ) { return _fcHor; }
-    std::vector<std::string>* getModelNames( void ) { return _modelNames; }
-
+    const OPAQ::TimeInterval& getForecastHorizon( void ) { return _fcHor; }
 
   private:
     OPAQ::AQNetworkProvider  *_net;
     OPAQ::ForecastBuffer     *_buf;
-    OPAQ::TimeInterval       *_fcHor;
-    std::vector<std::string> *_modelNames;
+    OPAQ::TimeInterval        _fcHor;
   };
 
 } // namespace OPAQ
