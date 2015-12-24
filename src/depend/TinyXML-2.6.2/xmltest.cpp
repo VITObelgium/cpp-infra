@@ -91,8 +91,8 @@ int main()
 {
 
 	//
-	// We start with the 'demoStart' todo list. Process it. And
-	// should hopefully end up with the todo list as illustrated.
+	// We start with the 'demoStart' list. Process it. And
+	// should hopefully end up with the list as illustrated.
 	//
 	const char* demoStart =
 		"<?xml version=\"1.0\"  standalone='no' >\n"
@@ -107,7 +107,7 @@ int main()
 	{
 
 	#ifdef TIXML_USE_STL
-		//	What the todo list should look like after processing.
+		//	What the list should look like after processing.
 		// In stream (no formatting) representation.
 		const char* demoEnd =
 			"<?xml version=\"1.0\" standalone=\"no\" ?>"
@@ -184,7 +184,7 @@ int main()
 		// an element from the document.
 		// --------------------------------------------------------
 
-		// Get the "ToDo" element.
+		// Get the  element.
 		// It is a child of the document, and can be selected by name.
 		node = doc.FirstChild( "ToDo" );
 		assert( node );
@@ -1138,19 +1138,19 @@ int main()
             // Legacy mode test. (This test may only pass on a western system)
             const char* str =
                         "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>"
-                        "<ä>"
-                        "CöntäntßäöüÄÖÜ"
-                        "</ä>";
+                        "<ï¿½>"
+                        "Cï¿½ntï¿½ntï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½"
+                        "</ï¿½>";
 
             TiXmlDocument doc;
             doc.Parse( str );
 
             TiXmlHandle docHandle( &doc );
-            TiXmlHandle aHandle = docHandle.FirstChildElement( "ä" );
+            TiXmlHandle aHandle = docHandle.FirstChildElement( "ï¿½" );
             TiXmlHandle tHandle = aHandle.Child( 0 );
             assert( aHandle.Element() );
             assert( tHandle.Text() );
-            XmlTest( "ISO-8859-1 Parsing.", "CöntäntßäöüÄÖÜ", tHandle.Text()->Value() );
+            XmlTest( "ISO-8859-1 Parsing.", "Cï¿½ntï¿½ntï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½", tHandle.Text()->Value() );
     }
 
 	{
