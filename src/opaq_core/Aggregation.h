@@ -17,7 +17,7 @@ public:
 	Aggregation();
 	virtual ~Aggregation();
 
-	enum Type { None, DailyAvg, Max1h, Max8h };
+	enum Type { None, DayAvg, Max1h, Max8h };
 
 	static std::string getName( Aggregation::Type agg );
 };
