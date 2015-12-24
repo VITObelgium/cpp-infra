@@ -1,4 +1,4 @@
 <?xml version="1.0" ?>
 <config>
-  <filename>opaqfc_%POL%_%BASETIME%.txt</filename>
+  <filename>opaqfc_%pol%_%aggr%_%basetime%.txt</filename>
 </config>
