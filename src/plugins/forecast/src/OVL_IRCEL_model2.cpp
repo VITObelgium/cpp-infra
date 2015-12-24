@@ -80,8 +80,8 @@ namespace OPAQ {
      Construct sample for the OVL_IRCEL_model2 configuration
      ========================================================================== */
   int OVL_IRCEL_model2::makeSample( double *sample,
-		  	  	  	  	  	  	    OPAQ::Station *st,
-									OPAQ::Pollutant *pol,
+		  	  	  	  	  	  	    const OPAQ::Station& st,
+									const OPAQ::Pollutant& pol,
 				    				const OPAQ::DateTime &baseTime,
 									const OPAQ::DateTime &fcTime,
 									const OPAQ::TimeInterval &fc_hor ) {
@@ -102,14 +102,14 @@ namespace OPAQ {
     t1 = fcTime + OPAQ::TimeInterval(0);
     t2 = fcTime + OPAQ::TimeInterval(24*3600) - meteo->getTimeResolution();
 
-    TimeSeries<double> blh  = meteo->getValues( t1, t2, st->getMeteoId(), p_blh );
-    TimeSeries<double> cc   = meteo->getValues( t1, t2, st->getMeteoId(), p_cc );
+    TimeSeries<double> blh  = meteo->getValues( t1, t2, st.getMeteoId(), p_blh );
+    TimeSeries<double> cc   = meteo->getValues( t1, t2, st.getMeteoId(), p_cc );
     
     t1 = fcTime - TimeInterval(12*3600); // dayN-1 : 12:00 to end, including 12:00
     t2 = fcTime + TimeInterval(12*3600) - meteo->getTimeResolution(); // day N : 00:00 to 12:00 (excluding)
     
-    TimeSeries<double> wsp  = meteo->getValues( t1, t2, st->getMeteoId(), p_wsp10m );
-    TimeSeries<double> wdir = meteo->getValues( t1, t2, st->getMeteoId(), p_wdir10m );
+    TimeSeries<double> wsp  = meteo->getValues( t1, t2, st.getMeteoId(), p_wsp10m );
+    TimeSeries<double> wdir = meteo->getValues( t1, t2, st.getMeteoId(), p_wdir10m );
     
 
     // TODO do we have enough meteo info ?
@@ -148,13 +148,13 @@ namespace OPAQ {
     t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - TimeInterval( 1, TimeInterval::Days );
     t2 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - obs->getTimeResolution();
     // 1x meteto TimeResultion aftrekken : - getTimeResolution();
-    OPAQ::TimeSeries<double> xx_yest = obs->getValues( t1, t2, st->getName(), pol->getName() );
+    OPAQ::TimeSeries<double> xx_yest = obs->getValues( t1, t2, st.getName(), pol.getName() );
     
     
     t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY );
     t2 = t1 + OPAQ::TimeInterval( this->mor_agg-1, TimeInterval::Hours );// met mor_agg uur of eentje aftrekken ????
 
-    OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st->getName(), pol->getName() ); // no aggregation
+    OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName() ); // no aggregation
 
     /*
     printPar( "Retrieved pollutant info yesterday : ", xx_yest );
