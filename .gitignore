@@ -5,6 +5,7 @@
 *.la
 .deps
 .libs
+*.bak
 
 # emacs temp files
 *~
