@@ -467,14 +467,6 @@ std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange(
 
 }
   */
-/*
-unsigned int Hdf5Buffer::size() {
-  //_checkFullyConfigured();
-  //return Hdf5Tools::getDataSetSize(_dataSet, 2);
-  std::cout << "IMPLEMENT MEEEEE !!! " << std::endl;
-  return 0;
-}
-*/
 
 OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const DateTime& t1,
 		const DateTime& t2, const std::string& stationId, const std::string& pollutantId,
@@ -509,142 +501,112 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const OPAQ::TimeInterval fc_hor,
 }
 
 
-/*
-std::vector<double> Hdf5Buffer::getValues(const std::string  & modelName, 
-					  const TimeInterval & beginOffset,
-					  const TimeInterval & endOffset, 
-					  const std::string  & parameter,
-					  const std::string  & station,
-					  const ForecastHorizon & forecastHorizon ) {
-  _checkFullyConfigured();
-  _checkIfExistsAndOpen();
 
-  // 1. validate forecastHorizon
-  long days = forecastHorizon.getHours();
-  if (days % 24 != 0)
-    throw RunTimeException( "Forecast horizon must be a multiple of 24 hours" );
-  days /= 24;
+// return model values for a given baseTime / forecast horizon
+// storage in file : "model x station x baseTime x fcHorizon"
+std::vector<double> Hdf5Buffer::getModelValues( const DateTime &baseTime, const OPAQ::TimeInterval& fc_hor,
+		const std::string& stationId, const std::string& pollutantId, OPAQ::Aggregation::Type aggr ) {
 
-  // a. calculate begin and end from given intervals and the base time
-  DateTime begin = _baseTime;
-  begin.addSeconds(beginOffset.getSeconds());
-  DateTime end = _baseTime;
-  end.addSeconds(endOffset.getSeconds());
-  
-  // a. first round them to the nearest day boundaries
-  DateTime myBegin = DateTimeTools::floor(begin, DateTimeTools::FIELD_DAY);
-  DateTime myEnd = DateTimeTools::ceil(end, DateTimeTools::FIELD_DAY);
+	H5::DataSet dsVals, dsStations;
+	H5::Group grpPol, grpAggr;
+	OPAQ::DateTime startTime;
 
-  hsize_t nvals = TimeInterval( myBegin, myEnd ).getDays() + 1;
+	try {
+		grpPol  = _h5file->openGroup( pollutantId );
+	    grpAggr = grpPol.openGroup( OPAQ::Aggregation::getName(aggr) );
+	    dsVals  = grpAggr.openDataSet( FORECAST_DATASET_NAME );
 
-  // get indices for basetime and forecasthorizon
-  hsize_t btIndex = TimeInterval(_startDate, myBegin).getDays();
-  hsize_t fhIndex = days;
+	    // retrieve startTime from the stored dataset in this group
+		startTime = OPAQ::DateTime( Hdf5Tools::readStringAttribute( dsVals, START_DATE_NAME ) );
 
-  // initialize the output array with the number of requested values
-  std::vector<double> out(nvals);
-  for ( unsigned int i = 0; i < nvals; i ++ ) out[i] = getNoData();
+		if (startTime > baseTime )
+			throw BadConfigurationException( "baseTime is before start date in the dataset" );
 
-  H5::DataSet dset; 
-  H5::Group grpStation, grpParameter, grpModel;
-  // now open groups etc...
-  try {
-    grpStation   = _h5file->openGroup( station );
-    grpParameter = grpStation.openGroup( parameter );
-    grpModel     = grpParameter.openGroup( modelName );
-    dset         = grpModel.openDataSet( "fc_value" );
+		// open datasets for models & stations
+		dsStations = grpAggr.openDataSet( STATION_DATASET_NAME );
 
-  } catch ( H5::Exception & err)  {
-    logger->trace( "no fc_value dataset or " + station + ", " + parameter + ", " + modelName + " present" );
-    throw NotAvailableException( "no fc_value dataset or " + station + ", " + parameter 
-				 + ", " + modelName + " present" ); 
-  }    
+	} catch ( H5::Exception & err ) {
+		logger->error( "cannot retrieve model values in forecast buffer..." );
+		throw NotAvailableException( "forecast is not available" );
+	}
 
-  // now get the size of the dataset in the buffer
-  hsize_t btSize = Hdf5Tools::getDataSetSize( dset, 0 );
-  hsize_t fhSize = Hdf5Tools::getDataSetSize( dset, 1 );
-  
-  // the forecast horizon is present in the datafile
-  if ( fhIndex >= 0 && fhIndex < fhSize ) {
-    
-    hsize_t dataStartIndex = btIndex < 0 ? 0 : btIndex;
-    hsize_t dataEndIndex   = btIndex + nvals - 1;
+	unsigned int stIndex = Hdf5Tools::getIndexInStringDataSet( dsStations, stationId );
+	unsigned int btIndex = OPAQ::TimeInterval( startTime, baseTime ).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
+	unsigned int fhIndex = fc_hor.getSeconds() / _fcTimeResolution.getSeconds();
 
-    if ( dataStartIndex < btSize && dataEndIndex >= 0 ) {
-      // only need to fill if the selected hyperslab lies within the data set
-      if (dataEndIndex >= btSize) dataEndIndex = btSize - 1;
-      
-      hsize_t dataCount     = dataEndIndex - dataStartIndex + 1;
-      hsize_t outStartIndex = btIndex < 0 ? -btIndex : 0;
-      // select hyperslabs and fetch the data
-      H5::DataSpace space = dset.getSpace();
-      hsize_t dc[2] = { dataCount, 1 };
-      hsize_t doffset[2] = { dataStartIndex, fhIndex };
-      space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
-      hsize_t mc[1] = { nvals };
-      hsize_t moffset[1] = { outStartIndex };
-      H5::DataSpace memSpace(1, mc);
-      mc[0] = dataCount;
-      memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
+#ifdef DEBUG
+		std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << std::endl;
+#endif
 
+	unsigned int nvals = Hdf5Tools::getDataSetSize( dsVals,  0 ); // index 0 is models
 
-      dset.read( &out[0], H5::PredType::NATIVE_DOUBLE, memSpace, space );
+	// initialize the output array with the number of requested values
+	std::vector<double> out(nvals);
+	for ( unsigned int i = 0; i < nvals; i ++ ) out[i] = getNoData();
 
-      space.close();
-    }
+	// now get the size of the dataset in the buffer
+	hsize_t btSize = Hdf5Tools::getDataSetSize( dsVals, 2 );
+	hsize_t fhSize = Hdf5Tools::getDataSetSize( dsVals, 3 );
 
+	// is the station/forecast/base time in the datafile ?
+	if ( fhIndex >= 0 && fhIndex < fhSize &&
+		 btIndex >= 0 && btIndex < btSize &&
+		 stIndex >= 0 ) {
 
-  } else throw RunTimeException( "Requested forecast horizon index not in HDF5 buffer" );
-  
+		// "model x station x baseTime x fcHorizon"
 
+		H5::DataSpace space = dsVals.getSpace();
+		hsize_t dc[4] = { nvals, 1, 1, 1 };
+		hsize_t doffset[4] = { 0, stIndex, btIndex, fhIndex };
+		space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
 
-  // TODO: put in a check on the basetimes
-  
+		hsize_t mc[1] = { nvals };
+		hsize_t moffset[1] = { 0 };
+		H5::DataSpace memSpace(1, mc);
+		memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
 
-  
-  return out;
-}
- */
+		dsVals.read( &out[0], H5::PredType::NATIVE_DOUBLE, memSpace, space );
+		space.close();
+	} else throw RunTimeException( "Requested forecast horizon index not in HDF5 buffer" );
 
-  // is the get values for an interpolation model --> get values for all the stations...
-/*
-std::vector<double> Hdf5Buffer::getValues(const std::string & parameter,
-					  const TimeInterval & offset,
-					  const ForecastHorizon & forecastHorizon ) {
-
-  if ( _aqNet == NULL) 
-    throw RunTimeException("no AQ network provider set, cannot provide values for stations");
-  std::vector<double> out;
-  Pollutant * pol = Config::PollutantManager::getInstance()->find(parameter);
-  AQNetwork * net = _aqNet->getAQNetwork();
-  std::vector<Station *> * stations = &(net->getStations());
-  std::vector<Station *>::iterator it = stations->begin();
-  while (it != stations->end()) {
-    Station * station = *it++;
-    if (pol == NULL || AQNetworkTools::stationHasPollutant(station, *pol)) {
-      //
-      // the parameter is not a pollutant
-      // or
-      // the parameter is a pollutant and it is provided by the station
-      //
-      // in both cases, we need to fetch the data from the file
-      //
-      out.push_back( getValues(offset, offset, parameter, station->getName(),
-			       forecastHorizon).front() );
-    } else {
-      //
-      // the parameter denotes a pollutant, but it is not provided by the station
-      //
-      out.push_back(getNoData());
-    }
-  }
-  return out;
-  // TODO: can we implement this more efficiently by directly querying the h5 file?
-  
-  
+	return out;
 }
 
-*/
+
+
+std::vector<std::string> Hdf5Buffer::getModelNames( const std::string& pollutantId, OPAQ::Aggregation::Type aggr ) {
+
+	std::vector<std::string> out;
+
+	H5::DataSet dsModels;
+	H5::Group grpPol, grpAggr;
+	  // now open groups etc...
+	  try {
+	    grpPol  = _h5file->openGroup( pollutantId );
+	    grpAggr = grpPol.openGroup( OPAQ::Aggregation::getName(aggr) );
+
+	    dsModels   = grpAggr.openDataSet( MODELS_DATASET_NAME );
+
+	  } catch ( H5::Exception & err)  {
+		  std::string s = "error reading model list for " + pollutantId + ", " + OPAQ::Aggregation::getName( aggr );
+		  logger->trace( s );
+		  throw NotAvailableException( s );
+	  }
+
+	  unsigned int bufferSize = Hdf5Tools::getDataSetSize(dsModels);
+	  char *buffer[bufferSize];
+	  Hdf5Tools::readStringData(buffer, dsModels);
+	  for ( unsigned int i = 0; i < bufferSize; i++ ) {
+		  out.push_back( buffer[i] );
+		  free( buffer[i] );
+	  }
+
+	  dsModels.close();
+	  grpAggr.close();
+	  grpPol.close();
+
+	  return out;
+}
 
 } /* namespace OPAQ */
 
