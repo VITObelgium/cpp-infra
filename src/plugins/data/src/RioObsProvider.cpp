@@ -179,7 +179,7 @@ void RioObsProvider::_readFile( const std::string & pollutant ) {
 				ts = _getOrInitValues( pollutant, OPAQ::Aggregation::Max8h, tokens[0] );
 				ts->insert( begin, atof( tokens[3].c_str() ) );  // 4th column is max 8h
 
-				ts = _getOrInitValues( pollutant, OPAQ::Aggregation::DailyAvg, tokens[0] );
+				ts = _getOrInitValues( pollutant, OPAQ::Aggregation::DayAvg, tokens[0] );
 				ts->insert( begin, atof( tokens[4].c_str() ) );  // 5th column is daily avg
 
 				// get the hourly values, no aggregation
