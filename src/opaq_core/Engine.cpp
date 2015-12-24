@@ -46,9 +46,6 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   // Get the forecast models to run
   std::vector<Config::Component*>::iterator it = cnf->getModels().begin();
 
-  // Vector to store which models we have run (will be passed on to outputwriter)
-  std::vector<std::string> modelNames;
-
   while (it != cnf->getModels().end()) {
     // get mode
     name = (*it++)->getName();
@@ -58,7 +55,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     model->setBaseTime(baseTime);
     model->setPollutant( *pol );
     model->setAQNetworkProvider( net );
-    model->setForecastHorizon( &forecastHorizon );
+    model->setForecastHorizon( forecastHorizon );
     model->setInputProvider( obs );
     model->setMeteoProvider( meteo );
     model->setBuffer(buffer); 
@@ -68,9 +65,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     // Run the model up till the requested forecast horizon...
     model->run();
 
-    // List of models that were run, 
-    // we get the component name back from the component
-    modelNames.push_back( model->getName() );
+    // TODO maybe nicer to have model->run( baseTime ) and change the
 
   } // loop over the ensemble of models
   
@@ -84,11 +79,12 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   ForecastOutputWriter *outWriter = cm->getComponent<ForecastOutputWriter>( name );
   outWriter->setAQNetworkProvider( net );
   outWriter->setBuffer( buffer );
-  outWriter->setForecastHorizon( &forecastHorizon );
-  outWriter->setModelNames( &modelNames ); // write output for these models
-
+  outWriter->setForecastHorizon( forecastHorizon );
   std::cout << " - calling " << outWriter->getName() << " ..." << std::endl;
-  outWriter->write( pol, baseTime );
+
+  std::cout << "THIS IS NOT RIGHT, WHERE TO PUT THE AGGREGATION AND THE POLLUTANT ???" << std::endl;
+
+  outWriter->write( pol, OPAQ::Aggregation::DayAvg, baseTime );
 
   return;
 }
