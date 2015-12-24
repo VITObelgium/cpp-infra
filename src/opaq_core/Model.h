@@ -37,7 +37,7 @@ public:
   virtual void setPollutant(Pollutant & pollutant) {
     this->pollutant = pollutant;
   }
-  virtual void setForecastHorizon(TimeInterval * forecastHorizon) {
+  virtual void setForecastHorizon( const TimeInterval& forecastHorizon) {
     this->forecastHorizon = forecastHorizon;
   }
   virtual void setAQNetworkProvider( AQNetworkProvider *aqNetworkProvider) {
@@ -62,8 +62,7 @@ public:
   virtual const Pollutant & getPollutant() {
     return pollutant;
   }
-  virtual TimeInterval * getForecastHorizon() throw (NullPointerException) {
-    if (forecastHorizon == NULL) throw NullPointerException();
+  virtual const TimeInterval& getForecastHorizon() {
     return forecastHorizon;
   }
   virtual AQNetworkProvider * getAQNetworkProvider() throw (NullPointerException) {
@@ -92,7 +91,8 @@ public:
 private:
   DateTime baseTime;
   Pollutant pollutant;
-  TimeInterval * forecastHorizon;
+  TimeInterval forecastHorizon;
+
   AQNetworkProvider * aqNetworkProvider;
   GridProvider * gridProvider;
   DataProvider * input;
