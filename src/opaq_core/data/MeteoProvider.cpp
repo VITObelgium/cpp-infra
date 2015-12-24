@@ -10,12 +10,9 @@
 namespace OPAQ {
 
 MeteoProvider::MeteoProvider() {
-	// TODO Auto-generated constructor stub
-
 }
 
 MeteoProvider::~MeteoProvider() {
-	// TODO Auto-generated destructor stub
 }
 
 } /* namespace OPAQ */
