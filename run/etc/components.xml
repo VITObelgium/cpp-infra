@@ -50,4 +50,11 @@
     <config ref="etc/OVL_model2_9UT.xml" />
   </component>
   
+  <component>
+    <name>OVL</name>
+    <plugin>OVL</plugin>
+    <config ref="etc/OVL.xml" />
+  </component>
+
+
 </components>
