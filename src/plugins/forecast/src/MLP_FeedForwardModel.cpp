@@ -33,7 +33,7 @@ void MLP_FeedForwardModel::run() {
 	// forecast horizon requested by user is available in abstract model and
 	// defined in the configuration file under <forecast><horizon></horizon></forecast>
 	// value is given in days, but stored in the TimeInterval format, so have to get days back
-	int fcHorMax = getForecastHorizon()->getDays();
+	int fcHorMax = getForecastHorizon().getDays();
 
 	// -- 2. loop over the stations
 	auto stationIt = stations.begin();
@@ -130,7 +130,7 @@ void MLP_FeedForwardModel::run() {
 
 		// now we have all the forecast values for this particular station, set the output values...
 		buffer->setCurrentModel( this->getName() );
-		buffer->setValues( baseTime, fc, station->getName(), pol.getName(), OPAQ::Aggregation::DailyAvg );
+		buffer->setValues( baseTime, fc, station->getName(), pol.getName(), OPAQ::Aggregation::DayAvg );
 
 	} // loop over the stations
 
