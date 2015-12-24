@@ -21,6 +21,12 @@ public:
   virtual ~ForecastBuffer();
 
   /**
+   * Return a list of available models in the buffer
+   */
+  virtual std::vector<std::string> getModelNames( const std::string& pollutantId, OPAQ::Aggregation::Type aggr ) = 0;
+
+
+  /**
    * Also return the basetime resolution
    */
   virtual TimeInterval getBaseTimeResolution( void ) = 0;
@@ -44,10 +50,24 @@ public:
    * This method is typically used by a forecast model to set the values
    */
   virtual void setValues( const DateTime &baseTime,
-		  	  	  	  	  const OPAQ::TimeSeries<double>& forecast,
-						  const std::string& stationId,
-						  const std::string& pollutantId,
-						  OPAQ::Aggregation::Type aggr ) = 0;
+		                  const OPAQ::TimeSeries<double>& forecast,
+					      const std::string& stationId,
+				          const std::string& pollutantId,
+					      OPAQ::Aggregation::Type aggr ) = 0;
+
+
+
+  /**
+   * Return all the model values for a given baseTime and forecast horizon. The given current model
+   * which is set in the DataProvider parent class is ignored here...
+   */
+  virtual std::vector<double> getModelValues( const DateTime &baseTime,
+  		                                      const OPAQ::TimeInterval& fc_hor,
+  										      const std::string& stationId,
+  										      const std::string& pollutantId,
+  										      OPAQ::Aggregation::Type aggr ) = 0;
+
+
 
   /**
    * This routine retrieves the forecasted values for a specific base time
