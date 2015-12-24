@@ -19,16 +19,16 @@ std::string Aggregation::getName( Aggregation::Type agg ) {
 
 	switch( agg ) {
 	case Type::None:
-		return std::string( "None" );
+		return std::string( "none" );
 		break;
-	case Type::DailyAvg:
-		return std::string( "DailyAvg" );
+	case Type::DayAvg:
+		return std::string( "dayavg" );
 		break;
 	case Type::Max1h:
-		return std::string( "Max1h" );
+		return std::string( "max1h" );
 		break;
 	case Type::Max8h:
-		return std::string( "Max8h" );
+		return std::string( "max8h" );
 		break;
 	}
 
