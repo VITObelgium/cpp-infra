@@ -28,18 +28,26 @@ public:
     // OPAQ::Model methods --> run for this particular fcTime...
     virtual void run();
     
+    /**
+     *  Workhorse routine which acutally performs the forecast and returns the
+     *  value
+     */
+    double fcValue( const OPAQ::Pollutant& pol, const OPAQ::Station& station,
+    		        OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
+			        const OPAQ::TimeInterval& fc_hor );
+
     // Some helper routines, make them public
     static double mean_missing( const std::vector<double> & list, double noData );
     static double max_missing( const std::vector<double> & list, double noData );
     static double min_missing( const std::vector<double> & list, double noData );
 
 protected:
+
     // Pure virtual method for the model to create it's input sample, the 
     // derived models are the actual plugins and they need to implement this particular
     // method... 
-    virtual int makeSample( double *sample, OPAQ::Station *st, OPAQ::Pollutant *pol, 
-			    const OPAQ::DateTime &baseTime, 
-			    const OPAQ::DateTime &fcTime, 
+    virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
+			    const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
 			    const OPAQ::TimeInterval &fc_hor ) = 0;
     
     virtual std::string getFFNetFile( const std::string &pol_name, 
