@@ -1,9 +1,58 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
-  
-  <!-- real time correction scheme -->
-  <rtc>
-    
-  </rtc>
 
+  <missing_value>-9999</missing_value>
+  
+  <!-- the selected mode, should be defined in a specific tune -->
+  <tune_mode>rmse</tune_mode>
+  
+  <!-- a list of available tunes -->
+  <tunes>
+    <tune mode="rmse">
+      <pollutant aggr="dayavg" name="pm10">
+	<station name="40AB01">
+          <model fc_hor="0" rtc_mode="2" rtc_param="8">model2</model>
+          <model fc_hor="1" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="2" rtc_mode="2" rtc_param="20">model2</model>
+          <model fc_hor="3" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="4" rtc_mode="2" rtc_param="19">model1</model>
+        </station>
+        <station name="40AB02">
+          <model fc_hor="0" rtc_mode="2" rtc_param="5">model1</model>
+          <model fc_hor="1" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="2" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="3" rtc_mode="1" rtc_param="0">model1</model>
+          <model fc_hor="4" rtc_mode="2" rtc_param="20">model1</model>
+        </station>
+	<station name="40AL01">
+          <model fc_hor="0" rtc_mode="2" rtc_param="8">model1</model>
+          <model fc_hor="1" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="2" rtc_mode="1" rtc_param="0">model1</model>
+          <model fc_hor="3" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="4" rtc_mode="1" rtc_param="0">model1</model>
+        </station>
+        <station name="40AL02">
+          <model fc_hor="0" rtc_mode="2" rtc_param="10">model1</model>
+          <model fc_hor="1" rtc_mode="0" rtc_param="0">model1</model>
+          <model fc_hor="2" rtc_mode="0" rtc_param="0">model1</model>
+          <model fc_hor="3" rtc_mode="1" rtc_param="0">model1</model>
+          <model fc_hor="4" rtc_mode="0" rtc_param="0">model1</model>
+        </station>
+        <station name="40AL05">
+          <model fc_hor="0" rtc_mode="2" rtc_param="5">model1</model>
+          <model fc_hor="1" rtc_mode="2" rtc_param="18">model1</model>
+          <model fc_hor="2" rtc_mode="0" rtc_param="0">model1</model>
+          <model fc_hor="3" rtc_mode="2" rtc_param="20">model1</model>
+          <model fc_hor="4" rtc_mode="2" rtc_param="15">model3</model>
+        </station>
+        <station name="40GK06">
+          <model fc_hor="0" rtc_mode="2" rtc_param="7">model1</model>
+          <model fc_hor="1" rtc_mode="2" rtc_param="16">model1</model>
+          <model fc_hor="2" rtc_mode="2" rtc_param="17">model1</model>
+          <model fc_hor="3" rtc_mode="2" rtc_param="20">model3</model>
+          <model fc_hor="4" rtc_mode="2" rtc_param="17">model3</model>
+        </station>
+      </pollutant>
+    </tune>
+  </tunes>
 </config>
