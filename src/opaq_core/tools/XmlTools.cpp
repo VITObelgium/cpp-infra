@@ -15,6 +15,31 @@ XmlTools::XmlTools() {
 XmlTools::~XmlTools() {
 }
 
+TiXmlElement* XmlTools::getElementByAttribute( TiXmlElement *parent,
+		const std::string &childName, const std::string & attrName, const std::string & attrValue )
+	throw ( ElementNotFoundException ) {
+
+	if ( ! parent ) throw ElementNotFoundException("parent element does not exist");
+
+	TiXmlElement *el = parent->FirstChildElement( childName );
+	while( el ) {
+
+		const char *val = el->Attribute( attrName.c_str() );
+		if ( val ) {
+			// we have the attribute
+			if ( ! attrValue.compare( val ) ) return el;
+		}
+
+		el = el->NextSiblingElement( childName );
+	}
+
+
+	throw ElementNotFoundException("Did not find child with requested attribute/value pair");
+}
+
+
+
+
 TiXmlElement * XmlTools::getElement(TiXmlElement * parent,
 		const std::string & childName, TiXmlDocument * refDoc)
 				throw (ElementNotFoundException) {
