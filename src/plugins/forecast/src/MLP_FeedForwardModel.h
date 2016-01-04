@@ -33,8 +33,8 @@ public:
      *  value
      */
     double fcValue( const OPAQ::Pollutant& pol, const OPAQ::Station& station,
-    		        OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-			        const OPAQ::TimeInterval& fc_hor );
+    			OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
+				const OPAQ::TimeInterval& fc_hor );
 
     // Some helper routines, make them public
     static double mean_missing( const std::vector<double> & list, double noData );
