@@ -56,5 +56,17 @@
     <config ref="etc/OVL.xml" />
   </component>
 
+  <component>
+    <name>model1</name>
+    <plugin>OVL_model1</plugin>
+    <config ref="etc/OVL_model1_9UT.xml" />
+  </component>
+  
+  <component>
+    <name>model2</name>
+    <plugin>OVL_model2</plugin>
+    <config ref="etc/OVL_model2_9UT.xml" />
+  </component>
 
+  
 </components>
