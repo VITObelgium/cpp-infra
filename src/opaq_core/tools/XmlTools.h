@@ -36,6 +36,19 @@ public:
 			const std::string & childName,
 			TiXmlDocument * refDoc = NULL) throw (ElementNotFoundException);
 
+	/**
+	 * Fetch a child element from a given parent element
+	 * where an specific attribute has a certain value...
+	 * @param parent     parent element
+	 * @param childName  name of child element
+	 * @param attrName   name of the attribute
+	 * @param attrValue  value of the attribute
+	 */
+	static TiXmlElement * getElementByAttribute( TiXmlElement *parent,
+			const std::string &childName, const std::string & attrName,
+			const std::string & attrValue )
+	throw (ElementNotFoundException);
+
 };
 
 } /* namespace OPAQ */
