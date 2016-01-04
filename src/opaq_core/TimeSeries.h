@@ -30,6 +30,12 @@ public:
 
 	size_t size() const { return _datetimes.size(); }
 	bool   isEmpty() const { return ( _datetimes.size() == 0 ); }
+	bool   isConsistent( const TimeSeries<T>& t ) const {
+		if ( t.size() != size() ) return false;
+		for ( unsigned int i = 0; i < size(); i++ )
+			if ( _datetimes[i] != t.datetimes().at(i) ) return false;
+		return true;
+	}
 
 	const std::vector<T>& values( void ) const { return _values; }
 	const std::vector<OPAQ::DateTime>& datetimes( void ) const { return _datetimes; }
