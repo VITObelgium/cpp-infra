@@ -37,6 +37,9 @@ public:
   virtual void setPollutant(Pollutant & pollutant) {
     this->pollutant = pollutant;
   }
+  virtual void setAggregation( Aggregation::Type aggr ) {
+	  this->aggregation = aggr;
+  }
   virtual void setForecastHorizon( const TimeInterval& forecastHorizon) {
     this->forecastHorizon = forecastHorizon;
   }
@@ -61,6 +64,9 @@ public:
   }
   virtual const Pollutant & getPollutant() {
     return pollutant;
+  }
+  virtual const Aggregation::Type & getAggregation() {
+	  return aggregation;
   }
   virtual const TimeInterval& getForecastHorizon() {
     return forecastHorizon;
@@ -89,15 +95,16 @@ public:
   virtual void run() = 0;
   
 private:
-  DateTime baseTime;
-  Pollutant pollutant;
-  TimeInterval forecastHorizon;
+  DateTime           baseTime;        //< run for this basetime
+  Pollutant          pollutant;       //< run for this pollutant
+  Aggregation::Type  aggregation;     //< run for this aggregation
+  TimeInterval       forecastHorizon; //< maximum forecast horizon to run to
 
-  AQNetworkProvider * aqNetworkProvider;
-  GridProvider * gridProvider;
-  DataProvider * input;
-  MeteoProvider * meteo;
-  ForecastBuffer   * buffer;
+  AQNetworkProvider *aqNetworkProvider;
+  GridProvider      *gridProvider;
+  DataProvider      *input;
+  MeteoProvider     *meteo;
+  ForecastBuffer    *buffer;
 };
 
 } /* namespace opaq */
