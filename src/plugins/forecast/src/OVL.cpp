@@ -102,9 +102,8 @@ void OVL::_parseTunes( TiXmlElement *lst ) {
 				modelEl->QueryIntAttribute( "rtc_param", &(c.rtc_param) );
 				c.model_name = modelEl->GetText();
 
-				// std::make_tuple( "pm10", "dayavg", "40ML01", TimeInterval( 1, day ) )
 				// inserting using list initializer instead of std::pair()... doesnt work for replacing the std::make_tuple command though
-				_conf.insert( { std::make_tuple( polName, polAggr, stName, fc_hor ), c } );
+				_conf.insert( { std::make_tuple( polName, Aggregation::fromString( polAggr ), stName, fc_hor ), c } );
 
 				modelEl = modelEl->NextSiblingElement( "model" );
 			}
@@ -131,12 +130,12 @@ void OVL::run() {
 
 	DateTime baseTime      = getBaseTime();
 	Pollutant pol          = getPollutant();
+	Aggregation::Type aggr = getAggregation();
 	AQNetwork *net         = getAQNetworkProvider()->getAQNetwork();
 	ForecastBuffer *buffer = getBuffer();
 
 	std::vector<Station *> stations = net->getStations();
 
-	OPAQ::Aggregation::Type agg = OPAQ::Aggregation::DayAvg;
 
 	// -- Forecast horizon
 	// forecast horizon requested by user is available in abstract model and
@@ -167,8 +166,7 @@ void OVL::run() {
 			DateTime fcTime = baseTime + fcHor;
 
 			// lookup the station configuration
-			// TODO : put in the correct aggregation, where to get it from ??
-			auto stIt = _conf.find( std::make_tuple( pol.getName(), OPAQ::Aggregation::getName(agg), station->getName(), fc_hor ) );
+			auto stIt = _conf.find( std::make_tuple( pol.getName(), aggr, station->getName(), fc_hor ) );
 			if (stIt == _conf.end() ) {
 				// no configuration for this station, returning -9999 or something
 				logger->warn(  "Model configuration not found for " + pol.getName() + ", st = " + station->getName() + ", skipping..."   );
@@ -199,7 +197,7 @@ void OVL::run() {
 			model->setBuffer( getBuffer() );
 
 			// run the model
-			double out = model->fcValue( pol, *station, OPAQ::Aggregation::DayAvg, baseTime, fcHor );
+			double out = model->fcValue( pol, *station, aggr, baseTime, fcHor );
 
 			// now handle the RTC, if the mode is larger than 0, otherwise we already have out output !!!
 			// get the historic forecasts
@@ -212,7 +210,7 @@ void OVL::run() {
 				std::cout << "*** calling getValues, OVL baseTime is " << baseTime << std::endl;
 #endif
 				buffer->setCurrentModel( model->getName() );
-				OPAQ::TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), OPAQ::Aggregation::DayAvg );
+				OPAQ::TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), aggr );
 
 #ifdef DEBUG
 				std::cout << "forecast hindcast : " << std::endl;
@@ -222,7 +220,7 @@ void OVL::run() {
 				// get the observed values from the input provider
 				// we could also implement it in such way to get them back from the forecast buffer...
 				// here a user should simply make sure we have enough data available in the data provider...
-				OPAQ::TimeSeries<double> obs_hindcast = getInputProvider()->getValues( t1, t2, station->getName(), pol.getName(), OPAQ::Aggregation::DayAvg );
+				OPAQ::TimeSeries<double> obs_hindcast = getInputProvider()->getValues( t1, t2, station->getName(), pol.getName(), aggr );
 
 #ifdef DEBUG
 				std::cout << "observation hindcast : " << std::endl;
@@ -281,11 +279,9 @@ void OVL::run() {
 			fc.insert( fcTime, out );
 		}
 
-		// TODO set aggregation in the model !!!
-
 		// now we have all the forecast values for this particular station, set the output values...
 		buffer->setCurrentModel( this->getName() );
-		buffer->setValues( baseTime, fc, station->getName(), pol.getName(), OPAQ::Aggregation::DayAvg );
+		buffer->setValues( baseTime, fc, station->getName(), pol.getName(), aggr );
 
 	} // loop over the stations
 
