@@ -151,9 +151,12 @@ int main (int argc, char* argv[]) {
 		  baseTime.addDays(1);
 	  }
   }
+
+#ifdef DEBUG
   std::vector<OPAQ::DateTime> *basetimes = &(ch.getOpaqRun()->getBaseTimes());
   logger->info("Requested base times:");
   for ( auto it = basetimes->begin(); it != basetimes->end(); it++ ) logger->info( it->toString() );
+#endif
   
   // validate configuration
   ch.validateConfiguration();
