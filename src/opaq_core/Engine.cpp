@@ -15,6 +15,7 @@ LOGGER_DEF(OPAQ::Engine)
 void Engine::runForecastStage( Config::ForecastStage *cnf, 
 							   AQNetworkProvider     *net,
 							   Pollutant             *pol,
+							   Aggregation::Type      aggr,
 							   DateTime              &baseTime ) {
 
   std::string name; 
@@ -22,7 +23,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   // Get the component manager
   ComponentManager *cm = ComponentManager::getInstance();
   
-  // Get max forecast horizon
+  // Get max forecast horizon...
   TimeInterval forecastHorizon = cnf->getHorizon();
 
   // Get observation data provider
@@ -54,20 +55,20 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     // set ins and outs for the model
     model->setBaseTime(baseTime);
     model->setPollutant( *pol );
+    model->setAggregation( aggr );
     model->setAQNetworkProvider( net );
     model->setForecastHorizon( forecastHorizon );
     model->setInputProvider( obs );
     model->setMeteoProvider( meteo );
     model->setBuffer(buffer); 
 
-    std::cout << " - running " << model->getName() << std::endl;
+    // Run the model up till the requested forecast horizon, the loop over the forecast horizons has to be
+    // in the model as probably some models (AR) use info of previous days...
+    logger->info( " - running " + model->getName() );
 
-    // Run the model up till the requested forecast horizon...
     model->run();
 
-    // TODO maybe nicer to have model->run( baseTime ) and change the
-
-  } // loop over the ensemble of models
+  } // end of loop over the models...
 
   // Prepare and run the forecast output writer for 
   // this basetime & pollutant
@@ -77,9 +78,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   outWriter->setBuffer( buffer );
   outWriter->setForecastHorizon( forecastHorizon );
   std::cout << " - calling " << outWriter->getName() << " ..." << std::endl;
-
-  std::cout << "THIS IS NOT RIGHT, WHERE TO PUT THE AGGREGATION AND THE POLLUTANT ???" << std::endl;
-  outWriter->write( pol, OPAQ::Aggregation::DayAvg, baseTime );
+  outWriter->write( pol, aggr, baseTime );
 
   return;
 }
@@ -150,11 +149,9 @@ void Engine::run(Config::OpaqRun * config) {
 
       // A log message
       logger->info( "Forecast stage for " + baseTime.dateToString() );
-      std::cout << "Forecast stage for " << baseTime.dateToString() << std::endl;
-
       try {
 
-	runForecastStage( forecastStage, aqNetworkProvider, pollutant, baseTime );
+    	  runForecastStage( forecastStage, aqNetworkProvider, pollutant, config->getAggregation(), baseTime );
 
       } catch (std::exception & e) {
 
@@ -168,11 +165,8 @@ void Engine::run(Config::OpaqRun * config) {
 
 	// a log message
 	logger->info( "  Mapping stage for " + baseTime.dateToString() );
-	std::cout << "Mapping stage for " << baseTime.dateToString() << std::endl;
-
 
 	// Buffer is input provider for the mapping models
-
 
 	logger->fatal("No mapping stage implemented yet");
 	exit(1);
@@ -207,7 +201,6 @@ void Engine::run(Config::OpaqRun * config) {
       
       // a log message
       logger->info( "  Mapping stage for " + baseTime.dateToString() );
-      std::cout << "Mapping stage for " << baseTime.dateToString() << std::endl;
       
       logger->fatal("No mapping stage implemented yet");
       exit(1);
