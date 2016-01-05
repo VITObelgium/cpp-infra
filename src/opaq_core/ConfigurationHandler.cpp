@@ -222,6 +222,13 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->warn("no pollutant set in configuration file");		// but might be given using command line args
   }
   
+  try {
+    std::string name = XmlTools::getText(rootElement, "aggregation");
+    opaqRun.setAggregation(name); // set the aggregation
+  } catch (ElementNotFoundException & e) {
+    logger->warn("no aggregation set in configuration file");		// but might be given using command line args
+  }
+
   /* ------------------------------------------------------------------------
      Parsing network section : selects the component which will deliver the
      AQ network configuration
