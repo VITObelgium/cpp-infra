@@ -247,7 +247,9 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 	unsigned int fhIndex      = OPAQ::TimeInterval( forecast.firstDateTime(), baseTime ).getSeconds() / _fcTimeResolution.getSeconds();
 
 	//DEBUG !!
+#ifdef DEBUG
 	std::cout << "modelIndex= " << modelIndex << ", stationIndex= " << stationIndex << ", dateIndex=" << dateIndex << ", fcIndex = " << fhIndex << std::endl;
+#endif
 
 	// -- store data
 	// a. get data space
