@@ -3,26 +3,26 @@
 
 namespace OPAQ {
 
-  namespace Config {
+namespace Config {
 
-    OpaqRun::OpaqRun() {
-    	pollutantSet = false;
-    }
-    
-    OpaqRun::~OpaqRun() {
-      if (forecastStage) delete forecastStage;
-      if (mappingStage) delete mappingStage;
-    }  
+OpaqRun::OpaqRun() :
+   pollutantSet(false),
+   aggregation(OPAQ::Aggregation::None),
+   networkProvider(0),
+   gridProvider(0),
+   forecastStage(0),
+   mappingStage(0) {
+}
 
-    LOGGER_DEF(OPAQ::Config::OpaqRun)
+OpaqRun::~OpaqRun() {
+	if (forecastStage) delete forecastStage;
+	if (mappingStage) delete mappingStage;
+}
 
-//    void OpaqRun::setPollutant( std::string name ) {
-//      pollutant = OPAQ::Config::PollutantManager::getInstance()->find( name );
-//      return;
-//    }
+LOGGER_DEF(OPAQ::Config::OpaqRun)
 
-  }
-  
+}
+
 } /* namespace OPAQ */
 
 
