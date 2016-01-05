@@ -34,6 +34,7 @@ MPL_FeedForwardSources = MLP_FeedForwardModel.cpp \
 # The effective plugins, based upon the general abstract classes
 pkglib_LTLIBRARIES = OVL_IRCEL_model1.la\
                      OVL_IRCEL_model2.la\
+                     OVL_IRCEL_model3.la\
                      OVL.la
 
 OVL_IRCEL_model1_la_SOURCES = $(MPL_FeedForwardSources) OVL_IRCEL_model1.cpp OVL_IRCEL_model1.h
@@ -41,6 +42,9 @@ OVL_IRCEL_model1_la_LIBADD  = $(top_srcdir)/src/opaq_core/libopaq.la
 
 OVL_IRCEL_model2_la_SOURCES = $(MPL_FeedForwardSources) OVL_IRCEL_model2.cpp OVL_IRCEL_model2.h
 OVL_IRCEL_model2_la_LIBADD  = $(top_srcdir)/src/opaq_core/libopaq.la
+
+OVL_IRCEL_model3_la_SOURCES = $(MPL_FeedForwardSources) OVL_IRCEL_model3.cpp OVL_IRCEL_model3.h
+OVL_IRCEL_model3_la_LIBADD  = $(top_srcdir)/src/opaq_core/libopaq.la
 
 OVL_la_SOURCES = $(MPL_FeedForwardSources) OVL.cpp OVL.h
 OVL_la_LIBADD  = $(top_srcdir)/src/opaq_core/libopaq.la
