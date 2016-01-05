@@ -40,6 +40,11 @@
   </plugin>
 
   <plugin>
+    <name>OVL_model3</name>
+    <lib>OVL_IRCEL_model3.so</lib>
+  </plugin>
+
+  <plugin>
     <name>OVL</name>
     <lib>OVL.so</lib>
   </plugin>
