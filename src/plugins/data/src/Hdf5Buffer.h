@@ -113,7 +113,8 @@ public:
   /**
    * This one gives the forecasts between the forecast times1 and 2 for a given fixed time lag (the
    * fc_hor. This routine can be used to e.g. retieve the archived day+2 forecasts for a given period
-   * to e.g. calculate real time corrections
+   * to e.g. calculate real time corrections. The user needs to be avare that the two DateTimes given
+   * are really the forecast times (so the datetimes for which the forecast is intended
    */
    virtual OPAQ::TimeSeries<double> getValues( const OPAQ::TimeInterval fc_hor,
            	  	  	  	  	  	  	  	  	  const DateTime &fcTime1,
@@ -121,6 +122,7 @@ public:
  											  const std::string& stationId,
  											  const std::string& pollutantId,
  											  OPAQ::Aggregation::Type aggr );
+
 /*
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
 					const TimeInterval & endOffset, 
