@@ -55,24 +55,16 @@ namespace OPAQ {
     
   private:
     LOGGER_DEC();
-    
-    /*
-    void runStage(Config::Stage * stage, AQNetworkProvider * aqNetworkProvider,
-		  GridProvider * gridProvider, DateTime & baseTime,
-		  Pollutant * pollutant, ForecastHorizon * forecastHorizon,
-		  ForecastHorizonsCollector * fhCollector);
-    void runStage(Config::Stage * stage, AQNetworkProvider * aqNetworkProvider,
-		  GridProvider * gridProvider, DateTime & baseTime,
-		  Pollutant * pollutant, ForecastHorizon * forecastHorizon );
 
-    */
-
-    void runForecastStage( Config::ForecastStage *cnf, 
-			   AQNetworkProvider     *net, 
-			   Pollutant             *pol,
-			   DateTime              &baseTime );
+    /**
+     * This runs the forecast stage with the given configuration, network,
+     * pollutant and aggregation type for a specific basetime. The forecast stage
+     * loops over the different models which are configured in the forecast config
+     * and calls the forecast output writer.
+     */
+    void runForecastStage( Config::ForecastStage *cnf, AQNetworkProvider *net,
+    		Pollutant *pol, Aggregation::Type agg, DateTime &baseTime );
       
-
     void loadPlugins(std::vector<Config::Plugin> * plugins);
     void initComponents(std::vector<Config::Component> & components);
     
