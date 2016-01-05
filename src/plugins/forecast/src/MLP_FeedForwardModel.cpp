@@ -16,7 +16,10 @@ namespace OPAQ {
 
 LOGGER_DEF(OPAQ::MLP_FeedForwardModel);
 
-MLP_FeedForwardModel::MLP_FeedForwardModel() {}
+MLP_FeedForwardModel::MLP_FeedForwardModel() :
+	sample_size(0) {
+}
+
 MLP_FeedForwardModel::~MLP_FeedForwardModel() {}
 
 
@@ -61,6 +64,11 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 		return this->getMissingValue();
 	}
 
+	if ( net->inputSize() != this->sample_size ) {
+		throw RunTimeException( "Invalid network input size (" + std::to_string(net->inputSize()) +
+				") for model sample size ("+ std::to_string( this->sample_size ) +")" );
+	}
+
 	DateTime fcTime = baseTime + fc_hor;
 
 	// construct the input feature vector, output is single pointer value
@@ -69,7 +77,7 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 	double *output;
 
 	// call abstract method to generate the sample
-	if ( this->makeSample( input_sample, station, pol, baseTime, fcTime, fc_hor ) ) {
+	if ( this->makeSample( input_sample, station, pol, aggr, baseTime, fcTime, fc_hor ) ) {
 		logger->error( "   input sample incomplete, setting missing value" );
 		return this->getMissingValue();
 	}
@@ -106,6 +114,7 @@ void MLP_FeedForwardModel::run() {
 
 	DateTime baseTime      = getBaseTime();
 	Pollutant pol          = getPollutant();
+	Aggregation::Type aggr = getAggregation();
 	AQNetwork *net         = getAQNetworkProvider()->getAQNetwork();
 	ForecastBuffer *buffer = getBuffer();
 
@@ -142,12 +151,12 @@ void MLP_FeedForwardModel::run() {
 					       ", horizon : day+" + std::to_string(fc_hor) +
 					       ", dayN is : "     + fcTime.dateToString() );
 
-			fc.insert( fcTime, fcValue( pol, *station, OPAQ::Aggregation::DayAvg, baseTime, fcHor ) );
+			fc.insert( fcTime, fcValue( pol, *station, aggr, baseTime, fcHor ) );
 		}
 
 		// now we have all the forecast values for this particular station, set the output values...
 		buffer->setCurrentModel( this->getName() );
-		buffer->setValues( baseTime, fc, station->getName(), pol.getName(), OPAQ::Aggregation::DayAvg );
+		buffer->setValues( baseTime, fc, station->getName(), pol.getName(), aggr );
 
 	} // loop over the stations
 
