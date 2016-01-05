@@ -47,8 +47,8 @@ protected:
     // derived models are the actual plugins and they need to implement this particular
     // method... 
     virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
-			    const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
-			    const OPAQ::TimeInterval &fc_hor ) = 0;
+    		    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime,
+				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor ) = 0;
     
     /**
      * virtual method which returns the name of the ffnet file from a given pattern
@@ -60,7 +60,8 @@ protected:
 
     void   printPar( std::string title, const std::vector<double> &x );
 
-    std::string pattern; //! needs to be set by the daughter class configure method
+    std::string pattern;      //! needs to be set by the daughter class configure method
+    unsigned int sample_size; //! needs to be set by daughter class
 
   private:    
     LOGGER_DEC();
