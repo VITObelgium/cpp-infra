@@ -50,13 +50,17 @@ protected:
 			    const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
 			    const OPAQ::TimeInterval &fc_hor ) = 0;
     
-    virtual std::string getFFNetFile( const std::string &pol_name, 
-				      const std::string &st_name, 
-				      int fc_hor ) = 0;
+    /**
+     * virtual method which returns the name of the ffnet file from a given pattern
+     */
+    virtual std::string getFFNetFile( const std::string &pol_name, Aggregation::Type aggr,
+			const std::string &st_name, int fc_hor );
     
     virtual int getMissingValue( void ) = 0;
 
     void   printPar( std::string title, const std::vector<double> &x );
+
+    std::string pattern; //! needs to be set by the daughter class configure method
 
   private:    
     LOGGER_DEC();
