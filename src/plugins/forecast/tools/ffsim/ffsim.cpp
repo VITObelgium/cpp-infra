@@ -143,7 +143,7 @@ int main( int argc, char *argv[] ) {
 
   char  line[1024];
   char *pch;
-  int   idx = 0, ID = 0;
+  unsigned int   idx = 0, ID = 0;
 #define SEPCHAR "\t;, "
   while ( fgets( line, 1024, inFp ) != NULL ) {
     trim(line);
@@ -185,7 +185,7 @@ int main( int argc, char *argv[] ) {
     }
 
     fprintf( outFp, "%d", ID );
-    for ( int i=0; i<net->outputSize(); i++ ) fprintf( outFp, "\t%f", exp(output(i))-1 );
+    for ( unsigned int i=0; i<net->outputSize(); i++ ) fprintf( outFp, "\t%f", exp(output(i))-1 );
     fprintf( outFp, "\n" );
   }
 
