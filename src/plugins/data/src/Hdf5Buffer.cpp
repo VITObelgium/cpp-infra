@@ -241,14 +241,13 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 	// -- now, store the data
 
 	// get the indices
-	unsigned int modelIndex = Hdf5Tools::getIndexInStringDataSet( dsModels, _currentModel, true);
+	unsigned int modelIndex   = Hdf5Tools::getIndexInStringDataSet( dsModels, _currentModel, true);
 	unsigned int stationIndex = Hdf5Tools::getIndexInStringDataSet( dsStations, stationId, true);
-	unsigned int dateIndex = OPAQ::TimeInterval( startTime, baseTime ).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
-	unsigned int fhIndex = OPAQ::TimeInterval( forecast.firstDateTime(), baseTime ).getSeconds() / _fcTimeResolution.getSeconds();
+	unsigned int dateIndex    = OPAQ::TimeInterval( startTime, baseTime ).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
+	unsigned int fhIndex      = OPAQ::TimeInterval( forecast.firstDateTime(), baseTime ).getSeconds() / _fcTimeResolution.getSeconds();
 
 	//DEBUG !!
 	std::cout << "modelIndex= " << modelIndex << ", stationIndex= " << stationIndex << ", dateIndex=" << dateIndex << ", fcIndex = " << fhIndex << std::endl;
-
 
 	// -- store data
 	// a. get data space
@@ -469,11 +468,18 @@ std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange(
   */
 
 OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const DateTime& t1,
-		const DateTime& t2, const std::string& stationId, const std::string& pollutantId,
-		OPAQ::Aggregation::Type aggr ) {
+												const DateTime& t2,
+												const std::string& stationId,
+												const std::string& pollutantId,
+												OPAQ::Aggregation::Type aggr ) {
+	// return the observations stored...
+	// this routine is inherited from the DataProvider...
 
 	// what to return here ??
 	throw RunTimeException( "not sure what to return here, need extra information ???" );
+
+
+
 
 	OPAQ::TimeSeries<double> out;
 	return out;
@@ -489,14 +495,152 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const DateTime &baseTime,
 	return out;
 }
 
+// return hindcast vector of model values for a fixed forecast horizon
+// for a forecasted day interval
 OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const OPAQ::TimeInterval fc_hor,
 		const DateTime &fcTime1, const DateTime &fcTime2,
 		const std::string& stationId, const std::string& pollutantId,
 		OPAQ::Aggregation::Type aggr ) {
 
-	throw RunTimeException( "IMPLEMENT ME !!" );
+	if ( fcTime1 > fcTime2 ) throw RunTimeException( "requested fcTime1 is > fcTime2..." );
+
+	H5::DataSet dsVals, dsStations, dsModels;
+	H5::Group grpPol, grpAggr;
+	OPAQ::DateTime startTime;
+
+	try {
+		grpPol  = _h5file->openGroup( pollutantId );
+	    grpAggr = grpPol.openGroup( OPAQ::Aggregation::getName(aggr) );
+	    dsVals  = grpAggr.openDataSet( FORECAST_DATASET_NAME );
+
+	    // retrieve startTime from the stored dataset in this group
+		startTime = OPAQ::DateTime( Hdf5Tools::readStringAttribute( dsVals, START_DATE_NAME ) );
+
+		// open datasets for models & stations
+		dsStations = grpAggr.openDataSet( STATION_DATASET_NAME );
+		dsModels   = grpAggr.openDataSet( MODELS_DATASET_NAME );
+
+	} catch ( H5::Exception & err ) {
+		logger->error( "cannot retrieve hindcast values in forecast buffer..." );
+		throw NotAvailableException( "forecast is not available" );
+	}
+
+	// retrieve station, model & forecsat horizon index
+	unsigned int stIndex = Hdf5Tools::getIndexInStringDataSet( dsStations, stationId );
+	unsigned int modelIndex = Hdf5Tools::getIndexInStringDataSet( dsModels, _currentModel );
+	unsigned int fhIndex = fc_hor.getSeconds() / _fcTimeResolution.getSeconds();
+
+#ifdef DEBUG
+	std::cout << "Hdf5Buffer::getValues()" << std::endl;
+	std::cout << "req station : " << stationId << ", idx = " << stIndex << std::endl;
+	std::cout << "req model : " << _currentModel << ", idx = " << modelIndex << std::endl;
+	std::cout << "req fh : " << fc_hor << ", idx = " << fhIndex << std::endl;
+#endif
+
+	hsize_t modelSize = Hdf5Tools::getDataSetSize( dsVals, 0 ); // index 0 is models
+	hsize_t stSize = Hdf5Tools::getDataSetSize( dsVals, 1 );
+	hsize_t btSize = Hdf5Tools::getDataSetSize( dsVals, 2 );
+	hsize_t fhSize = Hdf5Tools::getDataSetSize( dsVals, 3 );
+
+	//
+	if ( fhIndex < 0 || fhIndex >= fhSize ||
+		 modelIndex < 0 || modelIndex >= modelSize ||
+		 stIndex < 0 || stIndex >= stSize ) {
+		throw RunTimeException( "Could not find requested forecast horizon/model/station in HDF5 buffer" );
+	}
+
+	// compute the index for the base time of the first forecastTime
+	OPAQ::DateTime b1 = fcTime1 - fc_hor;
+	OPAQ::DateTime b2 = fcTime2 - fc_hor;
+	unsigned int nvals = OPAQ::TimeInterval( b1, b2 ).getSeconds() /_baseTimeResolution.getSeconds() + 1;
 
 	OPAQ::TimeSeries<double> out;
+	if ( b2 < startTime ) {
+		// we have no values in the buffer, so return all -9999
+		for ( OPAQ::DateTime fct = fcTime1; fct <= fcTime2 ; fct = fct + _baseTimeResolution ) out.insert( fct, _noData );
+
+	} else if ( b1 < startTime ) {
+		// first forecast time before the start time...
+
+#ifdef DEBUG
+		std::cout << "startTime : " << startTime << std::endl;
+		std::cout << "forecat horizon : " << fc_hor << std::endl;
+		std::cout << "basetime for fcTime1 : " << b1 << std::endl;
+		std::cout << "basetime for fcTime2 : " << b2 << std::endl;
+#endif
+
+		// number of elements before the HDF5 buffer
+		unsigned int n_before = OPAQ::TimeInterval( b1, startTime ).getSeconds() / _baseTimeResolution.getSeconds(); // number of steps before buffer start
+		unsigned int n_inside = OPAQ::TimeInterval( startTime, b2 ).getSeconds() / _baseTimeResolution.getSeconds() + 1; // number of steps inside buffer
+
+		if ( ( n_before + n_inside ) != nvals ) {
+#ifdef DEBUG
+			std::cout << "nvals = " << nvals << std::endl;
+			std::cout << "n_before = " << n_before << std::endl;
+			std::cout << "n_inside = " << n_inside << std::endl;
+#endif
+			throw RunTimeException( "Strange things are happening... everyday... i hear the music... up above my head !" );
+		}
+
+		// completely within the period
+		double tmp[n_inside];
+
+		// "model x station x baseTime x fcHorizon"
+		H5::DataSpace space = dsVals.getSpace();
+		hsize_t dc[4] = { 1, 1, n_inside, 1 };
+		hsize_t doffset[4] = { modelIndex, stIndex, 0, fhIndex };
+		space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
+
+		hsize_t mc[1] = { n_inside };
+		hsize_t moffset[1] = { 0 };
+		H5::DataSpace memSpace(1, mc);
+		memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
+
+		dsVals.read( &tmp[0], H5::PredType::NATIVE_DOUBLE, memSpace, space );
+		space.close();
+
+		// TODO make this more efficient !!
+		//      --> enable to directly dump into the timeseries object... let's worry about this later...
+		OPAQ::DateTime fct = fcTime1;
+		for ( unsigned int ii=0; ii<n_before; ii++ ) {
+			out.insert( fct, _noData );
+			fct = fct + _baseTimeResolution;
+		}
+		for ( unsigned int ii=0; ii<n_inside; ii++ ) {
+			out.insert( fct, tmp[ii] );
+			fct = fct + _baseTimeResolution;
+		}
+
+	} else {
+		// completely within the period
+		double tmp[nvals];
+		unsigned int btIndex = OPAQ::TimeInterval( startTime, b1 ).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
+
+		// "model x station x baseTime x fcHorizon"
+		H5::DataSpace space = dsVals.getSpace();
+		hsize_t dc[4] = { 1, 1, nvals, 1 };
+		hsize_t doffset[4] = { modelIndex, stIndex, btIndex, fhIndex };
+		space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
+
+		hsize_t mc[1] = { nvals };
+		hsize_t moffset[1] = { 0 };
+		H5::DataSpace memSpace(1, mc);
+		memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
+
+		dsVals.read( &tmp[0], H5::PredType::NATIVE_DOUBLE, memSpace, space );
+		space.close();
+
+		// TODO make this more efficient !!
+		//      --> enable to directly dump into the timeseries object... let's worry about this later...
+		OPAQ::DateTime fct = fcTime1;
+		for ( unsigned int ii=0; ii<nvals; ii++ ) {
+			  out.insert( fct, tmp[ii] );
+			  fct = fct + _baseTimeResolution;
+		}
+
+
+	}
+
 	return out;
 }
 
