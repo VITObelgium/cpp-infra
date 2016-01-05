@@ -24,8 +24,8 @@ namespace nnet {
     
     friend std::ostream& operator<<(std::ostream& os, const feedforwardnet& net );
 
-    int inputSize( void ) { return _input.size(); }
-    int outputSize( void ) { return _output.size(); }
+    unsigned int inputSize( void ) { return _input.size(); }
+    unsigned int outputSize( void ) { return _output.size(); }
 
     void getOutput( double **x ) { *x = _output.data(); }
     void getOutput( Eigen::VectorXd& out ) { out = _output; }
