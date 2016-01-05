@@ -18,6 +18,8 @@
 
 #include <config.h>
 
+// TODO default basetime is today !!
+
 const std::string OPAQ_VERSION ( VERSION );  // defined in the autoconf config.h
 
 void print_usage( void ) {
@@ -28,6 +30,7 @@ void print_usage( void ) {
   std::cout << " --cnf <fname> ......... : use this XML config file (def. opaq-config.xml)" << std::endl;
   std::cout << " --logcnf <name> ....... : log4cxx config file (def. Log4cxxConfig.xml)" << std::endl;
   std::cout << " --pol <name> .......... : run for this pollutant/index" << std::endl;
+  std::cout << " --aggr <aggr> ......... : run for this aggregation time" << std::endl;
   std::cout << " --basetime <yyyy-mm-dd> : run for this base time" << std::endl;
   std::cout << " --days <number> ....... : run for this many days, starting from base time (def. 1)" << std::endl;
 }
@@ -61,12 +64,14 @@ int main (int argc, char* argv[]) {
     { "logcnf",  1, 0, 'l' },
     { "cnf",     1, 0, 'c' },
     { "pol",     1, 0, 'p' },
+	{ "aggr",    1, 0, 'a' },
     { "basetime",1, 0, 'b' },
     { "days"    ,1, 0, 'd' },
     { 0,         0, 0,  0} };
 
   // general variable settable via command line options in opaq
   std::string pol         = "";
+  std::string aggr        = "";
   std::string config_file = "opaq-config.xml";
   std::string log_config  = "Log4cxxConfig.xml";
   std::string days        = "1";
@@ -86,6 +91,7 @@ int main (int argc, char* argv[]) {
     case 'l': log_config = optarg; break;
     case 'c': config_file = optarg; break;
     case 'p': pol = optarg; break;
+    case 'a': aggr = optarg; break;
     case 'b': basetime = optarg; break;
     case 'd': days = optarg; break;
     default:
@@ -122,11 +128,11 @@ int main (int argc, char* argv[]) {
   // overwrite a few of the standard run options by the command line options here...
   // 1. pollutant
 
-  //TODO do not run for a single pollutant, but for all --> accomodate multi-pollutant models
-  if ( pol.size() > 0 ) ch.getOpaqRun()->setPollutantName( pol );
+  //TODO do not run for a single pollutant, but for all --> accomodate multi-pollutant models, or alternatively call in a loop
+  if ( pol.size() > 0 ) ch.getOpaqRun()->setPollutantName( pol, aggr );
   else pol = ch.getOpaqRun()->getPollutantName();
   logger->info("Requested pollutant ....... : " + pol);
-
+  logger->info("Requested aggregation ..... : " + OPAQ::Aggregation::getName( ch.getOpaqRun()->getAggregation() ) );
 
   // 2. base times
   if (basetime.size() > 0) {
