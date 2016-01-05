@@ -113,7 +113,7 @@ namespace nnet {
   int feedforwardnet::sim( const double *inp ) {
     
     // copy over the input values
-    for( int i = 0; i<this->inputSize(); i++ ) _input(i) = inp[i];
+    for( unsigned int i = 0; i<this->inputSize(); i++ ) _input(i) = inp[i];
 
     if ( this->verbose ) std::cout << "[feedforwardnet::sim] network input : " 
 				   << std::endl << _input << std::endl;
