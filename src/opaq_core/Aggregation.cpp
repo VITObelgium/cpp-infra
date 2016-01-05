@@ -5,6 +5,7 @@
  *      Author: bino
  */
 
+#include <algorithm>
 #include "Aggregation.h"
 
 namespace OPAQ {
@@ -33,6 +34,29 @@ std::string Aggregation::getName( Aggregation::Type agg ) {
 	}
 
 	return std::string( "n/a" );
+}
+
+
+Aggregation::Type Aggregation::fromString( std::string s )
+	throw( NotAvailableException ) {
+
+	if ( s.size() == 0 ) return Aggregation::None;
+
+	// convert s to lower case
+	std::transform( s.begin(), s.end(), s.begin(), ::tolower );
+
+	if ( !s.compare( "da" ) || !s.compare( "dayavg" ) || !s.compare( "dailyavg" ) ) {
+		return Aggregation::DayAvg;
+	} else if ( !s.compare( "m1" ) || !s.compare( "max1h" ) || !s.compare( "daymax" ) || !s.compare( "dailymax" ) ) {
+		return Aggregation::Max1h;
+	} else if ( !s.compare( "m8" ) || !s.compare( "max8h" ) ) {
+		return Aggregation::Max8h;
+	} else if ( !s.compare( "none" ) ) {
+		return Aggregation::None;
+	}
+
+	throw NotAvailableException( "Aggregation " + s + " is not known..." );
+	return Aggregation::None;
 }
 
 } /* namespace OPAQ */
