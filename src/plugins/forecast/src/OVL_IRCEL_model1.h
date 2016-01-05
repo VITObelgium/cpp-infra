@@ -19,8 +19,8 @@ namespace OPAQ {
     virtual int getMissingValue( void ) { return missing_value; }
 
     virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
-			    const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
-			    const OPAQ::TimeInterval &fc_hor );
+        		    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime,
+    				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor );
 
   private:
     int         mor_agg;       //!< morning aggregation hour
