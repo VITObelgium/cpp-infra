@@ -48,6 +48,8 @@ private:
     std::string tune_mode;       //! the selected tune mode for how OVL was optimized.
     int         missing_value;   //! a missing value
 
+    OPAQ::TimeInterval hindcast;
+
     void _parseTunes( TiXmlElement *lst );
 
     /**
