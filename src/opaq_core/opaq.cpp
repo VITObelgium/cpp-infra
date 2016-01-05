@@ -18,8 +18,6 @@
 
 #include <config.h>
 
-// TODO default basetime is today !!
-
 const std::string OPAQ_VERSION ( VERSION );  // defined in the autoconf config.h
 
 void print_usage( void ) {
@@ -33,10 +31,10 @@ void print_usage( void ) {
   std::cout << " --aggr <aggr> ......... : run for this aggregation time" << std::endl;
   std::cout << " --basetime <yyyy-mm-dd> : run for this base time" << std::endl;
   std::cout << " --days <number> ....... : run for this many days, starting from base time (def. 1)" << std::endl;
+  std::cout  << std::endl;
 }
 
 void print_welcome( log4cxx::LoggerPtr logger ) {
-
   std::cout << "  ______   .______      ___       ______      " << std::endl;
   std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
   std::cout << "|  |  |  | |  |_)  |  /  ^  \\   |  |  |  |    " << std::endl;
@@ -49,7 +47,6 @@ void print_welcome( log4cxx::LoggerPtr logger ) {
   std::cout <<   "Copyright VITO (c) 2015, all rights reserved"  << std::endl;
   std::cout <<   "Contact: bino.maiheu@vito.be"  << std::endl;
   std::cout  << std::endl;
-
 }
 
 
