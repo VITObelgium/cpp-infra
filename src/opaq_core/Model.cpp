@@ -9,7 +9,15 @@
 
 namespace OPAQ {
 
-  Model::Model() {}
+  Model::Model() :
+	  aggregation(Aggregation::None),
+	  aqNetworkProvider(0),
+	  gridProvider(0),
+	  input(0),
+	  meteo(0),
+	  buffer(0) {
+
+  }
 
 } /* namespace opaq */
 
