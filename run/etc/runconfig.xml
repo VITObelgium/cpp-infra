@@ -4,6 +4,9 @@
   <!-- pollutant to use: can be overridden by command line arguments,
        in that case the value provided here is ignored -->
   <pollutant>pm10</pollutant>
+
+  <!-- set aggregation time -->
+  <aggregation>da</aggregation>
   
   <!-- base times to use: can be overridden by command line arguments,
        in that case the value provided here is ignored -->
