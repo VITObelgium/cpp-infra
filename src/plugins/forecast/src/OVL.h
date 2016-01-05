@@ -61,7 +61,7 @@ private:
      * we are not using TimeInterval in the tuple (could do) because we would need to
      * add some stuff in the implementation of the TimeInterval to be able to use it in a tuple
      */
-    std::map<std::tuple<std::string, std::string, std::string, int>, OVL::StationConfig> _conf;
+    std::map<std::tuple<std::string, OPAQ::Aggregation::Type, std::string, int>, OVL::StationConfig> _conf;
   };
   
   
