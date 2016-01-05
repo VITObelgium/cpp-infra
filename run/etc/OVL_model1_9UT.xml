@@ -1,20 +1,17 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <config>
-  <!-- specify the networks -->
+  <!-- specify the networks, include the morning aggreagtion here, the code is unaware of it,
+       except for the mor_agg -->
   <ffnetfile_pattern>
-    networks/%pol%/09UT/day%fc_hor%/ffnet_%station%_%pol%_dayavg_model1_09UT-day%fc_hor%.xml
+    networks/%pol%/09UT/day%fc_hor%/ffnet_%station%_%pol%_%aggr%_model1_09UT-day%fc_hor%.xml
   </ffnetfile_pattern>
   
   <!-- missing value -->
   <missing_value>-9999</missing_value>
 
-  <!-- morning aggregation time and associated tag -->
+  <!-- morning aggregation time, this represents the hour of the day up to which the
+       pollutants are averaged, if missing, the model will take all the available data
+       for day 0 -->
   <mor_agg>9</mor_agg>
-  <mcid>9UT</mcid>
-  
-  <!-- real time correction scheme -->
-  <rtc>
-    
-  </rtc>
 
 </config>
