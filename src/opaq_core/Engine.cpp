@@ -68,11 +68,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     // TODO maybe nicer to have model->run( baseTime ) and change the
 
   } // loop over the ensemble of models
-  
-  // Run ensemble mergers on the buffer
-  // an ensemble merger should basically be a model as well, but one which is
-  // aware of the other models and should give back exactly what to map
-  
+
   // Prepare and run the forecast output writer for 
   // this basetime & pollutant
   name = cnf->getOutputWriter()->getName();
@@ -83,7 +79,6 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   std::cout << " - calling " << outWriter->getName() << " ..." << std::endl;
 
   std::cout << "THIS IS NOT RIGHT, WHERE TO PUT THE AGGREGATION AND THE POLLUTANT ???" << std::endl;
-
   outWriter->write( pol, OPAQ::Aggregation::DayAvg, baseTime );
 
   return;
