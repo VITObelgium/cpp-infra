@@ -18,6 +18,7 @@
 #include "Plugin.h"
 #include "../Logger.h"
 #include "../Pollutant.h"
+#include "../Aggregation.h"
 #include "../DateTime.h"
 
 namespace OPAQ {
@@ -47,6 +48,9 @@ namespace OPAQ {
       std::string getPollutantName() const { return pollutantName; }
       bool pollutantIsSet () { return pollutantSet; }
 
+      /** Returns the aggreagation requested for this run */
+      OPAQ::Aggregation::Type getAggregation() const { return aggregation; }
+
       /** Returns a list of basetimes */
       std::vector<OPAQ::DateTime> & getBaseTimes() { return baseTimes; }
 
@@ -61,10 +65,18 @@ namespace OPAQ {
       /** Retrieve the mapping stage object */
       OPAQ::Config::MappingStage* getMappingStage() const { return mappingStage; }
 
-      /** Set the requested pollutant name for this run */
-      void setPollutantName( std::string & name ) {
+      /** Set the requested pollutant & aggregation for this run */
+      void setPollutantName( const std::string& name, const std::string& aggr = "" ) {
     	  pollutantName = name;
-    	  pollutantSet = true;
+    	  aggregation   = Aggregation::fromString( aggr );
+    	  pollutantSet  = true;
+      }
+
+      /**
+       * Set aggregation separately...
+       */
+      void setAggregation( const std::string& aggr ) {
+    	  aggregation = Aggregation::fromString( aggr );
       }
 
       /** 
@@ -90,13 +102,14 @@ private:
       std::vector<OPAQ::Config::Plugin>    plugins;    //!< list of available plugins
       std::vector<OPAQ::Config::Component> components; //!< list of available components
 
-      std::string pollutantName;
-      bool pollutantSet;
+      std::string pollutantName;                  //!< requested name of the pollutant
+      bool pollutantSet;                          //!< do we have the pollutant set in the run (also checks the aggreagtion)
+      OPAQ::Aggregation::Type aggregation;        //!< the aggregation for the run
 
-      std::vector<OPAQ::DateTime> baseTimes;
+      std::vector<OPAQ::DateTime> baseTimes;      //!< list of basetimes to process in this run
 
-      OPAQ::Config::Component *networkProvider; //!< the network provider
-      OPAQ::Config::Component *gridProvider;	//!< the grid provider
+      OPAQ::Config::Component *networkProvider;   //!< the network provider
+      OPAQ::Config::Component *gridProvider;	  //!< the grid provider
 
       OPAQ::Config::ForecastStage *forecastStage; //!< this defines the forecast configuration in the OPAQ run
       OPAQ::Config::MappingStage  *mappingStage;  //!< this defines the mapping configuration in the OPAQ run
