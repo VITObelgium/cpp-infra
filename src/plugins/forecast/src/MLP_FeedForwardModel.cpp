@@ -5,12 +5,34 @@
 #include "MLP_FeedForwardModel.h"
 #include "feedforwardnet.h"
 
+// define place holder for the neural network input files
+const std::string POLLUTANT_PLACEHOLDER   = "%pol%";     // placeholder for the pollutant in config file
+const std::string AGGREGATION_PLACEHOLDER = "%aggr%";    // placeholder ofr the aggregation in the config file
+const std::string STATION_PLACEHOLDER     = "%station%"; // placeholder for the station in config file
+const std::string FCHOR_PLACEHOLDER       = "%fc_hor%";  // idem for forecast horizon
+const std::string MODEL_PLACEHOLDER       = "%model%";   // idem for feature vector model
+
 namespace OPAQ {
 
 LOGGER_DEF(OPAQ::MLP_FeedForwardModel);
 
 MLP_FeedForwardModel::MLP_FeedForwardModel() {}
 MLP_FeedForwardModel::~MLP_FeedForwardModel() {}
+
+
+std::string MLP_FeedForwardModel::getFFNetFile( const std::string &pol_name, Aggregation::Type aggr,
+	    const std::string &st_name, int fc_hor ) {
+
+	// Building filename...
+	std::string fname = this->pattern;
+	OPAQ::StringTools::replaceAll( fname, POLLUTANT_PLACEHOLDER, pol_name );
+	OPAQ::StringTools::replaceAll( fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr) );
+	OPAQ::StringTools::replaceAll( fname, STATION_PLACEHOLDER, st_name );
+	OPAQ::StringTools::replaceAll( fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor) );
+	OPAQ::StringTools::replaceAll( fname, MODEL_PLACEHOLDER, this->getName() );
+
+  return fname;
+}
 
 
 // need to create a routine which can be re-used by the OVL model without having to make use of the
@@ -21,7 +43,7 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 									  const OPAQ::TimeInterval& fc_hor ) {
 
 	// Return the neural network filename, should be implemented in the daugher class
-	std::string fname = getFFNetFile( pol.getName(), station.getName(), fc_hor.getDays() );
+	std::string fname = getFFNetFile( pol.getName(), aggr, station.getName(), fc_hor.getDays() );
 
 	// Read in the network file
 	TiXmlDocument nnet_xml( fname.c_str() );
