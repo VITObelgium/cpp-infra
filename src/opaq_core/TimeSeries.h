@@ -29,7 +29,10 @@ public:
 	~TimeSeries(){ clear(); }
 
 	size_t size() const { return _datetimes.size(); }
-	bool   isEmpty() const { return ( _datetimes.size() == 0 ); }
+	void     setNoData( const T& missing_value ) { _missing_value = missing_value; }
+	const T& getNoData( void ) const { return _missing_value; }
+	bool     isEmpty() const { return ( _datetimes.size() == 0 ); }
+
 	bool   isConsistent( const TimeSeries<T>& t ) const {
 		if ( t.size() != size() ) return false;
 		for ( unsigned int i = 0; i < size(); i++ )
@@ -123,10 +126,19 @@ public:
 	// given timestamp (as the at that time most recent value)
 	T valueAt( const DateTime& dt ) const throw(OutOfBoundsException);
 
-	// subset the timeseries, returns a new timeseries with the subset of the
-	// object
+
+	/**
+	 * subset the timeseries, returns a new timeseries with the subset of the
+	 * object, this version just gives all the values, without wondering whether
+	 * there is any gaps
+	 */
 	TimeSeries<T> select( const DateTime& t1, const DateTime& t2 ) const;
 
+	/**
+	 * Subset the timeseries, returns a new timeseries with the subset of the
+	 * object, this version fills up the gaps with the nodata value.
+	 */
+	TimeSeries<T> select( const DateTime& t1, const DateTime& t2, const TimeInterval& step ) const;
 
 	// write the timeseries to a file
 	void write( std::string fname ) {
@@ -141,6 +153,7 @@ public:
 protected:
 	std::vector<T>        _values;
 	std::vector<DateTime> _datetimes;
+	T                     _missing_value;
 };
 
 // empty constructor
@@ -301,9 +314,22 @@ TimeSeries<T> TimeSeries<T>::select( const DateTime& t1, const DateTime& t2 ) co
 	return ts;
 }
 
+// TODO very slow implementation since we are looking up the index of each element, but for now let's leave it at this...
+template <class T>
+TimeSeries<T> TimeSeries<T>::select( const DateTime& t1, const DateTime& t2, const TimeInterval& step ) const {
+	TimeSeries<T> ts;
+
+	for ( DateTime t = t1; t <= t2; t = t + step ) {
+		int i = index(t);
+		if ( i < 0 ) ts.insert( t, _missing_value );
+		else ts.insert( t, _values[i] );
+	}
+
+	return ts;
+}
 
 template <class T>
-std::ostream& operator << (std::ostream& os, const TimeSeries<T>& ts ) {
+std::ostream& operator << ( std::ostream& os, const TimeSeries<T>& ts ) {
    if ( ts.isEmpty() ) return os;
    for (unsigned int i=0; i<ts.size(); i++) {
       os << "[" << ts.datetime(i) << "] "  << ts.value(i)  << std::endl;
