@@ -5,24 +5,21 @@
 
 #define epsilon 1e-6
 
-// a list of meteo variable names relevant for this model
-// we should acutally better put this in the config file and allow the user
-// to configure the ff model feature vector from the configuration
-const std::string p_t2m     = "P01"; // 2m temperature
-const std::string p_wsp10m  = "P03"; // wind speed 10 m
-const std::string p_wdir10m = "P04"; // wind direction 10 m 
-const std::string p_blh     = "P07"; // boundary layer height
-const std::string p_cc      = "P12"; // total cloud cover
-const std::string p_rh      = "P24"; // relative humidity
-const std::string p_S       = "P21"; // buyltinck-malet S parameter
-const std::string p_Transp  = "P16"; // horizontal transport in BL (BLH x mean wind in BLH)
-
 namespace OPAQ {
 
-  OVL_IRCEL_model3::OVL_IRCEL_model3() {
-    missing_value = -9999; // set default missing value, overwritting in xml config
-    mor_agg       = -1;
-    sample_size   = 11;
+  OVL_IRCEL_model3::OVL_IRCEL_model3() :
+		p_t2m( "P01" ),         // t2m in IRCEL meteo provider
+		p_wsp10m( "P03" ),      // wind speed 10 m in IRCEL meteo provider
+		p_wdir10m( "P04" ),     // wind direction 10 m
+		p_blh( "P07" ),         // boundary layer height
+		p_cc( "P13" ),          // low cloud cover
+		p_rh( "P24" ),          // relative humidity
+		p_S("P21"),             // buyltinck-malet S parameter
+		p_Transp("P16"),        // horizontal transport in BL (BLH x mean wind in BLH)
+		missing_value( -9999 ), // set default missing value, overwritting in xml config
+		mor_agg( -1 )           // default is all
+  {
+	  sample_size = 11;
   }
 
   OVL_IRCEL_model3::~OVL_IRCEL_model3() {};
@@ -90,6 +87,7 @@ namespace OPAQ {
     TimeSeries<double> wsp  = meteo->getValues( t1, t2, st.getMeteoId(), p_wsp10m );
     TimeSeries<double> wdir = meteo->getValues( t1, t2, st.getMeteoId(), p_wdir10m );
     
+    /*
     // calculate the wind speed u and v components from the wsp and wdir
     std::vector<double> u,v;
     u.resize(wsp.size());
@@ -104,7 +102,7 @@ namespace OPAQ {
     	  v[ii] = wsp.value(ii) * sin( OPAQ::Math::Pi * wdir.value(ii) / 180. );
       }
     }
-
+     */
 
 #ifdef DEBUG
     // some debugging information to a file...
@@ -147,7 +145,7 @@ namespace OPAQ {
     t2 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - obs->getTimeResolution();  // 1x meteto TimeResultion aftrekken : - getTimeResolution();
 
     OPAQ::TimeSeries<double> xx_yest = obs->getValues( t1, t2, st.getName(), pol.getName() );
-    xx = mean_missing( xx_morn.values(), obs->getNoData() );
+    xx = mean_missing( xx_yest.values(), obs->getNoData() );
     if ( fabs( xx - obs->getNoData() ) > epsilon ) sample[1] = log(1 + xx );
     else have_sample++;
 
@@ -173,9 +171,9 @@ namespace OPAQ {
     }
 
     // 3. -------------------------------------------------------------------------------
-    // sample[3] is the mean medium cloud cover for dayN
+    // sample[3] is the mean medium cloud cover for dayN, no logtransform
     xx = mean_missing( cc.values(), meteo->getNoData( p_cc ) );
-    if ( fabs( xx - meteo->getNoData(p_cc) ) > epsilon ) sample[3] = log(1 + xx );
+    if ( fabs( xx - meteo->getNoData(p_cc) ) > epsilon ) sample[3] = xx;
     else have_sample++;
     
 
@@ -239,11 +237,30 @@ namespace OPAQ {
     // 8. and 9. -------------------------------------------------------------------------
     // sample[8] and sample[9] are zoneal & meridional wind vectors, note that above
     // we have used the nodata value of the wsp10m
-    sample[8] = mean_missing( u, meteo->getNoData( p_wsp10m ) ); // wdir x
-    if ( fabs( sample[8] - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
+    /*
+        sample[8] = mean_missing( u, meteo->getNoData( p_wsp10m ) ); // wdir x
+        if ( fabs( sample[4] - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
 
-    sample[9] = mean_missing( v, meteo->getNoData( p_wsp10m ) ); // wdir y
-    if ( fabs( sample[9] - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
+        sample[9] = mean_missing( v, meteo->getNoData( p_wsp10m ) ); // wdir y
+        if ( fabs( sample[5] - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
+    */
+
+    // Note the above bugfix, firsst determe the average components
+    double x_vec, y_vec;
+    bool ok;
+    OPAQ::Math::winddir( &x_vec, &y_vec, wdir.values(), meteo->getNoData(p_wdir10m), &ok );
+    if ( ! ok ) {
+    	have_sample++;
+    } else {
+    	xx = mean_missing( wsp.values(), meteo->getNoData( p_wsp10m ) ); // average wind speed
+    	if ( fabs( xx - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
+    	else {
+    		sample[8] = x_vec * xx;
+    		sample[9] = y_vec * xx;
+    	}
+
+    }
+
 
     // 10. ------------------------------------------------------------------------------
     // get the weekday : week/weekend ?
