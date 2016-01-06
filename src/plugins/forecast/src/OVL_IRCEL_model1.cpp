@@ -4,22 +4,19 @@
 #include "OVL_IRCEL_model1.h"
 
 #define epsilon 1e-6
-
-// a list of meteo variable names relevant for this model
-// we should acutally better put this in the config file and allow the user
-// to configure the ff model feature vector from the configuration
-const std::string p_t2m     = "P01"; // 2m temperature
-const std::string p_wsp10m  = "P03"; // wind speed 10 m
-const std::string p_wdir10m = "P04"; // wind direction 10 m 
-const std::string p_blh     = "P07"; // boundary layer height
-const std::string p_cc      = "P12"; // total cloud cover
   
 namespace OPAQ {
 
-  OVL_IRCEL_model1::OVL_IRCEL_model1() {
-    missing_value = -9999; // set default missing value, overwritting in xml config
-    mor_agg       = -1;
-    sample_size   =  2;
+  OVL_IRCEL_model1::OVL_IRCEL_model1() :
+	  p_t2m( "P01" ),         // t2m in IRCEL meteo provider
+	  p_wsp10m( "P03" ),      // wind speed 10 m in IRCEL meteo provider
+  	  p_wdir10m( "P04" ),     // wind direction 10 m
+	  p_blh( "P07" ),         // boundary layer height
+	  p_cc( "P13" ),          // low cloud cover
+	  missing_value( -9999 ), // set default missing value, overwritting in xml config
+	  mor_agg( -1 )           // default is all
+  {
+	  sample_size = 2;
   }
 
   OVL_IRCEL_model1::~OVL_IRCEL_model1() {};
