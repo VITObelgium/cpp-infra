@@ -23,8 +23,17 @@ namespace OPAQ {
     				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor );
 
   private:
-    int         mor_agg;       //!< morning aggregation hour
-    int         missing_value; //!< missing value, read from configuration
+    const std::string p_t2m;     // 2m temperature
+    const std::string p_wsp10m;  // wind speed 10 m
+    const std::string p_wdir10m; // wind direction 10 m
+    const std::string p_blh;     // boundary layer height
+    const std::string p_cc;      // low cloud cover
+    const std::string p_rh;      // relative humidity
+    const std::string p_S;       // buyltinck-malet S parameter
+    const std::string p_Transp;  // horizontal transport in BL (BLH x mean wind in BLH)
+
+    int missing_value;           //!< missing value, read from configuration
+    int mor_agg;                 //!< morning aggregation hour
   };
   
 } // namespace
