@@ -23,8 +23,14 @@ namespace OPAQ {
     				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor );
 
   private:
-    int         mor_agg;       //!< morning aggregation hour
-    int         missing_value; //!< missing value, read from configuration
+    const std::string p_t2m;     // t2m
+    const std::string p_wsp10m;  // wind speed 10 m
+    const std::string p_wdir10m; // wind direction 10 m
+    const std::string p_blh;     // boundary layer height
+    const std::string p_cc;      // tot
+
+    int missing_value;           //!< missing value, read from configuration
+    int mor_agg;                 //!< morning aggregation hour
   };
   
 } // namespace
