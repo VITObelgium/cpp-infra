@@ -72,8 +72,18 @@ OPAQ::TimeSeries<double> RioObsProvider::getValues( const DateTime& t1, const Da
 		return empty;
 	}
 
-	//copy the data to the output time series
-	OPAQ::TimeSeries<double> out = data->select( t1, t2 );
+	// TODO to be safe better round down the t1 and t2 to the interval of the timestep, but is not really high priority now.. was originally like this in Stijn VL 's code...
+
+	TimeInterval step;
+	if ( aggr == OPAQ::Aggregation::None )
+		step = OPAQ::TimeInterval( 1, TimeInterval::Hours );
+	else
+		step = OPAQ::TimeInterval( 1, TimeInterval::Days );
+	//copy the data to the output time series and insert missing values if still needed (we cannot rely on i)
+	data->setNoData( _noData );
+	OPAQ::TimeSeries<double> out = data->select( t1, t2, step );
+
+
 	return out;
 }
 
