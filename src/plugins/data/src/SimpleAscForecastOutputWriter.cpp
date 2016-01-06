@@ -97,7 +97,7 @@ namespace OPAQ {
     			if ( modelVals.size() != modelNames.size() )
     				throw RunTimeException( "data size doesn't match the number of models..." );
 
-    			for( auto it=modelVals.begin(); it != modelVals.end(); ++it ) fprintf( fp, "\t%.2f", *it );
+    			for( auto it=modelVals.begin(); it != modelVals.end(); ++it ) fprintf( fp, "\t%.6f", *it );
     			fprintf( fp, "\n" );
 
     		} catch ( OPAQ::NotAvailableException & err ) {
