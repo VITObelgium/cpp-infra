@@ -44,6 +44,9 @@ public:
    * Simply return the observations for the station & pollutant Id between the given dates
    * the aggregation type returns what aggregation to give, default (when the 4th argument is
    * omitted, the base resolution is returned)
+   *
+   * The method relies on the select method of the TimeSeries template class which explicitly
+   * fills up the requested series. The timestep is set based upon the aggregation time
    */
   virtual OPAQ::TimeSeries<double> getValues( const DateTime& t1, const DateTime& t2,
 		  const std::string& stationId, const std::string& pollutantId,
