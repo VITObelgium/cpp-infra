@@ -11,30 +11,22 @@
 
    In this master XML configuration file, each plugin (.so file) is listed under the plugins section. 
    Example : 
-\verbatim
+\code{.xml}
 <plugins>
-  <plugin>
-    <name>XMLAQNetProviderPlugin</name>
-    <lib>plugins/libXMLAQNetProvider.so</lib>
-  </plugin>
-  <plugin>
-    <name>OVLDataProviderPlugin</name>
-    <lib>plugins/libOVLDataProvider.so</lib>
-  </plugin>
+  <plugin name="XMLAQNetProviderPlugin">plugins/libXMLAQNetProvider.so</plugin>
+  <plugin name="OVLDataProviderPlugin>plugins/libOVLDataProvider.so</plugin>
 </plugins>
-\endverbatim
+\endcode
 
   so in this example we list an XMLAQNetProviderPlugin as pluging name, which refers to the .so file found
-  in the <b>lib</b> XML tag in the configuration section. Each .so file , which contains a OPAQ::Component
+  in the XML tag in the configuration section. Each .so file , which contains a OPAQ::Component
   derived class and is compiled separately as an OPAQ plugin can such be labelled. In a following section
   in the OPAQ configuration file, we can add a configuration to each of the plugins, turning them into 
   useable components within the OPAQ framework. This is configured under 
 
-\verbatim
+\code{.xml}
  <components>
-  <component>
-    <name>XMLNetworkProvider</name>
-    <plugin>XMLAQNetProviderPlugin</plugin>
+  <component name="XMLNetworkProvider" plugin="XMLAQNetProviderPlugin">
     <config>
       <missing_value>-9999</missing_value>
       <network>
@@ -47,13 +39,22 @@
     </config>
   </component>
 
-  <component>
-    <name>...</name>
-    <plugin>...</plugin>
-    <config>
-           ....
-    </config>
+  <component name="..." plugin="...">
+    <config ref="path_to_external.xml" />
   </component>
 </components>
-\endverbatim
+\endcode
+
+
+  Components are instantiated (e.g. created via "new") upon loading, the (singleton) componentmanager simply 
+  returns a pointer to the existing components. E.g. : 
+
+  \code{.cpp}
+  MLP_FeedForwardModel *model = ComponentManager::getInstance()->getComponent<MLP_FeedForwardModel>( cf->model_name );
+  \endcode
+
+  Multiple components can be made from the same plugin, simply by using a different configuration, e.g. in the 
+  OVL prediction models, we use this for distinguisihing between the 9UT, 6UT and 17UT networks, which have a
+  slightly differnet configuration, but are using the samen codebase. 
+
 */
