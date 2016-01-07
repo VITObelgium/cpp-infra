@@ -22,26 +22,11 @@ pkglib_LTLIBRARIES = IRCELMeteoProvider.la \
 		     XmlGridProvider.la \
 		     AsciiForecastWriter.la
 
-#AsciiObsProvider_la_SOURCES = AsciiObsProvider.cpp AsciiObsProvider.h
-#AsciiObsProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
-
-#ECMWFMeteoProvider_la_SOURCES = ECMWFMeteoProvider.cpp ECMWFMeteoProvider.h
-#ECMWFMeteoProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
-
 IRCELMeteoProvider_la_SOURCES = IRCELMeteoProvider.cpp IRCELMeteoProvider.h
 IRCELMeteoProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
 
 Hdf5Buffer_la_SOURCES = Hdf5Buffer.cpp Hdf5Buffer.h
 Hdf5Buffer_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
-
-#Hdf5ForecastsProvider_la_SOURCES = Hdf5ForecastsProvider.cpp Hdf5ForecastsProvider.h
-#Hdf5ForecastsProvider_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
-
-#Hdf5ForecastsStore_la_SOURCES = Hdf5ForecastsStore.cpp Hdf5ForecastsStore.h
-#Hdf5ForecastsStore_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
-
-#Hdf5MappingsStore_la_SOURCES = Hdf5MappingsStore.cpp Hdf5MappingsStore.h
-#Hdf5MappingsStore_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
 
 RioObsProvider_la_SOURCES = RioObsProvider.cpp RioObsProvider.h
 RioObsProvider_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
