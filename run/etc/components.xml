@@ -1,64 +1,43 @@
 <?xml version="1.0" ?>
 <components>
 
-  <component>
-    <name>meteo</name>
-    <plugin>meteoPlugin</plugin>
+  <component name="meteo" plugin="meteoPlugin">
     <config ref="etc/meteoConfig.xml" />
   </component>
 
-  <component>
-    <name>obs</name>
-    <plugin>obsPlugin</plugin>
+  <component name="obs" plugin="obsPlugin">
     <config ref="etc/obsConfig.xml" />
   </component>
 
-  <component>
-    <name>net</name>
-    <plugin>netPlugin</plugin>
+  <component name="net" plugin="netPlugin">
     <config ref="etc/netConfig.xml" />
   </component>
 
-  <component>
-    <name>netDebug</name>
-    <plugin>netPlugin</plugin>
+  <component name="netDebug" plugin="netPlugin">
     <config ref="etc/netConfigDebug.xml" />
   </component>
 
-  <component>
-    <!-- Use HDF5 forecast data buffer to provide and store the forecasted data -->
-    <name>h5db</name>
-    <plugin>h5dbPlugin</plugin>
+  <component name="h5db" plugin="h5dbPlugin">
     <config ref="etc/h5dbConfig.xml" />
   </component>
 
-  <component>
-    <name>AsciiForecastWriter</name>
-    <plugin>AsciiForecastWriterPlugin</plugin>
+  <component name="AsciiForecastWriter" plugin="AsciiForecastWriterPlugin">
     <config ref="etc/asciiOutputConfig.xml" />
   </component>
 
-  <component>
-    <name>OVL_model1_9UT</name>
-    <plugin>OVL_model1</plugin>
+  <component name="OVL_model1_9UT" plugin="OVL_model1">
     <config ref="etc/OVL_model1_9UT.xml" />
   </component>
 
-  <component>
-    <name>OVL_model2_9UT</name>
-    <plugin>OVL_model2</plugin>
+  <component name="OVL_model2_9UT" plugin="OVL_model2">
     <config ref="etc/OVL_model2_9UT.xml" />
   </component>
 
-    <component>
-    <name>OVL_model3_9UT</name>
-    <plugin>OVL_model3</plugin>
+  <component name="OVL_model3_9UT" plugin="OVL_model3">
     <config ref="etc/OVL_model3_9UT.xml" />
   </component>
 
-  <component>
-    <name>OVL</name>
-    <plugin>OVL</plugin>
+  <component name="OVL" plugin="OVL">
     <config ref="etc/OVL.xml" />
   </component>
   
