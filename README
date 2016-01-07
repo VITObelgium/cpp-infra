@@ -1,13 +1,8 @@
 OPAQ - Operational prediction of air quality
 
-Bino Maiheu, (c) VITO 2013-2015
-Stijn Van Looy, (c) VITO 2013-2014
-
-
-OPAQ is a toolbox for operational prediction of air quality, both forecast as well as mapping.
+OPAQ is a runtime framework for operational prediction of air quality, both forecast as well as mapping.
 The package uses the GNU autotools built system, when checking out, please first run the
 autogen.sh script to add the build structure. After that just ./configure; make; make install. 
-
 
 Prerequisites  
 *************
@@ -37,4 +32,28 @@ OPAQ uses the GNU autotools, which should make the compilation process fairly st
 debugging configuration, which enables debugging symbols and turns of optimization. Turn it on using
 
 ./configure --enable-debug=yes 
+
+Compilation of the main code requires the HDF5 C++ library, as some tools are present to facilitate
+using this format in the plugin code. The configure script checks for the presence of the library,
+alternatively you can specify it's location using 
+
+./configure --with-hdf5=/full/path/to/bin/h5cc
+
+note that at runtime, you'll have to make sure to run with the samen HDF5 shared library
+
+Also for the Eigen libaray, needed to e.g. compile the forecast plugins, you can specify the location of
+the Eigen include folder (typically labeled "Eigen" via
+
+./configure --with-Eigen=/path/to/Eigen
+
+
+Contact
+*******
+Bino Maiheu, (c) VITO 2013-2015
+bino.maiheu@vito.be
+
+
+
+
+
 
