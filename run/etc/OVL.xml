@@ -19,6 +19,9 @@
   --> 
   <output_raw>enable</output_raw>
 
+
+  <!-- enable debugging output ?? -->
+  <debug_output>enable</debug_output>
   
   <!-- a list of available tunes -->
   <tunes>
