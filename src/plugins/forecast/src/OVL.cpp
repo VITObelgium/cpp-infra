@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <limits>
 #include <cmath>
 
@@ -11,8 +12,8 @@ namespace OPAQ {
 LOGGER_DEF(OPAQ::OVL);
 
 OVL::OVL() :
-	missing_value(-9999),
-	output_raw(false) {
+	output_raw(false),
+	debug_output(false) {
 }
 
 OVL::~OVL() {}
@@ -84,6 +85,16 @@ void OVL::configure (TiXmlElement * cnf )
 		this->output_raw = false;
 	}
 
+
+	// activate debugging output, hard coded for now
+	// get output mode
+	try {
+		std::string s = XmlTools::getText( cnf, "debug_output");
+		std::transform( s.begin(), s.end(), s.begin(), ::tolower );
+		if ( !s.compare( "enable" ) || !s.compare( "true" ) || !s.compare( "yes" ) ) this->debug_output = true;
+	} catch ( ... ) {
+		this->debug_output = false;
+	}
 
 }
 
@@ -185,11 +196,17 @@ void OVL::run() {
 	// value is given in days, but stored in the TimeInterval format, so have to get days back
 	int fcHorMax = getForecastHorizon().getDays();
 
-	// -- 2. loop over the stations
-	auto stationIt = stations.begin();
+	// some debugging output ?
+	std::ofstream fs;
+	if ( debug_output ) {
+		fs.open( std::string("ovl_debug") + "_"
+				 + pol.getName() + "_"
+				 + OPAQ::Aggregation::getName( aggr ) + "_"
+				 + baseTime.dateToString() + ".txt" );
+	}
 
-	while ( stationIt != stations.end() ) {
-		Station *station = *stationIt++;
+	// -- 2. loop over the stations, the C++ 11 way :)
+	for ( Station *station : stations ) {
 
 		// check if we have a valid meteo id, otherwise skip the station
 		if ( station->getMeteoId().length() == 0 ) {
@@ -198,14 +215,17 @@ void OVL::run() {
 		} else
 			logger->trace("Forecasting station " + station->getName() );
 
-		// store the output in a timeseries object
+		if ( debug_output ) fs << "[STATION] " << station->getName() << " - " << baseTime.dateToString() << std::endl;
+
+		// store the output in a time series object
 		OPAQ::TimeSeries<double> fc;
-		fc.clear();
 
 		for ( int fc_hor=0; fc_hor <= fcHorMax; fc_hor++ ) {
 
 			OPAQ::TimeInterval fcHor( fc_hor, TimeInterval::Days );
 			DateTime fcTime = baseTime + fcHor;
+
+			if ( debug_output ) fs << "\t[DAY+" << fc_hor << "]" << std::endl;
 
 			// lookup the station configuration
 			auto stIt = _conf.find( std::make_tuple( pol.getName(), aggr, this->tune_mode, station->getName(), fc_hor ) );
@@ -218,11 +238,6 @@ void OVL::run() {
 
 			// get a pointer to the station configuration
 			StationConfig *cf = &(stIt->second);
-
-#ifdef DEBUG
-			std::cout << "Constructing model " << cf->model_name << " for " << pol.getName() << ", st = " << station->getName() << ", fc_hor = " << fcHor.getDays()
-					  << "rtc_mode = " << cf->rtc_mode << ", param = " << cf->rtc_param << std::endl;
-#endif
 
 			// get the correct model plugin, we don't have to destroy it as there is only one instance of each component,
 			// configuration via the setters...
@@ -241,7 +256,14 @@ void OVL::run() {
 			// run the model
 			double out = model->fcValue( pol, *station, aggr, baseTime, fcHor );
 
+			if ( debug_output ) {
+				fs << "\t\tNN MODEL    : " << model->getName() << std::endl;
+				fs << "\t\tNN FORECAST : " << out << std::endl;
+				fs << "\t\tRTC MODE    : " << cf->rtc_mode << std::endl;
+			}
 
+			// if we do not have all the model components loaded in OPAQ that OVL is using, we have
+			// to store the output otherwise the RTC messes up
 			if ( output_raw ) {
 				// now we have all the forecast values for this particular station, set the output values...
 				OPAQ::TimeSeries<double> raw_fc;
@@ -252,32 +274,40 @@ void OVL::run() {
 			}
 
 			// now handle the RTC, if the mode is larger than 0, otherwise we already have out output !!!
-			// get the historic forecasts
-			if ( cf->rtc_mode > 0 ) {
+			// only to this if the output value of the model is not missing...
+			if ( cf->rtc_mode > 0 && fabs( out - model->getNoData() ) > 1.e-6 ) {
+
+				if ( debug_output ) {
+					fs << "\t\tRTC PARAM   : " << cf->rtc_param << std::endl;
+				}
 
 				// get the hind cast for the forecast times between yesterday & the hindcast
 				OPAQ::DateTime t1 = baseTime - hindcast;
 				OPAQ::DateTime t2 = baseTime - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
-#ifdef DEBUG
-				std::cout << "*** calling getValues, OVL baseTime is " << baseTime << std::endl;
-#endif
+
 				buffer->setCurrentModel( model->getName() );
 				OPAQ::TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), aggr );
 
-#ifdef DEBUG
-				std::cout << "forecast hindcast : " << std::endl;
-				std::cout << fc_hindcast << std::endl;
-#endif
+				if ( debug_output ) {
+					fs << "\t\tHINDCAST : " << std::endl;
+					for ( unsigned int i = 0; i < fc_hindcast.size(); i++ )
+						fs << "\t\t"
+						   << fc_hindcast.datetime(i).dateToString() << "\t"
+						   << fc_hindcast.value(i) << std::endl;
+				}
 
 				// get the observed values from the input provider
 				// we could also implement it in such way to get them back from the forecast buffer...
 				// here a user should simply make sure we have enough data available in the data provider...
 				OPAQ::TimeSeries<double> obs_hindcast = getInputProvider()->getValues( t1, t2, station->getName(), pol.getName(), aggr );
 
-#ifdef DEBUG
-				std::cout << "observation hindcast : " << std::endl;
-				std::cout << obs_hindcast << std::endl;
-#endif
+				if ( debug_output ) {
+					fs << "\t\tOBSERVATIONS : " << std::endl;
+					for ( unsigned int i = 0; i < fc_hindcast.size(); i++ )
+						fs << "\t\t"
+						   << obs_hindcast.datetime(i).dateToString() << "\t"
+						   << obs_hindcast.value(i) << std::endl;
+				}
 
 				// check if the timeseries are consistent !
 				if ( ! fc_hindcast.isConsistent( obs_hindcast ) )
@@ -294,12 +324,18 @@ void OVL::run() {
 								if ( fabs( fc_hindcast.value(i) - buffer->getNoData() ) > 1.e-6 &&
 									 fabs( obs_hindcast.value(i) - getInputProvider()->getNoData() ) > 1.e-6 ) {
 
+									if ( debug_output ) {
+										fs << "\t\tERROR : " << fc_hindcast.datetime(i).dateToString() << "\t" << fc_hindcast.value(i) - obs_hindcast.value(i) << std::endl;
+									}
+
 									fc_err += ( fc_hindcast.value(i) - obs_hindcast.value(i) );
 
 									n++;
 								}
 							}
 							if ( n > 0 ) fc_err /= n;
+
+							if ( debug_output ) fs << "\t\tFINAL ERROR (mode 1) : " << fc_err << std::endl;
 						}
 						break;
 
@@ -311,10 +347,22 @@ void OVL::run() {
 								if ( fabs( fc_hindcast.value(i) - buffer->getNoData() ) > 1.e-6 &&
 								     fabs( obs_hindcast.value(i) - getInputProvider()->getNoData() ) > 1.e-6 ) {
 
-									fc_err += _wexp( i, fc_hindcast.size(), cf->rtc_param ) * ( fc_hindcast.value(i) - obs_hindcast.value(i) );
+									// BUGFIX : have to turn the order of i around... !!
+									double w = _wexp( fc_hindcast.size()-i-1, fc_hindcast.size(), cf->rtc_param );
+
+									if ( debug_output ) {
+										fs << "\t\tERROR : " << fc_hindcast.datetime(i).dateToString() << "\t"
+												<< fc_hindcast.value(i) - obs_hindcast.value(i) << "\t"
+												<< "WEIGHT= " << w << std::endl;
+									}
+
+
+									fc_err +=  w * ( fc_hindcast.value(i) - obs_hindcast.value(i) );
 
 								}
 							}
+
+							if ( debug_output ) fs << "\t\tFINAL ERROR (mode 2) : " << fc_err << std::endl;
 						}
 						break;
 
@@ -323,8 +371,10 @@ void OVL::run() {
 						break;
 				}
 
-				// perform correction
+				// perform correction, of out is not missing
 				out = out - fc_err;
+
+				if ( debug_output ) fs << "\tCORRECTED FORECAST : " << out << std::endl;
 			}
 
 			// insert the final forecast...
