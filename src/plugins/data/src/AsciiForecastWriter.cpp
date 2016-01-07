@@ -19,7 +19,8 @@ namespace OPAQ {
 
   AsciiForecastWriter::AsciiForecastWriter() :
 	  _enable_fields(false),
-	  _sepchar( '\t' ) {
+	  _sepchar( '\t' ),
+	  _fctime_full(true) {
   }
 
   AsciiForecastWriter::~AsciiForecastWriter(){
@@ -71,6 +72,18 @@ namespace OPAQ {
 		}
 	} catch ( ... ) { } // do nothigg, dedfault is tab
 
+
+	// get output mode for fcTime
+	try {
+		std::string s = XmlTools::getText( configuration, "fctime");
+		std::transform( s.begin(), s.end(), s.begin(), ::tolower );
+		if ( ! s.compare( "full" ) ) _fctime_full = true;
+		else _fctime_full = false;
+	} catch ( ... ) {
+		_fctime_full = true; // default
+	}
+
+
     return;
   }
 
@@ -110,7 +123,12 @@ namespace OPAQ {
     // -- print header
     if ( _title.size() != 0 ) fprintf( fp, "# %s\n", _title.c_str() );
     if ( head.size() != 0 ) fprintf( fp, "# %s\n", head.c_str() );
-    if ( _enable_fields ) fprintf( fp, "BASETIME%cSTATION%cFCTIME", _sepchar, _sepchar );
+    if ( _enable_fields ) {
+    	if ( _fctime_full )
+    		fprintf( fp, "BASETIME%cSTATION%cFCTIME", _sepchar, _sepchar );
+    	else
+    		fprintf( fp, "BASETIME%cSTATION%cFCHOR", _sepchar, _sepchar );
+    }
 
     // -- get the results for the models for this baseTime/fcTime combination
     std::vector<std::string> modelNames = getBuffer()->getModelNames( pol->getName(), aggr );
@@ -144,8 +162,13 @@ namespace OPAQ {
     		OPAQ::TimeInterval fcHor( fc_hor, TimeInterval::Days );
     		OPAQ::DateTime     fcTime = baseTime + fcHor;
 
-    		fprintf( fp, "%s%c%s%c%s", baseTime.dateToString().c_str(), _sepchar,
-    				station->getName().c_str(), _sepchar, fcTime.dateToString().c_str() );
+    		if ( _fctime_full ) {
+    			fprintf( fp, "%s%c%s%c%s", baseTime.dateToString().c_str(), _sepchar,
+    					station->getName().c_str(), _sepchar, fcTime.dateToString().c_str() );
+    		} else {
+    			fprintf( fp, "%s%c%s%c%d", baseTime.dateToString().c_str(), _sepchar,
+    					station->getName().c_str(), _sepchar, fc_hor );
+    		}
 	
     		try {
     			std::vector<double> modelVals = getBuffer()->getModelValues( baseTime, fcHor, station->getName(), pol->getName(), aggr );
