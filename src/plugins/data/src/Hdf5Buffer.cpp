@@ -133,7 +133,13 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 	for( unsigned int i = 0; i<forecast.size(); i++ ) {
 		if ( forecast.datetime(i) < baseTime ) throw RunTimeException( "Expecting forecasts in the future" );
 		TimeInterval fc_hor = OPAQ::TimeInterval( baseTime, forecast.datetime(i) );
-		if ( fc_hor != ( i * _fcTimeResolution ) ) throw RunTimeException( "Provided values should be ordered & spaced by time resolution" );
+
+		//BUGFIX : this check is too strict
+		// if ( fc_hor != ( i * _fcTimeResolution ) ) throw RunTimeException( "Provided values should be ordered & spaced by time resolution" );
+
+		// this allows for setting forecast values one by one...
+		if ( ( fc_hor.getSeconds() % _fcTimeResolution.getSeconds() ) != 0 )
+			throw RunTimeException( "Provided values should be ordered & spaced by time resolution" );
 	}
 
 	// -- locate or create the groups in the file, 4 levels
@@ -244,7 +250,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 	unsigned int modelIndex   = Hdf5Tools::getIndexInStringDataSet( dsModels, _currentModel, true);
 	unsigned int stationIndex = Hdf5Tools::getIndexInStringDataSet( dsStations, stationId, true);
 	unsigned int dateIndex    = OPAQ::TimeInterval( startTime, baseTime ).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
-	unsigned int fhIndex      = OPAQ::TimeInterval( forecast.firstDateTime(), baseTime ).getSeconds() / _fcTimeResolution.getSeconds();
+	unsigned int fhIndex      = OPAQ::TimeInterval( baseTime, forecast.firstDateTime()).getSeconds() / _fcTimeResolution.getSeconds();
 
 	//DEBUG !!
 #ifdef DEBUG
