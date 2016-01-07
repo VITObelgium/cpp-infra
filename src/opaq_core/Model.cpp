@@ -15,7 +15,8 @@ namespace OPAQ {
 	  gridProvider(0),
 	  input(0),
 	  meteo(0),
-	  buffer(0) {
+	  buffer(0),
+	  missing_value(-9999) {
   }
 
 } /* namespace opaq */
