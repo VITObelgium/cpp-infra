@@ -22,9 +22,9 @@
   
   <!-- a list of available tunes -->
   <tunes>
-    <tune mode="rmse">
-      <pollutant aggr="dayavg" name="pm10">
-	<station name="40AB01">
+    <tune ref="etc/opaq_tune_pm10_dayavg-20090101-20131231.xml" />
+    <tune pollutant="pm10" aggr="dayavg" mode="si">
+      <station name="40AB01">
           <model fc_hor="0" rtc_mode="2" rtc_param="8">OVL_model2_9UT</model>
           <model fc_hor="1" rtc_mode="2" rtc_param="20">OVL_model1_9UT</model>
           <model fc_hor="2" rtc_mode="2" rtc_param="20">OVL_model2_9UT</model>
@@ -66,7 +66,6 @@
           <model fc_hor="3" rtc_mode="2" rtc_param="20">OVL_model3_9UT</model>
           <model fc_hor="4" rtc_mode="2" rtc_param="17">OVL_model3_9UT</model>
         </station>
-      </pollutant>
     </tune>
   </tunes>
 </config>
