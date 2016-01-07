@@ -52,7 +52,7 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 	TiXmlDocument nnet_xml( fname.c_str() );
 	if ( ! nnet_xml.LoadFile() ) {
 		logger->error( "   unable to load ffnet from: " + fname );
-		return this->getMissingValue();
+		return this->getNoData();
 	}
 
 	// construct the neural network object
@@ -61,7 +61,7 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 		net = new nnet::feedforwardnet( nnet_xml.RootElement() );
 	} catch ( const char *msg ) {
 		logger->error( "   unable to construct ffnet in " + fname );
-		return this->getMissingValue();
+		return this->getNoData();
 	}
 
 	if ( net->inputSize() != this->sample_size ) {
@@ -79,7 +79,7 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 	// call abstract method to generate the sample
 	if ( this->makeSample( input_sample, station, pol, aggr, baseTime, fcTime, fc_hor ) ) {
 		logger->error( "   input sample incomplete, setting missing value" );
-		return this->getMissingValue();
+		return this->getNoData();
 	}
 
 	// for ( int ii=0; ii< net->inputSize(); ++ii )
@@ -92,7 +92,7 @@ double MLP_FeedForwardModel::fcValue( const OPAQ::Pollutant& pol, const OPAQ::St
 	net->getOutput( &output );
 	double out = exp(output[0])-1;
 
-	if ( std::isnan(out) || std::isinf( out ) ) out = this->getMissingValue();
+	if ( std::isnan(out) || std::isinf( out ) ) out = this->getNoData();
 
 	delete [] input_sample;
 	delete net;
