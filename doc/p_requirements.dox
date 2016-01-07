@@ -1,48 +1,51 @@
 /**
-   \page p_requirements Key requirements and design choices
-
-   Here we list a number of key requirements which are guiding the development of OPAQ.
-
-   \section p_req_functional Functional requirements
-   - The framework consists of configurable components:
-     - Models:
-       - Forecast models (extrapolating historical time series at a station into the future)
-       - Mapping models (interpolating values at stations over a domain covering these stations)
-       .
-     - Data handlers:
-       - Data providers (input)
-       - Data stores (output)
-       - Data movers (moving data from one component to another)
-       - Ensemble mergers (merging the outputs of ensemble members in the ensemble output)
-       .
-     .
-   - The core workflow of the framework consists of 1 or 2 modelling steps:
-     - A forecast model only
-     - A mapping model only
-     - A forecast model followed by a mapping model 
-     .
-   - Each model in the core workflow can consist of an ensemble of models of the same type.
-     - The core workflow can be run for a configurable number of time steps. 
-     - The core workflow can be run for a configurable pollutant.
-     - The time steps and the pollutant to run for can be specified as command line arguments.
-     .
-   .
-
-   \section p_req_nonfunc Non-functional requirements
-   - Following actions require no modification of the framework code nor do they require recompilation of 
-     the framework:
-     - Configuration of components
-     - Integration of new components
-     - Configuration of the core workflow
-     .
-   - The configuration of the workflow and the components must be
-     - Easy (minimize the requirement of extra tools to get the configuration right)
-     - Uniform (strive for a common configuration format for all components)
-     - Generic (allow future configuration parameters and constructs)
-     .
-   - The framework is platform independent. (less important)
+   \page p_requirements Requirements and compilation
 
 
-   \section s_design Design choices
-   OPAQ is implemented in C++ and the code will be built using the GNU Compiler Collection (gcc). 
+   \section p_req Requirements
+
+   OPAQ used a number of 3th party libraries for matrix algebra, logging and storage. 
+   - Log4cxx
+   - Eigen3, the configure script checks for eigen3/Eigen/Dense
+   - HDF5, note that we need the H5Cpp bindinges for OPAQ, so be sure this is installed !
+
+   Under Ubuntu, you can install the development sources with : 
+
+\verbatim
+sudo apt-get install libeigen3-dev libhdf5-dev libhdf5-serial-dev libhdf5-7 \
+                     liblog4cxx10 liblog4cxx10-dev
+\endverbatim
+
+   OPAQ was tested with 
+   - log4cxx 0.10.0
+   - Eigen 3.2.0
+   - HDF5 1.8, note that the C++ bindings need to be present, this is checked inthe configure script
+
+   \section p_comp Compilation
+
+   OPAQ uses the GNU autotools, which should make the compilation process fairly straight forward. There is a
+   debugging configuration, which enables debugging symbols and turns of optimization. Turn it on using
+
+\verbatim
+./configure --enable-debug=yes 
+\endverbatim
+
+   Compilation of the main code requires the HDF5 C++ library, as some tools are present to facilitate
+   using this format in the plugin code. The configure script checks for the presence of the library,
+   alternatively you can specify it's location using 
+
+\verbatim
+./configure --with-hdf5=/full/path/to/bin/h5cc
+\endverbatim
+
+   note that at runtime, you'll have to make sure to run with the samen HDF5 shared library
+
+   Also for the Eigen library, needed to e.g. compile the forecast plugins, you can specify the location of
+   the Eigen include folder (typically labeled "Eigen" via
+
+\verbatim
+./configure --with-Eigen=/path/to/Eigen
+\endverbatim
+
+   In case of problems, please contact Bino Maiheu (bino.maiheu@vito.be)
  */
