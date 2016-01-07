@@ -40,6 +40,7 @@ EXCEPTION(IOException)
 EXCEPTION(NullPointerException);
 EXCEPTION(ParseException)
 
+EXCEPTION(InvalidArgumentsException)
 EXCEPTION(NotConfiguredException)
 EXCEPTION(NotAvailableException);
 EXCEPTION(ElementNotFoundException);
