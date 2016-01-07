@@ -11,11 +11,11 @@ namespace OPAQ {
 LOGGER_DEF(OPAQ::OVL);
 
 OVL::OVL() :
-	missing_value(-9999) {
+	missing_value(-9999),
+	output_raw(false) {
 }
 
 OVL::~OVL() {}
-
 
 /**
  * Helper function to compute the weighted exponetial weights. This is based upon
@@ -69,13 +69,11 @@ void OVL::configure (TiXmlElement * cnf )
 		this->hindcast = OPAQ::TimeInterval( atoi(XmlTools::getText( cnf, "hindcast" ).c_str() ), OPAQ::TimeInterval::Days );
 
 		// parse the tunes database & run configuration for OVL
-		TiXmlElement *tuneEl = XmlTools::getElementByAttribute( cnf->FirstChildElement( "tunes" ), "tune", "mode", this->tune_mode );
-		_parseTunes( tuneEl );
+		parseTuneList( cnf->FirstChildElement( "tunes" ) );
 
 	} catch ( BadConfigurationException & err ) {
 		throw BadConfigurationException(err.what());
 	}
-
 
 	// get output mode
 	try {
@@ -89,40 +87,73 @@ void OVL::configure (TiXmlElement * cnf )
 
 }
 
+void OVL::parseTuneElement( TiXmlElement *tuneEl ) {
 
-void OVL::_parseTunes( TiXmlElement *lst ) {
+	std::string tunePol, tuneAggr, tuneMode;
+	if ( tuneEl->QueryStringAttribute("pollutant", &tunePol) != TIXML_SUCCESS ) throw BadConfigurationException("pollutant not found in tune");
+	if ( tuneEl->QueryStringAttribute("aggr", &tuneAggr) != TIXML_SUCCESS ) throw BadConfigurationException("aggr not found in tune");
+	if ( tuneEl->QueryStringAttribute("mode", &tuneMode) != TIXML_SUCCESS ) throw BadConfigurationException("mode not found in tune");
 
-	TiXmlElement *polEl = lst->FirstChildElement( "pollutant" );
-	while( polEl ) {
+	TiXmlElement *stEl = tuneEl->FirstChildElement( "station" );
+	while ( stEl ) {
+		std::string stName = stEl->Attribute( "name" );
 
-		std::string polName = polEl->Attribute( "name" );
-		std::string polAggr = polEl->Attribute( "aggr" );
+		TiXmlElement *modelEl = stEl->FirstChildElement( "model" );
+		while( modelEl ) {
+			OVL::StationConfig c;
+			int fc_hor;
 
-		TiXmlElement *stEl = polEl->FirstChildElement( "station" );
-		while ( stEl ) {
+			modelEl->QueryIntAttribute( "fc_hor", &fc_hor );
+			modelEl->QueryIntAttribute( "rtc_mode", &(c.rtc_mode) );
+			modelEl->QueryIntAttribute( "rtc_param", &(c.rtc_param) );
+			c.model_name = modelEl->GetText();
 
-			std::string stName = stEl->Attribute( "name" );
+			// inserting using list initializer instead of std::pair()... doesnt work for replacing the std::make_tuple command though
+			_conf.insert( { std::make_tuple( tunePol, Aggregation::fromString( tuneAggr ), tuneMode, stName, fc_hor ), c } );
 
-			TiXmlElement *modelEl = stEl->FirstChildElement( "model" );
-			while( modelEl ) {
-				OVL::StationConfig c;
-				int fc_hor;
+			modelEl = modelEl->NextSiblingElement( "model" );
+		}
 
-				modelEl->QueryIntAttribute( "fc_hor", &fc_hor );
-				modelEl->QueryIntAttribute( "rtc_mode", &(c.rtc_mode) );
-				modelEl->QueryIntAttribute( "rtc_param", &(c.rtc_param) );
-				c.model_name = modelEl->GetText();
+		stEl = stEl->NextSiblingElement( "station" );
+	} // loop over the stations
+}
 
-				// inserting using list initializer instead of std::pair()... doesnt work for replacing the std::make_tuple command though
-				_conf.insert( { std::make_tuple( polName, Aggregation::fromString( polAggr ), stName, fc_hor ), c } );
 
-				modelEl = modelEl->NextSiblingElement( "model" );
+void OVL::parseTuneList( TiXmlElement *lst ) {
+
+	TiXmlDocument refDoc;
+	TiXmlElement *tuneEl = lst->FirstChildElement( "tune" );
+	while( tuneEl ) {
+		std::string ref;
+		if ( tuneEl->QueryStringAttribute("ref", &ref) == TIXML_SUCCESS ) {
+			// ref attribute found
+			if (FileTools::exists(ref)) {
+				// file found
+				if (!refDoc.LoadFile(ref)) {
+					std::stringstream ss;
+					ss << "Failed to load file in ref attribute: " << ref;
+					throw ElementNotFoundException(ss.str());
+				}
+				TiXmlElement* fileElement = refDoc.FirstChildElement( "tune" );
+				if (!fileElement) {
+					std::stringstream ss;
+					ss << "File in ref attribute (" << ref
+						<< ") does not have 'tune' as root element";
+					throw ElementNotFoundException(ss.str());
+				}
+				parseTuneElement( fileElement );
+
+			} else {
+				std::stringstream ss;
+				ss << "File in ref attribute '" << ref << "' not found.";
+				throw ElementNotFoundException(ss.str());
 			}
 
-			stEl = stEl->NextSiblingElement( "station" );
-		} // loop over the stations
+		} else {
+			parseTuneElement( tuneEl );
+		}
 
-		polEl = polEl->NextSiblingElement( "pollutant" );
+		tuneEl = tuneEl->NextSiblingElement( "tune" );
 	} // loop over the pollutants
 
 	return;
@@ -177,7 +208,7 @@ void OVL::run() {
 			DateTime fcTime = baseTime + fcHor;
 
 			// lookup the station configuration
-			auto stIt = _conf.find( std::make_tuple( pol.getName(), aggr, station->getName(), fc_hor ) );
+			auto stIt = _conf.find( std::make_tuple( pol.getName(), aggr, this->tune_mode, station->getName(), fc_hor ) );
 			if (stIt == _conf.end() ) {
 				// no configuration for this station, returning -9999 or something
 				logger->warn(  "Model configuration not found for " + pol.getName() + ", st = " + station->getName() + ", skipping..."   );
