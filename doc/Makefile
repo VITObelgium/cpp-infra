@@ -6,7 +6,7 @@ DX_DOC_DIR   := .
 #DX_GEN_RTF   := NO
 DX_HAVE_DOT  := YES
 
-all: html pdf rtf
+all: html pdf
 
 html:
 	$(eval DX_GEN_HTML  := YES)
@@ -67,12 +67,12 @@ pdf: latex
               pdflatex refman.tex; \
               countdown=`expr $$countdown - 1`; \
           done; \
-          mv refman.pdf ../$(PROJECT)-$(VERSION)-manual.pdf
+          mv refman.pdf ../opaq-manual.pdf
 
 clean:
 	rm -rf html
 	rm -rf latex
 	rm -rf rtf
-	rm -rf $(PROJECT)-$(VERSION)-manual.rtf
-	rm -rf $(PROJECT)-$(VERSION)-manual.pdf
+	rm -rf opaq-manual.rtf
+	rm -rf opaq-manual.pdf
 	rm -rf *.tag
