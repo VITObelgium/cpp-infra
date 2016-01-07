@@ -115,7 +115,7 @@ namespace OPAQ {
     // ========================================================================
     // initialization
     // ========================================================================
-    logger->info( "writing output file " + fname );
+    logger->info( "Writing output file " + fname );
 
     FILE *fp = fopen( fname.c_str(), "w" );
     if ( ! fp ) throw RunTimeException( "Unable to open output file " + fname );
