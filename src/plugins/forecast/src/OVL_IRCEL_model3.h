@@ -16,8 +16,6 @@ namespace OPAQ {
     virtual void configure (TiXmlElement * configuration) 
       throw (OPAQ::BadConfigurationException);
 
-    virtual int getMissingValue( void ) { return missing_value; }
-
     virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
         		    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime,
     				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor );
@@ -32,7 +30,6 @@ namespace OPAQ {
     const std::string p_S;       // buyltinck-malet S parameter
     const std::string p_Transp;  // horizontal transport in BL (BLH x mean wind in BLH)
 
-    int missing_value;           //!< missing value, read from configuration
     int mor_agg;                 //!< morning aggregation hour
   };
   
