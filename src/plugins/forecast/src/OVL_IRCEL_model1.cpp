@@ -13,7 +13,6 @@ namespace OPAQ {
   	  p_wdir10m( "P04" ),     // wind direction 10 m
 	  p_blh( "P07" ),         // boundary layer height
 	  p_cc( "P13" ),          // low cloud cover
-	  missing_value( -9999 ), // set default missing value, overwritting in xml config
 	  mor_agg( -1 )           // default is all
   {
 	  sample_size = 2;
@@ -31,9 +30,6 @@ namespace OPAQ {
       // read the path to the architecture files
       this->pattern = XmlTools::getText(cnf, "ffnetfile_pattern" );
 
-      // read missing value for this model
-      this->missing_value = atoi(XmlTools::getText( cnf, "missing_value" ).c_str() );
-
     } catch (ElementNotFoundException & e) {
       throw BadConfigurationException(e.what());
     }
@@ -44,6 +40,13 @@ namespace OPAQ {
     } catch (ElementNotFoundException & e) {
     	this->mor_agg = 24; // take all available observations for the day
     }
+
+    // read missing value for this model (optional)
+    try {
+    	this->missing_value = atoi(XmlTools::getText( cnf, "missing_value" ).c_str() );
+    } catch ( ... ) { };
+
+
 
   }
   

@@ -16,7 +16,6 @@ namespace OPAQ {
 		p_rh( "P24" ),          // relative humidity
 		p_S("P21"),             // buyltinck-malet S parameter
 		p_Transp("P16"),        // horizontal transport in BL (BLH x mean wind in BLH)
-		missing_value( -9999 ), // set default missing value, overwritting in xml config
 		mor_agg( -1 )           // default is all
   {
 	  sample_size = 11;
@@ -34,9 +33,6 @@ namespace OPAQ {
       // read the path to the architecture files
       this->pattern = XmlTools::getText(cnf, "ffnetfile_pattern" );
 
-      // read missing value for this model
-      this->missing_value = atoi(XmlTools::getText( cnf, "missing_value" ).c_str() );
-
     } catch (ElementNotFoundException & e) {
       throw BadConfigurationException(e.what());
     }
@@ -47,6 +43,11 @@ namespace OPAQ {
     } catch (ElementNotFoundException & e) {
     	this->mor_agg = 24; // take all available observations for the day
     }
+
+    // read missing value for this model (optional)
+    try {
+    	this->missing_value = atoi(XmlTools::getText( cnf, "missing_value" ).c_str() );
+    } catch ( ... ) { };
 
   }
   
