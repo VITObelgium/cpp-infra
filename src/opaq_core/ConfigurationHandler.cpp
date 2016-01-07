@@ -123,13 +123,15 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   // Parsing plugins section
   TiXmlDocument pluginsDoc;
   TiXmlElement * pluginsElement = XmlTools::getElement(rootElement, "plugins", &pluginsDoc);
-  std::string pluginPath = XmlTools::getText( pluginsElement, "pluginpath" );
+  std::string pluginPath = XmlTools::getText( pluginsElement, "path" );
 
+  // adjusting this to make use of attributes, the config looks much cleaner this way...
   TiXmlElement * pluginElement = pluginsElement->FirstChildElement("plugin");
   while (pluginElement) {
     Config::Plugin plugin;
-    plugin.setName(XmlTools::getText(pluginElement, "name"));
-    std::string fullname = pluginPath + "/" + XmlTools::getText(pluginElement, "lib");
+    plugin.setName( pluginElement->Attribute( "name" ) );
+    std::string fullname = pluginElement->GetText();
+	fullname = pluginPath + "/" + fullname;
     plugin.setLib( fullname );
     opaqRun.getPlugins().push_back(plugin);
     pluginElement = pluginElement->NextSiblingElement("plugin");
@@ -141,8 +143,8 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   TiXmlElement * componentElement = componentsElement->FirstChildElement("component");
   while (componentElement) {
     Config::Component component;
-    component.setName(XmlTools::getText(componentElement, "name"));
-    std::string pluginName = XmlTools::getText(componentElement, "plugin");
+    component.setName( componentElement->Attribute("name" ) );
+    std::string pluginName = componentElement->Attribute( "plugin" );
     component.setPlugin(findPlugin(pluginName));
     TiXmlDocument * configDoc = new TiXmlDocument();
     _configDocs.push_back(configDoc);
