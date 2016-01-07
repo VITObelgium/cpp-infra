@@ -76,6 +76,17 @@ void OVL::configure (TiXmlElement * cnf )
 		throw BadConfigurationException(err.what());
 	}
 
+
+	// get output mode
+	try {
+		std::string s = XmlTools::getText( cnf, "output_raw");
+		std::transform( s.begin(), s.end(), s.begin(), ::tolower );
+		if ( !s.compare( "enable" ) || !s.compare( "true" ) || !s.compare( "yes" ) ) this->output_raw = true;
+	} catch ( ... ) {
+		this->output_raw = false;
+	}
+
+
 }
 
 
@@ -198,6 +209,21 @@ void OVL::run() {
 
 			// run the model
 			double out = model->fcValue( pol, *station, aggr, baseTime, fcHor );
+
+
+			if ( output_raw ) {
+				// DOCUMENT THIS !!!!
+
+				// TODO : enable this piece of code only when we are only running OVL
+				// Note that this can mean that the output buffer is not complete and the models are not necessarily in the correct order...
+
+				// now we have all the forecast values for this particular station, set the output values...
+				OPAQ::TimeSeries<double> raw_fc;
+				raw_fc.clear();
+				raw_fc.insert(fcTime,out);
+				buffer->setCurrentModel( model->getName() );
+				buffer->setValues( baseTime, raw_fc, station->getName(), pol.getName(), aggr );
+			}
 
 			// now handle the RTC, if the mode is larger than 0, otherwise we already have out output !!!
 			// get the historic forecasts
