@@ -25,8 +25,8 @@
   </plugin>
 
   <plugin>
-    <name>simpleAsciiForecastOutputPlugin</name>
-    <lib>SimpleAscForecastOutputWriter.so</lib>
+    <name>AsciiForecastWriterPlugin</name>
+    <lib>AsciiForecastWriter.so</lib>
   </plugin>
 
   <plugin>
