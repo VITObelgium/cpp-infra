@@ -93,13 +93,10 @@ void Engine::run(Config::OpaqRun * config) {
   ComponentManager *cm = ComponentManager::getInstance();
 
   // 1. Load plugins...
-  logger->info("Loading plugins");
-  std::cout << "Loading plugins..." << std::endl;
   std::vector<Config::Plugin> plugins = config->getPlugins();
   loadPlugins(&plugins);
   
   // 2. Instantiate and configure components...
-  logger->info("Creating & configuring components");
   std::vector<Config::Component> components = config->getComponents();
   initComponents(components);
   
@@ -141,7 +138,6 @@ void Engine::run(Config::OpaqRun * config) {
   OPAQ::TimeInterval fcHorMax = forecastStage->getHorizon();
 
   logger->info("Starting OPAQ workflow...");
-  std::cout << "Starting OPAQ workflow..." << std::endl;
   if (forecastStage) {
     
     for ( auto it = baseTimes.begin(); it != baseTimes.end(); it++ ) {
@@ -233,11 +229,12 @@ void Engine::loadPlugins(std::vector<Config::Plugin> * plugins) {
     std::string name = plugin.getName();
     std::string filename = plugin.getLib();
     try {
-      cm->loadPlugin(name, filename);
+    	logger->info( "Loading plugin " + name + " from " + filename );
+    	cm->loadPlugin(name, filename);
     } catch (std::exception & e) {
-      logger->fatal("Error while loading plugin " + name);
-      logger->error(e.what());
-      exit(1);
+    	logger->fatal("Error while loading plugin " + name);
+    	logger->error(e.what());
+    	exit(1);
     }
   }
   
@@ -258,11 +255,12 @@ void Engine::initComponents(std::vector<Config::Component> & components) {
     TiXmlElement * config = component.getConfig();
     
     try {
-      cm->createComponent<Component>(componentName, pluginName, config);
+    	logger->info("Creating component " + componentName + " from plugin " + pluginName );
+    	cm->createComponent<Component>(componentName, pluginName, config);
     } catch (std::exception & e) {
-      logger->fatal("Error while creating & configuring component " + componentName);
-      logger->error(e.what());
-      exit(1);
+    	logger->fatal("Error while creating & configuring component " + componentName);
+    	logger->error(e.what());
+    	exit(1);
     }
   }
   
