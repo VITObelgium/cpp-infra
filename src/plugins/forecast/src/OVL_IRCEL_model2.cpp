@@ -80,49 +80,6 @@ namespace OPAQ {
     TimeSeries<double> wsp  = meteo->getValues( t1, t2, st.getMeteoId(), p_wsp10m );
     TimeSeries<double> wdir = meteo->getValues( t1, t2, st.getMeteoId(), p_wdir10m );
     
-    /*
-    BUGFIX :
-    We're not averaging the u & v components, we're computing the average winddirection (via the vector sum)
-    and subsequently determining the components u & v via the aveage wind speed
-
-    // calculate the wind speed u and v components from the wsp and wdir
-    std::vector<double> u,v;
-    u.resize(wsp.size());
-    v.resize(wsp.size());
-    for ( unsigned int ii=0; ii< u.size(); ii++ ) {
-    	if ( ( fabs( wdir.value(ii) - meteo->getNoData( p_wdir10m ) ) < 1.e-6 ) ||
-    		 ( fabs( wsp.value(ii) - meteo->getNoData( p_wsp10m ) ) < 1.e-6 ) ) {
-    		u[ii] = meteo->getNoData( p_wsp10m );
-    		v[ii] = meteo->getNoData( p_wsp10m );
-      } else {
-    	  u[ii] = wsp.value(ii) * cos( OPAQ::Math::Pi * wdir.value(ii) / 180. );
-    	  v[ii] = wsp.value(ii) * sin( OPAQ::Math::Pi * wdir.value(ii) / 180. );
-      }
-    }
-
-     */
-
-#ifdef DEBUG
-    // some debugging information to a file...
-    std::ofstream fs;
-    fs.open( std::string( "debug_" ) + st.getName() + "_" + pol.getName() + "_"
-    		+ std::to_string( baseTime.getYear() ) + "-"
-    		+ std::to_string( baseTime.getMonth() ) + "-"
-			+ std::to_string( baseTime.getDay() )
-    		+ ".txt" );
-    fs << st.getMeteoId() << std::endl;
-    fs << "BLH : " << std::endl;
-    fs << blh;
-    fs << "CC : " << std::endl;
-    fs << cc;
-    fs << "WSP : " << std::endl;
-    fs << wsp;
-    fs << "WDIR : " << std::endl;
-    fs << wdir;
-    fs.close();
-#endif
-
-
     // -----------------------
     // build sample
     // -----------------------
@@ -177,14 +134,6 @@ namespace OPAQ {
     // 4. and 5. ------------------------------------------------------------------------
     // sample[4] and sample[5] are zoneal & meridional wind vectors, note that above
     // we have used the nodata value of the wsp10m
-
-    /*
-        sample[4] = mean_missing( u, meteo->getNoData( p_wsp10m ) ); // wdir x
-        if ( fabs( sample[4] - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
-
-        sample[5] = mean_missing( v, meteo->getNoData( p_wsp10m ) ); // wdir y
-        if ( fabs( sample[5] - meteo->getNoData(p_wsp10m) ) < epsilon ) have_sample++;
-    */
 
     // Note the above bugfix, firsst determe the average components
     double x_vec, y_vec;
