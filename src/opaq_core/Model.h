@@ -94,7 +94,10 @@ public:
   
   virtual void run() = 0;
   
-private:
+  int getNoData() { return missing_value; }
+  void setNoData( int missing ) { missing_value = missing; }
+
+protected:
   DateTime           baseTime;        //< run for this basetime
   Pollutant          pollutant;       //< run for this pollutant
   Aggregation::Type  aggregation;     //< run for this aggregation
@@ -105,6 +108,8 @@ private:
   DataProvider      *input;
   MeteoProvider     *meteo;
   ForecastBuffer    *buffer;
+
+  int missing_value;                  //!< missing value, can be set in configuration, default set here
 };
 
 } /* namespace opaq */
