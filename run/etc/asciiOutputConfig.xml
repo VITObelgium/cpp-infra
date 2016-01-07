@@ -7,6 +7,7 @@
   -->
   <models>OVL</models>
 
+  <!-- a title for the file, preceded by #, leave empty to omit -->
   <title>OPAQ FORECAST</title>
   
   <!-- write a header, will be preceded by #
@@ -14,12 +15,22 @@
        %pol%      for the pollutant name
        %aggr%     for the aggregation
        %basetime% for the basetime
+
+       leave empty to omit
   -->
-  <header>%pol% - %aggr%</header>
+  <header>pollutant: %pol%, aggregation: %aggr%</header>
 
   <!-- write fieldnames, order is
        BASETIME STATION FCTIME MODEL1 MODEL2 MODEL3 ....
     -->
   <fields>enable</fields>
+
+  <!-- separation character
+       use  - "space" for whitespace
+            - "tab"   for tab character
+            - any other for any other character, such as ,;| etc...
+       noly the first character will be taken... 
+  -->
+  <sepchar>;</sepchar>
 
 </config>
