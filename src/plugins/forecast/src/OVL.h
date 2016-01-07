@@ -51,18 +51,19 @@ private:
 
     OPAQ::TimeInterval hindcast;
 
-    void _parseTunes( TiXmlElement *lst );
+    void parseTuneList( TiXmlElement *lst );
+    void parseTuneElement( TiXmlElement *el );
 
     /**
      * this one is a map for
      * pollutant -> aggregation, followed by a list of OVL::StationConfig structures
      * using std::tuples for this, a key pair can be made via
-     * std::make_tuple( "pm10", "dayavg", "40ML01", fc_hor )
+     * std::make_tuple( "pm10", "dayavg", "rmse", "40ML01", fc_hor )
      * where fc_hor is the forecast horizon in days...
      * we are not using TimeInterval in the tuple (could do) because we would need to
      * add some stuff in the implementation of the TimeInterval to be able to use it in a tuple
      */
-    std::map<std::tuple<std::string, OPAQ::Aggregation::Type, std::string, int>, OVL::StationConfig> _conf;
+    std::map<std::tuple<std::string, OPAQ::Aggregation::Type, std::string, std::string, int>, OVL::StationConfig> _conf;
   };
   
   
