@@ -33,4 +33,11 @@
   -->
   <sepchar>;</sepchar>
 
+  <!-- output of forecast time, either full or horizon
+       in case of 'full', the full datetime will be written,
+       otherwise an integer indicating the forecat horizon,
+       0 for day+0, 1 for day+1 etc... 
+  -->
+  <fctime>horizon</fctime>
+  
 </config>
