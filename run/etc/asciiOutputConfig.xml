@@ -1,0 +1,25 @@
+<?xml version="1.0" ?>
+<config>
+  <filename>opaqfc_%pol%_%aggr%_%basetime%.txt</filename>
+
+  <!-- only add these models to the output, specified by comma separated list
+       omit the tag or leave empty for the full list of available models
+  -->
+  <models>OVL</models>
+
+  <title>OPAQ FORECAST</title>
+  
+  <!-- write a header, will be preceded by #
+       allowed tags are :
+       %pol%      for the pollutant name
+       %aggr%     for the aggregation
+       %basetime% for the basetime
+  -->
+  <header>%pol% - %aggr%</header>
+
+  <!-- write fieldnames, order is
+       BASETIME STATION FCTIME MODEL1 MODEL2 MODEL3 ....
+    -->
+  <fields>enable</fields>
+
+</config>
