@@ -16,7 +16,6 @@ namespace OPAQ {
 	  input(0),
 	  meteo(0),
 	  buffer(0) {
-
   }
 
 } /* namespace opaq */
