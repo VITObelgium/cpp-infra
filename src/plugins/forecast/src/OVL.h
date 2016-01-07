@@ -46,8 +46,8 @@ private:
     LOGGER_DEC();
 
     std::string tune_mode;       //! the selected tune mode for how OVL was optimized.
-    int         missing_value;   //! a missing value
     bool        output_raw;      //! store the raw output (if not all models are present in OPAQ
+    bool        debug_output;    //! activate debugging output
 
     OPAQ::TimeInterval hindcast;
 
