@@ -18,7 +18,8 @@ namespace OPAQ {
 
 
   AsciiForecastWriter::AsciiForecastWriter() :
-	  _enable_fields(false) {
+	  _enable_fields(false),
+	  _sepchar( '\t' ) {
   }
 
   AsciiForecastWriter::~AsciiForecastWriter(){
@@ -59,6 +60,16 @@ namespace OPAQ {
 		_enable_fields = false;
 	}
 
+	// -- get separation character
+	try {
+		std::string s = XmlTools::getText( configuration, "sepchar" );
+		std::transform( s.begin(), s.end(), s.begin(), ::tolower );
+		if ( s.size() ) {
+			if ( ! s.compare( "tab" ) ) _sepchar = '\t';
+			else if ( ! s.compare( "space" ) ) _sepchar = ' ';
+			else _sepchar = s.c_str()[0]; //get the first character
+		}
+	} catch ( ... ) { } // do nothigg, dedfault is tab
 
     return;
   }
@@ -99,7 +110,7 @@ namespace OPAQ {
     // -- print header
     if ( _title.size() != 0 ) fprintf( fp, "# %s\n", _title.c_str() );
     if ( head.size() != 0 ) fprintf( fp, "# %s\n", head.c_str() );
-    if ( _enable_fields ) fprintf( fp, "BASETIME\tSTATION\tFCTIME" );
+    if ( _enable_fields ) fprintf( fp, "BASETIME%cSTATION%cFCTIME", _sepchar, _sepchar );
 
     // -- get the results for the models for this baseTime/fcTime combination
     std::vector<std::string> modelNames = getBuffer()->getModelNames( pol->getName(), aggr );
@@ -117,7 +128,7 @@ namespace OPAQ {
 
     // -- if we have to write the fields
     if ( _enable_fields ) {
-    	for ( auto ii : idx ) fprintf( fp, "\t%s", modelNames[ii].c_str() );
+    	for ( auto ii : idx ) fprintf( fp, "%c%s", _sepchar, modelNames[ii].c_str() );
     	fprintf( fp, "\n" );
     	fflush( fp );
     }
@@ -133,19 +144,19 @@ namespace OPAQ {
     		OPAQ::TimeInterval fcHor( fc_hor, TimeInterval::Days );
     		OPAQ::DateTime     fcTime = baseTime + fcHor;
 
-    		fprintf( fp, "%s\t%s\t%s", baseTime.dateToString().c_str(),
-    				station->getName().c_str(), fcTime.dateToString().c_str() );
+    		fprintf( fp, "%s%c%s%c%s", baseTime.dateToString().c_str(), _sepchar,
+    				station->getName().c_str(), _sepchar, fcTime.dateToString().c_str() );
 	
     		try {
     			std::vector<double> modelVals = getBuffer()->getModelValues( baseTime, fcHor, station->getName(), pol->getName(), aggr );
     			if ( modelVals.size() != modelNames.size() )
     				throw RunTimeException( "data size doesn't match the number of models..." );
 
-    			for ( auto ii : idx ) fprintf( fp, "\t%.6f", modelVals[ii] );
+    			for ( auto ii : idx ) fprintf( fp, "%c%.6f", _sepchar, modelVals[ii] );
     			fprintf( fp, "\n" );
 
     		} catch ( OPAQ::NotAvailableException & err ) {
-				for ( auto ii : idx ) fprintf( fp, "\t%f", getBuffer()->getNoData() );
+				for ( auto ii : idx ) fprintf( fp, "%c%f", _sepchar, getBuffer()->getNoData() );
 				fprintf( fp, "\n" );
 				continue;
     		}
