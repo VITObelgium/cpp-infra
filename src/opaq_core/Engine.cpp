@@ -77,7 +77,6 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   outWriter->setAQNetworkProvider( net );
   outWriter->setBuffer( buffer );
   outWriter->setForecastHorizon( forecastHorizon );
-  std::cout << " - calling " << outWriter->getName() << " ..." << std::endl;
   outWriter->write( pol, aggr, baseTime );
 
   return;
