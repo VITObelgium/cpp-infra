@@ -20,7 +20,7 @@ pkglib_LTLIBRARIES = IRCELMeteoProvider.la \
 		     RioObsProvider.la \
 		     XMLAQNetProvider.la \
 		     XmlGridProvider.la \
-		     SimpleAscForecastOutputWriter.la
+		     AsciiForecastWriter.la
 
 #AsciiObsProvider_la_SOURCES = AsciiObsProvider.cpp AsciiObsProvider.h
 #AsciiObsProvider_la_LIBADD   = $(top_srcdir)/src/opaq_core/libopaq.la
@@ -52,5 +52,5 @@ XMLAQNetProvider_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
 XmlGridProvider_la_SOURCES = XmlGridProvider.cpp XmlGridProvider.h
 XmlGridProvider_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
 
-SimpleAscForecastOutputWriter_la_SOURCES = SimpleAscForecastOutputWriter.cpp SimpleAscForecastOutputWriter.h
-SimpleAscForecastOutputWriter_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
+AsciiForecastWriter_la_SOURCES = AsciiForecastWriter.cpp AsciiForecastWriter.h
+AsciiForecastWriter_la_LIBADD = $(top_srcdir)/src/opaq_core/libopaq.la
