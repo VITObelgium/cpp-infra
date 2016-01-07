@@ -1,52 +1,18 @@
 <?xml version="1.0" ?>
 <plugins>
   <!-- adding the root path for the location of the plugins -->
-  <pluginpath>/home/bino/local/lib/opaq</pluginpath>
+  <path>/home/bino/local/lib/opaq</path>
 
   <!-- give list of plugin components... -->
-  <plugin>
-    <name>meteoPlugin</name>
-    <lib>IRCELMeteoProvider.so</lib>
-  </plugin>
+  <plugin name="meteoPlugin">IRCELMeteoProvider.so</plugin>
+  <plugin name="obsPlugin">RioObsProvider.so</plugin>
+  <plugin name="netPlugin">XMLAQNetProvider.so</plugin>
+  <plugin name="h5dbPlugin">Hdf5Buffer.so</plugin>
+  <plugin name="AsciiForecastWriterPlugin">AsciiForecastWriter.so</plugin>
 
-  <plugin>
-    <name>obsPlugin</name>
-    <lib>RioObsProvider.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>netPlugin</name>
-    <lib>XMLAQNetProvider.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>h5dbPlugin</name>
-    <lib>Hdf5Buffer.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>AsciiForecastWriterPlugin</name>
-    <lib>AsciiForecastWriter.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>OVL_model1</name>
-    <lib>OVL_IRCEL_model1.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>OVL_model2</name>
-    <lib>OVL_IRCEL_model2.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>OVL_model3</name>
-    <lib>OVL_IRCEL_model3.so</lib>
-  </plugin>
-
-  <plugin>
-    <name>OVL</name>
-    <lib>OVL.so</lib>
-  </plugin>
+  <plugin name="OVL_model1">OVL_IRCEL_model1.so</plugin>
+  <plugin name="OVL_model2">OVL_IRCEL_model2.so</plugin>
+  <plugin name="OVL_model3">OVL_IRCEL_model3.so</plugin>
+  <plugin name="OVL">OVL.so</plugin>
   
 </plugins>
