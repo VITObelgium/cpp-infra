@@ -2,7 +2,11 @@
 
 namespace OPAQ {
 
-  Point::Point(){
+  Point::Point() :
+	  id(0),
+	  x(0.),
+	  y(0.),
+	  z(0.) {
   };
 
   Point::Point( long ID, double X, double Y ) 
