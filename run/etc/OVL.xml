@@ -9,6 +9,16 @@
   
   <!-- the selected mode, should be defined in a specific tune -->
   <tune_mode>rmse</tune_mode>
+
+  <!-- If we're not running all the models in opaq which are used here in the OVL model,
+       we'll need to enable the storing of output of the raw neural network forecast models
+       before running the RTC, otherwise the RTC will not find it's raw output in the
+       forecastbuffer.
+
+       Set the output_raw to enable/true/yes to enable this behaviour. 
+  --> 
+  <output_raw>enable</output_raw>
+
   
   <!-- a list of available tunes -->
   <tunes>
