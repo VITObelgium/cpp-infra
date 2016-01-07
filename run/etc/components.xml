@@ -33,9 +33,9 @@
   </component>
 
   <component>
-    <name>simpleAsciiForecastOutput</name>
-    <plugin>simpleAsciiForecastOutputPlugin</plugin>
-    <config ref="etc/simpleAsciiForecastOutputConfig.xml" />
+    <name>AsciiForecastWriter</name>
+    <plugin>AsciiForecastWriterPlugin</plugin>
+    <config ref="etc/asciiOutputConfig.xml" />
   </component>
 
   <component>
