@@ -84,11 +84,6 @@ public:
  						  OPAQ::Aggregation::Type aggr );
 
 
-
-  // =======================================================================
-  // TODO : ADD METHOD AS A FUNCTION OF MODEL AS WELL TO USE IN THE OUTPUT WRITER !!!
-  // =======================================================================
-
   /**
    * Return all the model values for a given baseTime and forecast horizon. The given current model
    * which is set in the DataProvider parent class is ignored here...

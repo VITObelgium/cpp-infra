@@ -50,8 +50,6 @@ void XMLAQNetProvider::configure(TiXmlElement *cnf)
     if (stEl->QueryStringAttribute("meteo", &meteoId) != TIXML_SUCCESS)
       meteoId = "";
 
-    // TODO: read in description (long name)
-    
     // create station and push back to network
     OPAQ::Station *st = new OPAQ::Station();
     st->setName(name);

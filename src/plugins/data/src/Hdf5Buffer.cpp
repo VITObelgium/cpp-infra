@@ -190,8 +190,6 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 		// retrieve startTime from the stored dataset in this group
 		startTime = OPAQ::DateTime( Hdf5Tools::readStringAttribute( dsVals, START_DATE_NAME ) );
 
-		// TODO handle some more errors here...
-
 		if (startTime > baseTime )
 			throw BadConfigurationException( "baseTime is before start date in the dataset" );
 
@@ -288,7 +286,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 		space = dsVals.getSpace();
 	}
 	// d. select data set hyperslab
-	hsize_t count[4] = { 1, 1, 1, forecast.size() }; // TODO: set chunk size > 1 in fh dim?
+	hsize_t count[4] = { 1, 1, 1, forecast.size() };
 	hsize_t offset[4] = { modelIndex, stationIndex, dateIndex, fhIndex };
 	space.selectHyperslab(H5S_SELECT_SET, count, offset);
 	// e. write data to the hyperslab
@@ -313,7 +311,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 
 	/*
 
-	TODO : store the basetimes as well for convenience...
+ 	 // TODO store the basetimes as well for convenience...
 
 	// f. write basetimes to hyperslab
 	H5::DataSpace spaceBaseTimes = dataBaseTimes.getSpace();
@@ -334,7 +332,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
   }
 
   // d. select data set hyperslab
-  hsize_t count1[1]  = { 1 }; // TODO: set chunk size > 1 in fh dim?
+  hsize_t count1[1]  = { 1 }; //  set chunk size > 1 in fh dim?
   hsize_t offset1[1] = { dateIndex };
   spaceBaseTimes.selectHyperslab(H5S_SELECT_SET, count1, offset1);
   

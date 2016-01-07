@@ -243,11 +243,6 @@ void OVL::run() {
 
 
 			if ( output_raw ) {
-				// DOCUMENT THIS !!!!
-
-				// TODO : enable this piece of code only when we are only running OVL
-				// Note that this can mean that the output buffer is not complete and the models are not necessarily in the correct order...
-
 				// now we have all the forecast values for this particular station, set the output values...
 				OPAQ::TimeSeries<double> raw_fc;
 				raw_fc.clear();

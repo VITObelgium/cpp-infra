@@ -65,10 +65,6 @@ namespace OPAQ {
     std::string              desc;        //!< station description (full specification)
     std::string              meteoId;    //!< meteo model forecast id to connect to (typically gridcell or so)
 
-    //TODO
-    // add a station type, where the different possible types are configred by the 
-    // main XML file..
-
   };
   
 } /* namespace OPAQ */

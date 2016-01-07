@@ -72,7 +72,8 @@ OPAQ::TimeSeries<double> RioObsProvider::getValues( const DateTime& t1, const Da
 		return empty;
 	}
 
-	// TODO to be safe better round down the t1 and t2 to the interval of the timestep, but is not really high priority now.. was originally like this in Stijn VL 's code...
+	// TODO to be safe better round down the t1 and t2 to the interval of the timestep, but is not really high priority now..
+	// was originally like this in Stijn VL 's code...
 
 	TimeInterval step;
 	if ( aggr == OPAQ::Aggregation::None )
