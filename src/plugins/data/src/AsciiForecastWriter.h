@@ -40,6 +40,7 @@ private:
   std::string              _title;
   std::string              _header;
   bool                     _enable_fields;
+  char                     _sepchar;  //! fields separation character, default is tab
 };
 
 
