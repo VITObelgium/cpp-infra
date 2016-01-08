@@ -13,10 +13,6 @@
     <config ref="etc/netConfig.xml" />
   </component>
 
-  <component name="netDebug" plugin="netPlugin">
-    <config ref="etc/netConfigDebug.xml" />
-  </component>
-
   <component name="h5db" plugin="h5dbPlugin">
     <config ref="etc/h5dbConfig.xml" />
   </component>
