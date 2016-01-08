@@ -114,6 +114,12 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     exit(1);
   }
 
+  // read loadfile name
+  try {
+	  opaqRun.setLogFile( XmlTools::getText( rootElement, "logfile" ) );
+  } catch ( ... ) {
+	  opaqRun.setLogFile( "" );
+  }
   /* ------------------------------------------------------------------------
      First we parse what is available to the OPAQ system in general,
      irrespective of the actual run requested. This defines what is available
