@@ -26,7 +26,7 @@ void print_usage( void ) {
   std::cout << "Available options :" << std::endl;
   std::cout << " --help ................ : this message" << std::endl;
   std::cout << " --cnf <fname> ......... : use this XML config file (def. opaq-config.xml)" << std::endl;
-  std::cout << " --logcnf <name> ....... : log4cxx config file (def. Log4cxxConfig.xml)" << std::endl;
+  std::cout << " --log <name> .......... : name for logfile (default in <logfile>)" << std::endl;
   std::cout << " --pol <name> .......... : run for this pollutant/index" << std::endl;
   std::cout << " --aggr <aggr> ......... : run for this aggregation time" << std::endl;
   std::cout << " --basetime <yyyy-mm-dd> : run for this base time" << std::endl;
@@ -34,7 +34,7 @@ void print_usage( void ) {
   std::cout  << std::endl;
 }
 
-void print_welcome( log4cxx::LoggerPtr logger ) {
+void print_welcome( void ) {
   std::cout << "  ______   .______      ___       ______      " << std::endl;
   std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
   std::cout << "|  |  |  | |  |_)  |  /  ^  \\   |  |  |  |    " << std::endl;
@@ -58,7 +58,7 @@ int main (int argc, char* argv[]) {
   // define command line options
   struct option long_options[] = {
     { "help",    0, 0, 'h' },
-    { "logcnf",  1, 0, 'l' },
+    { "log",     1, 0, 'l' },
     { "cnf",     1, 0, 'c' },
     { "pol",     1, 0, 'p' },
 	{ "aggr",    1, 0, 'a' },
@@ -70,7 +70,7 @@ int main (int argc, char* argv[]) {
   std::string pol         = "";
   std::string aggr        = "";
   std::string config_file = "opaq-config.xml";
-  std::string log_config  = "Log4cxxConfig.xml";
+  std::string arg_log     = "";
   std::string days        = "1";
   std::string basetime    = "";
 
@@ -78,15 +78,15 @@ int main (int argc, char* argv[]) {
      Parsing command line options
      --------------------------------------------------------------------------------- */
    while( 1 ) {
-    c = getopt_long( argc, argv, "o:a:d:p:t:hl", long_options, &option_index );
+    c = getopt_long( argc, argv, "o:a:d:p:t:hl:", long_options, &option_index );
     if ( c == -1 ) break;
     switch( c ) {
     case 'h':
       print_usage();
       return 0;
       break;
-    case 'l': log_config = optarg; break;
     case 'c': config_file = optarg; break;
+    case 'l': arg_log = optarg; break;
     case 'p': pol = optarg; break;
     case 'a': aggr = optarg; break;
     case 'b': basetime = optarg; break;
@@ -98,30 +98,28 @@ int main (int argc, char* argv[]) {
     }
    } /* while loop parsing command line options */
 
+
+   // -- Parse configuration
+   OPAQ::ConfigurationHandler ch;
+   ch.parseConfigurationFile( config_file );
+
+   std::string log_file = ch.getOpaqRun()->getLogFile();
+   if ( arg_log.size() ) log_file = arg_log; // overwrite
+
    // initialize logging framework
-   bool loggingViaConfigFile = initLogger(log_config);
+   bool loggingViaConfigFile = initLogger( log_file );
    const log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("main");
 
 
-   // provide some feedback
-   print_welcome(logger);
-
-   if (loggingViaConfigFile) {
-	   logger->info("Configured logging using " + log_config);
-   } else {
-	   logger->info("log4cxx configuration file not found; falling back to console logger");
-   }
-
-   logger->info("Using OPAQ configuration in .... : " + config_file);
+   logger->info( "Starting OPAQ run..." );
+   logger->info( "Using OPAQ configuration in .... : " + config_file );
 
   /* -----------------------------------------------------------------------------------
      Starting initialization
      --------------------------------------------------------------------------------- */
+   // provide some feedback
+   print_welcome( );
 
-  // Parse configuration
-  OPAQ::ConfigurationHandler ch;
-  ch.parseConfigurationFile( config_file );
-  
   // overwrite a few of the standard run options by the command line options here...
   // 1. pollutant
 
