@@ -17,6 +17,7 @@
 #include <log4cxx/xml/domconfigurator.h>
 #include <log4cxx/basicconfigurator.h>
 #include <log4cxx/consoleappender.h>
+#include <log4cxx/fileappender.h>
 #include <log4cxx/patternlayout.h>
 #include "tools/FileTools.h"
 
@@ -25,19 +26,34 @@ static const log4cxx::LoggerPtr logger;
 #define LOGGER_DEF(NAME)\
 const log4cxx::LoggerPtr NAME::logger = log4cxx::Logger::getLogger(#NAME);
 
-static void initConsoleLogger () {
-	log4cxx::PatternLayout * layout = new log4cxx::PatternLayout();
+static void initConsoleLogger( void ) {
+
+	log4cxx::PatternLayout *layout = new log4cxx::PatternLayout();
 //	layout->setConversionPattern("%d %-5p (%-25c): %m%n");
-	layout->setConversionPattern("[%-5p] %m%n");
-	log4cxx::ConsoleAppender * consoleAppender =
-			new log4cxx::ConsoleAppender(layout);
+	layout->setConversionPattern("%m%n");
+	log4cxx::ConsoleAppender * consoleAppender = new log4cxx::ConsoleAppender(layout);
 	consoleAppender->setThreshold(log4cxx::Level::getInfo());
 	log4cxx::BasicConfigurator::configure(consoleAppender);
+
+	return;
 }
 
-static bool initLogger (const std::string & configFileName) {
-	if (OPAQ::FileTools::exists (configFileName)) {
-		log4cxx::xml::DOMConfigurator::configure(configFileName);
+static void initFileLogger( const std::string &fname ) {
+
+	log4cxx::PatternLayout *layout = new log4cxx::PatternLayout();
+	layout->setConversionPattern("%d %-5p (%c) %m%n");
+	log4cxx::FileAppender *fileAppender = new log4cxx::FileAppender(layout, fname );
+	fileAppender->setThreshold(log4cxx::Level::getInfo());
+	log4cxx::BasicConfigurator::configure(fileAppender);
+
+	return;
+}
+
+
+static bool initLogger( const std::string & logFileName ) {
+
+	if ( logFileName.size() ) {
+		initFileLogger( logFileName );
 		return true;
 	} else {
 		initConsoleLogger();
