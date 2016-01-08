@@ -37,7 +37,7 @@ Hdf5Buffer::Hdf5Buffer() :
   _noData      = -9999;
   _configured  = false;
   _baseTimeSet = false;
-  _offset      = 0;
+  //_offset      = 0;
 }
 
 Hdf5Buffer::~Hdf5Buffer() {
@@ -60,10 +60,13 @@ void Hdf5Buffer::configure(TiXmlElement * configuration)
   _filename = fileEl->GetText();
   
   // 2. parse start date
+  /*
   TiXmlElement * offsetEl = configuration->FirstChildElement("offset");
   if (!offsetEl)
     throw BadConfigurationException("offset element not found");
   _offset = atoi(offsetEl->GetText());
+   */
+
 
   // 3. need to specify the time interval for which to store these values...
   //    this has to be generic, the baseTime resolution can be different from the
