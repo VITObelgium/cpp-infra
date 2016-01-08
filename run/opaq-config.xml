@@ -1,5 +1,8 @@
 <?xml version="1.0" ?>
 <opaq>
+  <!-- if empty the console will get a log of output... -->
+  <logfile></logfile>
+
   <!-- Master OPAQ configuration settings -->
   <pollutants ref="etc/pollutants.xml" />
   <plugins    ref="etc/plugins.xml" />
