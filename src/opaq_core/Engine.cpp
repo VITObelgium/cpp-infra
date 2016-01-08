@@ -64,8 +64,8 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
 
     // Run the model up till the requested forecast horizon, the loop over the forecast horizons has to be
     // in the model as probably some models (AR) use info of previous days...
-    logger->info( " - running " + model->getName() );
-
+    logger->info( "Running " + model->getName() );
+    std::cout << ">> Running " << model->getName() << " ..." << std::endl;
     model->run();
 
   } // end of loop over the models...
@@ -145,7 +145,7 @@ void Engine::run(Config::OpaqRun * config) {
       // A log message
       logger->info( "Forecast stage for " + baseTime.dateToString() );
       try {
-
+    	  std::cout << ">> Forcasting basetime " << baseTime.dateToString() << std::endl;
     	  runForecastStage( forecastStage, aqNetworkProvider, pollutant, config->getAggregation(), baseTime );
 
       } catch (std::exception & e) {
@@ -159,7 +159,7 @@ void Engine::run(Config::OpaqRun * config) {
       if (mappingStage) {
 
 	// a log message
-	logger->info( "  Mapping stage for " + baseTime.dateToString() );
+	logger->info( ">> Mapping " + baseTime.dateToString() );
 
 	// Buffer is input provider for the mapping models
 
