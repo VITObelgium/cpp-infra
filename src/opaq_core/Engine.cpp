@@ -11,7 +11,6 @@ namespace OPAQ {
 
 LOGGER_DEF(OPAQ::Engine)
 
-
 void Engine::runForecastStage( Config::ForecastStage *cnf, 
 							   AQNetworkProvider     *net,
 							   Pollutant             *pol,
@@ -145,7 +144,7 @@ void Engine::run(Config::OpaqRun * config) {
       // A log message
       logger->info( "Forecast stage for " + baseTime.dateToString() );
       try {
-    	  std::cout << ">> Forcasting basetime " << baseTime.dateToString() << std::endl;
+    	  std::cout << ">> Forecast on basetime " << baseTime.dateToString() << std::endl;
     	  runForecastStage( forecastStage, aqNetworkProvider, pollutant, config->getAggregation(), baseTime );
 
       } catch (std::exception & e) {
@@ -159,7 +158,7 @@ void Engine::run(Config::OpaqRun * config) {
       if (mappingStage) {
 
 	// a log message
-	logger->info( ">> Mapping " + baseTime.dateToString() );
+	logger->info( ">> Mapping forecast " + baseTime.dateToString() );
 
 	// Buffer is input provider for the mapping models
 
@@ -195,7 +194,7 @@ void Engine::run(Config::OpaqRun * config) {
       DateTime baseTime = *it;
       
       // a log message
-      logger->info( "  Mapping stage for " + baseTime.dateToString() );
+      logger->info( ">> Mapping " + baseTime.dateToString() );
       
       logger->fatal("No mapping stage implemented yet");
       exit(1);

@@ -32,7 +32,7 @@ static void initConsoleLogger( void ) {
 //	layout->setConversionPattern("%d %-5p (%-25c): %m%n");
 	layout->setConversionPattern("%m%n");
 	log4cxx::ConsoleAppender * consoleAppender = new log4cxx::ConsoleAppender(layout);
-	consoleAppender->setThreshold(log4cxx::Level::getInfo());
+	consoleAppender->setThreshold( log4cxx::Level::getInfo() );
 	log4cxx::BasicConfigurator::configure(consoleAppender);
 
 	return;
@@ -42,8 +42,9 @@ static void initFileLogger( const std::string &fname ) {
 
 	log4cxx::PatternLayout *layout = new log4cxx::PatternLayout();
 	layout->setConversionPattern("%d %-5p (%c) %m%n");
-	log4cxx::FileAppender *fileAppender = new log4cxx::FileAppender(layout, fname );
-	fileAppender->setThreshold(log4cxx::Level::getInfo());
+	log4cxx::FileAppender *fileAppender = new log4cxx::FileAppender(layout, fname, false ); // do not append, overwrite...
+	fileAppender->setThreshold( log4cxx::Level::getInfo() );
+
 	log4cxx::BasicConfigurator::configure(fileAppender);
 
 	return;

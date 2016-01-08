@@ -34,6 +34,7 @@ void print_usage( void ) {
   std::cout  << std::endl;
 }
 
+
 void print_welcome( void ) {
   std::cout << "  ______   .______      ___       ______      " << std::endl;
   std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
@@ -49,6 +50,22 @@ void print_welcome( void ) {
   std::cout  << std::endl;
 }
 
+// have to read in the config file already once to the the log filename,
+// have to do this before the logging freamework is initialized, after
+// which the configuration handler will parse the config file properly...
+std::string readLogName( const std::string& config_file ) {
+	std::string s;
+	try {
+		TiXmlDocument doc(config_file);
+		doc.LoadFile(config_file);
+		TiXmlElement *rootElement = doc.FirstChildElement("opaq");
+		s = OPAQ::XmlTools::getText( rootElement, "logfile" );
+	} catch ( ... ) {
+		s = "";
+	}
+
+	return s;
+}
 
 int main (int argc, char* argv[]) {
 
@@ -99,17 +116,18 @@ int main (int argc, char* argv[]) {
    } /* while loop parsing command line options */
 
 
-   // -- Parse configuration
-   OPAQ::ConfigurationHandler ch;
-   ch.parseConfigurationFile( config_file );
-
-   std::string log_file = ch.getOpaqRun()->getLogFile();
+   // parse the config file here quicly just to get the log filename if given, cannot do this
+   // in the config handler (see remark below..)
+   std::string log_file = readLogName( config_file );
    if ( arg_log.size() ) log_file = arg_log; // overwrite
 
    // initialize logging framework
    bool loggingViaConfigFile = initLogger( log_file );
    const log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("main");
 
+   // -- Parse configuration, after init of the log, otherwise we get errors
+   OPAQ::ConfigurationHandler ch;
+   ch.parseConfigurationFile( config_file );
 
    logger->info( "Starting OPAQ run..." );
    logger->info( "Using OPAQ configuration in .... : " + config_file );

@@ -17,6 +17,7 @@
 #include <config/ForecastStage.h>
 #include <config/MappingStage.h>
 #include <PollutantManager.h>
+#include <Logger.h>
 
 namespace OPAQ {
 

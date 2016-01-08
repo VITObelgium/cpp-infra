@@ -72,10 +72,6 @@ namespace OPAQ {
     	  pollutantSet  = true;
       }
 
-      /** logfilename */
-      const std::string& getLogFile( ) const { return logFile; }
-      void setLogFile( const std::string& fname ) { logFile = fname; }
-
       /**
        * Set aggregation separately...
        */
@@ -117,8 +113,6 @@ private:
 
       OPAQ::Config::ForecastStage *forecastStage; //!< this defines the forecast configuration in the OPAQ run
       OPAQ::Config::MappingStage  *mappingStage;  //!< this defines the mapping configuration in the OPAQ run
-
-      std::string logFile;                        //!< name for the logfile...
     };
 
 
