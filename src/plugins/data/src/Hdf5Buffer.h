@@ -174,7 +174,7 @@ private:
   H5::DataSet _dataSet, _parametersSet, _stationsSet;
 
   double   _noData;
-  int      _offset;
+  // int      _offset;
 
   TimeInterval _baseTimeResolution; //! the time resolution at which to store basetimes
   TimeInterval _fcTimeResolution;   //! the time resolution at which to store the forecast values
@@ -183,7 +183,6 @@ private:
 
   DateTime _baseTime;  //!< the basetime against which to offset the intervals given by the 
                        //!< getValues and setValues routines
-
 
   bool     _configured;  //!< Flag, true if the OPAQ::Component configuration went well
   bool     _baseTimeSet; //!< Flag, true if a basetime was given to the 
