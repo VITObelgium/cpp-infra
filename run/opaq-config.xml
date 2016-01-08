@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <opaq>
   <!-- if empty the console will get a log of output... -->
-  <logfile></logfile>
+  <logfile>opaq.log</logfile>
 
   <!-- Master OPAQ configuration settings -->
   <pollutants ref="etc/pollutants.xml" />
