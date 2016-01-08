@@ -16,6 +16,7 @@
     <basetime>2014-03-03 00:00:00</basetime>
     <basetime>2014-03-04 00:00:00</basetime>
     <basetime>2014-03-05 00:00:00</basetime>
+    <basetime>2014-03-06 00:00:00</basetime>
     <basetime>2014-03-07 00:00:00</basetime>
     <basetime>2014-03-08 00:00:00</basetime>
     <basetime>2014-03-09 00:00:00</basetime>
@@ -23,16 +24,10 @@
     <basetime>2014-03-11 00:00:00</basetime>
     <basetime>2014-03-12 00:00:00</basetime>
   </basetimes>
-<!--
-  <basetimes>
-    <basetime>2014-03-10 00:00:00</basetime>
-  </basetimes>
--->
 
   <!-- AQNetworkProvider to use -->
   <network>
     <component>net</component>
-    <!-- <component>netDebug</component> -->
   </network>
   
   <!-- Forecast configuration -->
