@@ -1,5 +1,5 @@
 /**
-   \page p_loggin The logging functionality in OPAQ
+   \page p_loggin Logging in OPAQ
 
    Logging in the OPAQ framework is provided by Apache log4cxx, see : http://logging.apache.org/log4cxx/.
    Each class with logging functionality declares a LOGGER_DEC() macro and a LOGGER_DEF(OPAQ::ClassName) 
