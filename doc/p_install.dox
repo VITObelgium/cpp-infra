@@ -1,0 +1,125 @@
+/**
+   \page p_instal Compilation & installation
+
+   \section p_req Requirements
+
+   OPAQ used a number of 3th party libraries for matrix algebra, logging and storage. 
+   - Log4cxx
+   - Eigen3, the configure script checks for eigen3/Eigen/Dense
+   - HDF5, note that we need the H5Cpp bindinges for OPAQ, so be sure this is installed !
+
+   OPAQ make use of the C++11 standard and should work with gcc compilers > 4.7.2 (tested). See
+   below for instructions on how to compile on an older system such as CentOS 6.  
+
+   \section p_ubuntu Compilation under Ubuntu/Debian
+
+   Installation/compilation has been tested on Debian Wheezy (gcc 4.7.2.) and Ubuntu 15.04 (gcc 4.9.2).
+   You can install the development sources with : 
+\verbatim
+sh# sudo apt-get install libeigen3-dev
+sh# sudo apt-get install libhdf5-dev libhdf5-serial-dev libhdf5-7
+sh# sudo apt-get install liblog4cxx10 liblog4cxx10-dev
+\endverbatim
+
+   Or, you can simply install them from sources, OPAQ was tested with 
+   - log4cxx 0.10.0
+   - Eigen 3.2.0
+   - HDF5 1.8, note that the C++ bindings need to be present, this is checked inthe configure script !
+
+   OPAQ uses the GNU autotools, which should make the compilation process fairly straight forward. There is a
+   debugging configuration, which enables debugging symbols and turns of optimization. Turn it on using
+
+\verbatim
+./configure --enable-debug=yes 
+\endverbatim
+
+   Compilation of the main code requires the HDF5 C++ library, as some tools are present to facilitate
+   using this format in the plugin code. The configure script checks for the presence of the library,
+   alternatively you can specify it's location using 
+
+\verbatim
+./configure --with-hdf5=/full/path/to/bin/h5cc
+\endverbatim
+
+   note that at runtime, you'll have to make sure to run with the samen HDF5 shared library
+
+   Also for the Eigen library, needed to e.g. compile the forecast plugins, you can specify the location of
+   the Eigen include folder (typically labeled "Eigen" via
+
+\verbatim
+./configure --with-Eigen=/path/to/Eigen
+\endverbatim
+
+   In case of problems, please contact Bino Maiheu (bino.maiheu@vito.be)
+
+   \section p_centos6 Compilation on CentOS 6
+
+   As OPAQ requires a C++11 compiler, and was tested with gcc 4.7.2, compilation & installation
+   on CentOS 6 can be somewhat problematic. The default compiler is gcc 4.4.7 there. Below here is a
+   description on how to compile & run OPAQ on CentOS 6.
+
+   -# Start with installing <b>log4cxx</b>
+      - first we install some dependency libraries : 
+\verbatim
+sh# yum install apr-devel apr-util-devel
+\endverbatim
+      - Next, download the log4cxx sources from http://www.apache.org/dyn/closer.cgi/logging/log4cxx/0.10.0/apache-log4cxx-0.10.0.tar.gz
+\verbatim
+sh# wget http://www.apache.org/dyn/closer.cgi/logging/log4cxx/0.10.0/apache-log4cxx-0.10.0.tar.gz
+\endverbatim
+      - The version you get from the archive contains a number of missing header files w.r.t. the compiler used
+        under CentOS. Here are the fixes you need to add the header <tt>#include <cstring></tt> to :
+	     - <tt>src/main/cpp/inputstream.cpp</tt>
+	     - <tt>src/main/cpp/inputstreamreader.cpp</tt>
+	     - <tt>src/main/cpp/socketoutputstream.cpp</tt>
+      - And both add <tt>#include <stdio.h></tt> and <tt>#include <cstring></tt> to :
+	    - <tt>src/example/cpp/console.cpp</tt>
+      - Once that is done, to a simple ./configure; make and make install <b>as root</b>. 
+   -# Install the <b>Eigen</b> template library for linear algebra
+      - Begin with downloading the sources from : http://bitbucket.org/eigen/eigen/get/3.2.7.tar.gz
+      - unzip them somewhere and copy the </b>"Eigen"</b> subfoler, which contains all the
+        template header files of the library to some include path which you can reach, e.g. :
+\verbatim
+sh$ cp -r Eigen $HOME/local/include
+\endverbatim
+   -# install the HDF5 library.
+     - For this you'll need to install the RPM forge for CentOS 6 first. Instructions can be found on : https://wiki.centos.org/AdditionalResources/Repositories/RPMForge
+     - next, install the libraries & development headers :
+\verbatim
+sh# yum install hdf5 hdf5-devel
+\endverbatim
+   -# install zlib
+\verbatim
+sh# yum install zlib-devel
+\endverbatim
+
+Once those preparation are done, we'll need to install a more modern version of the C compiler & runtime
+libraries. OPAQ was developed using the new C++11 standard functionalities, which are not fully supported
+by the older gcc 4.4 series compiler which is used on CentOS 6. Fortunately, there is a relatively easy fix
+for that : see : https://www.centos.org/forums/viewtopic.php?t=6319. So follow the instructions on
+http://people.centos.org/tru/devtools-1.1/ to install the devtools :
+\verbatim
+sh# wget http://people.centos.org/tru/devtools-1.1/devtools-1.1.repo -O /etc/yum.repos.d/devtools-1.1.repo
+sh# yum install devtoolset-1.1
+\endverbatim
+This will install the gcc 4.7.2 suite under /opt. To make use of the environment, start up a
+"devtools-1.1" enables shell using
+
+\verbatim
+sh$ scl enable devtoolset-1.1 bash
+sh$ gcc -v
+\endverbatim
+
+This should report back the version 4.7.2 of gcc. Within this shell you should be
+able to compile OPAQ or it's plugins without a problem now... 
+
+Finally, to compiler OPAQ, just do the following : 
+\verbatim
+sh$ scl enable devtoolset-1.1 bash
+sh$ tar -xvzf opaq-x.y.tar.gz
+sh$ cd opaq-x.y
+sh$ ./configure --prefix=/path/to/install --with-Eigen=/path/to/eigen
+sh$ make
+sh$ make install
+\endverbatim
+*/
