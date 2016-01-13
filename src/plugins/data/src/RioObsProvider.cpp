@@ -11,7 +11,7 @@ namespace OPAQ {
 
 LOGGER_DEF(RioObsProvider);
 
-const std::string RioObsProvider::POLLUTANT_PLACEHOLDER = "%POL%";
+const std::string RioObsProvider::POLLUTANT_PLACEHOLDER = "%pol%";
 
 RioObsProvider::RioObsProvider() {
 	_noData         = -9999;              // RIO observations use -9999 as nodata placeholder
