@@ -1,53 +1,55 @@
 /**
-   \page p_eng Engine
-   
-   The OPAQ engine basically is the software representation of the lay-out of an OPAQ run. Either a 
-   forecasts stage alone, or a forecast stage followed by a mapping stage, or a mapping stage alone, 
-   or some ensemble run thereof. The Engine module essentially only contains a single class, called
-   OPAQ::Engine, which has a run method defining the different steps in an OPAQ run. These are : 
+\page p_eng Engine
 
-   1. Load the plugins known in the configuration file
-   2. Instantiate and configure the components
-   3. Execute the OPAQ workflow
+\todo adjust this documentation...
 
-   The core OPAQ workflow consists of two succeeding stages: first the forecast stage followed by the 
-   mapping stage. Each stage can be empty (but at least 1 of the stages must be non-empty), contain a
-   single model, or consist of an ensemble of models.
-   
-   This core workflow is repeated for a configurable number of pollutants and timestamps. Those timestamps 
-   define the moment to consider as 'now' by the forecast model(s). So for each of the configured pollutants
-   and timestamps, the forecast model or ensemble of forecast models (if defined) are executed. This will 
-   produce a time series of forecasts in different stations. The amount of forecasts in the time series and
-   the time resolution thereof depends on the configuration of the forecast model and may thus vary. The 
-   stations are defined in the OPAQ configuration, but the data availability in those stations (for which 
-   pollutants, at which points in time, at which time resolution, by which aggregation scheme, etc.) depends 
-   on the configuration (and underlying data source) of the used data provider.
+The OPAQ engine basically is the software representation of the lay-out of an OPAQ run. Either a 
+forecasts stage alone, or a forecast stage followed by a mapping stage, or a mapping stage alone, 
+or some ensemble run thereof. The Engine module essentially only contains a single class, called
+OPAQ::Engine, which has a run method defining the different steps in an OPAQ run. These are : 
 
-   In the mapping stage, the mapping model or ensemble of mapping models (if defined) are executed for each 
-   timestamp in the time series produced by the forecast stage. If the forecast stage was empty, the mapping 
-   stage is executed for each timestamp defined in the OPAQ configuration.
+1. Load the plugins known in the configuration file
+2. Instantiate and configure the components
+3. Execute the OPAQ workflow
 
-   \image html opaq_main_workflow_400px.png "OPAQ Main workflow"
-   \image latex opaq_main_workflow.eps "OPAQ Main workflow" width=12cm
+The core OPAQ workflow consists of two succeeding stages: first the forecast stage followed by the 
+mapping stage. Each stage can be empty (but at least 1 of the stages must be non-empty), contain a
+single model, or consist of an ensemble of models.
 
-   Both stages are not required to be present; the OPAQ workflow can thus have the following forms:
-   - do a forecast stage, followed by a mapping stage,
-   - do a forecast stage only,
-   - do a mapping stage only, and
-   - do nothing at all.
+This core workflow is repeated for a configurable number of pollutants and timestamps. Those timestamps 
+define the moment to consider as 'now' by the forecast model(s). So for each of the configured pollutants
+and timestamps, the forecast model or ensemble of forecast models (if defined) are executed. This will 
+produce a time series of forecasts in different stations. The amount of forecasts in the time series and
+the time resolution thereof depends on the configuration of the forecast model and may thus vary. The 
+stations are defined in the OPAQ configuration, but the data availability in those stations (for which 
+pollutants, at which points in time, at which time resolution, by which aggregation scheme, etc.) depends 
+on the configuration (and underlying data source) of the used data provider.
 
-   The mapping stage must be executed for every output time stamp of the forecast stage. These properties 
-   allow us to introduce more detail in the OPAQ workflow as one can see below : 
+In the mapping stage, the mapping model or ensemble of mapping models (if defined) are executed for each 
+timestamp in the time series produced by the forecast stage. If the forecast stage was empty, the mapping 
+stage is executed for each timestamp defined in the OPAQ configuration.
 
-   \image html opaq_workflow_detail_500px.png "A more detailed view on the OPAQ workflow"
-   \image latex opaq_workflow_detail.eps "A more detailed view on the OPAQ workflow" width=12cm
+\image html opaq_main_workflow_400px.png "OPAQ Main workflow"
+\image latex opaq_main_workflow.eps "OPAQ Main workflow" width=12cm
 
-   Each stage (forecast and mapping) can consist of a single model or an ensemble of models. Each model is 
-   executed for a single pollutant and a single time stamp. OPAQ can be configured to run for several time
-   stamps, this will then result in multiple model executions initiated by the OPAQ engine. Running for several 
-   pollutants will require an OPAQ execution for each pollutant, initiated by the user.
+Both stages are not required to be present; the OPAQ workflow can thus have the following forms:
+- do a forecast stage, followed by a mapping stage,
+- do a forecast stage only,
+- do a mapping stage only, and
+- do nothing at all.
 
-   The network data (stations, their locations, the pollutants they provide data for, etc.) will be provided 
-   by the data provider components. Therefore this information does not show up in the OPAQ workflow. If a
-   forecast needs to be done for several stations, the forecast model(s) will iterate over the stations themselves.
+The mapping stage must be executed for every output time stamp of the forecast stage. These properties 
+allow us to introduce more detail in the OPAQ workflow as one can see below : 
+
+\image html opaq_workflow_detail_500px.png "A more detailed view on the OPAQ workflow"
+\image latex opaq_workflow_detail.eps "A more detailed view on the OPAQ workflow" width=12cm
+
+Each stage (forecast and mapping) can consist of a single model or an ensemble of models. Each model is 
+executed for a single pollutant and a single time stamp. OPAQ can be configured to run for several time
+stamps, this will then result in multiple model executions initiated by the OPAQ engine. Running for several 
+pollutants will require an OPAQ execution for each pollutant, initiated by the user.
+
+The network data (stations, their locations, the pollutants they provide data for, etc.) will be provided 
+by the data provider components. Therefore this information does not show up in the OPAQ workflow. If a
+forecast needs to be done for several stations, the forecast model(s) will iterate over the stations themselves.
 */

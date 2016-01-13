@@ -1,64 +1,63 @@
 /**
-   \page p_models Prediction models in OPAQ
+\page p_models Prediction models in OPAQ
 
-   
-   \section s_intro Introduction
-   The main functionality provided by OPAQ comes off course through the model implementations in the 
-   plugins. OPAQ provides a generic prediction model interface which a user should implement. 
 
-   \section s_forecast_model Forecast models
+\section s_intro Introduction
+The main functionality provided by OPAQ comes through the model implementations in the 
+plugins. OPAQ provides a generic prediction model interface which a user should implement. 
 
-   \todo put in image of inputs/outputs
+\section s_forecast_model Forecast models
 
-   A forecast model needs the following input data.
-   - Model specific <b>configuration</b>, for example the weights for a neural network
-   - The <b>base time</b> for which the forecast model is run.
-   - The <b>pollutant</b> for which the forecast model is run.
-   - The <b>air quality network</b> that is used.
-   - The <b>observations</b>, these are the time series containing the observations in the stations in 
-     the air quality network for the given pollutant.
-   - The <b>meteo</b> (forecast) data, typically coming from a mesoscale meteo model (ECMWF, GFS, etc..)
-   - The <b>historical forecasts</b>, for example for a real time corrections step
+\todo put in image of inputs/outputs
 
-   Based on these data, the forecast model will produce <b>forecasts</b>.
+A forecast model needs the following input data.
+- Model specific <b>configuration</b>, for example the weights for a neural network
+- The <b>base time</b> for which the forecast model is run.
+- The <b>pollutant</b> for which the forecast model is run.
+- The <b>air quality network</b> that is used.
+- The <b>observations</b>, these are the time series containing the observations in the stations in 
+  the air quality network for the given pollutant.
+- The <b>meteo</b> (forecast) data, typically coming from a mesoscale meteo model (ECMWF, GFS, etc..)
+- The <b>historical forecasts</b>, for example for a real time corrections step
 
-   Note that the OPAQ engine needs to know for which forecast horizons the forecast model produced output. 
-   The OPAQ engine will acquire this information from the output of the forecast model itself. It can do this
-   by implementing a data store that is coupled to the forecast model which captures this information from the 
-   forecast model output and which forwards the forecasted data to the actual data store as provided and 
-   configured by the user
+Based on these data, the forecast model will produce <b>forecasts</b>.
 
-   \section s_mapping_model Mapping models
+Note that the OPAQ engine needs to know for which forecast horizons the forecast model produced output. 
+The OPAQ engine will acquire this information from the output of the forecast model itself. It can do this
+by implementing a data store that is coupled to the forecast model which captures this information from the 
+forecast model output and which forwards the forecasted data to the actual data store as provided and 
+configured by the user
 
-   \todo put in image of inputs/outputs
+\section s_mapping_model Mapping models
 
-   A mapping model needs the following input data.
-   - Model specific configuration.
-   - The base time for which the forecast model is run.
-   - The pollutant for which the forecast model is run.
-   - The air quality network that is used.
-   - The grid to map to.
-   - The forecast horizon to map for (only when the inputs are forecasts).
-   - The observations or forecasts; if no forecast stage was defined the mapping model will work on the 
-     observations, if a forecast stage precedes the mapping stage the mapping model will work with the 
-     forecasts produced by that forecast stage. 
+\todo put in image of inputs/outputs
 
-     Based on these data, the mapping model will produce mapped values.
+A mapping model needs the following input data.
+- Model specific configuration.
+- The base time for which the forecast model is run.
+- The pollutant for which the forecast model is run.
+- The air quality network that is used.
+- The grid to map to.
+- The forecast horizon to map for (only when the inputs are forecasts).
+- The observations or forecasts; if no forecast stage was defined the mapping model will work on the 
+  observations, if a forecast stage precedes the mapping stage the mapping model will work with the 
+  forecasts produced by that forecast stage. 
 
-     
-   \section s_generic_model A generic model
-   
-   We can combine the definitions of a forecast and mapping model into a single generic model definition. 
-   This will result in inputs to the (generic) model that are not needed for (for example) a forecast model.
-   The (example) forecast model can simply ignore these inputs.
-   
-   Most of the inputs for the generic model are explained in the previous paragraphs. Only input values is new.
-   This corresponds to the observations in case of a forecast model and to the observations or forecasts in case 
-   of a mapping model. In the same way, the output values will correspond to the forecasts in case of a forecast 
-   model and to the mapped values in case of a mapping model.
+  Based on these data, the mapping model will produce mapped values.
 
-   \section s_ensembles Model Ensembles
+  
+\section s_generic_model A generic model
 
-   \todo T.B.A.
+We can combine the definitions of a forecast and mapping model into a single generic model definition. 
+This will result in inputs to the (generic) model that are not needed for (for example) a forecast model.
+The (example) forecast model can simply ignore these inputs.
 
- */
+Most of the inputs for the generic model are explained in the previous paragraphs. Only input values is new.
+This corresponds to the observations in case of a forecast model and to the observations or forecasts in case 
+of a mapping model. In the same way, the output values will correspond to the forecasts in case of a forecast 
+model and to the mapped values in case of a mapping model.
+
+\section s_ensembles Model Ensembles
+
+\todo T.B.A.
+*/
