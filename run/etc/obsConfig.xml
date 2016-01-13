@@ -5,5 +5,5 @@
 	<resolution>60</resolution>
 
 	<!-- the file parttern for the observation files -->
-  	<file_pattern>./data/obs/%POL%_data_rio.txt</file_pattern>
+  	<file_pattern>./data/obs/%pol%_data_rio.txt</file_pattern>
 </config>
