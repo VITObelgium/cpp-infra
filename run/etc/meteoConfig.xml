@@ -1,48 +1,53 @@
 <?xml version="1.0" ?>
 <config>
 
-	<!-- configuration for IRCEL meteo data provider -->
-	<file_pattern>./data/meteo/BEL_%METEO%_%PARAMETER%.txt.gz</file_pattern>
-	
-	<!-- meteo time resolution in hours -->
-	<resolution>3</resolution>
+  <!-- configuration for IRCEL meteo data provider -->
+  <file_pattern>./data/meteo/BEL_%meteo%_%param%.txt.gz</file_pattern>
 
-	<!-- start date for meteo buffers, will store the whole file in memory if not given -->
-	<buffer_start>2011-01-01</buffer_start>
-
-	<parameters>
-		<parameter id="P01" nodata="-999" />
-		<parameter id="P02" nodata="-999" />
-		<parameter id="P03" nodata="-999" />
-		<parameter id="P04" nodata="-999" />
-		<parameter id="P05" nodata="-999" />
-		<parameter id="P06" nodata="-999" />
-		<parameter id="P07" alias="BLH" nodata="-999" />
-		<parameter id="P08" nodata="-999" />
-		<parameter id="P09" nodata="-999" />
-		<parameter id="P10" nodata="-999" />
-		<parameter id="P11" nodata="-999" />
-		<parameter id="P12" nodata="-999" />
-		<parameter id="P13" nodata="-999" />
-		<parameter id="P14" nodata="-999" />
-		<parameter id="P15" nodata="-999" />
-		<parameter id="P16" nodata="-999" />
-		<parameter id="P17" nodata="-999" />
-		<parameter id="P18" nodata="-999" />		
-		<parameter id="P19" nodata="-999" />
-		<parameter id="P20" nodata="-999" />
-		<parameter id="P21" nodata="-999" />
-		<parameter id="P22" nodata="-999" />
-		<parameter id="P23" nodata="-999" />
-		<parameter id="P24" nodata="-999" />
-		<parameter id="P25" nodata="-999" />
-		<parameter id="P26" nodata="-999" />
-		<parameter id="P27" nodata="-999" />
-		<parameter id="P28" nodata="-999" />
-		<parameter id="P29" nodata="-999" />
-		<parameter id="P30" nodata="-999" />
-		<parameter id="P31" nodata="-999" />
-		<parameter id="P32" nodata="-999" />
-	</parameters>
-	
+  <!-- if the filepattern contains the %basetime% (YYYY-MM-DD) format, we can search back
+       for previous basetimes if the current basetime is not found, this value says how
+       many days we go back -->
+  <backward_search>3</backward_search>
+  
+  <!-- meteo time resolution in hours -->
+  <resolution>3</resolution>
+  
+  <!-- start date for meteo buffers, will store the whole file in memory if not given -->
+  <buffer_start>2011-01-01</buffer_start>
+  
+  <parameters>
+    <parameter id="P01" nodata="-999" />
+    <parameter id="P02" nodata="-999" />
+    <parameter id="P03" nodata="-999" />
+    <parameter id="P04" nodata="-999" />
+    <parameter id="P05" nodata="-999" />
+    <parameter id="P06" nodata="-999" />
+    <parameter id="P07" alias="BLH" nodata="-999" />
+    <parameter id="P08" nodata="-999" />
+    <parameter id="P09" nodata="-999" />
+    <parameter id="P10" nodata="-999" />
+    <parameter id="P11" nodata="-999" />
+    <parameter id="P12" nodata="-999" />
+    <parameter id="P13" nodata="-999" />
+    <parameter id="P14" nodata="-999" />
+    <parameter id="P15" nodata="-999" />
+    <parameter id="P16" nodata="-999" />
+    <parameter id="P17" nodata="-999" />
+    <parameter id="P18" nodata="-999" />		
+    <parameter id="P19" nodata="-999" />
+    <parameter id="P20" nodata="-999" />
+    <parameter id="P21" nodata="-999" />
+    <parameter id="P22" nodata="-999" />
+    <parameter id="P23" nodata="-999" />
+    <parameter id="P24" nodata="-999" />
+    <parameter id="P25" nodata="-999" />
+    <parameter id="P26" nodata="-999" />
+    <parameter id="P27" nodata="-999" />
+    <parameter id="P28" nodata="-999" />
+    <parameter id="P29" nodata="-999" />
+    <parameter id="P30" nodata="-999" />
+    <parameter id="P31" nodata="-999" />
+    <parameter id="P32" nodata="-999" />
+  </parameters>
+  
 </config>
