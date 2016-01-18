@@ -183,7 +183,13 @@ TimeSeries<T> TimeSeries<T>::operator= ( const TimeSeries<T>& ts ) {
 	}
 }
 
-// insert function
+/**
+ *  Timeseries insert function.
+ *  - If the timeseries is empty or the date is after the last date, push it back...
+ *  - If the index is before the first index, simply insert
+ *  - If the timeseries already contains the datetime, replace the value...
+ *  - Otherwise, lookup the first index after the date to insert
+ */
 template <class T>
 void TimeSeries<T>::insert( const DateTime& dt, const T& val )
 		throw( OutOfBoundsException ) {
