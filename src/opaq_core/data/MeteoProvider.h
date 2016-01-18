@@ -39,6 +39,15 @@ public:
 				                                const DateTime & t2,
 												const std::string& meteoId,
 												const std::string& paramId ) = 0;
+
+	/**
+	 * Set basetime for the meteo provider
+	 */
+	void setBaseTime( const OPAQ::DateTime& t ) { _baseTime = t; }
+	const OPAQ::DateTime& getBaseTime(){ return _baseTime; }
+
+protected:
+	OPAQ::DateTime _baseTime;
 };
 
 } /* namespace OPAQ */
