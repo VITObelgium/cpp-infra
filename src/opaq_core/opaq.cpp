@@ -12,6 +12,7 @@
 #include <ConfigurationHandler.h>
 #include <Engine.h>
 #include <Logger.h>
+#include <Exceptions.h>
 
 #include <tools/FileTools.h>
 #include <tools/DateTimeTools.h>
@@ -59,9 +60,10 @@ std::string readLogName( const std::string& config_file ) {
 		TiXmlDocument doc(config_file);
 		doc.LoadFile(config_file);
 		TiXmlElement *rootElement = doc.FirstChildElement("opaq");
-		s = OPAQ::XmlTools::getText( rootElement, "logfile" );
+		if ( rootElement ) s = OPAQ::XmlTools::getText( rootElement, "logfile" );
 	} catch ( ... ) {
 		s = "";
+
 	}
 
 	return s;
@@ -129,7 +131,12 @@ int main (int argc, char* argv[]) {
 
    // -- Parse configuration, after init of the log, otherwise we get errors
    OPAQ::ConfigurationHandler ch;
-   ch.parseConfigurationFile( config_file );
+   try {
+	   ch.parseConfigurationFile( config_file );
+   } catch ( std::exception &e ) {
+	   std::cout << e.what() << std::endl;
+	   exit(1);
+   }
 
    logger->info( "Starting OPAQ run..." );
    logger->info( "Using OPAQ configuration in .... : " + config_file );
