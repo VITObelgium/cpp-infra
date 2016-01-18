@@ -9,15 +9,17 @@
 
 namespace OPAQ {
 
-const std::string IRCELMeteoProvider::METEO_PLACEHOLDER     = "%METEO%";
-const std::string IRCELMeteoProvider::PARAMETER_PLACEHOLDER = "%PARAMETER%";
+const std::string IRCELMeteoProvider::METEO_PLACEHOLDER     = "%meteo%";
+const std::string IRCELMeteoProvider::PARAMETER_PLACEHOLDER = "%param%";
+const std::string IRCELMeteoProvider::BASETIME_PLACEHOLDER  = "%basetime%";
 
 LOGGER_DEF(IRCELMeteoProvider)
 
-IRCELMeteoProvider::IRCELMeteoProvider() {
-	_configured     = false;
-	_bufferStartReq = false;
-	_nsteps         = 0;
+IRCELMeteoProvider::IRCELMeteoProvider() :
+	_configured(false),
+	_bufferStartReq(false),
+	_nsteps(0),
+	_backsearch(3) {
 }
 
 IRCELMeteoProvider::~IRCELMeteoProvider() {
@@ -52,6 +54,11 @@ void IRCELMeteoProvider::configure(TiXmlElement * configuration)
 	TiXmlElement * patternElement = configuration->FirstChildElement( "file_pattern" );
 	if (!patternElement) throw BadConfigurationException( "file_pattern element not found" );
 	_pattern = patternElement->GetText();
+
+	// -- parsed the backward_search
+	TiXmlElement *backSearchEl = configuration->FirstChildElement( "backward_search" );
+	if ( backSearchEl ) _backsearch = atoi( backSearchEl->GetText() );
+
 
 	// -- parse meteo time resolution, value in hours
 	TiXmlElement *resEl = configuration->FirstChildElement( "resolution" );
@@ -158,22 +165,37 @@ const OPAQ::TimeSeries<double> & IRCELMeteoProvider::_getTimeSeries( const std::
 void IRCELMeteoProvider::_readFile( const std::string & meteoId,
 									const std::string & parameterId ) {
 
-	// create file name
-	std::string filename = _pattern;
-	StringTools::replaceAll(filename, METEO_PLACEHOLDER, meteoId);
-	StringTools::replaceAll(filename, PARAMETER_PLACEHOLDER, parameterId);
-
-	// read & parse file
 	GzipReader reader;
-	try {
-		reader.open(filename);
-	} catch (IOException & e) {
-		std::stringstream ss;
-		ss << "File not found: " << filename;
-		logger->warn(ss.str());
+	std::string filename;
+
+	// -- Create file name for the current basetime, if it doesn't exist, check the previous
+	//    basetime, up till the amount of days configured...
+	OPAQ::DateTime checkDate = _baseTime;
+	bool have_file = false;
+	while (  ( checkDate >= _baseTime-OPAQ::TimeInterval( _backsearch, OPAQ::TimeInterval::Days ) )
+			&& ( ! have_file ) ) {
+
+		filename = _pattern;
+		StringTools::replaceAll(filename, METEO_PLACEHOLDER, meteoId);
+		StringTools::replaceAll(filename, PARAMETER_PLACEHOLDER, parameterId);
+		StringTools::replaceAll(filename, BASETIME_PLACEHOLDER, checkDate.dateToString() );
+
+		// -- Read & parse file
+		try {
+			reader.open(filename);
+			have_file = true;
+		} catch (IOException & e) {
+			checkDate = checkDate - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
+			logger->warn( filename + " not found, checking previous day : " + checkDate.dateToString() );
+		}
 	}
 
-	// get the timeseries for this meteo/parameter buffer
+	if ( ! have_file ) {
+		logger->error( "giving up : no meteo file found for " + meteoId + ", " + parameterId );
+		return;
+	}
+
+	// -- Get the timeseries for this meteo/parameter buffer
 	OPAQ::TimeSeries<double> *ts = _getOrInit( meteoId, parameterId );
 
 	std::string line = reader.readLine();
