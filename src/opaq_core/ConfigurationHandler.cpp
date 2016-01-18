@@ -104,14 +104,12 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
 
   doc = TiXmlDocument(filename);
   if (!doc.LoadFile(filename)) {
-    logger->fatal("Failed to load configuration file");
-    exit(1);
+	  throw BadConfigurationException( "Unable to load configuration file : " + filename );
   }
   TiXmlElement * rootElement;
   rootElement = doc.FirstChildElement("opaq");
   if (!rootElement) {
-    logger->fatal("Root element ('opaq') not found");
-    exit(1);
+    throw BadConfigurationException( "Unable to find opaq tag in configuration file : " + filename );
   }
 
   /* ------------------------------------------------------------------------
