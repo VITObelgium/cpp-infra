@@ -36,6 +36,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     Config::Component * component = cnf->getMeteo();
     std::string name = component->getName();
     meteo = cm->getComponent<MeteoProvider>(name);
+    meteo->setBaseTime( baseTime );
   } catch (NullPointerException & e) {}
   
   // Get data buffer (can't be missing)
