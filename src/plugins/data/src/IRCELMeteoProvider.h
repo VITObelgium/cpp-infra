@@ -23,6 +23,7 @@ public:
   
   static const std::string METEO_PLACEHOLDER;
   static const std::string PARAMETER_PLACEHOLDER;
+  static const std::string BASETIME_PLACEHOLDER;
 
   // OPAQ::Component methods
   virtual void configure(TiXmlElement *cnf)  throw (BadConfigurationException);
@@ -54,6 +55,7 @@ private:
   int                _nsteps;          //! number of steps in a line in the datafile
   OPAQ::DateTime     _bufferStartDate; //! requested buffer start date, if not given, then all file is stored
   bool               _bufferStartReq;  //! is this requested ?
+  int                _backsearch;      //! how many days are we looking in the past to find data file
 
   // -- the dynamic meteo data buffer
   std::map<std::string, std::map<std::string, OPAQ::TimeSeries<double> > > _buffer;
