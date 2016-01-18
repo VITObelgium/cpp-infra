@@ -115,6 +115,8 @@ int main (int argc, char* argv[]) {
     }
    } /* while loop parsing command line options */
 
+   // provide some feedback
+   print_welcome( );
 
    // parse the config file here quicly just to get the log filename if given, cannot do this
    // in the config handler (see remark below..)
@@ -135,8 +137,7 @@ int main (int argc, char* argv[]) {
   /* -----------------------------------------------------------------------------------
      Starting initialization
      --------------------------------------------------------------------------------- */
-   // provide some feedback
-   print_welcome( );
+
 
   // overwrite a few of the standard run options by the command line options here...
   // 1. pollutant
