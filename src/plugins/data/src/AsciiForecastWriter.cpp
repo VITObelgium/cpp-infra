@@ -20,7 +20,8 @@ namespace OPAQ {
   AsciiForecastWriter::AsciiForecastWriter() :
 	  _enable_fields(false),
 	  _sepchar( '\t' ),
-	  _fctime_full(true) {
+	  _fctime_full(true),
+	  _full_output(true) {
   }
 
   AsciiForecastWriter::~AsciiForecastWriter(){
@@ -83,6 +84,14 @@ namespace OPAQ {
 		_fctime_full = true; // default
 	}
 
+
+	try {
+		std::string s = XmlTools::getText( configuration, "full_output");
+		std::transform( s.begin(), s.end(), s.begin(), ::tolower );
+		if ( !s.compare( "disable" ) || !s.compare( "false" ) || !s.compare( "no" ) ) _full_output = false;
+	} catch ( ... ){  // do nothing, keep default
+		_full_output = true;
+	}
 
     return;
   }
@@ -155,6 +164,17 @@ namespace OPAQ {
     // loop over stations and produce the output
     // ========================================================================
     for ( Station *station : stations ) {
+
+    	if ( ! _full_output ) {
+    		// Issue 9 (github)
+    		// get list of pollutants & see whether this station acutally measures the pollutant requested,
+    		// if not then we skip this station
+    		bool have_pol = false;
+    		for ( Pollutant *st_pol : station->getPollutants() ) {
+    			if ( ! st_pol->getName().compare( pol->getName() ) ) { have_pol = true; break; }
+    		}
+    		if ( ! have_pol ) continue;
+    	}
 
     	// loop over the different forecast horizons
     	for ( int fc_hor=0; fc_hor <= fcHorMax; fc_hor++ ) {
