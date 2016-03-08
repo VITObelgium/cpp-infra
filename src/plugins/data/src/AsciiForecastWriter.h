@@ -36,12 +36,13 @@ class AsciiForecastWriter : public OPAQ::ForecastOutputWriter {
 
 private:
   std::string              _filename;
-  std::vector<std::string> _models;   //! a list of models to output
+  std::vector<std::string> _models;       //! a list of models to output
   std::string              _title;
   std::string              _header;
   bool                     _enable_fields;
-  char                     _sepchar;  //! fields separation character, default is tab
-  bool                     _fctime_full; //! output full fctime
+  char                     _sepchar;      //! fields separation character, default is tab
+  bool                     _fctime_full;  //! output full fctime
+  bool                     _full_output;  //! output all the stations, if false will only ouptut stations that measure the pollutant
 };
 
 
