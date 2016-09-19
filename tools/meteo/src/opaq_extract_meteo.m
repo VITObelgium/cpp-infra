@@ -71,17 +71,33 @@ clear lon lat time;
 % -------------------------------------------------------------------------
 % -- read fields
 % -------------------------------------------------------------------------
+% these have to be present otherwise we crash the lot
 t2m  = ncread( ncfile, 't2m' );
 rh2m = ncread( ncfile, 'rh2m' );
 u10m = ncread( ncfile, 'u10m' );
 v10m = ncread( ncfile, 'v10m' );
-    
 blh  = ncread( ncfile, 'blh' );
-    
-cctot  = ncread( ncfile, 'cloud_cover' );
-cclow  = ncread( ncfile, 'low_cloud_cover' );
-ccmid  = ncread( ncfile, 'middle_cloud_cover' );
-cchigh = ncread( ncfile, 'high_cloud_cover' );
+
+try
+    cctot  = ncread( ncfile, 'cloud_cover' );
+catch ME
+    cctot = nan(size(t2m));
+end
+try
+    cclow  = ncread( ncfile, 'low_cloud_cover' );
+catch ME
+    cclow = nan(size(t2m));
+end
+try
+    ccmid  = ncread( ncfile, 'middle_cloud_cover' );
+catch ME
+    ccmid  = nan(size(t2m));
+end
+try
+    cchigh = ncread( ncfile, 'high_cloud_cover' );
+catch ME
+    cchigh  = nan(size(t2m));
+end
 
 t3d    = ncread( ncfile, 't' );
 wsp3d  = sqrt( ncread( ncfile, 'u' ).^2 + ncread( ncfile, 'v' ).^2 );
