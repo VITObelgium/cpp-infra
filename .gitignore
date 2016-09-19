@@ -57,3 +57,4 @@ RemoteSystemTempFiles/
 # some doxygen stuff
 doc/.tag
 doc/doxygen_sqlite3.db
+build/

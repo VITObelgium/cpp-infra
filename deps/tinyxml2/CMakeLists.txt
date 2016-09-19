@@ -1,0 +1,15 @@
+SET(MAJOR 4)
+SET(MINOR 0)
+SET(REVISION 1)
+SET(NAME tinyxml2)
+SET(PACKAGE ${NAME}-${MAJOR}.${MINOR}.${REVISION})
+
+EXTERNALPROJECT_ADD(${NAME}
+    URL https://github.com/leethomason/${NAME}/archive/${MAJOR}.${MINOR}.${REVISION}.tar.gz TIMEOUT 180
+    INSTALL_DIR ${CMAKE_BINARY_DIR}/local
+    CMAKE_ARGS -G ${CMAKE_GENERATOR}
+               -DBUILD_STATIC_LIBS=ON
+               -DBUILD_SHARED_LIBS=OFF
+               -DCMAKE_BUILD_TYPE=Release
+               -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+)

@@ -1,0 +1,19 @@
+SET(MAJOR 1)
+SET(MINOR 10)
+SET(REVISION 0-patch1)
+SET(NAME hdf5)
+SET(PACKAGE ${NAME}-${MAJOR}.${MINOR}.${REVISION})
+
+EXTERNALPROJECT_ADD(${NAME}
+    DEPENDS zlib
+    URL https://support.hdfgroup.org/ftp/HDF5/releases/${NAME}-${MAJOR}.${MINOR}/${PACKAGE}/src/${PACKAGE}.tar.bz2 TIMEOUT 360
+    INSTALL_DIR ${CMAKE_BINARY_DIR}/local
+    CMAKE_ARGS -G ${CMAKE_GENERATOR}
+               -DCMAKE_BUILD_TYPE=Release
+               -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/../local
+               -DBUILD_TESTING=OFF
+               -DHDF5_BUILD_TOOLS=OFF
+               -DHDF5_BUILD_EXAMPLES=OFF
+               -DHDF5_BUILD_HL_LIB=OFF
+               -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+)
