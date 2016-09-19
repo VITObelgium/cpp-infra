@@ -1,7 +1,7 @@
 %OPAQ_IMPORT_FNL Import FNL data into OPAQ (OVL)
 %
 % Usage:
-%   opaq_import_fnl [options] LON1,LAT1;LON2,LAT2 start_date end_date
+%   opaq_import_fnl [options] LON1,LAT1;LON2,LAT2;LON3,LAT3;... start_date end_date
 %
 % Available options:
 %   --help ................ : this message
