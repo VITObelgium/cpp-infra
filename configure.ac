@@ -3,7 +3,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(opaq, 0.4, BUG-REPORT-ADDRESS)
+AC_INIT(opaq, 0.5, BUG-REPORT-ADDRESS)
 AC_CONFIG_SRCDIR([src/opaq_core/opaq.cpp])
 AC_CONFIG_HEADER([config.h])
 AC_CONFIG_MACRO_DIR([m4])
