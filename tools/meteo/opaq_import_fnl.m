@@ -15,7 +15,7 @@
 %                              'ovlasc' : write ovl ascii files
 %   --output <path> ....... : output folder
 %
-% Bino Maiheu, (c) VITO 2014 
+% Bino Maiheu, (c) VITO 2016 
 % Contact: bino.maiheu@vito.be
 
 function opaq_import_fnl( varargin )
@@ -111,6 +111,15 @@ switch lower(opts.mode)
                 sprintf( 'FNL_%d_%d', coords(k,1), coords(k,2) ) );
             
             opaq_write_ovl_ascii_meteo( base_name, xx_date_all, squeeze(xx_meteo_all(k,:,:))' );
+        end
+        
+    case 'opaqdb'
+        for k=1:n_coords            
+            fileName = fullfile( opts.output, ...
+                sprintf( 'FNL_%d_%d.mat', coords(k,1), coords(k,2) ) );            
+            xx_meteo = [ xx_date_all squeeze( xx_meteo_all(k,:,:) )' ];            
+            fprintf( 'Exporting pars for lon=%.2f, lat=%.2f : %s\n', coords(k,1), coords(k,2), fileName );
+            save( fileName, 'xx_meteo' ); 
         end
         
     otherwise
