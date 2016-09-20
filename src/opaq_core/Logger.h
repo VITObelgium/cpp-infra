@@ -9,7 +9,7 @@
 #ifndef LOGGER_H_
 #define LOGGER_H_
 
-#include <spdlog\spdlog.h>
+#include <spdlog/spdlog.h>
 #include "tools/FileTools.h"
 
 class Log
@@ -26,12 +26,21 @@ private:
     static std::shared_ptr<spdlog::sinks::sink> _sink;
 };
 
-fail; // statically allocated loggers are initialized first and encounter a null sink
+class Logger
+{
+public:
+    Logger(const std::string& name)
+    : _logger(Log::createLogger(name))
+    {
+    }
 
-#define LOGGER_DEC() \
-    static const std::shared_ptr<spdlog::logger> logger;
+    spdlog::logger* operator->()
+    {
+        return _logger.get();
+    }
 
-#define LOGGER_DEF(NAME) \
-    const std::shared_ptr<spdlog::logger> NAME::logger = Log::createLogger(#NAME);
+private:
+    std::shared_ptr<spdlog::logger> _logger;
+};
 
 #endif /* LOGGER_H_ */

@@ -7,7 +7,8 @@
 
 namespace OPAQ {
 
-XMLAQNetProvider::XMLAQNetProvider() {
+XMLAQNetProvider::XMLAQNetProvider()
+: _logger("OPAQ::XMLAQNetProvider") {
 }
 
 XMLAQNetProvider::~XMLAQNetProvider() {
@@ -19,13 +20,13 @@ XMLAQNetProvider::~XMLAQNetProvider() {
     delete toErase;
   }
 }
-  
+
 void XMLAQNetProvider::configure(TiXmlElement *cnf) {
 
   // Here we assume we recieve the <config> element which should define the AQNetwork...
   TiXmlElement *netEl = cnf->FirstChildElement("network");
   if (!netEl) {
-    logger->error("network element not found in configuration");
+    _logger->error("network element not found in configuration");
     throw OPAQ::BadConfigurationException("network element not found in configuration");
   }
 
@@ -41,7 +42,7 @@ void XMLAQNetProvider::configure(TiXmlElement *cnf) {
 	|| (stEl->QueryDoubleAttribute("x", &x) != TIXML_SUCCESS)
 	|| (stEl->QueryDoubleAttribute("y", &y) != TIXML_SUCCESS))
       throw OPAQ::BadConfigurationException("station " + name + " should at least have name, x and y defined");
-    
+
     // z is optional, default is 0.
     if (stEl->QueryDoubleAttribute("z", &z) != TIXML_SUCCESS) z = 0;
 
@@ -64,33 +65,33 @@ void XMLAQNetProvider::configure(TiXmlElement *cnf) {
       std::string str = stEl->GetText();
 
       std::vector<std::string> pol_list = OPAQ::StringTools::tokenize( str, ",:;| \t", 6 );
-      
+
       for ( auto it = pol_list.begin(); it != pol_list.end(); ++it) {
-	
+
 	OPAQ::Pollutant *p =
 	  OPAQ::Config::PollutantManager::getInstance()->find(*it);
 	if (!p)
 	  throw OPAQ::BadConfigurationException( "unknown pollutant found for " + name + " : " + *it);
-	
+
 	// add to the pollutants list for this station
 	st->getPollutants().push_back(p);
       }
 
-    }      
+    }
     _net.getStations().push_back(st);
-    
+
     stEl = stEl->NextSiblingElement("station");
   } /* end while loop over station elements */
-  
+
   if (_net.getStations().size() == 0)
     throw OPAQ::BadConfigurationException("no stations defined in network");
-  
+
 }
-  
+
 OPAQ::AQNetwork* XMLAQNetProvider::getAQNetwork() {
   return &_net;
 }
-  
+
 } /* namespace OPAQ */
 
 OPAQ_REGISTER_PLUGIN(OPAQ::XMLAQNetProvider);

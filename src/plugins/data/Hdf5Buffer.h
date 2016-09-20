@@ -15,8 +15,6 @@ class Hdf5Buffer: public OPAQ::ForecastBuffer {
 public:
   Hdf5Buffer();
   virtual ~Hdf5Buffer();
-  
-  LOGGER_DEC();
 
   static const std::string START_DATE_NAME;        // attribute that holds the start date
   static const std::string FORECAST_DATASET_NAME;
@@ -51,7 +49,7 @@ public:
   // ==================================================
   /**
    * Returns the time resolution of the Hdf5Buffer, this returns
-   * a TimeInterval object of 1 day. 
+   * a TimeInterval object of 1 day.
    */
   virtual TimeInterval getTimeResolution();
 
@@ -120,31 +118,31 @@ public:
 
 /*
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
-					const TimeInterval & endOffset, 
+					const TimeInterval & endOffset,
 					const std::string & parameter,
 					const std::string & station);
-  
+
 
   virtual std::vector<double> getValues(const std::string & modelName,
 					const TimeInterval & beginOffset,
-					const TimeInterval & endOffset, 
+					const TimeInterval & endOffset,
 					const std::string & parameter,
 					const std::string & station );
 
 
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
-					const TimeInterval & endOffset, 
+					const TimeInterval & endOffset,
 					const std::string & parameter,
 					const std::string & station,
 					const ForecastHorizon & forecastHorizon);
 
-  virtual std::vector<double> getValues(const std::string & modelName, 
+  virtual std::vector<double> getValues(const std::string & modelName,
 					const TimeInterval & beginOffset,
-					const TimeInterval & endOffset, 
+					const TimeInterval & endOffset,
 					const std::string & parameter,
 					const std::string & station,
 					const ForecastHorizon & forecastHorizon );
-  
+
   virtual std::vector<double> getValues(const std::string & parameter,
 					const TimeInterval & offset = TimeInterval(0),
 					const ForecastHorizon & forecastHorizon = ForecastHorizon(0));
@@ -152,7 +150,7 @@ public:
 
   // OPAQ::DataBuffer methods
   virtual void setNoData(double noData);
-  
+
   /**
    * throws Hdf5BufferRunTimeException on runtime errors:
    * . forecast horizons that don't lie on exact day boundaries
@@ -168,6 +166,7 @@ public:
 
 
 private:
+  Logger _logger;
   std::string _filename;  //!< filename for the buffer file
   H5::H5File *_h5file;    //!< HDF5 file handle for the buffer file
 
@@ -181,15 +180,15 @@ private:
 
   DateTime _startDate; //!< the start stored in the file (cannot add values before it)
 
-  DateTime _baseTime;  //!< the basetime against which to offset the intervals given by the 
+  DateTime _baseTime;  //!< the basetime against which to offset the intervals given by the
                        //!< getValues and setValues routines
 
   bool     _configured;  //!< Flag, true if the OPAQ::Component configuration went well
-  bool     _baseTimeSet; //!< Flag, true if a basetime was given to the 
-  
+  bool     _baseTimeSet; //!< Flag, true if a basetime was given to the
+
 private:
   void _closeFile();
-  
+
   /**
    * Checks whether the basetime is set and the configuration is succesful
    */
@@ -197,23 +196,23 @@ private:
   /**
    * Checks whether the file exists and open it
    * Note:: we always ope in RDWR mode, even only for read only operations...
-   *        this might be a bit dangerous... 
+   *        this might be a bit dangerous...
    */
   void _checkIfExistsAndOpen();
 
   // throws BadConfigurationException
   void _createOrOpenFile();
-  
+
   void _createFile(const std::string & filename);
-  
+
   // throws BadConfigurationException
   void _openFile(const std::string &filename);
-  
+
   //	int _getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &parameter);
   //	unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
   //	void _readStringData (char ** buffer, H5::DataSet & dataSet);
   //	void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
 };
-  
+
 } /* namespace OPAQ */
 #endif /* HDF5FORECASTSSTORE_H_ */

@@ -18,9 +18,7 @@ class IRCELMeteoProvider: public OPAQ::MeteoProvider {
 public:
   IRCELMeteoProvider();
   virtual ~IRCELMeteoProvider();
-  
-  LOGGER_DEC();
-  
+
   static const std::string METEO_PLACEHOLDER;
   static const std::string PARAMETER_PLACEHOLDER;
   static const std::string BASETIME_PLACEHOLDER;
@@ -28,9 +26,9 @@ public:
   // OPAQ::Component methods
   // throws BadConfigurationException
   virtual void configure(TiXmlElement *cnf);
-  
+
   // OPAQ::MeteoProvider methods
-  
+
   /**
    * Ignored
    */
@@ -40,7 +38,7 @@ public:
    * throws an exception: use getNoData(const std::string &) instead
    */
   virtual double getNoData(const std::string & parameterId);
-  
+
   /**
    * Return the values between t1 and t2 including the boundaries !
    */
@@ -48,8 +46,9 @@ public:
 						    				  const DateTime & t2,
 											  const std::string& meteoId,
 											  const std::string& paramId );
-  
+
 private:
+  Logger             _logger;
   bool               _configured;      //! is the object completely configured
   void               _checkConfig();
   OPAQ::TimeInterval _timeResolution;  //! what is the time resolution of the meteo data ?

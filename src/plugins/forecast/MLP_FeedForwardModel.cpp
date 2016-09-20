@@ -14,10 +14,9 @@ const std::string MODEL_PLACEHOLDER       = "%model%";   // idem for feature vec
 
 namespace OPAQ {
 
-LOGGER_DEF(OPAQ::MLP_FeedForwardModel);
-
-MLP_FeedForwardModel::MLP_FeedForwardModel() :
-	sample_size(0) {
+MLP_FeedForwardModel::MLP_FeedForwardModel()
+: sample_size(0)
+, logger("OPAQ::MLP_FeedForwardModel") {
 }
 
 MLP_FeedForwardModel::~MLP_FeedForwardModel() {}

@@ -19,13 +19,11 @@ class RioObsProvider: public OPAQ::DataProvider {
 public:
   RioObsProvider();
   virtual ~RioObsProvider();
-  
-  LOGGER_DEC();
-  
+
   static const std::string POLLUTANT_PLACEHOLDER;
-  
+
   // OPAQ::Component methods
-  
+
   /**
    * RioObsProvider configuration:
    *
@@ -34,7 +32,7 @@ public:
 
   // throws BadConfigurationException
   virtual void configure(TiXmlElement* configuration);
-  
+
   // OPAQ::DataProvider methods
   virtual TimeInterval getTimeResolution();
 
@@ -51,8 +49,9 @@ public:
   virtual OPAQ::TimeSeries<double> getValues( const DateTime& t1, const DateTime& t2,
 		  const std::string& stationId, const std::string& pollutantId,
 		  OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None );
-  
+
 private:
+  Logger              _logger;
   double              _noData;
   TimeInterval        _timeResolution;
   std::string         _pattern;
@@ -71,12 +70,12 @@ private:
 
   OPAQ::TimeSeries<double> *_getTimeSeries( const std::string& pollutant,
 		  const std::string& station, OPAQ::Aggregation::Type aggr );
-  
+
   void _readFile ( const std::string & pollutant );
-  
+
   OPAQ::TimeSeries<double> *_getOrInitValues( const std::string & pollutant,
 		  OPAQ::Aggregation::Type aggr, const std::string & station );
 };
-  
+
 } /* namespace OPAQ */
 #endif /* RIOOBSPROVIDER_H_ */

@@ -35,8 +35,6 @@ namespace OPAQ {
     public:
       OpaqRun();
       virtual ~OpaqRun();
-      
-      LOGGER_DEC();
 
       /** Returns a list of available plugins */
       std::vector<OPAQ::Config::Plugin>    & getPlugins() { return plugins; }
@@ -58,7 +56,7 @@ namespace OPAQ {
       OPAQ::Config::Component *getNetworkProvider() const { return networkProvider; }
       /** Returns the grid provider */
       OPAQ::Config::Component *getGridProvider() const { return gridProvider; }
-    
+
       /** Retrieve the forecast configuration object */
       OPAQ::Config::ForecastStage* getForecastStage() const { return forecastStage;  }
 
@@ -79,14 +77,14 @@ namespace OPAQ {
     	  aggregation = Aggregation::fromString( aggr );
       }
 
-      /** 
-       * Set the network provider from the component configuration 
-       * \param component a pointer to a OPAQ::Config::Component object which is defined in the 
+      /**
+       * Set the network provider from the component configuration
+       * \param component a pointer to a OPAQ::Config::Component object which is defined in the
        *                  master XML configuration file
        */
       void setNetworkProvider( OPAQ::Config::Component *component ) { this->networkProvider = component; }
       /** Set the grid provider from the component configuration
-       * \param component a pointer to a OPAQ::Config::Component object which is defined in the 
+       * \param component a pointer to a OPAQ::Config::Component object which is defined in the
        *                  master XML configuration file
        */
       void setGridProvider (OPAQ::Config::Component * component) {this->gridProvider = component; }
@@ -99,6 +97,8 @@ namespace OPAQ {
 
 
 private:
+      Logger logger;
+
       std::vector<OPAQ::Config::Plugin>    plugins;    //!< list of available plugins
       std::vector<OPAQ::Config::Component> components; //!< list of available components
 

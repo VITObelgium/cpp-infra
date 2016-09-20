@@ -4,13 +4,12 @@ namespace OPAQ {
 
 namespace Config {
 
-PollutantManager::PollutantManager() {
+PollutantManager::PollutantManager()
+: logger("OPAQ::Config::PollutantManager") {
 }
 
 PollutantManager::~PollutantManager() {
 }
-
-LOGGER_DEF(OPAQ::Config::PollutantManager);
 
 PollutantManager *PollutantManager::getInstance() {
 	static PollutantManager instance;

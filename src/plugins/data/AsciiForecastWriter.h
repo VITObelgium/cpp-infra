@@ -19,9 +19,6 @@ class AsciiForecastWriter : public OPAQ::ForecastOutputWriter {
   AsciiForecastWriter();
   virtual ~AsciiForecastWriter();
 
-  
-  LOGGER_DEC();
-
   static const std::string BASETIME_PLACEHOLDER;
   static const std::string POLLUTANT_PLACEHOLDER;
   static const std::string AGGREGATION_PLACEHOLDER;
@@ -35,6 +32,7 @@ class AsciiForecastWriter : public OPAQ::ForecastOutputWriter {
   virtual void write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime );
 
 private:
+  Logger                   _logger;
   std::string              _filename;
   std::vector<std::string> _models;       //! a list of models to output
   std::string              _title;

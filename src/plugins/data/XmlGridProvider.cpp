@@ -9,7 +9,8 @@
 
 namespace OPAQ {
 
-XmlGridProvider::XmlGridProvider() {
+XmlGridProvider::XmlGridProvider()
+: _logger("OPAQ::XmlGridProvider") {
 }
 
 XmlGridProvider::~XmlGridProvider() {
@@ -20,8 +21,6 @@ XmlGridProvider::~XmlGridProvider() {
 		delete toErase;
 	}
 }
-
-LOGGER_DEF(OPAQ::XmlGridProvider)
 
 /**
  * configuration example:
@@ -35,7 +34,7 @@ void XmlGridProvider::configure(TiXmlElement * configuration) {
 
 	TiXmlElement * gridEl = configuration->FirstChildElement("grid");
 	if (!gridEl) {
-		logger->error("grid element not found in configuration");
+		_logger->error("grid element not found in configuration");
 		throw BadConfigurationException("grid element not found in configuration");
 	}
 

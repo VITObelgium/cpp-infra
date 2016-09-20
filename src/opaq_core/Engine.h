@@ -29,32 +29,32 @@ namespace OPAQ {
 
   /**
    * The main OPAQ abstract workflow class
-   * The OPAQ engine contains the abstract implementation of the configurable workflow for an 
+   * The OPAQ engine contains the abstract implementation of the configurable workflow for an
    * OPAQ run. It's run method is basically the body of an OPAQ run and the main program is
-   * just a wrapper around it. 
+   * just a wrapper around it.
    */
   class Engine {
   public:
-    Engine() {}
+    Engine();
     virtual ~Engine() {}
-    
+
     /**
      * The main OPAQ run method given a configuration
      * This method executes the OPAQ workflow as configured in the configuration object by
      * -# loading the plugins
      * -# instantiating and configuring the components
-     * -# executing the main OPAQ workflow : 
+     * -# executing the main OPAQ workflow :
      *    - get the forecast/mapping stages
      *    - get the air quality network provider
      *    - get the grid provider
      *    - get the base times
-     *    - get the requested basetimes the user wants to run and loop over them executing the 
+     *    - get the requested basetimes the user wants to run and loop over them executing the
      *      mapping/forecast stages...
      */
     void run(Config::OpaqRun * config);
-    
+
   private:
-    LOGGER_DEC();
+    Logger logger;
 
     /**
      * This runs the forecast stage with the given configuration, network,
@@ -64,11 +64,11 @@ namespace OPAQ {
      */
     void runForecastStage( Config::ForecastStage *cnf, AQNetworkProvider *net,
     		Pollutant *pol, Aggregation::Type agg, DateTime &baseTime );
-      
+
     void loadPlugins(std::vector<Config::Plugin> * plugins);
     void initComponents(std::vector<Config::Component> & components);
-    
+
   };
-  
+
 } /* namespace OPAQ */
 #endif /* ENGINE_H_ */

@@ -19,16 +19,10 @@ IF (SANITIZE_ADDRESS)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
 ENDIF ()
 
-IF (WIN32)
-ELSE ()
-FIND_PACKAGE(PkgConfig)
-PKG_CHECK_MODULES(EIGEN_PKG eigen3 REQUIRED)
-ENDIF ()
-
 IF (MSVC)
     # use all cores for compilation
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
-	# avoid windows specific warnings
+    # avoid windows specific warnings
     ADD_DEFINITIONS("-D_CRT_SECURE_NO_WARNINGS")
 ENDIF()
 

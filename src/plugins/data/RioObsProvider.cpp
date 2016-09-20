@@ -9,11 +9,10 @@
 
 namespace OPAQ {
 
-LOGGER_DEF(RioObsProvider);
-
 const std::string RioObsProvider::POLLUTANT_PLACEHOLDER = "%pol%";
 
-RioObsProvider::RioObsProvider() {
+RioObsProvider::RioObsProvider()
+: _logger("RioObsProvider") {
 	_noData         = -9999;              // RIO observations use -9999 as nodata placeholder
 	_timeResolution = TimeInterval(3600); // RIO observations have hourly resolution, per default, can be overwritten !
 	_configured     = false;
@@ -204,7 +203,7 @@ void RioObsProvider::_readFile( const std::string & pollutant ) {
 	} else {
 		std::stringstream ss;
 		ss << "Failed to open file " << filename;
-		logger->warn(ss.str());
+		_logger->warn(ss.str());
 	}
 }
 

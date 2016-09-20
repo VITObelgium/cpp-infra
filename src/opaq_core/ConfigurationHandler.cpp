@@ -9,7 +9,9 @@
 
 namespace OPAQ {
 
-LOGGER_DEF(OPAQ::ConfigurationHandler)
+ConfigurationHandler::ConfigurationHandler()
+: logger("OPAQ::ConfigurationHandler") {
+}
 
 /* ================================================================================
    Forecast stage parser
@@ -20,7 +22,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
 
   // create a new forecast stage object
   fcStage = new OPAQ::Config::ForecastStage();
-  
+
   TiXmlElement *modelsElement = element->FirstChildElement("models");
   if ( ! modelsElement ) {
     logger->error( "No models tag given in forecast stage configuration..." );
@@ -33,7 +35,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     fcStage->getModels().push_back(findComponent(componentName));
     componentElement = componentElement->NextSiblingElement("component");
     }
-    
+
   // parse the <input> section
   TiXmlElement * inputElement = element->FirstChildElement("input");
   try {
@@ -117,7 +119,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
      irrespective of the actual run requested. This defines what is available
      in the OPAQ configuration
      --------------------------------------------------------------------- */
-  
+
   // Parsing plugins section
   TiXmlDocument pluginsDoc;
   TiXmlElement * pluginsElement = XmlTools::getElement(rootElement, "plugins", &pluginsDoc);
@@ -134,7 +136,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     opaqRun.getPlugins().push_back(plugin);
     pluginElement = pluginElement->NextSiblingElement("plugin");
   }
-  
+
   // Parsing components section
   TiXmlDocument componentsDoc;
   TiXmlElement * componentsElement = XmlTools::getElement(rootElement, "components", &componentsDoc);
@@ -150,7 +152,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     opaqRun.getComponents().push_back(component);
     componentElement = componentElement->NextSiblingElement("component");
   }
-  
+
   // Parsing pollutants section
   try {
     TiXmlDocument pollutantsDoc;
@@ -166,19 +168,19 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->critical("pollutant list is empty: define at least 1 pollutant");
     exit(1);
   }
-  
+
   logger->info("Pollutant list:");
   std::vector<Pollutant> * pols = &(Config::PollutantManager::getInstance()->getList());
   std::vector<Pollutant>::iterator it = pols->begin();
   while (it != pols->end()) {
     logger->info(" " + (*it++).toString());
   }
-  
+
   /* ------------------------------------------------------------------------
      Now we parse the run information, which defines how OPAQ should be run
      i.e. for what pollutant and what timesteps we should do ? Also this
      defines the forecast/mapping stages in the OPAQ run...
-     
+
      Let's us the rootElement pointer for this again...
      --------------------------------------------------------------------- */
   TiXmlDocument runConfigDoc;
@@ -190,7 +192,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->critical(ss.str());
     exit(1);
   }
-  
+
   /* ------------------------------------------------------------------------
      Parsing base times section
      --------------------------------------------------------------------- */
@@ -211,7 +213,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   } catch (const ElementNotFoundException&) {
     logger->warn("no base times section in configuration file");	// but might be given using command line args
   }
-  
+
   /* ------------------------------------------------------------------------
      Parsing pollutant elements section
      --------------------------------------------------------------------- */
@@ -221,7 +223,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   } catch (const ElementNotFoundException&) {
     logger->warn("no pollutant set in configuration file");		// but might be given using command line args
   }
-  
+
   try {
     std::string name = XmlTools::getText(rootElement, "aggregation");
     opaqRun.setAggregation(name); // set the aggregation
@@ -242,7 +244,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->critical(e.what());
     exit(1);
   }
-  
+
   /* ------------------------------------------------------------------------
      Parsing grid section : selects the component which will deliver the
      Grid configuration
@@ -255,7 +257,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->warn("no grid provider defined");
     opaqRun.setGridProvider(NULL);
   }
-  
+
   /* ------------------------------------------------------------------------
      Parsing forecast section
      --------------------------------------------------------------------- */
@@ -267,7 +269,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->warn("no forecast stage defined");
     opaqRun.setForecastStage(NULL);
   }
-  
+
   /* ------------------------------------------------------------------------
      Parsing mapping section
      --------------------------------------------------------------------- */
@@ -279,7 +281,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     logger->warn("no mapping stage defined");
     opaqRun.setMappingStage(NULL);
   }
-  
+
 }
 
 void ConfigurationHandler::validateConfiguration() {
@@ -297,7 +299,7 @@ void ConfigurationHandler::validateConfiguration() {
 	exit(1);
       }
     }
-    
+
     // check if plugin lib file exists
     std::string lib = (*it1).getLib();
     if (!FileTools::exists(lib)) {
@@ -305,7 +307,7 @@ void ConfigurationHandler::validateConfiguration() {
       exit(1);
     }
   }
-  
+
   // check for components with the same name
   for (std::vector<OPAQ::Config::Component>::iterator it1 =
 	 opaqRun.getComponents().begin();
@@ -320,13 +322,13 @@ void ConfigurationHandler::validateConfiguration() {
       }
     }
   }
-  
+
   // check if base times are defined
   if (opaqRun.getBaseTimes().size() == 0) {
     logger->error("no base times defined (need at least 1)");
     exit(1);
   }
-  
+
   // check if pollutant is defined
   if (!opaqRun.pollutantIsSet()) {
     logger->error("no pollutant set");
@@ -363,7 +365,7 @@ OPAQ::Config::Plugin * ConfigurationHandler::findPlugin( std::string & pluginNam
   exit(1);
   return NULL;
 }
-  
+
 OPAQ::Config::Component * ConfigurationHandler::findComponent(std::string & componentName) {
   for (std::vector<OPAQ::Config::Component>::iterator it =
 	 opaqRun.getComponents().begin();
@@ -377,5 +379,5 @@ OPAQ::Config::Component * ConfigurationHandler::findComponent(std::string & comp
   exit(1);
   return NULL;
 }
-  
+
 } /* namespace OPAQ */

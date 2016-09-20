@@ -18,8 +18,6 @@ public:
 	XmlGridProvider();
 	virtual ~XmlGridProvider();
 
-	LOGGER_DEC()
-
 	// OPAQ::Component methods
 
     // throws BadConfigurationException
@@ -33,7 +31,7 @@ public:
 
 private:
 	Grid _grid;
-
+	Logger _logger;
 };
 
 } /* namespace OPAQ */

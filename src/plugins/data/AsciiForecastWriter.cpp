@@ -10,14 +10,13 @@
 
 namespace OPAQ {
 
-  LOGGER_DEF(AsciiForecastWriter);
-
   const std::string AsciiForecastWriter::BASETIME_PLACEHOLDER    = "%basetime%";
   const std::string AsciiForecastWriter::POLLUTANT_PLACEHOLDER   = "%pol%";
   const std::string AsciiForecastWriter::AGGREGATION_PLACEHOLDER = "%aggr%";
 
 
   AsciiForecastWriter::AsciiForecastWriter() :
+      _logger("AsciiForecastWriter"),
 	  _enable_fields(false),
 	  _sepchar( '\t' ),
 	  _fctime_full(true),
@@ -27,18 +26,18 @@ namespace OPAQ {
   AsciiForecastWriter::~AsciiForecastWriter(){
   }
 
-  
+
   void AsciiForecastWriter::configure(TiXmlElement * configuration) {
-    
+
     if ( ! configuration )
       throw NullPointerException("No XML config element give");
-    
+
     // parse filename
     TiXmlElement * fileEl = configuration->FirstChildElement("filename");
     if (!fileEl)
       throw BadConfigurationException("filename element not found");
     _filename = fileEl->GetText();
-    
+
 
     // -- look for list of models to output, all will be dumped if no list given...
     try {
@@ -99,7 +98,7 @@ namespace OPAQ {
   void AsciiForecastWriter::write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr,
 					     	 	 	 	 	 const OPAQ::DateTime &baseTime ) {
 
-    std::string fname = _filename; 
+    std::string fname = _filename;
     std::string head  = _header;
 
     if ( ! getBuffer() )            throw RunTimeException( "No databuffer set" );
@@ -123,11 +122,11 @@ namespace OPAQ {
     // ========================================================================
     // initialization
     // ========================================================================
-    logger->info( "Writing output file " + fname );
+    _logger->info( "Writing output file " + fname );
 
     FILE *fp = fopen( fname.c_str(), "w" );
     if ( ! fp ) throw RunTimeException( "Unable to open output file " + fname );
-    
+
     // -- print header
     if ( _title.size() != 0 ) fprintf( fp, "# %s\n", _title.c_str() );
     if ( head.size() != 0 ) fprintf( fp, "# %s\n", head.c_str() );
@@ -190,7 +189,7 @@ namespace OPAQ {
     			fprintf( fp, "%s%c%s%c%d", baseTime.dateToString().c_str(), _sepchar,
     					station->getName().c_str(), _sepchar, fc_hor );
     		}
-	
+
     		try {
     			std::vector<double> modelVals = getBuffer()->getModelValues( baseTime, fcHor, station->getName(), pol->getName(), aggr );
     			if ( modelVals.size() != modelNames.size() )

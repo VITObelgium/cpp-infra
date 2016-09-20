@@ -13,9 +13,8 @@ const std::string IRCELMeteoProvider::METEO_PLACEHOLDER     = "%meteo%";
 const std::string IRCELMeteoProvider::PARAMETER_PLACEHOLDER = "%param%";
 const std::string IRCELMeteoProvider::BASETIME_PLACEHOLDER  = "%basetime%";
 
-LOGGER_DEF(IRCELMeteoProvider)
-
 IRCELMeteoProvider::IRCELMeteoProvider() :
+	_logger("IRCELMeteoProvider"),
 	_configured(false),
 	_bufferStartReq(false),
 	_nsteps(0),
@@ -184,12 +183,12 @@ void IRCELMeteoProvider::_readFile( const std::string & meteoId,
 			have_file = true;
 		} catch (const IOException &) {
 			checkDate = checkDate - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
-			logger->warn( filename + " not found, checking previous day : " + checkDate.dateToString() );
+			_logger->warn( filename + " not found, checking previous day : " + checkDate.dateToString() );
 		}
 	}
 
 	if ( ! have_file ) {
-		logger->error( "giving up : no meteo file found for " + meteoId + ", " + parameterId );
+		_logger->error( "giving up : no meteo file found for " + meteoId + ", " + parameterId );
 		return;
 	}
 

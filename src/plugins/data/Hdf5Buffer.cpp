@@ -9,8 +9,6 @@
 
 namespace OPAQ {
 
-LOGGER_DEF(Hdf5Buffer);
-
 // some string constants
 
 const std::string Hdf5Buffer::BASETIME_DATASET_NAME("basetime");
@@ -27,12 +25,12 @@ const std::string Hdf5Buffer::STATION_DATASET_NAME("stations");
 // set version information for this H5 store plugin
 const std::string Hdf5BufferVersion( "0.1" );
 
-Hdf5Buffer::Hdf5Buffer() : 
-  ForecastBuffer() {
+Hdf5Buffer::Hdf5Buffer() :
+  _logger("Hdf5Buffer") {
 
   // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
   H5::Exception::dontPrint();
-  
+
   _h5file      = NULL;
   _noData      = -9999;
   _configured  = false;
@@ -45,9 +43,9 @@ Hdf5Buffer::~Hdf5Buffer() {
 }
 
 void Hdf5Buffer::configure(TiXmlElement * configuration){
-    
+
   if (_configured) _closeFile();
-  
+
   if ( ! configuration )
     throw NullPointerException("No configuration element given for Hdf5Buffer...");
 
@@ -57,7 +55,7 @@ void Hdf5Buffer::configure(TiXmlElement * configuration){
   if (!fileEl)
     throw BadConfigurationException("filename element not found");
   _filename = fileEl->GetText();
-  
+
   // 2. parse start date
   /*
   TiXmlElement * offsetEl = configuration->FirstChildElement("offset");
@@ -84,10 +82,10 @@ void Hdf5Buffer::configure(TiXmlElement * configuration){
   	  _fcTimeResolution = TimeInterval( atoi(fcResEl->GetText()), TimeInterval::Hours );
   }
 
-  
+
   _createOrOpenFile();
   _configured = true;
-  
+
 }
 
 void Hdf5Buffer::setNoData(double noData) {
@@ -95,9 +93,9 @@ void Hdf5Buffer::setNoData(double noData) {
 }
 
 double Hdf5Buffer::getNoData() {
-  // an alternative would be to read back the no data value from one of the 
+  // an alternative would be to read back the no data value from one of the
   // datasets in the data, but the question is then... which one ?
-  
+
   // _checkFullyConfigured();
   // _dataSet.getCreatePlist().getFillValue(H5::PredType::NATIVE_DOUBLE, &out);
   return _noData;
@@ -118,7 +116,7 @@ void Hdf5Buffer::setBaseTime(const DateTime & baseTime)
 
 /* =================================================================================
    Set the values of the given forecast for the given baseTime
-   ============================================================================== */  
+   ============================================================================== */
 void Hdf5Buffer::setValues( const DateTime &baseTime,
 	 		  	     	  	const OPAQ::TimeSeries<double>& forecast,
 	 						const std::string& stationId,
@@ -127,7 +125,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 
 	// -- check whether we have our configuration
 	if ( ! _configured  ) throw NotConfiguredException("Not fully configured");
-  
+
 	// -- do nothing if no values are given
 	if ( forecast.size() == 0 ) return;
 
@@ -337,7 +335,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
   hsize_t count1[1]  = { 1 }; //  set chunk size > 1 in fh dim?
   hsize_t offset1[1] = { dateIndex };
   spaceBaseTimes.selectHyperslab(H5S_SELECT_SET, count1, offset1);
-  
+
   // e. write data to the hyperslab
   std::stringstream ss;
   ss << _baseTime;
@@ -353,15 +351,15 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
   grpPol.close();
   grpAggr.close();
 }
-  
-  
+
+
 void Hdf5Buffer::_closeFile() {
   if (_h5file != NULL) {
     _h5file->close();
     delete _h5file;
   }
 }
-  
+
 void Hdf5Buffer::_checkFullyConfigured() {
   if ( ! _configured  ) throw NotConfiguredException("Not fully configured");
 }
@@ -381,7 +379,7 @@ void Hdf5Buffer::_checkIfExistsAndOpen(){
 
 	return;
 }
- 
+
 void Hdf5Buffer::_createOrOpenFile() {
 
 	if (_h5file == NULL) { // don't open a new file if another base time is set
@@ -395,7 +393,7 @@ void Hdf5Buffer::_createOrOpenFile() {
 
 	return;
 }
-  
+
 void Hdf5Buffer::_createFile(const std::string & filename) {
 
   // Create a new file if not exists file
@@ -441,7 +439,7 @@ void Hdf5Buffer::_openFile(const std::string &filename) {
   }
 
 }
-  
+
 
 TimeInterval Hdf5Buffer::getTimeResolution(){
   return _fcTimeResolution; // return time resolution of the forecasts
@@ -527,7 +525,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const OPAQ::TimeInterval fc_hor,
 		dsModels   = grpAggr.openDataSet( MODELS_DATASET_NAME );
 
 	} catch (const H5::Exception&) {
-		logger->error( "cannot retrieve hindcast values in forecast buffer..." );
+		_logger->error( "cannot retrieve hindcast values in forecast buffer..." );
 		throw NotAvailableException( "forecast is not available" );
 	}
 
@@ -549,9 +547,9 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues( const OPAQ::TimeInterval fc_hor,
 	hsize_t fhSize = Hdf5Tools::getDataSetSize( dsVals, 3 );
 
 	//
-	if ( fhIndex < 0 || fhIndex >= fhSize ||
-		 modelIndex < 0 || modelIndex >= modelSize ||
-		 stIndex < 0 || stIndex >= stSize ) {
+	if ( fhIndex >= fhSize ||
+		 modelIndex >= modelSize ||
+		 stIndex >= stSize ) {
 		throw RunTimeException( "Could not find requested forecast horizon/model/station in HDF5 buffer" );
 	}
 
@@ -676,7 +674,7 @@ std::vector<double> Hdf5Buffer::getModelValues( const DateTime &baseTime, const 
 		dsStations = grpAggr.openDataSet( STATION_DATASET_NAME );
 
 	} catch (const H5::Exception&) {
-		logger->error( "cannot retrieve model values in forecast buffer..." );
+		_logger->error( "cannot retrieve model values in forecast buffer..." );
 		throw NotAvailableException( "forecast is not available" );
 	}
 
@@ -699,9 +697,8 @@ std::vector<double> Hdf5Buffer::getModelValues( const DateTime &baseTime, const 
 	hsize_t fhSize = Hdf5Tools::getDataSetSize( dsVals, 3 );
 
 	// is the station/forecast/base time in the datafile ?
-	if ( fhIndex >= 0 && fhIndex < fhSize &&
-		 btIndex >= 0 && btIndex < btSize &&
-		 stIndex >= 0 ) {
+	if ( fhIndex < fhSize &&
+		 btIndex < btSize) {
 
 		// "model x station x baseTime x fcHorizon"
 
@@ -739,7 +736,7 @@ std::vector<std::string> Hdf5Buffer::getModelNames( const std::string& pollutant
 
 	  } catch (const H5::Exception&)  {
 		  std::string s = "error reading model list for " + pollutantId + ", " + OPAQ::Aggregation::getName( aggr );
-		  logger->trace( s );
+		  _logger->trace( s );
 		  throw NotAvailableException( s );
 	  }
 
