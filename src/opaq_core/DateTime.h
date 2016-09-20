@@ -129,8 +129,7 @@ namespace OPAQ {
      * part denotes the time passed since noon that day.
      */
     long getUnixTime() const {
-      return (toJulianDate() - 2440588) * 86400.0
-	+ _hour * 3600 + _min * 60 + _sec;
+      return static_cast<long>((toJulianDate() - 2440588) * 86400.0 + _hour * 3600 + _min * 60 + _sec);
     }
     
     /**
@@ -140,7 +139,7 @@ namespace OPAQ {
     */
        
     void setUnixTime(long unixTime) {
-      long midnight = floor ((double) unixTime / 86400.0) * 86400;
+      long midnight = static_cast<long>(floor(static_cast<double>(unixTime) / 86400.0) * 86400);
       long jd = midnight / 86400 + 2440588;
       setJulianDay(jd);
       long delta = unixTime - midnight;

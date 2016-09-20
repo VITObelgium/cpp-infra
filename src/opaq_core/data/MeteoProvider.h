@@ -9,7 +9,7 @@
 #define SRC_OPAQ_CORE_DATA_METEOPROVIDER_H_
 
 #include <vector>
-#include <Component.h>
+#include "../Component.h"
 #include "../DateTime.h"
 #include "../TimeSeries.h"
 

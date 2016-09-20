@@ -8,18 +8,16 @@
 #include <iostream>
 #include <string.h>
 
-#include <DateTime.h>
-#include <ConfigurationHandler.h>
-#include <Engine.h>
-#include <Logger.h>
-#include <Exceptions.h>
+#include "DateTime.h"
+#include "ConfigurationHandler.h"
+#include "Engine.h"
+#include "Logger.h"
+#include "Exceptions.h"
 
-#include <tools/FileTools.h>
-#include <tools/DateTimeTools.h>
+#include "tools/FileTools.h"
+#include "tools/DateTimeTools.h"
 
 #include <config.h>
-
-const std::string OPAQ_VERSION ( VERSION );  // defined in the autoconf config.h
 
 void print_usage( void ) {
   std::cout << "Usage :" << std::endl;
@@ -126,8 +124,9 @@ int main (int argc, char* argv[]) {
    if ( arg_log.size() ) log_file = arg_log; // overwrite
 
    // initialize logging framework
-   bool loggingViaConfigFile = initLogger( log_file );
-   const log4cxx::LoggerPtr logger = log4cxx::Logger::getLogger("main");
+   Log::initLogger(log_file);
+
+   auto logger = Log::createLogger("main");
 
    // -- Parse configuration, after init of the log, otherwise we get errors
    OPAQ::ConfigurationHandler ch;
@@ -138,8 +137,8 @@ int main (int argc, char* argv[]) {
 	   exit(1);
    }
 
-   logger->info( "Starting OPAQ run..." );
-   logger->info( "Using OPAQ configuration in .... : " + config_file );
+   logger->info("Starting OPAQ run...");
+   logger->info("Using OPAQ configuration in .... : {}", config_file);
 
   /* -----------------------------------------------------------------------------------
      Starting initialization
@@ -162,7 +161,7 @@ int main (int argc, char* argv[]) {
 	  OPAQ::DateTime baseTime;
 	  try {
 		  baseTime = OPAQ::DateTimeTools::parseDate(basetime);
-	  } catch (OPAQ::ParseException & e) {
+	  } catch (const OPAQ::ParseException&) {
 		  logger->error("Failed to parse base time: " + basetime);
 		  exit(1);
 	  }

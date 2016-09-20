@@ -8,7 +8,7 @@
 #ifndef OPAQ_AQNETWORKPROVIDER_H_
 #define OPAQ_AQNETWORKPROVIDER_H_
 
-#include <Component.h>
+#include "Component.h"
 
 #include "AQNetwork.h"
 

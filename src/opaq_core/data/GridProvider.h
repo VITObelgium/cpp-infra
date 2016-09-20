@@ -8,7 +8,7 @@
 #ifndef GRIDPROVIDER_H_
 #define GRIDPROVIDER_H_
 
-#include "Component.h"
+#include "../Component.h"
 #include "../Grid.h"
 
 namespace OPAQ {

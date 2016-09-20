@@ -35,7 +35,7 @@ DateTime DateTimeTools::floor(const DateTime & datetime, int field) {
 	return out;
 }
 
-DateTime DateTimeTools::parseDateTime(const std::string & str) throw (ParseException) {
+DateTime DateTimeTools::parseDateTime(const std::string & str) {
 	std::vector<std::string> tokens = StringTools::tokenize(str);
 	if (tokens.size() != 2)
 		throw ParseException("failed to tokenize date and time part");
@@ -50,7 +50,7 @@ DateTime DateTimeTools::parseDateTime(const std::string & str) throw (ParseExcep
 	return out;
 }
 
-DateTime DateTimeTools::parseDate (const std::string & str) throw (ParseException) {
+DateTime DateTimeTools::parseDate (const std::string & str) {
 	std::vector<std::string> tokens = StringTools::tokenize(str, "-", 1, false);
 	if (tokens.size() != 3)
 		throw ParseException("failed to tokenize date part");

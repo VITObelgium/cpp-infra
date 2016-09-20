@@ -24,8 +24,9 @@ namespace OPAQ {
     GzipReader();
     virtual ~GzipReader();
 
-    /** Open the gzip file */
-    void open (const std::string & filename) throw (IOException);
+    /** Open the gzip file
+      * Throws IOException */
+    void open (const std::string & filename);
 
     /** Reads a line from the file and returns as a std::string */
     std::string readLine();

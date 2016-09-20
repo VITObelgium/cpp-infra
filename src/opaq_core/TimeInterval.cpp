@@ -58,9 +58,9 @@ bool TimeInterval::operator==(const TimeInterval &other) const {
 }
 
 std::ostream& operator<<(std::ostream& os, const TimeInterval& d) {
-    long days = d.getDays();
-    long hours = d.getHours() - (days * 24);
-    long minutes = d.getMinutes() - (days * 24 * 60) - (hours * 60);
+    long days = static_cast<long>(d.getDays());
+    long hours = static_cast<long>(d.getHours()) - (days * 24);
+    long minutes = static_cast<long>(d.getMinutes()) - (days * 24 * 60) - (hours * 60);
     long seconds = d.getSeconds() - (days * 24 * 60 * 60) - (hours * 60 * 60) - (minutes * 60);
     os << days << " days, " << std::setw(2) << std::setfill('0') << hours
        << std::setw(1) << ":" << std::setw(2) << minutes

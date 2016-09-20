@@ -37,7 +37,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
     std::string name = component->getName();
     meteo = cm->getComponent<MeteoProvider>(name);
     meteo->setBaseTime( baseTime );
-  } catch (NullPointerException & e) {}
+  } catch (const NullPointerException&) {}
   
   // Get data buffer (can't be missing)
   name = cnf->getBuffer()->getName();
@@ -150,7 +150,7 @@ void Engine::run(Config::OpaqRun * config) {
 
       } catch (std::exception & e) {
 
-	logger->fatal("Unexpected error during forecast stage");
+	logger->critical("Unexpected error during forecast stage");
 	logger->error(e.what());
 	exit(1); 
 
@@ -163,7 +163,7 @@ void Engine::run(Config::OpaqRun * config) {
 
 	// Buffer is input provider for the mapping models
 
-	logger->fatal("No mapping stage implemented yet");
+	logger->critical("No mapping stage implemented yet");
 	exit(1);
 
 	// we know what forecast horizons are requested by the user, no collector needed...
@@ -197,7 +197,7 @@ void Engine::run(Config::OpaqRun * config) {
       // a log message
       logger->info( ">> Mapping " + baseTime.dateToString() );
       
-      logger->fatal("No mapping stage implemented yet");
+      logger->critical("No mapping stage implemented yet");
       exit(1);
 
       /*
@@ -228,10 +228,10 @@ void Engine::loadPlugins(std::vector<Config::Plugin> * plugins) {
     std::string name = plugin.getName();
     std::string filename = plugin.getLib();
     try {
-    	logger->info( "Loading plugin " + name + " from " + filename );
+        logger->info("Loading plugin {} from {}", name, filename);
     	cm->loadPlugin(name, filename);
     } catch (std::exception & e) {
-    	logger->fatal("Error while loading plugin " + name);
+        logger->critical("Error while loading plugin {}", name);
     	logger->error(e.what());
     	exit(1);
     }
@@ -257,7 +257,7 @@ void Engine::initComponents(std::vector<Config::Component> & components) {
     	logger->info("Creating component " + componentName + " from plugin " + pluginName );
     	cm->createComponent<Component>(componentName, pluginName, config);
     } catch (std::exception & e) {
-    	logger->fatal("Error while creating & configuring component " + componentName);
+    	logger->critical("Error while creating & configuring component " + componentName);
     	logger->error(e.what());
     	exit(1);
     }

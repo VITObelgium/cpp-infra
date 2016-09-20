@@ -49,8 +49,9 @@ public:
 	/**
 	 * Insert elements into the timeseries, given as a datatime object and a
 	 * value (of type T)
+     * Throws OutOfBoundsException
 	 */
-	void insert( const DateTime&, const T& ) throw( OutOfBoundsException );
+	void insert( const DateTime&, const T& );
 	/**
 	 * Merges the given timeseries into this timeseries
 	 * value (of type T). When duplicate datetimestamps are present,
@@ -110,21 +111,28 @@ public:
 			if ( _datetimes[i] >= dt ) return i-1;
 		return -1; // not found
 	}
-	DateTime datetime( unsigned int i ) const throw(OutOfBoundsException) {
+	
+    // throws OutOfBoundsException
+    DateTime datetime( unsigned int i ) const {
 		if ( i >= size() ) throw OPAQ::OutOfBoundsException( "index out of range" );
 		return _datetimes[i];
 	}
-	T value( unsigned int i ) const throw(OutOfBoundsException) {
+
+    // throws OutOfBoundsException
+	T value( unsigned int i ) const {
 		if ( i >= size() ) throw OPAQ::OutOfBoundsException( "index out of range" );
 		return _values[i];
 	}
-	T value( const DateTime& dt ) const throw(OutOfBoundsException) {
+
+    // throws OutOfBoundsException
+	T value( const DateTime& dt ) const {
 		if ( ! contains(dt) ) throw OPAQ::OutOfBoundsException( "datetime not found in timeseries" );
 		return _values[index(dt)];
 	}
 	// this one returns either the value at dt if present, or the last value before the
 	// given timestamp (as the at that time most recent value)
-	T valueAt( const DateTime& dt ) const throw(OutOfBoundsException);
+    // throws OutOfBoundsException
+	T valueAt( const DateTime& dt ) const;
 
 
 	/**
@@ -189,10 +197,10 @@ TimeSeries<T> TimeSeries<T>::operator= ( const TimeSeries<T>& ts ) {
  *  - If the index is before the first index, simply insert
  *  - If the timeseries already contains the datetime, replace the value...
  *  - Otherwise, lookup the first index after the date to insert
+ *  Throws OutOfBoundsException
  */
 template <class T>
-void TimeSeries<T>::insert( const DateTime& dt, const T& val )
-		throw( OutOfBoundsException ) {
+void TimeSeries<T>::insert( const DateTime& dt, const T& val ) {
 
 	if ( ! dt.isValid() ) throw OPAQ::OutOfBoundsException( "invalid datetime given" );
 	// if the timeseries is empty or the date is after the last date, push it back...
@@ -299,9 +307,9 @@ void TimeSeries<T>::removeAfter( const DateTime &t ) {
 	return;
 }
 
+// Throws OutOfBoundsException
 template <class T>
-T TimeSeries<T>::valueAt( const DateTime& dt ) const
-		throw(OutOfBoundsException) {
+T TimeSeries<T>::valueAt( const DateTime& dt ) const {
 
 	if ( isEmpty() ) throw OPAQ::OutOfBoundsException( "empty timeseries" );
 	if ( dt < firstDateTime() ) throw OPAQ::OutOfBoundsException( "datetime before first requested" );

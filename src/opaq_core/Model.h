@@ -10,7 +10,8 @@
 
 #include <tinyxml.h>
 #include <string>
-#include <Component.h>
+
+#include "Component.h"
 
 #include "data/DataProvider.h"
 #include "data/MeteoProvider.h"
@@ -71,23 +72,33 @@ public:
   virtual const TimeInterval& getForecastHorizon() {
     return forecastHorizon;
   }
-  virtual AQNetworkProvider * getAQNetworkProvider() throw (NullPointerException) {
+
+  // Throws NullPointerException
+  virtual AQNetworkProvider * getAQNetworkProvider() {
     if (aqNetworkProvider == NULL) throw NullPointerException();
     return aqNetworkProvider;
   }
-  virtual GridProvider * getGridProvider() throw (NullPointerException) {
+
+  // Throws NullPointerException
+  virtual GridProvider * getGridProvider() {
     if (gridProvider == NULL) throw NullPointerException();
     return gridProvider;
   }
-  virtual DataProvider * getInputProvider() throw (NullPointerException) {
+
+  // Throws NullPointerException
+  virtual DataProvider * getInputProvider() {
     if (input == NULL) throw NullPointerException();
     return input;
   }
-  virtual MeteoProvider * getMeteoProvider() throw (NullPointerException) {
+
+  // Throws NullPointerException
+  virtual MeteoProvider * getMeteoProvider() {
     if (meteo == NULL) throw NullPointerException();
     return meteo;
   }
-  virtual ForecastBuffer * getBuffer() throw (NullPointerException) {
+
+  // Throws NullPointerException
+  virtual ForecastBuffer * getBuffer() {
     if (buffer == NULL) throw NullPointerException();
     return buffer;
   }

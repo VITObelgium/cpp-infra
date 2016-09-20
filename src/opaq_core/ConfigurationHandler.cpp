@@ -39,13 +39,13 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
   try {
     std::string componentName = XmlTools::getText(inputElement, "observations");
     fcStage->setValues(findComponent(componentName));
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     throw BadConfigurationException( "No observation data provider in run configuration" );
   }
   try {
     std::string componentName = XmlTools::getText(inputElement, "meteo");
     fcStage->setMeteo(findComponent(componentName));
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     fcStage->setMeteo(NULL);
     logger->warn( "no meteo dataprovider in the run configuration" );
   }
@@ -54,7 +54,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
   try {
     std::string bufferName = XmlTools::getText(element, "buffer");
     fcStage->setBuffer(findComponent(bufferName));
-  } catch (ElementNotFoundException & e ) {
+  } catch (const ElementNotFoundException&) {
     fcStage->setBuffer(NULL);
     logger->warn( "no databuffer given in run configuration" );
   }
@@ -62,7 +62,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
   try {
     std::string outputName = XmlTools::getText(element, "output");
     fcStage->setOutputWriter(findComponent(outputName));
-  } catch (ElementNotFoundException & e ) {
+  } catch (const ElementNotFoundException&) {
     fcStage->setOutputWriter(NULL);
     logger->warn( "no output writer given in run configuration" );
   }
@@ -72,7 +72,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     int fc_hor_max = atoi( XmlTools::getText(element, "horizon").c_str() );
     TimeInterval fc_hor( fc_hor_max, TimeInterval::Days );
     fcStage->setHorizon( fc_hor );
-  } catch ( ElementNotFoundException & e ) {
+  } catch (const ElementNotFoundException&) {
     logger->warn( "no forecast <horizon> given in forecast run configuration, using default 2" );
     fcStage->setHorizon( TimeInterval( 2, TimeInterval::Days ) );
   }
@@ -159,11 +159,11 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   } catch (ElementNotFoundException & e) {
     std::stringstream ss;
     ss << "no pollutants section in configuration file: " << e.what();
-    logger->fatal(ss.str());
+    logger->critical(ss.str());
     exit(1);
   }
   if (Config::PollutantManager::getInstance()->getList().size() == 0) {
-    logger->fatal("pollutant list is empty: define at least 1 pollutant");
+    logger->critical("pollutant list is empty: define at least 1 pollutant");
     exit(1);
   }
   
@@ -187,7 +187,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   } catch (ElementNotFoundException & e) {
     std::stringstream ss;
     ss << "no runconfig in configuration file: " << e.what();
-    logger->fatal(ss.str());
+    logger->critical(ss.str());
     exit(1);
   }
   
@@ -202,13 +202,13 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
       try {
 	opaqRun.getBaseTimes().push_back(DateTimeTools::parseDateTime(timestamp));
       } catch (ParseException & e) {
-	logger->fatal("Failed to parse base time: " + timestamp);
-	logger->fatal(e.what());
+	logger->critical("Failed to parse base time: " + timestamp);
+	logger->critical(e.what());
 	exit(1);
       }
       basetimeElement = basetimeElement->NextSiblingElement("basetime");
     }
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     logger->warn("no base times section in configuration file");	// but might be given using command line args
   }
   
@@ -218,14 +218,14 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   try {
     std::string name = XmlTools::getText(rootElement, "pollutant");
     opaqRun.setPollutantName(name); // set the pollutant name
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     logger->warn("no pollutant set in configuration file");		// but might be given using command line args
   }
   
   try {
     std::string name = XmlTools::getText(rootElement, "aggregation");
     opaqRun.setAggregation(name); // set the aggregation
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     logger->warn("no aggregation set in configuration file");		// but might be given using command line args
   }
 
@@ -237,9 +237,9 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     TiXmlElement *networkElement = XmlTools::getElement(rootElement, "network");
     std::string componentName = XmlTools::getText(networkElement, "component");
     opaqRun.setNetworkProvider(findComponent(componentName));
-  } catch (ElementNotFoundException & e) {
-    logger->fatal("no air quality network defined");
-    logger->fatal(e.what());
+  } catch (const ElementNotFoundException& e) {
+    logger->critical("no air quality network defined");
+    logger->critical(e.what());
     exit(1);
   }
   
@@ -251,7 +251,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     TiXmlElement *gridElement = XmlTools::getElement(rootElement, "grid");
     std::string componentName = XmlTools::getText(gridElement, "component");
     opaqRun.setGridProvider(findComponent(componentName));
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     logger->warn("no grid provider defined");
     opaqRun.setGridProvider(NULL);
   }
@@ -263,7 +263,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     TiXmlElement * forecastElement = XmlTools::getElement(rootElement, "forecast");
     Config::ForecastStage *forecastStage = parseForecastStage( forecastElement );
     opaqRun.setForecastStage( forecastStage);
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     logger->warn("no forecast stage defined");
     opaqRun.setForecastStage(NULL);
   }
@@ -275,7 +275,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
     TiXmlElement * mappingElement = XmlTools::getElement(rootElement, "mapping");
     Config::MappingStage * mappingStage = parseMappingStage(mappingElement);
     opaqRun.setMappingStage(mappingStage);
-  } catch (ElementNotFoundException & e) {
+  } catch (const ElementNotFoundException&) {
     logger->warn("no mapping stage defined");
     opaqRun.setMappingStage(NULL);
   }
@@ -301,7 +301,7 @@ void ConfigurationHandler::validateConfiguration() {
     // check if plugin lib file exists
     std::string lib = (*it1).getLib();
     if (!FileTools::exists(lib)) {
-      logger->fatal("Library file not found: " + lib);
+      logger->critical("Library file not found: " + lib);
       exit(1);
     }
   }

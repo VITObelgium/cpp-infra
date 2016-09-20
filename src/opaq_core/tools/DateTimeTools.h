@@ -30,9 +30,11 @@ public:
 
 	static DateTime floor(const DateTime & datetime, int field = FIELD_DAY);
 
-	static DateTime parseDateTime(const std::string & str) throw (ParseException);
+    // throws ParseException
+	static DateTime parseDateTime(const std::string & str);
 
-	static DateTime parseDate (const std::string & str) throw (ParseException);
+    // throws ParseException
+	static DateTime parseDate (const std::string & str);
 };
 
 } /* namespace OPAQ */

@@ -24,7 +24,8 @@ public:
   MappingStage();
   virtual ~MappingStage();
 
-  OPAQ::Config::Component* getValues() const throw (OPAQ::NullPointerException) {
+  // Throws OPAQ::NullPointerException
+  OPAQ::Config::Component* getValues() const {
     if (values == NULL) throw OPAQ::NullPointerException();
     return values;
   }
@@ -32,7 +33,8 @@ public:
     this->values = values;
   }
 
-  OPAQ::Config::Component* getMeteo() const throw (OPAQ::NullPointerException) {
+  // Throws OPAQ::NullPointerException
+  OPAQ::Config::Component* getMeteo() const {
     if (meteo == NULL) throw OPAQ::NullPointerException();
     return meteo;
   }

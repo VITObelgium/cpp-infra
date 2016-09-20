@@ -37,8 +37,7 @@ std::string Aggregation::getName( Aggregation::Type agg ) {
 }
 
 
-Aggregation::Type Aggregation::fromString( std::string s )
-	throw( NotAvailableException ) {
+Aggregation::Type Aggregation::fromString( std::string s ) {
 
 	if ( s.size() == 0 ) return Aggregation::None;
 

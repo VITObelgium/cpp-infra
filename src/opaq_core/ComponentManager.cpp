@@ -27,8 +27,8 @@ namespace OPAQ {
     return &instance;
   }
   
-  void ComponentManager::loadPlugin(std::string &pluginName, std::string &filename)
-    throw (FailedToLoadPluginException, PluginAlreadyLoadedException) {
+  // Throws FailedToLoadPluginException PluginAlreadyLoadedException
+  void ComponentManager::loadPlugin(std::string &pluginName, std::string &filename) {
 
     // 1. check if plugin was already loaded
     factoryMapType::iterator it = factoryMap.find(pluginName);
@@ -53,15 +53,15 @@ namespace OPAQ {
   }
 
 
+  // Throws ComponentAlreadyExistsException PluginNotFoundException BadConfigurationException
   Component * ComponentManager::createGenericComponent (std::string &componentName,
-							std::string &pluginName, TiXmlElement * configuration)
-    throw (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException) {
+							std::string &pluginName, TiXmlElement* configuration) {
 
     // 1. check if the component wasn't created previously
     bool ok = false;
     try {
       findComponent(componentName);
-    } catch (ComponentNotFoundException &e) {
+    } catch (const ComponentNotFoundException&) {
       ok = true;
     }
     if (!ok)
@@ -79,8 +79,8 @@ namespace OPAQ {
     return component;
   }
 
-  Component * ComponentManager::findComponent (std::string &name)
-    throw (ComponentNotFoundException) {
+  // Throws ComponentNotFoundException
+  Component * ComponentManager::findComponent (std::string &name) {
 
     instanceMapType::iterator it = instanceMap.find(name);
     if (it == instanceMap.end())
@@ -88,8 +88,8 @@ namespace OPAQ {
     return it->second;
   }
 
-  Component * ComponentManager::createComponent (std::string &pluginName, TiXmlElement * configuration)
-    throw (PluginNotFoundException, BadConfigurationException) {
+  // Throws PluginNotFoundException BadConfigurationException
+  Component * ComponentManager::createComponent (std::string &pluginName, TiXmlElement* configuration) {
     factoryMapType::iterator it = factoryMap.find(pluginName);
     if (it == factoryMap.end())
       throw PluginNotFoundException("Plugin not found: " + pluginName);

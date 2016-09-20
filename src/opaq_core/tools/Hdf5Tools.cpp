@@ -18,10 +18,10 @@ const H5::StrType Hdf5Tools::stringType = H5::StrType(0, H5T_VARIABLE);
 unsigned int Hdf5Tools::getDataSetSize (const H5::DataSet & dataSet, const unsigned int dimIndex) {
 	H5::DataSpace space = dataSet.getSpace();
 	unsigned int rank = space.getSimpleExtentNdims();
-	hsize_t size[rank];
-	space.getSimpleExtentDims(size, NULL);
+	std::vector<hsize_t> size(rank);
+	space.getSimpleExtentDims(size.data(), nullptr);
 	space.close();
-	return size[dimIndex];
+	return static_cast<unsigned int>(size[dimIndex]);
 }
 
 void Hdf5Tools::createStringAttribute(const H5::DataSet & dataSet, const std::string & attname,
@@ -42,11 +42,11 @@ std::string Hdf5Tools::readStringAttribute (const H5::DataSet & dataSet, const s
 int Hdf5Tools::getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &string, bool create) {
 	// 1. read parameter data set
 	unsigned int bufferSize = getDataSetSize(dataSet);
-	char * buffer [bufferSize];
-	readStringData(buffer, dataSet);
+	std::vector<char*> buffer(bufferSize);
+	readStringData(buffer.data(), dataSet);
 
 	// 2. check if given parameter is already in the set
-	int index = StringTools::find(buffer, bufferSize, string);
+	int index = StringTools::find(buffer.data(), bufferSize, string);
 	if (index < 0 && create) {
 		// if not found; add to list and update index value
 		addToStringDataSet(dataSet, string);

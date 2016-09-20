@@ -22,7 +22,7 @@
 #include "Exceptions.h"
 #include "Grid.h"
 #include "Logger.h"
-#include "Math.h"
+#include "OpaqMath.h"
 #include "Model.h"
 #include "Point.h"
 #include "Pollutant.h"

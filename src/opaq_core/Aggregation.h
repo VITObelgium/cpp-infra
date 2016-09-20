@@ -34,7 +34,7 @@ public:
 	 *
 	 * \param s input string
 	 */
-	static Aggregation::Type fromString( std::string s ) throw ( NotAvailableException ) ;
+	static Aggregation::Type fromString( std::string s );
 };
 
 } /* namespace OPAQ */

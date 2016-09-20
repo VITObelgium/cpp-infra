@@ -95,7 +95,6 @@ TiXmlElement* XmlTools::getElementByAttributes( TiXmlElement *parent, const std:
 	if ( ! parent ) throw ElementNotFoundException("parent element does not exist");
 	if ( attrValues.size() != attrNames.size() ) throw InvalidArgumentsException( "attrValues doesnt match attrNames" );
 	if ( attrValues.size() == 0 ) throw InvalidArgumentsException("no attributes given...");
-	unsigned int n = attrValues.size();
 
 	TiXmlElement *el = parent->FirstChildElement( childName );
 	if (! el ) throw ElementNotFoundException("Child with name " + childName + " not found");

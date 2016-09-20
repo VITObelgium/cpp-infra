@@ -30,8 +30,9 @@ public:
 
   /**
    *  Returns the dataprovider for the observed concentration values
+   *  Throws OPAQ::NullPointerException
    */
-  OPAQ::Config::Component* getValues() const throw (OPAQ::NullPointerException) {
+  OPAQ::Config::Component* getValues() const {
     if (values == NULL) throw OPAQ::NullPointerException();
     return values;
   }
@@ -39,7 +40,8 @@ public:
     this->values = values;
   }
   
-  OPAQ::Config::Component* getMeteo() const throw (OPAQ::NullPointerException) {
+  // Throws OPAQ::NullPointerException
+  OPAQ::Config::Component* getMeteo() const {
     if (meteo == NULL) throw OPAQ::NullPointerException();
     return meteo;
   }
@@ -47,7 +49,8 @@ public:
     this->meteo = meteo;
   }
   
-  OPAQ::Config::Component* getBuffer() const throw (OPAQ::NullPointerException) {
+  // Throws OPAQ::NullPointerException
+  OPAQ::Config::Component* getBuffer() const {
     if (buffer == NULL) throw OPAQ::NullPointerException();
     return buffer;
   }
@@ -55,7 +58,8 @@ public:
     this->buffer = buffer;
   }
 
-  OPAQ::Config::Component* getOutputWriter() const throw (OPAQ::NullPointerException) {
+  // Throws OPAQ::NullPointerException
+  OPAQ::Config::Component* getOutputWriter() const {
     if ( outputWriter == NULL) throw OPAQ::NullPointerException();
     return outputWriter;
   }

@@ -32,7 +32,7 @@ namespace OPAQ {
      * @param configuration pointer to the XML element holding the components configuration
      * @throws BadConfigurationException if the component failed to configure using the provided configuration
      */
-    virtual void configure (TiXmlElement * configuration) throw (BadConfigurationException) = 0;
+    virtual void configure (TiXmlElement * configuration) = 0;
 
     const std::string & getName( void ){ return name; }
 

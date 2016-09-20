@@ -11,19 +11,19 @@
 #include <vector>
 #include <tinyxml.h>
 
-#include <config/OpaqRun.h>
-#include <config/ForecastStage.h>
-#include <config/MappingStage.h>
+#include "config/OpaqRun.h"
+#include "config/ForecastStage.h"
+#include "config/MappingStage.h"
 
-#include <data/GridProvider.h>
-#include <data/DataProvider.h>
-#include <data/ForecastOutputWriter.h>
+#include "data/GridProvider.h"
+#include "data/DataProvider.h"
+#include "data/ForecastOutputWriter.h"
 
-#include <Model.h>
-#include <AQNetworkProvider.h>
-#include <Logger.h>
-#include <PollutantManager.h>
-#include <ComponentManager.h>
+#include "Model.h"
+#include "AQNetworkProvider.h"
+#include "Logger.h"
+#include "PollutantManager.h"
+#include "ComponentManager.h"
 
 namespace OPAQ {
 

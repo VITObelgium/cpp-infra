@@ -9,8 +9,8 @@
 
 #include <string>
 
-#include <Component.h>
 #include "ForecastBuffer.h"
+#include "../Component.h"
 #include "../AQNetworkProvider.h"
 #include "../DateTime.h"
 #include "../Aggregation.h"

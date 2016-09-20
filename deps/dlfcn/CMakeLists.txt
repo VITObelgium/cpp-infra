@@ -1,0 +1,13 @@
+#SET(MAJOR 1)
+#SET(MINOR 0)
+#SET(REVISION 0)
+SET(NAME dlfcn)
+
+EXTERNALPROJECT_ADD(${NAME}
+    URL https://github.com/${NAME}-win32/${NAME}-win32/archive/master.zip TIMEOUT 180
+    INSTALL_DIR ${CMAKE_BINARY_DIR}/local
+    CMAKE_ARGS -G ${CMAKE_GENERATOR}
+               -DBUILD_SHARED_LIBS=OFF
+               -DCMAKE_BUILD_TYPE=Release
+               -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+)

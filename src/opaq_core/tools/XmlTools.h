@@ -9,6 +9,7 @@
 #define XMLTOOLS_H_
 
 #include <tinyxml.h>
+#include <vector>
 #include "../Logger.h"
 #include "../Exceptions.h"
 

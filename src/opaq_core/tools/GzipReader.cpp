@@ -17,7 +17,7 @@ GzipReader::~GzipReader() {
 	close();
 }
 
-void GzipReader::open(const std::string & filename) throw (IOException) {
+void GzipReader::open(const std::string & filename) {
 	close();
 	if (! FileTools::exists(filename)) {
 		std::stringstream ss;

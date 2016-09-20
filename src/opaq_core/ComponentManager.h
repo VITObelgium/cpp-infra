@@ -63,18 +63,19 @@ namespace OPAQ {
     
     virtual ~ComponentManager();
     
-    void loadPlugin(std::string &pluginName, std::string &filename)
-      throw (FailedToLoadPluginException, PluginAlreadyLoadedException);
+    // throws FailedToLoadPluginException, PluginAlreadyLoadedException
+    void loadPlugin(std::string &pluginName, std::string &filename);
     
+    // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
     template<typename T> T * createComponent(std::string &componentName,
-					     std::string &pluginName, TiXmlElement * configuration)
-      throw (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException) {
+					     std::string &pluginName, TiXmlElement* configuration) {
+      
       Component * component = createGenericComponent(componentName, pluginName, configuration);
       return dynamic_cast<T*>(component);
     }
     
-    template<typename T> T * getComponent(std::string &componentName)
-      throw (ComponentNotFoundException) {
+    // throws ComponentNotFoundException
+    template<typename T> T * getComponent(std::string &componentName) {
       Component * component = findComponent(componentName);
       return dynamic_cast<T*>(component);
     }
@@ -90,14 +91,16 @@ namespace OPAQ {
     void operator=(ComponentManager const&);	// no implementation of assignment operator for singleton
     
 
+    // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
     Component * createGenericComponent (std::string &componentName,
-					std::string &pluginName, TiXmlElement * configuration)
-      throw (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException);
+					std::string &pluginName, TiXmlElement* configuration);
 
-    Component * findComponent (std::string &name) throw (ComponentNotFoundException);
+    // throws ComponentNotFoundException
+    Component * findComponent (std::string &name);
 
-    Component * createComponent (std::string &pluginName, TiXmlElement * configuration)
-      throw (PluginNotFoundException, BadConfigurationException);
+    // throw PluginNotFoundException, BadConfigurationException
+    Component * createComponent (std::string &pluginName, TiXmlElement* configuration);
+      
   };
   
 } /* namespace OPAQ */

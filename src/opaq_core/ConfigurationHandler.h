@@ -10,14 +10,14 @@
 
 #include <tinyxml.h>
 #include <string>
-#include <tools/XmlTools.h>
-#include <tools/FileTools.h>
-#include <tools/DateTimeTools.h>
-#include <config/OpaqRun.h>
-#include <config/ForecastStage.h>
-#include <config/MappingStage.h>
-#include <PollutantManager.h>
-#include <Logger.h>
+#include "tools/XmlTools.h"
+#include "tools/FileTools.h"
+#include "tools/DateTimeTools.h"
+#include "config/OpaqRun.h"
+#include "config/ForecastStage.h"
+#include "config/MappingStage.h"
+#include "PollutantManager.h"
+#include "Logger.h"
 
 namespace OPAQ {
 

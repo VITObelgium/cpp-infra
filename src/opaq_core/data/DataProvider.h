@@ -9,7 +9,7 @@
 #define OPAQ_DATA_PROVIDER_H_
 
 #include <vector>
-#include <Component.h>
+#include "../Component.h"
 #include "../TimeSeries.h"
 #include "../AQNetworkProvider.h"
 #include "../DateTime.h"
