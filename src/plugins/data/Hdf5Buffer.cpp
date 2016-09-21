@@ -699,8 +699,9 @@ std::vector<double> Hdf5Buffer::getModelValues( const DateTime &baseTime, const 
 	hsize_t fhSize = Hdf5Tools::getDataSetSize( dsVals, 3 );
 
 	// is the station/forecast/base time in the datafile ?
-	if ( fhIndex < fhSize &&
-		 btIndex < btSize) {
+    if (fhIndex >= 0 && fhIndex < fhSize &&
+        btIndex >= 0 && btIndex < btSize &&
+        stIndex >= 0) {
 
 		// "model x station x baseTime x fcHorizon"
 
@@ -714,8 +715,17 @@ std::vector<double> Hdf5Buffer::getModelValues( const DateTime &baseTime, const 
 		H5::DataSpace memSpace(1, mc);
 		memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
 
-		dsVals.read( &out[0], H5::PredType::NATIVE_DOUBLE, memSpace, space );
-		space.close();
+        try
+        {
+            dsVals.read(&out[0], H5::PredType::NATIVE_DOUBLE, memSpace, space);
+            space.close();
+        }
+        catch (const H5::DataSetIException&)
+        {
+            space.close();
+            throw RunTimeException("Failed to read value from HDF5 buffer");
+        }
+		
 	} else throw RunTimeException( "Requested forecast horizon index not in HDF5 buffer" );
 
 	return out;

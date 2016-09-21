@@ -9,13 +9,19 @@ void Log::initLogger(const std::string& filename)
 
 void Log::initConsoleLogger()
 {
-    _sink = std::make_shared<spdlog::sinks::stdout_sink_st>();
+    _sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
+
+#ifndef WIN32
+    // enable color output on linux
+    _sink = std::make_shared<spdlog::sinks::ansicolor_sink>(_sink);
+#endif
+
     //layout->setConversionPattern("%m%n");
 }
 
 void Log::initFileLogger(const std::string& filename)
 {
-    _sink = std::make_shared<spdlog::sinks::simple_file_sink_st>(filename, true /* truncate */);
+    _sink = std::make_shared<spdlog::sinks::simple_file_sink_mt>(filename, true /* truncate */);
     //layout->setConversionPattern("%d %-5p (%c) %m%n");
 }
 
