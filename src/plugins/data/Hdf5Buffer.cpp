@@ -26,7 +26,9 @@ const std::string Hdf5Buffer::STATION_DATASET_NAME("stations");
 const std::string Hdf5BufferVersion( "0.1" );
 
 Hdf5Buffer::Hdf5Buffer() :
-  _logger("Hdf5Buffer") {
+  _logger("Hdf5Buffer"),
+  _stringType(H5::StrType(0, H5T_VARIABLE))
+{
 
   // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
   H5::Exception::dontPrint();
@@ -42,7 +44,7 @@ Hdf5Buffer::~Hdf5Buffer() {
   _closeFile();
 }
 
-void Hdf5Buffer::configure(TiXmlElement * configuration){
+void Hdf5Buffer::configure(TiXmlElement * configuration, IEngine&) {
 
   if (_configured) _closeFile();
 
@@ -235,10 +237,10 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
 		hsize_t chunks2[1] = { 5 };
 		cparms2.setChunk(1, chunks2);
 		std::string noData("n/a");
-		cparms2.setFillValue(Hdf5Tools::stringType, &noData); // set no data value
+		cparms2.setFillValue(_stringType, &noData); // set no data value
 
-		dsModels   = grpAggr.createDataSet( MODELS_DATASET_NAME, Hdf5Tools::stringType, dataSpace2, cparms2);
-		dsStations = grpAggr.createDataSet( STATION_DATASET_NAME, Hdf5Tools::stringType, dataSpace2, cparms2);
+		dsModels   = grpAggr.createDataSet( MODELS_DATASET_NAME, _stringType, dataSpace2, cparms2);
+		dsStations = grpAggr.createDataSet( STATION_DATASET_NAME, _stringType, dataSpace2, cparms2);
 
 	}
 
@@ -341,7 +343,7 @@ void Hdf5Buffer::setValues( const DateTime &baseTime,
   ss << _baseTime;
   std::string writeBuffer[1]; writeBuffer[0] = ss.str();
   H5::DataSpace writeMemSpace1(1, count);
-  dataBaseTimes.write( writeBuffer, Hdf5Tools::stringType, writeMemSpace1, spaceBaseTimes);
+  dataBaseTimes.write( writeBuffer, _stringType, writeMemSpace1, spaceBaseTimes);
 
   spaceBaseTimes.close();
 */
@@ -413,8 +415,8 @@ void Hdf5Buffer::_createFile(const std::string & filename) {
     H5::Attribute att;
     H5::DataSpace att_space(H5S_SCALAR);
 
-    att = rootGroup.createAttribute( "HDF5BUFFER_VERSION", Hdf5Tools::stringType, att_space);
-    att.write( Hdf5Tools::stringType, Hdf5BufferVersion );
+    att = rootGroup.createAttribute( "HDF5BUFFER_VERSION", _stringType, att_space);
+    att.write( _stringType, Hdf5BufferVersion );
     att.close();
 
     rootGroup.close();

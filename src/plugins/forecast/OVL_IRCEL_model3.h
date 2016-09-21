@@ -14,7 +14,7 @@ namespace OPAQ {
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    virtual void configure (TiXmlElement * configuration);
+    virtual void configure (TiXmlElement * configuration, IEngine& engine);
 
     virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
         		    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime,

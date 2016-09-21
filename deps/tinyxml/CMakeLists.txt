@@ -9,8 +9,9 @@ EXTERNALPROJECT_ADD(${NAME}
     INSTALL_DIR ${CMAKE_BINARY_DIR}/local
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/patch/CMakeLists.txt ${CMAKE_CURRENT_BINARY_DIR}/tinyxml-prefix/src/tinyxml
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
+               -DCMAKE_DEBUG_POSTFIX=_d
                -DBUILD_STATIC_LIBS=ON
                -DBUILD_SHARED_LIBS=OFF
-               -DCMAKE_BUILD_TYPE=Release
+               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )

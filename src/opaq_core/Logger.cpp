@@ -19,6 +19,16 @@ void Log::initFileLogger(const std::string& filename)
     //layout->setConversionPattern("%d %-5p (%c) %m%n");
 }
 
+void Log::initLogger(std::shared_ptr<spdlog::sinks::sink> sink)
+{
+    _sink = sink;
+}
+
+std::shared_ptr<spdlog::sinks::sink> Log::getSink()
+{
+    return _sink;
+}
+
 std::shared_ptr<spdlog::logger> Log::getLogger(const std::string& name)
 {
     return spdlog::get(name);
@@ -26,11 +36,16 @@ std::shared_ptr<spdlog::logger> Log::getLogger(const std::string& name)
 
 std::shared_ptr<spdlog::logger> Log::createLogger(const std::string& name)
 {
-    std::vector<spdlog::sink_ptr> sinks;
-    sinks.push_back(_sink);
-    auto logger = std::make_shared<spdlog::logger>(name, begin(sinks), end(sinks));
-    //register it if you need to access it globally
-    spdlog::register_logger(logger);
+    auto logger = getLogger(name);
+    if (!logger)
+    {
+        assert(_sink);
+        std::vector<spdlog::sink_ptr> sinks;
+        sinks.push_back(_sink);
+        logger = std::make_shared<spdlog::logger>(name, begin(sinks), end(sinks));
+        //register it if you need to access it globally
+        spdlog::register_logger(logger);
+    }
 
     return logger;
 }

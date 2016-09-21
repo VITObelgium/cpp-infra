@@ -25,8 +25,8 @@ public:
     virtual ~OVL();
 
     // OPAQ::Component methods
-    virtual void configure (TiXmlElement * configuration)
-      throw (OPAQ::BadConfigurationException);
+    // throws OPAQ::BadConfigurationException
+    virtual void configure (TiXmlElement * configuration, IEngine& engine);
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
@@ -43,7 +43,8 @@ public:
 
 
 private:
-    LOGGER_DEC();
+    Logger logger;
+    ComponentManager* _componentMgr;
 
     std::string tune_mode;       //! the selected tune mode for how OVL was optimized.
     bool        output_raw;      //! store the raw output (if not all models are present in OPAQ

@@ -23,7 +23,7 @@ RioObsProvider::~RioObsProvider() {
 }
 
 // OPAQ::Component methods
-void RioObsProvider::configure( TiXmlElement * cnf ) {
+void RioObsProvider::configure( TiXmlElement * cnf, IEngine&) {
 
 	// -- parse data file pattern
 	TiXmlElement * patternElement = cnf->FirstChildElement( "file_pattern" );

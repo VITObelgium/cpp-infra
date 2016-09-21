@@ -100,7 +100,7 @@ OPAQ::Config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement
 /* ===========================================================================
  This is the main configuration file parser
  ======================================================================== */
-void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
+void ConfigurationHandler::parseConfigurationFile(std::string & filename, Config::PollutantManager& pollutantMgr) {
 
   clearConfig();
 
@@ -157,20 +157,20 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
   try {
     TiXmlDocument pollutantsDoc;
     TiXmlElement * pollutantsElement = XmlTools::getElement(rootElement, "pollutants", &pollutantsDoc);
-    Config::PollutantManager::getInstance()->configure(pollutantsElement);
+    pollutantMgr.configure(pollutantsElement);
   } catch (ElementNotFoundException & e) {
     std::stringstream ss;
     ss << "no pollutants section in configuration file: " << e.what();
     logger->critical(ss.str());
     exit(1);
   }
-  if (Config::PollutantManager::getInstance()->getList().size() == 0) {
+  if (pollutantMgr.getList().size() == 0) {
     logger->critical("pollutant list is empty: define at least 1 pollutant");
     exit(1);
   }
 
   logger->info("Pollutant list:");
-  std::vector<Pollutant> * pols = &(Config::PollutantManager::getInstance()->getList());
+  std::vector<Pollutant> * pols = &(pollutantMgr.getList());
   std::vector<Pollutant>::iterator it = pols->begin();
   while (it != pols->end()) {
     logger->info(" " + (*it++).toString());
@@ -284,7 +284,7 @@ void ConfigurationHandler::parseConfigurationFile(std::string & filename) {
 
 }
 
-void ConfigurationHandler::validateConfiguration() {
+void ConfigurationHandler::validateConfiguration(Config::PollutantManager& pollutantMgr) {
 
   // check for plugins with the same name
   for (std::vector<OPAQ::Config::Plugin>::iterator it1 =
@@ -335,8 +335,7 @@ void ConfigurationHandler::validateConfiguration() {
     exit(1);
   }
   std::string pollutantName = opaqRun.getPollutantName();
-  Config::PollutantManager * pm = Config::PollutantManager::getInstance();
-  Pollutant * pol = pm->find(pollutantName);
+  Pollutant * pol = pollutantMgr.find(pollutantName);
   if (pol == NULL) {
     logger->error("pollutant '" + pollutantName + "' not found in pollutant list");
     exit(1);

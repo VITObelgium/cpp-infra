@@ -42,7 +42,7 @@ public:
    * <offset>-10</offset>
    * throws BadConfigurationException
    */
-  virtual void configure(TiXmlElement * configuration);
+  virtual void configure(TiXmlElement * configuration, IEngine& engine);
 
   // ==================================================
   // OPAQ::DataProvider methods
@@ -171,6 +171,7 @@ private:
   H5::H5File *_h5file;    //!< HDF5 file handle for the buffer file
 
   H5::DataSet _dataSet, _parametersSet, _stationsSet;
+  H5::StrType _stringType;
 
   double   _noData;
   // int      _offset;

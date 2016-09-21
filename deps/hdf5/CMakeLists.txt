@@ -9,7 +9,8 @@ EXTERNALPROJECT_ADD(${NAME}
     URL https://support.hdfgroup.org/ftp/HDF5/releases/${NAME}-${MAJOR}.${MINOR}/${PACKAGE}/src/${PACKAGE}.tar.bz2 TIMEOUT 360
     INSTALL_DIR ${CMAKE_BINARY_DIR}/local
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
-               -DCMAKE_BUILD_TYPE=Release
+               -DBUILD_SHARED_LIBS=OFF
+               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_PREFIX_PATH=${CMAKE_CURRENT_BINARY_DIR}/../local
                -DBUILD_TESTING=OFF
                -DHDF5_BUILD_TOOLS=OFF

@@ -27,7 +27,7 @@ namespace OPAQ {
   }
 
 
-  void AsciiForecastWriter::configure(TiXmlElement * configuration) {
+  void AsciiForecastWriter::configure(TiXmlElement * configuration, IEngine&) {
 
     if ( ! configuration )
       throw NullPointerException("No XML config element give");

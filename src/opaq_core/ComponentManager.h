@@ -8,8 +8,12 @@
 #define COMPONENTMANAGER_H_
 
 #include "Component.h"
+#include "OpaqDllExports.h"
+#include "Logger.h"
+
 #include <tinyxml.h>
 #include <map>
+#include <memory>
 
 /**
  * \brief Macro to register a class as being an OPAQ component.
@@ -20,18 +24,17 @@
  *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
  */
 #define OPAQ_REGISTER_PLUGIN(TYPE)		\
-  extern "C" {					\
-    OPAQ::Component * factory () {		\
+    OPAQ_DLL_API OPAQ::Component * factory (void* sink) {		\
+      Log::initLogger(*reinterpret_cast<std::shared_ptr<spdlog::sinks::sink>*>(sink)); \
       return new TYPE();			\
-    }						\
   }
 
 /**
    The OPAQ namespace collects all the classes and the functions which reside in the OPAQ framework.
 */
 namespace OPAQ {
-
   // forward declarations
+  class IEngine;
   class Component;
   class FailedToLoadPluginException;
   class PluginAlreadyLoadedException;
@@ -57,21 +60,18 @@ namespace OPAQ {
   class ComponentManager {
   public:
     typedef std::map<std::string, Component*> instanceMapType;
-    typedef std::map<std::string, Component*(*)()> factoryMapType;
+    typedef std::map<std::string, Component*(*)(void*)> factoryMapType;
     
-    static ComponentManager * getInstance();
-    
+    ComponentManager(IEngine& engine);
     virtual ~ComponentManager();
     
     // throws FailedToLoadPluginException, PluginAlreadyLoadedException
     void loadPlugin(std::string &pluginName, std::string &filename);
     
     // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
-    template<typename T> T * createComponent(std::string &componentName,
-					     std::string &pluginName, TiXmlElement* configuration) {
-      
-      Component * component = createGenericComponent(componentName, pluginName, configuration);
-      return dynamic_cast<T*>(component);
+    template<typename T> T * createComponent(std::string &componentName, std::string &pluginName, TiXmlElement* configuration) {
+        Component * component = createGenericComponent(componentName, pluginName, configuration);
+        return dynamic_cast<T*>(component);
     }
     
     // throws ComponentNotFoundException
@@ -85,22 +85,20 @@ namespace OPAQ {
   private:
     instanceMapType instanceMap;
     factoryMapType factoryMap;
+    IEngine& _engine;
     
-    ComponentManager();
     ComponentManager(ComponentManager const&);	// no implementation of copy constructor for singleton
     void operator=(ComponentManager const&);	// no implementation of assignment operator for singleton
     
 
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
-    Component * createGenericComponent (std::string &componentName,
-					std::string &pluginName, TiXmlElement* configuration);
+    Component* createGenericComponent (std::string &componentName, std::string &pluginName, TiXmlElement* configuration);
 
     // throws ComponentNotFoundException
-    Component * findComponent (std::string &name);
+    Component* findComponent (std::string &name);
 
     // throw PluginNotFoundException, BadConfigurationException
     Component * createComponent (std::string &pluginName, TiXmlElement* configuration);
-      
   };
   
 } /* namespace OPAQ */

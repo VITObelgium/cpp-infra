@@ -25,7 +25,7 @@ class AsciiForecastWriter : public OPAQ::ForecastOutputWriter {
 
   // OPAQ::Component methods
   // throws (BadConfigurationException)
-  virtual void configure(TiXmlElement * configuration);
+  virtual void configure(TiXmlElement * configuration, IEngine& engine);
 
 
   // OPAQ::ForecastOutputWriter methods

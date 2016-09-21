@@ -27,6 +27,12 @@ ADD_LIBRARY(ovl_ircel_model3 MODULE
     OVL_IRCEL_model3.cpp
 )
 
+ADD_LIBRARY(ovl MODULE
+    OVL.h
+    OVL.cpp
+)
+
 TARGET_LINK_LIBRARIES(ovl_ircel_model1 opaqcore mpl_feedforward)
 TARGET_LINK_LIBRARIES(ovl_ircel_model2 opaqcore mpl_feedforward)
 TARGET_LINK_LIBRARIES(ovl_ircel_model3 opaqcore mpl_feedforward)
+TARGET_LINK_LIBRARIES(ovl opaqcore mpl_feedforward)

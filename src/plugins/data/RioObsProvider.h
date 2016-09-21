@@ -31,7 +31,7 @@ public:
    */
 
   // throws BadConfigurationException
-  virtual void configure(TiXmlElement* configuration);
+  virtual void configure(TiXmlElement* configuration, IEngine& engine);
 
   // OPAQ::DataProvider methods
   virtual TimeInterval getTimeResolution();

@@ -27,15 +27,24 @@
 
 namespace OPAQ {
 
+    class IEngine
+    {
+    public:
+        virtual ~IEngine() = default;
+
+        virtual Config::PollutantManager& pollutantManager() = 0;
+        virtual ComponentManager& componentManager() = 0;
+    };
+
   /**
    * The main OPAQ abstract workflow class
    * The OPAQ engine contains the abstract implementation of the configurable workflow for an
    * OPAQ run. It's run method is basically the body of an OPAQ run and the main program is
    * just a wrapper around it.
    */
-  class Engine {
+  class Engine : public IEngine {
   public:
-    Engine();
+    Engine(Config::PollutantManager& pollutantMgr);
     virtual ~Engine() {}
 
     /**
@@ -53,8 +62,13 @@ namespace OPAQ {
      */
     void run(Config::OpaqRun * config);
 
+    Config::PollutantManager& pollutantManager() override;
+    ComponentManager& componentManager() override;
+
   private:
-    Logger logger;
+    Logger _logger;
+    Config::PollutantManager& _pollutantMgr;
+    ComponentManager _componentMgr;
 
     /**
      * This runs the forecast stage with the given configuration, network,

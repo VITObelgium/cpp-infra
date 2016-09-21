@@ -7,6 +7,6 @@ EXTERNALPROJECT_ADD(${NAME}
     URL https://github.com/gabime/${NAME}/archive/v${MAJOR}.${MINOR}.${REVISION}.zip TIMEOUT 180
     INSTALL_DIR ${CMAKE_BINARY_DIR}/local
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
-               -DCMAKE_BUILD_TYPE=Release
+               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )

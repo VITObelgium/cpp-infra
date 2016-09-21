@@ -9,8 +9,10 @@
 
 namespace OPAQ {
 
-Engine::Engine()
-: logger("OPAQ::Engine") {
+Engine::Engine(Config::PollutantManager& pollutantMgr)
+: _logger("OPAQ::Engine")
+, _pollutantMgr(pollutantMgr)
+, _componentMgr(*this) {
 }
 
 void Engine::runForecastStage( Config::ForecastStage *cnf,
@@ -21,15 +23,12 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
 
   std::string name;
 
-  // Get the component manager
-  ComponentManager *cm = ComponentManager::getInstance();
-
   // Get max forecast horizon...
   TimeInterval forecastHorizon = cnf->getHorizon();
 
   // Get observation data provider
   name = cnf->getValues()->getName();
-  DataProvider *obs = cm->getComponent<DataProvider>(name);
+  DataProvider *obs = _componentMgr.getComponent<DataProvider>(name);
   obs->setAQNetworkProvider( net );
 
   // Get meteo data provider (can be missing)
@@ -37,13 +36,13 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   try {
     Config::Component * component = cnf->getMeteo();
     std::string name = component->getName();
-    meteo = cm->getComponent<MeteoProvider>(name);
+    meteo = _componentMgr.getComponent<MeteoProvider>(name);
     meteo->setBaseTime( baseTime );
   } catch (const NullPointerException&) {}
 
   // Get data buffer (can't be missing)
   name = cnf->getBuffer()->getName();
-  ForecastBuffer *buffer = cm->getComponent<ForecastBuffer>(name);
+  ForecastBuffer *buffer = _componentMgr.getComponent<ForecastBuffer>(name);
   buffer->setAQNetworkProvider( net );
 
   // Get the forecast models to run
@@ -52,7 +51,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   while (it != cnf->getModels().end()) {
     // get mode
     name = (*it++)->getName();
-    Model *model = cm->getComponent<Model>(name);
+    Model *model = _componentMgr.getComponent<Model>(name);
 
     // set ins and outs for the model
     model->setBaseTime(baseTime);
@@ -66,7 +65,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
 
     // Run the model up till the requested forecast horizon, the loop over the forecast horizons has to be
     // in the model as probably some models (AR) use info of previous days...
-    logger->info( "Running " + model->getName() );
+    _logger->info( "Running " + model->getName() );
     std::cout << ">> Running " << model->getName() << " ..." << std::endl;
     model->run();
 
@@ -75,7 +74,7 @@ void Engine::runForecastStage( Config::ForecastStage *cnf,
   // Prepare and run the forecast output writer for
   // this basetime & pollutant
   name = cnf->getOutputWriter()->getName();
-  ForecastOutputWriter *outWriter = cm->getComponent<ForecastOutputWriter>( name );
+  ForecastOutputWriter *outWriter = _componentMgr.getComponent<ForecastOutputWriter>( name );
   outWriter->setAQNetworkProvider( net );
   outWriter->setBuffer( buffer );
   outWriter->setForecastHorizon( forecastHorizon );
@@ -91,8 +90,6 @@ void Engine::run(Config::OpaqRun * config) {
 
   std::stringstream ss; // for logging
 
-  ComponentManager *cm = ComponentManager::getInstance();
-
   // 1. Load plugins...
   std::vector<Config::Plugin> plugins = config->getPlugins();
   loadPlugins(&plugins);
@@ -102,11 +99,10 @@ void Engine::run(Config::OpaqRun * config) {
   initComponents(components);
 
   // 3. OPAQ workflow...
-  logger->info("Fetching workflow configuration");
+  _logger->info("Fetching workflow configuration");
   std::string pollutantName = config->getPollutantName();
 
-  Config::PollutantManager * pm = Config::PollutantManager::getInstance();
-  Pollutant * pollutant = pm->find(pollutantName);
+  Pollutant * pollutant = _pollutantMgr.find(pollutantName);
 
   // Get stages
   Config::ForecastStage *forecastStage = config->getForecastStage();
@@ -114,10 +110,10 @@ void Engine::run(Config::OpaqRun * config) {
 
   // Get air quality network provider
   std::string name = config->getNetworkProvider()->getName();
-  AQNetworkProvider * aqNetworkProvider = cm->getComponent<AQNetworkProvider>(name);
+  AQNetworkProvider * aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
   ss.str(""); ss.clear();
   ss << "Using AQ network provider " << aqNetworkProvider->getName();
-  logger->info( ss.str() );
+  _logger->info( ss.str() );
 
 
   // Get grid provider
@@ -125,10 +121,10 @@ void Engine::run(Config::OpaqRun * config) {
   Config::Component * gridProviderDef = config->getGridProvider();
   if (gridProviderDef != NULL) {
     name = config->getGridProvider()->getName();
-    gridProvider = cm->getComponent<GridProvider>(name);
+    gridProvider = _componentMgr.getComponent<GridProvider>(name);
     ss.str(""); ss.clear();
     ss << "Using grid provider " << gridProvider->getName();
-    logger->info( ss.str() );
+    _logger->info( ss.str() );
   }
 
 
@@ -138,22 +134,22 @@ void Engine::run(Config::OpaqRun * config) {
   // Get the requested forecast horizon
   OPAQ::TimeInterval fcHorMax = forecastStage->getHorizon();
 
-  logger->info("Starting OPAQ workflow...");
+  _logger->info("Starting OPAQ workflow...");
   if (forecastStage) {
 
     for ( auto it = baseTimes.begin(); it != baseTimes.end(); it++ ) {
       DateTime baseTime = *it;
 
       // A log message
-      logger->info( "Forecast stage for " + baseTime.dateToString() );
+      _logger->info( "Forecast stage for " + baseTime.dateToString() );
       try {
     	  std::cout << ">> Forecast on basetime " << baseTime.dateToString() << std::endl;
     	  runForecastStage( forecastStage, aqNetworkProvider, pollutant, config->getAggregation(), baseTime );
 
       } catch (std::exception & e) {
 
-	logger->critical("Unexpected error during forecast stage");
-	logger->error(e.what());
+	_logger->critical("Unexpected error during forecast stage");
+	_logger->error(e.what());
 	exit(1);
 
       }
@@ -161,17 +157,17 @@ void Engine::run(Config::OpaqRun * config) {
       if (mappingStage) {
 
 	// a log message
-	logger->info( ">> Mapping forecast " + baseTime.dateToString() );
+	_logger->info( ">> Mapping forecast " + baseTime.dateToString() );
 
 	// Buffer is input provider for the mapping models
 
-	logger->critical("No mapping stage implemented yet");
+	_logger->critical("No mapping stage implemented yet");
 	exit(1);
 
 	// we know what forecast horizons are requested by the user, no collector needed...
 
 	/*
-	logger->info("running mapping stage");
+	_logger->info("running mapping stage");
 	const std::vector<ForecastHorizon> * fhs =
 	  &(fhCollector.getForecastHorizons());
 	std::vector<ForecastHorizon>::const_iterator it = fhs->begin();
@@ -179,12 +175,12 @@ void Engine::run(Config::OpaqRun * config) {
 	  ForecastHorizon fh = *it++;
 	  ss.str(std::string(""));
 	  ss << "forecast horizon = " << fh;
-	  logger->info(ss.str());
+	  _logger->info(ss.str());
 	  try {
 	    runStage(mappingStage, aqNetworkProvider, gridProvider, baseTime, pollutant, &fh, NULL);
 	  } catch (std::exception & e) {
-	    logger->fatal("Unexpected error during mapping stage");
-	    logger->error(e.what());
+	    _logger->fatal("Unexpected error during mapping stage");
+	    _logger->error(e.what());
 	    exit(1);
 	  }
 	}
@@ -197,9 +193,9 @@ void Engine::run(Config::OpaqRun * config) {
       DateTime baseTime = *it;
 
       // a log message
-      logger->info( ">> Mapping " + baseTime.dateToString() );
+      _logger->info( ">> Mapping " + baseTime.dateToString() );
 
-      logger->critical("No mapping stage implemented yet");
+      _logger->critical("No mapping stage implemented yet");
       exit(1);
 
       /*
@@ -207,8 +203,8 @@ void Engine::run(Config::OpaqRun * config) {
 	try {
 	  runStage(mappingStage, aqNetworkProvider, gridProvider, baseTime, pollutant, &fh, NULL);
 	} catch (std::exception & e) {
-	  logger->fatal("Unexpected error during mapping stage");
-	  logger->error(e.what());
+	  _logger->fatal("Unexpected error during mapping stage");
+	  _logger->error(e.what());
 	  exit(1);
 	}
       */
@@ -219,10 +215,17 @@ void Engine::run(Config::OpaqRun * config) {
   }
 }
 
+Config::PollutantManager& Engine::pollutantManager()
+{
+    return _pollutantMgr;
+}
+
+ComponentManager& Engine::componentManager()
+{
+    return _componentMgr;
+}
+
 void Engine::loadPlugins(std::vector<Config::Plugin> * plugins) {
-
-  ComponentManager * cm = ComponentManager::getInstance();
-
   for (std::vector<Config::Plugin>::iterator it = plugins->begin();
        it != plugins->end(); it++) {
     Config::Plugin plugin = *it;
@@ -230,11 +233,11 @@ void Engine::loadPlugins(std::vector<Config::Plugin> * plugins) {
     std::string name = plugin.getName();
     std::string filename = plugin.getLib();
     try {
-        logger->info("Loading plugin {} from {}", name, filename);
-    	cm->loadPlugin(name, filename);
+        _logger->info("Loading plugin {} from {}", name, filename);
+    	_componentMgr.loadPlugin(name, filename);
     } catch (std::exception & e) {
-        logger->critical("Error while loading plugin {}", name);
-    	logger->error(e.what());
+        _logger->critical("Error while loading plugin {}", name);
+    	_logger->error(e.what());
     	exit(1);
     }
   }
@@ -243,8 +246,6 @@ void Engine::loadPlugins(std::vector<Config::Plugin> * plugins) {
 }
 
 void Engine::initComponents(std::vector<Config::Component> & components) {
-
-  ComponentManager * cm = ComponentManager::getInstance();
 
   for (std::vector<Config::Component>::iterator it = components.begin();
        it != components.end(); it++) {
@@ -256,11 +257,11 @@ void Engine::initComponents(std::vector<Config::Component> & components) {
     TiXmlElement * config = component.getConfig();
 
     try {
-    	logger->info("Creating component " + componentName + " from plugin " + pluginName );
-    	cm->createComponent<Component>(componentName, pluginName, config);
+    	_logger->info("Creating component " + componentName + " from plugin " + pluginName );
+    	_componentMgr.createComponent<Component>(componentName, pluginName, config);
     } catch (std::exception & e) {
-    	logger->critical("Error while creating & configuring component " + componentName);
-    	logger->error(e.what());
+        _logger->critical("Error while creating & configuring component {}", componentName);
+    	_logger->error(e.what());
     	exit(1);
     }
   }

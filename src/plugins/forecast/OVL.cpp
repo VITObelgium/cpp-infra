@@ -9,11 +9,11 @@
 
 namespace OPAQ {
 
-LOGGER_DEF(OPAQ::OVL);
-
-OVL::OVL() :
-	output_raw(false),
-	debug_output(false) {
+OVL::OVL()
+: logger("OPAQ::OVL")
+, _componentMgr(nullptr)
+, output_raw(false)
+, debug_output(false) {
 }
 
 OVL::~OVL() {}
@@ -51,12 +51,12 @@ double _wexp( int i, int n, int p ) {
 }
 
 
-void OVL::configure (TiXmlElement * cnf )
-    throw (BadConfigurationException) {
+void OVL::configure (TiXmlElement * cnf, IEngine& engine) {
 
 	// here the actual station configuation & RTC configuration should be read, the individual models
 	// are already defined... in there respective plugins...
 	_conf.clear();
+    _componentMgr = &engine.componentManager();
 
 	try {
 
@@ -194,7 +194,7 @@ void OVL::run() {
 	// forecast horizon requested by user is available in abstract model and
 	// defined in the configuration file under <forecast><horizon></horizon></forecast>
 	// value is given in days, but stored in the TimeInterval format, so have to get days back
-	int fcHorMax = getForecastHorizon().getDays();
+	int fcHorMax = static_cast<int>(getForecastHorizon().getDays());
 
 	// some debugging output ?
 	std::ofstream fs;
@@ -241,7 +241,8 @@ void OVL::run() {
 
 			// get the correct model plugin, we don't have to destroy it as there is only one instance of each component,
 			// configuration via the setters...
-			MLP_FeedForwardModel *model = ComponentManager::getInstance()->getComponent<MLP_FeedForwardModel>( cf->model_name );
+            assert(_componentMgr);
+			MLP_FeedForwardModel *model = _componentMgr->getComponent<MLP_FeedForwardModel>( cf->model_name );
 
 			// set ins and outs for the model here...
 			// this is in fact a small engine...

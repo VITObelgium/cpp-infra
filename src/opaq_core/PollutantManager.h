@@ -13,11 +13,7 @@ namespace OPAQ {
      */
     class PollutantManager {
     public:
-      /**
-	  Returns the instance of the singleton pollutant manager object.
-	  As this is singleton class, there is no public constructor.
-      */
-      static PollutantManager *getInstance();
+      PollutantManager();
 
       virtual ~PollutantManager();
 
@@ -41,11 +37,9 @@ namespace OPAQ {
 	  This member function will push back OPAQ::Pollutants to the list for each
 	  "<pollutant>" found in the "<pollutants>" section
       */
-      void configure (TiXmlElement const * config);
+      void configure(TiXmlElement const * config);
 
     private:
-      /** Private constructor for singleton class */
-      PollutantManager();
       PollutantManager(PollutantManager const&); // no implementation of copy constructor for singleton
       void operator=(PollutantManager const&);   // no implementation of copy constructor for singleton
 

@@ -19,7 +19,7 @@ public:
 	Hdf5Tools();
 	virtual ~Hdf5Tools();
 
-	static const H5::StrType stringType;
+	//static const H5::StrType stringType;
 
 	static unsigned int getDataSetSize (const H5::DataSet & dataSet, const unsigned int dimIndex = 0);
 	static void createStringAttribute(const H5::DataSet & dataSet, const std::string & attname,

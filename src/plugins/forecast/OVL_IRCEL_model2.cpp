@@ -23,7 +23,7 @@ namespace OPAQ {
   /* ============================================================================
      Implementation of the configure method
      ========================================================================== */
-  void OVL_IRCEL_model2::configure (TiXmlElement * cnf ) {
+  void OVL_IRCEL_model2::configure (TiXmlElement * cnf, IEngine&) {
     
     try {
       // read the path to the architecture files

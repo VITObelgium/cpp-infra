@@ -27,7 +27,7 @@ DateTime::DateTime() {
 #ifdef WIN32
 // strptime is not implemented on windows (http://stackoverflow.com/questions/321849/strptime-equivalent-on-windows)
 static const char* strptime(const char* s, const char* f, struct tm* tm) {
-    std::istringstream input(s);
+    std::stringstream input(s);
     input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
     input >> std::get_time(tm, f);
     if (input.fail())
@@ -42,7 +42,8 @@ DateTime::DateTime( const std::string& s ) {
 	struct tm t;
 
 	memset( &t, 0, sizeof(struct tm) );
-	strptime( s.c_str(), "%Y-%m-%d %H:%M%S", &t );
+	//strptime( s.c_str(), "%Y-%m-%d %H:%M%S", &t );
+    strptime(s.c_str(), "%Y-%m-%d", &t);
 
 	_year  = t.tm_year + 1900;
 	_month = t.tm_mon + 1;

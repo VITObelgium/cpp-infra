@@ -11,11 +11,6 @@ PollutantManager::PollutantManager()
 PollutantManager::~PollutantManager() {
 }
 
-PollutantManager *PollutantManager::getInstance() {
-	static PollutantManager instance;
-	return &instance;
-}
-
 OPAQ::Pollutant *PollutantManager::find(std::string name) {
 
 	for (std::vector<OPAQ::Pollutant>::iterator it = pollutants.begin();
@@ -28,8 +23,8 @@ OPAQ::Pollutant *PollutantManager::find(std::string name) {
 	return NULL;
 }
 
-void PollutantManager::configure(TiXmlElement const * config) {
-	pollutants.clear();
+void PollutantManager::configure(TiXmlElement const* config) {
+    pollutants.clear();
 	const TiXmlElement * pollutantElement = config->FirstChildElement("pollutant");
 	while (pollutantElement) {
 		OPAQ::Pollutant pol(pollutantElement);

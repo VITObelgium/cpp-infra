@@ -6,12 +6,12 @@
 
 #include "ComponentManager.h"
 #include <dlfcn.h>
+#include "Logger.h"
 
 namespace OPAQ {
 
-  ComponentManager::ComponentManager() {
-    instanceMap = instanceMapType();
-    factoryMap = factoryMapType();
+  ComponentManager::ComponentManager(IEngine& engine)
+  : _engine(engine) {
   }
   
   ComponentManager::~ComponentManager() {
@@ -20,11 +20,6 @@ namespace OPAQ {
       delete it->second;
     }
     instanceMap.clear();
-  }
-  
-  ComponentManager * ComponentManager::getInstance() {
-    static ComponentManager instance;
-    return &instance;
   }
   
   // Throws FailedToLoadPluginException PluginAlreadyLoadedException
@@ -37,25 +32,28 @@ namespace OPAQ {
 
     // 2. load plugin
     void * handle;
-    Component * (*factory)(void);
-    char * error;
+    Component* (*factory)(void*);
     handle = dlopen(filename.c_str(), RTLD_LAZY);
     if (!handle)
       throw FailedToLoadPluginException ("Failed to load library with name '" + pluginName
 					 + "' from file with name '" + filename + "': " + dlerror());
     //BM funky function handle casting going on here :-)
-    factory = (Component* (*)() ) dlsym(handle, "factory");
-    if ((error = dlerror()) != NULL) {
+    factory = (Component* (*)(void*) ) dlsym(handle, "factory");
+    if (factory == nullptr) {
+      auto error = dlerror();
       throw FailedToLoadPluginException ("Failed to fetch factory symbol from library with name '"
-					 + pluginName + "' in file with name '" + filename + "': " + error);
+					 + pluginName + "' in file with name '" + filename + "': " + (error ? error : ""));
     }
+
+    // Create the logger in the application and not in the dll memory space
     factoryMap.insert(std::make_pair(pluginName, factory));
   }
 
 
   // Throws ComponentAlreadyExistsException PluginNotFoundException BadConfigurationException
-  Component * ComponentManager::createGenericComponent (std::string &componentName,
-							std::string &pluginName, TiXmlElement* configuration) {
+  Component * ComponentManager::createGenericComponent(std::string &componentName,
+                                                       std::string &pluginName,
+                                                       TiXmlElement* configuration) {
 
     // 1. check if the component wasn't created previously
     bool ok = false;
@@ -93,8 +91,9 @@ namespace OPAQ {
     factoryMapType::iterator it = factoryMap.find(pluginName);
     if (it == factoryMap.end())
       throw PluginNotFoundException("Plugin not found: " + pluginName);
-    Component * component = it->second();
-    component->configure(configuration);
+    auto sink = Log::getSink();
+    Component * component = it->second(&sink);
+    component->configure(configuration, _engine);
     return component;
   }
 

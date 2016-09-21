@@ -16,8 +16,9 @@
 
 #include "tools/FileTools.h"
 #include "tools/DateTimeTools.h"
+#include "PollutantManager.h"
 
-#include <config.h>
+#include "config.h"
 
 void print_usage( void ) {
   std::cout << "Usage :" << std::endl;
@@ -129,9 +130,10 @@ int main (int argc, char* argv[]) {
    auto logger = Log::createLogger("main");
 
    // -- Parse configuration, after init of the log, otherwise we get errors
+   OPAQ::Config::PollutantManager pollutantMgr;
    OPAQ::ConfigurationHandler ch;
    try {
-	   ch.parseConfigurationFile( config_file );
+	   ch.parseConfigurationFile(config_file, pollutantMgr);
    } catch ( std::exception &e ) {
 	   std::cout << e.what() << std::endl;
 	   exit(1);
@@ -179,12 +181,12 @@ int main (int argc, char* argv[]) {
 #endif
   
   // validate configuration
-  ch.validateConfiguration();
+  ch.validateConfiguration(pollutantMgr);
 
   /* -----------------------------------------------------------------------------------
      Starting Engine...
      --------------------------------------------------------------------------------- */
-  OPAQ::Engine engine;
+  OPAQ::Engine engine(pollutantMgr);
   engine.run( ch.getOpaqRun() );
 
   // some friendliness

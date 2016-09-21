@@ -28,8 +28,11 @@ ADD_LIBRARY(xmlgridprovider MODULE
     XmlGridProvider.cpp
 )
 
+TARGET_LINK_LIBRARIES(hdf5buffer opaqcore)
+TARGET_LINK_LIBRARIES(hdf5buffer optimized ${HDF5_CPP_LIBRARY})
+TARGET_LINK_LIBRARIES(hdf5buffer debug ${HDF5_CPP_LIBRARY_DEBUG})
+
 TARGET_LINK_LIBRARIES(asciiforecastwriter opaqcore)
-TARGET_LINK_LIBRARIES(hdf5buffer opaqcore ${HDF5_LIBRARY} ${HDF5_CPP_LIBRARY})
 TARGET_LINK_LIBRARIES(ircelmeteoprovider opaqcore)
 TARGET_LINK_LIBRARIES(rioobsprovider opaqcore)
 TARGET_LINK_LIBRARIES(xmlgridprovider opaqcore)

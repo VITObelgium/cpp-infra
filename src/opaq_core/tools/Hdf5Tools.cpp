@@ -13,7 +13,7 @@ Hdf5Tools::Hdf5Tools() {}
 
 Hdf5Tools::~Hdf5Tools() {}
 
-const H5::StrType Hdf5Tools::stringType = H5::StrType(0, H5T_VARIABLE);
+//const H5::StrType Hdf5Tools::stringType = H5::StrType(0, H5T_VARIABLE);
 
 unsigned int Hdf5Tools::getDataSetSize (const H5::DataSet & dataSet, const unsigned int dimIndex) {
 	H5::DataSpace space = dataSet.getSpace();
@@ -26,6 +26,9 @@ unsigned int Hdf5Tools::getDataSetSize (const H5::DataSet & dataSet, const unsig
 
 void Hdf5Tools::createStringAttribute(const H5::DataSet & dataSet, const std::string & attname,
 	const std::string & attvalue) {
+
+    static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
+
 	H5::DataSpace att_space(H5S_SCALAR);
 	H5::Attribute att = dataSet.createAttribute(attname, stringType, att_space);
 	att.write(stringType, attvalue);
@@ -33,7 +36,9 @@ void Hdf5Tools::createStringAttribute(const H5::DataSet & dataSet, const std::st
 
 std::string Hdf5Tools::readStringAttribute (const H5::DataSet & dataSet, const std::string & name) {
 	std::string out;
-	H5::Attribute att = dataSet.openAttribute(name);
+    static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
+    
+    H5::Attribute att = dataSet.openAttribute(name);
 	att.read(stringType, out);
 	att.close();
 	return out;
@@ -78,6 +83,7 @@ void Hdf5Tools::readStringData (char ** buffer, const H5::DataSet & dataSet) {
 	// define memory hyperslab
 	memSpace.selectHyperslab(H5S_SELECT_SET, count, offset);
 	// read data
+    static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
 	dataSet.read(buffer, stringType, memSpace, space);
 	space.close();
 	memSpace.close();
@@ -122,7 +128,8 @@ void Hdf5Tools::addToStringDataSet (H5::DataSet & dataSet, const std::string & v
 	std::string writeBuffer [1]; writeBuffer[0] = value;
 	hsize_t writeSize [1]; writeSize[0] = 1;
 	H5::DataSpace writeMemSpace (1, writeSize);
-	dataSet.write(writeBuffer, stringType, writeMemSpace, space);
+    static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
+    dataSet.write(writeBuffer, stringType, writeMemSpace, space);
 	space.close();
 	dataSet.flush(H5F_SCOPE_GLOBAL);
 }

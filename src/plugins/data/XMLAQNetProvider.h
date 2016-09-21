@@ -21,7 +21,7 @@ namespace OPAQ {
 
     // component members
     // throws OPAQ::BadConfigurationException
-    virtual void configure( TiXmlElement *configuration );
+    virtual void configure(TiXmlElement *configuration, IEngine& engine);
 
     // AQNetowrk functions
     virtual OPAQ::AQNetwork *getAQNetwork();

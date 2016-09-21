@@ -21,7 +21,7 @@ XMLAQNetProvider::~XMLAQNetProvider() {
   }
 }
 
-void XMLAQNetProvider::configure(TiXmlElement *cnf) {
+void XMLAQNetProvider::configure(TiXmlElement *cnf, IEngine& engine) {
 
   // Here we assume we recieve the <config> element which should define the AQNetwork...
   TiXmlElement *netEl = cnf->FirstChildElement("network");
@@ -68,8 +68,7 @@ void XMLAQNetProvider::configure(TiXmlElement *cnf) {
 
       for ( auto it = pol_list.begin(); it != pol_list.end(); ++it) {
 
-	OPAQ::Pollutant *p =
-	  OPAQ::Config::PollutantManager::getInstance()->find(*it);
+	OPAQ::Pollutant *p = engine.pollutantManager().find(*it);
 	if (!p)
 	  throw OPAQ::BadConfigurationException( "unknown pollutant found for " + name + " : " + *it);
 

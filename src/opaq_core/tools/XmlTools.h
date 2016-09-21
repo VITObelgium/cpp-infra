@@ -23,7 +23,8 @@ public:
 	static std::string getText(TiXmlElement* parent, const std::string & childName) {
 
 		TiXmlElement* child = getElement(parent, childName);
-		return std::string(child->GetText());
+        const char* text = child->GetText();
+		return text ? text : "";
 	}
 
 	/**

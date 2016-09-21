@@ -8,6 +8,6 @@ EXTERNALPROJECT_ADD(${NAME}
     URL http://bitbucket.org/${NAME}/${NAME}/get/${MAJOR}.${MINOR}.${REVISION}.tar.bz2 TIMEOUT 180
     INSTALL_DIR ${CMAKE_BINARY_DIR}/local
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
-               -DCMAKE_BUILD_TYPE=Release
+               -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
 )

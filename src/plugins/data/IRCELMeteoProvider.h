@@ -25,7 +25,7 @@ public:
 
   // OPAQ::Component methods
   // throws BadConfigurationException
-  virtual void configure(TiXmlElement *cnf);
+  virtual void configure(TiXmlElement *cnf, IEngine& engine);
 
   // OPAQ::MeteoProvider methods
 

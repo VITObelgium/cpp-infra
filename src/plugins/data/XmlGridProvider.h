@@ -21,7 +21,7 @@ public:
 	// OPAQ::Component methods
 
     // throws BadConfigurationException
-	virtual void configure (TiXmlElement * configuration);
+	virtual void configure (TiXmlElement * configuration, IEngine& engine);
 
 	// OPAQ::GridProvider methods
 

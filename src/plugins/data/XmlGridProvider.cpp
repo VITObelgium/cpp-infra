@@ -30,7 +30,7 @@ XmlGridProvider::~XmlGridProvider() {
  * 	<cell id="1" xmin="12.1" xmax="14.1" ymin="11.1" ymax="12.1"/>
  * </grid>
  */
-void XmlGridProvider::configure(TiXmlElement * configuration) {
+void XmlGridProvider::configure(TiXmlElement * configuration, IEngine&) {
 
 	TiXmlElement * gridEl = configuration->FirstChildElement("grid");
 	if (!gridEl) {

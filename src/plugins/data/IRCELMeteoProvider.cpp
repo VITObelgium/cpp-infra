@@ -25,7 +25,7 @@ IRCELMeteoProvider::~IRCELMeteoProvider() {
 }
 
 // OPAQ::Component methods
-void IRCELMeteoProvider::configure(TiXmlElement * configuration) {
+void IRCELMeteoProvider::configure(TiXmlElement * configuration, IEngine&) {
 
 	// clear buffers
 	_nodata.clear();

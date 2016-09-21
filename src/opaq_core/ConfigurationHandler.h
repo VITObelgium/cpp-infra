@@ -58,10 +58,10 @@ namespace OPAQ {
      *
      * \param filename The name of the master XML configuration file
      */
-    void parseConfigurationFile (std::string& filename);
+    void parseConfigurationFile (std::string& filename, Config::PollutantManager& pollutantMgr);
 
     /** Validates whether the configuration is ok */
-    void validateConfiguration ();
+    void validateConfiguration (Config::PollutantManager& pollutantMgr);
 
     /** Returns an opaq run object, constructed from the configuration parsing */
     OPAQ::Config::OpaqRun* getOpaqRun () { return &opaqRun; }

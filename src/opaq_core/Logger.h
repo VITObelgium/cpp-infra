@@ -19,6 +19,11 @@ public:
     static void initConsoleLogger();
     static void initFileLogger(const std::string& filename);
 
+    // Call this in a shared library to share the same sink througout the application
+    static void initLogger(std::shared_ptr<spdlog::sinks::sink> sink);
+
+    static std::shared_ptr<spdlog::sinks::sink> getSink();
+
     static std::shared_ptr<spdlog::logger> getLogger(const std::string& name);
     static std::shared_ptr<spdlog::logger> createLogger(const std::string& filename);
 

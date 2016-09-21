@@ -6,6 +6,7 @@
 
 namespace OPAQ {
 
+  class IEngine;
   class ComponentManager; 
   
   /**
@@ -30,9 +31,10 @@ namespace OPAQ {
     /**
      * Configure the component.
      * @param configuration pointer to the XML element holding the components configuration
+     * @param pollutantMgr the pollutant manager instance
      * @throws BadConfigurationException if the component failed to configure using the provided configuration
      */
-    virtual void configure (TiXmlElement * configuration) = 0;
+    virtual void configure(TiXmlElement* configuration, IEngine& engine) = 0;
 
     const std::string & getName( void ){ return name; }
 
