@@ -8,7 +8,7 @@ EXTERNALPROJECT_ADD(${NAME}
     URL https://github.com/leethomason/${NAME}/archive/${MAJOR}.${MINOR}.${REVISION}.tar.gz TIMEOUT 180
     INSTALL_DIR ${CMAKE_BINARY_DIR}/local
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
-               -DCMAKE_DEBUG_POSTFIX=_d
+               ${POSTFIX_CONFIG}
                -DBUILD_STATIC_LIBS=ON
                -DBUILD_SHARED_LIBS=OFF
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}

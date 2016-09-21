@@ -10,10 +10,25 @@ function checkresult {
     return $status
 }
 
+config=""
+
+echo -n "Select configuration: [1:Debug 2:Release]: "
+read yno
+case $yno in
+    [1] ) config="Debug";;
+    [2] ) config="Release";;
+    * ) echo "Invalid selection" exit;;
+esac
+
 mkdir -p build/deps
 cd build/deps
 
 PWD=`pwd`
+checkresult cmake ../../deps -DCMAKE_PREFIX_PATH=${PWD}/local -DCMAKE_BUILD_TYPE=${config}
+checkresult cmake --build .
 
-checkresult cmake ../../deps -DCMAKE_PREFIX_PATH=${PWD}/local -DCMAKE_BUILD_TYPE=Release
-checkresult cmake --build . --config Release
+if [ "${config}" = "Debug" ]; then
+    # rename hdf lib suffixes so debug libraries have the same name as release libraries
+    mv ./local/lib/libhdf5_cpp_debug.a ./local/lib/libhdf5_cpp.a
+    mv ./local/lib/libhdf5_debug.a ./local/lib/libhdf5.a
+fi

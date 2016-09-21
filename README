@@ -7,9 +7,13 @@ autogen.sh script to add the build structure. After that just ./configure; make;
 Prerequisites
 *************
 
-The prequisites can be compiled by calling
-bootstrap.sh on linux
-bootstrap.bat on windows
+The prequisites can be compiled by calling the bootstrap script.
+
+On linux:
+call bootstrap.sh and select the desired configuration
+
+On windows:
+call bootstrap.bat, it will build both debug and release versions of the prerequisites
 
 This will build all third party libraries required by OPAQ
 The libraries will be located in build/deps/local
@@ -19,15 +23,20 @@ Third party libraries:
 - Eigen3 matrix library
 - HDF5 hdf5 utilities
 
-
 Compilation & debugging
 ***********************
-OPAQ uses cmake which should make the compilation process fairly straight forward
+OPAQ uses cmake which should make the compilation process fairly straight forward.
+Use the build scripts to perform the cmake configuration and initial build.
 
-By calling build.sh on linux or build.bat on windows the OPAQ project is compiled.
+On linux:
+call build.sh and select the desired configuration
+build/opaq_[config] will be the build directory, use it for incremental builds after you make changes.
+
+On windows:
+call build.bat, it will generate a visual studio solution and perform an initial build
+build/opaq will contain the visual studio solution, use it for development
+
 Make sure to call the bootstrap script first.
-
-build/opaq will be the build directory, use it for incremental builds after you make changes.
 
 
 Contact
