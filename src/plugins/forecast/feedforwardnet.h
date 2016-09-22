@@ -2,48 +2,46 @@
 #define __FFNET_H
 
 #include <iostream>
-#include <vector>
 #include <math.h>
+#include <vector>
 
 #include <tinyxml.h>
 
 #include <Eigen/Dense>
 
-#include "scaler.h"
 #include "layer.h"
+#include "scaler.h"
+#include "Logger.h"
 
-namespace nnet {
+namespace nnet
+{
 
-  class feedforwardnet {
-  public: 
-    feedforwardnet( TiXmlElement *cnf );
-    virtual ~feedforwardnet();
-    
-    int sim( const double *input );
-    int sim( const Eigen::VectorXd& in );
-    
-    friend std::ostream& operator<<(std::ostream& os, const feedforwardnet& net );
+class feedforwardnet
+{
+public:
+    feedforwardnet(TiXmlElement* cnf);
 
-    unsigned int inputSize( void ) { return static_cast<unsigned int>(_input.size()); }
-    unsigned int outputSize( void ) { return static_cast<int>(_output.size()); }
+    int sim(const double* input);
+    int sim(const Eigen::VectorXd& in);
 
-    void getOutput( double **x ) { *x = _output.data(); }
-    void getOutput( Eigen::VectorXd& out ) { out = _output; }
+    friend std::ostream& operator<<(std::ostream& os, const feedforwardnet& net);
 
-    bool verbose;
+    unsigned int inputSize(void) { return static_cast<unsigned int>(_input.size()); }
+    unsigned int outputSize(void) { return static_cast<int>(_output.size()); }
 
-  private:
-    Eigen::VectorXd           _input;   // the input sample
-    Eigen::VectorXd           _output;  // the output sample
-    std::vector<nnet::layer*> _layers;  // the hidden/output layers
-    
-    nnet::scaler *_inputScaler; 
-    nnet::scaler *_outputScaler;
+    void getOutput(double** x) { *x = _output.data(); }
+    void getOutput(Eigen::VectorXd& out) { out = _output; }
 
-    nnet::scaler *_setScaler( TiXmlElement *el, int size );
+private:
+    Logger _logger;
+    Eigen::VectorXd _input;            // the input sample
+    Eigen::VectorXd _output;           // the output sample
+    std::vector<std::unique_ptr<nnet::layer>> _layers; // the hidden/output layers
 
-  };
-  
+    std::unique_ptr<nnet::scaler> _inputScaler;
+    std::unique_ptr<nnet::scaler> _outputScaler;
+};
+
 }; // namespace nnet
 
 #endif /* #ifndef __FFNET_H */

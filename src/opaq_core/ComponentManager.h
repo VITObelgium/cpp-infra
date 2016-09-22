@@ -23,9 +23,9 @@
  *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
  */
 #define OPAQ_REGISTER_PLUGIN(TYPE)                                                       \
-    OPAQ_DLL_API OPAQ::Component* factory(void* sink)                                    \
+    OPAQ_DLL_API OPAQ::Component* factory(LogConfiguration* logConfig)                   \
     {                                                                                    \
-        Log::initLogger(*reinterpret_cast<std::shared_ptr<spdlog::sinks::sink>*>(sink)); \
+        Log::initLogger(*logConfig);                                                     \
         return new TYPE();                                                               \
     }
 
@@ -58,7 +58,7 @@ class BadConfigurationException;
 class ComponentManager
 {
 public:
-    typedef Component* (*FactoryFunc)(void*);
+    typedef Component* (*FactoryFunc)(LogConfiguration*);
     typedef std::map<std::string, Component*> InstanceMapType;
     typedef std::map<std::string, FactoryFunc> FactoryMapType;
 

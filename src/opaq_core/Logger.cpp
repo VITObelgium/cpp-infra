@@ -1,6 +1,24 @@
 #include "Logger.h"
 
-std::shared_ptr<spdlog::sinks::sink> Log::_sink;
+#include <spdlog/details/log_msg.h>
+
+LogConfiguration Log::_config;
+
+#ifdef WIN32
+
+class OutputDebugSink : public spdlog::sinks::sink
+{
+    void log(const spdlog::details::log_msg& msg) override
+    {
+        OutputDebugString(msg.formatted.c_str());
+    }
+
+    void flush()
+    {
+    }
+};
+
+#endif
 
 void Log::initLogger(const std::string& filename)
 {
@@ -9,30 +27,34 @@ void Log::initLogger(const std::string& filename)
 
 void Log::initConsoleLogger()
 {
-    _sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
-
-#ifndef WIN32
+#ifdef WIN32
+    auto sink = std::make_shared<OutputDebugSink>();
+#else
+    auto sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
     // enable color output on linux
-    _sink = std::make_shared<spdlog::sinks::ansicolor_sink>(_sink);
+    sink = std::make_shared<spdlog::sinks::ansicolor_sink>(sink);
 #endif
 
-    //layout->setConversionPattern("%m%n");
+    _config.sinks.push_back(sink);
+    _config.pattern = "[%l] [%n] %v";
+    _config.level = spdlog::level::trace;
 }
 
 void Log::initFileLogger(const std::string& filename)
 {
-    _sink = std::make_shared<spdlog::sinks::simple_file_sink_mt>(filename, true /* truncate */);
-    //layout->setConversionPattern("%d %-5p (%c) %m%n");
+    _config.sinks.push_back(std::make_shared<spdlog::sinks::simple_file_sink_mt>(filename, true /* truncate */));
+    _config.pattern = "%+";
+    _config.level = spdlog::level::info;
 }
 
-void Log::initLogger(std::shared_ptr<spdlog::sinks::sink> sink)
+void Log::initLogger(const LogConfiguration& config)
 {
-    _sink = sink;
+    _config = config;
 }
 
-std::shared_ptr<spdlog::sinks::sink> Log::getSink()
+LogConfiguration Log::getConfiguration()
 {
-    return _sink;
+    return _config;
 }
 
 std::shared_ptr<spdlog::logger> Log::getLogger(const std::string& name)
@@ -45,10 +67,10 @@ std::shared_ptr<spdlog::logger> Log::createLogger(const std::string& name)
     auto logger = getLogger(name);
     if (!logger)
     {
-        assert(_sink);
-        std::vector<spdlog::sink_ptr> sinks;
-        sinks.push_back(_sink);
-        logger = std::make_shared<spdlog::logger>(name, begin(sinks), end(sinks));
+        assert(!_config.sinks.empty());
+        logger = std::make_shared<spdlog::logger>(name, begin(_config.sinks), end(_config.sinks));
+        logger->set_pattern(_config.pattern);
+        logger->set_level(_config.level);
         //register it if you need to access it globally
         spdlog::register_logger(logger);
     }

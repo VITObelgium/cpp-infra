@@ -12,6 +12,13 @@
 #include <spdlog/spdlog.h>
 #include "tools/FileTools.h"
 
+struct LogConfiguration
+{
+    std::vector<std::shared_ptr<spdlog::sinks::sink>> sinks;
+    std::string pattern;
+    spdlog::level::level_enum level;
+};
+
 class Log
 {
 public:
@@ -19,16 +26,16 @@ public:
     static void initConsoleLogger();
     static void initFileLogger(const std::string& filename);
 
-    // Call this in a shared library to share the same sink througout the application
-    static void initLogger(std::shared_ptr<spdlog::sinks::sink> sink);
+    // Call this in a shared library to share the same log configuration throughout the application
+    static void initLogger(const LogConfiguration& config);
 
-    static std::shared_ptr<spdlog::sinks::sink> getSink();
+    static LogConfiguration getConfiguration();
 
     static std::shared_ptr<spdlog::logger> getLogger(const std::string& name);
     static std::shared_ptr<spdlog::logger> createLogger(const std::string& filename);
 
 private:
-    static std::shared_ptr<spdlog::sinks::sink> _sink;
+    static LogConfiguration _config;
 };
 
 class Logger
