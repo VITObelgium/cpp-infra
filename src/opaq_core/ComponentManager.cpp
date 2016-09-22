@@ -46,7 +46,7 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
         throw FailedToLoadPluginException("Failed to fetch factory symbol from library with name '" + pluginName + "' in file with name '" + filename + "': " + (error ? error : ""));
     }
 
-    // Create the logger in the application and not in the dll memory space
+    // Create the _logger in the application and not in the dll memory space
     factoryMap.insert(std::make_pair(pluginName, factory));
 }
 

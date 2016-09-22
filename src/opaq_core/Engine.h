@@ -65,7 +65,7 @@ public:
    * executing the
    *      mapping/forecast stages...
    */
-    void run(Config::OpaqRun* config);
+    void run(Config::OpaqRun& config);
 
     Config::PollutantManager& pollutantManager() override;
     ComponentManager&         componentManager() override;

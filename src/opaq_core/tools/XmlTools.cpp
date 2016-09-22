@@ -76,7 +76,7 @@ TiXmlElement* XmlTools::getElementByAttribute( TiXmlElement* parent, const std::
 			}
 
 		} else {
-			// -- no ref doc, just check the attribute
+			// -- no ref _doc, just check the attribute
 			const char *val = el->Attribute( attrName.c_str() );
 			if ( val )
 				if ( ! attrValue.compare( val ) ) return el;
@@ -136,7 +136,7 @@ TiXmlElement* XmlTools::getElementByAttributes( TiXmlElement *parent, const std:
 			}
 
 		} else {
-			// -- no ref doc, just check the attribute
+			// -- no ref _doc, just check the attribute
 			if ( _checkMatch( el, attrNames, attrValues ) ) return el;
 		}
 

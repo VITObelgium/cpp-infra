@@ -158,16 +158,16 @@ int main(int argc, char* argv[])
 
     //TODO do not run for a single pollutant, but for all --> accomodate multi-pollutant models, or alternatively call in a loop
     if (pol.size() > 0)
-        ch.getOpaqRun()->setPollutantName(pol, aggr);
+        ch.getOpaqRun().setPollutantName(pol, aggr);
     else
-        pol = ch.getOpaqRun()->getPollutantName();
+        pol = ch.getOpaqRun().getPollutantName();
     logger->info("Requested pollutant ....... : " + pol);
-    logger->info("Requested aggregation ..... : " + OPAQ::Aggregation::getName(ch.getOpaqRun()->getAggregation()));
+    logger->info("Requested aggregation ..... : " + OPAQ::Aggregation::getName(ch.getOpaqRun().getAggregation()));
 
     // 2. base times
     if (basetime.size() > 0)
     {
-        std::vector<OPAQ::DateTime>* basetimes = &(ch.getOpaqRun()->getBaseTimes());
+        std::vector<OPAQ::DateTime>* basetimes = &(ch.getOpaqRun().getBaseTimes());
         basetimes->clear();
         try
         {
@@ -188,7 +188,7 @@ int main(int argc, char* argv[])
 
 #ifdef DEBUG
     logger->info("Requested base times:");
-    for (auto& basetime : ch.getOpaqRun()->getBaseTimes())
+    for (auto& basetime : ch.getOpaqRun().getBaseTimes())
         logger->info(basetime.toString());
 #endif
 
