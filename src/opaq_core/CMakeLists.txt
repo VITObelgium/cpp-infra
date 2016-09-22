@@ -86,26 +86,39 @@ SOURCE_GROUP(Data FILES ${CORE_DATA_SOURCES})
 
 ADD_LIBRARY(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES} ${CORE_DATA_SOURCES})
 
-TARGET_LINK_LIBRARIES(opaqcore ${EXTRA_LIBS} ${CMAKE_DL_LIBS})
-TARGET_LINK_LIBRARIES(opaqcore ${ZLIB_LIBRARY})
-TARGET_LINK_LIBRARIES(opaqcore ${GZSTREAM_LIBRARY})
-TARGET_LINK_LIBRARIES(opaqcore ${HDF5_LIBRARY})
-TARGET_LINK_LIBRARIES(opaqcore ${TINYXML_LIBRARY})
-
 IF (MSVC)
-    TARGET_LINK_LIBRARIES(opaqcore debug ${ZLIB_LIBRARY_DEBUG})
-    TARGET_LINK_LIBRARIES(opaqcore debug ${GZSTREAM_LIBRARY_DEBUG})
-    TARGET_LINK_LIBRARIES(opaqcore debug ${HDF5_LIBRARY_DEBUG})
-    TARGET_LINK_LIBRARIES(opaqcore debug ${TINYXML_LIBRARY_DEBUG})
+    # using visual studio we can not mix debug and release libraries
+    TARGET_LINK_LIBRARIES(opaqcore
+        ${EXTRA_LIBS}
+        debug ${ZLIB_LIBRARY_DEBUG}
+        debug ${GZSTREAM_LIBRARY_DEBUG}
+        debug ${HDF5_LIBRARY_DEBUG}
+        debug ${TINYXML_LIBRARY_DEBUG}
+        debug ${DL_LIBRARY_DEBUG}
 
-    TARGET_LINK_LIBRARIES(opaqcore debug ${DL_LIBRARY_DEBUG})
-    TARGET_LINK_LIBRARIES(opaqcore optimized ${DL_LIBRARY})
+        optimized ${ZLIB_LIBRARY}
+        optimized ${GZSTREAM_LIBRARY}
+        optimized ${HDF5_LIBRARY}
+        optimized ${TINYXML_LIBRARY}
+        optimized ${DL_LIBRARY}
+    )
+ELSE ()
+    TARGET_LINK_LIBRARIES(opaqcore
+        ${EXTRA_LIBS}
+        ${CMAKE_DL_LIBS}
+        ${ZLIB_LIBRARY}
+        ${GZSTREAM_LIBRARY}
+        ${HDF5_LIBRARY}
+        ${TINYXML_LIBRARY}
+    )
 ENDIF ()
 
 ADD_EXECUTABLE(opaq opaq.cpp)
 TARGET_LINK_LIBRARIES(opaq opaqcore)
 
 IF (MSVC)
-    TARGET_LINK_LIBRARIES(opaq optimized ${GETOPT_LIBRARY})
-    TARGET_LINK_LIBRARIES(opaq debug ${GETOPT_LIBRARY_DEBUG})
+    TARGET_LINK_LIBRARIES(opaq
+        debug ${GETOPT_LIBRARY_DEBUG}
+        optimized ${GETOPT_LIBRARY}
+    )
 ENDIF ()
