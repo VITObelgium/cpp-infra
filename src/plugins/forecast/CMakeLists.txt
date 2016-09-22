@@ -11,6 +11,7 @@ ADD_LIBRARY(mpl_feedforward
     feedforwardnet.cpp
     transfcn.h
 )
+SET_TARGET_PROPERTIES(mpl_feedforward PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 ADD_LIBRARY(ovl_ircel_model1 MODULE
     OVL_IRCEL_model1.h

@@ -86,6 +86,8 @@ SOURCE_GROUP(Data FILES ${CORE_DATA_SOURCES})
 
 ADD_LIBRARY(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES} ${CORE_DATA_SOURCES})
 
+SET_TARGET_PROPERTIES(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
 IF (MSVC)
     # using visual studio we can not mix debug and release libraries
     TARGET_LINK_LIBRARIES(opaqcore
@@ -104,12 +106,12 @@ IF (MSVC)
     )
 ELSE ()
     TARGET_LINK_LIBRARIES(opaqcore
-        ${EXTRA_LIBS}
-        ${CMAKE_DL_LIBS}
-        ${ZLIB_LIBRARY}
-        ${GZSTREAM_LIBRARY}
         ${HDF5_LIBRARY}
         ${TINYXML_LIBRARY}
+        ${GZSTREAM_LIBRARY}
+        ${ZLIB_LIBRARY}
+        ${CMAKE_DL_LIBS}
+        ${EXTRA_LIBS}
     )
 ENDIF ()
 
