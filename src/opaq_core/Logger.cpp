@@ -30,9 +30,9 @@ void Log::initConsoleLogger()
 #ifdef WIN32
     auto sink = std::make_shared<OutputDebugSink>();
 #else
-    auto sink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
+    auto consoleSink = std::make_shared<spdlog::sinks::stdout_sink_mt>();
     // enable color output on linux
-    sink = std::make_shared<spdlog::sinks::ansicolor_sink>(sink);
+    auto sink = std::make_shared<spdlog::sinks::ansicolor_sink>(consoleSink);
 #endif
 
     _config.sinks.push_back(sink);
