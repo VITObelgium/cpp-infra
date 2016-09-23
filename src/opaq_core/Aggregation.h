@@ -13,17 +13,13 @@
 
 namespace OPAQ {
 
-class Aggregation {
-public:
-	Aggregation();
-	virtual ~Aggregation();
-
+namespace Aggregation {
 	enum Type { None, DayAvg, Max1h, Max8h };
 
 	/**
 	 * Returns the preferred name of the aggregation type
 	 */
-	static std::string getName( Aggregation::Type agg );
+    std::string getName( Aggregation::Type agg );
 
 	/**
 	 * Converts the string to the aggregation type, supports the old-school
@@ -34,8 +30,8 @@ public:
 	 *
 	 * \param s input string
 	 */
-	static Aggregation::Type fromString( std::string s );
-};
+    Aggregation::Type fromString( std::string s );
+}
 
 } /* namespace OPAQ */
 

@@ -9,11 +9,18 @@
 
 namespace OPAQ {
 
-StringTools::StringTools() {}
+namespace StringTools {
 
-StringTools::~StringTools() {}
+static size_t findFirstDelimiter (const std::string& str, const char *delimiter, const int delimiterCount, size_t prev) {
+    size_t out = std::string::npos;
+    for (int i = 0; i < delimiterCount; i++) {
+        size_t pos = str.find_first_of(delimiter[i], prev);
+        if (pos < out) out = pos;
+    }
+    return out;
+}
 
-bool StringTools::replace(std::string& str, const std::string& from,
+bool replace(std::string& str, const std::string& from,
 		const std::string& to) {
 	size_t start_pos = str.find(from);
 	if (start_pos == std::string::npos)
@@ -22,8 +29,7 @@ bool StringTools::replace(std::string& str, const std::string& from,
 	return true;
 }
 
-void StringTools::replaceAll(std::string& str, const std::string& from,
-		const std::string& to) {
+void replaceAll(std::string& str, const std::string& from, const std::string& to) {
 	if (from.empty())
 		return;
 	size_t start_pos = 0;
@@ -33,7 +39,7 @@ void StringTools::replaceAll(std::string& str, const std::string& from,
 	}
 }
 
-std::vector<std::string> StringTools::tokenize(const std::string &source,
+std::vector<std::string> tokenize(const std::string &source,
 		const char *delimiter, const int delimiterCount, bool keepEmpty) {
 	std::vector<std::string> results;
 
@@ -54,16 +60,7 @@ std::vector<std::string> StringTools::tokenize(const std::string &source,
 	return results;
 }
 
-size_t StringTools::findFirstDelimiter (const std::string& str, const char *delimiter, const int delimiterCount, size_t prev) {
-	size_t out = std::string::npos;
-	for (int i = 0; i < delimiterCount; i++) {
-		size_t pos = str.find_first_of(delimiter[i], prev);
-		if (pos < out) out = pos;
-	}
-	return out;
-}
-
-int StringTools::find (char * list [], unsigned int listSize, const std::string & item) {
+int find (char * list [], unsigned int listSize, const std::string & item) {
 	for (unsigned int i = 0; i < listSize; i++) {
 		if (std::string(list[i]).compare(item) == 0)
 			return i;
@@ -71,4 +68,5 @@ int StringTools::find (char * list [], unsigned int listSize, const std::string 
 	return -1;	// not found
 }
 
-} /* namespace test */
+}
+}

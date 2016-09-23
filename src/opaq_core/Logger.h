@@ -29,13 +29,13 @@ public:
     // Call this in a shared library to share the same log configuration throughout the application
     static void initLogger(const LogConfiguration& config);
 
-    static LogConfiguration getConfiguration();
+    static LogConfiguration& getConfiguration();
 
     static std::shared_ptr<spdlog::logger> getLogger(const std::string& name);
     static std::shared_ptr<spdlog::logger> createLogger(const std::string& filename);
 
 private:
-    static LogConfiguration _config;
+    static std::unique_ptr<LogConfiguration> _config;
 };
 
 class Logger

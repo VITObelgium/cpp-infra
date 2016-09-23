@@ -93,7 +93,7 @@ Component* ComponentManager::createComponent(const std::string& pluginName, TiXm
     auto it = factoryMap.find(pluginName);
     if (it == factoryMap.end())
         throw PluginNotFoundException("Plugin not found: " + pluginName);
-    auto sink      = Log::getConfiguration();
+    auto& sink     = Log::getConfiguration();
     auto component = it->second(&sink);
     component->configure(configuration, _engine);
     return component;

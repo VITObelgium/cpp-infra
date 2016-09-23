@@ -29,8 +29,7 @@ class Component;
 class Model: virtual public OPAQ::Component {
 public:
   Model();
-  virtual ~Model() {
-  }
+  virtual ~Model();
 
   virtual void setBaseTime(DateTime & baseTime) {
     this->baseTime = baseTime;

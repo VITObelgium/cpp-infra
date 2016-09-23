@@ -9,14 +9,9 @@
 #include "Aggregation.h"
 
 namespace OPAQ {
+namespace Aggregation {
 
-Aggregation::Aggregation() {
-}
-
-Aggregation::~Aggregation() {
-}
-
-std::string Aggregation::getName( Aggregation::Type agg ) {
+std::string getName( Aggregation::Type agg ) {
 
 	switch( agg ) {
 	case Type::None:
@@ -37,7 +32,7 @@ std::string Aggregation::getName( Aggregation::Type agg ) {
 }
 
 
-Aggregation::Type Aggregation::fromString( std::string s ) {
+Aggregation::Type fromString( std::string s ) {
 
 	if ( s.size() == 0 ) return Aggregation::None;
 
@@ -55,7 +50,7 @@ Aggregation::Type Aggregation::fromString( std::string s ) {
 	}
 
 	throw NotAvailableException( "Aggregation " + s + " is not known..." );
-	return Aggregation::None;
 }
 
+}
 } /* namespace OPAQ */

@@ -19,6 +19,10 @@ namespace OPAQ {
 	  missing_value(-9999) {
   }
 
+  Model::~Model()
+  {
+  }
+
 } /* namespace opaq */
 
 
