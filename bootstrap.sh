@@ -27,6 +27,7 @@ PWD=`pwd`
 checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config}
 checkresult cmake --build .
 
+cd ..
 if [ "${config}" = "Debug" ]; then
     # rename hdf lib suffixes so debug libraries have the same name as release libraries
     mv ./local/lib/libhdf5_cpp_debug.a ./local/lib/libhdf5_cpp.a
