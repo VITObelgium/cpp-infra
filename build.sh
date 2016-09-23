@@ -31,5 +31,5 @@ cd ${builddir}
 echo "Building configuration ${config} in ${builddir}"
 
 PWD=`pwd`
-checkresult cmake ../.. -G ${generator} -DCMAKE_PREFIX_PATH=${PWD}/../deps/local -DCMAKE_BUILD_TYPE=${config}
+checkresult cmake ../.. -G ${generator} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config}
 checkresult cmake --build .

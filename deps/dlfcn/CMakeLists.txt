@@ -5,7 +5,7 @@ SET(NAME dlfcn)
 
 EXTERNALPROJECT_ADD(${NAME}
     URL https://github.com/${NAME}-win32/${NAME}-win32/archive/master.zip TIMEOUT 180
-    INSTALL_DIR ${CMAKE_BINARY_DIR}/local
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
                -DBUILD_SHARED_LIBS=OFF
                ${POSTFIX_CONFIG}

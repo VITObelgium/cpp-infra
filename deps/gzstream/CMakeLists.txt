@@ -6,7 +6,7 @@ SET(PACKAGE ${NAME}-${MAJOR}.${MINOR})
 EXTERNALPROJECT_ADD(${NAME}
     DEPENDS zlib
     URL http://www.cs.unc.edu/Research/compgeom/${NAME}/${NAME}.tgz TIMEOUT 180
-    INSTALL_DIR ${CMAKE_BINARY_DIR}/local
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/patch/CMakeLists.txt ${CMAKE_CURRENT_BINARY_DIR}/gzstream-prefix/src/gzstream
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
                ${POSTFIX_CONFIG}

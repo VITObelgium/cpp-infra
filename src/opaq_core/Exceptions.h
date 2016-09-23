@@ -8,26 +8,37 @@
 #ifndef EXCEPTIONS_H_
 #define EXCEPTIONS_H_
 
+#include <fmt/format.h>
 #include <string>
 
-#define EXCEPTION(NAME)\
-class NAME: public std::exception {\
-public:\
-	NAME() {\
-		this->message = #NAME;\
-	}\
-	NAME(std::string message) {\
-		this->message = message;\
-	}\
-	virtual ~NAME() throw () {};\
-	const char * what () const throw () {\
-		return message.c_str();\
-	}\
-private:\
-	std::string message;\
+#define EXCEPTION(NAME)                                 \
+class NAME : public std::exception                      \
+                                                        \
+{                                                       \
+public:                                                 \
+    NAME() = default;                                   \
+                                                        \
+    template<typename... T>                             \
+    NAME(T&&... args)                                   \
+    : _message(fmt::format(std::forward<T>(args)...))   \
+    {                                                   \
+    }                                                   \
+                                                        \
+    NAME(std::string message)                           \
+    : _message(std::move(message))                      \
+    {                                                   \
+    }                                                   \
+                                                        \
+    const char* what() const throw()                    \
+    {                                                   \
+        return _message.c_str();                        \
+    }                                                   \
+                                                        \
+    private : std::string _message;                     \
 };
 
-namespace OPAQ {
+namespace OPAQ
+{
 
 EXCEPTION(BadConfigurationException);
 EXCEPTION(ComponentAlreadyExistsException);
@@ -52,5 +63,3 @@ EXCEPTION(OutOfBoundsException)
 } /* namespace opaq */
 
 #endif /* EXCEPTIONS_H_ */
-
-

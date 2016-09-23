@@ -16,7 +16,7 @@ On windows:
 call bootstrap.bat, it will build both debug and release versions of the prerequisites
 
 This will build all third party libraries required by OPAQ
-The libraries will be located in build/deps/local
+The libraries will be located in build/local
 
 Third party libraries:
 - Spdlog logging facilities

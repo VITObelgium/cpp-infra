@@ -58,12 +58,10 @@ class BadConfigurationException;
 class ComponentManager
 {
 public:
-    typedef Component* (*FactoryFunc)(LogConfiguration*);
-    typedef std::map<std::string, Component*> InstanceMapType;
-    typedef std::map<std::string, FactoryFunc> FactoryMapType;
-
     ComponentManager(IEngine& engine);
-    virtual ~ComponentManager();
+    ComponentManager(ComponentManager const&) = delete; // no implementation of copy constructor for singleton
+
+    void operator=(ComponentManager const&) = delete;   // no implementation of assignment operator for singleton
 
     // throws FailedToLoadPluginException, PluginAlreadyLoadedException
     void loadPlugin(const std::string& pluginName, const std::string& filename);
@@ -72,36 +70,35 @@ public:
     template <typename T>
     T* createComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration)
     {
-        Component* component = createGenericComponent(componentName, pluginName, configuration);
-        return dynamic_cast<T*>(component);
+        return dynamic_cast<T*>(&createGenericComponent(componentName, pluginName, configuration));
     }
 
     // throws ComponentNotFoundException
     template <typename T>
     T* getComponent(const std::string& componentName)
     {
-        Component* component = findComponent(componentName);
-        return dynamic_cast<T*>(component);
+        return dynamic_cast<T*>(&findComponent(componentName));
     }
 
     void destroyComponent(const std::string& componentName);
 
 private:
+    typedef Component* (*FactoryFunc)(LogConfiguration*);
+    typedef std::map<std::string, std::unique_ptr<Component>> InstanceMapType;
+    typedef std::map<std::string, FactoryFunc> FactoryMapType;
+
     InstanceMapType instanceMap;
     FactoryMapType factoryMap;
     IEngine& _engine;
 
-    ComponentManager(ComponentManager const&); // no implementation of copy constructor for singleton
-    void operator=(ComponentManager const&);   // no implementation of assignment operator for singleton
-
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
-    Component* createGenericComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration);
+    Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration);
 
     // throws ComponentNotFoundException
-    Component* findComponent(const std::string& name);
+    Component& findComponent(const std::string& name);
 
     // throw PluginNotFoundException, BadConfigurationException
-    Component* createComponent(const std::string& pluginName, TiXmlElement* configuration);
+    std::unique_ptr<Component> createComponent(const std::string& pluginName, TiXmlElement* configuration);
 };
 
 }

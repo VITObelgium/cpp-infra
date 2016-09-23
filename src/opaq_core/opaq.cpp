@@ -35,7 +35,7 @@ void print_usage(void)
     std::cout << std::endl;
 }
 
-void print_welcome(void)
+void printWelcome(void)
 {
     std::cout << "  ______   .______      ___       ______      " << std::endl;
     std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
@@ -75,8 +75,6 @@ std::string readLogName(const std::string& config_file)
 
 int main(int argc, char* argv[])
 {
-    int option_index = 0;
-
     // define command line options
     struct option long_options[] = {
         {"help", 0, 0, 'h'},
@@ -89,19 +87,17 @@ int main(int argc, char* argv[])
         {0, 0, 0, 0}};
 
     // general variable settable via command line options in opaq
-    std::string pol         = "";
-    std::string aggr        = "";
+    std::string pol, aggr, arg_log, basetime;
     std::string config_file = "opaq-config.xml";
-    std::string arg_log     = "";
     std::string days        = "1";
-    std::string basetime    = "";
 
     /* -----------------------------------------------------------------------------------
      Parsing command line options
      --------------------------------------------------------------------------------- */
     while (1)
     {
-        int c = getopt_long(argc, argv, "o:a:d:p:t:hl:", long_options, &option_index);
+        int option_index = 0;
+        int c            = getopt_long(argc, argv, "o:a:d:p:t:hl:", long_options, &option_index);
         if (c == -1) break;
         switch (c)
         {
@@ -118,32 +114,33 @@ int main(int argc, char* argv[])
             std::cerr << "Error parsing command line options, try --help !" << std::endl;
             return EXIT_FAILURE;
         }
-    } /* while loop parsing command line options */
+    }
 
-    // provide some feedback
-    print_welcome();
+    printWelcome();
 
     // parse the config file here quicly just to get the log filename if given, cannot do this
     // in the config handler (see remark below..)
-    std::string log_file         = readLogName(config_file);
-    if (arg_log.size()) log_file = arg_log; // overwrite
+    std::string log_file = readLogName(config_file);
+    if (!arg_log.empty())
+    {
+        log_file = arg_log;
+    }
 
-    // initialize logging framework
     Log::initLogger(log_file);
-
     auto logger = Log::createLogger("main");
 
     // -- Parse configuration, after init of the log, otherwise we get errors
     OPAQ::Config::PollutantManager pollutantMgr;
     OPAQ::ConfigurationHandler ch;
+    
     try
     {
         ch.parseConfigurationFile(config_file, pollutantMgr);
     }
     catch (std::exception& e)
     {
-        std::cout << e.what() << std::endl;
-        exit(1);
+        std::cerr << e.what() << std::endl;
+        exit(EXIT_FAILURE);
     }
 
     logger->info("Starting OPAQ run...");
@@ -167,15 +164,16 @@ int main(int argc, char* argv[])
     // 2. base times
     if (basetime.size() > 0)
     {
-        std::vector<OPAQ::DateTime>* basetimes = &(ch.getOpaqRun().getBaseTimes());
-        basetimes->clear();
+        auto& basetimes = ch.getOpaqRun().getBaseTimes();
+        basetimes.clear();
+        
         try
         {
             auto baseTime = OPAQ::DateTimeTools::parseDate(basetime);
-            int dayCount = atoi(days.c_str());
+            int dayCount  = atoi(days.c_str());
             for (int i = 0; i < dayCount; ++i)
             {
-                basetimes->push_back(baseTime);
+                basetimes.push_back(baseTime);
                 baseTime.addDays(1);
             }
         }

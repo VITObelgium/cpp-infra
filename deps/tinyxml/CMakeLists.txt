@@ -6,7 +6,7 @@ SET(PACKAGE ${NAME}_${MAJOR}_${MINOR}_${REVISION})
 
 EXTERNALPROJECT_ADD(${NAME}
     URL http://downloads.sourceforge.net/project/${NAME}/${NAME}/${MAJOR}.${MINOR}.${REVISION}/${PACKAGE}.tar.gz TIMEOUT 180
-    INSTALL_DIR ${CMAKE_BINARY_DIR}/local
+    INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     PATCH_COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/patch/CMakeLists.txt ${CMAKE_CURRENT_BINARY_DIR}/tinyxml-prefix/src/tinyxml
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
                ${POSTFIX_CONFIG}
