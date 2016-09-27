@@ -6,7 +6,11 @@
 #include "config.h"
 #include "mainwindow.h"
 
-Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+#if defined WIN32
+    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+#elif defined __APPLE__
+    Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
+#endif
 
 int main(int argc, char *argv[])
 {

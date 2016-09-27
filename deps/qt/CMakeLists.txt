@@ -13,15 +13,24 @@ ENDIF()
 IF (WIN32)
     SET(PLATFORM win32-msvc2015)
     SET(BUILD_CMD nmake)
+    SET(CONFIGURE_CMD "call configure")
+    SET(TARBALL_EXTENSION zip)
 ELSE ()
-    SET(PLATFORM linux-g++)
+    IF (APPLE)
+        SET(PLATFORM macx-clang)
+    ELSE ()
+        SET(PLATFORM linux-g++)
+    ENDIF ()
+
     SET(BUILD_CMD make)
+    SET(CONFIGURE_CMD "./configure")
+    SET(TARBALL_EXTENSION tar.xz)
 ENDIF ()
 
 EXTERNALPROJECT_ADD(${NAME}
     URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.zip TIMEOUT 6000
     BUILD_IN_SOURCE 1
-    CONFIGURE_COMMAND call configure
+    CONFIGURE_COMMAND ${CONFIGURE_CMD}
         ${CONFIGURATIONS}
         -platform ${PLATFORM}
         -prefix ${CMAKE_INSTALL_PREFIX}

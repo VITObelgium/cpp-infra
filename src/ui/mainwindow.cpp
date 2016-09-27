@@ -53,15 +53,5 @@ void MainWindow::setupMenuBar()
     menu->addAction(tr("&Quit"), this, &QWidget::close);
 
     mainWindowMenu = menuBar()->addMenu(tr("Main window"));
-
-#ifdef Q_OS_OSX
-    toolBarMenu->addSeparator();
-
-    action = toolBarMenu->addAction(tr("Unified"));
-    action->setCheckable(true);
-    action->setChecked(unifiedTitleAndToolBarOnMac());
-    connect(action, &QAction::toggled, this, &QMainWindow::setUnifiedTitleAndToolBarOnMac);
-#endif
-
 }
 
