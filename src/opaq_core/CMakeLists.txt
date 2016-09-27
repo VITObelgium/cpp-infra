@@ -91,29 +91,26 @@ SET_TARGET_PROPERTIES(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 IF (MSVC)
     # using visual studio we can not mix debug and release libraries
     TARGET_LINK_LIBRARIES(opaqcore
-        ${EXTRA_LIBS}
         debug ${ZLIB_LIBRARY_DEBUG}
         debug ${GZSTREAM_LIBRARY_DEBUG}
-        debug ${HDF5_LIBRARY_DEBUG}
         debug ${TINYXML_LIBRARY_DEBUG}
         debug ${DL_LIBRARY_DEBUG}
 
         optimized ${ZLIB_LIBRARY}
         optimized ${GZSTREAM_LIBRARY}
-        optimized ${HDF5_LIBRARY}
         optimized ${TINYXML_LIBRARY}
         optimized ${DL_LIBRARY}
     )
 ELSE ()
     TARGET_LINK_LIBRARIES(opaqcore
-        ${HDF5_LIBRARY}
         ${TINYXML_LIBRARY}
         ${GZSTREAM_LIBRARY}
         ${ZLIB_LIBRARY}
         ${CMAKE_DL_LIBS}
-        ${EXTRA_LIBS}
     )
 ENDIF ()
+
+TARGET_LINK_LIBRARIES(opaqcore fmt hdf5-static ${EXTRA_LIBS})
 
 ADD_EXECUTABLE(opaq opaq.cpp)
 TARGET_LINK_LIBRARIES(opaq opaqcore)

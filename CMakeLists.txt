@@ -10,9 +10,10 @@ PROJECT(${PACKAGE})
 INCLUDE(GNUInstallDirs)
 
 SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
+SET(CMAKE_CXX_STANDARD 14)
 
 OPTION(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
+OPTION(BUILD_UI "Build the user interface" OFF)
 
 IF (SANITIZE_ADDRESS)
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")

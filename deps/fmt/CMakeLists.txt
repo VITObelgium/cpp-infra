@@ -9,6 +9,8 @@ EXTERNALPROJECT_ADD(${NAME}
     URL https://github.com/fmtlib/${NAME}/releases/download/${VERSION}/${PACKAGE}.zip TIMEOUT 180
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
+               -DFMT_TEST=OFF
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
+               ${POSTFIX_CONFIG}
 )

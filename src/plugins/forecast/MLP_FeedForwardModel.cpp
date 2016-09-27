@@ -164,19 +164,19 @@ void MLP_FeedForwardModel::run()
  */
 double MLP_FeedForwardModel::mean_missing(const std::vector<double>& list, double noData)
 {
-    double out      = 0;
-    int noDataCount = 0;
-    auto it         = list.begin();
+    double out    = 0;
+    int dataCount = 0;
 
-    while (it != list.end())
+    for (auto value : list)
     {
-        double value = *it++;
         if (value != noData)
+        {
             out += value;
-        else
-            noDataCount++;
+            ++dataCount;
+        }
     }
-    return list.size() - noDataCount > 0 ? out / (list.size() - noDataCount) : noData;
+
+    return dataCount > 0 ? out / dataCount : noData;
 }
 
 /**

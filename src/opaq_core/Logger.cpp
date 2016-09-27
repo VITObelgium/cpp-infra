@@ -38,7 +38,7 @@ void Log::initConsoleLogger()
     _config = std::make_unique<LogConfiguration>();
     _config->sinks.push_back(sink);
     _config->pattern = "[%l] [%n] %v";
-    _config->level = spdlog::level::trace;
+    _config->level = spdlog::level::info;
 }
 
 void Log::initFileLogger(const std::string& filename)
