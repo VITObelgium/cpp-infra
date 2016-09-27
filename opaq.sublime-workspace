@@ -1,0 +1,339 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"CMAKE_CURREN",
+				"CMAKE_CURRENT_SOURCE_DIR"
+			],
+			[
+				"CMAKE_CU",
+				"CMAKE_CURRENT_SOURCE_DIR"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 354.0,
+		"last_filter": "wor",
+		"selected_items":
+		[
+			[
+				"wor",
+				"Word Wrap: Toggle"
+			],
+			[
+				"html",
+				"HTMLPrettify"
+			],
+			[
+				"format",
+				"Clang Format: Format Selection"
+			],
+			[
+				"settings",
+				"Preferences: Settings"
+			],
+			[
+				"clang",
+				"Clang Format: Set Path"
+			],
+			[
+				"rename",
+				"File: Rename"
+			],
+			[
+				"lo",
+				"Convert Case: Lower Case"
+			],
+			[
+				"lowe",
+				"Convert Case: Lower Case"
+			],
+			[
+				"upp",
+				"Convert Case: Upper Case"
+			],
+			[
+				"upper",
+				"Convert Case: Upper Case"
+			],
+			[
+				"new f",
+				"File: New File Relative to Current View"
+			],
+			[
+				"install pa",
+				"Package Control: Install Package"
+			],
+			[
+				"depe",
+				"Package Control: Satisfy Dependencies"
+			]
+		],
+		"width": 598.0
+	},
+	"console":
+	{
+		"height": 218.0,
+		"history":
+		[
+			"import urllib.request,os,hashlib; h = '2915d1851351e5ee549c20394736b442' + '8bc59f460fa1548d1514676163dafc88'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/C/Work/opaq"
+	],
+	"file_history":
+	[
+		"/C/Work/opaq/m4/ax_check_eigen.m4",
+		"/C/Work/opaq/build.bat",
+		"/C/Work/opaq/build/local/lib/pkgconfig/spdlog.pc",
+		"/C/Work/opaq/deps/zlib/CMakeLists.txt",
+		"/C/Work/opaq/deps/wingetopt/CMakeLists.txt",
+		"/C/Work/opaq/deps/tinyxml2/CMakeLists.txt",
+		"/C/Work/opaq/deps/tinyxml/CMakeLists.txt",
+		"/C/Work/opaq/deps/spdlog/CMakeLists.txt",
+		"/C/Work/opaq/deps/hdf5/CMakeLists.txt",
+		"/C/Work/opaq/deps/gzstream/CMakeLists.txt",
+		"/C/Work/opaq/deps/fmt/CMakeLists.txt",
+		"/C/Work/opaq/deps/eigen/CMakeLists.txt",
+		"/C/Work/opaq/deps/CMakeLists.txt",
+		"/C/Work/opaq/deps/dlfcn/CMakeLists.txt",
+		"/C/Work/opaq/build/deps/CMakeCache.txt",
+		"/C/Work/opaq/build/deps/local/lib/pkgconfig/spdlog.pc",
+		"/C/Users/VDBOERD/AppData/Roaming/Sublime Text 3/Packages/HTML-CSS-JS Prettify/HTMLPrettify.sublime-settings",
+		"/C/Work/opaq/build/opaq/CMakeCache.txt",
+		"/C/Work/opaq/src/CMakeLists.txt",
+		"/C/Work/opaq/src/opaq_core/CMakeLists.txt",
+		"/C/Work/opaq/bootstrap.bat",
+		"/C/Work/opaq/build/deps/hdf5/hdf5-prefix/src/hdf5/c++/src/CMakeLists.txt",
+		"/C/Work/opaq/build/deps/hdf5/hdf5-prefix/src/hdf5/CMakeLists.txt",
+		"/C/Work/opaq/build/deps/hdf5/hdf5-prefix/src/hdf5/c++/CMakeLists.txt",
+		"/C/Work/opaq-0.4-ircel-2015a/etc/ircel_plugins.xml",
+		"/C/Work/opaq/src/plugins/forecast/CMakeLists.txt",
+		"/C/Work/opaq/build/deps/local/lib/libhdf5.settings",
+		"/C/Work/opaq-0.4-ircel-2015a/opaq-config-6UT.xml",
+		"/C/Work/CableConfig.h.in",
+		"/C/Work/opaq-0.4-ircel-2015a/log.opaq.6UT",
+		"/C/Work/opaq/src/plugins/data/CMakeLists.txt",
+		"/C/Work/opaq/CMakeLists.txt",
+		"/C/Work/opaq/src/plugins/CMakeLists.txt",
+		"/C/Work/opaq/build/opaq/Release/run.bat",
+		"/C/Work/opaq/config.h.in",
+		"/C/Work/opaq/deps/tinyxml/patch/CMakeLists.txt",
+		"/C/Users/VDBOERD/Downloads/tinyxml/tinyxml.h",
+		"/C/Work/opaq/build/opaq/Release/opaq-0.4-ircel-2015a/run_opaq.sh",
+		"/C/Work/opaq/src/opaq_core/Math.h",
+		"/C/Work/opaq/build/opaq/CMakeFiles/CMakeOutput.log",
+		"/C/Users/VDBOERD/Downloads/eigen-eigen-dc6cfdf9bcec/CMakeLists.txt",
+		"/C/Work/opaq/deps/gzstream/patch/CMakeLists.txt",
+		"/C/Users/VDBOERD/Downloads/spdlog-0.11.0/CMakeLists.txt",
+		"/C/Work/opaq/build/deps/gzstream/gzstream-prefix/src/gzstream-build/CMakeCache.txt",
+		"/C/msys64/home/VDBOERD/opaq/src/depend/hdf5/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/src/depend/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/deps/tinyxml2/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/build/deps/tinyxml2/tinyxml2-prefix/src/tinyxml2/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/deps/gzstream/patch/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/deps/hdf5/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/build/deps/hdf5/hdf5-prefix/src/hdf5/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/src/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/deps/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/deps/gzstream/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/build/deps/gzstream/gzstream-prefix/src/gzstream/README",
+		"/C/msys64/home/VDBOERD/opaq/deps/gzstream/CMakeLists.patch",
+		"/C/msys64/home/VDBOERD/opaq/build/deps/gzstream/gzstream-prefix/src/gzstream/gzstream.C",
+		"/C/msys64/home/VDBOERD/opaq/build/deps/gzstream/gzstream-prefix/src/gzstream/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/build/deps/gzstream/gzstream-prefix/src/gzstream/Makefile",
+		"/C/msys64/home/VDBOERD/opaq/build/config.log",
+		"/C/msys64/home/VDBOERD/opaq/configure.ac",
+		"/C/msys64/home/VDBOERD/opaq/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/Logger.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/data/GridProvider.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/data/ForecastBuffer.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/data/MeteoProvider.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/data/ForecastOutputWriter.h",
+		"/C/msys64/home/VDBOERD/opaq/src/depend/hdf5-1.10.0-patch1/c++/CMakeLists.txt",
+		"/C/Users/VDBOERD/Downloads/hdf5-1.10.0-patch1/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/src/plugins/mapping/src/SpatialCorrelator.cpp",
+		"/C/msys64/home/VDBOERD/tmp/apache-log4cxx-0.10.0/src/main/cpp/Makefile.am",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/ConfigurationHandler.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/opaq.cpp",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/AQNetworkProvider.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/Pollutant.cpp",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/Engine.h",
+		"/C/msys64/home/VDBOERD/opaq/src/opaq_core/data/DataProvider.h",
+		"/C/msys64/home/VDBOERD/opaq/src/depend/hdf5-1.10.0-patch1/c++/src/h5c++.in",
+		"/C/msys64/home/VDBOERD/tmp/apache-log4cxx-0.10.0/src/main/include/log4cxx/Makefile.am",
+		"/C/msys64/home/VDBOERD/tmp/apache-log4cxx-0.10.0/src/main/include/Makefile.am",
+		"/C/msys64/home/VDBOERD/tmp/apache-log4cxx-0.10.0/src/main/Makefile.am",
+		"/C/msys64/home/VDBOERD/opaq/src/depend/TinyXML-2.6.2/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/build/ninja/CMakeFiles/CMakeOutput.log",
+		"/C/msys64/home/VDBOERD/opaq/src/depend/gzstream-1.5/CMakeLists.txt",
+		"/C/msys64/home/VDBOERD/opaq/build/ninja/CMakeCache.txt",
+		"/C/Users/VDBOERD/AppData/Roaming/Sublime Text 3/Packages/User/Preferences.sublime-settings",
+		"/C/Users/VDBOERD/AppData/Roaming/Sublime Text 3/Packages/Default/Preferences.sublime-settings"
+	],
+	"find":
+	{
+		"height": 26.0
+	},
+	"find_in_files":
+	{
+		"height": 158.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"PDB",
+			"local",
+			"forecas",
+			"if",
+			"optimized",
+			"HDF5_CPP_LIB_TARGET",
+			"_D",
+			"SHARED_LIBS",
+			".so",
+			" \\",
+			"opaq_core/",
+			"local",
+			"values",
+			"LOGGER_DEC",
+			"<data/",
+			"<Config",
+			"<config",
+			"Eigen",
+			"eigen",
+			"libffmpegthumbnailer",
+			"CONFIG",
+			"AC_CONFIG_FIL"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 26.0
+	},
+	"input":
+	{
+		"height": 62.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"pinned_build_system": "",
+	"project": "opaq.sublime-project",
+	"replace":
+	{
+		"height": 48.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 335.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}
