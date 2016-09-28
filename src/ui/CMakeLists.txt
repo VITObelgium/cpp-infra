@@ -22,9 +22,18 @@ ELSE ()
     FIND_LIBRARY(PNG_LIBRARY NAMES qtpng)
 ENDIF ()
 
+INCLUDE_DIRECTORIES(
+    ${CMAKE_CURRENT_BINARY_DIR}
+)
+
+QT5_WRAP_UI(OPAQ_FORMS_HEADERS runsimulationdialog.ui)
+
 ADD_EXECUTABLE(opaqui
     main.cpp
     mainwindow.h mainwindow.cpp
+    runsimulationdialog.h runsimulationdialog.cpp
+    predictionresultsmodel.h predictionresultsmodel.cpp
+    ${OPAQ_FORMS_HEADERS}
 )
 
 IF (WIN32)

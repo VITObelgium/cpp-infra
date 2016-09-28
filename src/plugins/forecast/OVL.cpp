@@ -242,23 +242,23 @@ void OVL::run() {
 			// get the correct model plugin, we don't have to destroy it as there is only one instance of each component,
 			// configuration via the setters...
             assert(_componentMgr);
-			MLP_FeedForwardModel *model = _componentMgr->getComponent<MLP_FeedForwardModel>( cf->model_name );
+			auto& model = _componentMgr->getComponent<MLP_FeedForwardModel>( cf->model_name );
 
 			// set ins and outs for the model here...
 			// this is in fact a small engine...
-			model->setBaseTime(baseTime);
-			model->setPollutant( pol );
-			model->setAQNetworkProvider( getAQNetworkProvider() );
-			model->setForecastHorizon( getForecastHorizon() );
-			model->setInputProvider( getInputProvider() );
-			model->setMeteoProvider( getMeteoProvider() );
-			model->setBuffer( getBuffer() );
+			model.setBaseTime(baseTime);
+			model.setPollutant( pol );
+			model.setAQNetworkProvider( getAQNetworkProvider() );
+			model.setForecastHorizon( getForecastHorizon() );
+			model.setInputProvider( getInputProvider() );
+			model.setMeteoProvider( getMeteoProvider() );
+			model.setBuffer( getBuffer() );
 
 			// run the model
-			double out = model->fcValue( pol, *station, aggr, baseTime, fcHor );
+			double out = model.fcValue( pol, *station, aggr, baseTime, fcHor );
 
 			if ( debug_output ) {
-				fs << "\t\tNN MODEL    : " << model->getName() << std::endl;
+				fs << "\t\tNN MODEL    : " << model.getName() << std::endl;
 				fs << "\t\tNN FORECAST : " << out << std::endl;
 				fs << "\t\tRTC MODE    : " << cf->rtc_mode << std::endl;
 			}
@@ -270,13 +270,13 @@ void OVL::run() {
 				OPAQ::TimeSeries<double> raw_fc;
 				raw_fc.clear();
 				raw_fc.insert(fcTime,out);
-				buffer->setCurrentModel( model->getName() );
+				buffer->setCurrentModel( model.getName() );
 				buffer->setValues( baseTime, raw_fc, station->getName(), pol.getName(), aggr );
 			}
 
 			// now handle the RTC, if the mode is larger than 0, otherwise we already have out output !!!
 			// only to this if the output value of the model is not missing...
-			if ( cf->rtc_mode > 0 && fabs( out - model->getNoData() ) > 1.e-6 ) {
+			if ( cf->rtc_mode > 0 && fabs( out - model.getNoData() ) > 1.e-6 ) {
 
 				if ( debug_output ) {
 					fs << "\t\tRTC PARAM   : " << cf->rtc_param << std::endl;
@@ -286,7 +286,7 @@ void OVL::run() {
 				OPAQ::DateTime t1 = baseTime - hindcast;
 				OPAQ::DateTime t2 = baseTime - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
 
-				buffer->setCurrentModel( model->getName() );
+				buffer->setCurrentModel( model.getName() );
 				OPAQ::TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), aggr );
 
 				if ( debug_output ) {

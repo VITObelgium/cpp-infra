@@ -12,9 +12,11 @@
     Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 #endif
 
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     //Q_INIT_RESOURCE(application);
+
+    Log::initLogger("");
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");
@@ -28,9 +30,10 @@ int main(int argc, char *argv[])
     // parser.addPositionalArgument("file", "The file to open.");
     // parser.process(app);
 
-    MainWindow mainWin;
+    OPAQ::MainWindow mainWin;
     // if (!parser.positionalArguments().isEmpty())
     //     mainWin.loadFile(parser.positionalArguments().first());
+    mainWin.setFixedSize(640, 480);
     mainWin.show();
     return app.exec();
 }

@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
     {
         ch.parseConfigurationFile(config_file, pollutantMgr);
     }
-    catch (std::exception& e)
+    catch (const std::exception& e)
     {
         std::cerr << e.what() << std::endl;
         exit(EXIT_FAILURE);
@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
     // 1. pollutant
 
     //TODO do not run for a single pollutant, but for all --> accomodate multi-pollutant models, or alternatively call in a loop
-    if (pol.size() > 0)
+    if (!pol.empty())
         ch.getOpaqRun().setPollutantName(pol, aggr);
     else
         pol = ch.getOpaqRun().getPollutantName();
@@ -162,7 +162,7 @@ int main(int argc, char* argv[])
     logger->info("Requested aggregation ..... : " + OPAQ::Aggregation::getName(ch.getOpaqRun().getAggregation()));
 
     // 2. base times
-    if (basetime.size() > 0)
+    if (!basetime.empty())
     {
         auto& basetimes = ch.getOpaqRun().getBaseTimes();
         basetimes.clear();

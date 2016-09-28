@@ -75,9 +75,9 @@ public:
 
     // throws ComponentNotFoundException
     template <typename T>
-    T* getComponent(const std::string& componentName)
+    T& getComponent(const std::string& componentName)
     {
-        return dynamic_cast<T*>(&findComponent(componentName));
+        return dynamic_cast<T&>(findComponent(componentName));
     }
 
     void destroyComponent(const std::string& componentName);

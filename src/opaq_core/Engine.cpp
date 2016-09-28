@@ -27,8 +27,8 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     TimeInterval forecastHorizon = cnf->getHorizon();
 
     // Get observation data provider
-    auto* obs = _componentMgr.getComponent<DataProvider>(cnf->getValues()->getName());
-    obs->setAQNetworkProvider(net);
+    auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getValues()->getName());
+    obs.setAQNetworkProvider(net);
 
     // Get meteo data provider (can be missing)
     MeteoProvider* meteo = nullptr;
@@ -36,7 +36,7 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     {
         Config::Component* component = cnf->getMeteo();
         std::string name             = component->getName();
-        meteo                        = _componentMgr.getComponent<MeteoProvider>(name);
+        meteo                        = &_componentMgr.getComponent<MeteoProvider>(name);
         meteo->setBaseTime(baseTime);
     }
     catch (const NullPointerException&)
@@ -44,36 +44,36 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     }
 
     // Get data buffer (can't be missing)
-    auto* buffer = _componentMgr.getComponent<ForecastBuffer>(cnf->getBuffer()->getName());
-    buffer->setAQNetworkProvider(net);
+    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(cnf->getBuffer()->getName());
+    buffer.setAQNetworkProvider(net);
 
     // Get the forecast models to run
     for (auto* modelConfig : cnf->getModels())
     {
-        auto* model = _componentMgr.getComponent<Model>(modelConfig->getName());
+        auto& model = _componentMgr.getComponent<Model>(modelConfig->getName());
 
         // set ins and outs for the model
-        model->setBaseTime(baseTime);
-        model->setPollutant(*pol);
-        model->setAggregation(aggr);
-        model->setAQNetworkProvider(net);
-        model->setForecastHorizon(forecastHorizon);
-        model->setInputProvider(obs);
-        model->setMeteoProvider(meteo);
-        model->setBuffer(buffer);
+        model.setBaseTime(baseTime);
+        model.setPollutant(*pol);
+        model.setAggregation(aggr);
+        model.setAQNetworkProvider(net);
+        model.setForecastHorizon(forecastHorizon);
+        model.setInputProvider(&obs);
+        model.setMeteoProvider(meteo);
+        model.setBuffer(&buffer);
 
         // Run the model up till the requested forecast horizon, the loop over the forecast horizons has to be
         // in the model as probably some models (AR) use info of previous days...
-        _logger->info("Running {}", model->getName());
-        model->run();
+        _logger->info("Running {}", model.getName());
+        model.run();
     }
 
     // Prepare and run the forecast output writer for this basetime & pollutant
-    auto* outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf->getOutputWriter()->getName());
-    outWriter->setAQNetworkProvider(net);
-    outWriter->setBuffer(buffer);
-    outWriter->setForecastHorizon(forecastHorizon);
-    outWriter->write(pol, aggr, baseTime);
+    auto& outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf->getOutputWriter()->getName());
+    outWriter.setAQNetworkProvider(net);
+    outWriter.setBuffer(&buffer);
+    outWriter.setForecastHorizon(forecastHorizon);
+    outWriter.write(pol, aggr, baseTime);
 }
 
 /* =============================================================================
@@ -101,15 +101,15 @@ void Engine::run(Config::OpaqRun& config)
 
     // Get air quality network provider
     auto name                            = config.getNetworkProvider()->getName();
-    AQNetworkProvider* aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
-    _logger->info("Using AQ network provider {}", aqNetworkProvider->getName());
+    AQNetworkProvider& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
+    _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
     GridProvider* gridProvider;
     Config::Component* gridProviderDef = config.getGridProvider();
     if (gridProviderDef != nullptr) {
         name         = config.getGridProvider()->getName();
-        gridProvider = _componentMgr.getComponent<GridProvider>(name);
+        gridProvider = &_componentMgr.getComponent<GridProvider>(name);
         _logger->info("Using grid provider {}", name);
     }
 
@@ -120,25 +120,16 @@ void Engine::run(Config::OpaqRun& config)
     OPAQ::TimeInterval fcHorMax = forecastStage->getHorizon();
 
     _logger->info("Starting OPAQ workflow...");
-    if (forecastStage) {
-
+    if (forecastStage)
+    {
         for (auto& baseTime : baseTimes)
         {
             // A log message
             _logger->info("Forecast stage for " + baseTime.dateToString());
-            try
-            {
-                runForecastStage(forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
-            }
-            catch (std::exception& e)
-            {
+            runForecastStage(forecastStage, &aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
-                _logger->critical("Unexpected error during forecast stage");
-                _logger->error(e.what());
-                exit(1);
-            }
-
-            if (mappingStage) {
+            if (mappingStage)
+            {
 
                 // a log message
                 _logger->info(">> Mapping forecast " + baseTime.dateToString());
