@@ -39,19 +39,8 @@ ADD_EXECUTABLE(opaqui
 IF (WIN32)
     TARGET_LINK_LIBRARIES(opaqui Qt5::QWindowsIntegrationPlugin imm32 winmm)
 ELSEIF (APPLE)
-    FIND_LIBRARY(OPENGL_LIBRARY OpenGL)
-    FIND_LIBRARY(CUPS_LIBRARY cups)
-    TARGET_LINK_LIBRARIES(opaqui ${OPENGL_LIBRARY})
-
     TARGET_LINK_LIBRARIES(opaqui
         Qt5::QCocoaIntegrationPlugin
-        "-framework CoreFoundation"
-        "-framework CoreGraphics"
-        "-framework CoreText"
-        "-framework Carbon"
-        "-framework AppKit"
-        "-framework IOKit"
-        ${CUPS_LIBRARY}
     )
 ENDIF ()
 
@@ -63,6 +52,7 @@ IF (WIN32)
         debug ${QT_PLATFORMSUPPORT_LIBRARY_DEBUG} optimized ${QT_PLATFORMSUPPORT_LIBRARY}
         debug ${QT_FREETYPE_LIBRARY_DEBUG} optimized ${QT_FREETYPE_LIBRARY}
         debug ${QT_PCRE_LIBRARY_DEBUG} optimized ${QT_PCRE_LIBRARY})
+ELSEIF (APPLE)
 ELSE ()
     TARGET_LINK_LIBRARIES(opaqui ${QT_HARFBUZZ_LIBRARY} ${QT_PCRE_LIBRARY} ${QT_PLATFORMSUPPORT_LIBRARY} ${QT_FREETYPE_LIBRARY} ${PNG_LIBRARY})
 ENDIF ()
