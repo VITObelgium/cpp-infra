@@ -1,13 +1,12 @@
 #include "ForecastOutputWriter.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-ForecastOutputWriter::ForecastOutputWriter() :
-	_net(0),
-	_buf(0) {
-}
-
-ForecastOutputWriter::~ForecastOutputWriter(){
+ForecastOutputWriter::ForecastOutputWriter()
+: _net(nullptr)
+, _buf(nullptr)
+{
 }
 
 } // namespace OPAQ

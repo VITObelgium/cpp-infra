@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 
-#include "Engine.h"
 #include "runsimulationdialog.h"
+#include "AQNetwork.h"
 #include "data/ForecastBuffer.h"
 
 #include <QAction>
@@ -80,6 +80,7 @@ void MainWindow::loadConfiguration()
         // Change the working directory to the config file so the relative paths can be found
         QDir::setCurrent(fileInfo.absoluteDir().path());
         _config.parseConfigurationFile(fileName.toStdString(), _pollutantMgr);
+        _engine.prepareRun(_config.getOpaqRun());
     }
     catch (const std::exception& e)
     {
@@ -127,7 +128,12 @@ void MainWindow::runSimulation()
         {
             _config.validateConfiguration(_pollutantMgr);
             _engine.run(_config.getOpaqRun());
-            _model.updateResults(_engine.componentManager().getComponent<ForecastBuffer>(_config.getOpaqRun().getForecastStage()->getBuffer()->getName()));
+
+            auto& aqNetworkProvider = _engine.componentManager().getComponent<AQNetworkProvider>(_config.getOpaqRun().getNetworkProvider()->name);
+            auto& buffer = _engine.componentManager().getComponent<ForecastBuffer>(_config.getOpaqRun().getForecastStage()->getBuffer().name);
+            auto forecastHorizon = _config.getOpaqRun().getForecastStage()->getHorizon();
+            
+            _model.updateResults(buffer, dialog.basetime(), aqNetworkProvider.getAQNetwork()->getStations(), forecastHorizon, dialog.pollutant(), dialog.aggregation());
         }
         catch (const std::exception& e)
         {

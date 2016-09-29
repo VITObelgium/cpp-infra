@@ -1,5 +1,4 @@
-#ifndef __POLLUTANTMANAGER_H
-#define __POLLUTANTMANAGER_H
+#pragma once
 
 #include "Logger.h"
 #include "Pollutant.h"
@@ -17,6 +16,8 @@ class PollutantManager
 {
 public:
     PollutantManager();
+    PollutantManager(const PollutantManager&) = delete;
+    void operator=(const PollutantManager&) = delete;
 
     /**
       Output streamer for the pollutant manager
@@ -28,7 +29,7 @@ public:
 
     /** Returns a reference to the list of the available pollutants
        */
-    std::vector<OPAQ::Pollutant>& getList() { return pollutants; }
+    std::vector<OPAQ::Pollutant>& getList() { return _pollutants; }
 
     /** Searches for a pollutant of given name and returns a pointer to the pollutant object */
     OPAQ::Pollutant* find(const std::string& name);
@@ -41,16 +42,11 @@ public:
     void configure(TiXmlElement const* config);
 
 private:
-    PollutantManager(PollutantManager const&); // no implementation of copy constructor for singleton
-    void operator=(PollutantManager const&);   // no implementation of copy constructor for singleton
-
     // list of the available pollutants
-    std::vector<OPAQ::Pollutant> pollutants; //!< list of available pollutants
-    Logger logger;
+    std::vector<OPAQ::Pollutant> _pollutants; //!< list of available pollutants
+    Logger _logger;
 };
 
-} /* namespace Config */
+}
+}
 
-} /* namespace OPAQ */
-
-#endif /* #ifndef __POLLUTANTMANAGER_H */

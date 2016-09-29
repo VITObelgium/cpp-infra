@@ -5,12 +5,7 @@
  *      Author: vlooys
  */
 
-#ifndef OPAQ_OPAQRUN_H
-#define OPAQ_OPAQRUN_H
-
-#include <string>
-#include <tinyxml.h>
-#include <vector>
+#pragma once
 
 #include "../Aggregation.h"
 #include "../DateTime.h"
@@ -20,6 +15,10 @@
 #include "ForecastStage.h"
 #include "MappingStage.h"
 #include "Plugin.h"
+
+#include <string>
+#include <tinyxml.h>
+#include <vector>
 
 namespace OPAQ
 {
@@ -38,39 +37,43 @@ class OpaqRun
 public:
     OpaqRun();
 
-    /** Returns a list of available plugins */
-    std::vector<OPAQ::Config::Plugin>& getPlugins() { return plugins; }
+    void clear();
 
-    /** Returns a list of available components */
-    std::vector<OPAQ::Config::Component>& getComponents() { return components; }
+    void addPlugin(const Plugin& plugin);
+    void addComponent(const Component& component);
+
+    Plugin getPlugin(const std::string& pluginName);
+    Component& getComponent(const std::string& componentName);
+
+    std::vector<Plugin> getPlugins();
+    std::vector<Component> getComponents();
 
     /** Returns the pollutant name requested for this run */
-    std::string getPollutantName() const { return pollutantName; }
-    bool pollutantIsSet() { return pollutantSet; }
+    std::string getPollutantName() const { return _pollutantName; }
+    bool pollutantIsSet() { return !_pollutantName.empty(); }
 
     /** Returns the aggreagation requested for this run */
-    OPAQ::Aggregation::Type getAggregation() const { return aggregation; }
+    Aggregation::Type getAggregation() const { return _aggregation; }
 
     /** Returns a list of basetimes */
-    std::vector<OPAQ::DateTime>& getBaseTimes() { return baseTimes; }
+    std::vector<DateTime>& getBaseTimes() { return _baseTimes; }
 
     /** Returns the nework provider */
-    OPAQ::Config::Component* getNetworkProvider() const { return networkProvider; }
+    Component* getNetworkProvider() const { return _networkProvider.get(); }
     /** Returns the grid provider */
-    OPAQ::Config::Component* getGridProvider() const { return gridProvider; }
+    Component* getGridProvider() const { return _gridProvider.get(); }
 
     /** Retrieve the forecast configuration object */
-    OPAQ::Config::ForecastStage* getForecastStage() const { return forecastStage.get(); }
+    ForecastStage* getForecastStage() const { return _forecastStage.get(); }
 
     /** Retrieve the mapping stage object */
-    OPAQ::Config::MappingStage* getMappingStage() const { return mappingStage.get(); }
+    MappingStage* getMappingStage() const { return _mappingStage.get(); }
 
     /** Set the requested pollutant & aggregation for this run */
     void setPollutantName(const std::string& name, const std::string& aggr = "")
     {
-        pollutantName = name;
-        aggregation   = Aggregation::fromString(aggr);
-        pollutantSet  = true;
+        _pollutantName = name;
+        _aggregation   = Aggregation::fromString(aggr);
     }
 
     /**
@@ -78,48 +81,46 @@ public:
        */
     void setAggregation(const std::string& aggr)
     {
-        aggregation = Aggregation::fromString(aggr);
+        _aggregation = Aggregation::fromString(aggr);
     }
 
     /**
       * Set the network provider from the component configuration
-      * \param component a pointer to a OPAQ::Config::Component object which is defined in the
-      *                  master XML configuration file
+      * \param component a Config::Component object which is defined in the master XML configuration file
       */
-    void setNetworkProvider(Component* component) { this->networkProvider = component; }
+    void setNetworkProvider(const Component& component) { _networkProvider = std::make_unique<Component>(component); }
+    void resetNetworkProvider() { _networkProvider.reset(); }
+    
     /** Set the grid provider from the component configuration
-      * \param component a pointer to a OPAQ::Config::Component object which is defined in the
-      *                  master XML configuration file
+      * \param component a Config::Component object which is defined in the master XML configuration file
       */
-    void setGridProvider(Component* component) { this->gridProvider = component; }
+    void setGridProvider(const Component& component) { _gridProvider = std::make_unique<Component>(component); }
+    void resetGridProvider() { _gridProvider.reset(); }
+
 
     /** Set the forecast stage */
-    void setForecastStage(ForecastStage* forecastStage) { this->forecastStage.reset(forecastStage); }
+    void setForecastStage(ForecastStage* forecastStage) { _forecastStage.reset(forecastStage); }
 
     /** Set the mapping stage */
-    void setMappingStage(MappingStage* mappingStage) { this->mappingStage.reset(mappingStage); }
+    void setMappingStage(MappingStage* mappingStage) { _mappingStage.reset(mappingStage); }
 
 private:
-    Logger logger;
+    Logger _logger;
 
-    std::vector<Plugin> plugins;       //!< list of available plugins
-    std::vector<Component> components; //!< list of available components
+    std::vector<Plugin> _plugins;
+    std::vector<Component> _components;
 
-    std::string pollutantName;     //!< requested name of the pollutant
-    bool pollutantSet;             //!< do we have the pollutant set in the run (also checks the aggreagtion)
-    Aggregation::Type aggregation; //!< the aggregation for the run
+    std::string _pollutantName;
+    Aggregation::Type _aggregation;
 
-    std::vector<DateTime> baseTimes; //!< list of basetimes to process in this run
+    std::vector<DateTime> _baseTimes;
 
-    Component* networkProvider; //!< the network provider
-    Component* gridProvider;    //!< the grid provider
+    std::unique_ptr<Component> _networkProvider;
+    std::unique_ptr<Component> _gridProvider;
 
-    std::unique_ptr<ForecastStage> forecastStage; //!< this defines the forecast configuration in the OPAQ run
-    std::unique_ptr<MappingStage> mappingStage;   //!< this defines the mapping configuration in the OPAQ run
+    std::unique_ptr<ForecastStage> _forecastStage;
+    std::unique_ptr<MappingStage> _mappingStage;
 };
 
-} /* namespace Config */
-
-} /* namespace OPAQ */
-
-#endif /* OPAQ_OPAQRUN_H */
+}
+}

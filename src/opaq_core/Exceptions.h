@@ -5,8 +5,7 @@
  *      Author: vlooys
  */
 
-#ifndef EXCEPTIONS_H_
-#define EXCEPTIONS_H_
+#pragma once
 
 #include <fmt/format.h>
 #include <string>
@@ -45,7 +44,6 @@ EXCEPTION(ComponentAlreadyExistsException);
 EXCEPTION(ComponentNotFoundException);
 EXCEPTION(FailedToLoadPluginException);
 EXCEPTION(PluginNotFoundException);
-EXCEPTION(PluginAlreadyLoadedException);
 
 EXCEPTION(IOException)
 EXCEPTION(NullPointerException);
@@ -58,8 +56,5 @@ EXCEPTION(ElementNotFoundException);
 
 EXCEPTION(RunTimeException)
 
-EXCEPTION(OutOfBoundsException)
+}
 
-} /* namespace opaq */
-
-#endif /* EXCEPTIONS_H_ */

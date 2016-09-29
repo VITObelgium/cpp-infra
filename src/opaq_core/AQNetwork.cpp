@@ -1,23 +1,17 @@
 #include "AQNetwork.h"
 
-namespace OPAQ {
+#include <algorithm>
 
-  AQNetwork::AQNetwork(){
-  }
+namespace OPAQ
+{
 
-  AQNetwork::~AQNetwork(){
-  }
+Station* AQNetwork::findStation(const std::string& name)
+{
+    auto iter = std::find_if(_stations.begin(), _stations.end(), [&name](Station* station) {
+        return station->getName() == name;
+    });
 
-
-  Station * AQNetwork::findStation( std::string name ) {
-
-    for ( std::vector<Station *>::iterator it = stations.begin(); 
-	  it != stations.end(); 
-	  ++it ) {
-      if ( (*it)->getName() == name ) return (*it);
-    }
-
-    return NULL;
-  }
+    return iter == _stations.end() ? nullptr : *iter;
+}
 
 }

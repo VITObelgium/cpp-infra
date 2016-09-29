@@ -7,19 +7,19 @@ namespace Config
 {
 
 PollutantManager::PollutantManager()
-: logger("OPAQ::Config::PollutantManager")
+: _logger("OPAQ::Config::PollutantManager")
 {
 }
 
 OPAQ::Pollutant* PollutantManager::find(const std::string& name)
 {
-    auto iter = std::find_if(pollutants.begin(), pollutants.end(), [&name] (auto& pollutant) {
+    auto iter = std::find_if(_pollutants.begin(), _pollutants.end(), [&name] (auto& pollutant) {
         return pollutant.getName() == name;
     });
 
-    if (iter == pollutants.end())
+    if (iter == _pollutants.end())
     {
-        logger->warn("Pollutant with name '{}' not found.", name);
+        _logger->warn("Pollutant with name '{}' not found.", name);
         return nullptr;
     }
 
@@ -28,19 +28,19 @@ OPAQ::Pollutant* PollutantManager::find(const std::string& name)
 
 void PollutantManager::configure(TiXmlElement const* config)
 {
-    pollutants.clear();
+    _pollutants.clear();
     const TiXmlElement* pollutantElement = config->FirstChildElement("pollutant");
     while (pollutantElement)
     {
         OPAQ::Pollutant pol(pollutantElement);
-        pollutants.push_back(pol);
+        _pollutants.push_back(pol);
         pollutantElement = pollutantElement->NextSiblingElement("pollutant");
     }
 }
 
 std::ostream& operator<<(std::ostream& os, const PollutantManager& s)
 {
-    for (auto& pol : s.pollutants)
+    for (auto& pol : s._pollutants)
     {
         os << pol << std::endl;
     }

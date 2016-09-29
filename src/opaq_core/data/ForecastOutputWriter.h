@@ -4,44 +4,43 @@
  * Bino Maiheu
  */
 
-#ifndef OPAQ_FORECASTOUTPUTWRITER_H_
-#define OPAQ_FORECASTOUTPUTWRITER_H_
+#pragma once
 
 #include <string>
 
-#include "ForecastBuffer.h"
-#include "../Component.h"
 #include "../AQNetworkProvider.h"
-#include "../DateTime.h"
 #include "../Aggregation.h"
+#include "../Component.h"
+#include "../DateTime.h"
+#include "ForecastBuffer.h"
 
+namespace OPAQ
+{
 
-namespace OPAQ {
+class Pollutant;
 
-  class ForecastOutputWriter : public OPAQ::Component {
+class ForecastOutputWriter : public Component
+{
 
-  public:
+public:
     ForecastOutputWriter();
-    virtual  ~ForecastOutputWriter();
 
-    virtual void write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr, const DateTime &baseTime ) = 0;
+    virtual void write(Pollutant* pol, Aggregation::Type aggr, const DateTime& baseTime) = 0;
 
     // some setters
-    void setAQNetworkProvider( AQNetworkProvider *n ) { _net = n; }
-    void setBuffer( ForecastBuffer *buf ) { _buf = buf; }
-    void setForecastHorizon( const OPAQ::TimeInterval& fc ) { _fcHor = fc; }
+    void setAQNetworkProvider(AQNetworkProvider* n) { _net = n; }
+    void setBuffer(ForecastBuffer* buf) { _buf = buf; }
+    void setForecastHorizon(const TimeInterval& fc) { _fcHor = fc; }
 
-  protected:
-    ForecastBuffer*           getBuffer( void ) { return _buf; }
-    OPAQ::AQNetworkProvider*  getAQNetworkProvider( void ) { return _net; }
-    const OPAQ::TimeInterval& getForecastHorizon( void ) { return _fcHor; }
+protected:
+    ForecastBuffer* getBuffer(void) { return _buf; }
+    AQNetworkProvider* getAQNetworkProvider(void) { return _net; }
+    const TimeInterval& getForecastHorizon(void) { return _fcHor; }
 
-  private:
-    OPAQ::AQNetworkProvider  *_net;
-    OPAQ::ForecastBuffer     *_buf;
-    OPAQ::TimeInterval        _fcHor;
-  };
+private:
+    AQNetworkProvider* _net;
+    ForecastBuffer* _buf;
+    TimeInterval _fcHor;
+};
 
-} // namespace OPAQ
-
-#endif /* OPAQ_FORECASTOUTPUTWRITER_H_ */
+}

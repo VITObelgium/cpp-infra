@@ -5,99 +5,105 @@
  *      Author: bino.maiheu@vito.be
  */
 
-#ifndef OPAQ_CONFIG_FORECAST_H
-#define OPAQ_CONFIG_FORECAST_H
+#pragma once
 
 #include <string>
-#include <tinyxml.h>
 #include <vector>
 
-#include "Component.h"
 #include "../Exceptions.h"
+#include "../Tools/ExceptionTools.h"
 #include "../TimeInterval.h"
+#include "Component.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
+namespace Config
+{
 
-namespace Config {
-
-  /**
+/**
    * Forecast configuration class
    */
-class ForecastStage {
+class ForecastStage
+{
 public:
-  ForecastStage();
-  virtual ~ForecastStage(); 
+    ForecastStage();
 
-  /**
+    /**
    *  Returns the dataprovider for the observed concentration values
    *  Throws OPAQ::NullPointerException
    */
-  OPAQ::Config::Component* getValues() const {
-    if (values == NULL) throw OPAQ::NullPointerException();
-    return values;
-  }
-  void setValues(OPAQ::Config::Component* values) {
-    this->values = values;
-  }
-  
-  // Throws OPAQ::NullPointerException
-  OPAQ::Config::Component* getMeteo() const {
-    if (meteo == NULL) throw OPAQ::NullPointerException();
-    return meteo;
-  }
-  void setMeteo(OPAQ::Config::Component* meteo) {
-    this->meteo = meteo;
-  }
-  
-  // Throws OPAQ::NullPointerException
-  OPAQ::Config::Component* getBuffer() const {
-    if (buffer == NULL) throw OPAQ::NullPointerException();
-    return buffer;
-  }
-  void setBuffer(OPAQ::Config::Component* buffer) {
-    this->buffer = buffer;
-  }
+    OPAQ::Config::Component& getValues() const
+    {
+        throwOnNullPtr(_values);
+        return *_values;
+    }
+    
+    void setValues(OPAQ::Config::Component& values)
+    {
+        _values = &values;
+    }
 
-  // Throws OPAQ::NullPointerException
-  OPAQ::Config::Component* getOutputWriter() const {
-    if ( outputWriter == NULL) throw OPAQ::NullPointerException();
-    return outputWriter;
-  }
-  void setOutputWriter(OPAQ::Config::Component* ow ) {
-    this->outputWriter = ow;
-  }
+    // Throws OPAQ::NullPointerException
+    OPAQ::Config::Component& getMeteo() const
+    {
+        throwOnNullPtr(_meteo);
+        return *_meteo;
+    }
+    
+    void setMeteo(OPAQ::Config::Component* meteo)
+    {
+        _meteo = meteo;
+    }
 
-  // returns a list of models used in the forecast...
-  std::vector<OPAQ::Config::Component*> & getModels() { return models; }
+    // Throws OPAQ::NullPointerException
+    OPAQ::Config::Component& getBuffer() const
+    {
+        throwOnNullPtr(_buffer);
+        return *_buffer;
+    }
+    
+    void setBuffer(OPAQ::Config::Component* buffer)
+    {
+        _buffer = buffer;
+    }
 
-  /** Set the requested forecast horizon */
-  void setHorizon( const OPAQ::TimeInterval& f ) { fcHor = f; }
+    // Throws OPAQ::NullPointerException
+    OPAQ::Config::Component& getOutputWriter() const
+    {
+        throwOnNullPtr(_outputWriter);
+        return *_outputWriter;
+    }
 
-  /** Returns the requested (max) forecast horizon for the forecasts */
-  OPAQ::TimeInterval& getHorizon() { return fcHor; }
+    void setOutputWriter(Component* ow)
+    {
+        _outputWriter = ow;
+    }
 
-protected:
+    // returns a list of models used in the forecast...
+    std::vector<Component*>& getModels() { return models; }
 
+    /** Set the requested forecast horizon */
+    void setHorizon(const TimeInterval& f) { _fcHor = f; }
+
+    /** Returns the requested (max) forecast horizon for the forecasts */
+    TimeInterval& getHorizon() { return _fcHor; }
 
 private:
-  // vector of models to run in the forecast
-  std::vector<OPAQ::Config::Component *> models;
+    // vector of models to run in the forecast
+    std::vector<Component*> models;
 
-  // input data provider components
-  OPAQ::Config::Component *values;
-  OPAQ::Config::Component *meteo;
+    // input data provider components
+    Component* _values;
+    Component* _meteo;
 
-  // forecast buffer component
-  OPAQ::Config::Component *buffer;
-  
-  // output writer component
-  OPAQ::Config::Component *outputWriter;
-  
-  OPAQ::TimeInterval   fcHor;           //!< requested max forecast horizon
+    // forecast buffer component
+    Component* _buffer;
+
+    // output writer component
+    Component* _outputWriter;
+
+    TimeInterval _fcHor; //!< requested max forecast horizon
 };
 
-} /* namespace Config */
-
-} /* namespace OPAQ */
-#endif /* OPAQ_STAGE_H */
-
+}
+}

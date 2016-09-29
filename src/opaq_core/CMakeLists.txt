@@ -4,7 +4,6 @@ SET (CORE_SOURCES
     AQNetwork.h
     AQNetwork.cpp
     AQNetworkProvider.h
-    AQNetworkProvider.cpp
     Cell.h
     Cell.cpp
     Component.h
@@ -17,6 +16,7 @@ SET (CORE_SOURCES
     DateTime.cpp
     Engine.h
     Engine.cpp
+    Exceptions.h
     Grid.h
     Grid.cpp
     OpaqDllExports.h
@@ -33,17 +33,16 @@ SET (CORE_SOURCES
     PollutantManager.cpp
     Station.h
     Station.cpp
+    TimeSeries.h
     TimeInterval.h
     TimeInterval.cpp
 )
 
 SET (CORE_CONFIG_SOURCES
     config/Component.h
-    config/Component.cpp
     config/OpaqRun.h
     config/OpaqRun.cpp
     config/Plugin.h
-    config/Plugin.cpp
     config/ForecastStage.h
     config/ForecastStage.cpp
     config/MappingStage.h
@@ -68,6 +67,7 @@ SET (CORE_TOOLS_SOURCES
     tools/AQNetworkTools.cpp
     tools/DateTimeTools.h
     tools/DateTimeTools.cpp
+    tools/ExceptionTools.h
     tools/FileTools.h
     tools/FileTools.cpp
     tools/GzipReader.h

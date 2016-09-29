@@ -48,7 +48,16 @@ class Engine : public IEngine
 {
 public:
     Engine(Config::PollutantManager& pollutantMgr);
-    virtual ~Engine() {}
+    
+    /**
+    * Prepare an opaq run
+    * This method prepares the OPAQ workflow as configured in the configuration
+    * object by
+    * -# loading the plugins
+    * -# instantiating and configuring the components
+    * After you prepare a run, multiple runs can be executed
+    */
+    void prepareRun(Config::OpaqRun& config);
 
     /**
    * The main OPAQ run method given a configuration
@@ -65,6 +74,7 @@ public:
    * executing the
    *      mapping/forecast stages...
    */
+
     void run(Config::OpaqRun& config);
 
     Config::PollutantManager& pollutantManager() override;

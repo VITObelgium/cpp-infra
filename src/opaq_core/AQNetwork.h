@@ -5,39 +5,35 @@
  *      Author: vlooys, maiheub
  */
 
-#ifndef OPAQ_AQNETWORK_H_
-#define OPAQ_AQNETWORK_H_
+#pragma once
 
 #include <string>
 #include <vector>
 
 #include "Station.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-  /**
+/**
      Representation of an Air Quality network
      Essentially nothing more than a list of stations
   */
-  class AQNetwork {
-  public:
-    AQNetwork();
-    virtual ~AQNetwork();
-    
+class AQNetwork
+{
+public:
     /** 
-	Return a reference to the list of stations in the network
+    Return a reference to the list of stations in the network
     */
-    std::vector<Station*> & getStations() {  return stations; }
+    std::vector<Station*>& getStations() { return _stations; }
 
     /**
        Finds the requested station in the network and returns a pointer to it
        The routine compares the given string and the station name
     */
-    Station * findStation( std::string name );
-    
-  private:
-    std::vector<Station *> stations;
-  };
-  
+    Station* findStation(const std::string& name);
+
+private:
+    std::vector<Station*> _stations;
+};
 }
-#endif /* #ifndef OPAQ_AQNETWORK_H_ */

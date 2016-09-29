@@ -26,6 +26,8 @@ const std::string Hdf5Buffer::STATION_DATASET_NAME("stations");
 // set version information for this H5 store plugin
 const std::string Hdf5BufferVersion("0.1");
 
+static const char* s_noData = "n/a";
+
 Hdf5Buffer::Hdf5Buffer()
 : _logger("Hdf5Buffer")
 , _stringType(H5::StrType(0, H5T_VARIABLE))
@@ -254,8 +256,7 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
         H5::DSetCreatPropList cparms2;
         hsize_t chunks2[1] = {5};
         cparms2.setChunk(1, chunks2);
-        std::string noData("n/a");
-        cparms2.setFillValue(_stringType, &noData); // set no data value
+        cparms2.setFillValue(_stringType, &s_noData); // set no data value
 
         dsModels   = grpAggr.createDataSet(MODELS_DATASET_NAME, _stringType, dataSpace2, cparms2);
         dsStations = grpAggr.createDataSet(STATION_DATASET_NAME, _stringType, dataSpace2, cparms2);
@@ -723,7 +724,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, const O
     unsigned int fhIndex = fc_hor.getSeconds() / _fcTimeResolution.getSeconds();
 
 #ifdef DEBUG
-    std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << std::endl;
+    std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << "\n";
 #endif
 
     unsigned int nvals = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
@@ -731,7 +732,9 @@ std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, const O
     // initialize the output array with the number of requested values
     std::vector<double> out(nvals);
     for (unsigned int i = 0; i < nvals; i++)
-        out[i]          = getNoData();
+    {
+        out[i] = getNoData();
+    }
 
     // now get the size of the dataset in the buffer
     hsize_t btSize = Hdf5Tools::getDataSetSize(dsVals, 2);

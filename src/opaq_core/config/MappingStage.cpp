@@ -1,18 +1,15 @@
 #include "MappingStage.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
+namespace Config
+{
 
-  namespace Config {
+MappingStage::MappingStage()
+: _values(nullptr)
+, _meteo(nullptr)
+{
+}
 
-    MappingStage::MappingStage() {
-    	values = NULL;
-    	meteo = NULL;
-    };
-  
-    MappingStage::~MappingStage() {} 
-    
-  }
-
-} /* namespace OPAQ */
-
-
+}
+}

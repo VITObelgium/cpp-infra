@@ -5,6 +5,7 @@
  */
 
 #include "ComponentManager.h"
+#include "Exceptions.h"
 #include "Logger.h"
 #include <dlfcn.h>
 
@@ -23,7 +24,7 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
     FactoryMapType::iterator it = factoryMap.find(pluginName);
     if (it != factoryMap.end())
     {
-        throw PluginAlreadyLoadedException("There already exists a plugin with name {}", pluginName);
+        throw RunTimeException("There already exists a plugin with name {}", pluginName);
     }
 
     // 2. load plugin

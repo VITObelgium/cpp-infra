@@ -46,6 +46,11 @@ INCLUDE_DIRECTORIES(SYSTEM
 
 ADD_DEFINITIONS(-DTIXML_USE_STL -D_XOPEN_SOURCE)
 
+IF (MSVC)
+    # suppress decorated name length exceeded warning
+    ADD_DEFINITIONS(/wd4503)
+ENDIF ()
+
 ADD_SUBDIRECTORY(opaq_core)
 ADD_SUBDIRECTORY(plugins)
 

@@ -1,20 +1,17 @@
 #include "ForecastStage.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
+namespace Config
+{
 
-  namespace Config {
-    
-    ForecastStage::ForecastStage() {
-      values = NULL;
-      meteo  = NULL;
-      buffer = NULL;
-      outputWriter = NULL;
-    };
-    
-    ForecastStage::~ForecastStage() {}	// default implementation
-    
-  }
+ForecastStage::ForecastStage()
+: _values(nullptr)
+, _meteo(nullptr)
+, _buffer(nullptr)
+, _outputWriter(nullptr)
+{
+}
 
-} /* namespace OPAQ */
-
-
+}
+}

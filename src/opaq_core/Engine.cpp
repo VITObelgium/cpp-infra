@@ -27,16 +27,14 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     TimeInterval forecastHorizon = cnf->getHorizon();
 
     // Get observation data provider
-    auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getValues()->getName());
+    auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getValues().name);
     obs.setAQNetworkProvider(net);
 
     // Get meteo data provider (can be missing)
     MeteoProvider* meteo = nullptr;
     try
     {
-        Config::Component* component = cnf->getMeteo();
-        std::string name             = component->getName();
-        meteo                        = &_componentMgr.getComponent<MeteoProvider>(name);
+        meteo = &_componentMgr.getComponent<MeteoProvider>(cnf->getMeteo().name);
         meteo->setBaseTime(baseTime);
     }
     catch (const NullPointerException&)
@@ -44,13 +42,13 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     }
 
     // Get data buffer (can't be missing)
-    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(cnf->getBuffer()->getName());
+    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(cnf->getBuffer().name);
     buffer.setAQNetworkProvider(net);
 
     // Get the forecast models to run
     for (auto* modelConfig : cnf->getModels())
     {
-        auto& model = _componentMgr.getComponent<Model>(modelConfig->getName());
+        auto& model = _componentMgr.getComponent<Model>(modelConfig->name);
 
         // set ins and outs for the model
         model.setBaseTime(baseTime);
@@ -69,7 +67,7 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     }
 
     // Prepare and run the forecast output writer for this basetime & pollutant
-    auto& outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf->getOutputWriter()->getName());
+    auto& outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf->getOutputWriter().name);
     outWriter.setAQNetworkProvider(net);
     outWriter.setBuffer(&buffer);
     outWriter.setForecastHorizon(forecastHorizon);
@@ -79,17 +77,19 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
 /* =============================================================================
    MAIN WORKFLOW OF OPAQ
    ========================================================================== */
-void Engine::run(Config::OpaqRun& config)
+
+void Engine::prepareRun(Config::OpaqRun& config)
 {
     // 1. Load plugins...
-    auto& plugins = config.getPlugins();
-    loadPlugins(plugins);
+    loadPlugins(config.getPlugins());
 
     // 2. Instantiate and configure components...
-    auto& components = config.getComponents();
-    initComponents(components);
+    initComponents(config.getComponents());
+}
 
-    // 3. OPAQ workflow...
+void Engine::run(Config::OpaqRun& config)
+{
+    // OPAQ workflow...
     _logger->info("Fetching workflow configuration");
     auto pollutantName = config.getPollutantName();
 
@@ -100,7 +100,7 @@ void Engine::run(Config::OpaqRun& config)
     Config::MappingStage* mappingStage   = config.getMappingStage();
 
     // Get air quality network provider
-    auto name                            = config.getNetworkProvider()->getName();
+    auto name                            = config.getNetworkProvider()->name;
     AQNetworkProvider& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
     _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
@@ -108,16 +108,12 @@ void Engine::run(Config::OpaqRun& config)
     GridProvider* gridProvider;
     Config::Component* gridProviderDef = config.getGridProvider();
     if (gridProviderDef != nullptr) {
-        name         = config.getGridProvider()->getName();
-        gridProvider = &_componentMgr.getComponent<GridProvider>(name);
-        _logger->info("Using grid provider {}", name);
+        gridProvider = &_componentMgr.getComponent<GridProvider>(gridProviderDef->name);
+        _logger->info("Using grid provider {}", gridProviderDef->name);
     }
 
     // Get the base times
     std::vector<DateTime> baseTimes = config.getBaseTimes();
-
-    // Get the requested forecast horizon
-    OPAQ::TimeInterval fcHorMax = forecastStage->getHorizon();
 
     _logger->info("Starting OPAQ workflow...");
     if (forecastStage)
@@ -204,45 +200,33 @@ void Engine::loadPlugins(const std::vector<Config::Plugin>& plugins)
 {
     for (auto& plugin : plugins)
     {
-        std::string name     = plugin.getName();
-        std::string filename = plugin.getLib();
         try
         {
-            _logger->info("Loading plugin {} from {}", name, filename);
-            _componentMgr.loadPlugin(name, filename);
+            _logger->info("Loading plugin {} from {}", plugin.name, plugin.libPath);
+            _componentMgr.loadPlugin(plugin.name, plugin.libPath);
         }
         catch (std::exception& e)
         {
-            _logger->critical("Error while loading plugin {}", name);
-            _logger->error(e.what());
-            exit(1);
+            _logger->critical("Error while loading plugin {} ({})", plugin.name, e.what());
+            throw std::runtime_error("Failed to load plugins");
         }
     }
-
-    return;
 }
 
 void Engine::initComponents(const std::vector<Config::Component>& components)
 {
-
     for (auto& component : components)
     {
-        auto componentName = component.getName();
-        auto pluginName    = component.getPlugin()->getName();
-        auto config        = component.getConfig();
-
         try
         {
-            _logger->info("Creating component {} from plugin {}", componentName, pluginName);
-            _componentMgr.createComponent<Component>(componentName, pluginName, config);
+            _logger->info("Creating component {} from plugin {}", component.name, component.plugin.name);
+            _componentMgr.createComponent<Component>(component.name, component.plugin.name, component.config);
         }
         catch (const std::exception& e)
         {
-            _logger->critical("Error while creating & configuring component {}", componentName);
-            _logger->error(e.what());
-            exit(EXIT_FAILURE);
+            _logger->critical("Error while creating & configuring component {} ({})", component.name, e.what());
+            throw std::runtime_error("Failed to initialize components");
         }
     }
 }
-
-} /* namespace opaq */
+}

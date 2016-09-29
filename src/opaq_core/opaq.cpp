@@ -197,6 +197,7 @@ int main(int argc, char* argv[])
      Starting Engine...
      --------------------------------------------------------------------------------- */
     OPAQ::Engine engine(pollutantMgr);
+    engine.prepareRun(ch.getOpaqRun());
     engine.run(ch.getOpaqRun());
 
     // some friendliness

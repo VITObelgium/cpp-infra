@@ -57,24 +57,26 @@ std::string getDisplayName(Aggregation::Type agg)
 
 Aggregation::Type fromString(std::string s)
 {
-
-    if (s.size() == 0) return Aggregation::None;
+    if (s.empty())
+    {
+        return Aggregation::None;
+    }
 
     // convert s to lower case
     std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-    if (!s.compare("da") || !s.compare("dayavg") || !s.compare("dailyavg")) {
+    if (s == "da" || s == "dayavg" || s == "dailyavg") {
         return Aggregation::DayAvg;
     }
-    else if (!s.compare("m1") || !s.compare("max1h") || !s.compare("daymax") || !s.compare("dailymax"))
+    else if (s == "m1" || s == "max1h" || s == "daymax" || s == "dailymax")
     {
         return Aggregation::Max1h;
     }
-    else if (!s.compare("m8") || !s.compare("max8h"))
+    else if (s == "m8" || s == "max8h")
     {
         return Aggregation::Max8h;
     }
-    else if (!s.compare("none"))
+    else if (s == "none")
     {
         return Aggregation::None;
     }
@@ -82,4 +84,4 @@ Aggregation::Type fromString(std::string s)
     throw NotAvailableException("Aggregation " + s + " is not known...");
 }
 }
-} /* namespace OPAQ */
+}

@@ -32,7 +32,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     while (componentElement)
     {
         std::string componentName = componentElement->GetText();
-        fcStage->getModels().push_back(&findComponent(componentName));
+        fcStage->getModels().push_back(&_opaqRun.getComponent(componentName));
         componentElement = componentElement->NextSiblingElement("component");
     }
 
@@ -41,7 +41,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     try
     {
         std::string componentName = XmlTools::getText(inputElement, "observations");
-        fcStage->setValues(&findComponent(componentName));
+        fcStage->setValues(_opaqRun.getComponent(componentName));
     }
     catch (const ElementNotFoundException&)
     {
@@ -50,7 +50,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     try
     {
         std::string componentName = XmlTools::getText(inputElement, "meteo");
-        fcStage->setMeteo(&findComponent(componentName));
+        fcStage->setMeteo(&_opaqRun.getComponent(componentName));
     }
     catch (const ElementNotFoundException&)
     {
@@ -61,7 +61,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     try
     {
         std::string bufferName = XmlTools::getText(element, "buffer");
-        fcStage->setBuffer(&findComponent(bufferName));
+        fcStage->setBuffer(&_opaqRun.getComponent(bufferName));
     }
     catch (const ElementNotFoundException&)
     {
@@ -72,7 +72,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     try
     {
         std::string outputName = XmlTools::getText(element, "output");
-        fcStage->setOutputWriter(&findComponent(outputName));
+        fcStage->setOutputWriter(&_opaqRun.getComponent(outputName));
     }
     catch (const ElementNotFoundException&)
     {
@@ -109,7 +109,7 @@ OPAQ::Config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement
 /* ===========================================================================
  This is the main configuration file parser
  ======================================================================== */
-void ConfigurationHandler::parseConfigurationFile(std::string& filename, Config::PollutantManager& pollutantMgr)
+void ConfigurationHandler::parseConfigurationFile(const std::string& filename, Config::PollutantManager& pollutantMgr)
 {
 
     clearConfig();
@@ -139,12 +139,14 @@ void ConfigurationHandler::parseConfigurationFile(std::string& filename, Config:
     TiXmlElement* pluginElement = pluginsElement->FirstChildElement("plugin");
     while (pluginElement)
     {
-        Config::Plugin plugin;
-        plugin.setName(pluginElement->Attribute("name"));
+
         std::string fullname = pluginElement->GetText();
         fullname             = pluginPath + "/" + fullname;
-        plugin.setLib(fullname);
-        _opaqRun.getPlugins().push_back(plugin);
+
+        Config::Plugin plugin;
+        plugin.name    = pluginElement->Attribute("name");
+        plugin.libPath = fullname;
+        _opaqRun.addPlugin(plugin);
         pluginElement = pluginElement->NextSiblingElement("plugin");
     }
 
@@ -154,13 +156,14 @@ void ConfigurationHandler::parseConfigurationFile(std::string& filename, Config:
     TiXmlElement* componentElement  = componentsElement->FirstChildElement("component");
     while (componentElement)
     {
-        Config::Component component;
-        component.setName(componentElement->Attribute("name"));
-        std::string pluginName = componentElement->Attribute("plugin");
-        component.setPlugin(&findPlugin(pluginName));
         _configDocs.push_back(std::make_unique<TiXmlDocument>());
-        component.setConfig(XmlTools::getElement(componentElement, "config", _configDocs.back().get()));
-        _opaqRun.getComponents().push_back(component);
+
+        Config::Component component;
+        component.name = componentElement->Attribute("name");
+        component.plugin = _opaqRun.getPlugin(componentElement->Attribute("plugin"));
+        component.config = XmlTools::getElement(componentElement, "config", _configDocs.back().get());
+        _opaqRun.addComponent(component);
+        
         componentElement = componentElement->NextSiblingElement("component");
     }
 
@@ -270,13 +273,12 @@ void ConfigurationHandler::parseConfigurationFile(std::string& filename, Config:
     {
         TiXmlElement* networkElement = XmlTools::getElement(rootElement, "network");
         std::string componentName    = XmlTools::getText(networkElement, "component");
-        _opaqRun.setNetworkProvider(&findComponent(componentName));
+        _opaqRun.setNetworkProvider(_opaqRun.getComponent(componentName));
     }
     catch (const ElementNotFoundException& e)
     {
-        _logger->critical("no air quality network defined");
-        _logger->critical(e.what());
-        exit(1);
+        _logger->critical("No air quality network defined: {}", e.what());
+        throw RunTimeException("Invalid air quality network defined");
     }
 
     /* ------------------------------------------------------------------------
@@ -287,12 +289,12 @@ void ConfigurationHandler::parseConfigurationFile(std::string& filename, Config:
     {
         TiXmlElement* gridElement = XmlTools::getElement(rootElement, "grid");
         std::string componentName = XmlTools::getText(gridElement, "component");
-        _opaqRun.setGridProvider(&findComponent(componentName));
+        _opaqRun.setGridProvider(_opaqRun.getComponent(componentName));
     }
     catch (const ElementNotFoundException&)
     {
         _logger->warn("no grid provider defined");
-        _opaqRun.setGridProvider(nullptr);
+        _opaqRun.resetGridProvider();
     }
 
     /* ------------------------------------------------------------------------
@@ -329,33 +331,36 @@ void ConfigurationHandler::parseConfigurationFile(std::string& filename, Config:
 void ConfigurationHandler::validateConfiguration(Config::PollutantManager& pollutantMgr)
 {
     // check for plugins with the same name
-    for (auto it1 = _opaqRun.getPlugins().begin(); it1 != _opaqRun.getPlugins().end(); ++it1)
+    auto plugins = _opaqRun.getPlugins();
+
+    for (auto it1 = plugins.begin(); it1 != plugins.end(); ++it1)
     {
-        std::string name = it1->getName();
-        for (auto it2 = it1 + 1; it2 != _opaqRun.getPlugins().end(); ++it2)
+        auto name = it1->name;
+        for (auto it2 = it1 + 1; it2 != plugins.end(); ++it2)
         {
-            if (name == it2->getName())
+            if (name == it2->name)
             {
-                throw BadConfigurationException("Found 2 plugins with the same name: " + name);
+                throw BadConfigurationException("Found 2 plugins with the same name: {}", name);
             }
         }
 
         // check if plugin lib file exists
-        if (!FileTools::exists(it1->getLib()))
+        if (!FileTools::exists(it1->libPath))
         {
-            throw BadConfigurationException("Library file not found: " + it1->getLib());
+            throw BadConfigurationException("Library file not found: {}", it1->libPath);
         }
     }
 
     // check for components with the same name
-    for (auto it1 = _opaqRun.getComponents().begin(); it1 != _opaqRun.getComponents().end(); ++it1) 
+    auto components = _opaqRun.getComponents();
+    for (auto it1 = components.begin(); it1 != components.end(); ++it1)
     {
-        std::string name = it1->getName();
-        for (auto it2 = it1 + 1; it2 != _opaqRun.getComponents().end(); ++it2)
+        auto name = it1->name;
+        for (auto it2 = it1 + 1; it2 != components.end(); ++it2)
         {
-            if (name == it2->getName())
+            if (name == it2->name)
             {
-                throw BadConfigurationException("Found 2 components with the same name: " + name);
+                throw BadConfigurationException("Found 2 components with the same name: {}", name);
             }
         }
     }
@@ -374,48 +379,14 @@ void ConfigurationHandler::validateConfiguration(Config::PollutantManager& pollu
 
     if (!pollutantMgr.find(_opaqRun.getPollutantName()))
     {
-        throw BadConfigurationException("pollutant '" + _opaqRun.getPollutantName() + "' not found in pollutant list");
+        throw BadConfigurationException("pollutant '{}' not found in pollutant list", _opaqRun.getPollutantName());
     }
 }
 
 void ConfigurationHandler::clearConfig()
 {
-    _opaqRun.getPlugins().clear();
-    _opaqRun.getComponents().clear();
-    _opaqRun.getBaseTimes().clear();
+    _opaqRun.clear();
     //_opaqRun.setPollutant(nullptr);
-    _opaqRun.setForecastStage(nullptr);
-    _opaqRun.setMappingStage(nullptr);
-}
-
-OPAQ::Config::Plugin& ConfigurationHandler::findPlugin(const std::string& pluginName)
-{
-    auto iter = std::find_if(_opaqRun.getPlugins().begin(), _opaqRun.getPlugins().end(), [&](Config::Plugin& plugin) {
-        return plugin.getName() == pluginName;
-    });
-
-    if (iter == _opaqRun.getPlugins().end())
-    {
-        _logger->error("Plugin with name '{}' not found.", pluginName);
-        throw BadConfigurationException("Plugin with name '" + pluginName + "' not found.");
-    }
-
-    return *iter;
-}
-
-OPAQ::Config::Component& ConfigurationHandler::findComponent(const std::string& componentName)
-{
-    auto iter = std::find_if(_opaqRun.getComponents().begin(), _opaqRun.getComponents().end(), [&](Config::Component& comp) {
-        return comp.getName() == componentName;
-    });
-
-    if (iter == _opaqRun.getComponents().end())
-    {
-        _logger->error("Plugin with name '{}' not found.", componentName);
-        throw BadConfigurationException("Component with name '" + componentName + "' not found.");
-    }
-
-    return *iter;
 }
 
 } /* namespace OPAQ */

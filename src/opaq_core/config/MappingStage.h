@@ -5,55 +5,53 @@
  *      Author: vlooys
  */
 
-#ifndef OPAQ_MAPPINGSTAGE_H
-#define OPAQ_MAPPINGSTAGE_H
+#pragma once
 
 #include <string>
 #include <tinyxml.h>
 #include <vector>
 
-#include "Component.h"
 #include "../Exceptions.h"
+#include "../tools/ExceptionTools.h"
+#include "Component.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
+namespace Config
+{
 
-namespace Config {
-
-class MappingStage {
+class MappingStage
+{
 public:
-  MappingStage();
-  virtual ~MappingStage();
+    MappingStage();
 
-  // Throws OPAQ::NullPointerException
-  OPAQ::Config::Component* getValues() const {
-    if (values == NULL) throw OPAQ::NullPointerException();
-    return values;
-  }
-  void setValues(OPAQ::Config::Component* values) {
-    this->values = values;
-  }
+    Component& getValues() const
+    {
+        throwOnNullPtr(_values);
+        return *_values;
+    }
+    
+    void setValues(OPAQ::Config::Component* values)
+    {
+        _values = values;
+    }
 
-  // Throws OPAQ::NullPointerException
-  OPAQ::Config::Component* getMeteo() const {
-    if (meteo == NULL) throw OPAQ::NullPointerException();
-    return meteo;
-  }
-  void setMeteo(OPAQ::Config::Component* meteo) {
-    this->meteo = meteo;
-  }
-  
-protected:
-
+    OPAQ::Config::Component& getMeteo() const
+    {
+        throwOnNullPtr(_meteo);
+        return *_meteo;
+    }
+    
+    void setMeteo(Component* meteo)
+    {
+        _meteo = meteo;
+    }
 
 private:
-  // input data provider components
-  OPAQ::Config::Component *values;
-  OPAQ::Config::Component *meteo;
-  
+    // input data provider components
+    OPAQ::Config::Component* _values;
+    OPAQ::Config::Component* _meteo;
 };
 
-} /* namespace Config */
-
-} /* namespace OPAQ */
-#endif /* OPAQ_STAGE_H */
-
+}
+}
