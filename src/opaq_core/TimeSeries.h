@@ -9,6 +9,7 @@
 
 #include "DateTime.h"
 #include "Exceptions.h"
+#include <fstream>
 #include <algorithm>
 
 namespace OPAQ
@@ -295,8 +296,8 @@ template <class T>
 T TimeSeries<T>::valueAt(const DateTime& dt) const
 {
 
-    if (isEmpty()) throw OPAQ::OutOfBoundsException("empty timeseries");
-    if (dt < firstDateTime()) throw OPAQ::OutOfBoundsException("datetime before first requested");
+    if (isEmpty()) throw RunTimeException("empty timeseries");
+    if (dt < firstDateTime()) throw RunTimeException("datetime before first requested");
     if (contains(dt)) return value(dt);
     return _values[indexOfLastBefore(dt)];
 }

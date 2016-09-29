@@ -1,8 +1,28 @@
 {
-	"folders":
-	[
-		{
-			"path": "."
-		}
-	]
+    "build_systems":
+    [
+        {
+            "cmd":
+            [
+                "/usr/local/bin/ninja",
+                "all"
+            ],
+            "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
+            "name": "Opaq Debug",
+            "syntax": "Packages/User/c++output.tmLanguage",
+            "working_dir": "${project_path:${folder}}/build/opaq_debug",
+            "variants": [
+                {
+                    "name": "Opaq release",
+                    "working_dir": "${project_path:${folder}}/build/opaq_release"
+                }
+            ]
+        }
+    ],
+    "folders":
+    [
+        {
+            "path": "."
+        }
+    ]
 }

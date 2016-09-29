@@ -5,10 +5,10 @@
 
 #include <QList>
 
+Q_DECLARE_METATYPE(OPAQ::Aggregation::Type)
+
 namespace OPAQ
 {
-
-Q_DECLARE_METATYPE(Aggregation::Type)
 
 RunSimulationDialog::RunSimulationDialog(const std::vector<Pollutant>& pollutants, QWidget* parent)
 : QDialog(parent)
