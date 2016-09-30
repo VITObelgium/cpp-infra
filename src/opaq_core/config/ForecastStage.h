@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "../Exceptions.h"
-#include "../Tools/ExceptionTools.h"
+#include "../tools/ExceptionTools.h"
 #include "../TimeInterval.h"
 #include "Component.h"
 
@@ -37,7 +37,7 @@ public:
         throwOnNullPtr(_values);
         return *_values;
     }
-    
+
     void setValues(OPAQ::Config::Component& values)
     {
         _values = &values;
@@ -49,7 +49,7 @@ public:
         throwOnNullPtr(_meteo);
         return *_meteo;
     }
-    
+
     void setMeteo(OPAQ::Config::Component* meteo)
     {
         _meteo = meteo;
@@ -61,7 +61,7 @@ public:
         throwOnNullPtr(_buffer);
         return *_buffer;
     }
-    
+
     void setBuffer(OPAQ::Config::Component* buffer)
     {
         _buffer = buffer;

@@ -38,7 +38,7 @@ EXTERNALPROJECT_ADD(${NAME}
         -platform ${PLATFORM}
         -prefix ${CMAKE_INSTALL_PREFIX}
         ${PLATFORM_OPTIONS}
-        -static -opensource -confirm-license -nomake tools -nomake examples -nomake tests
+        -opensource -confirm-license -nomake tools -nomake examples -nomake tests
         -no-dbus -no-audio-backend -no-qml-debug
         -skip qtconnectivity
         -skip qtdeclarative
