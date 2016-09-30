@@ -26,3 +26,12 @@ cd build/deps
 PWD=`pwd`
 checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config}
 checkresult cmake --build .
+
+cd ..
+# overwrite invalid cmake files to avoid configuration errors
+if [ "${config}" = "Debug" ]; then
+    cp ./local/share/cmake/hdf5-targets-debug.cmake ./local/share/cmake/hdf5-targets-release.cmake
+else
+    cp ./local/share/cmake/hdf5-targets-release.cmake ./local/share/cmake/hdf5-targets-debug.cmake
+fi
+

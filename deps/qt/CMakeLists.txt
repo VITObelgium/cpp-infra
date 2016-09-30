@@ -15,11 +15,14 @@ IF (WIN32)
     SET(BUILD_CMD nmake)
     SET(CONFIGURE_CMD "call configure")
     SET(TARBALL_EXTENSION zip)
+    SET(PLATFORM_OPTIONS -mp -opengl desktop)
 ELSE ()
     IF (APPLE)
         SET(PLATFORM macx-clang)
+        SET(PLATFORM_OPTIONS -opengl desktop)
     ELSE ()
         SET(PLATFORM linux-g++)
+        SET(PLATFORM_OPTIONS -qt-xcb)
     ENDIF ()
 
     SET(BUILD_CMD make)
@@ -28,13 +31,14 @@ ELSE ()
 ENDIF ()
 
 EXTERNALPROJECT_ADD(${NAME}
-    URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.zip TIMEOUT 6000
+    URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
         ${CONFIGURATIONS}
         -platform ${PLATFORM}
         -prefix ${CMAKE_INSTALL_PREFIX}
-        -static -mp -opengl desktop -opensource -confirm-license -nomake tools -nomake examples -nomake tests
+        ${PLATFORM_OPTIONS}
+        -static -opensource -confirm-license -nomake tools -nomake examples -nomake tests
         -no-dbus -no-audio-backend -no-qml-debug
         -skip qtconnectivity
         -skip qtdeclarative
