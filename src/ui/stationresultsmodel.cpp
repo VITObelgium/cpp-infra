@@ -1,0 +1,116 @@
+#include "stationresultsmodel.h"
+
+#include "Station.h"
+#include "data/ForecastBuffer.h"
+
+#include <QColor>
+
+namespace OPAQ
+{
+
+StationResultsModel::StationResultsModel(QObject* parent)
+: QAbstractTableModel(parent)
+, _buffer(nullptr)
+, _rowCount(0)
+, _colCount(0)
+, _forecastHorizonDays(0)
+{
+}
+
+int StationResultsModel::rowCount(const QModelIndex& /*parent*/) const
+{
+    return _forecastHorizonDays;
+}
+
+int StationResultsModel::columnCount(const QModelIndex& /*parent*/) const
+{
+    return static_cast<int>(_headers.size()) + 1;
+}
+
+QVariant StationResultsModel::data(const QModelIndex& index, int role) const
+{
+    if (role == Qt::DisplayRole)
+    {
+        if (index.column() == _headers.size())
+        {
+            return QString::number(index.row());
+        }
+
+        int forecastDay = index.row();
+        int modelIndex  = index.column();
+        auto values     = _buffer->getModelValues(_baseTime, TimeInterval(forecastDay, TimeInterval::Days), _stationName, _pollutantId, _aggregationType);
+
+        auto value = values.at(modelIndex);
+        if (std::fabs(value - _buffer->getNoData()) < std::numeric_limits<double>::epsilon())
+        {
+            return tr("No data");
+        }
+
+        return QString::number(value, 'f', 6);
+    }
+    else if (role == Qt::BackgroundRole)
+    {
+        for (auto& rect : _mapping)
+        {
+            if (rect.contains(index.column(), index.row()))
+            {
+                return QColor(_mapping.key(rect));
+            }
+        }
+
+        // cell not mapped return white color
+        return QColor(Qt::white);
+    }
+
+    return QVariant();
+}
+
+void StationResultsModel::updateResults(ForecastBuffer& buffer,
+                                        DateTime baseTime,
+                                        const std::string& stationName,
+                                        TimeInterval forecastHorizon,
+                                        const std::string& pollutantId,
+                                        Aggregation::Type agg)
+{
+    beginResetModel();
+
+    _buffer              = &buffer;
+    _baseTime            = baseTime;
+    _stationName         = stationName;
+    _forecastHorizon     = forecastHorizon;
+    _forecastHorizonDays = static_cast<int>(forecastHorizon.getDays()) + 1;
+    _pollutantId         = pollutantId;
+    _aggregationType     = agg;
+    _headers             = _buffer->getModelNames(pollutantId, agg);
+
+    endResetModel();
+}
+
+QVariant StationResultsModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (role != Qt::DisplayRole)
+    {
+        return QVariant();
+    }
+
+    if (orientation == Qt::Horizontal)
+    {
+        if (section == _headers.size())
+        {
+            return QVariant();
+        }
+
+        return QString(_headers.at(section).c_str());
+    }
+    else
+    {
+        return QString("Day %1").arg(section);
+    }
+}
+
+void StationResultsModel::addMapping(QString color, QRect area)
+{
+    _mapping.insertMulti(color, area);
+}
+
+}

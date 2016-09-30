@@ -1,8 +1,10 @@
 CMAKE_POLICY(SET CMP0020 NEW)
 SET(CMAKE_AUTOMOC ON)
 FIND_PACKAGE(Qt5Gui)
+FIND_PACKAGE(Qt5Charts)
 FIND_PACKAGE(Qt5Widgets)
 FIND_PACKAGE(Qt5PrintSupport)
+FIND_PACKAGE(OpenGL)
 
 FIND_LIBRARY(QT_PLATFORMSUPPORT_LIBRARY NAMES Qt5PlatformSupport)
 FIND_LIBRARY(QT_PLATFORMSUPPORT_LIBRARY_DEBUG NAMES Qt5PlatformSupportd)
@@ -26,13 +28,16 @@ INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
 
-QT5_WRAP_UI(OPAQ_FORMS_HEADERS runsimulationdialog.ui)
+QT5_WRAP_UI(OPAQ_FORMS_HEADERS runsimulationdialog.ui opaqview.ui)
 
 ADD_EXECUTABLE(opaqui
     main.cpp
     mainwindow.h mainwindow.cpp
     runsimulationdialog.h runsimulationdialog.cpp
+    stationresultsmodel.h stationresultsmodel.cpp
     predictionresultsmodel.h predictionresultsmodel.cpp
+    opaqview.h opaqview.cpp
+    resultsview.h resultsview.cpp
     ${OPAQ_FORMS_HEADERS}
 )
 
@@ -44,7 +49,7 @@ ELSEIF (APPLE)
     )
 ENDIF ()
 
-TARGET_LINK_LIBRARIES(opaqui opaqcore Qt5::Gui Qt5::Widgets Qt5::PrintSupport ${EXTRA_LIBS} ${QT_MAIN_LIBRARY})
+TARGET_LINK_LIBRARIES(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets Qt5::PrintSupport ${EXTRA_LIBS} ${QT_MAIN_LIBRARY} ${OPENGL_LIBRARIES})
 
 IF (WIN32)
     TARGET_LINK_LIBRARIES(opaqui

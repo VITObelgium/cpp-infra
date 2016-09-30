@@ -6,31 +6,29 @@
  *
  */
 
-#ifndef __XMLAQNETPROVIDER_H
-#define __XMLAQNETPROVIDER_H
+#pragma once
 
 #include <opaq.h>
 
-// we can e.g. define namespaces per client for the plugin implementation...
-namespace OPAQ {
+namespace OPAQ
+{
 
-  class XMLAQNetProvider : public OPAQ::AQNetworkProvider {
-  public:
+class XMLAQNetProvider : public OPAQ::AQNetworkProvider
+{
+public:
     XMLAQNetProvider();
     virtual ~XMLAQNetProvider();
 
     // component members
     // throws OPAQ::BadConfigurationException
-    virtual void configure(TiXmlElement *configuration, IEngine& engine);
+    virtual void configure(TiXmlElement* configuration, IEngine& engine);
 
     // AQNetowrk functions
-    virtual OPAQ::AQNetwork *getAQNetwork();
+    virtual OPAQ::AQNetwork* getAQNetwork();
 
-  private:
+private:
     OPAQ::AQNetwork _net;
     Logger _logger;
-  };
+};
 
 } /* namespace IRCEL */
-
-#endif /* #ifndef __XMLAQNETPROVIDER_H */

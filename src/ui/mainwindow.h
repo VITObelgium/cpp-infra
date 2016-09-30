@@ -1,11 +1,12 @@
 #pragma once
 
-#include <QMainWindow>
-#include <QTableView>
-
 #include "predictionresultsmodel.h"
 #include "ConfigurationHandler.h"
 #include "Engine.h"
+#include "opaqview.h"
+
+#include <QMainWindow>
+#include <QTableView>
 
 class ToolBar;
 QT_FORWARD_DECLARE_CLASS(QMenu)
@@ -35,7 +36,8 @@ private:
 
     QList<ToolBar*> _toolBars;
 
-    QTableView _tableView;
+    //QTableView _tableView;
+    OpaqView _opaqView;
 
     Config::PollutantManager _pollutantMgr;
     ConfigurationHandler _config;

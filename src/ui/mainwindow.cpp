@@ -32,20 +32,21 @@ namespace OPAQ
 
 MainWindow::MainWindow()
 : QMainWindow()
-, _tableView(this)
+//, _tableView(this)
+, _opaqView(this)
 , _engine(_pollutantMgr)
 , _model(this)
 {
     setObjectName("Opaq");
     setWindowTitle("Opaq");
-    setCentralWidget(&_tableView);
+    setCentralWidget(&_opaqView);
 
     setupToolBar();
     setupMenuBar();
 
     statusBar()->showMessage(tr("Status Bar"));
 
-    _tableView.setModel(&_model);
+    //_tableView.setModel(&_model);
 }
 
 void MainWindow::actionTriggered(QAction *action)
@@ -76,11 +77,32 @@ void MainWindow::loadConfiguration()
     try
     {
         auto fileName = QFileDialog::getOpenFileName(this, tr("Load configuration"), "", tr("Config Files (*.xml)"));
+        if (fileName.isEmpty())
+        {
+            return;
+        }
+
         QFileInfo fileInfo(fileName);
         // Change the working directory to the config file so the relative paths can be found
         QDir::setCurrent(fileInfo.absoluteDir().path());
         _config.parseConfigurationFile(fileName.toStdString(), _pollutantMgr);
         _engine.prepareRun(_config.getOpaqRun());
+        _config.validateConfiguration(_pollutantMgr);
+
+        auto& aqNetworkProvider = _engine.componentManager().getComponent<AQNetworkProvider>(_config.getOpaqRun().getNetworkProvider()->name);
+        auto& buffer = _engine.componentManager().getComponent<ForecastBuffer>(_config.getOpaqRun().getForecastStage()->getBuffer().name);
+        auto forecastHorizon = _config.getOpaqRun().getForecastStage()->getHorizon();
+
+        _opaqView.setStations(aqNetworkProvider.getAQNetwork()->getStations());
+        _opaqView.setForecastBuffer(buffer);
+        _opaqView.setForecastHorizon(forecastHorizon);
+        
+        
+        auto* fcStage = _config.getOpaqRun().getForecastStage();
+        if (fcStage)
+        {
+            _opaqView.setModels(fcStage->getModels());
+        }
     }
     catch (const std::exception& e)
     {
@@ -126,7 +148,6 @@ void MainWindow::runSimulation()
 
         try
         {
-            _config.validateConfiguration(_pollutantMgr);
             _engine.run(_config.getOpaqRun());
 
             auto& aqNetworkProvider = _engine.componentManager().getComponent<AQNetworkProvider>(_config.getOpaqRun().getNetworkProvider()->name);
@@ -134,6 +155,10 @@ void MainWindow::runSimulation()
             auto forecastHorizon = _config.getOpaqRun().getForecastStage()->getHorizon();
             
             _model.updateResults(buffer, dialog.basetime(), aqNetworkProvider.getAQNetwork()->getStations(), forecastHorizon, dialog.pollutant(), dialog.aggregation());
+            _opaqView.setPollutantId(dialog.pollutant());
+            _opaqView.setAggregationType(dialog.aggregation());
+            _opaqView.setBaseTime(dialog.basetime());
+            _opaqView.updateResultsForCurrentStation(); 
         }
         catch (const std::exception& e)
         {
