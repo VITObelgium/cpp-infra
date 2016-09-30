@@ -18,12 +18,6 @@ FIND_LIBRARY(QT_FREETYPE_LIBRARY_DEBUG NAMES qtfreetyped)
 FIND_LIBRARY(QT_PCRE_LIBRARY NAMES qtpcre)
 FIND_LIBRARY(QT_PCRE_LIBRARY_DEBUG NAMES qtpcred)
 
-IF (WIN32)
-    FIND_LIBRARY(QT_MAIN_LIBRARY NAMES qtmain)
-ELSE ()
-    FIND_LIBRARY(PNG_LIBRARY NAMES qtpng)
-ENDIF ()
-
 INCLUDE_DIRECTORIES(
     ${CMAKE_CURRENT_BINARY_DIR}
 )
@@ -41,20 +35,17 @@ ADD_EXECUTABLE(opaqui
     ${OPAQ_FORMS_HEADERS}
 )
 
-IF (WIN32)
-    TARGET_LINK_LIBRARIES(opaqui Qt5::QWindowsIntegrationPlugin imm32 winmm)
-ELSEIF (APPLE)
-    TARGET_LINK_LIBRARIES(opaqui
-        Qt5::QCocoaIntegrationPlugin
-    )
-ENDIF ()
+TARGET_LINK_LIBRARIES(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets ${EXTRA_LIBS} ${OPENGL_LIBRARIES})
 
-TARGET_LINK_LIBRARIES(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets Qt5::PrintSupport ${EXTRA_LIBS} ${QT_MAIN_LIBRARY} ${OPENGL_LIBRARIES})
-
-IF (WIN32)
-    TARGET_LINK_LIBRARIES(opaqui
-        debug ${QT_HARFBUZZ_LIBRARY_DEBUG} optimized ${QT_HARFBUZZ_LIBRARY}
-        debug ${QT_PLATFORMSUPPORT_LIBRARY_DEBUG} optimized ${QT_PLATFORMSUPPORT_LIBRARY}
-        debug ${QT_FREETYPE_LIBRARY_DEBUG} optimized ${QT_FREETYPE_LIBRARY}
-        debug ${QT_PCRE_LIBRARY_DEBUG} optimized ${QT_PCRE_LIBRARY})
+IF (STATIC_QT)
+    IF (WIN32)
+        TARGET_LINK_LIBRARIES(opaqui
+            Qt5::QWindowsIntegrationPlugin imm32 winmm
+            debug ${QT_HARFBUZZ_LIBRARY_DEBUG} optimized ${QT_HARFBUZZ_LIBRARY}
+            debug ${QT_PLATFORMSUPPORT_LIBRARY_DEBUG} optimized ${QT_PLATFORMSUPPORT_LIBRARY}
+            debug ${QT_FREETYPE_LIBRARY_DEBUG} optimized ${QT_FREETYPE_LIBRARY}
+            debug ${QT_PCRE_LIBRARY_DEBUG} optimized ${QT_PCRE_LIBRARY})
+    ELSEIF (APPLE)
+        TARGET_LINK_LIBRARIES(opaqui Qt5::QCocoaIntegrationPlugin)
+    ENDIF ()
 ENDIF ()
