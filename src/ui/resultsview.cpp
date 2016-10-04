@@ -1,10 +1,11 @@
 #include "resultsview.h"
 
 #include "config/Component.h"
+#include "stationresultsmodel.h"
 
 #include <QtCharts/QChartView>
 #include <QtCharts/QLineSeries>
-#include <QtCharts/QVXYModelMapper>
+#include <QtCharts/QHXYModelMapper>
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTableView>
@@ -16,8 +17,6 @@ QT_CHARTS_USE_NAMESPACE
 
 ResultsView::ResultsView(QWidget* parent)
 : QWidget(parent)
-, _model(this)
-, _tableView(nullptr)
 , _rows(0)
 , _axisX(nullptr)
 , _axisY(nullptr)
@@ -25,12 +24,6 @@ ResultsView::ResultsView(QWidget* parent)
 {
     // create simple model for storing data
     // user's table data model
-
-    // create table view and add model to it
-    _tableView = new QTableView();
-    _tableView->setModel(&_model);
-    _tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
-    _tableView->verticalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     _chart = new QChart;
     _chart->setAnimationOptions(QChart::AllAnimations);
@@ -52,12 +45,8 @@ ResultsView::ResultsView(QWidget* parent)
     _chart->addAxis(_axisY, Qt::AlignLeft);
 
     // create main layout
-    auto* mainLayout = new QGridLayout;
-    mainLayout->addWidget(_tableView, 1, 0);
-    mainLayout->addWidget(chartView, 1, 1);
-    mainLayout->setColumnStretch(1, 1);
-    mainLayout->setColumnStretch(0, 0);
-    mainLayout->setColumnMinimumWidth(0, 300);
+    auto* mainLayout = new QHBoxLayout;
+    mainLayout->addWidget(chartView);
     setLayout(mainLayout);
 }
 
@@ -66,37 +55,27 @@ void ResultsView::setForecastHorizon(TimeInterval forecastHorizon)
     _rows = static_cast<int>(forecastHorizon.getDays()) + 1;
 }
 
-void ResultsView::setModels(const std::vector<Config::Component*>& models)
+void ResultsView::setModels(StationResultsModel& model, const std::vector<Config::Component*>& modelComponents)
 {
-    int column = 0;
-    for (auto* model : models)
+    int row = 1;
+    for (auto* comp : modelComponents)
     {
         QLineSeries* series = new QLineSeries();
-        series->setName(model->name.c_str());
-        auto* mapper = new QVXYModelMapper(this);
+        series->setName(comp->name.c_str());
+        auto* mapper = new QHXYModelMapper(this);
 
-        mapper->setXColumn(static_cast<int>(models.size()));
-        mapper->setYColumn(column);
+        mapper->setXRow(0);
+        mapper->setYRow(row);
         mapper->setSeries(series);
-        mapper->setModel(&_model);
+        mapper->setModel(&model);
         _chart->addSeries(series);
         series->attachAxis(_axisX);
         series->attachAxis(_axisY);
 
         // get the color of the series and use it for showing the mapped area
         QString seriesColorHex = "#" + QString::number(series->pen().color().rgb(), 16).right(6).toUpper();
-        _model.addMapping(seriesColorHex, QRect(column++, 0, 1, _rows));
+        model.addMapping(seriesColorHex, QRect(0, row++, _rows, 1));
     }
 }
 
-void ResultsView::updateResultsForStation(ForecastBuffer& buffer,
-                                          DateTime baseTime,
-                                          const std::string& stationName,
-                                          TimeInterval forecastHorizon,
-                                          const std::string& pollutantId,
-                                          Aggregation::Type agg)
-{
-    _model.updateResults(buffer, baseTime, stationName, forecastHorizon, pollutantId, agg);
-    _tableView->setColumnHidden(_model.rowCount() - 1, true);
-}
 }

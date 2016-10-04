@@ -31,13 +31,13 @@ QVariant StationResultsModel::data(const QModelIndex& index, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        if (index.column() == _headers.size())
+        if (index.row() == 0)
         {
-            return QString::number(index.row());
+            return QString::number(index.column());
         }
 
-        int forecastDay = index.row();
-        int modelIndex  = index.column();
+        int forecastDay = index.column();
+        int modelIndex  = index.row() - 1;
         auto values     = _buffer->getModelValues(_baseTime, TimeInterval(forecastDay, TimeInterval::Days), _stationName, _pollutantId, _aggregationType);
 
         auto value = values.at(modelIndex);
@@ -93,18 +93,18 @@ QVariant StationResultsModel::headerData(int section, Qt::Orientation orientatio
         return QVariant();
     }
 
-    if (orientation == Qt::Horizontal)
+    if (orientation == Qt::Vertical)
     {
-        if (section == _headers.size())
+        if (section == 0)
         {
             return QVariant();
         }
 
-        return QString(_headers.at(section).c_str());
+        return QString(_headers.at(section - 1).c_str());
     }
     else
     {
-        return QString("Day %1").arg(section);
+        return QString("Day+%1").arg(section);
     }
 }
 

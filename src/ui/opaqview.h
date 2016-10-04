@@ -3,15 +3,15 @@
 #include "DateTime.h"
 #include "Aggregation.h"
 #include "TimeInterval.h"
+#include "ConfigurationHandler.h"
+#include "Engine.h"
+
+#include "ui_opaqview.h"
 
 #include <QComboBox>
+#include <QStandardItemModel>
 #include <QWidget>
 #include <memory>
-
-namespace Ui
-{
-class OpaqView;
-}
 
 namespace OPAQ
 {
@@ -32,24 +32,24 @@ public:
     explicit OpaqView(QWidget* parent = nullptr);
     virtual ~OpaqView();
 
-    void setStations(const std::vector<Station*>& stations);
-    void setModels(const std::vector<Config::Component*>& models);
-    void setBaseTime(const DateTime& baseTime);
-    void setForecastHorizon(const TimeInterval& forecastHorizon);
-    void setForecastBuffer(ForecastBuffer& buffer);
-    void setPollutantId(const std::string& pollutantId);
-    void setAggregationType(Aggregation::Type agg);
-
-    void updateResultsForCurrentStation();
-
 private:
-    void stationChanged();
+    void setModels(const std::vector<Config::Component*>& models);
 
-    std::unique_ptr<Ui::OpaqView> _ui;
-    DateTime _baseTime;
-    TimeInterval _forecastHorizon;
-    std::string _pollutantId;
-    Aggregation::Type _aggregation;
-    ForecastBuffer* _buffer;
+    void showConfigFileSelector();
+    void loadConfiguration(const QString& path);
+    void loadRecentConfigurations();
+    void updateRecentConfiguration(const QString &filePath);
+    
+    void updateStationModel(const std::vector<Station*>& stations);
+    void updatePollutantModel();
+
+    Ui::OpaqView _ui;
+    QStandardItemModel _stationModel;
+    QStandardItemModel _pollutantModel;
+    QStandardItemModel _aggregationModel;
+    
+    Config::PollutantManager _pollutantMgr;
+    ConfigurationHandler _config;
+    Engine _engine;
 };
 }

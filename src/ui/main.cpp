@@ -18,6 +18,7 @@ int main(int argc, char* argv[])
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");
+    QCoreApplication::setOrganizationDomain("vito.be");
     QCoreApplication::setApplicationName("Opaq");
     QCoreApplication::setApplicationVersion(OPAQ_VERSION);
 

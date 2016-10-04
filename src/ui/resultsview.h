@@ -1,6 +1,6 @@
 #pragma once
 
-#include "stationresultsmodel.h"
+#include "TimeInterval.h"
 
 #include <QtCharts/QChart>
 #include <QtCharts/QValueAxis>
@@ -10,6 +10,8 @@ class QTableView;
 
 namespace OPAQ
 {
+
+class StationResultsModel;
 
 namespace Config
 {
@@ -27,17 +29,9 @@ public:
     ResultsView(QWidget* parent = 0);
 
     void setForecastHorizon(TimeInterval forecastHorizon);
-    void setModels(const std::vector<Config::Component*>& model);
-    void updateResultsForStation(ForecastBuffer& buffer,
-                                 DateTime baseTime,
-                                 const std::string& station,
-                                 TimeInterval forecastHorizon,
-                                 const std::string& pollutantId,
-                                 Aggregation::Type agg);
+    void setModels(StationResultsModel& model, const std::vector<Config::Component*>& modelComponents);
 
 private:
-    StationResultsModel _model;
-    QTableView* _tableView;
     int _rows;
     QtCharts::QValueAxis* _axisX;
     QtCharts::QValueAxis* _axisY;
