@@ -220,46 +220,53 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
     }
     catch (const H5::Exception&)
     {
+        try
+        {
+            // --------------------------------------------------------
+            // 1. create the dataset at the grpAggr location
+            //    dimensions : model x station x baseTime x fchorizon
+            // --------------------------------------------------------
+            hsize_t dims[4]    = {0, 0, 0, 0};
+            hsize_t maxdims[4] = {H5S_UNLIMITED, H5S_UNLIMITED, H5S_UNLIMITED, H5S_UNLIMITED};
+            H5::DataSpace dataSpace(4, dims, maxdims);
 
-        // --------------------------------------------------------
-        // 1. create the dataset at the grpAggr location
-        //    dimensions : model x station x baseTime x fchorizon
-        // --------------------------------------------------------
-        hsize_t dims[4]    = {0, 0, 0, 0};
-        hsize_t maxdims[4] = {H5S_UNLIMITED, H5S_UNLIMITED, H5S_UNLIMITED, H5S_UNLIMITED};
-        H5::DataSpace dataSpace(4, dims, maxdims);
+            // create parameters for the dataset
+            H5::DSetCreatPropList cparms;
+            hsize_t chunks[4] = {1, 10, 10, 1};
+            cparms.setChunk(4, chunks);
+            cparms.setFillValue(H5::PredType::NATIVE_DOUBLE, &_noData); // set no data value,n HDF5 handles this automatically
 
-        // create parameters for the dataset
-        H5::DSetCreatPropList cparms;
-        hsize_t chunks[4] = {1, 10, 10, 1};
-        cparms.setChunk(4, chunks);
-        cparms.setFillValue(H5::PredType::NATIVE_DOUBLE, &_noData); // set no data value,n HDF5 handles this automatically
+            // create data set
+            dsVals = grpAggr.createDataSet(FORECAST_DATASET_NAME, H5::PredType::NATIVE_DOUBLE, dataSpace, cparms);
 
-        // create data set
-        dsVals = grpAggr.createDataSet(FORECAST_DATASET_NAME, H5::PredType::NATIVE_DOUBLE, dataSpace, cparms);
+            // we're creating a new file, so the baseTime given here is the start time of the dataset
+            // we take the hour as a basic measure, flooring it to the hour !! this allows alternative
+            // time resolutions later on...
+            startTime = DateTimeTools::floor(baseTime, DateTimeTools::FIELD_HOUR);
 
-        // we're creating a new file, so the baseTime given here is the start time of the dataset
-        // we take the hour as a basic measure, flooring it to the hour !! this allows alternative
-        // time resolutions later on...
-        startTime = DateTimeTools::floor(baseTime, DateTimeTools::FIELD_HOUR);
+            Hdf5Tools::createStringAttribute(dsVals, START_DATE_NAME, startTime.toString());
+            Hdf5Tools::createStringAttribute(dsVals, DIMENSIONS_NAME, DIMENSIONS);
+            Hdf5Tools::createStringAttribute(dsVals, DESCRIPTION_NAME, DESCRIPTION);
 
-        Hdf5Tools::createStringAttribute(dsVals, START_DATE_NAME, startTime.toString());
-        Hdf5Tools::createStringAttribute(dsVals, DIMENSIONS_NAME, DIMENSIONS);
-        Hdf5Tools::createStringAttribute(dsVals, DESCRIPTION_NAME, DESCRIPTION);
+            // --------------------------------------------------------
+            // 2. create the datasets with meta data: models & stations
+            // --------------------------------------------------------
+            hsize_t dims2[1]    = {0};
+            hsize_t maxdims2[1] = {H5S_UNLIMITED};
+            H5::DataSpace dataSpace2(1, dims2, maxdims2);
+            H5::DSetCreatPropList cparms2;
+            hsize_t chunks2[1] = {5};
+            cparms2.setChunk(1, chunks2);
+            cparms2.setFillValue(_stringType, &s_noData); // set no data value
 
-        // --------------------------------------------------------
-        // 2. create the datasets with meta data: models & stations
-        // --------------------------------------------------------
-        hsize_t dims2[1]    = {0};
-        hsize_t maxdims2[1] = {H5S_UNLIMITED};
-        H5::DataSpace dataSpace2(1, dims2, maxdims2);
-        H5::DSetCreatPropList cparms2;
-        hsize_t chunks2[1] = {5};
-        cparms2.setChunk(1, chunks2);
-        cparms2.setFillValue(_stringType, &s_noData); // set no data value
-
-        dsModels   = grpAggr.createDataSet(MODELS_DATASET_NAME, _stringType, dataSpace2, cparms2);
-        dsStations = grpAggr.createDataSet(STATION_DATASET_NAME, _stringType, dataSpace2, cparms2);
+            dsModels   = grpAggr.createDataSet(MODELS_DATASET_NAME, _stringType, dataSpace2, cparms2);
+            dsStations = grpAggr.createDataSet(STATION_DATASET_NAME, _stringType, dataSpace2, cparms2);
+        }
+        catch (const H5::Exception& e)
+        {
+            _logger->error("Failed to write values to HDF5 buffer: {} {}", e.getDetailMsg());
+            throw RunTimeException("Failed to write values to HDF5 buffer");
+        }
     }
 
     // -- now, store the data

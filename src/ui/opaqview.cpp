@@ -55,14 +55,21 @@ OpaqView::OpaqView(QWidget* parent)
     _ui.viewerTab->setPollutantModel(_pollutantModel);
     _ui.viewerTab->setAggregationModel(_aggregationModel);
 
+    _ui.validationTab->setConfig(_config);
+    _ui.validationTab->setEngine(_engine);
+    _ui.validationTab->setStationModel(_stationModel);
+    _ui.validationTab->setPollutantModel(_pollutantModel);
+    _ui.validationTab->setAggregationModel(_aggregationModel);
+
     _ui.tabWidget->setDisabled(true);
 }
 
 OpaqView::~OpaqView() = default;
 
-void OpaqView::setModels(const std::vector<Config::Component*>& models)
+void OpaqView::setModels(const std::vector<Config::Component>& models)
 {
     _ui.viewerTab->setModels(models);
+    _ui.validationTab->setModels(models);
 }
 
 void OpaqView::showConfigFileSelector()

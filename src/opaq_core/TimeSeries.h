@@ -118,14 +118,14 @@ public:
     DateTime datetime(unsigned int i) const
     {
         if (i >= size()) throw RunTimeException("index out of range");
-        return _datetimes[i];
+        return _datetimes.at(i);
     }
 
     // throws OutOfBoundsException
     T value(unsigned int i) const
     {
         if (i >= size()) throw RunTimeException("index out of range");
-        return _values[i];
+        return _values.at(i);
     }
 
     // throws OutOfBoundsException

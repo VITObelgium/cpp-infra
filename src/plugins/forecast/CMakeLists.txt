@@ -1,4 +1,4 @@
-ADD_LIBRARY(mpl_feedforward
+add_library(mpl_feedforward
     MLP_FeedForwardModel.h
     MLP_FeedForwardModel.cpp
     Tune.h
@@ -11,29 +11,29 @@ ADD_LIBRARY(mpl_feedforward
     feedforwardnet.cpp
     transfcn.h
 )
-SET_TARGET_PROPERTIES(mpl_feedforward PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(mpl_feedforward PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-ADD_LIBRARY(ovl_ircel_model1 MODULE
+add_library(ovl_ircel_model1 MODULE
     OVL_IRCEL_model1.h
     OVL_IRCEL_model1.cpp
 )
 
-ADD_LIBRARY(ovl_ircel_model2 MODULE
+add_library(ovl_ircel_model2 MODULE
     OVL_IRCEL_model2.h
     OVL_IRCEL_model2.cpp
 )
 
-ADD_LIBRARY(ovl_ircel_model3 MODULE
+add_library(ovl_ircel_model3 MODULE
     OVL_IRCEL_model3.h
     OVL_IRCEL_model3.cpp
 )
 
-ADD_LIBRARY(ovl MODULE
+add_library(ovl MODULE
     OVL.h
     OVL.cpp
 )
 
-TARGET_LINK_LIBRARIES(ovl_ircel_model1 mpl_feedforward opaqcore)
-TARGET_LINK_LIBRARIES(ovl_ircel_model2 mpl_feedforward opaqcore)
-TARGET_LINK_LIBRARIES(ovl_ircel_model3 mpl_feedforward opaqcore)
-TARGET_LINK_LIBRARIES(ovl mpl_feedforward opaqcore)
+target_link_libraries(ovl_ircel_model1 mpl_feedforward opaqcore)
+target_link_libraries(ovl_ircel_model2 mpl_feedforward opaqcore)
+target_link_libraries(ovl_ircel_model3 mpl_feedforward opaqcore)
+target_link_libraries(ovl mpl_feedforward opaqcore)

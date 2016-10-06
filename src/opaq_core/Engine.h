@@ -36,6 +36,20 @@ public:
     virtual ComponentManager&         componentManager() = 0;
 };
 
+struct PredictionResult
+{
+    PredictionResult(const DateTime& dt, double measured, double predicted)
+    : time(dt)
+    , measuredValue(measured)
+    , predictedValue(predicted)
+    {
+    }
+
+    DateTime time;
+    double measuredValue  = 0.0;
+    double predictedValue = 0.0;
+};
+
 /**
  * The main OPAQ abstract workflow class
  * The OPAQ engine contains the abstract implementation of the configurable
@@ -76,6 +90,11 @@ public:
    */
 
     void run(Config::OpaqRun& config);
+
+    /*
+     * Validate the measured values agains the predicted values for the given station
+     */
+    std::vector<PredictionResult> validate(Config::OpaqRun& config, const std::string& station, DateTime startTime, DateTime endTime);
 
     Config::PollutantManager& pollutantManager() override;
     ComponentManager&         componentManager() override;

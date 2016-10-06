@@ -55,13 +55,13 @@ void ResultsView::setForecastHorizon(TimeInterval forecastHorizon)
     _rows = static_cast<int>(forecastHorizon.getDays()) + 1;
 }
 
-void ResultsView::setModels(StationResultsModel& model, const std::vector<Config::Component*>& modelComponents)
+void ResultsView::setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents)
 {
     int row = 1;
-    for (auto* comp : modelComponents)
+    for (auto& comp : modelComponents)
     {
         QLineSeries* series = new QLineSeries();
-        series->setName(comp->name.c_str());
+        series->setName(comp.name.c_str());
         auto* mapper = new QHXYModelMapper(this);
 
         mapper->setXRow(0);

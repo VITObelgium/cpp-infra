@@ -1,36 +1,36 @@
-ADD_LIBRARY(asciiforecastwriter MODULE
+add_library(asciiforecastwriter MODULE
     AsciiForecastWriter.h
     AsciiForecastWriter.cpp
 )
 
-ADD_LIBRARY(hdf5buffer MODULE
+add_library(hdf5buffer MODULE
     Hdf5Buffer.h
     Hdf5Buffer.cpp
 )
 
-ADD_LIBRARY(ircelmeteoprovider MODULE
+add_library(ircelmeteoprovider MODULE
     IRCELMeteoProvider.h
     IRCELMeteoProvider.cpp
 )
 
-ADD_LIBRARY(rioobsprovider MODULE
+add_library(rioobsprovider MODULE
     RioObsProvider.h
     RioObsProvider.cpp
 )
 
-ADD_LIBRARY(xmlaqnetprovider MODULE
+add_library(xmlaqnetprovider MODULE
     XMLAQNetProvider.h
     XMLAQNetProvider.cpp
 )
 
-ADD_LIBRARY(xmlgridprovider MODULE
+add_library(xmlgridprovider MODULE
     XmlGridProvider.h
     XmlGridProvider.cpp
 )
 
-TARGET_LINK_LIBRARIES(hdf5buffer opaqcore hdf5_cpp-static)
-TARGET_LINK_LIBRARIES(asciiforecastwriter opaqcore)
-TARGET_LINK_LIBRARIES(ircelmeteoprovider opaqcore)
-TARGET_LINK_LIBRARIES(rioobsprovider opaqcore)
-TARGET_LINK_LIBRARIES(xmlgridprovider opaqcore)
-TARGET_LINK_LIBRARIES(xmlaqnetprovider opaqcore)
+target_link_libraries(hdf5buffer opaqcore hdf5_cpp-static)
+target_link_libraries(asciiforecastwriter opaqcore)
+target_link_libraries(ircelmeteoprovider opaqcore)
+target_link_libraries(rioobsprovider opaqcore)
+target_link_libraries(xmlgridprovider opaqcore)
+target_link_libraries(xmlaqnetprovider opaqcore)

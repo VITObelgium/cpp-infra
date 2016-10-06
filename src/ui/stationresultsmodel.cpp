@@ -24,6 +24,11 @@ int StationResultsModel::rowCount(const QModelIndex& /*parent*/) const
 
 int StationResultsModel::columnCount(const QModelIndex& /*parent*/) const
 {
+    if (_headers.size() == 0)
+    {
+        return 0;
+    }
+
     return static_cast<int>(_headers.size()) + 1;
 }
 

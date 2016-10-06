@@ -1,39 +1,39 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-CMAKE_POLICY(VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
+cmake_policy(VERSION 2.8)
 
-SET(PACKAGE "opaq")
-SET(PACKAGE_VERSION_MAJOR 0)
-SET(PACKAGE_VERSION_MINOR 5)
-SET(PACKAGE_VERSION_REVISION 0)
+set(PACKAGE "opaq")
+set(PACKAGE_VERSION_MAJOR 0)
+set(PACKAGE_VERSION_MINOR 5)
+set(PACKAGE_VERSION_REVISION 0)
 
-PROJECT(${PACKAGE})
-INCLUDE(GNUInstallDirs)
+project(${PACKAGE})
+include(GNUInstallDirs)
 
-SET(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-SET(CMAKE_CXX_STANDARD 14)
+set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+set(CMAKE_CXX_STANDARD 14)
 
-OPTION(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
-OPTION(BUILD_UI "Build the user interface" OFF)
+option(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
+option(BUILD_UI "Build the user interface" OFF)
 
-IF (SANITIZE_ADDRESS)
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
-    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
-ENDIF ()
+if (SANITIZE_ADDRESS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+endif ()
 
-IF (MSVC)
+if (MSVC)
     # use all cores for compilation
-    SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     # avoid windows specific warnings
-    ADD_DEFINITIONS("-D_CRT_SECURE_NO_WARNINGS")
-ENDIF()
+    add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+endif()
 
-INCLUDE_DIRECTORIES(
+include_directories(
     ${CMAKE_BINARY_DIR}
 )
 
-CONFIGURE_FILE(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
 
-SET (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-SET (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
-ADD_SUBDIRECTORY(src)
+add_subdirectory(src)

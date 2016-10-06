@@ -32,55 +32,75 @@ public:
    *  Returns the dataprovider for the observed concentration values
    *  Throws OPAQ::NullPointerException
    */
-    OPAQ::Config::Component& getValues() const
+    const OPAQ::Config::Component& getValues() const
     {
         throwOnNullPtr(_values);
         return *_values;
     }
 
-    void setValues(OPAQ::Config::Component& values)
+    void setValues(const OPAQ::Config::Component& values)
     {
         _values = &values;
     }
 
     // Throws OPAQ::NullPointerException
-    OPAQ::Config::Component& getMeteo() const
+    const OPAQ::Config::Component& getMeteo() const
     {
         throwOnNullPtr(_meteo);
         return *_meteo;
     }
 
-    void setMeteo(OPAQ::Config::Component* meteo)
+    void setMeteo(const OPAQ::Config::Component& meteo)
     {
-        _meteo = meteo;
+        _meteo = &meteo;
+    }
+
+    void resetMeteo()
+    {
+        _meteo = nullptr;
     }
 
     // Throws OPAQ::NullPointerException
-    OPAQ::Config::Component& getBuffer() const
+    const OPAQ::Config::Component& getBuffer() const
     {
         throwOnNullPtr(_buffer);
         return *_buffer;
     }
 
-    void setBuffer(OPAQ::Config::Component* buffer)
+    void setBuffer(const OPAQ::Config::Component& buffer)
     {
-        _buffer = buffer;
+        _buffer = &buffer;
+    }
+
+    void resetBuffer()
+    {
+        _buffer = nullptr;
     }
 
     // Throws OPAQ::NullPointerException
-    OPAQ::Config::Component& getOutputWriter() const
+    const OPAQ::Config::Component& getOutputWriter() const
     {
         throwOnNullPtr(_outputWriter);
         return *_outputWriter;
     }
 
-    void setOutputWriter(Component* ow)
+    void setOutputWriter(const Component& ow)
     {
-        _outputWriter = ow;
+        _outputWriter = &ow;
+    }
+
+    void resetOutputWriter()
+    {
+        _outputWriter = nullptr;
+    }
+
+    void addModel(const Component& model)
+    {
+        _models.push_back(model);
     }
 
     // returns a list of models used in the forecast...
-    std::vector<Component*>& getModels() { return models; }
+    const std::vector<Component>& getModels() { return _models; }
 
     /** Set the requested forecast horizon */
     void setHorizon(const TimeInterval& f) { _fcHor = f; }
@@ -90,17 +110,17 @@ public:
 
 private:
     // vector of models to run in the forecast
-    std::vector<Component*> models;
+    std::vector<Component> _models;
 
     // input data provider components
-    Component* _values;
-    Component* _meteo;
+    const Component* _values;
+    const Component* _meteo;
 
     // forecast buffer component
-    Component* _buffer;
+    const Component* _buffer;
 
     // output writer component
-    Component* _outputWriter;
+    const Component* _outputWriter;
 
     TimeInterval _fcHor; //!< requested max forecast horizon
 };

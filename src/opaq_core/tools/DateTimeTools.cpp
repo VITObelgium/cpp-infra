@@ -38,12 +38,11 @@ DateTime DateTimeTools::floor(const DateTime & datetime, int field) {
 DateTime DateTimeTools::parseDateTime(const std::string & str) {
 	std::vector<std::string> tokens = StringTools::tokenize(str);
 	if (tokens.size() != 2)
-		throw ParseException("failed to tokenize date and time part");
+        throw ParseException("failed to parse date and time part {}", str);
 	DateTime out = parseDate(tokens[0]);
-	std::vector<std::string> timeTokens = StringTools::tokenize(tokens[1], ":",
-			1, false);
+	std::vector<std::string> timeTokens = StringTools::tokenize(tokens[1], ":", 1, false);
 	if (timeTokens.size() != 3)
-		throw ParseException("failed to tokenize time part");
+        throw ParseException("failed to parse date {}", str);
 	out.setHour(atoi(timeTokens[0].c_str()));
 	out.setMin(atoi(timeTokens[1].c_str()));
 	out.setSec(atoi(timeTokens[2].c_str()));
@@ -53,7 +52,7 @@ DateTime DateTimeTools::parseDateTime(const std::string & str) {
 DateTime DateTimeTools::parseDate (const std::string & str) {
 	std::vector<std::string> tokens = StringTools::tokenize(str, "-", 1, false);
 	if (tokens.size() != 3)
-		throw ParseException("failed to tokenize date part");
+        throw ParseException("failed to parse date {}", str);
 	int year = atoi(tokens[0].c_str());
 	int month = atoi(tokens[1].c_str());
 	int day = atoi(tokens[2].c_str());

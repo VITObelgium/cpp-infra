@@ -46,9 +46,9 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
     buffer.setAQNetworkProvider(net);
 
     // Get the forecast models to run
-    for (auto* modelConfig : cnf->getModels())
+    for (auto& modelConfig : cnf->getModels())
     {
-        auto& model = _componentMgr.getComponent<Model>(modelConfig->name);
+        auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
 
         // set ins and outs for the model
         model.setBaseTime(baseTime);
@@ -184,6 +184,46 @@ void Engine::run(Config::OpaqRun& config)
       */
         }
     }
+}
+
+std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config, const std::string& station, DateTime startTime, DateTime endTime)
+{
+    if (startTime > endTime)
+    {
+        throw RunTimeException("Validation start time must be before the end time");
+    }
+
+    auto days  = static_cast<int>(TimeInterval(startTime, endTime).getDays());
+    auto fcHor = config.getForecastStage()->getHorizon();
+
+    std::vector<PredictionResult> results;
+    results.reserve(days);
+
+    auto& valuesConfig = config.getForecastStage()->getValues();
+    auto& bufferConfig = config.getForecastStage()->getBuffer();
+
+    auto& values = _componentMgr.getComponent<MeteoProvider>(valuesConfig.name);
+    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(bufferConfig.name);
+
+    /*const OPAQ::TimeInterval fc_hor,
+        const DateTime& fcTime1, const DateTime& fcTime2,
+        const std::string& stationId, const std::string& pollutantId,
+        OPAQ::Aggregation::Type aggr*/
+
+    auto measuredValues  = values.getValues(startTime, endTime, station, config.getPollutantName());
+    auto predictedValues = buffer.getValues(fcHor, startTime, endTime, station, config.getPollutantName(), config.getAggregation());
+
+    if (!measuredValues.isConsistent(predictedValues))
+    {
+        throw RunTimeException("Inconsistent measured and predicted values");
+    }
+
+    for (int i = 0; i < measuredValues.size(); ++i)
+    {
+        results.emplace_back(measuredValues.datetime(i), measuredValues.value(i), predictedValues.value(i));
+    }
+    
+    return results;
 }
 
 Config::PollutantManager& Engine::pollutantManager()

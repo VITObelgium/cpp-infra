@@ -196,9 +196,18 @@ int main(int argc, char* argv[])
     /* -----------------------------------------------------------------------------------
      Starting Engine...
      --------------------------------------------------------------------------------- */
-    OPAQ::Engine engine(pollutantMgr);
-    engine.prepareRun(ch.getOpaqRun());
-    engine.run(ch.getOpaqRun());
+    
+    try
+    {
+        OPAQ::Engine engine(pollutantMgr);
+        engine.prepareRun(ch.getOpaqRun());
+        engine.run(ch.getOpaqRun());
+    }
+    catch (const std::exception& e)
+    {
+        logger->error("Error during run: {}", e.what());
+        return EXIT_FAILURE;
+    }
 
     // some friendliness
     logger->info("All done, have a nice day !");

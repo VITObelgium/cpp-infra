@@ -29,7 +29,7 @@ public:
     ResultsView(QWidget* parent = 0);
 
     void setForecastHorizon(TimeInterval forecastHorizon);
-    void setModels(StationResultsModel& model, const std::vector<Config::Component*>& modelComponents);
+    void setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents);
 
 private:
     int _rows;

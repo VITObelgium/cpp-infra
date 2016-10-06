@@ -2,26 +2,27 @@
 
 #include "DateTime.h"
 #include "Aggregation.h"
-#include "TimeInterval.h"
+#include "ui_opaqvalidation.h"
 
-#include "stationresultsmodel.h"
-#include "ui_opaqviewer.h"
-
-#include <string>
 #include <QWidget>
 
 namespace OPAQ
 {
 
+namespace Config
+{
+struct Component;
+}
+
 class Engine;
 class ConfigurationHandler;
 
-class OpaqViewer : public QWidget
+class OpaqValidation : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit OpaqViewer(QWidget* parent = 0);
+    explicit OpaqValidation(QWidget *parent = 0);
 
     void setConfig(ConfigurationHandler& config);
     void setEngine(Engine& engine);
@@ -31,24 +32,19 @@ public:
     void setPollutantModel(QAbstractItemModel& model);
     void setAggregationModel(QAbstractItemModel& model);
 
-    void setForecastBuffer(ForecastBuffer& buffer);
-    void setForecastHorizon(const TimeInterval& fcHor);
-
 private:
-    void updateResultsForCurrentStation();
-    void runSimulation();
+    void runValidation();
 
     std::string pollutant() const noexcept;
     Aggregation::Type aggregation() const noexcept;
-    std::string basetime() const noexcept;
     std::string station() const noexcept;
+    DateTime startTime() const noexcept;
+    DateTime endTime() const noexcept;
 
-    Ui::OpaqViewer _ui;
-    StationResultsModel _model;
+    Ui::OpaqValidation _ui;
 
-    TimeInterval _forecastHorizon;
-    ForecastBuffer* _buffer;
     ConfigurationHandler* _config;
     Engine* _engine;
 };
+
 }

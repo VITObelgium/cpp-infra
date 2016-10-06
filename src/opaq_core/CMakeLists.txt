@@ -1,4 +1,4 @@
-SET (CORE_SOURCES
+set (CORE_SOURCES
     Aggregation.h
     Aggregation.cpp
     AQNetwork.h
@@ -38,7 +38,7 @@ SET (CORE_SOURCES
     TimeInterval.cpp
 )
 
-SET (CORE_CONFIG_SOURCES
+set (CORE_CONFIG_SOURCES
     config/Component.h
     config/OpaqRun.h
     config/OpaqRun.cpp
@@ -49,7 +49,7 @@ SET (CORE_CONFIG_SOURCES
     config/MappingStage.cpp
 )
 
-SET (CORE_DATA_SOURCES
+set (CORE_DATA_SOURCES
     data/ForecastBuffer.cpp
     data/ForecastBuffer.h
     data/DataProvider.h
@@ -62,7 +62,7 @@ SET (CORE_DATA_SOURCES
     data/ForecastOutputWriter.cpp
 )
 
-SET (CORE_TOOLS_SOURCES
+set (CORE_TOOLS_SOURCES
     tools/AQNetworkTools.h
     tools/AQNetworkTools.cpp
     tools/DateTimeTools.h
@@ -80,18 +80,18 @@ SET (CORE_TOOLS_SOURCES
     tools/XmlTools.cpp
 )
 
-SOURCE_GROUP(Config FILES ${CORE_CONFIG_SOURCES})
-SOURCE_GROUP(Tools FILES ${CORE_TOOLS_SOURCES})
-SOURCE_GROUP(Data FILES ${CORE_DATA_SOURCES})
+source_group(Config FILES ${CORE_CONFIG_SOURCES})
+source_group(Tools FILES ${CORE_TOOLS_SOURCES})
+source_group(Data FILES ${CORE_DATA_SOURCES})
 
-ADD_LIBRARY(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES} ${CORE_DATA_SOURCES})
+add_library(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES} ${CORE_DATA_SOURCES})
 
-TARGET_INCLUDE_DIRECTORIES(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-SET_TARGET_PROPERTIES(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
+target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+set_target_properties(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 IF (MSVC)
     # using visual studio we can not mix debug and release libraries
-    TARGET_LINK_LIBRARIES(opaqcore
+    target_link_libraries(opaqcore
         debug ${ZLIB_LIBRARY_DEBUG}
         debug ${GZSTREAM_LIBRARY_DEBUG}
         debug ${TINYXML_LIBRARY_DEBUG}
@@ -103,7 +103,7 @@ IF (MSVC)
         optimized ${DL_LIBRARY}
     )
 ELSE ()
-    TARGET_LINK_LIBRARIES(opaqcore
+    target_link_libraries(opaqcore
         ${TINYXML_LIBRARY}
         ${GZSTREAM_LIBRARY}
         ${ZLIB_LIBRARY}
@@ -111,13 +111,13 @@ ELSE ()
     )
 ENDIF ()
 
-TARGET_LINK_LIBRARIES(opaqcore fmt hdf5-static ${EXTRA_LIBS})
+target_link_libraries(opaqcore fmt hdf5-static ${EXTRA_LIBS})
 
-ADD_EXECUTABLE(opaq opaq.cpp)
-TARGET_LINK_LIBRARIES(opaq opaqcore)
+add_executable(opaq opaq.cpp)
+target_link_libraries(opaq opaqcore)
 
 IF (MSVC)
-    TARGET_LINK_LIBRARIES(opaq
+    target_link_libraries(opaq
         debug ${GETOPT_LIBRARY_DEBUG}
         optimized ${GETOPT_LIBRARY}
     )

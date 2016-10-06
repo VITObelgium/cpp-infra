@@ -47,6 +47,11 @@ void OpaqViewer::setEngine(Engine& engine)
     _engine = &engine;
 }
 
+void OpaqViewer::setModels(const std::vector<Config::Component>& models)
+{
+    _ui.resultsView->setModels(_model, models);
+}
+
 void OpaqViewer::setStationModel(QAbstractItemModel& model)
 {
     _ui.stationComboBox->setModel(&model);
@@ -91,11 +96,11 @@ void OpaqViewer::updateResultsForCurrentStation()
 
     _model.updateResults(*_buffer, basetime(), station(), _forecastHorizon, pollutant(), aggregation());
     _ui.tableView->setRowHidden(0, true);
-}
 
-void OpaqViewer::setModels(const std::vector<Config::Component*>& models)
-{
-    _ui.resultsView->setModels(_model, models);
+    for (int i = 0; i <= static_cast<int>(_forecastHorizon.getDays()); ++i)
+    {
+        _ui.tableView->setColumnWidth(i, 60);
+    }
 }
 
 std::string OpaqViewer::pollutant() const noexcept

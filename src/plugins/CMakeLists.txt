@@ -1,5 +1,5 @@
-INCLUDE_DIRECTORIES(${CMAKE_CURRENT_SOURCE_DIR}/../opaq_core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../opaq_core)
 
-ADD_SUBDIRECTORY(data)
-ADD_SUBDIRECTORY(forecast)
-#ADD_SUBDIRECTORY(mapping)
+add_subdirectory(data)
+add_subdirectory(forecast)
+#add_subdirectory(mapping)

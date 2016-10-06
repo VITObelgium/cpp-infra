@@ -5,7 +5,7 @@
 namespace OPAQ
 {
 
-inline void throwOnNullPtr(void* ptr)
+inline void throwOnNullPtr(const void* ptr)
 {
     if (ptr == nullptr)
     {

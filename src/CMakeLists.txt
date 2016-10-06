@@ -1,61 +1,61 @@
-FIND_PATH(ZLIB_INCLUDE_DIR NAMES zlib.h)
-FIND_LIBRARY(ZLIB_LIBRARY NAMES zlibstatic z)
-FIND_LIBRARY(ZLIB_LIBRARY_DEBUG NAMES zlibstaticd z)
+find_path(ZLIB_INCLUDE_DIR NAMES zlib.h)
+find_library(ZLIB_LIBRARY NAMES zlibstatic z)
+find_library(ZLIB_LIBRARY_DEBUG NAMES zlibstaticd z)
 
-FIND_PATH(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
-FIND_LIBRARY(TINYXML_LIBRARY NAMES tinyxml)
-FIND_LIBRARY(TINYXML_LIBRARY_DEBUG NAMES tinyxml_d)
+find_path(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
+find_library(TINYXML_LIBRARY NAMES tinyxml)
+find_library(TINYXML_LIBRARY_DEBUG NAMES tinyxml_d)
 
-FIND_LIBRARY(GZSTREAM_LIBRARY NAMES gzstream)
-FIND_LIBRARY(GZSTREAM_LIBRARY_DEBUG NAMES gzstream_d)
+find_library(GZSTREAM_LIBRARY NAMES gzstream)
+find_library(GZSTREAM_LIBRARY_DEBUG NAMES gzstream_d)
 
-IF (UNIX)
-    SET(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
-ENDIF ()
+if (UNIX)
+    set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
+endif ()
 
-#FIND_PACKAGE(HDF5 NAMES hdf5 COMPONENTS C CPP static)
+#find_package(HDF5 NAMES hdf5 COMPONENTS C CPP static)
 
-FIND_PACKAGE(fmt CONFIG REQUIRED)
-FIND_PACKAGE(spdlog CONFIG REQUIRED)
-FIND_PACKAGE(hdf5 CONFIG REQUIRED)
+find_package(fmt CONFIG REQUIRED)
+find_package(spdlog CONFIG REQUIRED)
+find_package(hdf5 CONFIG REQUIRED)
 
 # We use our own version of FMT, let spdlog use the same version
-ADD_DEFINITIONS(-DSPDLOG_FMT_EXTERNAL)
+add_definitions(-DSPDLOG_FMT_EXTERNAL)
 
-IF (MSVC)
-    FIND_LIBRARY(GETOPT_LIBRARY NAMES wingetopt)
-    FIND_LIBRARY(GETOPT_LIBRARY_DEBUG NAMES wingetopt_d)
-    FIND_LIBRARY(DL_LIBRARY NAMES dl)
-    FIND_LIBRARY(DL_LIBRARY_DEBUG NAMES dl_d)
+if (MSVC)
+    find_library(GETOPT_LIBRARY NAMES wingetopt)
+    find_library(GETOPT_LIBRARY_DEBUG NAMES wingetopt_d)
+    find_library(DL_LIBRARY NAMES dl)
+    find_library(DL_LIBRARY_DEBUG NAMES dl_d)
 
-    SET(EXTRA_LIBS Psapi Ws2_32)
-ENDIF ()
+    set(EXTRA_LIBS Psapi Ws2_32)
+endif ()
 
-FIND_PATH(EIGEN3_INCLUDE_DIR
+find_path(EIGEN3_INCLUDE_DIR
     NAMES Eigen/Dense
     PATH_SUFFIXES eigen3
 )
 
-IF (NOT EIGEN3_INCLUDE_DIR)
-    MESSAGE(FATAL_ERROR "Could not find eigen headers")
-ENDIF ()
+if (NOT EIGEN3_INCLUDE_DIR)
+    message(FATAL_ERROR "Could not find eigen headers")
+endif ()
 
-INCLUDE_DIRECTORIES(SYSTEM
+include_directories(SYSTEM
     ${EIGEN3_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
     ${TINYXML_INCLUDE_DIR}
 )
 
-ADD_DEFINITIONS(-DTIXML_USE_STL -D_XOPEN_SOURCE)
+add_definitions(-DTIXML_USE_STL -D_XOPEN_SOURCE)
 
-IF (MSVC)
+if (MSVC)
     # suppress decorated name length exceeded warning
-    ADD_DEFINITIONS(/wd4503)
-ENDIF ()
+    add_definitions(/wd4503)
+endif ()
 
-ADD_SUBDIRECTORY(opaq_core)
-ADD_SUBDIRECTORY(plugins)
+add_subdirectory(opaq_core)
+add_subdirectory(plugins)
 
-IF (BUILD_UI)
-    ADD_SUBDIRECTORY(ui)
-ENDIF ()
+if (BUILD_UI)
+    add_subdirectory(ui)
+endif ()

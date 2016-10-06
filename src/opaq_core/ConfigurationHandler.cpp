@@ -32,7 +32,7 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     while (componentElement)
     {
         std::string componentName = componentElement->GetText();
-        fcStage->getModels().push_back(&_opaqRun.getComponent(componentName));
+        fcStage->addModel(_opaqRun.getComponent(componentName));
         componentElement = componentElement->NextSiblingElement("component");
     }
 
@@ -50,33 +50,33 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     try
     {
         std::string componentName = XmlTools::getText(inputElement, "meteo");
-        fcStage->setMeteo(&_opaqRun.getComponent(componentName));
+        fcStage->setMeteo(_opaqRun.getComponent(componentName));
     }
     catch (const ElementNotFoundException&)
     {
-        fcStage->setMeteo(nullptr);
+        fcStage->resetMeteo();
         _logger->warn("no meteo dataprovider in the run configuration");
     }
 
     try
     {
         std::string bufferName = XmlTools::getText(element, "buffer");
-        fcStage->setBuffer(&_opaqRun.getComponent(bufferName));
+        fcStage->setBuffer(_opaqRun.getComponent(bufferName));
     }
     catch (const ElementNotFoundException&)
     {
-        fcStage->setBuffer(nullptr);
+        fcStage->resetBuffer();
         _logger->warn("no databuffer given in run configuration");
     }
 
     try
     {
         std::string outputName = XmlTools::getText(element, "output");
-        fcStage->setOutputWriter(&_opaqRun.getComponent(outputName));
+        fcStage->setOutputWriter(_opaqRun.getComponent(outputName));
     }
     catch (const ElementNotFoundException&)
     {
-        fcStage->setOutputWriter(nullptr);
+        fcStage->resetOutputWriter();
         _logger->warn("no output writer given in run configuration");
     }
 

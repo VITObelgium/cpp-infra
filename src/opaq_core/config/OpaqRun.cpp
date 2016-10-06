@@ -50,7 +50,7 @@ Plugin OpaqRun::getPlugin(const std::string& pluginName)
     return *iter;
 }
 
-Component& OpaqRun::getComponent(const std::string& componentName)
+const Component& OpaqRun::getComponent(const std::string& componentName)
 {
     auto iter = std::find_if(_components.begin(), _components.end(), [&](Config::Component& comp) {
         return comp.name == componentName;

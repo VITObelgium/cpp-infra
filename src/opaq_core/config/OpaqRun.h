@@ -43,7 +43,7 @@ public:
     void addComponent(const Component& component);
 
     Plugin getPlugin(const std::string& pluginName);
-    Component& getComponent(const std::string& componentName);
+    const Component& getComponent(const std::string& componentName);
 
     std::vector<Plugin> getPlugins();
     std::vector<Component> getComponents();

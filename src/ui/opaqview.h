@@ -33,7 +33,7 @@ public:
     virtual ~OpaqView();
 
 private:
-    void setModels(const std::vector<Config::Component*>& models);
+    void setModels(const std::vector<Config::Component>& models);
 
     void showConfigFileSelector();
     void loadConfiguration(const QString& path);
