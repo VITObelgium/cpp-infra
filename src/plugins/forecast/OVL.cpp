@@ -181,13 +181,13 @@ void OVL::run() {
 	// -- 1. initialization
 	logger->debug("OVL " + this->getName() + " run() method called");
 
-	DateTime baseTime      = getBaseTime();
-	Pollutant pol          = getPollutant();
-	Aggregation::Type aggr = getAggregation();
-	AQNetwork *net         = getAQNetworkProvider()->getAQNetwork();
-	ForecastBuffer *buffer = getBuffer();
+    DateTime baseTime      = getBaseTime();
+    Pollutant pol          = getPollutant();
+    Aggregation::Type aggr = getAggregation();
+    auto* net              = getAQNetworkProvider().getAQNetwork();
+    ForecastBuffer* buffer = getBuffer();
 
-	std::vector<Station *> stations = net->getStations();
+    std::vector<Station *> stations = net->getStations();
 
 
 	// -- Forecast horizon

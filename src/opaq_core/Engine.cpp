@@ -18,7 +18,7 @@ Engine::Engine(Config::PollutantManager& pollutantMgr)
 }
 
 void Engine::runForecastStage(Config::ForecastStage* cnf,
-                              AQNetworkProvider* net,
+                              AQNetworkProvider& net,
                               Pollutant* pol,
                               Aggregation::Type aggr,
                               DateTime& baseTime)
@@ -122,7 +122,7 @@ void Engine::run(Config::OpaqRun& config)
         {
             // A log message
             _logger->info("Forecast stage for " + baseTime.dateToString());
-            runForecastStage(forecastStage, &aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
+            runForecastStage(forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
             if (mappingStage)
             {
@@ -186,7 +186,12 @@ void Engine::run(Config::OpaqRun& config)
     }
 }
 
-std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config, const std::string& station, DateTime startTime, DateTime endTime)
+std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
+                                               const TimeInterval& forecastHorizon,
+                                               const std::string& station,
+                                               DateTime startTime,
+                                               DateTime endTime,
+                                               const std::string& model)
 {
     if (startTime > endTime)
     {
@@ -194,7 +199,6 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config, const st
     }
 
     auto days  = static_cast<int>(TimeInterval(startTime, endTime).getDays());
-    auto fcHor = config.getForecastStage()->getHorizon();
 
     std::vector<PredictionResult> results;
     results.reserve(days);
@@ -202,25 +206,26 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config, const st
     auto& valuesConfig = config.getForecastStage()->getValues();
     auto& bufferConfig = config.getForecastStage()->getBuffer();
 
-    auto& values = _componentMgr.getComponent<MeteoProvider>(valuesConfig.name);
+    auto& values = _componentMgr.getComponent<DataProvider>(valuesConfig.name);
     auto& buffer = _componentMgr.getComponent<ForecastBuffer>(bufferConfig.name);
 
-    /*const OPAQ::TimeInterval fc_hor,
-        const DateTime& fcTime1, const DateTime& fcTime2,
-        const std::string& stationId, const std::string& pollutantId,
-        OPAQ::Aggregation::Type aggr*/
+    auto& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(config.getNetworkProvider()->name);
+    values.setAQNetworkProvider(aqNetworkProvider);
+    buffer.setAQNetworkProvider(aqNetworkProvider);
+    buffer.setCurrentModel(model);
 
     auto measuredValues  = values.getValues(startTime, endTime, station, config.getPollutantName());
-    auto predictedValues = buffer.getValues(fcHor, startTime, endTime, station, config.getPollutantName(), config.getAggregation());
+    auto predictedValues = buffer.getValues(forecastHorizon, startTime, endTime, station, config.getPollutantName(), config.getAggregation());
 
-    if (!measuredValues.isConsistent(predictedValues))
+    /*if (!measuredValues.isConsistent(predictedValues))
     {
         throw RunTimeException("Inconsistent measured and predicted values");
-    }
+    }*/
 
-    for (int i = 0; i < measuredValues.size(); ++i)
+    for (int i = 0; i < predictedValues.size(); ++i)
     {
-        results.emplace_back(measuredValues.datetime(i), measuredValues.value(i), predictedValues.value(i));
+        double measured = measuredValues.valueAt(predictedValues.datetime(i));
+        results.emplace_back(predictedValues.datetime(i), measuredValues.value(i), predictedValues.value(i));
     }
     
     return results;

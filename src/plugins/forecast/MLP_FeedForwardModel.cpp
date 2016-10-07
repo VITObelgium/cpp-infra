@@ -115,7 +115,7 @@ void MLP_FeedForwardModel::run()
     DateTime baseTime      = getBaseTime();
     Pollutant pol          = getPollutant();
     Aggregation::Type aggr = getAggregation();
-    AQNetwork* net         = getAQNetworkProvider()->getAQNetwork();
+    auto* net              = getAQNetworkProvider().getAQNetwork();
     ForecastBuffer* buffer = getBuffer();
 
     std::vector<Station*> stations = net->getStations();

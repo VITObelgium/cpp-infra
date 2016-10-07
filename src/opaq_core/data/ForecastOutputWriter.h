@@ -28,7 +28,7 @@ public:
     virtual void write(Pollutant* pol, Aggregation::Type aggr, const DateTime& baseTime) = 0;
 
     // some setters
-    void setAQNetworkProvider(AQNetworkProvider* n) { _net = n; }
+    void setAQNetworkProvider(AQNetworkProvider& n) { _net = &n; }
     void setBuffer(ForecastBuffer* buf) { _buf = buf; }
     void setForecastHorizon(const TimeInterval& fc) { _fcHor = fc; }
 

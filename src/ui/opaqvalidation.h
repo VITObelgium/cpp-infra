@@ -2,6 +2,7 @@
 
 #include "DateTime.h"
 #include "Aggregation.h"
+#include "validationresultsmodel.h"
 #include "ui_opaqvalidation.h"
 
 #include <QWidget>
@@ -40,11 +41,13 @@ private:
     std::string station() const noexcept;
     DateTime startTime() const noexcept;
     DateTime endTime() const noexcept;
+    TimeInterval forecastHorizon() const noexcept;
 
     Ui::OpaqValidation _ui;
 
     ConfigurationHandler* _config;
     Engine* _engine;
+    ValidationResultsModel _model;
 };
 
 }

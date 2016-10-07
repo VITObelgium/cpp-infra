@@ -7,13 +7,12 @@
 
 #include "DataProvider.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-DataProvider::DataProvider() {
-	_AQNetworkProvider = 0;
-	_currentModel      = "";
+DataProvider::DataProvider()
+: _AQNetworkProvider(nullptr)
+{
 }
 
-DataProvider::~DataProvider() {}
-
-} /* namespace OPAQ */
+}

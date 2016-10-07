@@ -13,6 +13,7 @@ namespace OPAQ
 
 OpaqValidation::OpaqValidation(QWidget* parent)
 : QWidget(parent)
+, _model(this)
 {
     _ui.setupUi(this);
 
@@ -96,6 +97,10 @@ DateTime OpaqValidation::endTime() const noexcept
     return OPAQ::DateTimeTools::parseDate(_ui.toDateEdit->date().toString("yyyy-MM-dd").toStdString());
 }
 
+TimeInterval OpaqValidation::forecastHorizon() const noexcept
+{
+    return TimeInterval(_ui.forecastHorizonComboBox->currentIndex() + 1, TimeInterval::Days);
+}
 
 void OpaqValidation::runValidation()
 {
@@ -107,12 +112,26 @@ void OpaqValidation::runValidation()
 
     try
     {
-        auto results = _engine->validate(_config->getOpaqRun(), station(), startTime(), endTime());
-        for (auto& res : results)
+        _model.clear();
+        for (int i = 0; i < _ui.modelsListWidget->count(); ++i)
         {
-            std::cout << res.time << ": " << res.measuredValue << " <-> " << res.predictedValue << "\n";
+            auto* model = _ui.modelsListWidget->item(i);
+            if (model->checkState() == Qt::CheckState::Checked)
+            {
+                OutputDebugString(fmt::format("Model: {}", model->text().toStdString()).c_str());
+
+                auto results = _engine->validate(_config->getOpaqRun(), forecastHorizon(), station(), startTime(), endTime(), model->text().toStdString());
+                for (auto& res : results)
+                {
+                    OutputDebugString(fmt::format("{} <-> {}", res.measuredValue, res.predictedValue).c_str());
+                }
+                //updateResultsForCurrentStation();
+
+                _model.addResult(model->text().toStdString(), std::move(results));
+            }
         }
-        //updateResultsForCurrentStation();
+
+        _ui.scatterView->setModel(_model);
     }
     catch (const OPAQ::ParseException& e)
     {

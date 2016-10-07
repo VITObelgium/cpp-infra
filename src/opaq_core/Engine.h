@@ -94,7 +94,12 @@ public:
     /*
      * Validate the measured values agains the predicted values for the given station
      */
-    std::vector<PredictionResult> validate(Config::OpaqRun& config, const std::string& station, DateTime startTime, DateTime endTime);
+    std::vector<PredictionResult> validate(Config::OpaqRun& config,
+                                           const TimeInterval& forecastHorizon,
+                                           const std::string& station,
+                                           DateTime startTime,
+                                           DateTime endTime,
+                                           const std::string& model);
 
     Config::PollutantManager& pollutantManager() override;
     ComponentManager&         componentManager() override;
@@ -110,7 +115,7 @@ private:
    * loops over the different models which are configured in the forecast config
    * and calls the forecast output writer.
    */
-    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider* net, Pollutant* pol, Aggregation::Type agg, DateTime& baseTime);
+    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider& net, Pollutant* pol, Aggregation::Type agg, DateTime& baseTime);
 
     void loadPlugins(const std::vector<Config::Plugin>& plugins);
     void initComponents(const std::vector<Config::Component>& components);
