@@ -39,25 +39,27 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
 	}
 }
 
-std::vector<std::string> tokenize(const std::string &source,
-		const char *delimiter, const int delimiterCount, bool keepEmpty) {
-	std::vector<std::string> results;
+std::vector<std::string> tokenize(const std::string& source,
+                                  const char* delimiter, const int delimiterCount, bool keepEmpty)
+{
+    std::vector<std::string> results;
 
-	size_t prev = 0;
-	size_t next = 0;
+    size_t prev = 0;
+    size_t next = 0;
 
-	while ((next = findFirstDelimiter(source, delimiter, delimiterCount, prev)) != std::string::npos) {
-		if (keepEmpty || (next - prev != 0)) {
-			results.push_back(source.substr(prev, next - prev));
-		}
-		prev = next + 1;
-	}
+    while ((next = findFirstDelimiter(source, delimiter, delimiterCount, prev)) != std::string::npos)
+    {
+        if (keepEmpty || (next - prev != 0)) {
+            results.push_back(source.substr(prev, next - prev));
+        }
+        prev = next + 1;
+    }
 
-	if (prev < source.size()) {
-		results.push_back(source.substr(prev));
-	}
+    if (prev < source.size()) {
+        results.push_back(source.substr(prev));
+    }
 
-	return results;
+    return results;
 }
 
 int find (char * list [], unsigned int listSize, const std::string & item) {

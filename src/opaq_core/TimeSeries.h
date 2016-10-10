@@ -24,8 +24,8 @@ class TimeSeries
 public:
     size_t size() const { return _datetimes.size(); }
     void setNoData(const T& missing_value) { _missing_value = missing_value; }
-    const T& getNoData(void) const { return _missing_value; }
-    bool isEmpty() const { return (_datetimes.size() == 0); }
+    const T& getNoData() const { return _missing_value; }
+    bool isEmpty() const { return _datetimes.empty(); }
 
     bool isConsistent(const TimeSeries<T>& t) const
     {
@@ -64,6 +64,12 @@ public:
         _datetimes.clear();
     }
 
+    void reserve(size_t size)
+    {
+        _values.reserve(size);
+        _datetimes.reserve(size);
+    }
+
     void remove(const DateTime&);
     void removeRange(const DateTime&, const DateTime&, bool with_ends = false);
     void removeBefore(const DateTime&);
@@ -77,12 +83,12 @@ public:
     bool contains(const DateTime& dt) const { return std::binary_search(_datetimes.begin(), _datetimes.end(), dt); }
 
     // return the first date time in the timeseries
-    DateTime firstDateTime() const
+    const DateTime& firstDateTime() const
     {
         return _datetimes.front();
     };
     // return the last date time in the timeseries
-    DateTime lastDateTime() const
+    const DateTime& lastDateTime() const
     {
         return _datetimes.back();
     };

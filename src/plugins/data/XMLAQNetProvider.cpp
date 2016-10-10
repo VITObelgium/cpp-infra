@@ -13,18 +13,6 @@ XMLAQNetProvider::XMLAQNetProvider()
 {
 }
 
-XMLAQNetProvider::~XMLAQNetProvider()
-{
-    // clean up
-    std::vector<Station*>* stations    = &(_net.getStations());
-    std::vector<Station*>::iterator it = stations->begin();
-    while (it != stations->end())
-    {
-        Station* toErase = *it++;
-        delete toErase;
-    }
-}
-
 void XMLAQNetProvider::configure(TiXmlElement* cnf, IEngine& engine)
 {
 
@@ -59,7 +47,7 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, IEngine& engine)
             meteoId = "";
 
         // create station and push back to network
-        OPAQ::Station* st = new OPAQ::Station();
+        auto st = std::make_unique<OPAQ::Station>();
         st->setName(name);
         st->setId(stID++); // and increment Id after assignment
         st->setX(x);
@@ -86,7 +74,8 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, IEngine& engine)
                 st->getPollutants().push_back(p);
             }
         }
-        _net.getStations().push_back(st);
+        
+        _net.addStation(std::move(st));
 
         stEl = stEl->NextSiblingElement("station");
     } /* end while loop over station elements */

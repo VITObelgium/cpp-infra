@@ -118,7 +118,7 @@ void MLP_FeedForwardModel::run()
     auto* net              = getAQNetworkProvider().getAQNetwork();
     ForecastBuffer* buffer = getBuffer();
 
-    std::vector<Station*> stations = net->getStations();
+    auto& stations = net->getStations();
 
     // -- Forecast horizon
     // forecast horizon requested by user is available in abstract model and
@@ -127,7 +127,7 @@ void MLP_FeedForwardModel::run()
     int fcHorMax = static_cast<int>(getForecastHorizon().getDays());
 
     // -- 2. loop over the stations
-    for (auto* station : stations)
+    for (auto& station : stations)
     {
         // check if we have a valid meteo id, otherwise skip the station
         if (station->getMeteoId().empty()) {

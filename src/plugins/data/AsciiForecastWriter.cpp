@@ -105,9 +105,9 @@ namespace OPAQ {
     if ( ! getAQNetworkProvider() ) throw RunTimeException( "No AQ network set" );
 
     // -- get network & stations & maximum forecast horizon
-    OPAQ::AQNetwork *net            = getAQNetworkProvider()->getAQNetwork();
-    std::vector<Station *> stations = net->getStations();
-    int fcHorMax                    = static_cast<int>(getForecastHorizon().getDays());
+    OPAQ::AQNetwork* net = getAQNetworkProvider()->getAQNetwork();
+    auto& stations       = net->getStations();
+    int fcHorMax         = static_cast<int>(getForecastHorizon().getDays());
 
     // -- translate the filename
     StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol->getName() );
@@ -163,7 +163,7 @@ namespace OPAQ {
     // ========================================================================
     // loop over stations and produce the output
     // ========================================================================
-    for ( Station *station : stations ) {
+    for (auto& station : stations) {
 
     	if ( ! _full_output ) {
     		// Issue 9 (github)

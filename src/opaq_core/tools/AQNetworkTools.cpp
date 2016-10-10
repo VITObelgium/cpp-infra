@@ -7,10 +7,20 @@
 
 #include "AQNetworkTools.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
+namespace AQNetworkTools
+{
 
-AQNetworkTools::AQNetworkTools() {}
+bool stationHasPollutant(Station* station, Pollutant& pollutant)
+{
+    auto& pols = station->getPollutants();
+    auto iter = std::find_if(pols.begin(), pols.end(), [&pollutant] (const Pollutant* pol) {
+        return pol->getId() == pollutant.getId();
+    });
 
-AQNetworkTools::~AQNetworkTools() {}
+    return iter == pols.end();
+}
 
-} /* namespace test */
+}
+}

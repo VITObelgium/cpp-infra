@@ -133,7 +133,7 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
 {
 
     // -- check whether we have our configuration
-    if (!_configured) throw NotConfiguredException("Not fully configured");
+    if (!_configured) throw RunTimeException("Hdf5Buffer Not fully configured");
 
     // -- do nothing if no values are given
     if (forecast.size() == 0) return;
@@ -382,7 +382,7 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
 
 void Hdf5Buffer::_closeFile()
 {
-    if (_h5file != NULL) {
+    if (_h5file != nullptr) {
         _h5file->close();
         delete _h5file;
     }
@@ -390,21 +390,18 @@ void Hdf5Buffer::_closeFile()
 
 void Hdf5Buffer::_checkFullyConfigured()
 {
-    if (!_configured) throw NotConfiguredException("Not fully configured");
+    if (!_configured) throw RunTimeException("Hdf5Buffer Not fully configured");
 }
 
 void Hdf5Buffer::_checkIfExistsAndOpen()
 {
-
-    if (_h5file == NULL) {
-        if (FileTools::exists(_filename))
-            _openFile(_filename);
-        else
+    if (_h5file == nullptr) {
+        if (!FileTools::exists(_filename))
         {
-            std::stringstream ss;
-            ss << "Cannot read from non existing " << _filename;
-            throw RunTimeException(ss.str());
+            throw RunTimeException("Cannot read from non existing file: {}", _filename);
         }
+        
+        _openFile(_filename);
     }
 
     return;

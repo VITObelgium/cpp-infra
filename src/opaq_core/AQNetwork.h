@@ -7,10 +7,11 @@
 
 #pragma once
 
+#include "Station.h"
+
 #include <string>
 #include <vector>
-
-#include "Station.h"
+#include <memory>
 
 namespace OPAQ
 {
@@ -22,10 +23,19 @@ namespace OPAQ
 class AQNetwork
 {
 public:
+    /**
+    Checks whether the air quality network contains a certain station
+    \param stationCode a string reference indicating the station
+    \return true or false
+    */
+    bool containsStation(const std::string& stationCode) const;
+
+    void addStation(std::unique_ptr<Station> station);
+
     /** 
     Return a reference to the list of stations in the network
     */
-    std::vector<Station*>& getStations() { return _stations; }
+    const std::vector<std::unique_ptr<Station>>& getStations() const { return _stations; }
 
     /**
        Finds the requested station in the network and returns a pointer to it
@@ -34,6 +44,6 @@ public:
     Station* findStation(const std::string& name);
 
 private:
-    std::vector<Station*> _stations;
+    std::vector<std::unique_ptr<Station>> _stations;
 };
 }

@@ -14,6 +14,8 @@ add_library(ircelmeteoprovider MODULE
 )
 
 add_library(rioobsprovider MODULE
+    ObsParser.h
+    ObsParser.cpp
     RioObsProvider.h
     RioObsProvider.cpp
 )
@@ -34,3 +36,5 @@ target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(xmlgridprovider opaqcore)
 target_link_libraries(xmlaqnetprovider opaqcore)
+
+add_subdirectory(test)

@@ -40,7 +40,7 @@ private:
     void loadRecentConfigurations();
     void updateRecentConfiguration(const QString &filePath);
     
-    void updateStationModel(const std::vector<Station*>& stations);
+    void updateStationModel(const std::vector<std::unique_ptr<Station>>& stations);
     void updatePollutantModel();
 
     Ui::OpaqView _ui;

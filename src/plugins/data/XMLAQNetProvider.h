@@ -17,7 +17,6 @@ class XMLAQNetProvider : public OPAQ::AQNetworkProvider
 {
 public:
     XMLAQNetProvider();
-    virtual ~XMLAQNetProvider();
 
     // component members
     // throws OPAQ::BadConfigurationException

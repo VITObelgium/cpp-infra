@@ -147,13 +147,13 @@ void OpaqView::updateRecentConfiguration(const QString &filePath)
     loadRecentConfigurations();
 }
 
-void OpaqView::updateStationModel(const std::vector<Station*>& stations)
+void OpaqView::updateStationModel(const std::vector<std::unique_ptr<Station>>& stations)
 {
     _stationModel.clear();
     _stationModel.insertRows(0, static_cast<int>(stations.size()));
 
     int row = 0;
-    for (auto* station : stations)
+    for (auto& station : stations)
     {
         _stationModel.setItem(row, 0, new QStandardItem(QString("%1 [%2]").arg(station->getDescription().c_str()).arg(station->getName().c_str())));
         _stationModel.setData(_stationModel.index(row++, 0), QString(station->getName().c_str()), Qt::UserRole);

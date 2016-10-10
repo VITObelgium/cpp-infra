@@ -187,7 +187,7 @@ void OVL::run() {
     auto* net              = getAQNetworkProvider().getAQNetwork();
     ForecastBuffer* buffer = getBuffer();
 
-    std::vector<Station *> stations = net->getStations();
+    auto& stations = net->getStations();
 
 
 	// -- Forecast horizon
@@ -206,7 +206,7 @@ void OVL::run() {
 	}
 
 	// -- 2. loop over the stations, the C++ 11 way :)
-	for ( Station *station : stations ) {
+	for (auto& station : stations ) {
 
 		// check if we have a valid meteo id, otherwise skip the station
 		if ( station->getMeteoId().length() == 0 ) {

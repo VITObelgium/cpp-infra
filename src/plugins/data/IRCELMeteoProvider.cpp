@@ -124,7 +124,7 @@ OPAQ::TimeSeries<double> IRCELMeteoProvider::getValues(	const DateTime& t1,
 
 void IRCELMeteoProvider::_checkConfig() {
 	if (!_configured )
-		throw NotConfiguredException("Not fully configured");
+		throw RunTimeException("IRCELMeteoProvider Not fully configured");
 }
 
 
