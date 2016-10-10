@@ -132,6 +132,7 @@ void OpaqValidation::runValidation()
         }
 
         _ui.scatterView->setModel(_model);
+        _ui.lineView->setModel(_model);
     }
     catch (const OPAQ::ParseException& e)
     {

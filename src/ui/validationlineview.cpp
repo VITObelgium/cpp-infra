@@ -1,10 +1,10 @@
-#include "resultsview.h"
+#include "validationlineview.h"
 
 #include "config/Component.h"
-#include "stationresultsmodel.h"
+#include "validationresultsmodel.h"
 
 #include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
 #include <QtCharts/QHXYModelMapper>
 #include <QtCharts/QLegendMarker>
 
@@ -17,9 +17,8 @@ namespace OPAQ
 
 QT_CHARTS_USE_NAMESPACE
 
-ResultsView::ResultsView(QWidget* parent)
+ValidationLineView::ValidationLineView(QWidget* parent)
 : QWidget(parent)
-, _rows(0)
 , _axisX(nullptr)
 , _axisY(nullptr)
 , _chart(nullptr)
@@ -35,14 +34,12 @@ ResultsView::ResultsView(QWidget* parent)
     chartView->setMinimumSize(640, 480);
 
     _axisX = new QValueAxis();
-    _axisX->setRange(0, 4);
-    _axisX->setLabelFormat("Day %d");
-    _axisX->setTitleText("Forecast");
+    _axisX->setRange(0, 75);
+    _axisX->setTitleText("Days");
     _chart->addAxis(_axisX, Qt::AlignBottom);
 
     _axisY = new QValueAxis();
-    _axisY->setRange(0, 100);
-    _axisY->setTickCount(10);
+    _axisY->setRange(0, 75);
     _axisY->setTitleText("Pollution");
     _chart->addAxis(_axisY, Qt::AlignLeft);
 
@@ -52,42 +49,52 @@ ResultsView::ResultsView(QWidget* parent)
     setLayout(mainLayout);
 }
 
-void ResultsView::setForecastHorizon(TimeInterval forecastHorizon)
+void ValidationLineView::setModel(ValidationResultsModel& model)
 {
-    _rows = static_cast<int>(forecastHorizon.getDays()) + 1;
-}
+    _chart->removeAllSeries();
 
-void ResultsView::setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents)
-{
-    int row = 1;
-    for (auto& comp : modelComponents)
+    _axisX->setRange(0, model.columnCount());
+
+    auto rowCount = model.rowCount() - 1;
+    for (int i = 1; i < rowCount; i+=2)
     {
-        QLineSeries* series = new QLineSeries();
-        series->setName(comp.name.c_str());
+        auto* series = new QSplineSeries();
+        series->setName(model.headerData(i, Qt::Orientation::Horizontal, Qt::DisplayRole).value<QString>());
         auto* mapper = new QHXYModelMapper(this);
 
         mapper->setXRow(0);
-        mapper->setYRow(row);
+        mapper->setYRow(i+1);
         mapper->setSeries(series);
         mapper->setModel(&model);
         _chart->addSeries(series);
         series->attachAxis(_axisX);
         series->attachAxis(_axisY);
+    }
 
-        // get the color of the series and use it for showing the mapped area
-        QString seriesColorHex = "#" + QString::number(series->pen().color().rgb(), 16).right(6).toUpper();
-        model.addMapping(seriesColorHex, QRect(0, row++, _rows, 1));
+    if (rowCount > 0)
+    {
+        auto* series = new QSplineSeries();
+        series->setName(tr("Observed"));
+        auto* mapper = new QHXYModelMapper(this);
+
+        mapper->setXRow(0);
+        mapper->setYRow(1);
+        mapper->setSeries(series);
+        mapper->setModel(&model);
+        _chart->addSeries(series);
+        series->attachAxis(_axisX);
+        series->attachAxis(_axisY);
     }
 
     for (auto* marker : _chart->legend()->markers())
     {
         // Disconnect possible existing connection to avoid multiple connections
-        disconnect(marker, &QLegendMarker::clicked, this, &ResultsView::handleMarkerClicked);
-        connect(marker, &QLegendMarker::clicked, this, &ResultsView::handleMarkerClicked);
+        disconnect(marker, &QLegendMarker::clicked, this, &ValidationLineView::handleMarkerClicked);
+        connect(marker, &QLegendMarker::clicked, this, &ValidationLineView::handleMarkerClicked);
     }
 }
 
-void ResultsView::handleMarkerClicked()
+void ValidationLineView::handleMarkerClicked()
 {
     QLegendMarker* marker = qobject_cast<QLegendMarker*>(sender());
     Q_ASSERT(marker);
@@ -113,7 +120,7 @@ void ResultsView::handleMarkerClicked()
 
         QColor color;
         QBrush brush = marker->labelBrush();
-        color = brush.color();
+        color        = brush.color();
         color.setAlphaF(alpha);
         brush.setColor(color);
         marker->setLabelBrush(brush);
@@ -125,7 +132,7 @@ void ResultsView::handleMarkerClicked()
         marker->setBrush(brush);
 
         QPen pen = marker->pen();
-        color = pen.color();
+        color    = pen.color();
         color.setAlphaF(alpha);
         pen.setColor(color);
         marker->setPen(pen);
@@ -135,6 +142,5 @@ void ResultsView::handleMarkerClicked()
         break;
     }
 }
-
 
 }

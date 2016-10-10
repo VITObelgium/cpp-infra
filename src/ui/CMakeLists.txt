@@ -15,12 +15,12 @@ add_executable(opaqui
     mainwindow.h mainwindow.cpp
     runsimulationdialog.h runsimulationdialog.cpp
     stationresultsmodel.h stationresultsmodel.cpp
-    predictionresultsmodel.h predictionresultsmodel.cpp
     validationresultsmodel.h validationresultsmodel.cpp
     opaqview.h opaqview.cpp
     opaqviewer.h opaqviewer.cpp
     opaqvalidation.h opaqvalidation.cpp
     resultsview.h resultsview.cpp
+    validationlineview.h validationlineview.cpp
     validationscatterview.h validationscatterview.cpp
     ${OPAQ_FORMS_HEADERS}
 )

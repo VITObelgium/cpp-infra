@@ -133,6 +133,16 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout_3">
+     <item row="1" column="0">
+      <widget class="OPAQ::ValidationLineView" name="lineView" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="OPAQ::ValidationScatterView" name="scatterView" native="true">
        <property name="sizePolicy">
@@ -141,6 +151,7 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
+       <zorder>lineView</zorder>
       </widget>
      </item>
     </layout>
@@ -152,6 +163,12 @@
    <class>OPAQ::ValidationScatterView</class>
    <extends>QWidget</extends>
    <header>validationscatterview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>OPAQ::ValidationLineView</class>
+   <extends>QWidget</extends>
+   <header>validationlineview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

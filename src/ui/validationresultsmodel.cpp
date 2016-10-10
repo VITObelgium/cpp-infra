@@ -26,9 +26,17 @@ QVariant ValidationResultsModel::data(const QModelIndex& index, int role) const
 {
     if (role == Qt::DisplayRole)
     {
-        auto& results = _results.at(index.row() / 2);
+        if (index.row() == 0)
+        {
+            return index.column();
+        }
+
+        // We use the first row to store the indexes, so take that into account
+        int adjustedRow = index.row() - 1;
+
+        auto& results = _results.at(adjustedRow / 2);
         float value;
-        if (index.row() % 2 == 0)
+        if (adjustedRow % 2 == 0)
         {
             // measured values
             value = results.at(index.column()).measuredValue;
@@ -59,7 +67,12 @@ QVariant ValidationResultsModel::headerData(int section, Qt::Orientation orienta
 
     if (orientation == Qt::Horizontal)
     {
-        return QString(_headers.at(section / 2).c_str());
+        if (section == 0)
+        {
+            return QVariant();
+        }
+
+        return QString(_headers.at((section - 1) / 2).c_str());
     }
     else
     {
@@ -69,6 +82,11 @@ QVariant ValidationResultsModel::headerData(int section, Qt::Orientation orienta
 
 void ValidationResultsModel::addResult(const std::string& modelName, std::vector<PredictionResult> result)
 {
+    if (_rowCount == 0)
+    {
+        ++_rowCount;
+    }
+
     _rowCount += 2;
     _colCount = std::max(_colCount, static_cast<int>(result.size()));
 

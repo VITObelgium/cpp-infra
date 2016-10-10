@@ -32,6 +32,8 @@ public:
     void setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents);
 
 private:
+    void handleMarkerClicked();
+
     int _rows;
     QtCharts::QValueAxis* _axisX;
     QtCharts::QValueAxis* _axisY;

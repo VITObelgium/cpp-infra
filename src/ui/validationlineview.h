@@ -20,12 +20,12 @@ struct Component;
 
 class Station;
 
-class ValidationScatterView : public QWidget
+class ValidationLineView : public QWidget
 {
     Q_OBJECT
 
 public:
-    ValidationScatterView(QWidget* parent = 0);
+    ValidationLineView(QWidget* parent = 0);
 
     void setModel(ValidationResultsModel& model);
 
