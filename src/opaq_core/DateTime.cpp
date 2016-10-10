@@ -12,18 +12,19 @@
 #include <cassert>
 
 #include "DateTime.h"
+#include "Exceptions.h"
 #include "TimeInterval.h"
 
 namespace OPAQ
 {
 
 DateTime::DateTime()
-: _year(0)
-, _month(0)
-, _day(0)
-, _hour(0)
-, _min(0)
-, _sec(0)
+: _time(-1)
+{
+}
+
+DateTime::DateTime(time_t t)
+: _time(t)
 {
 }
 
@@ -44,18 +45,13 @@ static const char* strptime(const char* s, const char* f, struct tm* tm)
 
 DateTime::DateTime(const std::string& s)
 {
-    struct tm t;
+    std::tm t;
 
     memset(&t, 0, sizeof(struct tm));
     //strptime( s.c_str(), "%Y-%m-%d %H:%M%S", &t );
     strptime(s.c_str(), "%Y-%m-%d", &t);
 
-    _year  = t.tm_year + 1900;
-    _month = t.tm_mon + 1;
-    _day   = t.tm_mday;
-    _hour  = t.tm_hour;
-    _min   = t.tm_min;
-    _sec   = t.tm_sec;
+    _time = mktime(&t);
 }
 
 const DateTime DateTime::operator+(const TimeInterval& timeInterval) const
@@ -74,16 +70,53 @@ const DateTime DateTime::operator-(const TimeInterval& timeInterval) const
 
 bool DateTime::isValid() const
 {
-
-    struct tm t;
-    memset(&t, 0, sizeof(struct tm));
-    t.tm_year = _year - 1900;
-    t.tm_mon  = _month - 1;
-    t.tm_mday = _day;
-    t.tm_hour = _hour;
-    t.tm_min  = _min;
-    t.tm_sec  = _sec;
-
-    return mktime(&t) >= 0;
+    return _time != -1;
 }
+
+int DateTime::getSec() const
+{
+    auto* t = std::gmtime(&_time);
+    assert(t);
+    return t->tm_sec;
+}
+
+int DateTime::getMin() const
+{
+    auto* t = std::gmtime(&_time);
+    assert(t);
+    return t->tm_min;
+}
+
+int DateTime::getHour() const
+{
+    auto* t = std::gmtime(&_time);
+    assert(t);
+    return t->tm_hour;
+}
+
+int DateTime::getDay() const
+{
+    auto* t = std::gmtime(&_time);
+    assert(t);
+    return t->tm_mday;
+}
+
+int DateTime::getMonth() const
+{
+    auto* t = std::gmtime(&_time);
+    assert(t);
+    return t->tm_mon + 1;
+}
+
+int DateTime::getYear() const
+{
+    auto* t = gmtime(&_time);
+    if (t == nullptr)
+    {
+        throw RunTimeException("Invalid time structure");
+    }
+
+    return t->tm_year + 1900;
+}
+
 }

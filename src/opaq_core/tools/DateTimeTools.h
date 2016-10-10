@@ -27,8 +27,7 @@ public:
 	static const int FIELD_DAY = 3;
 
 	static DateTime ceil(const DateTime & datetime, int field = FIELD_DAY);
-
-	static DateTime floor(const DateTime & datetime, int field = FIELD_DAY);
+    static DateTime floor(const DateTime & datetime, int field = FIELD_DAY);
 
     // throws ParseException
 	static DateTime parseDateTime(const std::string & str);

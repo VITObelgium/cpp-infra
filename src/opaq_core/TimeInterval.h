@@ -34,7 +34,7 @@ namespace OPAQ {
 	Both begin and end date are given by a OPAQ::DateTime object
     */
     TimeInterval(const DateTime &begin, const DateTime &end) {
-      this->_seconds = end.getUnixTime() - begin.getUnixTime();
+      this->_seconds = static_cast<long>(end.getUnixTime() - begin.getUnixTime());
     }
 
     /** Return the interval as seconds */
