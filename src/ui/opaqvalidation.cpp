@@ -118,15 +118,7 @@ void OpaqValidation::runValidation()
             auto* model = _ui.modelsListWidget->item(i);
             if (model->checkState() == Qt::CheckState::Checked)
             {
-                OutputDebugString(fmt::format("Model: {}", model->text().toStdString()).c_str());
-
                 auto results = _engine->validate(_config->getOpaqRun(), forecastHorizon(), station(), startTime(), endTime(), model->text().toStdString());
-                for (auto& res : results)
-                {
-                    OutputDebugString(fmt::format("{} <-> {}", res.measuredValue, res.predictedValue).c_str());
-                }
-                //updateResultsForCurrentStation();
-
                 _model.addResult(model->text().toStdString(), std::move(results));
             }
         }

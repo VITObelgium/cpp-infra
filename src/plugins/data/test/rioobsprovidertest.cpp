@@ -11,9 +11,9 @@ namespace OPAQ
 namespace Test
 {
 
-using namespace ::testing;
+  using namespace testing;
 
-class ObserverVationParser : public Test
+class ObserverVationParser : public testing::Test
 {
 protected:
 };
