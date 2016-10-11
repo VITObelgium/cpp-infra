@@ -41,6 +41,8 @@ EXTERNALPROJECT_ADD(${NAME}
         threading=multi
         runtime-link=shared
         --with-math
+        --with-system
+        --with-filesystem
         ${PLATFORM_OPTIONS}
         --prefix=${CMAKE_INSTALL_PREFIX} install
     INSTALL_COMMAND ""

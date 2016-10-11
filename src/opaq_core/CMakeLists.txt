@@ -111,7 +111,7 @@ ELSE ()
     )
 ENDIF ()
 
-target_link_libraries(opaqcore fmt hdf5-static ${EXTRA_LIBS})
+target_link_libraries(opaqcore fmt hdf5-static ${Boost_LIBRARIES} ${EXTRA_LIBS})
 
 add_executable(opaq opaq.cpp)
 target_link_libraries(opaq opaqcore)

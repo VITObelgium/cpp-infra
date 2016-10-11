@@ -19,6 +19,8 @@ find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(hdf5 CONFIG REQUIRED)
 
+find_package(Boost REQUIRED COMPONENTS system filesystem)
+
 # We use our own version of FMT, let spdlog use the same version
 add_definitions(-DSPDLOG_FMT_EXTERNAL)
 
