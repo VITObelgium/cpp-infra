@@ -41,6 +41,7 @@ EXTERNALPROJECT_ADD(${NAME}
         threading=multi
         runtime-link=shared
         --with-math
+        --with-iostreams
         --with-system
         --with-filesystem
         ${PLATFORM_OPTIONS}

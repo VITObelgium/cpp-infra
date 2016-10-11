@@ -93,19 +93,16 @@ IF (MSVC)
     # using visual studio we can not mix debug and release libraries
     target_link_libraries(opaqcore
         debug ${ZLIB_LIBRARY_DEBUG}
-        debug ${GZSTREAM_LIBRARY_DEBUG}
         debug ${TINYXML_LIBRARY_DEBUG}
         debug ${DL_LIBRARY_DEBUG}
 
         optimized ${ZLIB_LIBRARY}
-        optimized ${GZSTREAM_LIBRARY}
         optimized ${TINYXML_LIBRARY}
         optimized ${DL_LIBRARY}
     )
 ELSE ()
     target_link_libraries(opaqcore
         ${TINYXML_LIBRARY}
-        ${GZSTREAM_LIBRARY}
         ${ZLIB_LIBRARY}
         ${CMAKE_DL_LIBS}
     )
