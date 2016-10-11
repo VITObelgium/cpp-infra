@@ -28,7 +28,7 @@ public:
     \param stationCode a string reference indicating the station
     \return true or false
     */
-    bool containsStation(const std::string& stationCode) const;
+    bool containsStation(const std::string& stationCode) const noexcept;
 
     void addStation(std::unique_ptr<Station> station);
 
@@ -41,7 +41,7 @@ public:
        Finds the requested station in the network and returns a pointer to it
        The routine compares the given string and the station name
     */
-    Station* findStation(const std::string& name);
+    Station* findStation(const std::string& name) const noexcept;
 
 private:
     std::vector<std::unique_ptr<Station>> _stations;

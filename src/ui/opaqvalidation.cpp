@@ -41,7 +41,7 @@ void OpaqValidation::setModels(const std::vector<Config::Component>& models)
     {
         auto* item = new QListWidgetItem();
         item->setData(Qt::DisplayRole, model.name.c_str());
-        item->setData(Qt::CheckStateRole, Qt::Unchecked);
+        item->setData(Qt::CheckStateRole, Qt::Checked);
         _ui.modelsListWidget->addItem(item);
     }
 

@@ -20,3 +20,5 @@ if (WIN32)
 else ()
     target_link_libraries(dataplugintest ${GTEST_LIBRARY})
 endif ()
+
+add_test(NAME dataplugintest COMMAND dataplugintest)
