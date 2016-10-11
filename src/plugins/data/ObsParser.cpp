@@ -4,6 +4,7 @@
 #include "tools/AQNetworkTools.h"
 
 #include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 #include <boost/utility/string_ref.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
@@ -84,7 +85,9 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
         // line format:
         // stationCode YYYYMMDD m1 m8 da hour0 hour1, ..., hour23
 
-        boost::tokenizer<> tok(line);
+        boost::char_separator<char> sep(" ");
+        boost::tokenizer<boost::char_separator<char>> tok(line, sep);
+
         auto iter = tok.begin();
 
         auto station = *iter;
@@ -98,17 +101,20 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
                            atoi(iter->substr(4, 2).c_str()),
                            atoi(iter->substr(6, 2).c_str()), 0, 0, 0);
 
+            ++iter;
+
             // get the different aggregations...
-            result[Aggregation::Max1h][station].insert(begin, atof((*iter++).c_str())); // 3rd column is daily max
-            result[Aggregation::Max8h][station].insert(begin, atof((*iter++).c_str())); // 4th column is max 8h
-            result[Aggregation::DayAvg][station].insert(begin, atof((*iter++).c_str())); // 5th column is daily avg
+            result[Aggregation::Max1h][station].insert(begin, boost::lexical_cast<float>((*iter++).c_str())); // 3rd column is daily max
+            result[Aggregation::Max8h][station].insert(begin, boost::lexical_cast<float>((*iter++).c_str())); // 4th column is max 8h
+            result[Aggregation::DayAvg][station].insert(begin, boost::lexical_cast<float>((*iter++).c_str())); // 5th column is daily avg
 
             // get the hourly values, no aggregation
             auto& ts = result[Aggregation::None][station];
             ts.reserve(numberOfValues);
             for (; iter != tok.end(); ++iter)
             {
-                ts.insert(begin, atof(iter->c_str()));
+                std::string s = iter->c_str();
+                ts.insert(begin, boost::lexical_cast<float>(iter->c_str()));
                 begin = begin + timeResolution;
             }
         }
