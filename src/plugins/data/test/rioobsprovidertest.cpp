@@ -77,6 +77,20 @@ TEST_F(ObserverVationParser, ParseFile)
     }
 }
 
+TEST_F(ObserverVationParser, ParseFileCarriageReturnLineFeed)
+{
+    std::stringstream ss;
+    ss << "40AB01 20090101    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\r\n"
+        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\r\n";
+
+    auto result = readObservationsFile(ss, network, 24, TimeInterval(60, TimeInterval::Minutes));
+    EXPECT_EQ(4u, result.size()); // one result for each aggregation
+    EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size()); // one value for each basetime
+    EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size()); // one value for each basetime
+    EXPECT_EQ(2u, result[Aggregation::DayAvg][s_station].size()); // one value for each basetime
+    EXPECT_EQ(48u, result[Aggregation::None][s_station].size()); // 24 values for each basetime
+}
+
 TEST_F(ObserverVationParser, ParseInvalidFile)
 {
     std::stringstream ss;

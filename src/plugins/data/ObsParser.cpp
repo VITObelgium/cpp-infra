@@ -1,6 +1,7 @@
 #include "ObsParser.h"
 
 #include "tools/StringTools.h"
+#include "tools/FileTools.h"
 #include "tools/AQNetworkTools.h"
 
 #include <boost/lexical_cast.hpp>
@@ -20,21 +21,17 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
 {
     std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> result;
 
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    std::string contents(buffer.str());
-
-    StringTools::StringSplitter lineSplitter(contents, "\n");
+    auto contents = FileTools::readStreamContents(file);
+    StringTools::StringSplitter lineSplitter(contents, "\r\n");
 
     for (auto& line : lineSplitter)
     {
-        // line format:
-        // stationCode YYYYMMDD m1 m8 da hour0 hour1, ..., hour23
+        // line format: stationCode YYYYMMDD m1 m8 da hour0 hour1, ..., hour23
 
-        StringTools::StringSplitter observationSplitter(line, " ");
+        StringTools::StringSplitter observationSplitter(line, " \t\r\n\f");
 
         auto iter = observationSplitter.begin();
-        const auto station = std::string((*iter).begin(), (*iter).end());
+        const auto station = std::string(iter->begin(), iter->end());
 
         if (aqNetwork.containsStation(station))
         {
