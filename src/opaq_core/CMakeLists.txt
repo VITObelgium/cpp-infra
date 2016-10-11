@@ -94,11 +94,9 @@ IF (MSVC)
     target_link_libraries(opaqcore
         debug ${ZLIB_LIBRARY_DEBUG}
         debug ${TINYXML_LIBRARY_DEBUG}
-        debug ${DL_LIBRARY_DEBUG}
 
         optimized ${ZLIB_LIBRARY}
         optimized ${TINYXML_LIBRARY}
-        optimized ${DL_LIBRARY}
     )
 ELSE ()
     target_link_libraries(opaqcore
@@ -112,10 +110,3 @@ target_link_libraries(opaqcore fmt hdf5-static ${Boost_LIBRARIES} ${EXTRA_LIBS})
 
 add_executable(opaq opaq.cpp)
 target_link_libraries(opaq opaqcore)
-
-IF (MSVC)
-    target_link_libraries(opaq
-        debug ${GETOPT_LIBRARY_DEBUG}
-        optimized ${GETOPT_LIBRARY}
-    )
-ENDIF ()

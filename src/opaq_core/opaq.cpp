@@ -4,7 +4,6 @@
  *  Created on: Jan 16, 2014
  *      Author: vlooys, maiheub
  */
-#include <getopt.h>
 #include <iostream>
 #include <string.h>
 
@@ -20,22 +19,16 @@
 
 #include "config.h"
 
-void print_usage(void)
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
+
+static void printVersion()
 {
-    std::cout << "Usage :" << std::endl;
-    std::cout << " opaq [options]" << std::endl;
-    std::cout << "Available options :" << std::endl;
-    std::cout << " --help ................ : this message" << std::endl;
-    std::cout << " --cnf <fname> ......... : use this XML config file (def. opaq-config.xml)" << std::endl;
-    std::cout << " --log <name> .......... : name for logfile (default in <logfile>)" << std::endl;
-    std::cout << " --pol <name> .......... : run for this pollutant/index" << std::endl;
-    std::cout << " --aggr <aggr> ......... : run for this aggregation time" << std::endl;
-    std::cout << " --basetime <yyyy-mm-dd> : run for this base time" << std::endl;
-    std::cout << " --days <number> ....... : run for this many days, starting from base time (def. 1)" << std::endl;
-    std::cout << std::endl;
+    std::cout << "OPAQ Version: " << OPAQ_VERSION << std::endl;
 }
 
-void printWelcome(void)
+static void printWelcome()
 {
     std::cout << "  ______   .______      ___       ______      " << std::endl;
     std::cout << " /  __  \\  |   _  \\    /   \\     /  __  \\     " << std::endl;
@@ -49,6 +42,17 @@ void printWelcome(void)
     std::cout << "Copyright VITO (c) 2015, all rights reserved" << std::endl;
     std::cout << "Contact: bino.maiheu@vito.be" << std::endl;
     std::cout << std::endl;
+}
+
+template <typename T>
+static T getOptionalArg(const po::variables_map& vm, const char* name, const T& defaultValue)
+{
+    if (vm.count(name) > 0)
+    {
+        return vm[name].as<T>();
+    }
+
+    return defaultValue;
 }
 
 // have to read in the config file already once to the the log filename,
@@ -73,69 +77,79 @@ std::string readLogName(const std::string& config_file)
     return "";
 }
 
+static const std::string s_emptyString = "";
+
 int main(int argc, char* argv[])
 {
-    // define command line options
-    struct option long_options[] = {
-        {"help", 0, 0, 'h'},
-        {"log", 1, 0, 'l'},
-        {"cnf", 1, 0, 'c'},
-        {"pol", 1, 0, 'p'},
-        {"aggr", 1, 0, 'a'},
-        {"basetime", 1, 0, 'b'},
-        {"days", 1, 0, 'd'},
-        {0, 0, 0, 0}};
-
     // general variable settable via command line options in opaq
-    std::string pol, aggr, arg_log, basetime;
-    std::string config_file = "opaq-config.xml";
-    std::string days        = "1";
+    std::string pol, aggr, basetime, logFile, configFile;
+    uint32_t days;
 
-    /* -----------------------------------------------------------------------------------
-     Parsing command line options
-     --------------------------------------------------------------------------------- */
-    while (1)
+    try
     {
-        int option_index = 0;
-        int c            = getopt_long(argc, argv, "o:a:d:p:t:hl:", long_options, &option_index);
-        if (c == -1) break;
-        switch (c)
+        /* -----------------------------------------------------------------------------------
+           Parsing command line options
+           --------------------------------------------------------------------------------- */
+        po::options_description desc("Command line options");
+        desc.add_options()
+            ("help,h", "display help message")
+            ("version,v", "show version info")
+            ("log,l", po::value<std::string>(), "name for logfile")
+            ("cnf,c", po::value<std::string>()->default_value("opaq-config.xml"), "use this XML config file")
+            ("pol,p", po::value<std::string>(), "run for this pollutant/index")
+            ("aggr,a", po::value<std::string>(), "run for this aggregation time")
+            ("basetime,b", po::value<std::string>(), "run for this base time (yyyy-mm-dd)")
+            ("days,d", po::value<uint32_t>()->default_value(1), "run for this many days, starting from base time")
+        ;
+
+        po::variables_map vm;
+        po::store(po::parse_command_line(argc, argv, desc), vm);
+        po::notify(vm);
+
+        if (vm.count("help") > 0)
         {
-        case 'h':
-            print_usage();
+            std::cout << desc << std::endl;
             return EXIT_SUCCESS;
-        case 'c': config_file = optarg; break;
-        case 'l': arg_log     = optarg; break;
-        case 'p': pol         = optarg; break;
-        case 'a': aggr        = optarg; break;
-        case 'b': basetime    = optarg; break;
-        case 'd': days        = optarg; break;
-        default:
-            std::cerr << "Error parsing command line options, try --help !" << std::endl;
-            return EXIT_FAILURE;
         }
+
+        if (vm.count("version") > 0)
+        {
+            printVersion();
+            return EXIT_SUCCESS;
+        }
+
+        // parse the config file here quickly just to get the log filename if given, cannot do this
+        // in the config handler (see remark below..)
+        logFile = readLogName(vm["cnf"].as<std::string>());
+        if (vm.count("log") > 0)
+        {
+            logFile = vm["log"].as<std::string>();
+        }
+
+        configFile = vm["cnf"].as<std::string>();
+        pol = getOptionalArg(vm, "pol", s_emptyString);
+        aggr = getOptionalArg(vm, "agg", s_emptyString);
+        basetime = getOptionalArg(vm, "basetime", s_emptyString);
+        days = vm["days"].as<uint32_t>();
+    }
+    catch (const po::error& e)
+    {
+        std::cerr << "Invalid command line: " << e.what() << std::endl;
+        return EXIT_FAILURE;
     }
 
     printWelcome();
 
-    // parse the config file here quicly just to get the log filename if given, cannot do this
-    // in the config handler (see remark below..)
-    std::string log_file = readLogName(config_file);
-    if (!arg_log.empty())
-    {
-        log_file = arg_log;
-    }
-
-    Log::initLogger(log_file);
+    Log::initLogger(logFile);
     auto logger = Log::createLogger("main");
 
     // -- Parse configuration, after init of the log, otherwise we get errors
     OPAQ::Config::PollutantManager pollutantMgr;
     OPAQ::ConfigurationHandler ch;
-    
+
     try
     {
-        ch.parseConfigurationFile(config_file, pollutantMgr);
+        ch.parseConfigurationFile(configFile, pollutantMgr);
     }
     catch (const std::exception& e)
     {
@@ -144,7 +158,7 @@ int main(int argc, char* argv[])
     }
 
     logger->info("Starting OPAQ run...");
-    logger->info("Using OPAQ configuration in .... : {}", config_file);
+    logger->info("Using OPAQ configuration in .... : {}", configFile);
 
     /* -----------------------------------------------------------------------------------
      Starting initialization
@@ -166,12 +180,11 @@ int main(int argc, char* argv[])
     {
         auto& basetimes = ch.getOpaqRun().getBaseTimes();
         basetimes.clear();
-        
+
         try
         {
             auto baseTime = OPAQ::DateTimeTools::parseDate(basetime);
-            int dayCount  = atoi(days.c_str());
-            for (int i = 0; i < dayCount; ++i)
+            for (uint32_t i = 0; i < days; ++i)
             {
                 basetimes.push_back(baseTime);
                 baseTime.addDays(1);
@@ -196,7 +209,7 @@ int main(int argc, char* argv[])
     /* -----------------------------------------------------------------------------------
      Starting Engine...
      --------------------------------------------------------------------------------- */
-    
+
     try
     {
         OPAQ::Engine engine(pollutantMgr);

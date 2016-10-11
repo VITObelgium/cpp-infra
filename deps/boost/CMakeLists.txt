@@ -44,6 +44,7 @@ EXTERNALPROJECT_ADD(${NAME}
         --with-iostreams
         --with-system
         --with-filesystem
+        --with-program_options
         ${PLATFORM_OPTIONS}
         --prefix=${CMAKE_INSTALL_PREFIX} install
     INSTALL_COMMAND ""
