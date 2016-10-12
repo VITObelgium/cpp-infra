@@ -12,6 +12,7 @@
 
 #include <map>
 #include <memory>
+#include <functional>
 #include <tinyxml.h>
 #include <boost/shared_ptr.hpp>
 
@@ -84,9 +85,9 @@ public:
     void destroyComponent(const std::string& componentName);
 
 private:
-    typedef Component* (*FactoryFunc)(LogConfiguration*);
+    typedef Component* (FactoryFunc)(LogConfiguration*);
     typedef std::map<std::string, std::unique_ptr<Component>> InstanceMapType;
-    typedef std::map<std::string, boost::shared_ptr<FactoryFunc>> FactoryMapType;
+    typedef std::map<std::string, std::function<Component*(LogConfiguration*)>> FactoryMapType;
 
     InstanceMapType instanceMap;
     FactoryMapType factoryMap;

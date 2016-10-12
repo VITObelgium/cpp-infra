@@ -16,6 +16,8 @@ find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(hdf5 CONFIG REQUIRED)
 
+set (Boost_USE_STATIC_LIBS ON)
+ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
 find_package(Boost REQUIRED COMPONENTS system filesystem iostreams program_options)
 
 # We use our own version of FMT, let spdlog use the same version

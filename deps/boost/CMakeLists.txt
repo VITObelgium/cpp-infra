@@ -1,5 +1,5 @@
 SET(MAJOR 1)
-SET(MINOR 62)
+SET(MINOR 61)
 SET(REVISION 0)
 SET(VERSION ${MAJOR}.${MINOR}.${REVISION})
 SET(VERSION_UNDERSCORE ${MAJOR}_${MINOR}_${REVISION})
@@ -30,11 +30,14 @@ ELSE ()
 ENDIF ()
 
 EXTERNALPROJECT_ADD(${NAME}
+    DEPENDS zlib
     URL http://downloads.sourceforge.net/project/${NAME}/${NAME}/${VERSION}/${NAME}_${VERSION_UNDERSCORE}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
     BUILD_COMMAND ${BUILD_CMD}
+        -a
         address-model=64
+        architecture=x86
         variant=${VARIANT}
         toolset=${TOOLSET}
         link=static
@@ -45,6 +48,9 @@ EXTERNALPROJECT_ADD(${NAME}
         --with-system
         --with-filesystem
         --with-program_options
+        -s NO_ZLIB=0
+        -s ZLIB_INCLUDE=${CMAKE_PREFIX_PATH}/include
+        -s ZLIB_LIBPATH=${CMAKE_PREFIX_PATH}/lib
         ${PLATFORM_OPTIONS}
         --prefix=${CMAKE_INSTALL_PREFIX} install
     INSTALL_COMMAND ""

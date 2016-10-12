@@ -25,7 +25,7 @@ ComponentManager::ComponentManager(IEngine& engine)
 void ComponentManager::loadPlugin(const std::string& pluginName, const std::string& filename)
 {
     // 1. check if plugin was already loaded
-    FactoryMapType::iterator it = factoryMap.find(pluginName);
+    auto it = factoryMap.find(pluginName);
     if (it != factoryMap.end())
     {
         throw RunTimeException("There already exists a plugin with name {}", pluginName);
@@ -81,7 +81,7 @@ std::unique_ptr<Component> ComponentManager::createComponent(const std::string& 
     }
 
     auto& sink = Log::getConfiguration();
-    std::unique_ptr<Component> component((*it->second)(&sink));
+    std::unique_ptr<Component> component((it->second)(&sink));
     component->configure(configuration, _engine);
     return component;
 }
