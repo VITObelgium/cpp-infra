@@ -2,11 +2,16 @@
 
 #include "TimeInterval.h"
 
-#include <QtCharts/QChart>
-#include <QtCharts/QValueAxis>
 #include <QtWidgets/QWidget>
 
 class QTableView;
+
+namespace QtCharts
+{
+    class QScatterSeries;
+    class QValueAxis;
+    class QChart;
+}
 
 namespace OPAQ
 {
@@ -31,9 +36,12 @@ public:
 
 private:
     void handleMarkerClicked();
+    void addReferenceOriginLine(double x, double y, Qt::PenStyle style, QColor color);
 
     QtCharts::QValueAxis* _axisX;
     QtCharts::QValueAxis* _axisY;
     QtCharts::QChart* _chart;
+
+    std::vector<QtCharts::QScatterSeries*> _modelSeries;
 };
 }
