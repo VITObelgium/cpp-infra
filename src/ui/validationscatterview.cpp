@@ -3,10 +3,14 @@
 #include "config/Component.h"
 #include "validationresultsmodel.h"
 
+#include <QtCharts/QChart>
+#include <QtCharts/QValueAxis>
 #include <QtCharts/QChartView>
-#include <QtCharts/QScatterSeries>
 #include <QtCharts/QHXYModelMapper>
 #include <QtCharts/QLegendMarker>
+#include <QtCharts/QScatterSeries>
+#include <QtCharts/QLineSeries>
+#include <QtCharts/QSplineSeries>
 
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
@@ -43,6 +47,16 @@ ValidationScatterView::ValidationScatterView(QWidget* parent)
     _axisY->setTitleText("OPAQ - RTC");
     _chart->addAxis(_axisY, Qt::AlignLeft);
 
+    // Add reference lines
+    addReferenceOriginLine(500, 1000, Qt::PenStyle::DashLine, QColor(Qt::GlobalColor::black)); //   2x
+    addReferenceOriginLine(500, 500, Qt::PenStyle::SolidLine, QColor(Qt::GlobalColor::red));  //    x
+    addReferenceOriginLine(500, 250, Qt::PenStyle::DashLine, QColor(Qt::GlobalColor::black));  // 0.5x
+
+    for (auto* marker : _chart->legend()->markers())
+    {
+        marker->setVisible(false);
+    }
+
     // create main layout
     auto* mainLayout = new QHBoxLayout;
     mainLayout->addWidget(chartView);
@@ -51,10 +65,15 @@ ValidationScatterView::ValidationScatterView(QWidget* parent)
 
 void ValidationScatterView::setModel(ValidationResultsModel& model)
 {
-    _chart->removeAllSeries();
+    for (auto* series : _modelSeries)
+    {
+        _chart->removeSeries(series);
+    }
+
+    _modelSeries.clear();
 
     auto rowCount = model.rowCount() - 1;
-    for (int i = 1; i < rowCount; i+=2)
+    for (int i = 1; i < rowCount; i += 2)
     {
         auto* series = new QScatterSeries();
         series->setMarkerSize(5.0);
@@ -62,12 +81,14 @@ void ValidationScatterView::setModel(ValidationResultsModel& model)
         auto* mapper = new QHXYModelMapper(this);
 
         mapper->setXRow(i);
-        mapper->setYRow(i+1);
+        mapper->setYRow(i + 1);
         mapper->setSeries(series);
         mapper->setModel(&model);
         _chart->addSeries(series);
         series->attachAxis(_axisX);
         series->attachAxis(_axisY);
+
+        _modelSeries.push_back(series);
     }
 
     for (auto* marker : _chart->legend()->markers())
@@ -104,7 +125,7 @@ void ValidationScatterView::handleMarkerClicked()
 
         QColor color;
         QBrush brush = marker->labelBrush();
-        color = brush.color();
+        color        = brush.color();
         color.setAlphaF(alpha);
         brush.setColor(color);
         marker->setLabelBrush(brush);
@@ -116,7 +137,7 @@ void ValidationScatterView::handleMarkerClicked()
         marker->setBrush(brush);
 
         QPen pen = marker->pen();
-        color = pen.color();
+        color    = pen.color();
         color.setAlphaF(alpha);
         pen.setColor(color);
         marker->setPen(pen);
@@ -127,4 +148,22 @@ void ValidationScatterView::handleMarkerClicked()
     }
 }
 
+void ValidationScatterView::addReferenceOriginLine(double x, double y, Qt::PenStyle style, QColor color)
+{
+    auto* series = new QLineSeries();
+
+    QPen pen(style);
+    pen.setColor(color);
+
+    series->append(0, 0);
+    series->append(x, y);
+    series->setOpacity(0.75);
+    series->setPen(pen);
+
+    _chart->addSeries(series);
+    series->attachAxis(_axisX);
+    series->attachAxis(_axisY);
 }
+
+}
+
