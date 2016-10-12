@@ -151,7 +151,6 @@
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <zorder>lineView</zorder>
       </widget>
      </item>
     </layout>
@@ -172,6 +171,16 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>stationComboBox</tabstop>
+  <tabstop>pollutantComboBox</tabstop>
+  <tabstop>aggregationComboBox</tabstop>
+  <tabstop>forecastHorizonComboBox</tabstop>
+  <tabstop>fromDateEdit</tabstop>
+  <tabstop>toDateEdit</tabstop>
+  <tabstop>modelsListWidget</tabstop>
+  <tabstop>validateButton</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>
