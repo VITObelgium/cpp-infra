@@ -1,6 +1,7 @@
 #include "validationresultsmodel.h"
 
 #include "data/ForecastBuffer.h"
+#include "tools/CalcTools.h"
 
 namespace OPAQ
 {
@@ -80,6 +81,21 @@ QVariant ValidationResultsModel::headerData(int section, Qt::Orientation orienta
     }
 }
 
+double ValidationResultsModel::getRootMeanSquareError(const std::string& modelName) const
+{
+    return _rmse.at(modelName);
+}
+
+double ValidationResultsModel::getBias(const std::string& modelName) const
+{
+    return _bias.at(modelName);
+}
+
+double ValidationResultsModel::getRSquare(const std::string& modelName) const
+{
+    return _rSquare.at(modelName);
+}
+
 void ValidationResultsModel::addResult(const std::string& modelName, std::vector<PredictionResult> result)
 {
     if (_rowCount == 0)
@@ -89,6 +105,12 @@ void ValidationResultsModel::addResult(const std::string& modelName, std::vector
 
     _rowCount += 2;
     _colCount = std::max(_colCount, static_cast<int>(result.size()));
+
+    _rmse[modelName] = CalcTools::rmse(result);
+    _bias[modelName] = CalcTools::bias(result);
+
+    double slope, icept;
+    _rSquare[modelName] = CalcTools::lsqreg(result, slope, icept);
 
     _headers.push_back(modelName);
     _results.emplace_back(std::move(result));
@@ -100,6 +122,9 @@ void ValidationResultsModel::clear()
     _colCount = 0;
     _headers.clear();
     _results.clear();
+    _rmse.clear();
+    _bias.clear();
+    _rSquare.clear();
 }
 
 

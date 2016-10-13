@@ -26,6 +26,7 @@ ValidationScatterView::ValidationScatterView(QWidget* parent)
 , _axisX(nullptr)
 , _axisY(nullptr)
 , _chart(nullptr)
+, _model(nullptr)
 {
     // create simple model for storing data
     // user's table data model
@@ -71,6 +72,7 @@ void ValidationScatterView::setModel(ValidationResultsModel& model)
     }
 
     _modelSeries.clear();
+    _model = &model;
 
     auto rowCount = model.rowCount() - 1;
     for (int i = 1; i < rowCount; i += 2)
@@ -95,7 +97,29 @@ void ValidationScatterView::setModel(ValidationResultsModel& model)
     {
         // Disconnect possible existing connection to avoid multiple connections
         disconnect(marker, &QLegendMarker::clicked, this, &ValidationScatterView::handleMarkerClicked);
+        disconnect(marker, &QLegendMarker::hovered, this, &ValidationScatterView::handleMarkerHovered);
+        
         connect(marker, &QLegendMarker::clicked, this, &ValidationScatterView::handleMarkerClicked);
+        connect(marker, &QLegendMarker::hovered, this, &ValidationScatterView::handleMarkerHovered);
+    }
+}
+
+void ValidationScatterView::handleMarkerHovered(bool status)
+{
+    QLegendMarker* marker = qobject_cast<QLegendMarker*>(sender());
+    Q_ASSERT(marker);
+
+    if (status)
+    {
+        auto modelName = marker->series()->name().toStdString();
+        _chart->legend()->setToolTip(QString("<b>RMSE</b>: %1<br/><b>BIAS</b>: %2<br/><b>R&sup2;</b>: %3")
+            .arg(_model->getRootMeanSquareError(modelName))
+            .arg(_model->getBias(modelName))
+            .arg(_model->getRSquare(modelName)));
+    }
+    else
+    {
+        _chart->legend()->setToolTip("");
     }
 }
 

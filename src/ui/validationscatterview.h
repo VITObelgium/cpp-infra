@@ -35,6 +35,7 @@ public:
     void setModel(ValidationResultsModel& model);
 
 private:
+    void handleMarkerHovered(bool status);
     void handleMarkerClicked();
     void addReferenceOriginLine(double x, double y, Qt::PenStyle style, QColor color);
 
@@ -42,6 +43,7 @@ private:
     QtCharts::QValueAxis* _axisY;
     QtCharts::QChart* _chart;
 
+    ValidationResultsModel* _model;
     std::vector<QtCharts::QScatterSeries*> _modelSeries;
 };
 }

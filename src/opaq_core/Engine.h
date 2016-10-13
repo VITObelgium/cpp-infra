@@ -45,6 +45,9 @@ struct PredictionResult
     {
     }
 
+    double x() const noexcept { return measuredValue; }
+    double y() const noexcept { return predictedValue; }
+
     DateTime time;
     double measuredValue  = 0.0;
     double predictedValue = 0.0;

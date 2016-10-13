@@ -78,6 +78,7 @@ set (CORE_TOOLS_SOURCES
     tools/StringTools.cpp
     tools/XmlTools.h
     tools/XmlTools.cpp
+    tools/CalcTools.h
 )
 
 source_group(Config FILES ${CORE_CONFIG_SOURCES})
