@@ -89,8 +89,10 @@ private:
     typedef std::map<std::string, std::unique_ptr<Component>> InstanceMapType;
     typedef std::map<std::string, std::function<Component*(LogConfiguration*)>> FactoryMapType;
 
-    InstanceMapType instanceMap;
+    // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
+    // The instance map has to be destroyed before the dll unload
     FactoryMapType factoryMap;
+    InstanceMapType instanceMap;
     IEngine& _engine;
 
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
