@@ -6,7 +6,7 @@ SET(VERSION ${MAJOR}.${MINOR}.${REVISION})
 SET(PACKAGE ${NAME}-${VERSION})
 
 EXTERNALPROJECT_ADD(${NAME}
-    URL https://github.com/HowardHinnant/${NAME}/archive/v${VERSION}.tar.gz TIMEOUT 180
+    URL http://github.com/HowardHinnant/${NAME}/archive/v${VERSION}.tar.gz TIMEOUT 180
     PREFIX ${NAME}
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CONFIGURE_COMMAND ""

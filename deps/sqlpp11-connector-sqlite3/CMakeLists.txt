@@ -5,13 +5,14 @@ SET(VERSION ${MAJOR}.${MINOR})
 SET(PACKAGE ${NAME}-${VERSION})
 
 EXTERNALPROJECT_ADD(${NAME}
-    DEPENDS sqlpp11
-    URL https://github.com/rbock/${NAME}/archive/${VERSION}.tar.gz TIMEOUT 180
+    DEPENDS sqlpp11 sqlite date
+    URL http://github.com/rbock/${NAME}/archive/${VERSION}.tar.gz TIMEOUT 180
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>
                -DCMAKE_POSITION_INDEPENDENT_CODE=TRUE
+               -DCMAKE_PREFIX_PATH=${CMAKE_PREFIX_PATH}
                -DDATE_INCLUDE_DIR:FILEPATH=<INSTALL_DIR>/include
                -DSQLPP11_INCLUDE_DIR:FILEPATH=<INSTALL_DIR>/include
                ${POSTFIX_CONFIG}
