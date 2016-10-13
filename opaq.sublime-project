@@ -4,9 +4,10 @@
         {
             "cmd":
             [
-                "/usr/bin/ninja",
+                "ninja",
                 "all"
             ],
+            "path": "/usr/local/bin:/usr/bin",
             "file_regex": "^(..[^:]*):([0-9]+):?([0-9]+)?:? (.*)$",
             "name": "Opaq Debug",
             "syntax": "Packages/User/c++output.tmLanguage",
