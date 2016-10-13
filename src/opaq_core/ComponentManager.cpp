@@ -7,10 +7,14 @@
 #include "ComponentManager.h"
 #include "Exceptions.h"
 #include "Logger.h"
-#include <dlfcn.h>
+
+#include <boost/dll/import.hpp>         // for dll::import
+#include <boost/dll/shared_library.hpp> // for dll::shared_library
 
 namespace OPAQ
 {
+
+namespace dll = boost::dll;
 
 ComponentManager::ComponentManager(IEngine& engine)
 : _engine(engine)
@@ -21,29 +25,15 @@ ComponentManager::ComponentManager(IEngine& engine)
 void ComponentManager::loadPlugin(const std::string& pluginName, const std::string& filename)
 {
     // 1. check if plugin was already loaded
-    FactoryMapType::iterator it = factoryMap.find(pluginName);
+    auto it = factoryMap.find(pluginName);
     if (it != factoryMap.end())
     {
         throw RunTimeException("There already exists a plugin with name {}", pluginName);
     }
 
-    // 2. load plugin
-    void* handle = dlopen(filename.c_str(), RTLD_LAZY);
-    if (!handle)
-    {
-        auto* error = dlerror();
-        throw FailedToLoadPluginException("Failed to load library with name '{}' from file with name '{}': {}", pluginName, filename, (error ? error : ""));
-    }
-    //BM funky function handle casting going on here :-)
-    auto factory = reinterpret_cast<FactoryFunc>(dlsym(handle, "factory"));
-    if (factory == nullptr)
-    {
-        auto* error = dlerror();
-        throw FailedToLoadPluginException("Failed to fetch factory symbol from library with name '{}' in file with name '{}': {}", pluginName, filename, (error ? error : ""));
-    }
-
-    // Create the _logger in the application and not in the dll memory space
-    factoryMap.emplace(pluginName, factory);
+    // 2. load plugin function
+    auto factoryFunc = dll::import<FactoryFunc>(filename.c_str(), "factory", boost::dll::load_mode::rtld_lazy);
+    factoryMap.emplace(pluginName, factoryFunc);
 }
 
 // Throws ComponentAlreadyExistsException PluginNotFoundException BadConfigurationException
@@ -91,7 +81,7 @@ std::unique_ptr<Component> ComponentManager::createComponent(const std::string& 
     }
 
     auto& sink = Log::getConfiguration();
-    std::unique_ptr<Component> component(it->second(&sink));
+    std::unique_ptr<Component> component((it->second)(&sink));
     component->configure(configuration, _engine);
     return component;
 }

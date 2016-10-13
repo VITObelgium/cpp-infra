@@ -12,13 +12,15 @@
 
 #include <map>
 #include <memory>
+#include <functional>
 #include <tinyxml.h>
+#include <boost/shared_ptr.hpp>
 
 /**
  * \brief Macro to register a class as being an OPAQ component.
- * When writing new components, a user should add this macro statement to 
+ * When writing new components, a user should add this macro statement to
  * the implementation source file. Dont forget to include a correct namespace
- * if you want to have the plugin to have it's own namespace. 
+ * if you want to have the plugin to have it's own namespace.
  *
  *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
  */
@@ -44,12 +46,12 @@ class ComponentNotFoundException;
 class PluginNotFoundException;
 class BadConfigurationException;
 
-/** 
-   * \brief class for managing the components. 
+/**
+   * \brief class for managing the components.
    * \author Stijn Van Looy
    *
-   *  Class to manage the components in OPAQ. It provides functionality to discover and 
-   *  create instances of the different OPAQ plugins which derive from OPAQ::Component. 
+   *  Class to manage the components in OPAQ. It provides functionality to discover and
+   *  create instances of the different OPAQ plugins which derive from OPAQ::Component.
    *
    *  This factory class was started from and loosely inspired by:
    *  http://stackoverflow.com/questions/582331/is-there-a-way-to-instantiate-objects-from-a-string-holding-their-class-name
@@ -83,12 +85,14 @@ public:
     void destroyComponent(const std::string& componentName);
 
 private:
-    typedef Component* (*FactoryFunc)(LogConfiguration*);
+    typedef Component* (FactoryFunc)(LogConfiguration*);
     typedef std::map<std::string, std::unique_ptr<Component>> InstanceMapType;
-    typedef std::map<std::string, FactoryFunc> FactoryMapType;
+    typedef std::map<std::string, std::function<Component*(LogConfiguration*)>> FactoryMapType;
 
-    InstanceMapType instanceMap;
+    // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
+    // The instance map has to be destroyed before the dll unload
     FactoryMapType factoryMap;
+    InstanceMapType instanceMap;
     IEngine& _engine;
 
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
