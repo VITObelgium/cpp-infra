@@ -14,10 +14,15 @@ set(CMAKE_CXX_STANDARD 14)
 
 option(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
 option(BUILD_UI "Build the user interface" OFF)
+option(STATIC_BUILD "Build fully statically linked binaries" OFF)
 
 if (SANITIZE_ADDRESS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+endif ()
+
+if (STATIC_BUILD)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -static-libgcc -static-libstdc++")
 endif ()
 
 if (MSVC)
@@ -26,6 +31,10 @@ if (MSVC)
     # avoid windows specific warnings
     add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 endif()
+
+if (CMAKE_COMPILER_IS_GNUCC)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
+endif ()
 
 include_directories(
     ${CMAKE_BINARY_DIR}
