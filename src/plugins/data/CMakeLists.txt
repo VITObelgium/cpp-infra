@@ -1,11 +1,19 @@
-add_library(asciiforecastwriter MODULE
-    AsciiForecastWriter.h
-    AsciiForecastWriter.cpp
-)
+if (hdf5_FOUND)
 
 add_library(hdf5buffer MODULE
     Hdf5Buffer.h
     Hdf5Buffer.cpp
+    Hdf5Tools.h
+    Hdf5Tools.cpp
+)
+
+target_link_libraries(hdf5buffer opaqcore hdf5_cpp-static)
+
+endif ()
+
+add_library(asciiforecastwriter MODULE
+    AsciiForecastWriter.h
+    AsciiForecastWriter.cpp
 )
 
 add_library(ircelmeteoprovider MODULE
@@ -30,7 +38,6 @@ add_library(xmlgridprovider MODULE
     XmlGridProvider.cpp
 )
 
-target_link_libraries(hdf5buffer opaqcore hdf5_cpp-static)
 target_link_libraries(asciiforecastwriter opaqcore)
 target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(rioobsprovider opaqcore)

@@ -14,7 +14,7 @@ endif ()
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-find_package(hdf5 CONFIG REQUIRED)
+find_package(hdf5 CONFIG)
 
 set (Boost_USE_STATIC_LIBS ON)
 ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")

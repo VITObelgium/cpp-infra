@@ -9,7 +9,6 @@
 #define HDF5TOOLS_H_
 
 #include <H5Cpp.h>
-#include "StringTools.h"
 #include <stdlib.h>
 
 namespace OPAQ {

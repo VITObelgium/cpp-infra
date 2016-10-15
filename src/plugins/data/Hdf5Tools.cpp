@@ -6,6 +6,7 @@
  */
 
 #include "Hdf5Tools.h"
+#include "tools/StringTools.h"
 
 namespace OPAQ {
 
@@ -37,7 +38,7 @@ void Hdf5Tools::createStringAttribute(const H5::DataSet & dataSet, const std::st
 std::string Hdf5Tools::readStringAttribute (const H5::DataSet & dataSet, const std::string & name) {
 	std::string out;
     static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
-    
+
     H5::Attribute att = dataSet.openAttribute(name);
 	att.read(stringType, out);
 	att.close();

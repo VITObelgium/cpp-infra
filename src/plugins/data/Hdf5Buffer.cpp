@@ -6,6 +6,7 @@
  */
 
 #include "Hdf5Buffer.h"
+#include "Hdf5Tools.h"
 
 namespace OPAQ
 {
@@ -400,7 +401,7 @@ void Hdf5Buffer::_checkIfExistsAndOpen()
         {
             throw RunTimeException("Cannot read from non existing file: {}", _filename);
         }
-        
+
         _openFile(_filename);
     }
 

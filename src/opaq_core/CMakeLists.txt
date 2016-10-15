@@ -72,8 +72,6 @@ set (CORE_TOOLS_SOURCES
     tools/FileTools.cpp
     tools/GzipReader.h
     tools/GzipReader.cpp
-    tools/Hdf5Tools.cpp
-    tools/Hdf5Tools.h
     tools/StringTools.h
     tools/StringTools.cpp
     tools/XmlTools.h
@@ -107,7 +105,7 @@ ELSE ()
     )
 ENDIF ()
 
-target_link_libraries(opaqcore fmt hdf5-static ${Boost_LIBRARIES} ${EXTRA_LIBS})
+target_link_libraries(opaqcore fmt ${Boost_LIBRARIES} ${EXTRA_LIBS})
 
 add_executable(opaq opaq.cpp)
 target_link_libraries(opaq opaqcore)

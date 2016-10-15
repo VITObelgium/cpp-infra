@@ -24,7 +24,7 @@ mkdir -p build/deps
 cd build/deps
 
 PWD=`pwd`
-checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config}
+checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
 checkresult cmake --build .
 
 cd ..
