@@ -7,6 +7,7 @@
 #include <sstream>
 
 #include <ctime>
+#include <cstring>
 #include <cassert>
 
 namespace OPAQ
@@ -20,9 +21,9 @@ class TimeInterval;
      The class contains some general functionality to deal with date/times in OPAQ. It contains
      some routines for conversion to a julian date (having sequential date numbers ) and unix time
      being the number of seconds since 1970-01-01 00:00:00 UTC.
-     \note That OPAQ is completely unaware of the timezone and contains no functionality for 
-           timezone conversion. This has to be handled by the dataproviders in the plugins or the 
-	   preprocessing of the data fed into OPAQ. 
+     \note That OPAQ is completely unaware of the timezone and contains no functionality for
+           timezone conversion. This has to be handled by the dataproviders in the plugins or the
+	   preprocessing of the data fed into OPAQ.
    */
 class DateTime
 {
@@ -132,7 +133,7 @@ public:
         addSeconds(count * 86400);
     }
 
-    /** 
+    /**
 	Return the day of the week for the datetime object
 	Day_Of_Week: (0=Sunday,1=Monday...6=Saturday)
 	cf J.D.Robertson, CACM 15(10):918

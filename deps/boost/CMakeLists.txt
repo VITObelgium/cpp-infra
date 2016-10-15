@@ -29,13 +29,17 @@ ELSE ()
     SET(TARBALL_EXTENSION tar.bz2)
 ENDIF ()
 
+IF (CMAKE_CROSSCOMPILING)
+    SET(TOOLSET gcc-musl cxxflags=-std=c++14)
+    SET(PLATFORM_OPTIONS --user-config=${CMAKE_CURRENT_SOURCE_DIR}/user-config.jam)
+ENDIF ()
+
 EXTERNALPROJECT_ADD(${NAME}
     DEPENDS zlib
     URL http://downloads.sourceforge.net/project/${NAME}/${NAME}/${VERSION}/${NAME}_${VERSION_UNDERSCORE}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
     BUILD_COMMAND ${BUILD_CMD}
-        -a
         address-model=64
         architecture=x86
         variant=${VARIANT}
@@ -48,6 +52,7 @@ EXTERNALPROJECT_ADD(${NAME}
         --with-system
         --with-filesystem
         --with-program_options
+        -s NO_BZIP2=1
         -s NO_ZLIB=0
         -s ZLIB_INCLUDE=${CMAKE_PREFIX_PATH}/include
         -s ZLIB_LIBPATH=${CMAKE_PREFIX_PATH}/lib
