@@ -24,6 +24,6 @@ mkdir -p build/deps_musl
 cd build/deps_musl
 
 PWD=`pwd`
-checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local_musl -DCMAKE_PREFIX_PATH=${PWD}/../local_musl -DCMAKE_TOOLCHAIN_FILE=${PWD}/../../deps/toolchain-musl.make -DCMAKE_BUILD_TYPE=${config}
+checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local_musl -DCMAKE_PREFIX_PATH=${PWD}/../local_musl -DCMAKE_TOOLCHAIN_FILE=${PWD}/../../deps/toolchain-musl.make -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
 checkresult cmake --build .
 
