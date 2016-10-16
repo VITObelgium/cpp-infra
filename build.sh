@@ -47,5 +47,5 @@ esac
 
 echo "Building configuration ${config} in ${builddir} toolchain (${toolchain})"
 
-checkresult cmake ../.. -G ${generator} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_BUILD=${static_build}
+checkresult cmake ../.. -G "${generator}" -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_BUILD=${static_build}
 checkresult cmake --build .

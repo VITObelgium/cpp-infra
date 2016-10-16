@@ -8,7 +8,7 @@ include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 add_executable(dataplugintest
-    ../obsparser.cpp
+    ../ObsParser.cpp
     rioobsprovidertest.cpp
     main.cpp
 )

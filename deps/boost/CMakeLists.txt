@@ -29,8 +29,8 @@ ELSE ()
     SET(TARBALL_EXTENSION tar.bz2)
 ENDIF ()
 
-IF (CMAKE_CROSSCOMPILING)
-    SET(TOOLSET gcc-musl cxxflags=-std=c++14)
+IF(HOST MATCHES ".*-musl")
+    SET(TOOLSET gcc-musl)
     SET(PLATFORM_OPTIONS --user-config=${CMAKE_CURRENT_SOURCE_DIR}/user-config.jam)
 ENDIF ()
 

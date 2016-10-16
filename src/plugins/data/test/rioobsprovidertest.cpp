@@ -64,9 +64,9 @@ TEST_F(ObserverVationParser, ParseFile)
     EXPECT_THAT(result[Aggregation::DayAvg][s_station].valueAt(DateTime(2009, 01, 01)), DoubleEq(80));
     EXPECT_THAT(result[Aggregation::DayAvg][s_station].valueAt(DateTime(2009, 01, 02)), DoubleEq(29));
 
-    std::vector<double> values = { 129, 101, 93, 87, 81, 77, 74, 72, 69, 71, 73, 70, 69, 69, 68, 66, 64, 73, 85, 85, 88, 94, 82, 80, 
+    std::vector<double> values = { 129, 101, 93, 87, 81, 77, 74, 72, 69, 71, 73, 70, 69, 69, 68, 66, 64, 73, 85, 85, 88, 94, 82, 80,
                                    39, 41, 42, 37, 33, 34, 37, 40, 32, 35, 38, 36, 19, -9999, -9999, -9999, 13, 16, 16, 16, 17, 20, 19, 22 };
-    
+
     EXPECT_THAT(result[Aggregation::None][s_station].values(), ContainerEq(values));
 
     DateTime date(2009, 01, 01);
@@ -101,9 +101,10 @@ TEST_F(ObserverVationParser, ParseInvalidFile)
 }
 
 // Used to check performance
-TEST_F(ObserverVationParser, ParseFile1)
+TEST_F(ObserverVationParser, DISABLED_ParseFile1)
 {
     std::ifstream fs("C:\\Work\\opaq-validation\\data\\obs\\pm10_data_rio.txt");
+    ASSERT_TRUE(fs.is_open());
 
     AQNetwork network;
     auto station = std::make_unique<Station>();

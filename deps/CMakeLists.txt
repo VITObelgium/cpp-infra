@@ -8,7 +8,7 @@ IF (WIN32)
     SET (POSTFIX_CONFIG -DCMAKE_DEBUG_POSTFIX=_d)
 ENDIF ()
 
-ADD_SUBDIRECTORY(benchmark)
+#ADD_SUBDIRECTORY(benchmark)
 ADD_SUBDIRECTORY(googletest)
 ADD_SUBDIRECTORY(zlib)
 ADD_SUBDIRECTORY(fmt)
@@ -23,7 +23,7 @@ ADD_SUBDIRECTORY(tinyxml)
 
 IF (NOT CMAKE_CROSSCOMPILING)
     # hdf5 build system does not support cross compiling
-    ADD_SUBDIRECTORY(hdf5)
+    #ADD_SUBDIRECTORY(hdf5)
 ENDIF ()
 
 IF (BUILD_UI)
