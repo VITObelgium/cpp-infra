@@ -10,7 +10,13 @@ function checkresult {
     return $status
 }
 
+mkdir -p build/deps
+cd build/deps
+
+PWD=`pwd`
+
 config=""
+toolchain=""
 
 echo -n "Select configuration: [1:Debug 2:Release]: "
 read yno
@@ -20,11 +26,15 @@ case $yno in
     * ) echo "Invalid selection" exit;;
 esac
 
-mkdir -p build/deps
-cd build/deps
+echo -n "Select toolchain to use: [1:Default 2:Musl (static linking)]: "
+read yno
+case $yno in
+    [1] ) toolchain="";;
+    [2] ) toolchain="${PWD}/../../deps/cluster.make";;
+    * ) echo "Invalid selection" exit;;
+esac
 
-PWD=`pwd`
-checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
+checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
 checkresult cmake --build .
 
 cd ..
