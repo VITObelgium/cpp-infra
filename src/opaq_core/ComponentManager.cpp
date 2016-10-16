@@ -8,8 +8,7 @@
 #include "Exceptions.h"
 #include "Logger.h"
 
-#include <boost/dll/import.hpp>         // for dll::import
-#include <boost/dll/shared_library.hpp> // for dll::shared_library
+#include <boost/dll/import.hpp>
 
 namespace OPAQ
 {

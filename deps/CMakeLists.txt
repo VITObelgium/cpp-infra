@@ -23,7 +23,7 @@ ADD_SUBDIRECTORY(tinyxml)
 
 IF (NOT CMAKE_CROSSCOMPILING)
     # hdf5 build system does not support cross compiling
-    #ADD_SUBDIRECTORY(hdf5)
+    ADD_SUBDIRECTORY(hdf5)
 ENDIF ()
 
 IF (BUILD_UI)

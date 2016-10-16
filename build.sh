@@ -36,7 +36,6 @@ read yno
 case $yno in
     [1] )
         toolchain=""
-        build_ui="ON"
         ;;
     [2] )
         toolchain="${PWD}/../../deps/cluster.make"

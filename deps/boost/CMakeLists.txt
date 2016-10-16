@@ -47,7 +47,6 @@ EXTERNALPROJECT_ADD(${NAME}
         link=static
         threading=multi
         runtime-link=shared
-        --with-math
         --with-iostreams
         --with-system
         --with-filesystem
