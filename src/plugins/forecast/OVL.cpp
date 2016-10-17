@@ -16,8 +16,6 @@ OVL::OVL()
 , debug_output(false) {
 }
 
-OVL::~OVL() {}
-
 /**
  * Helper function to compute the weighted exponetial weights. This is based upon
  *
@@ -51,7 +49,8 @@ double _wexp( int i, int n, int p ) {
 }
 
 
-void OVL::configure (TiXmlElement * cnf, IEngine& engine) {
+void OVL::configure(TiXmlElement * cnf, const std::string& componentName, IEngine& engine) {
+	setName(componentName);
 
 	// here the actual station configuation & RTC configuration should be read, the individual models
 	// are already defined... in there respective plugins...

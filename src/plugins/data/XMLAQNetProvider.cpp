@@ -13,8 +13,9 @@ XMLAQNetProvider::XMLAQNetProvider()
 {
 }
 
-void XMLAQNetProvider::configure(TiXmlElement* cnf, IEngine& engine)
+void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& componentName, IEngine& engine)
 {
+    setName(componentName);
 
     // Here we assume we recieve the <config> element which should define the AQNetwork...
     TiXmlElement* netEl = cnf->FirstChildElement("network");
@@ -74,7 +75,7 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, IEngine& engine)
                 st->getPollutants().push_back(p);
             }
         }
-        
+
         _net.addStation(std::move(st));
 
         stEl = stEl->NextSiblingElement("station");

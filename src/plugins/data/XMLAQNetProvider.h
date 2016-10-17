@@ -20,10 +20,10 @@ public:
 
     // component members
     // throws OPAQ::BadConfigurationException
-    virtual void configure(TiXmlElement* configuration, IEngine& engine);
+    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // AQNetowrk functions
-    virtual OPAQ::AQNetwork* getAQNetwork();
+    virtual OPAQ::AQNetwork* getAQNetwork() override;
 
 private:
     OPAQ::AQNetwork _net;

@@ -8,8 +8,14 @@ set (CORE_SOURCES
     Cell.cpp
     Component.h
     Component.cpp
+    ComponentManagerFactory.h
+    ComponentManagerFactory.cpp
     ComponentManager.h
     ComponentManager.cpp
+    ComponentManagerDynamic.h
+    ComponentManagerDynamic.cpp
+    ComponentManagerStatic.h
+    ComponentManagerStatic.cpp
     ConfigurationHandler.h
     ConfigurationHandler.cpp
     DateTime.h

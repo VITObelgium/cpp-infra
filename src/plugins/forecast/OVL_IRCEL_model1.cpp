@@ -4,7 +4,7 @@
 #include "OVL_IRCEL_model1.h"
 
 #define epsilon 1e-6
-  
+
 namespace OPAQ {
 
   OVL_IRCEL_model1::OVL_IRCEL_model1() :
@@ -23,8 +23,9 @@ namespace OPAQ {
   /* ============================================================================
      Implementation of the configure method
      ========================================================================== */
-  void OVL_IRCEL_model1::configure (TiXmlElement * cnf, IEngine&) {
-    
+  void OVL_IRCEL_model1::configure (TiXmlElement * cnf, const std::string& componentName, IEngine&) {
+    setName(componentName);
+
     try {
       // read the path to the architecture files
       this->pattern = XmlTools::getText(cnf, "ffnetfile_pattern" );
@@ -32,7 +33,7 @@ namespace OPAQ {
     } catch (ElementNotFoundException & e) {
       throw BadConfigurationException(e.what());
     }
-    
+
     // read morning aggregation (optional)
     try {
     	this->mor_agg = atoi(XmlTools::getText( cnf, "mor_agg" ).c_str() );
@@ -48,7 +49,7 @@ namespace OPAQ {
 
 
   }
-  
+
   /* ============================================================================
      Construct sample for the OVL_IRCEL_model1 configuration
      ========================================================================== */
@@ -65,7 +66,7 @@ namespace OPAQ {
     // -----------------------
     DataProvider *obs    = getInputProvider();
     MeteoProvider *meteo = getMeteoProvider();
-    
+
     // -----------------------
     // Get the meteo input
     // -----------------------
@@ -77,7 +78,7 @@ namespace OPAQ {
     // -----------------------
     // build sample
     // -----------------------
-    
+
     // 0. -------------------------------------------------------------------------------
     // sample[0] is the mean morning concentration of the measured pollutant we're trying to forecast
     t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY );
@@ -109,10 +110,10 @@ namespace OPAQ {
     	have_sample++;
     	// TODO perhaps provide some kind of climatology to fill the missing sample...
     }
-    
+
     return have_sample;
   }
-  
+
 }
 
-OPAQ_REGISTER_PLUGIN(OPAQ::OVL_IRCEL_model1);  
+OPAQ_REGISTER_PLUGIN(OPAQ::OVL_IRCEL_model1);

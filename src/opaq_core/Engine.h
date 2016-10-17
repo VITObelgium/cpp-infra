@@ -19,10 +19,10 @@
 #include "data/GridProvider.h"
 
 #include "AQNetworkProvider.h"
-#include "ComponentManager.h"
 #include "Logger.h"
 #include "Model.h"
 #include "PollutantManager.h"
+#include "ComponentManager.h"
 
 namespace OPAQ
 {
@@ -65,7 +65,7 @@ class Engine : public IEngine
 {
 public:
     Engine(Config::PollutantManager& pollutantMgr);
-    
+
     /**
     * Prepare an opaq run
     * This method prepares the OPAQ workflow as configured in the configuration
@@ -108,9 +108,9 @@ public:
     ComponentManager&         componentManager() override;
 
 private:
-    Logger                    _logger;
-    Config::PollutantManager& _pollutantMgr;
-    ComponentManager          _componentMgr;
+    Logger                              _logger;
+    Config::PollutantManager&           _pollutantMgr;
+    std::unique_ptr<ComponentManager>   _componentMgr;
 
     /**
    * This runs the forecast stage with the given configuration, network,

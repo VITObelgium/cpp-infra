@@ -1,9 +1,3 @@
-/*
- *
- *  Created on: Dec 20, 2013
- *      Author: vlooys
- */
-
 #include "ComponentManager.h"
 #include "Exceptions.h"
 #include "Logger.h"
@@ -20,21 +14,6 @@ ComponentManager::ComponentManager(IEngine& engine)
 {
 }
 
-// Throws FailedToLoadPluginException PluginAlreadyLoadedException
-void ComponentManager::loadPlugin(const std::string& pluginName, const std::string& filename)
-{
-    // 1. check if plugin was already loaded
-    auto it = factoryMap.find(pluginName);
-    if (it != factoryMap.end())
-    {
-        throw RunTimeException("There already exists a plugin with name {}", pluginName);
-    }
-
-    // 2. load plugin function
-    auto factoryFunc = dll::import<FactoryFunc>(filename.c_str(), "factory", boost::dll::load_mode::rtld_lazy);
-    factoryMap.emplace(pluginName, factoryFunc);
-}
-
 // Throws ComponentAlreadyExistsException PluginNotFoundException BadConfigurationException
 Component& ComponentManager::createGenericComponent(const std::string& componentName,
                                                     const std::string& pluginName,
@@ -47,10 +26,7 @@ Component& ComponentManager::createGenericComponent(const std::string& component
     }
 
     // 2. find the factory method for the plugin, create an instance and configure it
-    auto component = createComponent(pluginName, configuration);
-
-    // 2.1 store the component name in the component, to be returned by getName();
-    component->setName(componentName);
+    auto component = createComponent(pluginName, componentName, configuration);
 
     // 3. store the instance in the instance map
     instanceMap.emplace(componentName, std::move(component));
@@ -71,7 +47,7 @@ Component& ComponentManager::findComponent(const std::string& name)
 }
 
 // Throws PluginNotFoundException BadConfigurationException
-std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, TiXmlElement* configuration)
+std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration)
 {
     auto it = factoryMap.find(pluginName);
     if (it == factoryMap.end())
@@ -81,7 +57,7 @@ std::unique_ptr<Component> ComponentManager::createComponent(const std::string& 
 
     auto& sink = Log::getConfiguration();
     std::unique_ptr<Component> component((it->second)(&sink));
-    component->configure(configuration, _engine);
+    component->configure(configuration, componentName, _engine);
     return component;
 }
 

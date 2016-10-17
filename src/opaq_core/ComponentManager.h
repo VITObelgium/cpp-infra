@@ -1,11 +1,6 @@
-/*
- *      Created on: Dec 20, 2013
- *      Author: vlooys
- *
- */
-
 #pragma once
 
+#include "Config.h"
 #include "Component.h"
 #include "Logger.h"
 #include "OpaqDllExports.h"
@@ -13,38 +8,9 @@
 #include <map>
 #include <memory>
 #include <functional>
-#include <tinyxml.h>
-#include <boost/shared_ptr.hpp>
 
-/**
- * \brief Macro to register a class as being an OPAQ component.
- * When writing new components, a user should add this macro statement to
- * the implementation source file. Dont forget to include a correct namespace
- * if you want to have the plugin to have it's own namespace.
- *
- *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
- */
-#define OPAQ_REGISTER_PLUGIN(TYPE)                                                       \
-    OPAQ_DLL_API OPAQ::Component* factory(LogConfiguration* logConfig)                   \
-    {                                                                                    \
-        Log::initLogger(*logConfig);                                                     \
-        return new TYPE();                                                               \
-    }
-
-/**
-   The OPAQ namespace collects all the classes and the functions which reside in the OPAQ framework.
-*/
 namespace OPAQ
 {
-// forward declarations
-class IEngine;
-class Component;
-class FailedToLoadPluginException;
-class PluginAlreadyLoadedException;
-class ComponentAlreadyExistsException;
-class ComponentNotFoundException;
-class PluginNotFoundException;
-class BadConfigurationException;
 
 /**
    * \brief class for managing the components.
@@ -61,18 +27,12 @@ class ComponentManager
 {
 public:
     ComponentManager(IEngine& engine);
-    ComponentManager(ComponentManager const&) = delete; // no implementation of copy constructor for singleton
-
-    void operator=(ComponentManager const&) = delete;   // no implementation of assignment operator for singleton
-
-    // throws FailedToLoadPluginException, PluginAlreadyLoadedException
-    void loadPlugin(const std::string& pluginName, const std::string& filename);
 
     // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
     template <typename T>
-    T* createComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration)
+    T& createComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration)
     {
-        return dynamic_cast<T*>(&createGenericComponent(componentName, pluginName, configuration));
+        return dynamic_cast<T&>(createGenericComponent(componentName, pluginName, configuration));
     }
 
     // throws ComponentNotFoundException
@@ -82,12 +42,16 @@ public:
         return dynamic_cast<T&>(findComponent(componentName));
     }
 
+    virtual void loadPlugin(const std::string& pluginName, const std::string& filename) = 0;
     void destroyComponent(const std::string& componentName);
 
-private:
+    void registerPlugim();
+
+protected:
     typedef Component* (FactoryFunc)(LogConfiguration*);
+    typedef std::function<Component*(LogConfiguration*)> FactoryCallback;
     typedef std::map<std::string, std::unique_ptr<Component>> InstanceMapType;
-    typedef std::map<std::string, std::function<Component*(LogConfiguration*)>> FactoryMapType;
+    typedef std::map<std::string, FactoryCallback> FactoryMapType;
 
     // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
     // The instance map has to be destroyed before the dll unload
@@ -102,7 +66,29 @@ private:
     Component& findComponent(const std::string& name);
 
     // throw PluginNotFoundException, BadConfigurationException
-    std::unique_ptr<Component> createComponent(const std::string& pluginName, TiXmlElement* configuration);
+    std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration);
 };
-
 }
+
+#ifdef STATIC_PLUGINS
+#define OPAQ_REGISTER_PLUGIN(TYPE) \
+  ;
+//OPAQ::ComponentManagerStatic::registerPlugin(#TYPE, [] (LogConfiguration*) { return new TYPE(); });
+#else
+/**
+ * \brief Macro to register a class as being an OPAQ component.
+ * When writing new components, a user should add this macro statement to
+ * the implementation source file. Dont forget to include a correct namespace
+ * if you want to have the plugin to have it's own namespace.
+ *
+ *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
+ */
+#define OPAQ_REGISTER_PLUGIN(TYPE)                                                       \
+    OPAQ_DLL_API OPAQ::Component* factory(LogConfiguration* logConfig)                   \
+    {                                                                                    \
+        Log::initLogger(*logConfig);                                                     \
+        return new TYPE();                                                               \
+    }
+
+#endif
+

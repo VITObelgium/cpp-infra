@@ -16,8 +16,8 @@ const std::string IRCELMeteoProvider::BASETIME_PLACEHOLDER  = "%basetime%";
 IRCELMeteoProvider::IRCELMeteoProvider() :
 	_logger("IRCELMeteoProvider"),
 	_configured(false),
-	_bufferStartReq(false),
 	_nsteps(0),
+	_bufferStartReq(false),
 	_backsearch(3) {
 }
 
@@ -25,7 +25,8 @@ IRCELMeteoProvider::~IRCELMeteoProvider() {
 }
 
 // OPAQ::Component methods
-void IRCELMeteoProvider::configure(TiXmlElement * configuration, IEngine&) {
+void IRCELMeteoProvider::configure(TiXmlElement * configuration, const std::string& componentName, IEngine&) {
+	setName(componentName);
 
 	// clear buffers
 	_nodata.clear();

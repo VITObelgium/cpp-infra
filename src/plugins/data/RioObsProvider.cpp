@@ -23,8 +23,10 @@ RioObsProvider::RioObsProvider()
 }
 
 // OPAQ::Component methods
-void RioObsProvider::configure(TiXmlElement* cnf, IEngine&)
+void RioObsProvider::configure(TiXmlElement* cnf, const std::string& componentName, IEngine&)
 {
+    setName(componentName);
+
     // -- parse data file pattern
     TiXmlElement* patternElement = cnf->FirstChildElement("file_pattern");
     if (!patternElement)
@@ -131,7 +133,7 @@ TimeSeries<double>* RioObsProvider::_getTimeSeries(const std::string& pollutant,
         // and fetch it again
         it = _buffer.find(pollutant);
     }
-    
+
     if (it == _buffer.end())
     {
         return nullptr;
@@ -171,7 +173,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
         _logger->warn("Failed to open file: {}", filename);
         return;
     }
-    
+
     _buffer[pollutant] = readObservationsFile(file, *_AQNetworkProvider->getAQNetwork(), _nvalues, _timeResolution);
 }
 

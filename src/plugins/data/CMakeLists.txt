@@ -1,5 +1,11 @@
+if (STATIC_PLUGINS)
+    set (PLUGIN_TYPE STATIC)
+else ()
+    set (PLUGIN_TYPE MODULE)
+endif ()
+
 if (hdf5_FOUND)
-    add_library(hdf5buffer MODULE
+    add_library(hdf5buffer ${PLUGIN_TYPE}
         Hdf5Buffer.h
         Hdf5Buffer.cpp
         Hdf5Tools.h
@@ -21,12 +27,12 @@ if (SQLPP_CONNECTOR_LIBRARY AND SQLPP_CONNECTOR_LIBRARY_DEBUG)
     set(SQLPP_CONNECTOR_LIBRARY optimized ${SQLPP_CONNECTOR_LIBRARY} debug ${SQLPP_CONNECTOR_LIBRARY_DEBUG})
 endif ()
 
-add_library(asciiforecastwriter MODULE
+add_library(asciiforecastwriter ${PLUGIN_TYPE}
     AsciiForecastWriter.h
     AsciiForecastWriter.cpp
 )
 
-add_library(sqlbuffer MODULE
+add_library(sqlbuffer ${PLUGIN_TYPE}
     SqlBuffer.h
     SqlBuffer.cpp
     PredictionScheme.h
@@ -34,24 +40,24 @@ add_library(sqlbuffer MODULE
     PredictionDatabase.cpp
 )
 
-add_library(ircelmeteoprovider MODULE
+add_library(ircelmeteoprovider ${PLUGIN_TYPE}
     IRCELMeteoProvider.h
     IRCELMeteoProvider.cpp
 )
 
-add_library(rioobsprovider MODULE
+add_library(rioobsprovider ${PLUGIN_TYPE}
     ObsParser.h
     ObsParser.cpp
     RioObsProvider.h
     RioObsProvider.cpp
 )
 
-add_library(xmlaqnetprovider MODULE
+add_library(xmlaqnetprovider ${PLUGIN_TYPE}
     XMLAQNetProvider.h
     XMLAQNetProvider.cpp
 )
 
-add_library(xmlgridprovider MODULE
+add_library(xmlgridprovider ${PLUGIN_TYPE}
     XmlGridProvider.h
     XmlGridProvider.cpp
 )

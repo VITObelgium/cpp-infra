@@ -23,8 +23,9 @@ namespace OPAQ {
   /* ============================================================================
      Implementation of the configure method
      ========================================================================== */
-  void OVL_IRCEL_model2::configure (TiXmlElement * cnf, IEngine&) {
-    
+  void OVL_IRCEL_model2::configure (TiXmlElement * cnf, const std::string& componentName, IEngine&) {
+    setName(componentName);
+
     try {
       // read the path to the architecture files
       this->pattern = XmlTools::getText(cnf, "ffnetfile_pattern" );
@@ -46,7 +47,7 @@ namespace OPAQ {
     } catch ( ... ) { };
 
   }
-  
+
   /* ============================================================================
      Construct sample for the OVL_IRCEL_model2 configuration
      ========================================================================== */
@@ -54,7 +55,7 @@ namespace OPAQ {
 		  const OPAQ::Pollutant& pol, Aggregation::Type aggr,
 		  const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
 		  const OPAQ::TimeInterval &fc_hor ) {
-    
+
     int have_sample = 0; // return code, 0 for success
     OPAQ::DateTime t1, t2;
 
@@ -63,7 +64,7 @@ namespace OPAQ {
     // -----------------------
     DataProvider *obs    = getInputProvider();
     MeteoProvider *meteo = getMeteoProvider();
-    
+
     // -----------------------
     // Get the meteo input
     // -----------------------
@@ -73,13 +74,13 @@ namespace OPAQ {
 
     TimeSeries<double> blh  = meteo->getValues( t1, t2, st.getMeteoId(), p_blh );
     TimeSeries<double> cc   = meteo->getValues( t1, t2, st.getMeteoId(), p_cc );
-    
+
     t1 = fcTime - TimeInterval(12*3600); // dayN-1 : 12:00 to end, including 12:00
     t2 = fcTime + TimeInterval(12*3600) - meteo->getTimeResolution(); // day N : 00:00 to 12:00 (excluding)
-    
+
     TimeSeries<double> wsp  = meteo->getValues( t1, t2, st.getMeteoId(), p_wsp10m );
     TimeSeries<double> wdir = meteo->getValues( t1, t2, st.getMeteoId(), p_wdir10m );
-    
+
     // -----------------------
     // build sample
     // -----------------------
@@ -130,7 +131,7 @@ namespace OPAQ {
     xx = mean_missing( cc.values(), meteo->getNoData( p_cc ) );
     if ( fabs( xx - meteo->getNoData(p_cc) ) > epsilon ) sample[3] = xx;
     else have_sample++;
-    
+
     // 4. and 5. ------------------------------------------------------------------------
     // sample[4] and sample[5] are zoneal & meridional wind vectors, note that above
     // we have used the nodata value of the wsp10m
@@ -160,7 +161,7 @@ namespace OPAQ {
 
     return have_sample;
   }
-  
+
 }
 
 OPAQ_REGISTER_PLUGIN(OPAQ::OVL_IRCEL_model2);

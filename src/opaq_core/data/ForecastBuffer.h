@@ -3,7 +3,7 @@
  *
  *  Created on: 2014
  *      Author: Stijn.VanLooy@vito.be
- */ 
+ */
 
 #ifndef OPAQ_DATA_BUFFER_H_
 #define OPAQ_DATA_BUFFER_H_
@@ -44,7 +44,7 @@ public:
    * ids.
    *
    * Only forecasted values are stored where the forecast horizons are relative
-   * with respect to the basetime set in the DataProvider from which this 
+   * with respect to the basetime set in the DataProvider from which this
    * class derives...
    *
    * This method is typically used by a forecast model to set the values
@@ -96,8 +96,8 @@ public:
   // - for a given model and a given fcdate and fc horizon
 
 private:
-  
+
 };
-  
+
 } /* namespace OPAQ */
 #endif /* OPAQ_FORECAST_BUFFER_H_ */

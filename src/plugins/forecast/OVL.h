@@ -18,27 +18,26 @@
 #include <opaq.h>
 
 namespace OPAQ {
-  
+
 class OVL: virtual public OPAQ::Model {
 public:
-	OVL();
-    virtual ~OVL();
+    OVL();
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    virtual void configure (TiXmlElement * configuration, IEngine& engine);
+    void configure(TiXmlElement * configuration, const std::string& componentName, IEngine& engine) override;
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
-    virtual void run();
-    
+    virtual void run() override;
+
 
     // define a nested struct to hold the configuration of
     // a station
     struct StationConfig {
-    	int         rtc_mode;
-    	int         rtc_param;
-    	std::string model_name;
+        int         rtc_mode;
+        int         rtc_param;
+        std::string model_name;
     };
 
 
@@ -66,7 +65,7 @@ private:
      */
     std::map<std::tuple<std::string, OPAQ::Aggregation::Type, std::string, std::string, int>, OVL::StationConfig> _conf;
   };
-  
-  
+
+
 } /* namespace OPAQ */
 #endif /* OVL_H_ */

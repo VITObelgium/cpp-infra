@@ -44,7 +44,7 @@ public:
    * <offset>-10</offset>
    * throws BadConfigurationException
    */
-    virtual void configure(TiXmlElement* configuration, IEngine& engine);
+    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // ==================================================
     // OPAQ::DataProvider methods
@@ -53,17 +53,17 @@ public:
    * Returns the time resolution of the Hdf5Buffer, this returns
    * a TimeInterval object of 1 day.
    */
-    virtual TimeInterval getTimeResolution();
+    virtual TimeInterval getTimeResolution() override;
 
-    virtual TimeInterval getBaseTimeResolution();
+    virtual TimeInterval getBaseTimeResolution() override;
 
-    virtual double getNoData();
+    virtual double getNoData() override;
 
     virtual OPAQ::TimeSeries<double> getValues(const DateTime& t1,
                                                const DateTime& t2,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None);
+                                               OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None) override;
 
     // the current model is already set by the DataProvider parent class
 
@@ -71,7 +71,7 @@ public:
     // OPAQ::ForecastBuffer methods
     // ==================================================
 
-    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr);
+    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr) override;
 
     /**
    * Fill the Hdf5 file with the values given by the current basetime & the forecast
@@ -81,7 +81,7 @@ public:
                            const OPAQ::TimeSeries<double>& forecast,
                            const std::string& stationId,
                            const std::string& pollutantId,
-                           OPAQ::Aggregation::Type aggr);
+                           OPAQ::Aggregation::Type aggr) override;
 
     /**
    * Return all the model values for a given baseTime and forecast horizon. The given current model
@@ -91,7 +91,7 @@ public:
                                                const OPAQ::TimeInterval& fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr);
+                                               OPAQ::Aggregation::Type aggr) override;
 
     /**
     * This routine retrieves the forecasted values for a specific base time
@@ -101,7 +101,7 @@ public:
                                                const std::vector<OPAQ::TimeInterval>& fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr);
+                                               OPAQ::Aggregation::Type aggr) override;
 
     /**
    * This one gives the forecasts between the forecast times1 and 2 for a given fixed time lag (the
@@ -114,7 +114,7 @@ public:
                                                const DateTime& fcTime2,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr);
+                                               OPAQ::Aggregation::Type aggr) override;
 
     /*
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
@@ -149,7 +149,7 @@ public:
 */
 
     // OPAQ::DataBuffer methods
-    virtual void setNoData(double noData);
+    virtual void setNoData(double noData) override;
 
     /**
    * throws Hdf5BufferRunTimeException on runtime errors:

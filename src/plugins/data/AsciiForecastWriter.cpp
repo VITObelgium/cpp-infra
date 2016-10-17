@@ -27,7 +27,8 @@ namespace OPAQ {
   }
 
 
-  void AsciiForecastWriter::configure(TiXmlElement * configuration, IEngine&) {
+  void AsciiForecastWriter::configure(TiXmlElement * configuration, const std::string& componentName, IEngine&) {
+    setName(componentName);
 
     if ( ! configuration )
       throw NullPointerException("No XML config element give");
@@ -199,7 +200,7 @@ namespace OPAQ {
     			fprintf( fp, "\n" );
 
     		} catch (const OPAQ::NotAvailableException&) {
-				for ( auto ii : idx ) fprintf( fp, "%c%f", _sepchar, getBuffer()->getNoData() );
+				for ( int i = 0; i < idx.size(); ++i ) fprintf( fp, "%c%f", _sepchar, getBuffer()->getNoData() );
 				fprintf( fp, "\n" );
 				continue;
     		}

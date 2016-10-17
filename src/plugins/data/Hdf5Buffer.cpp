@@ -49,8 +49,9 @@ Hdf5Buffer::~Hdf5Buffer()
     _closeFile();
 }
 
-void Hdf5Buffer::configure(TiXmlElement* configuration, IEngine&)
+void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {
+    setName(componentName);
 
     if (_configured) _closeFile();
 
@@ -746,10 +747,8 @@ std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, const O
     hsize_t fhSize = Hdf5Tools::getDataSetSize(dsVals, 3);
 
     // is the station/forecast/base time in the datafile ?
-    if (fhIndex >= 0 && fhIndex < fhSize &&
-        btIndex >= 0 && btIndex < btSize &&
-        stIndex >= 0) {
-
+    if (fhIndex < fhSize && btIndex < btSize)
+    {
         // "model x station x baseTime x fcHorizon"
 
         H5::DataSpace space = dsVals.getSpace();

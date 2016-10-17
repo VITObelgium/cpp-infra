@@ -25,19 +25,19 @@ public:
 
   // OPAQ::Component methods
   // throws BadConfigurationException
-  virtual void configure(TiXmlElement *cnf, IEngine& engine);
+  void configure(TiXmlElement *cnf, const std::string& componentName, IEngine& engine) override;
 
   // OPAQ::MeteoProvider methods
 
   /**
    * Ignored
    */
-  virtual const TimeInterval& getTimeResolution();
+  virtual const TimeInterval& getTimeResolution() override;
 
   /**
    * throws an exception: use getNoData(const std::string &) instead
    */
-  virtual double getNoData(const std::string & parameterId);
+  virtual double getNoData(const std::string & parameterId) override;
 
   /**
    * Return the values between t1 and t2 including the boundaries !
@@ -45,7 +45,7 @@ public:
   virtual OPAQ::TimeSeries<double> getValues( const DateTime & t1,
 						    				  const DateTime & t2,
 											  const std::string& meteoId,
-											  const std::string& paramId );
+											  const std::string& paramId ) override;
 
 private:
   Logger             _logger;

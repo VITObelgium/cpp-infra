@@ -21,11 +21,11 @@ public:
 	// OPAQ::Component methods
 
     // throws BadConfigurationException
-	virtual void configure (TiXmlElement * configuration, IEngine& engine);
+	void configure (TiXmlElement * configuration, const std::string& componentName, IEngine& engine) override;
 
 	// OPAQ::GridProvider methods
 
-	virtual Grid * getGrid() {
+	virtual Grid * getGrid() override {
 		return &_grid;
 	}
 

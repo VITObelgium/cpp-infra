@@ -25,11 +25,11 @@ class AsciiForecastWriter : public OPAQ::ForecastOutputWriter {
 
   // OPAQ::Component methods
   // throws (BadConfigurationException)
-  virtual void configure(TiXmlElement * configuration, IEngine& engine);
+  void configure(TiXmlElement * configuration, const std::string& componentName, IEngine& engine) override;
 
 
   // OPAQ::ForecastOutputWriter methods
-  virtual void write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime );
+  virtual void write( OPAQ::Pollutant *pol, OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime ) override;
 
 private:
   Logger                   _logger;

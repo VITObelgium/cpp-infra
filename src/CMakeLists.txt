@@ -16,8 +16,6 @@ if (UNIX)
     set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
 endif ()
 
-#find_package(HDF5 NAMES hdf5 COMPONENTS C CPP static)
-
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(hdf5 CONFIG)

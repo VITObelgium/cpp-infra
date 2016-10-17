@@ -16,8 +16,10 @@ SqlBuffer::SqlBuffer()
 
 SqlBuffer::~SqlBuffer() = default;
 
-void SqlBuffer::configure(TiXmlElement* configuration, IEngine&)
+void SqlBuffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {
+    setName(componentName);
+
     if (!configuration)
         throw NullPointerException("No configuration element given for Hdf5Buffer...");
 
@@ -25,7 +27,7 @@ void SqlBuffer::configure(TiXmlElement* configuration, IEngine&)
     auto* fileEl = configuration->FirstChildElement("filename");
     if (!fileEl)
         throw BadConfigurationException("filename element not found");
-    
+
     auto filename = fileEl->GetText();
 
     // need to specify the time interval for which to store these values...

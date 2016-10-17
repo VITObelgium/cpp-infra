@@ -14,11 +14,11 @@ namespace OPAQ {
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    virtual void configure (TiXmlElement * configuration, IEngine& engine);
+    void configure (TiXmlElement * configuration, const std::string& componentName, IEngine& engine) override;
 
     virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
         		    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime,
-    				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor );
+    				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor ) override;
 
   private:
     const std::string p_t2m;     // 2m temperature
@@ -32,6 +32,6 @@ namespace OPAQ {
 
     int mor_agg;                 //!< morning aggregation hour
   };
-  
+
 } // namespace
 #endif /* #ifndef __OVL_IRCEL_model3_H */

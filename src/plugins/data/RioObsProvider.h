@@ -32,12 +32,12 @@ public:
    */
 
     // throws BadConfigurationException
-    virtual void configure(TiXmlElement* configuration, IEngine& engine);
+    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::DataProvider methods
-    virtual TimeInterval getTimeResolution();
+    virtual TimeInterval getTimeResolution() override;
 
-    virtual double getNoData();
+    virtual double getNoData() override;
 
     /**
    * Simply return the observations for the station & pollutant Id between the given dates
@@ -49,7 +49,7 @@ public:
    */
     virtual TimeSeries<double> getValues(const DateTime& t1, const DateTime& t2,
                                          const std::string& stationId, const std::string& pollutantId,
-                                         Aggregation::Type aggr = Aggregation::None);
+                                         Aggregation::Type aggr = Aggregation::None) override;
 
 private:
     Logger _logger;
