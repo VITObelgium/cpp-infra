@@ -1,16 +1,8 @@
 find_path(ZLIB_INCLUDE_DIR NAMES zlib.h)
-find_library(ZLIB_LIBRARY NAMES zlibstatic z)
-find_library(ZLIB_LIBRARY_DEBUG NAMES zlibstaticd)
-if (ZLIB_LIBRARY AND ZLIB_LIBRARY_DEBUG)
-    set(ZLIB_LIBRARY optimized ${ZLIB_LIBRARY} debug ${ZLIB_LIBRARY_DEBUG})
-endif ()
-
 find_path(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
-find_library(TINYXML_LIBRARY NAMES tinyxml)
-find_library(TINYXML_LIBRARY_DEBUG NAMES tinyxml_d)
-if (TINYXML_LIBRARY AND TINYXML_LIBRARY_DEBUG)
-    set(TINYXML_LIBRARY optimized ${TINYXML_LIBRARY} debug ${TINYXML_LIBRARY_DEBUG})
-endif ()
+
+find_dependency(NAME ZLIB LIBNAMES zlibstatic z DEBUGLIBNAMES zlibstaticd)
+find_dependency(NAME TINYXML LIBNAMES tinyxml DEBUGLIBNAMES tinyxml_d)
 
 if (UNIX)
     set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
