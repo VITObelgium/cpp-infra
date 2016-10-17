@@ -88,24 +88,20 @@ add_library(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES
 target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 set_target_properties(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-IF (MSVC)
+if (MSVC)
     # using visual studio we can not mix debug and release libraries
     target_link_libraries(opaqcore
         debug ${ZLIB_LIBRARY_DEBUG}
-        debug ${TINYXML_LIBRARY_DEBUG}
-
         optimized ${ZLIB_LIBRARY}
-        optimized ${TINYXML_LIBRARY}
     )
-ELSE ()
+else ()
     target_link_libraries(opaqcore
-        ${TINYXML_LIBRARY}
         ${ZLIB_LIBRARY}
         ${CMAKE_DL_LIBS}
     )
-ENDIF ()
+endif ()
 
-target_link_libraries(opaqcore fmt ${Boost_LIBRARIES} ${EXTRA_LIBS})
+target_link_libraries(opaqcore fmt ${Boost_LIBRARIES} ${TINYXML_LIBRARY} ${EXTRA_LIBS})
 
 add_executable(opaq opaq.cpp)
 target_link_libraries(opaq opaqcore)

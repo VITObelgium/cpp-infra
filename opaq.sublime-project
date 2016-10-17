@@ -16,6 +16,12 @@
                 {
                     "name": "Opaq release",
                     "working_dir": "${project_path:${folder}}/build/opaq_release"
+                },
+                {
+                    "name": "Cmake build debug",
+                    "working_dir": "${project_path:${folder}}/build/opaq",
+                    "cmd": ["cmake", "--build", ".", "--config", "Debug"],
+                    "path": "C:/Program Files/CMake/bin/"
                 }
             ]
         }

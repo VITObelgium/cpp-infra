@@ -6,6 +6,10 @@ find_path(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
 find_library(TINYXML_LIBRARY NAMES tinyxml)
 find_library(TINYXML_LIBRARY_DEBUG NAMES tinyxml_d)
 
+if (TINYXML_LIBRARY AND TINYXML_LIBRARY_DEBUG)
+    set(TINYXML_LIBRARY optimized ${TINYXML_LIBRARY} debug ${TINYXML_LIBRARY_DEBUG})
+endif ()
+
 if (UNIX)
     set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
 endif ()
@@ -17,7 +21,7 @@ find_package(spdlog CONFIG REQUIRED)
 find_package(hdf5 CONFIG)
 
 set (Boost_USE_STATIC_LIBS ON)
-ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
+add_definitions("-DBOOST_ALL_NO_LIB")
 find_package(Boost REQUIRED COMPONENTS system filesystem iostreams program_options)
 
 # We use our own version of FMT, let spdlog use the same version
