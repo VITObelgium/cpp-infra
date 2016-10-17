@@ -27,19 +27,27 @@ public:
 
     void addPrediction(time_t baseTime,
                        time_t time,
-                       double value,
                        const std::string& model,
                        const std::string& stationId,
                        const std::string& pollutantId,
                        const std::string& aggr,
-                       int fcHor);
+                       int fcHor,
+                       double value);
 
-    TimeSeries<double> getPrediction(int fcHor,
-                                     time_t date,
-                                     const std::string& model,
-                                     const std::string& stationId,
-                                     const std::string& pollutantId,
-                                     const std::string& aggr);
+    double getPrediction(time_t date,
+                         const std::string& model,
+                         const std::string& stationId,
+                         const std::string& pollutantId,
+                         const std::string& aggr,
+                         int fcHor);
+
+    TimeSeries<double> getPredictions(time_t startDate,
+                                      time_t endDate,
+                                      const std::string& model,
+                                      const std::string& stationId,
+                                      const std::string& pollutantId,
+                                      const std::string& aggr,
+                                      int fcHor);
 
 private:
     void createInitialDatabase();

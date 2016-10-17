@@ -70,7 +70,12 @@ void SqlBuffer::setValues(const DateTime& baseTime,
                           const std::string& pollutantId,
                           OPAQ::Aggregation::Type aggr)
 {
-
+    auto aggStr = Aggregation::getName(aggr);
+    for (size_t i = 0; i < forecast.size(); ++i)
+    {
+        // TODO: two missing values
+        _db->addPrediction(baseTime.getUnixTime(), forecast.datetime(i).getUnixTime(), "", stationId, pollutantId, aggStr, 0, forecast.value(i));
+    }
 }
 
 TimeInterval SqlBuffer::getTimeResolution()

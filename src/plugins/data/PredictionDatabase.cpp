@@ -7,7 +7,12 @@
 namespace OPAQ
 {
 
+//#define DEBUG_QUERIES
+
 namespace sql = sqlpp::sqlite3;
+
+SQLPP_ALIAS_PROVIDER(startDate);
+SQLPP_ALIAS_PROVIDER(endDate);
 
 static Predictions predictions;
 
@@ -51,13 +56,28 @@ auto getPredictionQuery = []() {
     );
 };
 
-using AddPredictionQuery = decltype(addPredictionQuery());
-using GetPredictionQuery = decltype(getPredictionQuery());
+auto getPredictionsQuery = []() {
+    return select(predictions.Value, predictions.Date)
+        .from(predictions)
+        .where(predictions.Date >= parameter(sqlpp::integer(), startDate) and
+               predictions.Date <= parameter(sqlpp::integer(), endDate) and
+               predictions.Model == parameter(predictions.Model) and
+               predictions.Pollutant == parameter(predictions.Pollutant) and
+               predictions.Aggregation == parameter(predictions.Aggregation) and
+               predictions.Station == parameter(predictions.Station) and
+               predictions.ForecastHorizon == parameter(predictions.ForecastHorizon)
+    );
+};
 
 struct PredictionDatabase::PreparedStatements
 {
+    using AddPredictionQuery = decltype(addPredictionQuery());
+    using GetPredictionQuery = decltype(getPredictionQuery());
+    using GetPredictionsQuery = decltype(getPredictionsQuery());
+
     PreparedStatement<AddPredictionQuery> addPrediction;
     PreparedStatement<GetPredictionQuery> getPrediction;
+    PreparedStatement<GetPredictionsQuery> getPredictions;
 };
 
 PredictionDatabase::PredictionDatabase(const std::string& filename)
@@ -65,8 +85,8 @@ PredictionDatabase::PredictionDatabase(const std::string& filename)
 , _db(createConfig(filename))
 , _statements(std::make_unique<PreparedStatements>())
 {
-    prepareStatements();
     createInitialDatabase();
+    prepareStatements();
 }
 
 PredictionDatabase::~PredictionDatabase() = default;
@@ -75,16 +95,17 @@ void PredictionDatabase::prepareStatements()
 {
     _statements->addPrediction = _db.prepare(addPredictionQuery());
     _statements->getPrediction = _db.prepare(getPredictionQuery());
+    _statements->getPredictions = _db.prepare(getPredictionsQuery());
 }
 
 void PredictionDatabase::addPrediction(time_t baseTime,
                                        time_t time,
-                                       double value,
                                        const std::string& model,
                                        const std::string& stationId,
                                        const std::string& pollutantId,
                                        const std::string& aggr,
-                                       int fcHor)
+                                       int fcHor,
+                                       double value)
 {
     _statements->addPrediction.params.Date = time;
     _statements->addPrediction.params.Value = value;
@@ -97,21 +118,50 @@ void PredictionDatabase::addPrediction(time_t baseTime,
     _db(_statements->addPrediction);
 }
 
-TimeSeries<double> PredictionDatabase::getPrediction(int fcHor,
-                                                     time_t date,
-                                                     const std::string& model,
-                                                     const std::string& stationId,
-                                                     const std::string& pollutantId,
-                                                     const std::string& aggr)
+double PredictionDatabase::getPrediction(time_t date,
+                                         const std::string& model,
+                                         const std::string& stationId,
+                                         const std::string& pollutantId,
+                                         const std::string& aggr,
+                                         int fcHor)
 {
-    TimeSeries<double> result;
-
     _statements->getPrediction.params.Date = date;
     _statements->getPrediction.params.Model = model;
     _statements->getPrediction.params.Pollutant = pollutantId;
     _statements->getPrediction.params.Aggregation = aggr;
     _statements->getPrediction.params.Station = stationId;
     _statements->getPrediction.params.ForecastHorizon = fcHor;
+
+    for (auto& row : _db(_statements->getPrediction))
+    {
+        // The result should be only one row
+        return row.Value;
+    }
+
+    throw RunTimeException("Could not get prediction from database");
+}
+
+TimeSeries<double> PredictionDatabase::getPredictions(time_t startDate,
+                                                      time_t endDate,
+                                                      const std::string& model,
+                                                      const std::string& stationId,
+                                                      const std::string& pollutantId,
+                                                      const std::string& aggr,
+                                                      int fcHor)
+{
+    _statements->getPredictions.params.startDate = startDate;
+    _statements->getPredictions.params.endDate = endDate;
+    _statements->getPredictions.params.Model = model;
+    _statements->getPredictions.params.Pollutant = pollutantId;
+    _statements->getPredictions.params.Aggregation = aggr;
+    _statements->getPredictions.params.Station = stationId;
+    _statements->getPredictions.params.ForecastHorizon = fcHor;
+
+    TimeSeries<double> result;
+    for (auto& row : _db(_statements->getPredictions))
+    {
+        result.insert(DateTime(row.Date), row.Value);
+    }
 
     return result;
 }
@@ -122,6 +172,7 @@ void PredictionDatabase::createInitialDatabase()
                  "Date INTEGER,"
                  "Value REAL,"
                  "Model TEXT,"
+                 "Station TEXT,"
                  "Pollutant TEXT,"
                  "Aggregation TEXT,"
                  "ForecastHorizon INTEGER);");

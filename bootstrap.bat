@@ -4,11 +4,11 @@ CALL "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd6
 mkdir build
 mkdir build\deps
 mkdir build\deps_d
-cd build\deps_d
-cmake ..\..\deps -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Debug -DBUILD_UI=ON
-cmake --build .
-cd ..\deps
+cd build\deps
 cmake ..\..\deps -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Release -DBUILD_UI=ON
+cmake --build .
+cd ..\deps_d
+cmake ..\..\deps -G "NMake Makefiles" -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Debug -DBUILD_UI=ON
 cmake --build .
 cd ..\..\
 pause
