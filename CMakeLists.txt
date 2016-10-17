@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 2.8)
 cmake_policy(VERSION 2.8)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(FindDependency)
+
 set(PACKAGE "opaq")
 set(PACKAGE_VERSION_MAJOR 0)
 set(PACKAGE_VERSION_MINOR 5)
