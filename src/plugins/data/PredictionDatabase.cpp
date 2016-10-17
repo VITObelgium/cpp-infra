@@ -30,7 +30,7 @@ static sql::connection_config createConfig(const std::string& filename)
 }
 
 template <typename SelectType>
-using PreparedStatement = decltype(((sql::connection*)nullptr)->prepare(*(reinterpret_cast<SelectType*>(nullptr))));
+using PreparedStatement = decltype(((sql::connection*)nullptr)->prepare(*(SelectType*)nullptr));
 
 auto addPredictionQuery = []() {
     return insert_into(predictions).set(
@@ -114,7 +114,7 @@ void PredictionDatabase::addPrediction(time_t baseTime,
     _statements->addPrediction.params.Aggregation = aggr;
     _statements->addPrediction.params.Station = stationId;
     _statements->addPrediction.params.ForecastHorizon = fcHor;
-    
+
     _db(_statements->addPrediction);
 }
 
