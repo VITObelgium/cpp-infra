@@ -1,8 +1,9 @@
-SET(CMAKE_C_COMPILER x86_64-multilib-linux-musl-gcc)
-SET(CMAKE_CXX_COMPILER x86_64-multilib-linux-musl-g++)
+set(CMAKE_COMMAND /tools/toolchains/x86_64-multilib-linux-musl/bin/cmake)
+set(CMAKE_C_COMPILER /tools/toolchains/x86_64-multilib-linux-musl/bin/x86_64-multilib-linux-musl-gcc)
+set(CMAKE_CXX_COMPILER /tools/toolchains/x86_64-multilib-linux-musl/bin/x86_64-multilib-linux-musl-g++)
 
-SET(HOST x86_64-multilib-linux-musl)
+set(HOST x86_64-multilib-linux-musl)
 
 # for libraries and headers in the target directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
