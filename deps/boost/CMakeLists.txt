@@ -41,7 +41,7 @@ EXTERNALPROJECT_ADD(${NAME}
     BUILD_IN_SOURCE 1
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
     BUILD_COMMAND ${BUILD_CMD}
-        --user-config=${CMAKE_CURRENT_SOURCE_DIR}/
+        --user-config=${CMAKE_CURRENT_SOURCE_DIR}/${USER_CONFIG}
         address-model=64
         architecture=x86
         variant=${VARIANT}
