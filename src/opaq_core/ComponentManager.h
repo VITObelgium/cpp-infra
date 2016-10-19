@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Config.h"
+#include "config.h"
 #include "Component.h"
 #include "Logger.h"
 #include "OpaqDllExports.h"
