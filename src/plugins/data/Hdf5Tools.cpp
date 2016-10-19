@@ -126,7 +126,8 @@ void Hdf5Tools::addToStringDataSet (H5::DataSet & dataSet, const std::string & v
 	hsize_t offset[1]; offset [0] = size[0] - 1;
 	space.selectHyperslab(H5S_SELECT_SET, count, offset);
 	// write data to the hyperslab
-	std::string writeBuffer [1]; writeBuffer[0] = value;
+	const char* writeBuffer[1];
+    writeBuffer[0] = value.c_str();
 	hsize_t writeSize [1]; writeSize[0] = 1;
 	H5::DataSpace writeMemSpace (1, writeSize);
     static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
