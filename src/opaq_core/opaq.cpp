@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
 
         configFile = vm["cnf"].as<std::string>();
         pol = getOptionalArg(vm, "pol", s_emptyString);
-        aggr = getOptionalArg(vm, "agg", s_emptyString);
+        aggr = getOptionalArg(vm, "aggr", s_emptyString);
         basetime = getOptionalArg(vm, "basetime", s_emptyString);
         days = vm["days"].as<uint32_t>();
     }
@@ -210,9 +210,10 @@ int main(int argc, char* argv[])
      Starting Engine...
      --------------------------------------------------------------------------------- */
 
+    OPAQ::Engine engine(pollutantMgr);
+
     try
     {
-        OPAQ::Engine engine(pollutantMgr);
         engine.prepareRun(ch.getOpaqRun());
         engine.run(ch.getOpaqRun());
     }

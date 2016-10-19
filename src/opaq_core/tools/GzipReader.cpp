@@ -6,7 +6,9 @@
  */
 
 #include "GzipReader.h"
+#include <boost/algorithm/string.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
+#include "StringTools.h"
 
 namespace OPAQ
 {
@@ -23,7 +25,11 @@ void GzipReader::open(const std::string& filename)
     }
 
     _filterStream = std::make_unique<boost::iostreams::filtering_istream>();
-    _filterStream->push(boost::iostreams::gzip_decompressor());
+    if (boost::algorithm::ends_with(filename, ".gz"))
+    {
+        _filterStream->push(boost::iostreams::gzip_decompressor());
+    }
+    
     _filterStream->push(_file);
 }
 

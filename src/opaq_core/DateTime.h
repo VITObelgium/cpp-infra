@@ -180,31 +180,31 @@ public:
      * Comparison operator overloading
      * \author Stijn Van Looy (c) VITO 2014
      */
-    inline bool operator==(const DateTime& rhs) const
+    bool operator==(const DateTime& rhs) const
     {
         return _time == rhs._time;
     }
-    inline bool operator!=(const DateTime& rhs) const
+    bool operator!=(const DateTime& rhs) const
     {
         return !(*this == rhs);
     }
-    inline bool operator<(const DateTime& rhs) const
+    bool operator<(const DateTime& rhs) const
     {
         return _time < rhs._time;
     }
-    inline bool operator>(const DateTime& rhs) const
+    bool operator>(const DateTime& rhs) const
     {
         return rhs < *this;
     }
-    inline bool operator<=(const DateTime& rhs) const
+    bool operator<=(const DateTime& rhs) const
     {
         return !(*this > rhs);
     }
-    inline bool operator>=(const DateTime& rhs) const
+    bool operator>=(const DateTime& rhs) const
     {
         return !(*this < rhs);
     }
-
+    
     /**
      * operator+ overloaded: allows adding a time interval to the date time
      */
@@ -214,6 +214,9 @@ public:
 	 * operator- overloaded: allows substracting a time interval from the date time
 	 */
     const DateTime operator-(const TimeInterval& timeInterval) const;
+
+    DateTime& operator+=(const TimeInterval& ti);
+    DateTime& operator-=(const TimeInterval& ti);
 
 private:
     time_t _time;

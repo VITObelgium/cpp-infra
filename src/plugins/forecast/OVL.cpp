@@ -282,11 +282,11 @@ void OVL::run() {
 				}
 
 				// get the hind cast for the forecast times between yesterday & the hindcast
-				OPAQ::DateTime t1 = baseTime - hindcast;
-				OPAQ::DateTime t2 = baseTime - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
+				DateTime t1 = baseTime - hindcast;
+				DateTime t2 = baseTime - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
 
 				buffer->setCurrentModel( model.getName() );
-				OPAQ::TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), aggr );
+				TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), aggr );
 
 				if ( debug_output ) {
 					fs << "\t\tHINDCAST : " << std::endl;
@@ -299,7 +299,7 @@ void OVL::run() {
 				// get the observed values from the input provider
 				// we could also implement it in such way to get them back from the forecast buffer...
 				// here a user should simply make sure we have enough data available in the data provider...
-				OPAQ::TimeSeries<double> obs_hindcast = getInputProvider()->getValues( t1, t2, station->getName(), pol.getName(), aggr );
+				TimeSeries<double> obs_hindcast = getInputProvider()->getValues( t1, t2, station->getName(), pol.getName(), aggr );
 
 				if ( debug_output ) {
 					fs << "\t\tOBSERVATIONS : " << std::endl;
@@ -311,7 +311,7 @@ void OVL::run() {
 
 				// check if the timeseries are consistent !
 				if ( ! fc_hindcast.isConsistent( obs_hindcast ) )
-					throw RunTimeException( "foreacst & hindcast timeseries are not consistent..." );
+					throw RunTimeException( "forecast & hindcast timeseries are not consistent..." );
 
 				double fc_err = 0.;
 				// run the real time correction scheme, let's do it this way for the moment,

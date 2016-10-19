@@ -1,4 +1,5 @@
 CREATE TABLE predictions(
+    Basetime INTEGER,
     Date INTEGER,
     Value DOUBLE,
     Model TEXT,

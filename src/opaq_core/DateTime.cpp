@@ -68,6 +68,18 @@ const DateTime DateTime::operator-(const TimeInterval& timeInterval) const
     return out;
 }
 
+DateTime& DateTime::operator+=(const TimeInterval& ti)
+{
+    addSeconds(ti.getSeconds());
+    return *this;
+}
+
+DateTime& DateTime::operator-=(const TimeInterval& ti)
+{
+    addSeconds(-ti.getSeconds());
+    return *this;
+}
+
 bool DateTime::isValid() const
 {
     return _time != -1;

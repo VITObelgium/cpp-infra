@@ -290,7 +290,7 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
 
     // b. get current size
     hsize_t size[4];
-    space.getSimpleExtentDims(size, NULL);
+    space.getSimpleExtentDims(size, nullptr);
     bool extend = false;
     if (modelIndex >= size[0]) {
         size[0] = modelIndex + 1;
@@ -736,11 +736,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, const O
     unsigned int nvals = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
 
     // initialize the output array with the number of requested values
-    std::vector<double> out(nvals);
-    for (unsigned int i = 0; i < nvals; i++)
-    {
-        out[i] = getNoData();
-    }
+    std::vector<double> out(nvals, getNoData());
 
     // now get the size of the dataset in the buffer
     hsize_t btSize = Hdf5Tools::getDataSetSize(dsVals, 2);
