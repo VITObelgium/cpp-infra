@@ -46,7 +46,7 @@ public:
     {
         this->aggregation = aggr;
     }
-    virtual void setForecastHorizon(const TimeInterval& forecastHorizon)
+    virtual void setForecastHorizon(days forecastHorizon)
     {
         this->forecastHorizon = forecastHorizon;
     }
@@ -83,7 +83,7 @@ public:
     {
         return aggregation;
     }
-    virtual const TimeInterval& getForecastHorizon()
+    virtual days getForecastHorizon()
     {
         return forecastHorizon;
     }
@@ -132,7 +132,7 @@ protected:
     DateTime baseTime;             //< run for this basetime
     Pollutant pollutant;           //< run for this pollutant
     Aggregation::Type aggregation; //< run for this aggregation
-    TimeInterval forecastHorizon;  //< maximum forecast horizon to run to
+    days forecastHorizon;  //< maximum forecast horizon to run to
 
     AQNetworkProvider* aqNetworkProvider;
     GridProvider* gridProvider;

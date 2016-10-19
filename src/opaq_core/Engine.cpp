@@ -25,7 +25,7 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
                               DateTime& baseTime)
 {
     // Get max forecast horizon...
-    TimeInterval forecastHorizon = cnf->getHorizon();
+    auto forecastHorizon = cnf->getHorizon();
 
     // Get observation data provider
     auto& obs = _componentMgr->getComponent<DataProvider>(cnf->getValues().name);
@@ -188,7 +188,7 @@ void Engine::run(Config::OpaqRun& config)
 }
 
 std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
-                                               const TimeInterval& forecastHorizon,
+                                               days forecastHorizon,
                                                const std::string& station,
                                                DateTime startTime,
                                                DateTime endTime,
@@ -199,10 +199,12 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
         throw RunTimeException("Validation start time must be before the end time");
     }
 
-    auto days  = static_cast<int>(TimeInterval(startTime, endTime).getDays());
+    std::chrono::seconds diff(endTime.getUnixTime() - startTime.getUnixTime());
+
+    auto daysDiff = std::chrono::duration_cast<days>(diff);
 
     std::vector<PredictionResult> results;
-    results.reserve(days);
+    results.reserve(daysDiff.count());
 
     auto& valuesConfig = config.getForecastStage()->getValues();
     auto& bufferConfig = config.getForecastStage()->getBuffer();

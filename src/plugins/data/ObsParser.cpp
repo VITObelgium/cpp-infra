@@ -17,7 +17,7 @@ namespace OPAQ
 std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObservationsFile(std::istream& file,
                                                                                             const AQNetwork& aqNetwork,
                                                                                             uint32_t numberOfValues,
-                                                                                            const TimeInterval& timeResolution)
+                                                                                            std::chrono::hours timeResolution)
 {
     std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> result;
 
@@ -56,7 +56,7 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
             for (; iter != observationSplitter.end(); ++iter)
             {
                 ts.insert(begin, boost::lexical_cast<float>(*iter));
-                begin = begin + timeResolution;
+                begin += timeResolution;
                 ++parsedValues;
             }
 

@@ -11,7 +11,7 @@
 namespace OPAQ
 {
 
-// some string constants
+using namespace std::chrono_literals;
 
 const std::string Hdf5Buffer::BASETIME_DATASET_NAME("basetime");
 
@@ -77,20 +77,20 @@ void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& compo
     //    forecast time resolution...
     TiXmlElement* baseResEl = configuration->FirstChildElement("basetime_resolution");
     if (!baseResEl) {
-        _baseTimeResolution = TimeInterval(24, TimeInterval::Hours);
+        _baseTimeResolution = 24h;
     }
     else
     {
-        _baseTimeResolution = TimeInterval(atoi(baseResEl->GetText()), TimeInterval::Hours);
+        _baseTimeResolution = std::chrono::hours(atoi(baseResEl->GetText()));
     }
 
     TiXmlElement* fcResEl = configuration->FirstChildElement("fctime_resolution");
     if (!fcResEl) {
-        _fcTimeResolution = TimeInterval(24, TimeInterval::Hours);
+        _fcTimeResolution = 24h;
     }
     else
     {
-        _fcTimeResolution = TimeInterval(atoi(fcResEl->GetText()), TimeInterval::Hours);
+        _fcTimeResolution = std::chrono::hours(atoi(fcResEl->GetText()));
     }
 
     _createOrOpenFile();
@@ -144,13 +144,15 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
     for (unsigned int i = 0; i < forecast.size(); i++)
     {
         if (forecast.datetime(i) < baseTime) throw RunTimeException("Expecting forecasts in the future");
-        TimeInterval fc_hor = OPAQ::TimeInterval(baseTime, forecast.datetime(i));
+
+        auto secs = std::chrono::seconds(forecast.datetime(i).getUnixTime() - baseTime.getUnixTime());
+        auto fc_hor = std::chrono::duration_cast<days>(secs);
 
         //BUGFIX : this check is too strict
         // if ( fc_hor != ( i * _fcTimeResolution ) ) throw RunTimeException( "Provided values should be ordered & spaced by time resolution" );
 
         // this allows for setting forecast values one by one...
-        if ((fc_hor.getSeconds() % _fcTimeResolution.getSeconds()) != 0)
+        if ((secs.count() % std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count()) != 0)
             throw RunTimeException("Provided values should be ordered & spaced by time resolution");
     }
 
@@ -273,11 +275,14 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
 
     // -- now, store the data
 
+    auto secsDiff = std::chrono::seconds(baseTime.getUnixTime() - startTime.getUnixTime());
+    auto secsDiffFirst = std::chrono::seconds(forecast.firstDateTime().getUnixTime() - baseTime.getUnixTime());
+
     // get the indices
     unsigned int modelIndex   = Hdf5Tools::getIndexInStringDataSet(dsModels, _currentModel, true);
     unsigned int stationIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId, true);
-    unsigned int dateIndex    = OPAQ::TimeInterval(startTime, baseTime).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
-    unsigned int fhIndex      = OPAQ::TimeInterval(baseTime, forecast.firstDateTime()).getSeconds() / _fcTimeResolution.getSeconds();
+    unsigned int dateIndex    = secsDiff.count() / std::chrono::duration_cast<std::chrono::seconds>(_baseTimeResolution).count(); // integer division... should be ok !
+    unsigned int fhIndex      = secsDiffFirst.count() / std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 //DEBUG !!
 #ifdef DEBUG
@@ -479,12 +484,12 @@ void Hdf5Buffer::_openFile(const std::string& filename)
     }
 }
 
-TimeInterval Hdf5Buffer::getTimeResolution()
+std::chrono::hours Hdf5Buffer::getTimeResolution()
 {
     return _fcTimeResolution; // return time resolution of the forecasts
 }
 
-TimeInterval Hdf5Buffer::getBaseTimeResolution()
+std::chrono::hours Hdf5Buffer::getBaseTimeResolution()
 {
     return _baseTimeResolution;
 }
@@ -528,7 +533,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const DateTime& t1,
 }
 
 OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const DateTime& baseTime,
-                                               const std::vector<OPAQ::TimeInterval>& fc_hor, const std::string& stationId,
+                                               const std::vector<days>& fc_hor, const std::string& stationId,
                                                const std::string& pollutantId, OPAQ::Aggregation::Type aggr)
 {
 
@@ -540,7 +545,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const DateTime& baseTime,
 
 // return hindcast vector of model values for a fixed forecast horizon
 // for a forecasted day interval
-OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const OPAQ::TimeInterval fc_hor,
+OPAQ::TimeSeries<double> Hdf5Buffer::getValues(days fc_hor,
                                                const DateTime& fcTime1, const DateTime& fcTime2,
                                                const std::string& stationId, const std::string& pollutantId,
                                                OPAQ::Aggregation::Type aggr)
@@ -574,7 +579,8 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const OPAQ::TimeInterval fc_hor,
     // retrieve station, model & forecsat horizon index
     unsigned int stIndex    = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
     unsigned int modelIndex = Hdf5Tools::getIndexInStringDataSet(dsModels, _currentModel);
-    unsigned int fhIndex    = fc_hor.getSeconds() / _fcTimeResolution.getSeconds();
+    unsigned int fhIndex    = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
+                              std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 #ifdef DEBUG
     std::cout << "Hdf5Buffer::getValues()" << std::endl;
@@ -598,7 +604,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const OPAQ::TimeInterval fc_hor,
     // compute the index for the base time of the first forecastTime
     OPAQ::DateTime b1  = fcTime1 - fc_hor;
     OPAQ::DateTime b2  = fcTime2 - fc_hor;
-    unsigned int nvals = OPAQ::TimeInterval(b1, b2).getSeconds() / _baseTimeResolution.getSeconds() + 1;
+    unsigned int nvals = (timeDiffInSeconds(b1, b2).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
     OPAQ::TimeSeries<double> out;
     if (b2 < startTime) {
@@ -618,8 +624,8 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const OPAQ::TimeInterval fc_hor,
 #endif
 
         // number of elements before the HDF5 buffer
-        unsigned int n_before = OPAQ::TimeInterval(b1, startTime).getSeconds() / _baseTimeResolution.getSeconds();     // number of steps before buffer start
-        unsigned int n_inside = OPAQ::TimeInterval(startTime, b2).getSeconds() / _baseTimeResolution.getSeconds() + 1; // number of steps inside buffer
+        unsigned int n_before = timeDiffInSeconds(b1, startTime).count() / getBaseTimeResolutionInSeconds().count();     // number of steps before buffer start
+        unsigned int n_inside = (timeDiffInSeconds(startTime, b2).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
 
         if ((n_before + n_inside) != nvals) {
 #ifdef DEBUG
@@ -665,7 +671,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const OPAQ::TimeInterval fc_hor,
     {
         // completely within the period
         std::vector<double> tmp(nvals);
-        unsigned int btIndex = OPAQ::TimeInterval(startTime, b1).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
+        unsigned int btIndex = timeDiffInSeconds(startTime, b1).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
 
         // "model x station x baseTime x fcHorizon"
         H5::DataSpace space = dsVals.getSpace();
@@ -696,7 +702,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const OPAQ::TimeInterval fc_hor,
 
 // return model values for a given baseTime / forecast horizon
 // storage in file : "model x station x baseTime x fcHorizon"
-std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, const OPAQ::TimeInterval& fc_hor,
+std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, days fc_hor,
                                                const std::string& stationId, const std::string& pollutantId, OPAQ::Aggregation::Type aggr)
 {
 
@@ -726,8 +732,9 @@ std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, const O
     }
 
     unsigned int stIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
-    unsigned int btIndex = OPAQ::TimeInterval(startTime, baseTime).getSeconds() / _baseTimeResolution.getSeconds(); // integer division... should be ok !
-    unsigned int fhIndex = fc_hor.getSeconds() / _fcTimeResolution.getSeconds();
+    unsigned int btIndex = timeDiffInSeconds(startTime, baseTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
+    unsigned int fhIndex = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
+                           std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 #ifdef DEBUG
     std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << "\n";
@@ -810,6 +817,11 @@ std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantI
     grpPol.close();
 
     return out;
+}
+
+std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()
+{
+    return std::chrono::duration_cast<std::chrono::seconds>(getBaseTimeResolution());
 }
 
 } /* namespace OPAQ */

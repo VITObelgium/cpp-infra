@@ -7,6 +7,8 @@
 
 namespace OPAQ {
 
+using namespace std::chrono_literals;
+
   OVL_IRCEL_model1::OVL_IRCEL_model1() :
 	  p_t2m( "P01" ),         // t2m in IRCEL meteo provider
 	  p_wsp10m( "P03" ),      // wind speed 10 m in IRCEL meteo provider
@@ -56,7 +58,7 @@ namespace OPAQ {
   int OVL_IRCEL_model1::makeSample( double *sample, const OPAQ::Station& st,
 		  const OPAQ::Pollutant& pol, Aggregation::Type aggr,
 		  const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
-		  const OPAQ::TimeInterval &fc_hor ) {
+		  days fc_hor ) {
 
 	int have_sample = 0; // return code, 0 for success
 	OPAQ::DateTime t1, t2;
@@ -71,8 +73,8 @@ namespace OPAQ {
     // Get the meteo input
     // -----------------------
     // BLH for dayN, offsets relative from fcTime (set by setBaseTime in the meteo provider)
-    t1 = fcTime + OPAQ::TimeInterval(0);
-    t2 = fcTime + OPAQ::TimeInterval(24, TimeInterval::Hours ) - meteo->getTimeResolution();
+    t1 = fcTime;
+    t2 = fcTime + 24h - meteo->getTimeResolution();
     TimeSeries<double> blh  = meteo->getValues( t1, t2, st.getMeteoId(), p_blh );
 
     // -----------------------
@@ -82,7 +84,7 @@ namespace OPAQ {
     // 0. -------------------------------------------------------------------------------
     // sample[0] is the mean morning concentration of the measured pollutant we're trying to forecast
     t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY );
-    t2 = t1 + OPAQ::TimeInterval( this->mor_agg-1, TimeInterval::Hours ); // mor_agg uur of eentje aftrekken ?
+    t2 = t1 + std::chrono::hours(this->mor_agg-1); // mor_agg uur of eentje aftrekken ?
 
     OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName() ); // no aggregation
     double xx = mean_missing( xx_morn.values(), obs->getNoData() );

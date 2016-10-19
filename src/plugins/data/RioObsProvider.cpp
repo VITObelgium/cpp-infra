@@ -11,12 +11,14 @@
 namespace OPAQ
 {
 
+using namespace std::chrono_literals;
+
 const std::string RioObsProvider::POLLUTANT_PLACEHOLDER = "%pol%";
 
 RioObsProvider::RioObsProvider()
 : _logger("RioObsProvider")
 , _noData(-9999)                      // RIO observations use -9999 as nodata placeholder
-, _timeResolution(TimeInterval(3600)) // RIO observations have hourly resolution, per default, can be overwritten !
+, _timeResolution(1h) // RIO observations have hourly resolution, per default, can be overwritten !
 , _configured(false)
 , _nvalues(24)
 {
@@ -37,7 +39,7 @@ void RioObsProvider::configure(TiXmlElement* cnf, const std::string& componentNa
     TiXmlElement* resEl = cnf->FirstChildElement("resolution");
     if (resEl) {
         int res         = atoi(resEl->GetText());
-        _timeResolution = OPAQ::TimeInterval(res, TimeInterval::Minutes);
+        _timeResolution = std::chrono::duration_cast<std::chrono::hours>(std::chrono::minutes(res));
         _nvalues        = (60 * 24) / res;
     }
 
@@ -49,7 +51,7 @@ void RioObsProvider::configure(TiXmlElement* cnf, const std::string& componentNa
 }
 
 // OPAQ::DataProvider methods
-TimeInterval RioObsProvider::getTimeResolution()
+std::chrono::hours RioObsProvider::getTimeResolution()
 {
     return _timeResolution;
 }
@@ -78,11 +80,11 @@ TimeSeries<double> RioObsProvider::getValues(const DateTime& t1, const DateTime&
     // TODO to be safe better round down the t1 and t2 to the interval of the timestep, but is not really high priority now..
     // was originally like this in Stijn VL 's code...
 
-    TimeInterval step;
+    std::chrono::hours step;
     if (aggr == OPAQ::Aggregation::None)
-        step = OPAQ::TimeInterval(1, TimeInterval::Hours);
+        step = 1h;
     else
-        step = OPAQ::TimeInterval(1, TimeInterval::Days);
+        step = days(1);
     //copy the data to the output time series and insert missing values if still needed (we cannot rely on i)
     data->setNoData(_noData);
     OPAQ::TimeSeries<double> out = data->select(t1, t2, step);

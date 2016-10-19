@@ -18,7 +18,7 @@ namespace OPAQ {
 
     virtual int makeSample( double *sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
         		    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime &baseTime,
-    				const OPAQ::DateTime &fcTime, const OPAQ::TimeInterval &fc_hor ) override;
+    				const OPAQ::DateTime &fcTime, days fc_hor ) override;
 
   private:
     const std::string p_t2m;     // t2m

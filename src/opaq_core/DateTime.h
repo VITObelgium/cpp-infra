@@ -7,14 +7,14 @@
 #include <sstream>
 
 #include <ctime>
+#include <chrono>
 #include <cstring>
 #include <cassert>
 
 namespace OPAQ
 {
 
-// forward declaration to avoid circular header references
-class TimeInterval;
+using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>::type>;
 
 /**
      Class representing a DateTime object
@@ -204,19 +204,19 @@ public:
     {
         return !(*this < rhs);
     }
-    
+
     /**
      * operator+ overloaded: allows adding a time interval to the date time
      */
-    const DateTime operator+(const TimeInterval& timeInterval) const;
+    const DateTime operator+(std::chrono::seconds secs) const;
 
     /**
 	 * operator- overloaded: allows substracting a time interval from the date time
 	 */
-    const DateTime operator-(const TimeInterval& timeInterval) const;
+    const DateTime operator-(std::chrono::seconds secs) const;
 
-    DateTime& operator+=(const TimeInterval& ti);
-    DateTime& operator-=(const TimeInterval& ti);
+    DateTime& operator+=(std::chrono::seconds secs);
+    DateTime& operator-=(std::chrono::seconds secs);
 
 private:
     time_t _time;

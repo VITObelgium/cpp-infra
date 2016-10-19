@@ -33,8 +33,8 @@ public:
    * Returns the time resolution of the Hdf5Buffer, this returns
    * a TimeInterval object of 1 day.
    */
-    virtual TimeInterval getTimeResolution() override;
-    virtual TimeInterval getBaseTimeResolution() override;
+    virtual std::chrono::hours getTimeResolution() override;
+    virtual std::chrono::hours getBaseTimeResolution() override;
 
     virtual double getNoData() override;
     virtual TimeSeries<double> getValues(const DateTime& t1,
@@ -64,7 +64,7 @@ public:
    * which is set in the DataProvider parent class is ignored here...
    */
     virtual std::vector<double> getModelValues(const DateTime& baseTime,
-                                               const TimeInterval& fc_hor,
+                                               days fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
                                                Aggregation::Type aggr) override;
@@ -74,7 +74,7 @@ public:
     * as a function of forecast horizon, given by the vector of time intervals
     */
     virtual TimeSeries<double> getValues(const DateTime& baseTime,
-                                         const std::vector<TimeInterval>& fc_hor,
+                                         const std::vector<days>& fc_hor,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
                                          Aggregation::Type aggr) override;
@@ -85,7 +85,7 @@ public:
    * to e.g. calculate real time corrections. The user needs to be avare that the two DateTimes given
    * are really the forecast times (so the datetimes for which the forecast is intended
    */
-    virtual TimeSeries<double> getValues(const TimeInterval fc_hor,
+    virtual TimeSeries<double> getValues(days fc_hor,
                                          const DateTime& fcTime1,
                                          const DateTime& fcTime2,
                                          const std::string& stationId,
@@ -103,8 +103,8 @@ private:
 
     double _noData;
 
-    TimeInterval _baseTimeResolution; //! the time resolution at which to store basetimes
-    TimeInterval _fcTimeResolution;   //! the time resolution at which to store the forecast values
+    std::chrono::hours _baseTimeResolution; //! the time resolution at which to store basetimes
+    std::chrono::hours _fcTimeResolution;   //! the time resolution at which to store the forecast values
 
     DateTime _startDate; //!< the start stored in the file (cannot add values before it)
     DateTime _baseTime;  //!< the basetime against which to offset the intervals given by the

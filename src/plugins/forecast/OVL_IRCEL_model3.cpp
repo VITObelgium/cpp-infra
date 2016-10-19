@@ -7,6 +7,8 @@
 
 namespace OPAQ {
 
+using namespace std::chrono_literals;
+
   OVL_IRCEL_model3::OVL_IRCEL_model3() :
 		p_t2m( "P01" ),         // t2m in IRCEL meteo provider
 		p_wsp10m( "P03" ),      // wind speed 10 m in IRCEL meteo provider
@@ -56,7 +58,7 @@ namespace OPAQ {
   int OVL_IRCEL_model3::makeSample( double *sample, const OPAQ::Station& st,
 		  const OPAQ::Pollutant& pol, Aggregation::Type aggr,
 		  const OPAQ::DateTime &baseTime, const OPAQ::DateTime &fcTime,
-		  const OPAQ::TimeInterval &fc_hor ) {
+		  days fc_hor ) {
 
     int have_sample = 0; // return code, 0 for success
     OPAQ::DateTime t1, t2;
@@ -71,8 +73,8 @@ namespace OPAQ {
     // Get the meteo input
     // -----------------------
     // BLH for dayN, offsets relative from fcTime (set by setBaseTime in the meteo provider)
-    t1 = fcTime + OPAQ::TimeInterval(0);
-    t2 = fcTime + OPAQ::TimeInterval(24*3600) - meteo->getTimeResolution();
+    t1 = fcTime;
+    t2 = fcTime + days(1) - meteo->getTimeResolution();
 
     TimeSeries<double> blh  = meteo->getValues( t1, t2, st.getMeteoId(), p_blh );
     TimeSeries<double> cc   = meteo->getValues( t1, t2, st.getMeteoId(), p_cc );
@@ -81,8 +83,8 @@ namespace OPAQ {
     TimeSeries<double> S    = meteo->getValues( t1, t2, st.getMeteoId(), p_S );
     TimeSeries<double> tra  = meteo->getValues( t1, t2, st.getMeteoId(), p_Transp );
 
-    t1 = fcTime - TimeInterval(12*3600); // dayN-1 : 12:00 to end, including 12:00
-    t2 = fcTime + TimeInterval(12*3600) - meteo->getTimeResolution(); // day N : 00:00 to 12:00 (excluding)
+    t1 = fcTime - 12h; // dayN-1 : 12:00 to end, including 12:00
+    t2 = fcTime + 12h - meteo->getTimeResolution(); // day N : 00:00 to 12:00 (excluding)
 
     TimeSeries<double> wsp  = meteo->getValues( t1, t2, st.getMeteoId(), p_wsp10m );
     TimeSeries<double> wdir = meteo->getValues( t1, t2, st.getMeteoId(), p_wdir10m );
@@ -94,7 +96,7 @@ namespace OPAQ {
     // 0. -------------------------------------------------------------------------------
     // sample[0] is the mean morning concentration of the measured pollutant we're trying to forecast
     t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY );
-    t2 = t1 + OPAQ::TimeInterval( this->mor_agg-1, TimeInterval::Hours ); // mor_agg uur of eentje aftrekken ?
+    t2 = t1 + std::chrono::hours(this->mor_agg-1); // mor_agg uur of eentje aftrekken ?
 
     OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName() ); // no aggregation
     double xx = mean_missing( xx_morn.values(), obs->getNoData() );
@@ -103,7 +105,7 @@ namespace OPAQ {
 
     // 1. -------------------------------------------------------------------------------
     // sample[1] is the mean concentration of the measured pollutant of day-1
-    t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - TimeInterval( 1, TimeInterval::Days );
+    t1 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - days(1);
     t2 = DateTimeTools::floor( baseTime, DateTimeTools::FIELD_DAY ) - obs->getTimeResolution();  // 1x meteto TimeResultion aftrekken : - getTimeResolution();
 
     OPAQ::TimeSeries<double> xx_yest = obs->getValues( t1, t2, st.getName(), pol.getName() );

@@ -29,8 +29,8 @@ void SqlBuffer::configure(TiXmlElement* configuration, const std::string& compon
     // need to specify the time interval for which to store these values...
     //    this has to be generic, the baseTime resolution can be different from the
     //    forecast time resolution...
-    _baseTimeResolution = TimeInterval(XmlTools::getChildValue(configuration, "basetime_resolution", 24), TimeInterval::Hours);
-    _fcTimeResolution   = TimeInterval(XmlTools::getChildValue(configuration, "fctime_resolution", 24), TimeInterval::Hours);
+    _baseTimeResolution = std::chrono::hours(XmlTools::getChildValue(configuration, "basetime_resolution", 24));
+    _fcTimeResolution   = std::chrono::hours(XmlTools::getChildValue(configuration, "fctime_resolution", 24));
     _db                 = std::make_unique<PredictionDatabase>(filename);
 }
 
@@ -61,17 +61,17 @@ void SqlBuffer::setValues(const DateTime& baseTime,
     throwIfNotConfigured();
 
     auto aggStr = Aggregation::getName(aggr);
-    int fh = (TimeInterval(baseTime, forecast.firstDateTime()).getSeconds() / _fcTimeResolution.getSeconds());
+    int fh = (timeDiffInSeconds(baseTime, forecast.firstDateTime()).count() / std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count());
 
     _db->addPredictions(baseTime.getUnixTime(), _currentModel, stationId, pollutantId, aggStr, fh, forecast);
 }
 
-TimeInterval SqlBuffer::getTimeResolution()
+std::chrono::hours SqlBuffer::getTimeResolution()
 {
     return _fcTimeResolution;
 }
 
-TimeInterval SqlBuffer::getBaseTimeResolution()
+std::chrono::hours SqlBuffer::getBaseTimeResolution()
 {
     return _baseTimeResolution;
 }
@@ -86,7 +86,7 @@ TimeSeries<double> SqlBuffer::getValues(const DateTime& t1,
 }
 
 TimeSeries<double> SqlBuffer::getValues(const DateTime& baseTime,
-                                        const std::vector<TimeInterval>& fc_hor, const std::string& stationId,
+                                        const std::vector<days>& fc_hor, const std::string& stationId,
                                         const std::string& pollutantId, Aggregation::Type aggr)
 {
     throw RunTimeException("IMPLEMENT ME !!");
@@ -94,7 +94,7 @@ TimeSeries<double> SqlBuffer::getValues(const DateTime& baseTime,
 
 // return hindcast vector of model values for a fixed forecast horizon
 // for a forecasted day interval
-TimeSeries<double> SqlBuffer::getValues(const TimeInterval fcHor,
+TimeSeries<double> SqlBuffer::getValues(days fcHor,
                                         const DateTime& fcTime1, const DateTime& fcTime2,
                                         const std::string& stationId, const std::string& pollutantId,
                                         Aggregation::Type aggr)
@@ -105,7 +105,7 @@ TimeSeries<double> SqlBuffer::getValues(const TimeInterval fcHor,
     auto t2 = fcTime2 - fcHor;
 
     auto aggStr = Aggregation::getName(aggr);
-    auto result = _db->getPredictions(t1.getUnixTime(), t2.getUnixTime(), _currentModel, stationId, pollutantId, aggStr, static_cast<int>(fcHor.getDays()));
+    auto result = _db->getPredictions(t1.getUnixTime(), t2.getUnixTime(), _currentModel, stationId, pollutantId, aggStr, fcHor.count());
 
     if (result.isEmpty())
     {
@@ -129,15 +129,16 @@ TimeSeries<double> SqlBuffer::getValues(const TimeInterval fcHor,
         }
     }
 
-    std::cout << result.size() << " <-> " << ((fcTime2.getUnixTime() - fcTime1.getUnixTime()) / _baseTimeResolution.getSeconds()) + 1 << std::endl;
-    assert(result.size() == ((fcTime2.getUnixTime() - fcTime1.getUnixTime()) / _baseTimeResolution.getSeconds() + 1));
+    auto secs = std::chrono::duration_cast<std::chrono::seconds>(_baseTimeResolution);
+    std::cout << result.size() << " <-> " << ((fcTime2.getUnixTime() - fcTime1.getUnixTime()) / secs.count()) + 1 << std::endl;
+    assert(result.size() == ((fcTime2.getUnixTime() - fcTime1.getUnixTime()) / secs.count()) + 1);
 
     return result;
 }
 
 // return model values for a given baseTime / forecast horizon
 std::vector<double> SqlBuffer::getModelValues(const DateTime& baseTime,
-                                              const TimeInterval& fcHor,
+                                              days fcHor,
                                               const std::string& stationId,
                                               const std::string& pollutantId,
                                               Aggregation::Type aggr)
@@ -145,7 +146,7 @@ std::vector<double> SqlBuffer::getModelValues(const DateTime& baseTime,
     throwIfNotConfigured();
 
     auto aggStr = Aggregation::getName(aggr);
-    auto results = _db->getPredictionValues(baseTime.getUnixTime(), stationId, pollutantId, aggStr, static_cast<int>(fcHor.getDays()));
+    auto results = _db->getPredictionValues(baseTime.getUnixTime(), stationId, pollutantId, aggStr, fcHor.count());
     if (results.empty())
     {
         results = std::vector<double>(getModelNames(pollutantId, aggr).size(), getNoData());

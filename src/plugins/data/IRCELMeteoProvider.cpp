@@ -65,7 +65,7 @@ void IRCELMeteoProvider::configure(TiXmlElement * configuration, const std::stri
 	int res = atoi( resEl->GetText() );
 	if ( ( res != 1 ) && ( res != 2 ) && ( res != 3 ) && ( res != 4 ) && ( res != 6 ) && ( res != 8 ) )
 		throw BadConfigurationException( "invalid resolution, valid values are 1, 2, 3, 4, 6 and 8 hours !" );
-	_timeResolution = OPAQ::TimeInterval( res, TimeInterval::Hours );
+	_timeResolution = std::chrono::hours(res);
 	_nsteps = 24/res;
 
 	// -- parse start time
@@ -79,7 +79,7 @@ void IRCELMeteoProvider::configure(TiXmlElement * configuration, const std::stri
 	_configured = true;
 }
 
-const OPAQ::TimeInterval& IRCELMeteoProvider::getTimeResolution() {
+std::chrono::hours IRCELMeteoProvider::getTimeResolution() {
 	return _timeResolution;
 }
 
@@ -170,7 +170,7 @@ void IRCELMeteoProvider::_readFile( const std::string & meteoId,
 	//    basetime, up till the amount of days configured...
 	OPAQ::DateTime checkDate = _baseTime;
 	bool have_file = false;
-	while (  ( checkDate >= _baseTime-OPAQ::TimeInterval( _backsearch, OPAQ::TimeInterval::Days ) )
+	while (  ( checkDate >= _baseTime - days(_backsearch))
 			&& ( ! have_file ) ) {
 
 		filename = _pattern;
@@ -183,7 +183,7 @@ void IRCELMeteoProvider::_readFile( const std::string & meteoId,
 			reader.open(filename);
 			have_file = true;
 		} catch (const IOException &) {
-			checkDate = checkDate - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
+			checkDate = checkDate - days(1);
 			_logger->warn( filename + " not found, checking previous day : " + checkDate.dateToString() );
 		}
 	}

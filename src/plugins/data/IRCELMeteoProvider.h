@@ -32,7 +32,7 @@ public:
   /**
    * Ignored
    */
-  virtual const TimeInterval& getTimeResolution() override;
+  virtual std::chrono::hours getTimeResolution() override;
 
   /**
    * throws an exception: use getNoData(const std::string &) instead
@@ -51,7 +51,7 @@ private:
   Logger             _logger;
   bool               _configured;      //! is the object completely configured
   void               _checkConfig();
-  OPAQ::TimeInterval _timeResolution;  //! what is the time resolution of the meteo data ?
+  std::chrono::hours _timeResolution;  //! what is the time resolution of the meteo data ?
   int                _nsteps;          //! number of steps in a line in the datafile
   OPAQ::DateTime     _bufferStartDate; //! requested buffer start date, if not given, then all file is stored
   bool               _bufferStartReq;  //! is this requested ?

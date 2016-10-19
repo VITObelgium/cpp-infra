@@ -35,7 +35,7 @@ public:
      */
     double fcValue(const OPAQ::Pollutant& pol, const OPAQ::Station& station,
                    OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-                   const OPAQ::TimeInterval& fc_hor);
+                   days fc_hor);
 
     // Some helper routines, make them public
     static double mean_missing(const std::vector<double>& list, double noData);
@@ -48,7 +48,7 @@ protected:
     // method...
     virtual int makeSample(double* sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
                            OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-                           const OPAQ::DateTime& fcTime, const OPAQ::TimeInterval& fc_hor) = 0;
+                           const OPAQ::DateTime& fcTime, days fc_hor) = 0;
 
     /**
      * virtual method which returns the name of the ffnet file from a given pattern

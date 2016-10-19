@@ -66,7 +66,7 @@ void OVL::configure(TiXmlElement * cnf, const std::string& componentName, IEngin
 		this->missing_value = atoi(XmlTools::getText( cnf, "missing_value" ).c_str() );
 
 		// read hind cast period
-		this->hindcast = OPAQ::TimeInterval( atoi(XmlTools::getText( cnf, "hindcast" ).c_str() ), OPAQ::TimeInterval::Days );
+		this->hindcast = days(atoi(XmlTools::getText(cnf, "hindcast" ).c_str()));
 
 		// parse the tunes database & run configuration for OVL
 		parseTuneList( cnf->FirstChildElement( "tunes" ) );
@@ -193,7 +193,7 @@ void OVL::run() {
 	// forecast horizon requested by user is available in abstract model and
 	// defined in the configuration file under <forecast><horizon></horizon></forecast>
 	// value is given in days, but stored in the TimeInterval format, so have to get days back
-	int fcHorMax = static_cast<int>(getForecastHorizon().getDays());
+	int fcHorMax = getForecastHorizon().count();
 
 	// some debugging output ?
 	std::ofstream fs;
@@ -221,7 +221,7 @@ void OVL::run() {
 
 		for ( int fc_hor=0; fc_hor <= fcHorMax; fc_hor++ ) {
 
-			OPAQ::TimeInterval fcHor( fc_hor, TimeInterval::Days );
+			auto fcHor = days(fc_hor);
 			DateTime fcTime = baseTime + fcHor;
 
 			if ( debug_output ) fs << "\t[DAY+" << fc_hor << "]" << std::endl;
@@ -283,7 +283,7 @@ void OVL::run() {
 
 				// get the hind cast for the forecast times between yesterday & the hindcast
 				DateTime t1 = baseTime - hindcast;
-				DateTime t2 = baseTime - OPAQ::TimeInterval( 1, OPAQ::TimeInterval::Days );
+				DateTime t2 = baseTime - days(1);
 
 				buffer->setCurrentModel( model.getName() );
 				TimeSeries<double> fc_hindcast = buffer->getValues( fcHor, t1, t2, station->getName(), pol.getName(), aggr );

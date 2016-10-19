@@ -41,11 +41,11 @@ std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggr
 // we should make it independent of the output of the other models --> so run them twice !!!
 double MLP_FeedForwardModel::fcValue(const OPAQ::Pollutant& pol, const OPAQ::Station& station,
                                      OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-                                     const OPAQ::TimeInterval& fc_hor)
+                                     days fc_hor)
 {
 
     // Return the neural network filename, should be implemented in the daughter class
-    std::string fname = getFFNetFile(pol.getName(), aggr, station.getName(), static_cast<int>(fc_hor.getDays()));
+    auto fname = getFFNetFile(pol.getName(), aggr, station.getName(), fc_hor.count());
 
     // Read in the network file
     TiXmlDocument nnet_xml(fname.c_str());
@@ -124,7 +124,7 @@ void MLP_FeedForwardModel::run()
     // forecast horizon requested by user is available in abstract model and
     // defined in the configuration file under <forecast><horizon></horizon></forecast>
     // value is given in days, but stored in the TimeInterval format, so have to get days back
-    int fcHorMax = static_cast<int>(getForecastHorizon().getDays());
+    int fcHorMax = getForecastHorizon().count();
 
     // -- 2. loop over the stations
     for (auto& station : stations)
@@ -143,7 +143,7 @@ void MLP_FeedForwardModel::run()
 
         for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor)
         {
-            OPAQ::TimeInterval fcHor(fc_hor, TimeInterval::Days);
+            days fcHor(fc_hor);
             DateTime fcTime = baseTime + fcHor;
             _logger->trace(" -- basetime: {}, horizon: day {}, dayN is: {}", baseTime.dateToString(), fc_hor, fcTime.dateToString());
 

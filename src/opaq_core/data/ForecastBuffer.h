@@ -11,7 +11,6 @@
 #include "../Component.h"
 #include <vector>
 #include "DataProvider.h"
-#include "../TimeInterval.h"
 
 namespace OPAQ {
 
@@ -29,7 +28,7 @@ public:
   /**
    * Also return the basetime resolution
    */
-  virtual TimeInterval getBaseTimeResolution( void ) = 0;
+  virtual std::chrono::hours getBaseTimeResolution() = 0;
 
 
   /**
@@ -61,8 +60,8 @@ public:
    * Return all the model values for a given baseTime and forecast horizon. The given current model
    * which is set in the DataProvider parent class is ignored here...
    */
-  virtual std::vector<double> getModelValues( const DateTime &baseTime,
-  		                                      const OPAQ::TimeInterval& fc_hor,
+  virtual std::vector<double> getModelValues(const DateTime &baseTime,
+  		                                       days fc_hor,
   										      const std::string& stationId,
   										      const std::string& pollutantId,
   										      OPAQ::Aggregation::Type aggr ) = 0;
@@ -74,7 +73,7 @@ public:
    * as a function of forecast horizon, given by the vector of time intervals
    */
   virtual OPAQ::TimeSeries<double> getValues( const DateTime &baseTime,
-											  const std::vector<OPAQ::TimeInterval>& fc_hor,
+											  const std::vector<days>& fc_hor,
 											  const std::string& stationId,
 											  const std::string& pollutantId,
 											  OPAQ::Aggregation::Type aggr ) = 0;
@@ -84,7 +83,7 @@ public:
    * fc_hor. This routine can be used to e.g. retieve the archived day+2 forecasts for a given period
    * to e.g. calculate real time corrections
    */
-  virtual OPAQ::TimeSeries<double> getValues( const OPAQ::TimeInterval fc_hor,
+  virtual OPAQ::TimeSeries<double> getValues( days fc_hor,
           	  	  	  	  	  	  	  	  	  const DateTime &fcTime1,
 											  const DateTime &fcTime2,
 											  const std::string& stationId,
@@ -95,7 +94,11 @@ public:
   // has to be
   // - for a given model and a given fcdate and fc horizon
 
-private:
+protected:
+    std::chrono::seconds timeDiffInSeconds(const DateTime& oldest, const DateTime& newest)
+    {
+        return std::chrono::seconds(newest.getUnixTime() - oldest.getUnixTime());
+    }
 
 };
 

@@ -3,7 +3,6 @@
 
 #include <sstream>
 
-#include "TimeInterval.h"
 #include "ObsParser.h"
 #include "AQNetwork.h"
 
@@ -16,6 +15,7 @@ namespace Test
 {
 
 using namespace testing;
+using namespace std::chrono_literals;
 
 static const std::string s_station = "40AB01";
 
@@ -48,7 +48,7 @@ TEST_F(ObserverVationParser, ParseFile)
     ss << "40AB01 20090101    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\n"
        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\n";
 
-    auto result = readObservationsFile(ss, network, 24, TimeInterval(60, TimeInterval::Minutes));
+    auto result = readObservationsFile(ss, network, 24, 1h);
     EXPECT_EQ(4u, result.size()); // one result for each aggregation
     EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size()); // one value for each basetime
     EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size()); // one value for each basetime
@@ -83,7 +83,7 @@ TEST_F(ObserverVationParser, ParseFileCarriageReturnLineFeed)
     ss << "40AB01 20090101    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\r\n"
         << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\r\n";
 
-    auto result = readObservationsFile(ss, network, 24, TimeInterval(60, TimeInterval::Minutes));
+    auto result = readObservationsFile(ss, network, 24, 1h);
     EXPECT_EQ(4u, result.size()); // one result for each aggregation
     EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size()); // one value for each basetime
     EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size()); // one value for each basetime
@@ -97,7 +97,7 @@ TEST_F(ObserverVationParser, ParseInvalidFile)
     ss << "40AB01 20090101    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\n"
        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    \n"; // one value too little
 
-    EXPECT_THROW(readObservationsFile(ss, network, 24, TimeInterval(60, TimeInterval::Minutes)), RunTimeException);
+    EXPECT_THROW(readObservationsFile(ss, network, 24, 1h), RunTimeException);
 }
 
 // Used to check performance
@@ -111,7 +111,7 @@ TEST_F(ObserverVationParser, DISABLED_ParseFile1)
     station->setName(s_station);
     network.addStation(std::move(station));
 
-    auto result = readObservationsFile(fs, network, 24, TimeInterval(60, TimeInterval::Minutes));
+    auto result = readObservationsFile(fs, network, 24, 1h);
     EXPECT_EQ(4u, result.size()); // one result for each aggregation
 }
 

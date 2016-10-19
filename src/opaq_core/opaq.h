@@ -28,7 +28,6 @@
 #include "Pollutant.h"
 #include "PollutantManager.h"
 #include "Station.h"
-#include "TimeInterval.h"
 #include "TimeSeries.h"
 #include "tools/FileTools.h"
 #include "tools/AQNetworkTools.h"

@@ -7,16 +7,20 @@
 
 #pragma once
 
+#include <ratio>
 #include <string>
 #include <vector>
+#include <chrono>
 
 #include "../Exceptions.h"
 #include "../tools/ExceptionTools.h"
-#include "../TimeInterval.h"
+#include "../DateTime.h"
+
 #include "Component.h"
 
 namespace OPAQ
 {
+
 namespace Config
 {
 
@@ -103,10 +107,10 @@ public:
     const std::vector<Component>& getModels() { return _models; }
 
     /** Set the requested forecast horizon */
-    void setHorizon(const TimeInterval& f) { _fcHor = f; }
+    void setHorizon(days fcHor) { _fcHor = fcHor; }
 
     /** Returns the requested (max) forecast horizon for the forecasts */
-    TimeInterval& getHorizon() { return _fcHor; }
+    days getHorizon() { return _fcHor; }
 
 private:
     // vector of models to run in the forecast
@@ -122,7 +126,7 @@ private:
     // output writer component
     const Component* _outputWriter;
 
-    TimeInterval _fcHor; //!< requested max forecast horizon
+    days _fcHor; //!< requested max forecast horizon
 };
 
 }

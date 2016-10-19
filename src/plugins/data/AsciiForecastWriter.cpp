@@ -141,7 +141,7 @@ void AsciiForecastWriter::write(OPAQ::Pollutant* pol, OPAQ::Aggregation::Type ag
     // -- get network & stations & maximum forecast horizon
     OPAQ::AQNetwork* net = getAQNetworkProvider()->getAQNetwork();
     auto& stations       = net->getStations();
-    int fcHorMax         = static_cast<int>(getForecastHorizon().getDays());
+    int fcHorMax         = getForecastHorizon().count();
 
     // -- translate the filename
     StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol->getName());
@@ -222,7 +222,7 @@ void AsciiForecastWriter::write(OPAQ::Pollutant* pol, OPAQ::Aggregation::Type ag
         for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor)
         {
 
-            TimeInterval fcHor(fc_hor, TimeInterval::Days);
+            auto fcHor = days(fc_hor);
             DateTime fcTime = baseTime + fcHor;
 
             if (_fctime_full)

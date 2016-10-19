@@ -13,7 +13,6 @@
 
 #include "DateTime.h"
 #include "Exceptions.h"
-#include "TimeInterval.h"
 
 namespace OPAQ
 {
@@ -54,29 +53,29 @@ DateTime::DateTime(const std::string& s)
     _time = mktime(&t);
 }
 
-const DateTime DateTime::operator+(const TimeInterval& timeInterval) const
+const DateTime DateTime::operator+(std::chrono::seconds secs) const
 {
     DateTime out = *this;
-    out.addSeconds(timeInterval.getSeconds());
+    out.addSeconds(secs.count());
     return out;
 }
 
-const DateTime DateTime::operator-(const TimeInterval& timeInterval) const
+const DateTime DateTime::operator-(std::chrono::seconds secs) const
 {
     DateTime out = *this;
-    out.addSeconds(-timeInterval.getSeconds());
+    out.addSeconds(-secs.count());
     return out;
 }
 
-DateTime& DateTime::operator+=(const TimeInterval& ti)
+DateTime& DateTime::operator+=(std::chrono::seconds secs)
 {
-    addSeconds(ti.getSeconds());
+    addSeconds(secs.count());
     return *this;
 }
 
-DateTime& DateTime::operator-=(const TimeInterval& ti)
+DateTime& DateTime::operator-=(std::chrono::seconds secs)
 {
-    addSeconds(-ti.getSeconds());
+    addSeconds(-secs.count());
     return *this;
 }
 

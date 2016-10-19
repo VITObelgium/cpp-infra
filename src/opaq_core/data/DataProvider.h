@@ -11,8 +11,9 @@
 #include "../Aggregation.h"
 #include "../Component.h"
 #include "../DateTime.h"
-#include "../TimeInterval.h"
 #include "../TimeSeries.h"
+
+#include <chrono>
 #include <vector>
 
 namespace OPAQ
@@ -52,7 +53,7 @@ public:
    * Get the time resolution of the provided data, for forecasted data this will be the time resolution
    * of the forecasts
    */
-    virtual TimeInterval getTimeResolution() = 0;
+    virtual std::chrono::hours getTimeResolution() = 0;
 
     /**
    * Get the nodata placeholder

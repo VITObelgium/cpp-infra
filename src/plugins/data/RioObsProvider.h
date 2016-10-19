@@ -35,7 +35,7 @@ public:
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::DataProvider methods
-    virtual TimeInterval getTimeResolution() override;
+    virtual std::chrono::hours getTimeResolution() override;
 
     virtual double getNoData() override;
 
@@ -54,7 +54,7 @@ public:
 private:
     Logger _logger;
     double _noData;
-    TimeInterval _timeResolution;
+    std::chrono::hours _timeResolution;
     std::string _pattern;
     bool _configured;
 

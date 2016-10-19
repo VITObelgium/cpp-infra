@@ -98,7 +98,7 @@ public:
      * Validate the measured values agains the predicted values for the given station
      */
     std::vector<PredictionResult> validate(Config::OpaqRun& config,
-                                           const TimeInterval& forecastHorizon,
+                                           days forecastHorizon,
                                            const std::string& station,
                                            DateTime startTime,
                                            DateTime endTime,

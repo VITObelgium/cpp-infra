@@ -156,7 +156,7 @@ public:
 	 * Subset the timeseries, returns a new timeseries with the subset of the
 	 * object, this version fills up the gaps with the nodata value.
 	 */
-    TimeSeries<T> select(const DateTime& t1, const DateTime& t2, const TimeInterval& step) const;
+    TimeSeries<T> select(const DateTime& t1, const DateTime& t2, std::chrono::seconds step) const;
 
     // write the timeseries to a file
     void write(std::string fname)
@@ -322,11 +322,11 @@ TimeSeries<T> TimeSeries<T>::select(const DateTime& t1, const DateTime& t2) cons
 
 // TODO very slow implementation since we are looking up the index of each element, but for now let's leave it at this...
 template <class T>
-TimeSeries<T> TimeSeries<T>::select(const DateTime& t1, const DateTime& t2, const TimeInterval& step) const
+TimeSeries<T> TimeSeries<T>::select(const DateTime& t1, const DateTime& t2, std::chrono::seconds step) const
 {
     TimeSeries<T> ts;
 
-    for (DateTime t = t1; t <= t2; t = t + step)
+    for (DateTime t = t1; t <= t2; t += step)
     {
         int i = index(t);
         if (i < 0)

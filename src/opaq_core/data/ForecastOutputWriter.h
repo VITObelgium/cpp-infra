@@ -30,17 +30,17 @@ public:
     // some setters
     void setAQNetworkProvider(AQNetworkProvider& n) { _net = &n; }
     void setBuffer(ForecastBuffer* buf) { _buf = buf; }
-    void setForecastHorizon(const TimeInterval& fc) { _fcHor = fc; }
+    void setForecastHorizon(days fc) { _fcHor = fc; }
 
 protected:
-    ForecastBuffer* getBuffer(void) { return _buf; }
-    AQNetworkProvider* getAQNetworkProvider(void) { return _net; }
-    const TimeInterval& getForecastHorizon(void) { return _fcHor; }
+    ForecastBuffer* getBuffer() { return _buf; }
+    AQNetworkProvider* getAQNetworkProvider() { return _net; }
+    days getForecastHorizon() { return _fcHor; }
 
 private:
     AQNetworkProvider* _net;
     ForecastBuffer* _buf;
-    TimeInterval _fcHor;
+    days _fcHor;
 };
 
 }

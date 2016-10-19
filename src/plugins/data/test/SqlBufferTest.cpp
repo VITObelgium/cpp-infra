@@ -4,7 +4,6 @@
 #include <chrono>
 
 #include "TimeSeries.h"
-#include "TimeInterval.h"
 #include "tools/FileTools.h"
 #include "PredictionDatabase.h"
 
@@ -38,7 +37,7 @@ TEST_F(SqlBufferTest, GetSetPrediction)
     forecast.insert(basetime, 0.5);
 
     db->addPredictions(basetime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, forecast);
-    
+
     EXPECT_DOUBLE_EQ(0.5, db->getPrediction(basetime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4));
 }
 
@@ -48,10 +47,10 @@ TEST_F(SqlBufferTest, GetPredictions)
 
     auto baseTime = DateTime(2015, 1, 1);
     forecast.insert(baseTime, 0.5);
-    forecast.insert(baseTime + TimeInterval(1, TimeInterval::Hours), 1.5);
-    forecast.insert(baseTime + TimeInterval(2, TimeInterval::Hours), 2.5);
-    forecast.insert(baseTime + TimeInterval(3, TimeInterval::Hours), 3.5);
-    forecast.insert(baseTime + TimeInterval(4, TimeInterval::Hours), 4.5);
+    forecast.insert(baseTime + 1h, 1.5);
+    forecast.insert(baseTime + 2h, 2.5);
+    forecast.insert(baseTime + 3h, 3.5);
+    forecast.insert(baseTime + 4h, 4.5);
 
     db->addPredictions(baseTime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, forecast);
 
@@ -59,10 +58,10 @@ TEST_F(SqlBufferTest, GetPredictions)
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<DateTime>{
         baseTime,
-        baseTime + TimeInterval(1, TimeInterval::Hours),
-        baseTime + TimeInterval(2, TimeInterval::Hours),
-        baseTime + TimeInterval(3, TimeInterval::Hours),
-        baseTime + TimeInterval(4, TimeInterval::Hours),
+        baseTime + 1h,
+        baseTime + 2h,
+        baseTime + 3h,
+        baseTime + 4h,
     }));
     EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 0.5, 1.5, 2.5, 3.5, 4.5 }));
 }
@@ -88,7 +87,7 @@ TEST_F(SqlBufferTest, DuplicatePredictionMultipleTransactions)
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(baseTime, 0.5);
     forecast2.insert(baseTime, 1.5);
-    
+
     db->addPredictions(baseTime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, forecast1);
     db->addPredictions(baseTime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, forecast2);
 
@@ -99,38 +98,38 @@ TEST_F(SqlBufferTest, DuplicatePredictionMultipleTransactions)
 TEST_F(SqlBufferTest, GetPredictionValues)
 {
     auto basetime = DateTime(2015, 1, 1);
-    
+
     TimeSeries<double> model1Forecast;
-    model1Forecast.insert(basetime + TimeInterval(0, TimeInterval::Hours), 0.5);
-    model1Forecast.insert(basetime + TimeInterval(1, TimeInterval::Hours), 2.5);
+    model1Forecast.insert(basetime, 0.5);
+    model1Forecast.insert(basetime + 1h, 2.5);
     db->addPredictions(basetime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, model1Forecast);
 
     TimeSeries<double> model2Forecast;
-    model2Forecast.insert(basetime + TimeInterval(0, TimeInterval::Hours), 1.5);
-    model2Forecast.insert(basetime + TimeInterval(1, TimeInterval::Hours), 3.5);
+    model2Forecast.insert(basetime, 1.5);
+    model2Forecast.insert(basetime + 1h, 3.5);
     db->addPredictions(basetime.getUnixTime(), "model2", "Ukkel", "pm10", "dayavg", 4, model2Forecast);
 
     TimeSeries<double> model1ForecastPm25;
-    model1ForecastPm25.insert(basetime + TimeInterval(0, TimeInterval::Hours), 10.5);
-    model1ForecastPm25.insert(basetime + TimeInterval(1, TimeInterval::Hours), 12.5);
+    model1ForecastPm25.insert(basetime, 10.5);
+    model1ForecastPm25.insert(basetime + 1h, 12.5);
     db->addPredictions(basetime.getUnixTime(), "model1", "Ukkel", "pm25", "dayavg", 4, model1ForecastPm25);
 
     TimeSeries<double> model2ForecastPm25;
-    model2ForecastPm25.insert(basetime + TimeInterval(0, TimeInterval::Hours), 11.5);
-    model2ForecastPm25.insert(basetime + TimeInterval(1, TimeInterval::Hours), 13.5);
+    model2ForecastPm25.insert(basetime, 11.5);
+    model2ForecastPm25.insert(basetime + 1h, 13.5);
     db->addPredictions(basetime.getUnixTime(), "model2", "Ukkel", "pm25", "dayavg", 4, model2ForecastPm25);
 
     EXPECT_THAT(db->getPredictionValues(basetime.getUnixTime(), "Ukkel", "pm10", "dayavg", 4), ContainerEq(std::vector<double>{ 0.5, 1.5 }));
-    EXPECT_THAT(db->getPredictionValues((basetime + TimeInterval(1, TimeInterval::Hours)).getUnixTime(), "Ukkel", "pm25", "dayavg", 4), ContainerEq(std::vector<double>{ 12.5, 13.5 }));
+    EXPECT_THAT(db->getPredictionValues((basetime + 1h).getUnixTime(), "Ukkel", "pm25", "dayavg", 4), ContainerEq(std::vector<double>{ 12.5, 13.5 }));
 }
 
 TEST_F(SqlBufferTest, GetModelNames)
 {
     auto basetime = DateTime(2015, 1, 1);
-    
+
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime, 1.5);
-    forecast2.insert(basetime + TimeInterval(1, TimeInterval::Hours), 1.5);
+    forecast2.insert(basetime + 1h, 1.5);
 
     db->addPredictions(basetime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, forecast1);
     db->addPredictions(basetime.getUnixTime(), "model2", "Ukkel", "pm10", "dayavg", 4, forecast1);
@@ -149,21 +148,21 @@ TEST_F(SqlBufferTest, GetPredictionsRange)
     auto basetime = DateTime(2015, 1, 1);
     TimeSeries<double> forecast;
     forecast.insert(basetime, 0.5);
-    forecast.insert(basetime + TimeInterval(1, TimeInterval::Hours), 1.5);
-    forecast.insert(basetime + TimeInterval(2, TimeInterval::Hours), 2.5);
-    forecast.insert(basetime + TimeInterval(3, TimeInterval::Hours), 3.5);
-    forecast.insert(basetime + TimeInterval(4, TimeInterval::Hours), 4.5);
+    forecast.insert(basetime + 1h, 1.5);
+    forecast.insert(basetime + 2h, 2.5);
+    forecast.insert(basetime + 3h, 3.5);
+    forecast.insert(basetime + 4h, 4.5);
 
     db->addPredictions(basetime.getUnixTime(), "model1", "Ukkel", "pm10", "dayavg", 4, forecast);
 
-    auto startTime = (basetime + TimeInterval(1, TimeInterval::Hours)).getUnixTime();
-    auto endTime = (basetime + TimeInterval(3, TimeInterval::Hours)).getUnixTime();
+    auto startTime = (basetime + 1h).getUnixTime();
+    auto endTime = (basetime + 3h).getUnixTime();
     auto results = db->getPredictions(startTime, endTime, "model1", "Ukkel", "pm10", "dayavg", 4);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<DateTime>{
-        DateTime(basetime + TimeInterval(1, TimeInterval::Hours)),
-        DateTime(basetime + TimeInterval(2, TimeInterval::Hours)),
-        DateTime(basetime + TimeInterval(3, TimeInterval::Hours))
+        DateTime(basetime + 1h),
+        DateTime(basetime + 2h),
+        DateTime(basetime + 3h)
     }));
     EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, 2.5, 3.5 }));
 }

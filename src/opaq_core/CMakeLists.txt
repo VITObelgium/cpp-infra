@@ -40,8 +40,6 @@ set (CORE_SOURCES
     Station.h
     Station.cpp
     TimeSeries.h
-    TimeInterval.h
-    TimeInterval.cpp
 )
 
 set (CORE_CONFIG_SOURCES

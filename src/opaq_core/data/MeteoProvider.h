@@ -23,7 +23,7 @@ public:
 	/**
 	 * Get the time resolution of the provided data in the meteo data provider
 	 */
-	virtual const TimeInterval& getTimeResolution() = 0;
+	virtual std::chrono::hours getTimeResolution() = 0;
 
 	/**
 	 * Get the nodata placeholder for the given parameter
