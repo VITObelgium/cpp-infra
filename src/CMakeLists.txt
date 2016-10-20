@@ -11,6 +11,7 @@ endif ()
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(hdf5 CONFIG)
+find_package(Threads)
 
 set (Boost_USE_STATIC_LIBS ON)
 add_definitions("-DBOOST_ALL_NO_LIB")
@@ -22,6 +23,8 @@ add_definitions(-DSPDLOG_FMT_EXTERNAL)
 if (MSVC)
     set(EXTRA_LIBS Psapi Ws2_32)
 endif ()
+
+list(APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 find_path(EIGEN3_INCLUDE_DIR
     NAMES Eigen/Dense

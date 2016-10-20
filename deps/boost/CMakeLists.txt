@@ -24,7 +24,7 @@ ELSE ()
         SET(USER_CONFIG user-config-clang.jam)
         SET(TOOLSET clang)
     ELSE ()
-        SET(USER_CONFIG user-config.jam)
+        SET(USER_CONFIG user-config-gcc.jam)
         SET(TOOLSET gcc)
     ENDIF ()
 
@@ -34,6 +34,7 @@ ENDIF ()
 
 IF(HOST MATCHES ".*-musl")
     SET(TOOLSET gcc-musl)
+    SET(USER_CONFIG user-config-musl.jam)
 ENDIF ()
 
 EXTERNALPROJECT_ADD(${NAME}
