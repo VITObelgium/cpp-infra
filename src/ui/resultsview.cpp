@@ -52,9 +52,9 @@ ResultsView::ResultsView(QWidget* parent)
     setLayout(mainLayout);
 }
 
-void ResultsView::setForecastHorizon(TimeInterval forecastHorizon)
+void ResultsView::setForecastHorizon(days forecastHorizon)
 {
-    _rows = static_cast<int>(forecastHorizon.getDays()) + 1;
+    _rows = static_cast<int>(forecastHorizon.count()) + 1;
 }
 
 void ResultsView::setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents)

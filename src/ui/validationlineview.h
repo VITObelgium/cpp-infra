@@ -1,7 +1,5 @@
 #pragma once
 
-#include "TimeInterval.h"
-
 #include <QtCharts/QChart>
 #include <QtCharts/QValueAxis>
 #include <QtWidgets/QWidget>

@@ -2,7 +2,6 @@
 
 #include "DateTime.h"
 #include "Aggregation.h"
-#include "TimeInterval.h"
 
 #include "stationresultsmodel.h"
 #include "ui_opaqviewer.h"
@@ -32,7 +31,7 @@ public:
     void setAggregationModel(QAbstractItemModel& model);
 
     void setForecastBuffer(ForecastBuffer& buffer);
-    void setForecastHorizon(const TimeInterval& fcHor);
+    void setForecastHorizon(days fcHor);
 
 private:
     void updateResultsForCurrentStation();
@@ -46,7 +45,7 @@ private:
     Ui::OpaqViewer _ui;
     StationResultsModel _model;
 
-    TimeInterval _forecastHorizon;
+    days _forecastHorizon;
     ForecastBuffer* _buffer;
     ConfigurationHandler* _config;
     Engine* _engine;

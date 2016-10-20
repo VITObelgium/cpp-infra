@@ -1,7 +1,5 @@
 #pragma once
 
-#include "TimeInterval.h"
-
 #include <QtWidgets/QWidget>
 
 class QTableView;

@@ -2,7 +2,6 @@
 
 #include "DateTime.h"
 #include "Aggregation.h"
-#include "TimeInterval.h"
 #include "ConfigurationHandler.h"
 #include "Engine.h"
 

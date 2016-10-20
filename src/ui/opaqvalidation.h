@@ -41,7 +41,7 @@ private:
     std::string station() const noexcept;
     DateTime startTime() const noexcept;
     DateTime endTime() const noexcept;
-    TimeInterval forecastHorizon() const noexcept;
+    days forecastHorizon() const noexcept;
 
     Ui::OpaqValidation _ui;
 

@@ -1,7 +1,7 @@
 #pragma once
 
+#include "DateTime.h"
 #include "Aggregation.h"
-#include "TimeInterval.h"
 
 #include <QAbstractTableModel>
 #include <QRect>
@@ -28,7 +28,7 @@ public:
     void updateResults(ForecastBuffer& buffer,
                        DateTime baseTime,
                        const std::string& stationName,
-                       TimeInterval forecastHorizonDays,
+                       days forecastHorizon,
                        const std::string& pollutantId,
                        Aggregation::Type agg);
 
@@ -38,9 +38,8 @@ private:
     ForecastBuffer* _buffer;
     int _rowCount;
     int _colCount;
-    int _forecastHorizonDays;
     DateTime _baseTime;
-    TimeInterval _forecastHorizon;
+    days _forecastHorizon;
     std::string _stationName;
     std::string _pollutantId;
     Aggregation::Type _aggregationType;

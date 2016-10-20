@@ -80,7 +80,7 @@ void OpaqViewer::setForecastBuffer(ForecastBuffer& buffer)
     _buffer = &buffer;
 }
 
-void OpaqViewer::setForecastHorizon(const TimeInterval& fcHor)
+void OpaqViewer::setForecastHorizon(days fcHor)
 {
     _forecastHorizon = fcHor;
     _ui.resultsView->setForecastHorizon(fcHor);
@@ -97,7 +97,7 @@ void OpaqViewer::updateResultsForCurrentStation()
     _model.updateResults(*_buffer, basetime(), station(), _forecastHorizon, pollutant(), aggregation());
     _ui.tableView->setRowHidden(0, true);
 
-    for (int i = 0; i <= static_cast<int>(_forecastHorizon.getDays()); ++i)
+    for (int i = 0; i <= static_cast<int>(_forecastHorizon.count()); ++i)
     {
         _ui.tableView->setColumnWidth(i, 60);
     }

@@ -97,9 +97,9 @@ DateTime OpaqValidation::endTime() const noexcept
     return OPAQ::DateTimeTools::parseDate(_ui.toDateEdit->date().toString("yyyy-MM-dd").toStdString());
 }
 
-TimeInterval OpaqValidation::forecastHorizon() const noexcept
+days OpaqValidation::forecastHorizon() const noexcept
 {
-    return TimeInterval(_ui.forecastHorizonComboBox->currentIndex() + 1, TimeInterval::Days);
+    return days(_ui.forecastHorizonComboBox->currentIndex() + 1);
 }
 
 void OpaqValidation::runValidation()

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TimeInterval.h"
+#include "DateTime.h"
 
 #include <QtCharts/QChart>
 #include <QtCharts/QValueAxis>
@@ -28,7 +28,7 @@ class ResultsView : public QWidget
 public:
     ResultsView(QWidget* parent = 0);
 
-    void setForecastHorizon(TimeInterval forecastHorizon);
+    void setForecastHorizon(days forecastHorizon);
     void setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents);
 
 private:

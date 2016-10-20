@@ -281,8 +281,8 @@ void Hdf5Buffer::setValues(const DateTime& baseTime,
     // get the indices
     unsigned int modelIndex   = Hdf5Tools::getIndexInStringDataSet(dsModels, _currentModel, true);
     unsigned int stationIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId, true);
-    unsigned int dateIndex    = secsDiff.count() / std::chrono::duration_cast<std::chrono::seconds>(_baseTimeResolution).count(); // integer division... should be ok !
-    unsigned int fhIndex      = secsDiffFirst.count() / std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
+    size_t dateIndex    = secsDiff.count() / std::chrono::duration_cast<std::chrono::seconds>(_baseTimeResolution).count(); // integer division... should be ok !
+    size_t fhIndex      = secsDiffFirst.count() / std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 //DEBUG !!
 #ifdef DEBUG
@@ -579,14 +579,14 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(days fc_hor,
     // retrieve station, model & forecsat horizon index
     unsigned int stIndex    = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
     unsigned int modelIndex = Hdf5Tools::getIndexInStringDataSet(dsModels, _currentModel);
-    unsigned int fhIndex    = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
-                              std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
+    size_t fhIndex    = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
+                        std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 #ifdef DEBUG
     std::cout << "Hdf5Buffer::getValues()" << std::endl;
     std::cout << "req station : " << stationId << ", idx = " << stIndex << std::endl;
     std::cout << "req model : " << _currentModel << ", idx = " << modelIndex << std::endl;
-    std::cout << "req fh : " << fc_hor << ", idx = " << fhIndex << std::endl;
+    std::cout << "req fh : " << fc_hor.count() << ", idx = " << fhIndex << std::endl;
 #endif
 
     hsize_t modelSize = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
@@ -604,7 +604,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(days fc_hor,
     // compute the index for the base time of the first forecastTime
     OPAQ::DateTime b1  = fcTime1 - fc_hor;
     OPAQ::DateTime b2  = fcTime2 - fc_hor;
-    unsigned int nvals = (timeDiffInSeconds(b1, b2).count() / getBaseTimeResolutionInSeconds().count()) + 1;
+    size_t nvals = (timeDiffInSeconds(b1, b2).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
     OPAQ::TimeSeries<double> out;
     if (b2 < startTime) {
@@ -618,14 +618,14 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(days fc_hor,
 
 #ifdef DEBUG
         std::cout << "startTime : " << startTime << std::endl;
-        std::cout << "forecat horizon : " << fc_hor << std::endl;
+        std::cout << "forecat horizon : " << fc_hor.count() << std::endl;
         std::cout << "basetime for fcTime1 : " << b1 << std::endl;
         std::cout << "basetime for fcTime2 : " << b2 << std::endl;
 #endif
 
         // number of elements before the HDF5 buffer
-        unsigned int n_before = timeDiffInSeconds(b1, startTime).count() / getBaseTimeResolutionInSeconds().count();     // number of steps before buffer start
-        unsigned int n_inside = (timeDiffInSeconds(startTime, b2).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
+        size_t n_before = timeDiffInSeconds(b1, startTime).count() / getBaseTimeResolutionInSeconds().count();     // number of steps before buffer start
+        size_t n_inside = (timeDiffInSeconds(startTime, b2).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
 
         if ((n_before + n_inside) != nvals) {
 #ifdef DEBUG
@@ -671,7 +671,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(days fc_hor,
     {
         // completely within the period
         std::vector<double> tmp(nvals);
-        unsigned int btIndex = timeDiffInSeconds(startTime, b1).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
+        size_t btIndex = timeDiffInSeconds(startTime, b1).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
 
         // "model x station x baseTime x fcHorizon"
         H5::DataSpace space = dsVals.getSpace();
@@ -732,9 +732,9 @@ std::vector<double> Hdf5Buffer::getModelValues(const DateTime& baseTime, days fc
     }
 
     unsigned int stIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
-    unsigned int btIndex = timeDiffInSeconds(startTime, baseTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
-    unsigned int fhIndex = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
-                           std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
+    size_t btIndex = timeDiffInSeconds(startTime, baseTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
+    size_t fhIndex = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
+                     std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 #ifdef DEBUG
     std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << "\n";
