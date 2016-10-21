@@ -1,8 +1,6 @@
 add_library(mpl_feedforward
     MLP_FeedForwardModel.h
     MLP_FeedForwardModel.cpp
-    Tune.h
-    Tune.cpp
     scaler.h
     scaler.cpp
     layer.h
