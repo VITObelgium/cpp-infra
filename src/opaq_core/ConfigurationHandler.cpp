@@ -175,14 +175,12 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     }
     catch (ElementNotFoundException& e)
     {
-        std::stringstream ss;
-        ss << "no pollutants section in configuration file: " << e.what();
-        _logger->critical(ss.str());
-        exit(1);
+        throw BadConfigurationException("no pollutants section in configuration file: {}", e.what());
     }
-    if (pollutantMgr.getList().size() == 0) {
-        _logger->critical("pollutant list is empty: define at least 1 pollutant");
-        exit(1);
+
+    if (pollutantMgr.getList().empty())
+    {
+        throw BadConfigurationException("pollutant list is empty: define at least 1 pollutant");
     }
 
     _logger->info("Pollutant list:");
@@ -198,17 +196,14 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
 
      Let's us the rootElement pointer for this again...
      --------------------------------------------------------------------- */
-    TiXmlDocument runConfigDoc;
     try
     {
+        TiXmlDocument runConfigDoc;
         rootElement = XmlTools::getElement(rootElement, "runconfig", &runConfigDoc);
     }
     catch (ElementNotFoundException& e)
     {
-        std::stringstream ss;
-        ss << "no runconfig in configuration file: " << e.what();
-        _logger->critical(ss.str());
-        exit(1);
+        throw BadConfigurationException("No runconfig in configuration file: {}", e.what());
     }
 
     /* ------------------------------------------------------------------------
@@ -220,17 +215,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
         TiXmlElement* basetimeElement  = basetimesElement->FirstChildElement("basetime");
         while (basetimeElement)
         {
-            std::string timestamp = std::string(basetimeElement->GetText());
-            try
-            {
-                _opaqRun.addBaseTime(chrono::from_date_time_string(timestamp));
-            }
-            catch (ParseException& e)
-            {
-                _logger->critical("Failed to parse base time: " + timestamp);
-                _logger->critical(e.what());
-                exit(1);
-            }
+            _opaqRun.addBaseTime(chrono::from_date_time_string(basetimeElement->GetText()));
             basetimeElement = basetimeElement->NextSiblingElement("basetime");
         }
     }

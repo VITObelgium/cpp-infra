@@ -185,7 +185,7 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
         }
     }
     // -- no index defined, dump all models
-    if (idx.size() == 0) {
+    if (idx.empty()) {
         for (unsigned int i = 0; i < modelNames.size(); i++)
             idx.push_back(i);
     }
@@ -251,10 +251,8 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
     } // loop over stations
 
     fclose(fp);
-
-    return;
 }
 
-} // namespace
+}
 
 OPAQ_REGISTER_PLUGIN(OPAQ::AsciiForecastWriter);
