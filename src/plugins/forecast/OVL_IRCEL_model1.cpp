@@ -93,7 +93,7 @@ int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
 
     // 0. -------------------------------------------------------------------------------
     // sample[0] is the mean morning concentration of the measured pollutant we're trying to forecast
-    t1 = std::chrono::floor<chrono::days>(baseTime);
+    t1 = date::floor<chrono::days>(baseTime);
     t2 = t1 + std::chrono::hours(mor_agg - 1); // mor_agg uur of eentje aftrekken ?
 
     auto xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName()); // no aggregation

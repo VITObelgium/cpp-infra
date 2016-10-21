@@ -63,7 +63,7 @@ void SqlBuffer::setValues(const chrono::date_time& baseTime,
     throwIfNotConfigured();
 
     auto aggStr = Aggregation::getName(aggr);
-    auto fh = std::chrono::floor<chrono::days>(std::chrono::seconds((forecast.firstDateTime() - baseTime) / std::chrono::seconds(_fcTimeResolution)));
+    auto fh = date::floor<chrono::days>(std::chrono::seconds((forecast.firstDateTime() - baseTime) / std::chrono::seconds(_fcTimeResolution)));
 
     _db->addPredictions(baseTime, _currentModel, stationId, pollutantId, aggStr, fh, forecast);
 }

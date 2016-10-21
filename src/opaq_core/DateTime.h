@@ -30,7 +30,7 @@ namespace chrono
 
     date_time from_date_string(const std::string& s);
     date_time from_date_time_string(const std::string& s);
-    
+
     date_time make_date_time(date::year_month_day ymd);
     date_time make_date_time(int year, int month, int day);
     bool is_weekend(const date_time& dt);
@@ -38,7 +38,7 @@ namespace chrono
 
 namespace chrono_literals
 {
-    constexpr chrono::days operator""_d(std::size_t d)
+    constexpr chrono::days operator""_d(unsigned long long int d)
     {
         return chrono::days(d);
     }

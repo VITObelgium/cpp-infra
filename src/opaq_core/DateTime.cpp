@@ -9,7 +9,7 @@ namespace OPAQ
 {
 namespace chrono
 {
-    
+
 std::string to_date_string(const date_time& dt)
 {
     std::time_t t = std::chrono::system_clock::to_time_t(dt);
@@ -77,7 +77,7 @@ date_time make_date_time(int year, int month, int day)
 
 bool is_weekend(const date_time& dt)
 {
-    auto weekDay = date::weekday(date::sys_days(std::chrono::floor<days>(dt)));
+    auto weekDay = date::weekday(date::sys_days(date::floor<days>(dt)));
     return weekDay == date::sun || weekDay == date::sat;
 }
 

@@ -245,7 +245,7 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
             // we're creating a new file, so the baseTime given here is the start time of the dataset
             // we take the hour as a basic measure, flooring it to the hour !! this allows alternative
             // time resolutions later on...
-            startTime = std::chrono::floor<std::chrono::hours>(baseTime);
+            startTime = date::floor<std::chrono::hours>(baseTime);
 
             Hdf5Tools::createStringAttribute(dsVals, START_DATE_NAME, chrono::to_string(startTime));
             Hdf5Tools::createStringAttribute(dsVals, DIMENSIONS_NAME, DIMENSIONS);
