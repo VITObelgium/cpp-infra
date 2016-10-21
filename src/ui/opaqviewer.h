@@ -31,7 +31,7 @@ public:
     void setAggregationModel(QAbstractItemModel& model);
 
     void setForecastBuffer(ForecastBuffer& buffer);
-    void setForecastHorizon(days fcHor);
+    void setForecastHorizon(chrono::days fcHor);
 
 private:
     void updateResultsForCurrentStation();
@@ -39,13 +39,13 @@ private:
 
     std::string pollutant() const noexcept;
     Aggregation::Type aggregation() const noexcept;
-    std::string basetime() const noexcept;
+    chrono::date_time basetime() const noexcept;
     std::string station() const noexcept;
 
     Ui::OpaqViewer _ui;
     StationResultsModel _model;
 
-    days _forecastHorizon;
+    chrono::days _forecastHorizon;
     ForecastBuffer* _buffer;
     ConfigurationHandler* _config;
     Engine* _engine;

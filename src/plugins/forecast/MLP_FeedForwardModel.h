@@ -34,8 +34,8 @@ public:
      *  value
      */
     double fcValue(const OPAQ::Pollutant& pol, const OPAQ::Station& station,
-                   OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-                   days fc_hor);
+                   Aggregation::Type aggr, const chrono::date_time& baseTime,
+                   chrono::days fc_hor);
 
     // Some helper routines, make them public
     static double mean_missing(const std::vector<double>& list, double noData);
@@ -47,8 +47,8 @@ protected:
     // derived models are the actual plugins and they need to implement this particular
     // method...
     virtual int makeSample(double* sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
-                           OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-                           const OPAQ::DateTime& fcTime, days fc_hor) = 0;
+                           OPAQ::Aggregation::Type aggr, const chrono::date_time& baseTime,
+                           const chrono::date_time& fcTime, chrono::days fc_hor) = 0;
 
     /**
      * virtual method which returns the name of the ffnet file from a given pattern

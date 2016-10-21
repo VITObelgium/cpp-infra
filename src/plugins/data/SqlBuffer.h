@@ -37,8 +37,8 @@ public:
     virtual std::chrono::hours getBaseTimeResolution() override;
 
     virtual double getNoData() override;
-    virtual TimeSeries<double> getValues(const DateTime& t1,
-                                         const DateTime& t2,
+    virtual TimeSeries<double> getValues(const chrono::date_time& t1,
+                                         const chrono::date_time& t2,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
                                          Aggregation::Type aggr = Aggregation::None) override;
@@ -53,7 +53,7 @@ public:
    * Fill the Hdf5 file with the values given by the current basetime & the forecast
    * horizon
    */
-    virtual void setValues(const DateTime& baseTime,
+    virtual void setValues(const chrono::date_time& baseTime,
                            const TimeSeries<double>& forecast,
                            const std::string& stationId,
                            const std::string& pollutantId,
@@ -63,8 +63,8 @@ public:
    * Return all the model values for a given baseTime and forecast horizon. The given current model
    * which is set in the DataProvider parent class is ignored here...
    */
-    virtual std::vector<double> getModelValues(const DateTime& baseTime,
-                                               days fc_hor,
+    virtual std::vector<double> getModelValues(const chrono::date_time& baseTime,
+                                               chrono::days fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
                                                Aggregation::Type aggr) override;
@@ -73,8 +73,8 @@ public:
     * This routine retrieves the forecasted values for a specific base time
     * as a function of forecast horizon, given by the vector of time intervals
     */
-    virtual TimeSeries<double> getValues(const DateTime& baseTime,
-                                         const std::vector<days>& fc_hor,
+    virtual TimeSeries<double> getValues(const chrono::date_time& baseTime,
+                                         const std::vector<chrono::days>& fc_hor,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
                                          Aggregation::Type aggr) override;
@@ -85,9 +85,9 @@ public:
    * to e.g. calculate real time corrections. The user needs to be avare that the two DateTimes given
    * are really the forecast times (so the datetimes for which the forecast is intended
    */
-    virtual TimeSeries<double> getValues(days fc_hor,
-                                         const DateTime& fcTime1,
-                                         const DateTime& fcTime2,
+    virtual TimeSeries<double> getValues(chrono::days fc_hor,
+                                         const chrono::date_time& fcTime1,
+                                         const chrono::date_time& fcTime2,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
                                          Aggregation::Type aggr) override;
@@ -106,8 +106,8 @@ private:
     std::chrono::hours _baseTimeResolution; //! the time resolution at which to store basetimes
     std::chrono::hours _fcTimeResolution;   //! the time resolution at which to store the forecast values
 
-    DateTime _startDate; //!< the start stored in the file (cannot add values before it)
-    DateTime _baseTime;  //!< the basetime against which to offset the intervals given by the
+    chrono::date_time _startDate; //!< the start stored in the file (cannot add values before it)
+    chrono::date_time _baseTime;  //!< the basetime against which to offset the intervals given by the
                          //!< getValues and setValues routines
 
     bool _baseTimeSet; //!< Flag, true if a basetime was given to the

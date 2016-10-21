@@ -49,7 +49,7 @@ private:
     bool        output_raw;      //! store the raw output (if not all models are present in OPAQ
     bool        debug_output;    //! activate debugging output
 
-    days hindcast;
+    chrono::days hindcast;
 
     void parseTuneList( TiXmlElement *lst );
     void parseTuneElement( TiXmlElement *el );

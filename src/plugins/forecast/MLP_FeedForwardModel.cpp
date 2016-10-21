@@ -39,9 +39,9 @@ std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggr
 // need to create a routine which can be re-used by the OVL model without having to make use of the
 // run( ) method, as this will require updating the buffers, as we want OVL to be a standalone plugin,
 // we should make it independent of the output of the other models --> so run them twice !!!
-double MLP_FeedForwardModel::fcValue(const OPAQ::Pollutant& pol, const OPAQ::Station& station,
-                                     OPAQ::Aggregation::Type aggr, const OPAQ::DateTime& baseTime,
-                                     days fc_hor)
+double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& station,
+                                     Aggregation::Type aggr, const chrono::date_time& baseTime,
+                                     chrono::days fc_hor)
 {
 
     // Return the neural network filename, should be implemented in the daughter class
@@ -71,7 +71,7 @@ double MLP_FeedForwardModel::fcValue(const OPAQ::Pollutant& pol, const OPAQ::Sta
                                ") for model sample size (" + std::to_string(this->sample_size) + ")");
     }
 
-    DateTime fcTime = baseTime + fc_hor;
+    auto fcTime = baseTime + fc_hor;
 
     // construct the input feature vector, output is single pointer value
     // not really nice, but let's leave it for the moment...
@@ -112,7 +112,7 @@ void MLP_FeedForwardModel::run()
     // -- 1. initialization
     _logger->debug("MLP_FeedForwardModel " + this->getName() + " run() method called");
 
-    DateTime baseTime      = getBaseTime();
+    auto baseTime          = getBaseTime();
     Pollutant pol          = getPollutant();
     Aggregation::Type aggr = getAggregation();
     auto* net              = getAQNetworkProvider().getAQNetwork();
@@ -143,9 +143,9 @@ void MLP_FeedForwardModel::run()
 
         for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor)
         {
-            days fcHor(fc_hor);
-            DateTime fcTime = baseTime + fcHor;
-            _logger->trace(" -- basetime: {}, horizon: day {}, dayN is: {}", baseTime.dateToString(), fc_hor, fcTime.dateToString());
+            chrono::days fcHor(fc_hor);
+            auto fcTime = baseTime + fcHor;
+            _logger->trace(" -- basetime: {}, horizon: day {}, dayN is: {}", chrono::to_date_string(baseTime), fc_hor, chrono::to_date_string(fcTime));
 
             fc.insert(fcTime, fcValue(pol, *station, aggr, baseTime, fcHor));
         }

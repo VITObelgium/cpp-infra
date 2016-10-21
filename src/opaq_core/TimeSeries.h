@@ -36,7 +36,7 @@ public:
     }
 
     const std::vector<T>& values(void) const { return _values; }
-    const std::vector<OPAQ::DateTime>& datetimes(void) const { return _datetimes; }
+    const std::vector<OPAQ::chrono::date_time>& datetimes(void) const { return _datetimes; }
 
     // ======================
     // insert functionality
@@ -46,7 +46,7 @@ public:
 	 * value (of type T)
      * Throws OutOfBoundsException
 	 */
-    void insert(const DateTime&, const T&);
+    void insert(const chrono::date_time&, const T&);
     /**
 	 * Merges the given timeseries into this timeseries
 	 * value (of type T). When duplicate datetimestamps are present,
@@ -70,39 +70,39 @@ public:
         _datetimes.reserve(size);
     }
 
-    void remove(const DateTime&);
-    void removeRange(const DateTime&, const DateTime&, bool with_ends = false);
-    void removeBefore(const DateTime&);
-    void removeAfter(const DateTime&);
+    void remove(const chrono::date_time&);
+    void removeRange(const chrono::date_time&, const chrono::date_time&, bool with_ends = false);
+    void removeBefore(const chrono::date_time&);
+    void removeAfter(const chrono::date_time&);
 
     // ===================
     // search algorithms
     // ===================
 
     // does the timeseries contain the given datetime
-    bool contains(const DateTime& dt) const { return std::binary_search(_datetimes.begin(), _datetimes.end(), dt); }
+    bool contains(const chrono::date_time& dt) const { return std::binary_search(_datetimes.begin(), _datetimes.end(), dt); }
 
     // return the first date time in the timeseries
-    const DateTime& firstDateTime() const
+    const chrono::date_time& firstDateTime() const
     {
         return _datetimes.front();
     };
     // return the last date time in the timeseries
-    const DateTime& lastDateTime() const
+    const chrono::date_time& lastDateTime() const
     {
         return _datetimes.back();
     };
     // return the index of the date time, -1 if not found
-    int index(const DateTime& dt) const
+    int index(const chrono::date_time& dt) const
     {
         for (unsigned int i = 0; i < size(); i++)
             if (_datetimes[i] == dt) return i;
         return -1; // not found
     }
     // return first index after the given datetime
-    int indexOfFirstAfter(const DateTime& dt) const
+    int indexOfFirstAfter(const chrono::date_time& dt) const
     {
-        if (!dt.isValid()) return -1;
+        if (dt == chrono::date_time()) return -1;
         if (dt >= lastDateTime()) return -1;
         if (dt < firstDateTime()) return 0;
         for (unsigned int i = 0; i < size(); i++)
@@ -110,9 +110,9 @@ public:
         return -1; // not found
     }
     // return first index after the given datetime
-    int indexOfLastBefore(const DateTime& dt) const
+    int indexOfLastBefore(const chrono::date_time& dt) const
     {
-        if (!dt.isValid()) return -1;
+        if (dt == chrono::date_time()) return -1;
         if (dt <= firstDateTime()) return -1;
         if (dt > lastDateTime()) return index(lastDateTime());
         for (unsigned int i = 0; i < size(); i++)
@@ -121,7 +121,7 @@ public:
     }
 
     // throws OutOfBoundsException
-    DateTime datetime(unsigned int i) const
+    chrono::date_time datetime(unsigned int i) const
     {
         if (i >= size()) throw RunTimeException("index out of range");
         return _datetimes.at(i);
@@ -135,7 +135,7 @@ public:
     }
 
     // throws OutOfBoundsException
-    T value(const DateTime& dt) const
+    T value(const chrono::date_time& dt) const
     {
         if (!contains(dt)) throw RunTimeException("datetime not found in timeseries");
         return _values[index(dt)];
@@ -143,20 +143,20 @@ public:
     // this one returns either the value at dt if present, or the last value before the
     // given timestamp (as the at that time most recent value)
     // throws OutOfBoundsException
-    T valueAt(const DateTime& dt) const;
+    T valueAt(const chrono::date_time& dt) const;
 
     /**
 	 * subset the timeseries, returns a new timeseries with the subset of the
 	 * object, this version just gives all the values, without wondering whether
 	 * there is any gaps
 	 */
-    TimeSeries<T> select(const DateTime& t1, const DateTime& t2) const;
+    TimeSeries<T> select(const chrono::date_time& t1, const chrono::date_time& t2) const;
 
     /**
 	 * Subset the timeseries, returns a new timeseries with the subset of the
 	 * object, this version fills up the gaps with the nodata value.
 	 */
-    TimeSeries<T> select(const DateTime& t1, const DateTime& t2, std::chrono::seconds step) const;
+    TimeSeries<T> select(const chrono::date_time& t1, const chrono::date_time& t2, std::chrono::seconds step) const;
 
     // write the timeseries to a file
     void write(std::string fname)
@@ -170,7 +170,7 @@ public:
 
 protected:
     std::vector<T> _values;
-    std::vector<DateTime> _datetimes;
+    std::vector<chrono::date_time> _datetimes;
     T _missing_value;
 };
 
@@ -183,10 +183,10 @@ protected:
  *  Throws OutOfBoundsException
  */
 template <class T>
-void TimeSeries<T>::insert(const DateTime& dt, const T& val)
+void TimeSeries<T>::insert(const chrono::date_time& dt, const T& val)
 {
 
-    if (!dt.isValid()) throw RunTimeException("invalid datetime given");
+    if (dt == chrono::date_time()) throw RunTimeException("invalid datetime given");
     // if the timeseries is empty or the date is after the last date, push it back...
     if (isEmpty() || dt > lastDateTime()) {
         _datetimes.push_back(dt);
@@ -233,9 +233,9 @@ void TimeSeries<T>::merge(const TimeSeries<T>& ts, bool overwrite)
 
 // remove function
 template <class T>
-void TimeSeries<T>::remove(const DateTime& dt)
+void TimeSeries<T>::remove(const chrono::date_time& dt)
 {
-    if (!dt.isValid()) return;
+    if (dt == chrono::date_time()) return;
     int i = index(dt);
     if (i >= 0) {
         _datetimes.erase(_datetimes.begin() + i);
@@ -245,10 +245,10 @@ void TimeSeries<T>::remove(const DateTime& dt)
 }
 
 template <class T>
-void TimeSeries<T>::removeRange(const DateTime& dt1, const DateTime& dt2, bool with_ends)
+void TimeSeries<T>::removeRange(const chrono::date_time& dt1, const chrono::date_time& dt2, bool with_ends)
 {
-    if (!dt1.isValid()) return;
-    if (!dt2.isValid()) return;
+    if (dt1 == chrono::date_time()) return;
+    if (dt2 == chrono::date_time()) return;
 
     // whole range ?
     if ((dt1 < firstDateTime()) && (dt2 > lastDateTime())) {
@@ -274,9 +274,9 @@ void TimeSeries<T>::removeRange(const DateTime& dt1, const DateTime& dt2, bool w
 }
 
 template <class T>
-void TimeSeries<T>::removeBefore(const DateTime& t)
+void TimeSeries<T>::removeBefore(const chrono::date_time& t)
 {
-    if (!t.isValid()) return;
+    if (t == chrono::date_time()) return;
     int idx = indexOfLastBefore(t);
     if (idx < 0) {
         _values.erase(_values.begin(), _values.begin() + idx + 1);
@@ -286,9 +286,9 @@ void TimeSeries<T>::removeBefore(const DateTime& t)
 }
 
 template <class T>
-void TimeSeries<T>::removeAfter(const DateTime& t)
+void TimeSeries<T>::removeAfter(const chrono::date_time& t)
 {
-    if (!t.isValid()) return;
+    if (t == chrono::date_time()) return;
     int idx = indexOfFirstAfter(t);
     if (idx < 0) {
         _values.erase(_values.begin() + idx + 1, _values.end());
@@ -299,7 +299,7 @@ void TimeSeries<T>::removeAfter(const DateTime& t)
 
 // Throws OutOfBoundsException
 template <class T>
-T TimeSeries<T>::valueAt(const DateTime& dt) const
+T TimeSeries<T>::valueAt(const chrono::date_time& dt) const
 {
 
     if (isEmpty()) throw RunTimeException("empty timeseries");
@@ -309,7 +309,7 @@ T TimeSeries<T>::valueAt(const DateTime& dt) const
 }
 
 template <class T>
-TimeSeries<T> TimeSeries<T>::select(const DateTime& t1, const DateTime& t2) const
+TimeSeries<T> TimeSeries<T>::select(const chrono::date_time& t1, const chrono::date_time& t2) const
 {
     TimeSeries<T> ts;
     for (unsigned int i = 0; i < size(); i++)
@@ -322,11 +322,11 @@ TimeSeries<T> TimeSeries<T>::select(const DateTime& t1, const DateTime& t2) cons
 
 // TODO very slow implementation since we are looking up the index of each element, but for now let's leave it at this...
 template <class T>
-TimeSeries<T> TimeSeries<T>::select(const DateTime& t1, const DateTime& t2, std::chrono::seconds step) const
+TimeSeries<T> TimeSeries<T>::select(const chrono::date_time& t1, const chrono::date_time& t2, std::chrono::seconds step) const
 {
     TimeSeries<T> ts;
 
-    for (DateTime t = t1; t <= t2; t += step)
+    for (chrono::date_time t = t1; t <= t2; t += step)
     {
         int i = index(t);
         if (i < 0)

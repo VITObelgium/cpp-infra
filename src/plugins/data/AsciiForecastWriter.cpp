@@ -128,8 +128,7 @@ void AsciiForecastWriter::configure(TiXmlElement* configuration, const std::stri
     return;
 }
 
-void AsciiForecastWriter::write(OPAQ::Pollutant* pol, OPAQ::Aggregation::Type aggr,
-                                const OPAQ::DateTime& baseTime)
+void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const chrono::date_time& baseTime)
 {
 
     std::string fname = _filename;
@@ -146,12 +145,12 @@ void AsciiForecastWriter::write(OPAQ::Pollutant* pol, OPAQ::Aggregation::Type ag
     // -- translate the filename
     StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol->getName());
     StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, OPAQ::Aggregation::getName(aggr));
-    StringTools::replaceAll(fname, BASETIME_PLACEHOLDER, baseTime.dateToString());
+    StringTools::replaceAll(fname, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // -- translate the header
     StringTools::replaceAll(head, POLLUTANT_PLACEHOLDER, pol->getName());
     StringTools::replaceAll(head, AGGREGATION_PLACEHOLDER, OPAQ::Aggregation::getName(aggr));
-    StringTools::replaceAll(head, BASETIME_PLACEHOLDER, baseTime.dateToString());
+    StringTools::replaceAll(head, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // ========================================================================
     // initialization
@@ -222,16 +221,16 @@ void AsciiForecastWriter::write(OPAQ::Pollutant* pol, OPAQ::Aggregation::Type ag
         for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor)
         {
 
-            auto fcHor = days(fc_hor);
-            DateTime fcTime = baseTime + fcHor;
+            auto fcHor = chrono::days(fc_hor);
+            auto fcTime = baseTime + fcHor;
 
             if (_fctime_full)
             {
-                fprintf(fp, "%s%c%s%c%s", baseTime.dateToString().c_str(), _sepchar, station->getName().c_str(), _sepchar, fcTime.dateToString().c_str());
+                fprintf(fp, "%s%c%s%c%s", chrono::to_date_string(baseTime).c_str(), _sepchar, station->getName().c_str(), _sepchar, chrono::to_date_string(fcTime).c_str());
             }
             else
             {
-                fprintf(fp, "%s%c%s%c%d", baseTime.dateToString().c_str(), _sepchar, station->getName().c_str(), _sepchar, fc_hor);
+                fprintf(fp, "%s%c%s%c%d", chrono::to_date_string(baseTime).c_str(), _sepchar, station->getName().c_str(), _sepchar, fc_hor);
             }
 
             try
@@ -244,7 +243,7 @@ void AsciiForecastWriter::write(OPAQ::Pollutant* pol, OPAQ::Aggregation::Type ag
                     fprintf(fp, "%c%.6f", _sepchar, modelVals[ii]);
                 fprintf(fp, "\n");
             }
-            catch (const OPAQ::NotAvailableException&)
+            catch (const NotAvailableException&)
             {
                 for (int i = 0; i < idx.size(); ++i)
                     fprintf(fp, "%c%f", _sepchar, getBuffer()->getNoData());

@@ -16,6 +16,16 @@ SQLPP_ALIAS_PROVIDER(endDate);
 
 static Predictions predictions;
 
+static time_t to_epoch(const chrono::date_time& dt)
+{
+    return chrono::to_seconds(dt.time_since_epoch()).count();
+}
+
+static chrono::date_time from_epoch(time_t t)
+{
+    return chrono::date_time(std::chrono::seconds(t));
+}
+
 static sql::connection_config createConfig(const std::string& filename)
 {
     sql::connection_config config;
@@ -126,12 +136,12 @@ void PredictionDatabase::prepareStatements()
     _statements->getPredictionsInRange = _db.prepare(getPredictionsInRangeQuery());
 }
 
-void PredictionDatabase::addPredictions(time_t baseTime,
+void PredictionDatabase::addPredictions(chrono::date_time baseTime,
                                         const std::string& model,
                                         const std::string& stationId,
                                         const std::string& pollutantId,
                                         const std::string& aggr,
-                                        int fcHor,
+                                        chrono::days fcHor,
                                         const TimeSeries<double>& forecast)
 {
     _db.start_transaction();
@@ -140,14 +150,14 @@ void PredictionDatabase::addPredictions(time_t baseTime,
     {
         auto index = static_cast<unsigned int>(i);
     
-        _statements->addPrediction.params.Basetime = baseTime;
-        _statements->addPrediction.params.Date = forecast.datetime(index).getUnixTime();
+        _statements->addPrediction.params.Basetime = to_epoch(baseTime);
+        _statements->addPrediction.params.Date = to_epoch(forecast.datetime(index));
         _statements->addPrediction.params.Value = forecast.value(index);
         _statements->addPrediction.params.Model = model;
         _statements->addPrediction.params.Pollutant = pollutantId;
         _statements->addPrediction.params.Aggregation = aggr;
         _statements->addPrediction.params.Station = stationId;
-        _statements->addPrediction.params.ForecastHorizon = fcHor + index;
+        _statements->addPrediction.params.ForecastHorizon = fcHor.count() + index;
 
         _db(_statements->addPrediction);
     }
@@ -155,19 +165,19 @@ void PredictionDatabase::addPredictions(time_t baseTime,
     _db.commit_transaction();
 }
 
-double PredictionDatabase::getPrediction(time_t date,
+double PredictionDatabase::getPrediction(chrono::date_time date,
                                          const std::string& model,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
                                          const std::string& aggr,
-                                         int fcHor)
+                                         chrono::days fcHor)
 {
-    _statements->getPrediction.params.Date = date;
+    _statements->getPrediction.params.Date = to_epoch(date);
     _statements->getPrediction.params.Model = model;
     _statements->getPrediction.params.Pollutant = pollutantId;
     _statements->getPrediction.params.Aggregation = aggr;
     _statements->getPrediction.params.Station = stationId;
-    _statements->getPrediction.params.ForecastHorizon = fcHor;
+    _statements->getPrediction.params.ForecastHorizon = fcHor.count();
 
     for (auto& row : _db(_statements->getPrediction))
     {
@@ -182,34 +192,34 @@ TimeSeries<double> PredictionDatabase::getPredictions(const std::string& model,
                                                       const std::string& stationId,
                                                       const std::string& pollutantId,
                                                       const std::string& aggr,
-                                                      int fcHor)
+                                                      chrono::days fcHor)
 {
     _statements->getPredictions.params.Model = model;
     _statements->getPredictions.params.Pollutant = pollutantId;
     _statements->getPredictions.params.Aggregation = aggr;
     _statements->getPredictions.params.Station = stationId;
-    _statements->getPredictions.params.ForecastHorizon = fcHor;
+    _statements->getPredictions.params.ForecastHorizon = fcHor.count();
 
     TimeSeries<double> result;
     for (auto& row : _db(_statements->getPredictions))
     {
-        result.insert(DateTime(row.Date), row.Value);
+        result.insert(from_epoch(row.Date), row.Value);
     }
 
     return result;
 }
 
-std::vector<double> PredictionDatabase::getPredictionValues(time_t basetime,
+std::vector<double> PredictionDatabase::getPredictionValues(chrono::date_time basetime,
                                                             const std::string& stationId,
                                                             const std::string& pollutantId,
                                                             const std::string& aggr,
-                                                            int fcHor)
+                                                            chrono::days fcHor)
 {
-    _statements->getPredictionValues.params.Basetime = basetime;
+    _statements->getPredictionValues.params.Basetime = to_epoch(basetime);
     _statements->getPredictionValues.params.Pollutant = pollutantId;
     _statements->getPredictionValues.params.Aggregation = aggr;
     _statements->getPredictionValues.params.Station = stationId;
-    _statements->getPredictionValues.params.ForecastHorizon = fcHor;
+    _statements->getPredictionValues.params.ForecastHorizon = fcHor.count();
 
     std::vector<double> result;
     for (auto& row : _db(_statements->getPredictionValues))
@@ -220,26 +230,26 @@ std::vector<double> PredictionDatabase::getPredictionValues(time_t basetime,
     return result;
 }
 
-TimeSeries<double> PredictionDatabase::getPredictions(time_t startDate,
-                                                      time_t endDate,
+TimeSeries<double> PredictionDatabase::getPredictions(chrono::date_time startDate,
+                                                      chrono::date_time endDate,
                                                       const std::string& model,
                                                       const std::string& stationId,
                                                       const std::string& pollutantId,
                                                       const std::string& aggr,
-                                                      int fcHor)
+                                                      chrono::days fcHor)
 {
-    _statements->getPredictionsInRange.params.startDate = startDate;
-    _statements->getPredictionsInRange.params.endDate = endDate;
+    _statements->getPredictionsInRange.params.startDate = to_epoch(startDate);
+    _statements->getPredictionsInRange.params.endDate = to_epoch(endDate);
     _statements->getPredictionsInRange.params.Model = model;
     _statements->getPredictionsInRange.params.Pollutant = pollutantId;
     _statements->getPredictionsInRange.params.Aggregation = aggr;
     _statements->getPredictionsInRange.params.Station = stationId;
-    _statements->getPredictionsInRange.params.ForecastHorizon = fcHor;
+    _statements->getPredictionsInRange.params.ForecastHorizon = fcHor.count();
 
     TimeSeries<double> result;
     for (auto& row : _db(_statements->getPredictionsInRange))
     {
-        result.insert(DateTime(row.Date), row.Value);
+        result.insert(from_epoch(row.Date), row.Value);
     }
 
     return result;

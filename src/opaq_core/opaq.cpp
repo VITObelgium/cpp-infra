@@ -14,9 +14,6 @@
 #include "Logger.h"
 
 #include "PollutantManager.h"
-#include "tools/DateTimeTools.h"
-#include "tools/FileTools.h"
-
 #include "config.h"
 
 #include <boost/program_options.hpp>
@@ -178,16 +175,15 @@ int main(int argc, char* argv[])
     // 2. base times
     if (!basetime.empty())
     {
-        auto& basetimes = ch.getOpaqRun().getBaseTimes();
-        basetimes.clear();
-
+        ch.getOpaqRun().clearBaseTimes();
+        
         try
         {
-            auto baseTime = OPAQ::DateTimeTools::parseDate(basetime);
+            auto baseTime = OPAQ::chrono::from_date_string(basetime);
             for (uint32_t i = 0; i < days; ++i)
             {
-                basetimes.push_back(baseTime);
-                baseTime.addDays(1);
+                ch.getOpaqRun().addBaseTime(baseTime);
+                baseTime += OPAQ::chrono::days(1);
             }
         }
         catch (const OPAQ::ParseException&)
@@ -200,7 +196,7 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
     logger->info("Requested base times:");
     for (auto& basetime : ch.getOpaqRun().getBaseTimes())
-        logger->info(basetime.toString());
+        logger->info(OPAQ::chrono::to_string(basetime));
 #endif
 
     // validate configuration

@@ -5,7 +5,6 @@
 #include "AQNetworkProvider.h"
 #include "ConfigurationHandler.h"
 #include "uiutils.h"
-#include "tools/DateTimeTools.h"
 
 #include <cassert>
 
@@ -13,6 +12,8 @@ Q_DECLARE_METATYPE(OPAQ::Aggregation::Type)
 
 namespace OPAQ
 {
+
+using namespace chrono_literals;
 
 OpaqViewer::OpaqViewer(QWidget* parent)
 : QWidget(parent)
@@ -80,7 +81,7 @@ void OpaqViewer::setForecastBuffer(ForecastBuffer& buffer)
     _buffer = &buffer;
 }
 
-void OpaqViewer::setForecastHorizon(days fcHor)
+void OpaqViewer::setForecastHorizon(chrono::days fcHor)
 {
     _forecastHorizon = fcHor;
     _ui.resultsView->setForecastHorizon(fcHor);
@@ -119,9 +120,9 @@ std::string OpaqViewer::station() const noexcept
     return _ui.stationComboBox->currentData(Qt::UserRole).value<QString>().toStdString();
 }
 
-std::string OpaqViewer::basetime() const noexcept
+chrono::date_time OpaqViewer::basetime() const noexcept
 {
-    return _ui.basetimeDateEdit->date().toString("yyyy-MM-dd").toStdString();
+    return chrono::from_date_string(_ui.basetimeDateEdit->date().toString("yyyy-MM-dd").toStdString());
 }
 
 void OpaqViewer::runSimulation()
@@ -132,26 +133,16 @@ void OpaqViewer::runSimulation()
     auto pol = pollutant();
     _config->getOpaqRun().setPollutantName(pollutant(), Aggregation::getName(aggregation()));
 
-    auto baset = basetime();
-    if (!baset.empty())
+    auto baseTime = basetime();
+    if (baseTime != chrono::date_time())
     {
-        auto& basetimes = _config->getOpaqRun().getBaseTimes();
-        basetimes.clear();
-
-        try
+        _config->getOpaqRun().clearBaseTimes();
+        
+        int dayCount = 1;
+        for (int i = 0; i < dayCount; ++i)
         {
-            auto baseTime = OPAQ::DateTimeTools::parseDate(baset);
-            int dayCount = 1;
-            for (int i = 0; i < dayCount; ++i)
-            {
-                basetimes.push_back(baseTime);
-                baseTime.addDays(1);
-            }
-        }
-        catch (const OPAQ::ParseException&)
-        {
-            displayError(this, tr("Failed to parse base time"), QString("Failed to parse base time : %1").arg(baset.c_str()));
-            return;
+            _config->getOpaqRun().addBaseTime(baseTime);
+            baseTime += 1_d;
         }
     }
 

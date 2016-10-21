@@ -1,241 +1,53 @@
-#ifndef __OPAQ_DATETIME_H
-#define __OPAQ_DATETIME_H
+#pragma once
 
-#include <iomanip>
-#include <math.h>
+#include <date.h>
+
 #include <ostream>
-#include <sstream>
-
-#include <ctime>
 #include <chrono>
-#include <cstring>
-#include <cassert>
 
 namespace OPAQ
 {
 
-using days = std::chrono::duration<int, std::ratio_multiply<std::chrono::hours::period, std::ratio<24>>::type>;
-
-/**
-     Class representing a DateTime object
-     The class contains some general functionality to deal with date/times in OPAQ. It contains
-     some routines for conversion to a julian date (having sequential date numbers ) and unix time
-     being the number of seconds since 1970-01-01 00:00:00 UTC.
-     \note That OPAQ is completely unaware of the timezone and contains no functionality for
-           timezone conversion. This has to be handled by the dataproviders in the plugins or the
-	   preprocessing of the data fed into OPAQ.
-   */
-class DateTime
+namespace chrono
 {
-public:
-    DateTime();
+    using days = date::days;
+    using date_time = std::chrono::system_clock::time_point;
 
-    DateTime(time_t t);
-
-    /** Construct a datetime from a given year, month and day */
-    DateTime(int yyyy, int mm, int dd)
-    : DateTime(yyyy, mm, dd, 0, 0, 0)
+    template <typename T>
+    std::chrono::seconds to_seconds(const T& timePoint)
     {
+        return std::chrono::duration_cast<std::chrono::seconds>(timePoint);
     }
 
-    /** Construct a datetime from a given year, month, day as well as hours, minutes and seconds */
-    DateTime(int yyyy, int mm, int dd, int hour, int min, int sec)
+    template <typename T>
+    chrono::days to_days(const T& timePoint)
     {
-        tm t;
-        memset(&t, 0, sizeof(struct tm));
-        t.tm_year = yyyy - 1900;
-        t.tm_mon = mm - 1;
-        t.tm_mday = dd;
-        t.tm_hour = hour;
-        t.tm_min = min;
-        t.tm_sec = sec;
-
-        _time = mktime(&t);
+        return std::chrono::duration_cast<chrono::days>(timePoint);
     }
 
-    /** Construct a datetime from a given string, format should be YYYY-MM-DD HH:MM:SS, the
-     * HH:MM:SS can be omitted
-     */
-    DateTime(const std::string& s);
+    std::string to_date_string(const date_time& dt);
+    std::string to_string(const date_time& dt);
 
-    /**
-     * Checks whether the date/time is actually valid
-     */
-    bool isValid() const;
+    date_time from_date_string(const std::string& s);
+    date_time from_date_time_string(const std::string& s);
+    
+    date_time make_date_time(date::year_month_day ymd);
+    date_time make_date_time(int year, int month, int day);
+    bool is_weekend(const date_time& dt);
+}
 
-    int getSec() const;
-    int getMin() const;
-    int getHour() const;
-    int getDay() const;
-    int getMonth() const;
-    int getYear() const;
-
-    /**
-       Converts the datetime object to a julian date number which it returns
-       See Fliegel & Van Flandern, CACM 11(10):657, 1968
-       example: julian_date(1970,1,1)=2440588
-     */
-
-    /**
-     * Returns the UNIX time from the datetime object
-     * \author Stijn Van Looy, (c) 2014 VITO
-     * A bit different from the formula @ http://en.wikipedia.org/wiki/Julian_day
-     * since in this implementation the julian 'date' is actually the julian _day_
-     * (that is: an integer counting the days from noon to noon, and not a floating
-     * point number of which the integer part is the julian day and the decimal
-     * part denotes the time passed since noon that day.
-     */
-    time_t getUnixTime() const
-    {
-        return _time;
-    }
-
-    /**
-       Set the datetime to the given unix time
-       \note The UNIX time is the number of seconds since 01-01-1970 00:00:00
-       \author Stijn Van Looy, (c) VITO 2014
-    */
-
-    void setUnixTime(time_t time)
-    {
-        _time = time;
-    }
-
-    /**
-     * Add/subtract a number of seconds to/from the datetime
-     */
-    void addSeconds(int count)
-    {
-        _time += count;
-    }
-
-    /**
-     * Add/subtract a number of minutes to/from the datetime
-     */
-    void addMinutes(int count)
-    {
-        addSeconds(count * 60);
-    }
-
-    /**
-     * Add/subtract a number of hours to/from the datetime
-     */
-    void addHours(int count)
-    {
-        addSeconds(count * 3600);
-    }
-
-    /**
-     * Add/subtract a number of days to/from the datetime
-     */
-    void addDays(int count)
-    {
-        addSeconds(count * 86400);
-    }
-
-    /**
-	Return the day of the week for the datetime object
-	Day_Of_Week: (0=Sunday,1=Monday...6=Saturday)
-	cf J.D.Robertson, CACM 15(10):918
-    */
-    int getDayOfWeek() const
-    {
-        auto* t = std::gmtime(&_time);
-        assert(t);
-        return t->tm_wday;
-    }
-
-    /**
-       Convert the datetime to a string for easy output
-       Format is YYYY-MM-DD HH:MM:SS
-    */
-    std::string toString() const
-    {
-        std::ostringstream s;
-        s << (*this);
-        return s.str();
-    }
-
-    /**
-       Convert only the date and not full datetime to string for easy output
-       format is YYYY-MM-DD
-    */
-    std::string dateToString() const
-    {
-        auto* t = std::gmtime(&_time);
-        assert(t);
-
-        std::ostringstream s;
-        s << std::setw(4) << t->tm_year + 1900 << "-" << std::setw(2) << std::setfill('0')
-          << t->tm_mon + 1 << std::setw(1) << "-" << std::setw(2)
-          << std::setfill('0') << t->tm_mday;
-
-        return s.str();
-    }
-
-    /** A friendly output streamer */
-    friend std::ostream& operator<<(std::ostream& os, const DateTime& d);
-
-    /**
-     * Comparison operator overloading
-     * \author Stijn Van Looy (c) VITO 2014
-     */
-    bool operator==(const DateTime& rhs) const
-    {
-        return _time == rhs._time;
-    }
-    bool operator!=(const DateTime& rhs) const
-    {
-        return !(*this == rhs);
-    }
-    bool operator<(const DateTime& rhs) const
-    {
-        return _time < rhs._time;
-    }
-    bool operator>(const DateTime& rhs) const
-    {
-        return rhs < *this;
-    }
-    bool operator<=(const DateTime& rhs) const
-    {
-        return !(*this > rhs);
-    }
-    bool operator>=(const DateTime& rhs) const
-    {
-        return !(*this < rhs);
-    }
-
-    /**
-     * operator+ overloaded: allows adding a time interval to the date time
-     */
-    const DateTime operator+(std::chrono::seconds secs) const;
-
-    /**
-	 * operator- overloaded: allows substracting a time interval from the date time
-	 */
-    const DateTime operator-(std::chrono::seconds secs) const;
-
-    DateTime& operator+=(std::chrono::seconds secs);
-    DateTime& operator-=(std::chrono::seconds secs);
-
-private:
-    time_t _time;
-};
-
-inline std::ostream& operator<<(std::ostream& os, const DateTime& d)
+namespace chrono_literals
 {
-    auto* t = std::gmtime(&d._time);
-    assert(t);
+    constexpr chrono::days operator""_d(std::size_t d)
+    {
+        return chrono::days(d);
+    }
+}
 
-    os << std::setw(4) << t->tm_year + 1900 << "-" << std::setw(2) << std::setfill('0')
-       << t->tm_mon + 1 << std::setw(1) << "-" << std::setw(2)
-       << std::setfill('0') << t->tm_mday << std::setw(1) << " "
-       << std::setw(2) << std::setfill('0') << t->tm_hour << std::setw(1)
-       << ":" << std::setw(2) << std::setfill('0') << t->tm_min
-       << std::setw(1) << ":" << std::setw(2) << std::setfill('0')
-       << t->tm_sec;
+inline std::ostream& operator<< (std::ostream& os, const chrono::date_time& dt)
+{
+    os << chrono::to_string(dt);
     return os;
 }
-}
 
-#endif /* #ifndef __OPAQ_DATETIME_H */
+}

@@ -18,48 +18,46 @@ class connection;
 namespace OPAQ
 {
 
-class DateTime;
-
 class PredictionDatabase
 {
 public:
     explicit PredictionDatabase(const std::string& filename);
     ~PredictionDatabase();
 
-    void addPredictions(time_t baseTime,
+    void addPredictions(chrono::date_time baseTime,
                         const std::string& model,
                         const std::string& stationId,
                         const std::string& pollutantId,
                         const std::string& aggr,
-                        int fcHor,
+                        chrono::days fcHor,
                         const TimeSeries<double>& forecast);
 
-    double getPrediction(time_t date,
+    double getPrediction(chrono::date_time date,
                          const std::string& model,
                          const std::string& stationId,
                          const std::string& pollutantId,
                          const std::string& aggr,
-                         int fcHor);
+                         chrono::days fcHor);
 
     TimeSeries<double> getPredictions(const std::string& model,
                                       const std::string& stationId,
                                       const std::string& pollutantId,
                                       const std::string& aggr,
-                                      int fcHor);
+                                      chrono::days fcHor);
 
-    std::vector<double> getPredictionValues(time_t basetime,
+    std::vector<double> getPredictionValues(chrono::date_time basetime,
                                             const std::string& stationId,
                                             const std::string& pollutantId,
                                             const std::string& aggr,
-                                            int fcHor);
+                                            chrono::days fcHor);
 
-    TimeSeries<double> getPredictions(time_t startDate,
-                                      time_t endDate,
+    TimeSeries<double> getPredictions(chrono::date_time startDate,
+                                      chrono::date_time endDate,
                                       const std::string& model,
                                       const std::string& stationId,
                                       const std::string& pollutantId,
                                       const std::string& aggr,
-                                      int fcHor);
+                                      chrono::days fcHor);
 
     std::vector<std::string> getModelNames(const std::string& pollutantId, const std::string& aggr);
 

@@ -56,7 +56,9 @@ public:
     Aggregation::Type getAggregation() const { return _aggregation; }
 
     /** Returns a list of basetimes */
-    std::vector<DateTime>& getBaseTimes() { return _baseTimes; }
+    const std::vector<chrono::date_time>& getBaseTimes() const { return _baseTimes; }
+    void addBaseTime(const chrono::date_time& dt) { _baseTimes.push_back(dt); }
+    void clearBaseTimes() { _baseTimes.clear(); }
 
     /** Returns the nework provider */
     Component* getNetworkProvider() const { return _networkProvider.get(); }
@@ -113,7 +115,7 @@ private:
     std::string _pollutantName;
     Aggregation::Type _aggregation;
 
-    std::vector<DateTime> _baseTimes;
+    std::vector<chrono::date_time> _baseTimes;
 
     std::unique_ptr<Component> _networkProvider;
     std::unique_ptr<Component> _gridProvider;

@@ -38,9 +38,9 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
             ++iter;
 
             // only parse lines within the time interval of the buffer
-            DateTime begin(boost::lexical_cast<int>(iter->substr(0, 4)),
-                           boost::lexical_cast<int>(iter->substr(4, 2)),
-                           boost::lexical_cast<int>(iter->substr(6, 2)), 0, 0, 0);
+            auto begin = chrono::make_date_time(boost::lexical_cast<int>(iter->substr(0, 4)),
+                                                boost::lexical_cast<int>(iter->substr(4, 2)),
+                                                boost::lexical_cast<int>(iter->substr(6, 2)));
 
             ++iter;
 

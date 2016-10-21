@@ -52,7 +52,7 @@ ResultsView::ResultsView(QWidget* parent)
     setLayout(mainLayout);
 }
 
-void ResultsView::setForecastHorizon(days forecastHorizon)
+void ResultsView::setForecastHorizon(chrono::days forecastHorizon)
 {
     _rows = static_cast<int>(forecastHorizon.count()) + 1;
 }

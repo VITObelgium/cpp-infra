@@ -33,6 +33,5 @@
 #include "tools/AQNetworkTools.h"
 #include "tools/StringTools.h"
 #include "tools/GzipReader.h"
-#include "tools/DateTimeTools.h"
 #include "tools/XmlTools.h"
 #endif

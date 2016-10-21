@@ -11,6 +11,7 @@
 namespace OPAQ
 {
 
+using namespace chrono_literals;
 using namespace std::chrono_literals;
 
 const std::string RioObsProvider::POLLUTANT_PLACEHOLDER = "%pol%";
@@ -61,7 +62,7 @@ double RioObsProvider::getNoData()
     return _noData;
 }
 
-TimeSeries<double> RioObsProvider::getValues(const DateTime& t1, const DateTime& t2,
+TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const chrono::date_time& t2,
                                              const std::string& stationId, const std::string& pollutantId,
                                              Aggregation::Type aggr)
 {
@@ -84,7 +85,7 @@ TimeSeries<double> RioObsProvider::getValues(const DateTime& t1, const DateTime&
     if (aggr == OPAQ::Aggregation::None)
         step = 1h;
     else
-        step = days(1);
+        step = 1_d;
     //copy the data to the output time series and insert missing values if still needed (we cannot rely on i)
     data->setNoData(_noData);
     OPAQ::TimeSeries<double> out = data->select(t1, t2, step);

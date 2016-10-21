@@ -83,12 +83,12 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
     try
     {
         int fc_hor_max = atoi(XmlTools::getText(element, "horizon").c_str());
-        fcStage->setHorizon(days(fc_hor_max));
+        fcStage->setHorizon(chrono::days(fc_hor_max));
     }
     catch (const ElementNotFoundException&)
     {
         _logger->warn("no forecast <horizon> given in forecast run configuration, using default 2");
-        fcStage->setHorizon(days(2));
+        fcStage->setHorizon(chrono::days(2));
     }
 
     return fcStage.release();
@@ -225,7 +225,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
             std::string timestamp = std::string(basetimeElement->GetText());
             try
             {
-                _opaqRun.getBaseTimes().push_back(DateTimeTools::parseDateTime(timestamp));
+                _opaqRun.addBaseTime(chrono::from_date_time_string(timestamp));
             }
             catch (ParseException& e)
             {

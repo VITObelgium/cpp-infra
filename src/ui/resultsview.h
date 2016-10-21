@@ -28,7 +28,7 @@ class ResultsView : public QWidget
 public:
     ResultsView(QWidget* parent = 0);
 
-    void setForecastHorizon(days forecastHorizon);
+    void setForecastHorizon(chrono::days forecastHorizon);
     void setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents);
 
 private:

@@ -59,11 +59,11 @@ public:
 
     virtual double getNoData() override;
 
-    virtual OPAQ::TimeSeries<double> getValues(const DateTime& t1,
-                                               const DateTime& t2,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None) override;
+    virtual TimeSeries<double> getValues(const chrono::date_time& t1,
+                                         const chrono::date_time& t2,
+                                         const std::string& stationId,
+                                         const std::string& pollutantId,
+                                         OPAQ::Aggregation::Type aggr = Aggregation::None) override;
 
     // the current model is already set by the DataProvider parent class
 
@@ -77,18 +77,18 @@ public:
    * Fill the Hdf5 file with the values given by the current basetime & the forecast
    * horizon
    */
-    virtual void setValues(const DateTime& baseTime,
-                           const OPAQ::TimeSeries<double>& forecast,
+    virtual void setValues(const chrono::date_time& baseTime,
+                           const TimeSeries<double>& forecast,
                            const std::string& stationId,
                            const std::string& pollutantId,
-                           OPAQ::Aggregation::Type aggr) override;
+                           Aggregation::Type aggr) override;
 
     /**
    * Return all the model values for a given baseTime and forecast horizon. The given current model
    * which is set in the DataProvider parent class is ignored here...
    */
-    virtual std::vector<double> getModelValues(const DateTime& baseTime,
-                                               days fc_hor,
+    virtual std::vector<double> getModelValues(const chrono::date_time& baseTime,
+                                               chrono::days fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
                                                Aggregation::Type aggr) override;
@@ -97,8 +97,8 @@ public:
     * This routine retrieves the forecasted values for a specific base time
     * as a function of forecast horizon, given by the vector of time intervals
     */
-    virtual OPAQ::TimeSeries<double> getValues(const DateTime& baseTime,
-                                               const std::vector<days>& fc_hor,
+    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& baseTime,
+                                               const std::vector<chrono::days>& fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
                                                Aggregation::Type aggr) override;
@@ -109,9 +109,9 @@ public:
    * to e.g. calculate real time corrections. The user needs to be avare that the two DateTimes given
    * are really the forecast times (so the datetimes for which the forecast is intended
    */
-    virtual OPAQ::TimeSeries<double> getValues(days fc_hor,
-                                               const DateTime& fcTime1,
-                                               const DateTime& fcTime2,
+    virtual OPAQ::TimeSeries<double> getValues(chrono::days fc_hor,
+                                               const chrono::date_time& fcTime1,
+                                               const chrono::date_time& fcTime2,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
                                                OPAQ::Aggregation::Type aggr) override;
@@ -178,9 +178,9 @@ private:
     std::chrono::hours _baseTimeResolution; //! the time resolution at which to store basetimes
     std::chrono::hours _fcTimeResolution;   //! the time resolution at which to store the forecast values
 
-    DateTime _startDate; //!< the start stored in the file (cannot add values before it)
+    chrono::date_time _startDate; //!< the start stored in the file (cannot add values before it)
 
-    DateTime _baseTime; //!< the basetime against which to offset the intervals given by the
+    chrono::date_time _baseTime; //!< the basetime against which to offset the intervals given by the
                         //!< getValues and setValues routines
 
     bool _configured;  //!< Flag, true if the OPAQ::Component configuration went well

@@ -1,133 +1,85 @@
-/*
- * DateTime.cpp
- *
- *  Created on: 2014
- *      Author: Stijn.VanLooy@vito.be
- */
-
-#include <iomanip>
-#include <sstream>
-#include <cstring>
-#include <ctime>
-#include <cassert>
-
 #include "DateTime.h"
 #include "Exceptions.h"
 
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+
 namespace OPAQ
 {
-
-DateTime::DateTime()
-: _time(-1)
+namespace chrono
 {
+    
+std::string to_date_string(const date_time& dt)
+{
+    std::time_t t = std::chrono::system_clock::to_time_t(dt);
+    std::tm tm = *std::gmtime(&t);
+
+    std::stringstream ss;
+    ss << std::put_time(&tm, "%Y-%m-%d");
+    return ss.str();
 }
 
-DateTime::DateTime(time_t t)
-: _time(t)
+std::string to_string(const date_time& dt)
 {
+    std::time_t t = std::chrono::system_clock::to_time_t(dt);
+    std::tm tm = *std::gmtime(&t);
+
+    std::stringstream ss;
+    ss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+    return ss.str();
 }
 
-#ifdef WIN32
-// strptime is not implemented on windows (http://stackoverflow.com/questions/321849/strptime-equivalent-on-windows)
-static const char* strptime(const char* s, const char* f, struct tm* tm)
+date_time from_date_string(const std::string& s)
 {
     std::stringstream input(s);
     input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
-    input >> std::get_time(tm, f);
+
+    std::tm tm{ 0 };
+    input >> std::get_time(&tm, "%Y-%m-%d");
     if (input.fail())
     {
-        return nullptr;
+        throw InvalidArgumentsException("Could not parse date: {}", s);
     }
-    return s + static_cast<size_t>(input.tellg());
-}
-#endif
 
-DateTime::DateTime(const std::string& s)
-{
-    std::tm t;
-
-    memset(&t, 0, sizeof(struct tm));
-    //strptime( s.c_str(), "%Y-%m-%d %H:%M%S", &t );
-    strptime(s.c_str(), "%Y-%m-%d", &t);
-
-    _time = mktime(&t);
+    return make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 }
 
-const DateTime DateTime::operator+(std::chrono::seconds secs) const
+date_time from_date_time_string(const std::string& s)
 {
-    DateTime out = *this;
-    out.addSeconds(secs.count());
-    return out;
-}
+    std::stringstream input(s);
+    input.imbue(std::locale(setlocale(LC_ALL, nullptr)));
 
-const DateTime DateTime::operator-(std::chrono::seconds secs) const
-{
-    DateTime out = *this;
-    out.addSeconds(-secs.count());
-    return out;
-}
-
-DateTime& DateTime::operator+=(std::chrono::seconds secs)
-{
-    addSeconds(secs.count());
-    return *this;
-}
-
-DateTime& DateTime::operator-=(std::chrono::seconds secs)
-{
-    addSeconds(-secs.count());
-    return *this;
-}
-
-bool DateTime::isValid() const
-{
-    return _time != -1;
-}
-
-int DateTime::getSec() const
-{
-    auto* t = std::gmtime(&_time);
-    assert(t);
-    return t->tm_sec;
-}
-
-int DateTime::getMin() const
-{
-    auto* t = std::gmtime(&_time);
-    assert(t);
-    return t->tm_min;
-}
-
-int DateTime::getHour() const
-{
-    auto* t = std::gmtime(&_time);
-    assert(t);
-    return t->tm_hour;
-}
-
-int DateTime::getDay() const
-{
-    auto* t = std::gmtime(&_time);
-    assert(t);
-    return t->tm_mday;
-}
-
-int DateTime::getMonth() const
-{
-    auto* t = std::gmtime(&_time);
-    assert(t);
-    return t->tm_mon + 1;
-}
-
-int DateTime::getYear() const
-{
-    auto* t = gmtime(&_time);
-    if (t == nullptr)
+    std::tm tm{ 0 };
+    input >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    if (input.fail())
     {
-        throw RunTimeException("Invalid time structure");
+        throw InvalidArgumentsException("Could not parse date time: {}", s);
     }
 
-    return t->tm_year + 1900;
+    auto date = make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    date += std::chrono::hours(tm.tm_hour);
+    date += std::chrono::minutes(tm.tm_min);
+    date += std::chrono::seconds(tm.tm_sec);
+
+    return date;
 }
 
+date_time make_date_time(date::year_month_day ymd)
+{
+    return date::sys_days(ymd);
+}
+
+date_time make_date_time(int year, int month, int day)
+{
+    return make_date_time(date::year_month_day(date::year(year), date::month(month), date::day(day)));
+}
+
+bool is_weekend(const date_time& dt)
+{
+    auto weekDay = date::weekday(date::sys_days(std::chrono::floor<days>(dt)));
+    return weekDay == date::sun || weekDay == date::sat;
+}
+
+}
 }

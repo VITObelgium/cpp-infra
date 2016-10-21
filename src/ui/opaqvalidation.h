@@ -39,9 +39,9 @@ private:
     std::string pollutant() const noexcept;
     Aggregation::Type aggregation() const noexcept;
     std::string station() const noexcept;
-    DateTime startTime() const noexcept;
-    DateTime endTime() const noexcept;
-    days forecastHorizon() const noexcept;
+    chrono::date_time startTime() const noexcept;
+    chrono::date_time endTime() const noexcept;
+    chrono::days forecastHorizon() const noexcept;
 
     Ui::OpaqValidation _ui;
 

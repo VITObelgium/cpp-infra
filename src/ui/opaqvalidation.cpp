@@ -87,19 +87,19 @@ std::string OpaqValidation::station() const noexcept
     return _ui.stationComboBox->currentData(Qt::UserRole).value<QString>().toStdString();
 }
 
-DateTime OpaqValidation::startTime() const noexcept
+chrono::date_time OpaqValidation::startTime() const noexcept
 {
-    return OPAQ::DateTimeTools::parseDate(_ui.fromDateEdit->date().toString("yyyy-MM-dd").toStdString());
+    return chrono::from_date_string(_ui.fromDateEdit->date().toString("yyyy-MM-dd").toStdString());
 }
 
-DateTime OpaqValidation::endTime() const noexcept
+chrono::date_time OpaqValidation::endTime() const noexcept
 {
-    return OPAQ::DateTimeTools::parseDate(_ui.toDateEdit->date().toString("yyyy-MM-dd").toStdString());
+    return chrono::from_date_string(_ui.toDateEdit->date().toString("yyyy-MM-dd").toStdString());
 }
 
-days OpaqValidation::forecastHorizon() const noexcept
+chrono::days OpaqValidation::forecastHorizon() const noexcept
 {
-    return days(_ui.forecastHorizonComboBox->currentIndex() + 1);
+    return chrono::days(_ui.forecastHorizonComboBox->currentIndex() + 1);
 }
 
 void OpaqValidation::runValidation()

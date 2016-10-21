@@ -107,10 +107,10 @@ public:
     const std::vector<Component>& getModels() { return _models; }
 
     /** Set the requested forecast horizon */
-    void setHorizon(days fcHor) { _fcHor = fcHor; }
+    void setHorizon(chrono::days fcHor) { _fcHor = fcHor; }
 
     /** Returns the requested (max) forecast horizon for the forecasts */
-    days getHorizon() { return _fcHor; }
+    chrono::days getHorizon() { return _fcHor; }
 
 private:
     // vector of models to run in the forecast
@@ -126,7 +126,7 @@ private:
     // output writer component
     const Component* _outputWriter;
 
-    days _fcHor; //!< requested max forecast horizon
+    chrono::days _fcHor; //!< requested max forecast horizon
 };
 
 }

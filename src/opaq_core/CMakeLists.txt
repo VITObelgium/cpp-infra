@@ -54,12 +54,10 @@ set (CORE_CONFIG_SOURCES
 )
 
 set (CORE_DATA_SOURCES
-    data/ForecastBuffer.cpp
     data/ForecastBuffer.h
     data/DataProvider.h
     data/DataProvider.cpp
     data/MeteoProvider.h
-    data/MeteoProvider.cpp
     data/GridProvider.h
     data/GridProvider.cpp
     data/ForecastOutputWriter.h
@@ -69,8 +67,6 @@ set (CORE_DATA_SOURCES
 set (CORE_TOOLS_SOURCES
     tools/AQNetworkTools.h
     tools/AQNetworkTools.cpp
-    tools/DateTimeTools.h
-    tools/DateTimeTools.cpp
     tools/ExceptionTools.h
     tools/FileTools.h
     tools/FileTools.cpp
@@ -94,3 +90,5 @@ set_target_properties(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
 add_executable(opaq opaq.cpp)
 target_link_libraries(opaq opaqcore)
+
+add_subdirectory(test)

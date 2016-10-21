@@ -42,7 +42,7 @@ QVariant StationResultsModel::data(const QModelIndex& index, int role) const
 
         int forecastDay = index.column();
         int modelIndex  = index.row() - 1;
-        auto values     = _buffer->getModelValues(_baseTime, days(forecastDay), _stationName, _pollutantId, _aggregationType);
+        auto values     = _buffer->getModelValues(_baseTime, chrono::days(forecastDay), _stationName, _pollutantId, _aggregationType);
 
         auto value = values.at(modelIndex);
         if (std::fabs(value - _buffer->getNoData()) < std::numeric_limits<double>::epsilon())
@@ -70,9 +70,9 @@ QVariant StationResultsModel::data(const QModelIndex& index, int role) const
 }
 
 void StationResultsModel::updateResults(ForecastBuffer& buffer,
-                                        DateTime baseTime,
+                                        chrono::date_time baseTime,
                                         const std::string& stationName,
-                                        days forecastHorizon,
+                                        chrono::days forecastHorizon,
                                         const std::string& pollutantId,
                                         Aggregation::Type agg)
 {

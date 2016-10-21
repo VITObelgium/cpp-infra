@@ -63,8 +63,8 @@ public:
     /**
    * Return an aggregated version of the base data in there..
    */
-    virtual OPAQ::TimeSeries<double> getValues(const DateTime& t1,
-                                               const DateTime& t2,
+    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& t1,
+                                               const chrono::date_time& t2,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
                                                OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None) = 0;

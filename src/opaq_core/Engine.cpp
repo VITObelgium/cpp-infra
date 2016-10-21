@@ -22,7 +22,7 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
                               AQNetworkProvider& net,
                               Pollutant* pol,
                               Aggregation::Type aggr,
-                              DateTime& baseTime)
+                              const chrono::date_time& baseTime)
 {
     // Get max forecast horizon...
     auto forecastHorizon = cnf->getHorizon();
@@ -114,7 +114,7 @@ void Engine::run(Config::OpaqRun& config)
     }
 
     // Get the base times
-    std::vector<DateTime> baseTimes = config.getBaseTimes();
+    auto baseTimes = config.getBaseTimes();
 
     _logger->info("Starting OPAQ workflow...");
     if (forecastStage)
@@ -122,14 +122,14 @@ void Engine::run(Config::OpaqRun& config)
         for (auto& baseTime : baseTimes)
         {
             // A log message
-            _logger->info("Forecast stage for " + baseTime.dateToString());
+            _logger->info("Forecast stage for {}", chrono::to_date_string(baseTime));
             runForecastStage(forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
             if (mappingStage)
             {
 
                 // a log message
-                _logger->info(">> Mapping forecast " + baseTime.dateToString());
+                _logger->info(">> Mapping forecast {}", chrono::to_date_string(baseTime));
 
                 // Buffer is input provider for the mapping models
 
@@ -162,14 +162,9 @@ void Engine::run(Config::OpaqRun& config)
     }
     else
     {
-
-        for (auto it = baseTimes.begin(); it != baseTimes.end(); it++)
+        for (auto& bt : baseTimes)
         {
-            DateTime baseTime = *it;
-
-            // a log message
-            _logger->info(">> Mapping " + baseTime.dateToString());
-
+            _logger->info(">> Mapping {}", chrono::to_date_string(bt));
             _logger->critical("No mapping stage implemented yet");
             exit(1);
 
@@ -188,10 +183,10 @@ void Engine::run(Config::OpaqRun& config)
 }
 
 std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
-                                               days forecastHorizon,
+                                               chrono::days forecastHorizon,
                                                const std::string& station,
-                                               DateTime startTime,
-                                               DateTime endTime,
+                                               chrono::date_time startTime,
+                                               chrono::date_time endTime,
                                                const std::string& model)
 {
     if (startTime > endTime)
@@ -199,12 +194,10 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
         throw RunTimeException("Validation start time must be before the end time");
     }
 
-    std::chrono::seconds diff(endTime.getUnixTime() - startTime.getUnixTime());
-
-    auto daysDiff = std::chrono::duration_cast<days>(diff);
+    auto days = chrono::to_days(endTime - startTime);
 
     std::vector<PredictionResult> results;
-    results.reserve(daysDiff.count());
+    results.reserve(days.count());
 
     auto& valuesConfig = config.getForecastStage()->getValues();
     auto& bufferConfig = config.getForecastStage()->getBuffer();

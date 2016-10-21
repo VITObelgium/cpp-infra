@@ -38,7 +38,7 @@ public:
 
 struct PredictionResult
 {
-    PredictionResult(const DateTime& dt, double measured, double predicted)
+    PredictionResult(const chrono::date_time& dt, double measured, double predicted)
     : time(dt)
     , measuredValue(measured)
     , predictedValue(predicted)
@@ -48,7 +48,7 @@ struct PredictionResult
     double x() const noexcept { return measuredValue; }
     double y() const noexcept { return predictedValue; }
 
-    DateTime time;
+    chrono::date_time time;
     double measuredValue  = 0.0;
     double predictedValue = 0.0;
 };
@@ -98,10 +98,10 @@ public:
      * Validate the measured values agains the predicted values for the given station
      */
     std::vector<PredictionResult> validate(Config::OpaqRun& config,
-                                           days forecastHorizon,
+                                           chrono::days forecastHorizon,
                                            const std::string& station,
-                                           DateTime startTime,
-                                           DateTime endTime,
+                                           chrono::date_time startTime,
+                                           chrono::date_time endTime,
                                            const std::string& model);
 
     Config::PollutantManager& pollutantManager() override;
@@ -118,7 +118,7 @@ private:
    * loops over the different models which are configured in the forecast config
    * and calls the forecast output writer.
    */
-    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider& net, Pollutant* pol, Aggregation::Type agg, DateTime& baseTime);
+    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider& net, Pollutant* pol, Aggregation::Type agg, const chrono::date_time& baseTime);
 
     void loadPlugins(const std::vector<Config::Plugin>& plugins);
     void initComponents(const std::vector<Config::Component>& components);

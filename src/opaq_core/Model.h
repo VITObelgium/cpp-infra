@@ -1,12 +1,4 @@
-/*
- * Interfaces.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys
- */
-
-#ifndef OPAQ_MODEL_H_
-#define OPAQ_MODEL_H_
+#pragma once
 
 #include <string>
 #include <tinyxml.h>
@@ -28,13 +20,12 @@ namespace OPAQ
 // forward declaration
 class Component;
 
-class Model : virtual public OPAQ::Component
+class Model : virtual public Component
 {
 public:
     Model();
-    virtual ~Model();
 
-    virtual void setBaseTime(DateTime& baseTime)
+    virtual void setBaseTime(const chrono::date_time& baseTime)
     {
         this->baseTime = baseTime;
     }
@@ -46,7 +37,7 @@ public:
     {
         this->aggregation = aggr;
     }
-    virtual void setForecastHorizon(days forecastHorizon)
+    virtual void setForecastHorizon(chrono::days forecastHorizon)
     {
         this->forecastHorizon = forecastHorizon;
     }
@@ -71,7 +62,7 @@ public:
         this->buffer = buffer;
     }
 
-    virtual const DateTime& getBaseTime()
+    virtual const chrono::date_time& getBaseTime()
     {
         return baseTime;
     }
@@ -83,7 +74,7 @@ public:
     {
         return aggregation;
     }
-    virtual days getForecastHorizon()
+    virtual chrono::days getForecastHorizon()
     {
         return forecastHorizon;
     }
@@ -129,10 +120,10 @@ public:
     void setNoData(int missing) { missing_value = missing; }
 
 protected:
-    DateTime baseTime;             //< run for this basetime
+    chrono::date_time baseTime;    //< run for this basetime
     Pollutant pollutant;           //< run for this pollutant
     Aggregation::Type aggregation; //< run for this aggregation
-    days forecastHorizon;  //< maximum forecast horizon to run to
+    chrono::days forecastHorizon;  //< maximum forecast horizon to run to
 
     AQNetworkProvider* aqNetworkProvider;
     GridProvider* gridProvider;
@@ -143,5 +134,4 @@ protected:
     int missing_value; //!< missing value, can be set in configuration, default set here
 };
 
-} /* namespace opaq */
-#endif /* OPAQ_MODEL_H_ */
+}

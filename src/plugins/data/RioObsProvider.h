@@ -47,7 +47,7 @@ public:
    * The method relies on the select method of the TimeSeries template class which explicitly
    * fills up the requested series. The timestep is set based upon the aggregation time
    */
-    virtual TimeSeries<double> getValues(const DateTime& t1, const DateTime& t2,
+    virtual TimeSeries<double> getValues(const chrono::date_time& t1, const chrono::date_time& t2,
                                          const std::string& stationId, const std::string& pollutantId,
                                          Aggregation::Type aggr = Aggregation::None) override;
 

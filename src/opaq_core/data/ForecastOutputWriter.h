@@ -25,22 +25,22 @@ class ForecastOutputWriter : public Component
 public:
     ForecastOutputWriter();
 
-    virtual void write(Pollutant* pol, Aggregation::Type aggr, const DateTime& baseTime) = 0;
+    virtual void write(Pollutant* pol, Aggregation::Type aggr, const chrono::date_time& baseTime) = 0;
 
     // some setters
     void setAQNetworkProvider(AQNetworkProvider& n) { _net = &n; }
     void setBuffer(ForecastBuffer* buf) { _buf = buf; }
-    void setForecastHorizon(days fc) { _fcHor = fc; }
+    void setForecastHorizon(chrono::days fc) { _fcHor = fc; }
 
 protected:
     ForecastBuffer* getBuffer() { return _buf; }
     AQNetworkProvider* getAQNetworkProvider() { return _net; }
-    days getForecastHorizon() { return _fcHor; }
+    chrono::days getForecastHorizon() { return _fcHor; }
 
 private:
     AQNetworkProvider* _net;
     ForecastBuffer* _buf;
-    days _fcHor;
+    chrono::days _fcHor;
 };
 
 }

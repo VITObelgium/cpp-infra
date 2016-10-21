@@ -26,9 +26,9 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
 
     void updateResults(ForecastBuffer& buffer,
-                       DateTime baseTime,
+                       chrono::date_time baseTime,
                        const std::string& stationName,
-                       days forecastHorizon,
+                       chrono::days forecastHorizon,
                        const std::string& pollutantId,
                        Aggregation::Type agg);
 
@@ -38,8 +38,8 @@ private:
     ForecastBuffer* _buffer;
     int _rowCount;
     int _colCount;
-    DateTime _baseTime;
-    days _forecastHorizon;
+    chrono::date_time _baseTime;
+    chrono::days _forecastHorizon;
     std::string _stationName;
     std::string _pollutantId;
     Aggregation::Type _aggregationType;
