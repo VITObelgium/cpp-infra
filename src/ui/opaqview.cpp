@@ -102,7 +102,7 @@ void OpaqView::loadConfiguration(const QString& path)
         auto& buffer = _engine.componentManager().getComponent<ForecastBuffer>(_config.getOpaqRun().getForecastStage()->getBuffer().name);
         auto forecastHorizon = _config.getOpaqRun().getForecastStage()->getHorizon();
 
-        updateStationModel(aqNetworkProvider.getAQNetwork()->getStations());
+        updateStationModel(aqNetworkProvider.getAQNetwork().getStations());
         
         _ui.viewerTab->setForecastBuffer(buffer);
         _ui.viewerTab->setForecastHorizon(forecastHorizon);

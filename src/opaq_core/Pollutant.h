@@ -27,13 +27,11 @@ public:
     */
     Pollutant(TiXmlElement const* el);
 
-    virtual ~Pollutant();
-
     /** Writes out the pollutant information to the ostream */
     friend std::ostream& operator<<(std::ostream& os, const Pollutant& s);
 
     /** Converts the pollutant to a string, making use of the outputstreamer */
-    std::string toString();
+    std::string toString() const;
 
     /** returns the ID of the pollutant */
     long getId() const { return id; }

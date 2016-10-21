@@ -31,7 +31,7 @@ class AQNetworkProvider : virtual public Component
 {
 public:
     /** Pure virtual method which returns a pointer to an Air quality network object */
-    virtual AQNetwork* getAQNetwork() = 0;
+    virtual AQNetwork& getAQNetwork() = 0;
 };
 
 }

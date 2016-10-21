@@ -1,8 +1,8 @@
 #include "ObsParser.h"
 
+#include "AQNetwork.h"
 #include "tools/StringTools.h"
 #include "tools/FileTools.h"
-#include "tools/AQNetworkTools.h"
 
 #include <boost/lexical_cast.hpp>
 

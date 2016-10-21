@@ -1,8 +1,9 @@
 #include "PollutantManager.h"
 
+#include "Exceptions.h"
+
 namespace OPAQ
 {
-
 namespace Config
 {
 
@@ -11,7 +12,7 @@ PollutantManager::PollutantManager()
 {
 }
 
-OPAQ::Pollutant* PollutantManager::find(const std::string& name)
+OPAQ::Pollutant PollutantManager::find(const std::string& name)
 {
     auto iter = std::find_if(_pollutants.begin(), _pollutants.end(), [&name] (auto& pollutant) {
         return pollutant.getName() == name;
@@ -19,11 +20,10 @@ OPAQ::Pollutant* PollutantManager::find(const std::string& name)
 
     if (iter == _pollutants.end())
     {
-        _logger->warn("Pollutant with name '{}' not found.", name);
-        return nullptr;
+        throw InvalidArgumentsException("No pollutant with name: {}", name);
     }
 
-    return &(*iter);
+    return *iter;
 }
 
 void PollutantManager::configure(TiXmlElement const* config)

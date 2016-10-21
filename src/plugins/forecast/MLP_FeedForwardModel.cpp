@@ -115,10 +115,10 @@ void MLP_FeedForwardModel::run()
     auto baseTime          = getBaseTime();
     Pollutant pol          = getPollutant();
     Aggregation::Type aggr = getAggregation();
-    auto* net              = getAQNetworkProvider().getAQNetwork();
+    auto& net              = getAQNetworkProvider().getAQNetwork();
     ForecastBuffer* buffer = getBuffer();
 
-    auto& stations = net->getStations();
+    auto& stations = net.getStations();
 
     // -- Forecast horizon
     // forecast horizon requested by user is available in abstract model and

@@ -20,7 +20,7 @@ Engine::Engine(Config::PollutantManager& pollutantMgr)
 
 void Engine::runForecastStage(Config::ForecastStage* cnf,
                               AQNetworkProvider& net,
-                              Pollutant* pol,
+                              const Pollutant& pol,
                               Aggregation::Type aggr,
                               const chrono::date_time& baseTime)
 {
@@ -53,7 +53,7 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
 
         // set ins and outs for the model
         model.setBaseTime(baseTime);
-        model.setPollutant(*pol);
+        model.setPollutant(pol);
         model.setAggregation(aggr);
         model.setAQNetworkProvider(net);
         model.setForecastHorizon(forecastHorizon);
@@ -94,7 +94,7 @@ void Engine::run(Config::OpaqRun& config)
     _logger->info("Fetching workflow configuration");
     auto pollutantName = config.getPollutantName();
 
-    auto* pollutant = _pollutantMgr.find(pollutantName);
+    auto pollutant = _pollutantMgr.find(pollutantName);
 
     // Get stages
     Config::ForecastStage* forecastStage = config.getForecastStage();

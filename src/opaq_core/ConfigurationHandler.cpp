@@ -186,11 +186,9 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     }
 
     _logger->info("Pollutant list:");
-    std::vector<Pollutant>* pols        = &(pollutantMgr.getList());
-    std::vector<Pollutant>::iterator it = pols->begin();
-    while (it != pols->end())
+    for (auto& pol : pollutantMgr.getList())
     {
-        _logger->info(" " + (*it++).toString());
+        _logger->info(" {}", pol.toString());
     }
 
     /* ------------------------------------------------------------------------
@@ -376,10 +374,8 @@ void ConfigurationHandler::validateConfiguration(Config::PollutantManager& pollu
         throw BadConfigurationException("No pollutant set");
     }
 
-    if (!pollutantMgr.find(_opaqRun.getPollutantName()))
-    {
-        throw BadConfigurationException("pollutant '{}' not found in pollutant list", _opaqRun.getPollutantName());
-    }
+    // throws if not found
+    pollutantMgr.find(_opaqRun.getPollutantName());
 }
 
 void ConfigurationHandler::clearConfig()

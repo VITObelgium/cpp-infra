@@ -200,10 +200,9 @@ void OVL::run()
     auto baseTime          = getBaseTime();
     Pollutant pol          = getPollutant();
     Aggregation::Type aggr = getAggregation();
-    auto* net              = getAQNetworkProvider().getAQNetwork();
     ForecastBuffer* buffer = getBuffer();
 
-    auto& stations = net->getStations();
+    auto& stations = getAQNetworkProvider().getAQNetwork().getStations();
 
     // -- Forecast horizon
     // forecast horizon requested by user is available in abstract model and
@@ -315,7 +314,7 @@ void OVL::run()
                 // get the observed values from the input provider
                 // we could also implement it in such way to get them back from the forecast buffer...
                 // here a user should simply make sure we have enough data available in the data provider...
-                TimeSeries<double> obs_hindcast = getInputProvider()->getValues(t1, t2, station->getName(), pol.getName(), aggr);
+                auto obs_hindcast = getInputProvider()->getValues(t1, t2, station->getName(), pol.getName(), aggr);
 
                 if (debug_output) {
                     fs << "\t\tOBSERVATIONS : " << std::endl;

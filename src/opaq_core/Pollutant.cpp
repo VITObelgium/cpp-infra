@@ -21,10 +21,7 @@ namespace OPAQ {
     this->desc = el->GetText();
   }
   
-  Pollutant::~Pollutant(){
-  }
-
-  std::string Pollutant::toString() {
+  std::string Pollutant::toString() const {
 	  std::stringstream ss;
 	  ss << *this;
 	  return ss.str();

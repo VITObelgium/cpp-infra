@@ -30,7 +30,7 @@ public:
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::ForecastOutputWriter methods
-    void write(Pollutant* pol, Aggregation::Type aggr, const chrono::date_time& baseTime) override;
+    void write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime) override;
 
 private:
     Logger _logger;

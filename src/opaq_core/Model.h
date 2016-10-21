@@ -29,7 +29,7 @@ public:
     {
         this->baseTime = baseTime;
     }
-    virtual void setPollutant(Pollutant& pollutant)
+    virtual void setPollutant(const Pollutant& pollutant)
     {
         this->pollutant = pollutant;
     }

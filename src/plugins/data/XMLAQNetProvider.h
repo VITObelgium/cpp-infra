@@ -23,7 +23,7 @@ public:
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // AQNetowrk functions
-    virtual OPAQ::AQNetwork* getAQNetwork() override;
+    virtual OPAQ::AQNetwork& getAQNetwork() override;
 
 private:
     OPAQ::AQNetwork _net;

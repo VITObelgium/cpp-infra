@@ -25,7 +25,7 @@ class ForecastOutputWriter : public Component
 public:
     ForecastOutputWriter();
 
-    virtual void write(Pollutant* pol, Aggregation::Type aggr, const chrono::date_time& baseTime) = 0;
+    virtual void write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime) = 0;
 
     // some setters
     void setAQNetworkProvider(AQNetworkProvider& n) { _net = &n; }

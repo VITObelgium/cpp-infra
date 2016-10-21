@@ -29,10 +29,10 @@ public:
 
     /** Returns a reference to the list of the available pollutants
        */
-    std::vector<OPAQ::Pollutant>& getList() { return _pollutants; }
+    const std::vector<OPAQ::Pollutant>& getList() { return _pollutants; }
 
     /** Searches for a pollutant of given name and returns a pointer to the pollutant object */
-    OPAQ::Pollutant* find(const std::string& name);
+    Pollutant find(const std::string& name);
 
     /** Configures the pollutant manager from the XML element
       \param config const pointer to the TiXmlElement
@@ -43,7 +43,7 @@ public:
 
 private:
     // list of the available pollutants
-    std::vector<OPAQ::Pollutant> _pollutants; //!< list of available pollutants
+    std::vector<Pollutant> _pollutants; //!< list of available pollutants
     Logger _logger;
 };
 

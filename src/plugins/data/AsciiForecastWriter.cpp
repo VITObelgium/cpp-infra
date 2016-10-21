@@ -128,7 +128,7 @@ void AsciiForecastWriter::configure(TiXmlElement* configuration, const std::stri
     return;
 }
 
-void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const chrono::date_time& baseTime)
+void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime)
 {
 
     std::string fname = _filename;
@@ -138,17 +138,16 @@ void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const ch
     if (!getAQNetworkProvider()) throw RunTimeException("No AQ network set");
 
     // -- get network & stations & maximum forecast horizon
-    OPAQ::AQNetwork* net = getAQNetworkProvider()->getAQNetwork();
-    auto& stations       = net->getStations();
-    int fcHorMax         = getForecastHorizon().count();
+    auto& stations  = getAQNetworkProvider()->getAQNetwork().getStations();
+    int fcHorMax    = getForecastHorizon().count();
 
     // -- translate the filename
-    StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol->getName());
+    StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol.getName());
     StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, OPAQ::Aggregation::getName(aggr));
     StringTools::replaceAll(fname, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // -- translate the header
-    StringTools::replaceAll(head, POLLUTANT_PLACEHOLDER, pol->getName());
+    StringTools::replaceAll(head, POLLUTANT_PLACEHOLDER, pol.getName());
     StringTools::replaceAll(head, AGGREGATION_PLACEHOLDER, OPAQ::Aggregation::getName(aggr));
     StringTools::replaceAll(head, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
@@ -158,7 +157,10 @@ void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const ch
     _logger->info("Writing output file " + fname);
 
     FILE* fp = fopen(fname.c_str(), "w");
-    if (!fp) throw RunTimeException("Unable to open output file " + fname);
+    if (!fp)
+    {
+        throw RunTimeException("Unable to open output file " + fname);
+    }
 
     // -- print header
     if (_title.size() != 0) fprintf(fp, "# %s\n", _title.c_str());
@@ -171,11 +173,11 @@ void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const ch
     }
 
     // -- get the results for the models for this baseTime/fcTime combination
-    std::vector<std::string> modelNames = getBuffer()->getModelNames(pol->getName(), aggr);
+    auto modelNames = getBuffer()->getModelNames(pol.getName(), aggr);
 
     // -- determine the indices of the requested models
     std::vector<unsigned int> idx;
-    for (auto m : _models)
+    for (auto& m : _models)
     {
         size_t i = std::find(modelNames.begin(), modelNames.end(), m) - modelNames.begin(); // look up index of this model in the list of available models
         if (i < modelNames.size()) {
@@ -201,20 +203,14 @@ void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const ch
     // ========================================================================
     for (auto& station : stations)
     {
-
-        if (!_full_output) {
-            // Issue 9 (github)
-            // get list of pollutants & see whether this station acutally measures the pollutant requested,
+        if (!_full_output)
+        {
+            // check whether this station acutally measures the pollutant requested,
             // if not then we skip this station
-            bool have_pol = false;
-            for (Pollutant* st_pol : station->getPollutants())
+            if (!station->measuresPollutant(pol))
             {
-                if (!st_pol->getName().compare(pol->getName())) {
-                    have_pol = true;
-                    break;
-                }
+                continue;
             }
-            if (!have_pol) continue;
         }
 
         // loop over the different forecast horizons
@@ -235,7 +231,7 @@ void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const ch
 
             try
             {
-                auto modelVals = getBuffer()->getModelValues(baseTime, fcHor, station->getName(), pol->getName(), aggr);
+                auto modelVals = getBuffer()->getModelValues(baseTime, fcHor, station->getName(), pol.getName(), aggr);
                 if (modelVals.size() != modelNames.size())
                     throw RunTimeException("data size doesn't match the number of models...");
 
@@ -245,7 +241,7 @@ void AsciiForecastWriter::write(Pollutant* pol, Aggregation::Type aggr, const ch
             }
             catch (const NotAvailableException&)
             {
-                for (int i = 0; i < idx.size(); ++i)
+                for (size_t i = 0; i < idx.size(); ++i)
                     fprintf(fp, "%c%f", _sepchar, getBuffer()->getNoData());
                 fprintf(fp, "\n");
             }

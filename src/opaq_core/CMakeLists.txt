@@ -65,8 +65,6 @@ set (CORE_DATA_SOURCES
 )
 
 set (CORE_TOOLS_SOURCES
-    tools/AQNetworkTools.h
-    tools/AQNetworkTools.cpp
     tools/ExceptionTools.h
     tools/FileTools.h
     tools/FileTools.cpp

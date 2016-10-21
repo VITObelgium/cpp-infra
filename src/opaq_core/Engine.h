@@ -118,7 +118,7 @@ private:
    * loops over the different models which are configured in the forecast config
    * and calls the forecast output writer.
    */
-    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider& net, Pollutant* pol, Aggregation::Type agg, const chrono::date_time& baseTime);
+    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider& net, const Pollutant& pol, Aggregation::Type agg, const chrono::date_time& baseTime);
 
     void loadPlugins(const std::vector<Config::Plugin>& plugins);
     void initComponents(const std::vector<Config::Component>& components);

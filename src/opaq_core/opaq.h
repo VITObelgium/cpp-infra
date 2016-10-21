@@ -30,7 +30,6 @@
 #include "Station.h"
 #include "TimeSeries.h"
 #include "tools/FileTools.h"
-#include "tools/AQNetworkTools.h"
 #include "tools/StringTools.h"
 #include "tools/GzipReader.h"
 #include "tools/XmlTools.h"

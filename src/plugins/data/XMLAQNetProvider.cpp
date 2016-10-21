@@ -62,17 +62,11 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
 
             std::string str = stEl->GetText();
 
-            std::vector<std::string> pol_list = OPAQ::StringTools::tokenize(str, ",:;| \t", 6);
-
-            for (auto it = pol_list.begin(); it != pol_list.end(); ++it)
+            auto pol_list = OPAQ::StringTools::tokenize(str, ",:;| \t", 6);
+            for (auto& pol : pol_list)
             {
-
-                OPAQ::Pollutant* p = engine.pollutantManager().find(*it);
-                if (!p)
-                    throw OPAQ::BadConfigurationException("unknown pollutant found for " + name + " : " + *it);
-
                 // add to the pollutants list for this station
-                st->getPollutants().push_back(p);
+                st->addPollutant(engine.pollutantManager().find(pol));
             }
         }
 
@@ -85,9 +79,9 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
         throw OPAQ::BadConfigurationException("no stations defined in network");
 }
 
-OPAQ::AQNetwork* XMLAQNetProvider::getAQNetwork()
+OPAQ::AQNetwork& XMLAQNetProvider::getAQNetwork()
 {
-    return &_net;
+    return _net;
 }
 
 } /* namespace OPAQ */
