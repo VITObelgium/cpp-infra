@@ -6,10 +6,11 @@
 #ifndef AsciiForecastWriter_H_
 #define AsciiForecastWriter_H_
 
+#include "Logger.h"
+#include "data/ForecastOutputWriter.h"
+
 #include <string>
 #include <vector>
-
-#include "opaq.h"
 
 namespace OPAQ
 {

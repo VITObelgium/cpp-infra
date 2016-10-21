@@ -7,6 +7,11 @@
 
 #include "RioObsProvider.h"
 #include "ObsParser.h"
+#include "ComponentManager.h"
+
+#include "tools/StringTools.h"
+
+#include <tinyxml.h>
 
 namespace OPAQ
 {

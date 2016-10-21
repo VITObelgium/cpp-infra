@@ -8,12 +8,14 @@
 
 #pragma once
 
-#include <opaq.h>
+#include "Logger.h"
+#include "AQNetwork.h"
+#include "AQNetworkProvider.h"
 
 namespace OPAQ
 {
 
-class XMLAQNetProvider : public OPAQ::AQNetworkProvider
+class XMLAQNetProvider : public AQNetworkProvider
 {
 public:
     XMLAQNetProvider();
@@ -26,7 +28,7 @@ public:
     virtual OPAQ::AQNetwork& getAQNetwork() override;
 
 private:
-    OPAQ::AQNetwork _net;
+    AQNetwork _net;
     Logger _logger;
 };
 

@@ -9,7 +9,6 @@
 #define TUNE_H_
 
 #include <string>
-#include <opaq.h>
 
 namespace OVL {
 

@@ -1,8 +1,9 @@
 #pragma once
 
-#include "opaq.h"
-#include <memory>
 #include "PredictionDatabase.h"
+#include "data/ForecastBuffer.h"
+
+#include <memory>
 
 namespace sqlpp
 {

@@ -1,6 +1,8 @@
 #include "SqlBuffer.h"
 
 #include "PredictionDatabase.h"
+#include "ComponentManager.h"
+#include "tools/XmlTools.h"
 
 namespace OPAQ
 {

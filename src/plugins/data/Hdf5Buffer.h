@@ -6,7 +6,9 @@
 #ifndef Hdf5Buffer_H_
 #define Hdf5Buffer_H_
 
-#include "opaq.h"
+#include "Logger.h"
+#include "data/ForecastOutputWriter.h"
+
 #include <H5Cpp.h>
 
 namespace OPAQ

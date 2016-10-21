@@ -1,12 +1,14 @@
-#include <cstdio>
-#include <cstdlib>
-
-#include <iostream>
-#include <iterator>
-#include <string>
-#include <vector>
-
 #include "AsciiForecastWriter.h"
+
+#include "AQNetwork.h"
+#include "ComponentManager.h"
+
+#include "tools/XmlTools.h"
+#include "tools/StringTools.h"
+
+#include <tinyxml.h>
+#include <iterator>
+#include <vector>
 
 namespace OPAQ
 {

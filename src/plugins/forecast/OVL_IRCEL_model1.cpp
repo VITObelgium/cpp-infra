@@ -1,7 +1,11 @@
-#include <fstream>
 
 #include "OVL_IRCEL_model1.h"
-#include <opaq.h>
+
+#include "Station.h"
+#include "ComponentManager.h"
+#include "tools/XmlTools.h"
+
+#include <tinyxml.h>
 
 #define epsilon 1e-6
 

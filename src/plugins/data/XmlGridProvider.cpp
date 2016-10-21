@@ -6,6 +6,10 @@
  */
 
 #include "XmlGridProvider.h"
+#include "Exceptions.h"
+#include "ComponentManager.h"
+
+#include <tinyxml.h>
 
 namespace OPAQ {
 

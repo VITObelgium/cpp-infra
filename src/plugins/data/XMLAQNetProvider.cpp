@@ -1,9 +1,13 @@
-#include <iostream>
-#include <stdlib.h>
-#include <string>
-#include <vector>
-
 #include "XMLAQNetProvider.h"
+
+
+#include "Station.h"
+#include "Engine.h"
+#include "Exceptions.h"
+#include "ComponentManager.h"
+#include "tools/StringTools.h"
+
+#include <tinyxml.h>
 
 namespace OPAQ
 {

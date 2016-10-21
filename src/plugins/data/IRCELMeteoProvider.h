@@ -8,9 +8,10 @@
 #ifndef IRCELMETEOPROVIDER_H_
 #define IRCELMETEOPROVIDER_H_
 
-#include <map>
+#include "Logger.h"
+#include "data/MeteoProvider.h"
 
-#include <opaq.h>
+#include <map>
 
 namespace OPAQ
 {

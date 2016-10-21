@@ -8,10 +8,8 @@
 #ifndef RIOOBSPROVIDER_H_
 #define RIOOBSPROVIDER_H_
 
-#include <algorithm> // std::transform
-#include <fstream>
-#include <opaq.h>
-#include <string>
+#include "Logger.h"
+#include "data/DataProvider.h"
 
 namespace OPAQ
 {

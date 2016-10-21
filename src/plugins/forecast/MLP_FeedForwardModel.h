@@ -8,11 +8,15 @@
 #ifndef MLP_FEEDFORWARDFORECASTMODEL_H_
 #define MLP_FEEDFORWARDFORECASTMODEL_H_
 
-#include <opaq.h>
+#include "Logger.h"
+#include "Model.h"
+
 #include <string>
 
 namespace OPAQ
 {
+
+class Station;
 
 /**
  * Implementation of an OPAQ multi layer perceptron feed forward neural
@@ -33,7 +37,7 @@ public:
      *  Workhorse routine which acutally performs the forecast and returns the
      *  value
      */
-    double fcValue(const OPAQ::Pollutant& pol, const OPAQ::Station& station,
+    double fcValue(const OPAQ::Pollutant& pol, const Station& station,
                    Aggregation::Type aggr, const chrono::date_time& baseTime,
                    chrono::days fc_hor);
 
@@ -46,8 +50,8 @@ protected:
     // Pure virtual method for the model to create it's input sample, the
     // derived models are the actual plugins and they need to implement this particular
     // method...
-    virtual int makeSample(double* sample, const OPAQ::Station& st, const OPAQ::Pollutant& pol,
-                           OPAQ::Aggregation::Type aggr, const chrono::date_time& baseTime,
+    virtual int makeSample(double* sample, const Station& st, const Pollutant& pol,
+                           Aggregation::Type aggr, const chrono::date_time& baseTime,
                            const chrono::date_time& fcTime, chrono::days fc_hor) = 0;
 
     /**

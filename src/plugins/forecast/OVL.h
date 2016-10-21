@@ -12,10 +12,12 @@
 #ifndef OVL_H_
 #define OVL_H_
 
+#include "Model.h"
+#include "Logger.h"
+
 #include <string>
 #include <map>
 #include <tuple>
-#include <opaq.h>
 
 namespace OPAQ {
 

@@ -2,12 +2,11 @@
 #define __OVL_IRCEL_model1_H
 
 #include "MLP_FeedForwardModel.h"
-#include <opaq.h>
 
 namespace OPAQ
 {
 
-class OVL_IRCEL_model1 : public OPAQ::MLP_FeedForwardModel
+class OVL_IRCEL_model1 : public MLP_FeedForwardModel
 {
 
 public:

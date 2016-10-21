@@ -8,7 +8,9 @@
 #ifndef XMLGRIDPROVIDER_H_
 #define XMLGRIDPROVIDER_H_
 
-#include <opaq.h>
+#include "Logger.h"
+#include "data/GridProvider.h"
+
 #include <algorithm>		// std::find
 
 namespace OPAQ {

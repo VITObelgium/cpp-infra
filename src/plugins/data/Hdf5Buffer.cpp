@@ -7,6 +7,9 @@
 
 #include "Hdf5Buffer.h"
 #include "Hdf5Tools.h"
+#include "ComponentManager.h"
+
+#include <tinyxml.h>
 
 namespace OPAQ
 {

@@ -6,6 +6,11 @@
  */
 
 #include "IRCELMeteoProvider.h"
+#include "ComponentManager.h"
+#include "tools/GzipReader.h"
+#include "tools/StringTools.h"
+
+#include <tinyxml.h>
 
 namespace OPAQ
 {

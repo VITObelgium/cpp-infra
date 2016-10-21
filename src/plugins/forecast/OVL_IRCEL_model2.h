@@ -2,7 +2,6 @@
 #define __OVL_IRCEL_model2_H
 
 #include "MLP_FeedForwardModel.h"
-#include <opaq.h>
 
 namespace OPAQ
 {
