@@ -101,11 +101,11 @@ public:
     * This routine retrieves the forecasted values for a specific base time
     * as a function of forecast horizon, given by the vector of time intervals
     */
-    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& baseTime,
-                                               const std::vector<chrono::days>& fc_hor,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               Aggregation::Type aggr) override;
+    TimeSeries<double> getForecastValues(const chrono::date_time& baseTime,
+                                         const std::vector<chrono::days>& fc_hor,
+                                         const std::string& stationId,
+                                         const std::string& pollutantId,
+                                         Aggregation::Type aggr) override;
 
     /**
    * This one gives the forecasts between the forecast times1 and 2 for a given fixed time lag (the
@@ -113,43 +113,43 @@ public:
    * to e.g. calculate real time corrections. The user needs to be avare that the two DateTimes given
    * are really the forecast times (so the datetimes for which the forecast is intended
    */
-    virtual OPAQ::TimeSeries<double> getValues(chrono::days fc_hor,
-                                               const chrono::date_time& fcTime1,
-                                               const chrono::date_time& fcTime2,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr) override;
+    TimeSeries<double> getForecastValues(chrono::days fc_hor,
+                                         const chrono::date_time& fcTime1,
+                                         const chrono::date_time& fcTime2,
+                                         const std::string& stationId,
+                                         const std::string& pollutantId,
+                                         OPAQ::Aggregation::Type aggr) override;
 
     /*
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
-					const TimeInterval & endOffset,
-					const std::string & parameter,
-					const std::string & station);
+          const TimeInterval & endOffset,
+          const std::string & parameter,
+          const std::string & station);
 
 
   virtual std::vector<double> getValues(const std::string & modelName,
-					const TimeInterval & beginOffset,
-					const TimeInterval & endOffset,
-					const std::string & parameter,
-					const std::string & station );
+          const TimeInterval & beginOffset,
+          const TimeInterval & endOffset,
+          const std::string & parameter,
+          const std::string & station );
 
 
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,
-					const TimeInterval & endOffset,
-					const std::string & parameter,
-					const std::string & station,
-					const ForecastHorizon & forecastHorizon);
+          const TimeInterval & endOffset,
+          const std::string & parameter,
+          const std::string & station,
+          const ForecastHorizon & forecastHorizon);
 
   virtual std::vector<double> getValues(const std::string & modelName,
-					const TimeInterval & beginOffset,
-					const TimeInterval & endOffset,
-					const std::string & parameter,
-					const std::string & station,
-					const ForecastHorizon & forecastHorizon );
+          const TimeInterval & beginOffset,
+          const TimeInterval & endOffset,
+          const std::string & parameter,
+          const std::string & station,
+          const ForecastHorizon & forecastHorizon );
 
   virtual std::vector<double> getValues(const std::string & parameter,
-					const TimeInterval & offset = TimeInterval(0),
-					const ForecastHorizon & forecastHorizon = ForecastHorizon(0));
+          const TimeInterval & offset = TimeInterval(0),
+          const ForecastHorizon & forecastHorizon = ForecastHorizon(0));
 */
 
     // OPAQ::DataBuffer methods
@@ -163,9 +163,9 @@ public:
 
     /*
   virtual void setValues(const std::string &modelName,
-			 const std::vector<double> & values,
-			 const std::vector<ForecastHorizon> & forecastHorizons,
-			 const std::string & parameter, const std::string & station);
+       const std::vector<double> & values,
+       const std::vector<ForecastHorizon> & forecastHorizons,
+       const std::string & parameter, const std::string & station);
    */
 
 private:
@@ -185,7 +185,7 @@ private:
     chrono::date_time _startDate; //!< the start stored in the file (cannot add values before it)
 
     chrono::date_time _baseTime; //!< the basetime against which to offset the intervals given by the
-                        //!< getValues and setValues routines
+                                 //!< getValues and setValues routines
 
     bool _configured;  //!< Flag, true if the OPAQ::Component configuration went well
     bool _baseTimeSet; //!< Flag, true if a basetime was given to the
@@ -214,10 +214,10 @@ private:
     // throws BadConfigurationException
     void _openFile(const std::string& filename);
 
-    //	int _getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &parameter);
-    //	unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
-    //	void _readStringData (char ** buffer, H5::DataSet & dataSet);
-    //	void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
+    //  int _getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &parameter);
+    //  unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
+    //  void _readStringData (char ** buffer, H5::DataSet & dataSet);
+    //  void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
 };
 
 } /* namespace OPAQ */

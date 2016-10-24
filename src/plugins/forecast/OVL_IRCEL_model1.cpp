@@ -60,7 +60,7 @@ void OVL_IRCEL_model1::configure(TiXmlElement* cnf, const std::string& component
     // read missing value for this model (optional)
     try
     {
-        this->missing_value = atoi(XmlTools::getText(cnf, "missing_value").c_str());
+        setNoData(atoi(XmlTools::getText(cnf, "missing_value").c_str()));
     }
     catch (...)
     {

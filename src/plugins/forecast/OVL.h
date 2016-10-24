@@ -12,17 +12,19 @@
 #ifndef OVL_H_
 #define OVL_H_
 
-#include "Model.h"
-#include "Logger.h"
 #include "ComponentManager.h"
+#include "Logger.h"
+#include "Model.h"
 
-#include <string>
 #include <map>
+#include <string>
 #include <tuple>
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-class OVL: virtual public OPAQ::Model {
+class OVL : virtual public OPAQ::Model
+{
 public:
     OVL();
 
@@ -30,34 +32,33 @@ public:
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    void configure(TiXmlElement * configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
     virtual void run() override;
 
-
     // define a nested struct to hold the configuration of
     // a station
-    struct StationConfig {
-        int         rtc_mode;
-        int         rtc_param;
+    struct StationConfig
+    {
+        int rtc_mode;
+        int rtc_param;
         std::string model_name;
     };
 
-
 private:
-    Logger logger;
+    void parseTuneList(TiXmlElement* lst);
+    void parseTuneElement(TiXmlElement* el);
+
+    Logger _logger;
     ComponentManager* _componentMgr;
 
-    std::string tune_mode;       //! the selected tune mode for how OVL was optimized.
-    bool        output_raw;      //! store the raw output (if not all models are present in OPAQ
-    bool        debug_output;    //! activate debugging output
+    std::string _tune_mode; //! the selected tune mode for how OVL was optimized.
+    bool _output_raw;       //! store the raw output (if not all models are present in OPAQ
+    bool _debug_output;     //! activate debugging output
 
-    chrono::days hindcast;
-
-    void parseTuneList( TiXmlElement *lst );
-    void parseTuneElement( TiXmlElement *el );
+    chrono::days _hindcast;
 
     /**
      * this one is a map for
@@ -69,8 +70,7 @@ private:
      * add some stuff in the implementation of the TimeInterval to be able to use it in a tuple
      */
     std::map<std::tuple<std::string, OPAQ::Aggregation::Type, std::string, std::string, int>, OVL::StationConfig> _conf;
-  };
-
+};
 
 } /* namespace OPAQ */
 #endif /* OVL_H_ */

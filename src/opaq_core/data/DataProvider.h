@@ -22,7 +22,7 @@ namespace OPAQ
 /**
  * Observation data provider
  */
-class DataProvider : public OPAQ::Component
+class DataProvider : public Component
 {
 public:
     DataProvider();
@@ -33,7 +33,7 @@ public:
     /**
    * Set the Air Quality Network provider
    */
-    void setAQNetworkProvider(AQNetworkProvider& net) { _AQNetworkProvider = &net; };
+    void setAQNetworkProvider(AQNetworkProvider& net) { _aqNetworkProvider = &net; };
 
     /**
    * Sets the name of the current active model in the buffer. Not used for observation
@@ -63,11 +63,11 @@ public:
     /**
    * Return an aggregated version of the base data in there..
    */
-    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& t1,
-                                               const chrono::date_time& t2,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr = OPAQ::Aggregation::None) = 0;
+    virtual TimeSeries<double> getValues(const chrono::date_time& t1,
+                                         const chrono::date_time& t2,
+                                         const std::string& stationId,
+                                         const std::string& pollutantId,
+                                         Aggregation::Type aggr = Aggregation::None) = 0;
 
     /**
    * This method would typically be used by a mapping model
@@ -82,6 +82,6 @@ public:
 
 protected:
     std::string _currentModel;             //! name of the current model which provides the data, not used for observations
-    AQNetworkProvider* _AQNetworkProvider; //! the network provider
+    AQNetworkProvider* _aqNetworkProvider; //! the network provider
 };
 }

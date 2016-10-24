@@ -279,14 +279,14 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
 
     // -- now, store the data
 
-    auto secsDiff = chrono::to_seconds(baseTime - startTime);
+    auto secsDiff      = chrono::to_seconds(baseTime - startTime);
     auto secsDiffFirst = chrono::to_seconds(forecast.firstDateTime() - baseTime);
 
     // get the indices
     unsigned int modelIndex   = Hdf5Tools::getIndexInStringDataSet(dsModels, _currentModel, true);
     unsigned int stationIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId, true);
-    size_t dateIndex    = secsDiff.count() / std::chrono::seconds(_baseTimeResolution).count(); // integer division... should be ok !
-    size_t fhIndex      = secsDiffFirst.count() / std::chrono::seconds(_fcTimeResolution).count();
+    size_t dateIndex          = secsDiff.count() / std::chrono::seconds(_baseTimeResolution).count(); // integer division... should be ok !
+    size_t fhIndex            = secsDiffFirst.count() / std::chrono::seconds(_fcTimeResolution).count();
 
 //DEBUG !!
 #ifdef DEBUG
@@ -350,10 +350,10 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
 
     /*
 
- 	 // TODO store the basetimes as well for convenience...
+     // TODO store the basetimes as well for convenience...
 
-	// f. write basetimes to hyperslab
-	H5::DataSpace spaceBaseTimes = dataBaseTimes.getSpace();
+    // f. write basetimes to hyperslab
+    H5::DataSpace spaceBaseTimes = dataBaseTimes.getSpace();
 
   // b. get current size
   hsize_t size1[1];
@@ -504,7 +504,7 @@ std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange() {
 }
 
 std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange(
-		       const ForecastHorizon & forecastHorizon) {
+               const ForecastHorizon & forecastHorizon) {
 
 
   _checkFullyConfigured();
@@ -515,16 +515,16 @@ std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange(
   TimeInterval beginOffset(_baseTime, begin);
   TimeInterval endOffset(_baseTime, end);
   return std::pair<const TimeInterval, const TimeInterval>(beginOffset,
-							   endOffset);
+                               endOffset);
 
 }
   */
 
-OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
-                                               const chrono::date_time& t2,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               Aggregation::Type aggr)
+TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
+                                         const chrono::date_time& t2,
+                                         const std::string& stationId,
+                                         const std::string& pollutantId,
+                                         Aggregation::Type aggr)
 {
     // return the observations stored...
     // this routine is inherited from the DataProvider...
@@ -536,11 +536,12 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
     return out;
 }
 
-OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& baseTime,
-                                               const std::vector<chrono::days>& fc_hor, const std::string& stationId,
-                                               const std::string& pollutantId, OPAQ::Aggregation::Type aggr)
+TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& baseTime,
+                                                 const std::vector<chrono::days>& fc_hor,
+                                                 const std::string& stationId,
+                                                 const std::string& pollutantId,
+                                                 Aggregation::Type aggr)
 {
-
     throw RunTimeException("IMPLEMENT ME !!");
 
     OPAQ::TimeSeries<double> out;
@@ -549,10 +550,12 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& baseTime
 
 // return hindcast vector of model values for a fixed forecast horizon
 // for a forecasted day interval
-OPAQ::TimeSeries<double> Hdf5Buffer::getValues(chrono::days fc_hor,
-                                               const chrono::date_time& fcTime1, const chrono::date_time& fcTime2,
-                                               const std::string& stationId, const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr)
+TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
+                                                 const chrono::date_time& fcTime1,
+                                                 const chrono::date_time& fcTime2,
+                                                 const std::string& stationId,
+                                                 const std::string& pollutantId,
+                                                 Aggregation::Type aggr)
 {
 
     if (fcTime1 > fcTime2) throw RunTimeException("requested fcTime1 is > fcTime2...");
@@ -583,8 +586,8 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(chrono::days fc_hor,
     // retrieve station, model & forecsat horizon index
     unsigned int stIndex    = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
     unsigned int modelIndex = Hdf5Tools::getIndexInStringDataSet(dsModels, _currentModel);
-    size_t fhIndex    = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
-                        std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
+    size_t fhIndex          = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
+                     std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 #ifdef DEBUG
     std::cout << "Hdf5Buffer::getValues()" << std::endl;
@@ -596,7 +599,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(chrono::days fc_hor,
     hsize_t modelSize = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
     hsize_t stSize    = Hdf5Tools::getDataSetSize(dsVals, 1);
     //hsize_t btSize    = Hdf5Tools::getDataSetSize(dsVals, 2);
-    hsize_t fhSize    = Hdf5Tools::getDataSetSize(dsVals, 3);
+    hsize_t fhSize = Hdf5Tools::getDataSetSize(dsVals, 3);
 
     //
     if (fhIndex >= fhSize ||
@@ -606,8 +609,8 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(chrono::days fc_hor,
     }
 
     // compute the index for the base time of the first forecastTime
-    auto b1  = fcTime1 - fc_hor;
-    auto b2  = fcTime2 - fc_hor;
+    auto b1      = fcTime1 - fc_hor;
+    auto b2      = fcTime2 - fc_hor;
     size_t nvals = (chrono::to_seconds(b2 - b1).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
     OPAQ::TimeSeries<double> out;
@@ -628,7 +631,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(chrono::days fc_hor,
 #endif
 
         // number of elements before the HDF5 buffer
-        size_t n_before = chrono::to_seconds(startTime - b1).count() / getBaseTimeResolutionInSeconds().count();     // number of steps before buffer start
+        size_t n_before = chrono::to_seconds(startTime - b1).count() / getBaseTimeResolutionInSeconds().count();       // number of steps before buffer start
         size_t n_inside = (chrono::to_seconds(b2 - startTime).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
 
         if ((n_before + n_inside) != nvals) {
@@ -736,8 +739,8 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
     }
 
     unsigned int stIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
-    size_t btIndex = chrono::to_seconds(baseTime - startTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
-    size_t fhIndex = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
+    size_t btIndex       = chrono::to_seconds(baseTime - startTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
+    size_t fhIndex       = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
                      std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
 
 #ifdef DEBUG

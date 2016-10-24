@@ -11,7 +11,7 @@ namespace OPAQ
 {
 
 DataProvider::DataProvider()
-: _AQNetworkProvider(nullptr)
+: _aqNetworkProvider(nullptr)
 {
 }
 

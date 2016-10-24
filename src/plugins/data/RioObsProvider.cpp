@@ -182,7 +182,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
         return;
     }
 
-    _buffer[pollutant] = readObservationsFile(file, _AQNetworkProvider->getAQNetwork(), _nvalues, _timeResolution);
+    _buffer[pollutant] = readObservationsFile(file, _aqNetworkProvider->getAQNetwork(), _nvalues, _timeResolution);
 }
 
 }

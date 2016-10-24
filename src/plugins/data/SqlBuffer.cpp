@@ -1,18 +1,15 @@
 #include "SqlBuffer.h"
 
-#include "PredictionDatabase.h"
 #include "PluginRegistration.h"
+#include "PredictionDatabase.h"
 #include "tools/XmlTools.h"
 
 namespace OPAQ
 {
 
-static const char* s_noData = "n/a";
-
 SqlBuffer::SqlBuffer()
 : _logger("SqlBuffer")
 , _noData(-9999)
-, _baseTimeSet(false)
 {
 }
 
@@ -68,7 +65,7 @@ void SqlBuffer::setValues(const chrono::date_time& baseTime,
     throwIfNotConfigured();
 
     auto aggStr = Aggregation::getName(aggr);
-    auto fh = date::floor<chrono::days>(std::chrono::seconds((forecast.firstDateTime() - baseTime) / std::chrono::seconds(_fcTimeResolution)));
+    auto fh     = date::floor<chrono::days>(std::chrono::seconds((forecast.firstDateTime() - baseTime) / std::chrono::seconds(_fcTimeResolution)));
 
     _db->addPredictions(baseTime, _currentModel, stationId, pollutantId, aggStr, fh, forecast);
 }
@@ -92,19 +89,19 @@ TimeSeries<double> SqlBuffer::getValues(const chrono::date_time& t1,
     throw RunTimeException("not sure what to return here, need extra information ???");
 }
 
-TimeSeries<double> SqlBuffer::getValues(const chrono::date_time& baseTime,
-                                        const std::vector<chrono::days>& fc_hor, const std::string& stationId,
-                                        const std::string& pollutantId, Aggregation::Type aggr)
+TimeSeries<double> SqlBuffer::getForecastValues(const chrono::date_time& baseTime,
+                                                const std::vector<chrono::days>& fc_hor, const std::string& stationId,
+                                                const std::string& pollutantId, Aggregation::Type aggr)
 {
     throw RunTimeException("IMPLEMENT ME !!");
 }
 
 // return hindcast vector of model values for a fixed forecast horizon
 // for a forecasted day interval
-TimeSeries<double> SqlBuffer::getValues(chrono::days fcHor,
-                                        const chrono::date_time& fcTime1, const chrono::date_time& fcTime2,
-                                        const std::string& stationId, const std::string& pollutantId,
-                                        Aggregation::Type aggr)
+TimeSeries<double> SqlBuffer::getForecastValues(chrono::days fcHor,
+                                                const chrono::date_time& fcTime1, const chrono::date_time& fcTime2,
+                                                const std::string& stationId, const std::string& pollutantId,
+                                                Aggregation::Type aggr)
 {
     throwIfNotConfigured();
 
@@ -152,7 +149,7 @@ std::vector<double> SqlBuffer::getModelValues(const chrono::date_time& baseTime,
 {
     throwIfNotConfigured();
 
-    auto aggStr = Aggregation::getName(aggr);
+    auto aggStr  = Aggregation::getName(aggr);
     auto results = _db->getPredictionValues(baseTime, stationId, pollutantId, aggStr, fcHor);
     if (results.empty())
     {

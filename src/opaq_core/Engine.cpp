@@ -211,7 +211,7 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
     buffer.setCurrentModel(model);
 
     auto measuredValues  = values.getValues(startTime, endTime, station, config.getPollutantName());
-    auto predictedValues = buffer.getValues(forecastHorizon, startTime, endTime, station, config.getPollutantName(), config.getAggregation());
+    auto predictedValues = buffer.getForecastValues(forecastHorizon, startTime, endTime, station, config.getPollutantName(), config.getAggregation());
 
     /*if (!measuredValues.isConsistent(predictedValues))
     {

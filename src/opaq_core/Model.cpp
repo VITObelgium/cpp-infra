@@ -10,7 +10,7 @@ Model::Model()
 , input(0)
 , meteo(0)
 , buffer(0)
-, missing_value(-9999)
+, _missing_value(-9999)
 {
 }
 

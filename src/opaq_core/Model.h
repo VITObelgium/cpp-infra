@@ -116,8 +116,8 @@ public:
 
     virtual void run() = 0;
 
-    int getNoData() { return missing_value; }
-    void setNoData(int missing) { missing_value = missing; }
+    int getNoData() { return _missing_value; }
+    void setNoData(int missing) { _missing_value = missing; }
 
 protected:
     chrono::date_time baseTime;    //< run for this basetime
@@ -131,7 +131,8 @@ protected:
     MeteoProvider* meteo;
     ForecastBuffer* buffer;
 
-    int missing_value; //!< missing value, can be set in configuration, default set here
+private:
+    int _missing_value; //!< missing value, can be set in configuration, default set here
 };
 
 }

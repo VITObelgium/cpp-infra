@@ -1,12 +1,4 @@
-/*
- * DataBuffer.h
- *
- *  Created on: 2014
- *      Author: Stijn.VanLooy@vito.be
- */
-
-#ifndef OPAQ_DATA_BUFFER_H_
-#define OPAQ_DATA_BUFFER_H_
+#pragma once
 
 #include "../Component.h"
 #include "DataProvider.h"
@@ -15,13 +7,13 @@
 namespace OPAQ
 {
 
-class ForecastBuffer : public OPAQ::DataProvider
+class ForecastBuffer : public DataProvider
 {
 public:
     /**
    * Return a list of available models in the buffer
    */
-    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr) = 0;
+    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, Aggregation::Type aggr) = 0;
 
     /**
    * Also return the basetime resolution
@@ -59,34 +51,32 @@ public:
                                                chrono::days fc_hor,
                                                const std::string& stationId,
                                                const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr) = 0;
+                                               Aggregation::Type aggr) = 0;
 
     /**
    * This routine retrieves the forecasted values for a specific base time
    * as a function of forecast horizon, given by the vector of time intervals
    */
-    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& baseTime,
-                                               const std::vector<chrono::days>& fc_hor,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr) = 0;
+    virtual TimeSeries<double> getForecastValues(const chrono::date_time& baseTime,
+                                                 const std::vector<chrono::days>& fc_hor,
+                                                 const std::string& stationId,
+                                                 const std::string& pollutantId,
+                                                 Aggregation::Type aggr) = 0;
 
     /**
    * This one gives the forecasts between the forecast times1 and 2 for a given fixed time lag (the
    * fc_hor. This routine can be used to e.g. retieve the archived day+2 forecasts for a given period
    * to e.g. calculate real time corrections
    */
-    virtual OPAQ::TimeSeries<double> getValues(chrono::days fc_hor,
-                                               const chrono::date_time& fcTime1,
-                                               const chrono::date_time& fcTime2,
-                                               const std::string& stationId,
-                                               const std::string& pollutantId,
-                                               OPAQ::Aggregation::Type aggr) = 0;
+    virtual TimeSeries<double> getForecastValues(chrono::days fc_hor,
+                                                 const chrono::date_time& fcTime1,
+                                                 const chrono::date_time& fcTime2,
+                                                 const std::string& stationId,
+                                                 const std::string& pollutantId,
+                                                 Aggregation::Type aggr) = 0;
 
     // need also routines for retrieving data for mapping, this
     // has to be
     // - for a given model and a given fcdate and fc horizon
 };
-
-} /* namespace OPAQ */
-#endif /* OPAQ_FORECAST_BUFFER_H_ */
+}

@@ -1,23 +1,30 @@
 #include "Point.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-  Point::Point() :
-	  id(0),
-	  x(0.),
-	  y(0.),
-	  z(0.) {
-  };
+Point::Point()
+: _id(0)
+, _x(0.0)
+, _y(0.0)
+, _z(0.0)
+{
+}
 
-  Point::Point( long ID, double X, double Y ) 
-    : id(ID),x(X),y(Y),z(0.) { 
-  };
+Point::Point(long ID, double X, double Y)
+: _id(ID)
+, _x(X)
+, _y(Y)
+, _z(0.0)
+{
+}
 
-  Point::Point( long ID, double X, double Y, double Z ) 
-    : id(ID),x(X),y(Y),z(Z) { 
-  };
-
-  Point::~Point(){
-  };
+Point::Point(long ID, double X, double Y, double Z)
+: _id(ID)
+, _x(X)
+, _y(Y)
+, _z(Z)
+{
+}
 
 }
