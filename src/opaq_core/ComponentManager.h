@@ -3,9 +3,9 @@
 #include "config.h"
 #include "Component.h"
 #include "Logger.h"
-#include "OpaqDllExports.h"
 
 #include <map>
+#include <iostream>
 #include <memory>
 #include <functional>
 
@@ -23,10 +23,16 @@ namespace OPAQ
    *  http://stackoverflow.com/questions/582331/is-there-a-way-to-instantiate-objects-from-a-string-holding-their-class-name
    *
    */
+
+using FactoryCallback = std::function<Component*(LogConfiguration*)>;
+
 class ComponentManager
 {
 public:
-    ComponentManager(IEngine& engine);
+    ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb);
+
+    ComponentManager(ComponentManager&&) = default;
+    ComponentManager(const ComponentManager&) = delete;
 
     // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
     template <typename T>
@@ -42,23 +48,10 @@ public:
         return dynamic_cast<T&>(findComponent(componentName));
     }
 
-    virtual void loadPlugin(const std::string& pluginName, const std::string& filename) = 0;
+    void loadPlugin(const std::string& pluginName, const std::string& filename);
     void destroyComponent(const std::string& componentName);
 
-    void registerPlugim();
-
-protected:
-    typedef Component* (FactoryFunc)(LogConfiguration*);
-    typedef std::function<Component*(LogConfiguration*)> FactoryCallback;
-    typedef std::map<std::string, std::unique_ptr<Component>> InstanceMapType;
-    typedef std::map<std::string, FactoryCallback> FactoryMapType;
-
-    // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
-    // The instance map has to be destroyed before the dll unload
-    FactoryMapType factoryMap;
-    InstanceMapType instanceMap;
-    IEngine& _engine;
-
+private:
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
     Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration);
 
@@ -67,28 +60,13 @@ protected:
 
     // throw PluginNotFoundException, BadConfigurationException
     std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration);
+
+    std::function<FactoryCallback(const std::string&, const std::string&)> _loadPluginCb;
+    // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
+    // The instance map has to be destroyed before the dll unload
+    std::map<std::string, FactoryCallback> _factoryMap;
+    std::map<std::string, std::unique_ptr<Component>> instanceMap;
+    IEngine& _engine;
 };
+
 }
-
-#ifdef STATIC_PLUGINS
-#define OPAQ_REGISTER_PLUGIN(TYPE) \
-  ;
-//OPAQ::ComponentManagerStatic::registerPlugin(#TYPE, [] (LogConfiguration*) { return new TYPE(); });
-#else
-/**
- * \brief Macro to register a class as being an OPAQ component.
- * When writing new components, a user should add this macro statement to
- * the implementation source file. Dont forget to include a correct namespace
- * if you want to have the plugin to have it's own namespace.
- *
- *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
- */
-#define OPAQ_REGISTER_PLUGIN(TYPE)                                                       \
-    OPAQ_DLL_API OPAQ::Component* factory(LogConfiguration* logConfig)                   \
-    {                                                                                    \
-        Log::initLogger(*logConfig);                                                     \
-        return new TYPE();                                                               \
-    }
-
-#endif
-

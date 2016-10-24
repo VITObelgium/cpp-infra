@@ -22,7 +22,7 @@
 #include "Logger.h"
 #include "Model.h"
 #include "PollutantManager.h"
-#include "ComponentManager.h"
+#include "ComponentManagerFactory.h"
 
 namespace OPAQ
 {
@@ -110,7 +110,7 @@ public:
 private:
     Logger                              _logger;
     Config::PollutantManager&           _pollutantMgr;
-    std::unique_ptr<ComponentManager>   _componentMgr;
+    ComponentManager                    _componentMgr;
 
     /**
    * This runs the forecast stage with the given configuration, network,

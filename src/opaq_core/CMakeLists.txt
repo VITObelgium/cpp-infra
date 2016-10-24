@@ -12,10 +12,6 @@ set (CORE_SOURCES
     ComponentManagerFactory.cpp
     ComponentManager.h
     ComponentManager.cpp
-    ComponentManagerDynamic.h
-    ComponentManagerDynamic.cpp
-    ComponentManagerStatic.h
-    ComponentManagerStatic.cpp
     ConfigurationHandler.h
     ConfigurationHandler.cpp
     DateTime.h
@@ -37,6 +33,8 @@ set (CORE_SOURCES
     Pollutant.cpp
     PollutantManager.h
     PollutantManager.cpp
+    PluginRegistration.h
+    PluginRegistration.cpp
     Station.h
     Station.cpp
     TimeSeries.h
@@ -85,8 +83,5 @@ add_library(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES
 target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(opaqcore fmt ${Boost_LIBRARIES} ${TINYXML_LIBRARY} ${ZLIB_LIBRARY} ${EXTRA_LIBS} ${CMAKE_DL_LIBS})
 set_target_properties(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-add_executable(opaq opaq.cpp)
-target_link_libraries(opaq opaqcore)
 
 add_subdirectory(test)

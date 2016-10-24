@@ -1,7 +1,7 @@
 #include "SqlBuffer.h"
 
 #include "PredictionDatabase.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "tools/XmlTools.h"
 
 namespace OPAQ
@@ -17,6 +17,11 @@ SqlBuffer::SqlBuffer()
 }
 
 SqlBuffer::~SqlBuffer() = default;
+
+std::string SqlBuffer::name()
+{
+    return "SqlBuffer";
+}
 
 void SqlBuffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {

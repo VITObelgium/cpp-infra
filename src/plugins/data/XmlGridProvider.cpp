@@ -7,7 +7,7 @@
 
 #include "XmlGridProvider.h"
 #include "Exceptions.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 
 #include <tinyxml.h>
 
@@ -24,6 +24,11 @@ XmlGridProvider::~XmlGridProvider() {
 		Cell * toErase = *it++;
 		delete toErase;
 	}
+}
+
+std::string XmlGridProvider::name()
+{
+    return "XmlGridProvider";
 }
 
 /**

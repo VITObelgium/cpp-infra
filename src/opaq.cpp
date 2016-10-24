@@ -15,14 +15,28 @@
 
 #include "PollutantManager.h"
 #include "config.h"
+#include "plugins/ForcePluginLink.h"
 
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
 
+static void printPlugins()
+{
+    std::cout << "Available Plugins:" << std::endl;
+    for (auto& plugin : OPAQ::getPluginNames())
+    {
+        std::cout << " - " << plugin << std::endl;
+    }
+}
+
 static void printVersion()
 {
     std::cout << "OPAQ Version: " << OPAQ_VERSION << std::endl;
+
+#ifdef STATIC_PLUGINS
+    printPlugins();
+#endif
 }
 
 static void printWelcome()
@@ -176,7 +190,7 @@ int main(int argc, char* argv[])
     if (!basetime.empty())
     {
         ch.getOpaqRun().clearBaseTimes();
-        
+
         try
         {
             auto baseTime = OPAQ::chrono::from_date_string(basetime);

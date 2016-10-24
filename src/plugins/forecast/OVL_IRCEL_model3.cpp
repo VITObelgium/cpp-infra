@@ -1,6 +1,6 @@
 #include "OVL_IRCEL_model3.h"
 #include "Station.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "OpaqMath.h"
 #include "tools/XmlTools.h"
 
@@ -26,6 +26,11 @@ OVL_IRCEL_model3::OVL_IRCEL_model3()
 , mor_agg(-1) // default is all
 {
     sample_size = 11;
+}
+
+std::string OVL_IRCEL_model3::name()
+{
+    return "ovl_ircel_model3";
 }
 
 /* ============================================================================

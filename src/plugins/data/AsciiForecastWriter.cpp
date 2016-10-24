@@ -1,7 +1,7 @@
 #include "AsciiForecastWriter.h"
 
 #include "AQNetwork.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 
 #include "tools/XmlTools.h"
 #include "tools/StringTools.h"
@@ -28,6 +28,11 @@ AsciiForecastWriter::AsciiForecastWriter()
 
 AsciiForecastWriter::~AsciiForecastWriter()
 {
+}
+
+std::string AsciiForecastWriter::name()
+{
+    return "AsciiForecastWriter";
 }
 
 void AsciiForecastWriter::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)

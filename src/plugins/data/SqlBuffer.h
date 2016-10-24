@@ -24,6 +24,8 @@ public:
     SqlBuffer();
     virtual ~SqlBuffer();
 
+    static std::string name();
+
     // throws BadConfigurationException
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 

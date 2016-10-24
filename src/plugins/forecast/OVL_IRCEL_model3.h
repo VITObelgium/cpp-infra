@@ -13,6 +13,8 @@ class OVL_IRCEL_model3 : public OPAQ::MLP_FeedForwardModel
 public:
     OVL_IRCEL_model3();
 
+    static std::string name();
+
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;

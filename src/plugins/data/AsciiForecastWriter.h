@@ -22,6 +22,8 @@ public:
     AsciiForecastWriter();
     virtual ~AsciiForecastWriter();
 
+    static std::string name();
+
     static const std::string BASETIME_PLACEHOLDER;
     static const std::string POLLUTANT_PLACEHOLDER;
     static const std::string AGGREGATION_PLACEHOLDER;

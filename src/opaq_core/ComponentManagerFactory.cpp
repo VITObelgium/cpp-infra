@@ -1,19 +1,19 @@
 #include "ComponentManagerFactory.h"
 
-#include "ComponentManagerStatic.h"
-#include "ComponentManagerDynamic.h"
+#include "config.h"
+#include "PluginRegistration.h"
 
 namespace OPAQ
 {
 namespace Factory
 {
 
-std::unique_ptr<ComponentManager> createComponentManager(IEngine& engine)
+ComponentManager createComponentManager(IEngine& engine)
 {
 #ifdef STATIC_PLUGINS
-    return std::make_unique<ComponentManagerStatic>(engine);
+    return ComponentManager(engine, loadStaticPlugin);
 #else
-    return std::make_unique<ComponentManagerDynamic>(engine);
+    return ComponentManager(engine, loadDynamicPlugin);
 #endif
 }
 

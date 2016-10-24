@@ -1,9 +1,3 @@
-if (STATIC_PLUGINS)
-    set (PLUGIN_TYPE STATIC)
-else ()
-    set (PLUGIN_TYPE MODULE)
-endif ()
-
 if (hdf5_FOUND)
     add_library(hdf5buffer ${PLUGIN_TYPE}
         Hdf5Buffer.h
@@ -68,5 +62,7 @@ target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(xmlgridprovider opaqcore)
 target_link_libraries(xmlaqnetprovider opaqcore)
+
+set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider xmlaqnetprovider PARENT_SCOPE)
 
 add_subdirectory(test)

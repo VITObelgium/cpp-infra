@@ -1,17 +1,18 @@
 #pragma once
 
+#include "ComponentManager.h"
+
 #include <memory>
 
 namespace OPAQ
 {
 
 class IEngine;
-class ComponentManager;
 
 namespace Factory
 {
 
-std::unique_ptr<ComponentManager> createComponentManager(IEngine&);
+ComponentManager createComponentManager(IEngine&);
 
 }
 

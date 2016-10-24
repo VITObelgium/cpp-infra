@@ -22,6 +22,8 @@ public:
     IRCELMeteoProvider();
     virtual ~IRCELMeteoProvider();
 
+    static std::string name();
+
     static const std::string METEO_PLACEHOLDER;
     static const std::string PARAMETER_PLACEHOLDER;
     static const std::string BASETIME_PLACEHOLDER;

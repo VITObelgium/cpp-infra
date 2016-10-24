@@ -7,7 +7,7 @@
 
 #include "Hdf5Buffer.h"
 #include "Hdf5Tools.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 
 #include <tinyxml.h>
 
@@ -50,6 +50,11 @@ Hdf5Buffer::Hdf5Buffer()
 Hdf5Buffer::~Hdf5Buffer()
 {
     _closeFile();
+}
+
+std::string Hdf5Buffer::name()
+{
+    return "Hdf5Buffer";
 }
 
 void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
@@ -590,7 +595,7 @@ OPAQ::TimeSeries<double> Hdf5Buffer::getValues(chrono::days fc_hor,
 
     hsize_t modelSize = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
     hsize_t stSize    = Hdf5Tools::getDataSetSize(dsVals, 1);
-    hsize_t btSize    = Hdf5Tools::getDataSetSize(dsVals, 2);
+    //hsize_t btSize    = Hdf5Tools::getDataSetSize(dsVals, 2);
     hsize_t fhSize    = Hdf5Tools::getDataSetSize(dsVals, 3);
 
     //

@@ -2,22 +2,18 @@
 #include "Exceptions.h"
 #include "Logger.h"
 
-#include <boost/dll/import.hpp>
-
 namespace OPAQ
 {
 
-namespace dll = boost::dll;
-
-ComponentManager::ComponentManager(IEngine& engine)
-: _engine(engine)
+ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb)
+: _loadPluginCb(cb)
+, _engine(engine)
 {
 }
 
-// Throws ComponentAlreadyExistsException PluginNotFoundException BadConfigurationException
 Component& ComponentManager::createGenericComponent(const std::string& componentName,
-                                                    const std::string& pluginName,
-                                                    TiXmlElement* configuration)
+                                                        const std::string& pluginName,
+                                                        TiXmlElement* configuration)
 {
     // 1. check if the component wasn't created previously
     if (instanceMap.find(componentName) != instanceMap.end())
@@ -34,7 +30,6 @@ Component& ComponentManager::createGenericComponent(const std::string& component
     return *instanceMap.at(componentName);
 }
 
-// Throws ComponentNotFoundException
 Component& ComponentManager::findComponent(const std::string& name)
 {
     auto it = instanceMap.find(name);
@@ -46,11 +41,10 @@ Component& ComponentManager::findComponent(const std::string& name)
     return *it->second;
 }
 
-// Throws PluginNotFoundException BadConfigurationException
 std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration)
 {
-    auto it = factoryMap.find(pluginName);
-    if (it == factoryMap.end())
+    auto it = _factoryMap.find(pluginName);
+    if (it == _factoryMap.end())
     {
         throw PluginNotFoundException("Plugin not found: {}", pluginName);
     }
@@ -61,8 +55,21 @@ std::unique_ptr<Component> ComponentManager::createComponent(const std::string& 
     return component;
 }
 
+void ComponentManager::loadPlugin(const std::string& pluginName, const std::string& filename)
+{
+    // 1. check if plugin was already loaded
+    auto it = _factoryMap.find(pluginName);
+    if (it != _factoryMap.end())
+    {
+        throw RunTimeException("There already exists a plugin with name {}", pluginName);
+    }
+
+    _factoryMap.emplace(filename, _loadPluginCb(pluginName, filename));
+}
+
 void ComponentManager::destroyComponent(const std::string& componentName)
 {
     instanceMap.erase(componentName);
 }
+
 }

@@ -54,3 +54,11 @@ add_subdirectory(plugins)
 if (BUILD_UI)
     add_subdirectory(ui)
 endif ()
+
+add_executable(opaq opaq.cpp)
+target_link_libraries(opaq opaqcore)
+
+if (STATIC_PLUGINS)
+    target_link_libraries(opaq ${PLUGINS})
+endif ()
+

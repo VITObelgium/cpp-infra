@@ -6,7 +6,7 @@
 #include "Engine.h"
 #include "Station.h"
 #include "AQNetwork.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "tools/XmlTools.h"
 
 #include <cmath>
@@ -23,6 +23,11 @@ OVL::OVL()
 , output_raw(false)
 , debug_output(false)
 {
+}
+
+std::string OVL::name()
+{
+    return "ovl";
 }
 
 /**

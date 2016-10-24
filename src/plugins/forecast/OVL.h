@@ -14,6 +14,7 @@
 
 #include "Model.h"
 #include "Logger.h"
+#include "ComponentManager.h"
 
 #include <string>
 #include <map>
@@ -24,6 +25,8 @@ namespace OPAQ {
 class OVL: virtual public OPAQ::Model {
 public:
     OVL();
+
+    static std::string name();
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException

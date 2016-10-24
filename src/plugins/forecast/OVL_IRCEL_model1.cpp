@@ -2,7 +2,7 @@
 #include "OVL_IRCEL_model1.h"
 
 #include "Station.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "tools/XmlTools.h"
 
 #include <tinyxml.h>
@@ -23,6 +23,11 @@ OVL_IRCEL_model1::OVL_IRCEL_model1()
 , mor_agg(-1)      // default is all
 {
     sample_size = 2;
+}
+
+std::string OVL_IRCEL_model1::name()
+{
+    return "ovl_ircel_model1";
 }
 
 /* ============================================================================

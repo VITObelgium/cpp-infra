@@ -20,6 +20,8 @@ public:
     Hdf5Buffer();
     virtual ~Hdf5Buffer();
 
+    static std::string name();
+
     static const std::string START_DATE_NAME; // attribute that holds the start date
     static const std::string FORECAST_DATASET_NAME;
     static const std::string BASETIME_DATASET_NAME;

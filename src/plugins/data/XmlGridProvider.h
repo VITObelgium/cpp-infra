@@ -20,6 +20,8 @@ public:
 	XmlGridProvider();
 	virtual ~XmlGridProvider();
 
+	static std::string name();
+
 	// OPAQ::Component methods
 
     // throws BadConfigurationException

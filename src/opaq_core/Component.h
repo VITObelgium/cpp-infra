@@ -8,7 +8,6 @@ namespace OPAQ
 {
 
 class IEngine;
-class ComponentManager;
 
 /**
      \brief The base class for an OPAQ component

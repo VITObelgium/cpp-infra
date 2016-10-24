@@ -11,7 +11,7 @@
 
 namespace OPAQ
 {
-namespace Test
+namespace test
 {
 
 using namespace testing;
@@ -19,7 +19,7 @@ using namespace std::chrono_literals;
 
 static const std::string s_station = "40AB01";
 
-class ObserverVationParser : public testing::Test
+class ObserverVationParser : public Test
 {
 protected:
     ObserverVationParser()

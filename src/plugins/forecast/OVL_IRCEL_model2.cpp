@@ -2,7 +2,7 @@
 
 #include "Station.h"
 #include "OpaqMath.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "tools/XmlTools.h"
 
 #define epsilon 1e-6
@@ -24,6 +24,10 @@ OVL_IRCEL_model2::OVL_IRCEL_model2()
     sample_size = 7;
 }
 
+std::string OVL_IRCEL_model2::name()
+{
+    return "ovl_ircel_model2";
+}
 
 /* ============================================================================
      Implementation of the configure method

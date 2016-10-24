@@ -19,6 +19,8 @@ class RioObsProvider : public DataProvider
 public:
     RioObsProvider();
 
+    static std::string name();
+
     static const std::string POLLUTANT_PLACEHOLDER;
 
     // OPAQ::Component methods

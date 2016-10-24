@@ -20,6 +20,8 @@ class XMLAQNetProvider : public AQNetworkProvider
 public:
     XMLAQNetProvider();
 
+    static std::string name();
+
     // component members
     // throws OPAQ::BadConfigurationException
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;

@@ -6,7 +6,7 @@
  */
 
 #include "IRCELMeteoProvider.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "tools/GzipReader.h"
 #include "tools/StringTools.h"
 
@@ -30,6 +30,11 @@ IRCELMeteoProvider::IRCELMeteoProvider()
 
 IRCELMeteoProvider::~IRCELMeteoProvider()
 {
+}
+
+std::string IRCELMeteoProvider::name()
+{
+    return "IRCELMeteoProvider";
 }
 
 // OPAQ::Component methods
@@ -231,7 +236,7 @@ void IRCELMeteoProvider::_readFile(const std::string& meteoId,
             auto ymd = date::year_month_day(date::year(atoi(tokens[0].substr(0, 4).c_str())),
                                             date::month(atoi(tokens[0].substr(4, 2).c_str())),
                                             date::day(atoi(tokens[0].substr(6, 2).c_str())));
-            
+
             chrono::date_time begin = date::sys_days(ymd);
 
             // check if we are beyond the buffer start (if requested...)

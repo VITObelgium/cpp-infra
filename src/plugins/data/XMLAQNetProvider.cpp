@@ -4,7 +4,7 @@
 #include "Station.h"
 #include "Engine.h"
 #include "Exceptions.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 #include "tools/StringTools.h"
 
 #include <tinyxml.h>
@@ -15,6 +15,11 @@ namespace OPAQ
 XMLAQNetProvider::XMLAQNetProvider()
 : _logger("OPAQ::XMLAQNetProvider")
 {
+}
+
+std::string XMLAQNetProvider::name()
+{
+    return "XMLAQNetProvider";
 }
 
 void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& componentName, IEngine& engine)

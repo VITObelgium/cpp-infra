@@ -7,7 +7,7 @@
 
 #include "RioObsProvider.h"
 #include "ObsParser.h"
-#include "ComponentManager.h"
+#include "PluginRegistration.h"
 
 #include "tools/StringTools.h"
 
@@ -28,6 +28,11 @@ RioObsProvider::RioObsProvider()
 , _configured(false)
 , _nvalues(24)
 {
+}
+
+std::string RioObsProvider::name()
+{
+    return "RioObsProvider";
 }
 
 // OPAQ::Component methods
@@ -87,7 +92,7 @@ TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const 
     // was originally like this in Stijn VL 's code...
 
     std::chrono::hours step = (aggr == OPAQ::Aggregation::None) ? 1h : 1_d;
-    
+
     //copy the data to the output time series and insert missing values if still needed (we cannot rely on i)
     data->setNoData(_noData);
     return data->select(t1, t2, step);
