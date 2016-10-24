@@ -11,6 +11,7 @@ set(PACKAGE_VERSION_REVISION 0)
 
 project(${PACKAGE})
 include(GNUInstallDirs)
+enable_testing()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_CXX_STANDARD 14)
