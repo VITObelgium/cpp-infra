@@ -40,12 +40,8 @@ if (MSVC)
     # avoid windows specific warnings
     add_definitions("-D_CRT_SECURE_NO_WARNINGS")
 else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -Werror")
 endif()
-
-if (CMAKE_COMPILER_IS_GNUXX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wfatal-errors")
-endif ()
 
 include_directories(
     ${CMAKE_BINARY_DIR}
