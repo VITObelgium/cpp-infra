@@ -1,5 +1,3 @@
-enable_testing()
-
 find_dependency(NAME GTEST LIBNAMES gmock DEBUGLIBNAMES gmock_d)
 
 include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})

@@ -1,5 +1,3 @@
-enable_testing()
-
 find_dependency(NAME GTEST LIBNAMES gmock DEBUGLIBNAMES gmock_d)
 
 include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
@@ -13,4 +11,4 @@ add_executable(opaqcoretest
 
 target_link_libraries(opaqcoretest opaqcore ${GTEST_LIBRARY})
 
-add_test(NAME opaqcoretest COMMAND opaqcoretest)
+add_test(NAME opaqcore COMMAND opaqcoretest)
