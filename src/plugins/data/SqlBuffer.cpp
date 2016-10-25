@@ -135,7 +135,7 @@ TimeSeries<double> SqlBuffer::getForecastValues(chrono::days fcHor,
 
     auto secs = std::chrono::seconds(_baseTimeResolution);
     std::cout << result.size() << " <-> " << ((fcTime2 - fcTime1) / secs) + 1 << std::endl;
-    assert(result.size() == ((fcTime2 - fcTime1) / secs) + 1);
+    assert(result.size() == static_cast<size_t>(((fcTime2 - fcTime1) / secs) + 1));
 
     return result;
 }

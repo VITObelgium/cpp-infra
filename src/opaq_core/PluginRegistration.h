@@ -4,6 +4,7 @@
 #include "ComponentManager.h"
 
 #include <functional>
+#include <unordered_map>
 
 namespace OPAQ
 {
@@ -11,12 +12,15 @@ namespace OPAQ
 class PluginRegistry
 {
 public:
-    static void registerPlugin(const std::string& name, FactoryCallback cb)
+    static PluginRegistry& instance()
     {
-        _registeredFactories.emplace(name, cb);
+        static PluginRegistry reg;
+        return reg;
     }
 
-    static std::map<std::string, FactoryCallback> _registeredFactories;
+    void registerPlugin(const std::string& name, FactoryCallback cb);
+
+    std::unordered_map<std::string, FactoryCallback> _registeredFactories;
 };
 
 template <typename T>
@@ -25,7 +29,7 @@ class PluginRegistration
 public:
     PluginRegistration(const std::string& name)
     {
-        PluginRegistry::registerPlugin(name, [] (LogConfiguration*) {
+        PluginRegistry::instance().registerPlugin(name, [] (LogConfiguration*) {
             return new T;
         });
     }

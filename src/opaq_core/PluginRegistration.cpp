@@ -8,7 +8,10 @@ namespace OPAQ
 
 namespace dll = boost::dll;
 
-std::map<std::string, FactoryCallback> PluginRegistry::_registeredFactories;
+void PluginRegistry::registerPlugin(const std::string& name, FactoryCallback cb)
+{
+    _registeredFactories.emplace(name, cb);
+}
 
 FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::string& filename)
 {
@@ -18,8 +21,8 @@ FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::stri
 
 FactoryCallback loadStaticPlugin(const std::string& pluginName, const std::string&)
 {
-    auto iter = PluginRegistry::_registeredFactories.find(pluginName);
-    if (iter == PluginRegistry::_registeredFactories.end())
+    auto iter = PluginRegistry::instance()._registeredFactories.find(pluginName);
+    if (iter == PluginRegistry::instance()._registeredFactories.end())
     {
         throw RunTimeException("No plugin registered with name {}", pluginName);
     }

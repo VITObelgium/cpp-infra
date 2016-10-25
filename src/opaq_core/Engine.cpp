@@ -106,12 +106,12 @@ void Engine::run(Config::OpaqRun& config)
     _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
-    GridProvider* gridProvider;
-    Config::Component* gridProviderDef = config.getGridProvider();
-    if (gridProviderDef != nullptr) {
-        gridProvider = &_componentMgr.getComponent<GridProvider>(gridProviderDef->name);
-        _logger->info("Using grid provider {}", gridProviderDef->name);
-    }
+    // GridProvider* gridProvider;
+    // Config::Component* gridProviderDef = config.getGridProvider();
+    // if (gridProviderDef != nullptr) {
+    //     gridProvider = &_componentMgr.getComponent<GridProvider>(gridProviderDef->name);
+    //     _logger->info("Using grid provider {}", gridProviderDef->name);
+    // }
 
     // Get the base times
     auto baseTimes = config.getBaseTimes();
@@ -218,7 +218,7 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
         throw RunTimeException("Inconsistent measured and predicted values");
     }*/
 
-    for (int i = 0; i < predictedValues.size(); ++i)
+    for (size_t i = 0; i < predictedValues.size(); ++i)
     {
         results.emplace_back(predictedValues.datetime(i), measuredValues.value(i), predictedValues.value(i));
     }
