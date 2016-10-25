@@ -13,27 +13,29 @@
 
 #include "Cell.h"
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-  /**
+/**
      A class to contain the interpolation grid.
      Basically is a container class for a list of gridcells, which can be fetched as a 
      vector by the getCells member function. 
    */
-  class Grid {
-  public:
+class Grid
+{
+public:
     Grid();
-    virtual ~Grid();
-    
-    /** Get the gridcells
-	Returns a reference to the vector of cells (pointers) */
-    std::vector<Cell*> & getCells() { return cells; }
+
+    void addCell(const Cell& cell);
+
+    size_t cellCount() const noexcept;
+
     //std::vector<Pollutant*> & getPollutants() { return pollutants; }
-    
-  private:
-    std::vector<Cell*> cells;
+
+private:
+    std::vector<Cell> _cells;
     //std::vector<Pollutant*> pollutants;
-  };
-  
+};
+
 } /* namespace opaq */
 #endif /* OPAQ_GRID_H_ */

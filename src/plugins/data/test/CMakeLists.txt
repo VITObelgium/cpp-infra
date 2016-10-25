@@ -1,16 +1,23 @@
 find_dependency(NAME GTEST LIBNAMES gmock DEBUGLIBNAMES gmock_d)
 
 include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/..)
+
+set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(dataplugintest
     ../ObsParser.cpp
-    ../PredictionDatabase.cpp
     rioobsprovidertest.cpp
-    SqlBufferTest.cpp
+    ForecastBufferTest.cpp
     main.cpp
 )
 
-target_link_libraries(dataplugintest opaqcore ${GTEST_LIBRARY} ${SQLPP_CONNECTOR_LIBRARY} ${SQLITE_LIBRARY})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.h)
+
+target_link_libraries(dataplugintest opaqcore ${GTEST_LIBRARY})
+
+if (STATIC_PLUGINS)
+    target_link_libraries(dataplugintest hdf5buffer sqlbuffer)
+endif ()
 
 add_test(NAME dataplugintest COMMAND dataplugintest)

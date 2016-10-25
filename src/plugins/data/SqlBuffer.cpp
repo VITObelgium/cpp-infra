@@ -15,11 +15,6 @@ SqlBuffer::SqlBuffer()
 
 SqlBuffer::~SqlBuffer() = default;
 
-std::string SqlBuffer::name()
-{
-    return "sqlbuffer";
-}
-
 void SqlBuffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
@@ -65,7 +60,7 @@ void SqlBuffer::setValues(const chrono::date_time& baseTime,
     throwIfNotConfigured();
 
     auto aggStr = Aggregation::getName(aggr);
-    auto fh     = date::floor<chrono::days>(std::chrono::seconds((forecast.firstDateTime() - baseTime) / std::chrono::seconds(_fcTimeResolution)));
+    auto fh     = date::floor<chrono::days>(forecast.firstDateTime() - baseTime);
 
     _db->addPredictions(baseTime, _currentModel, stationId, pollutantId, aggStr, fh, forecast);
 }
@@ -105,15 +100,12 @@ TimeSeries<double> SqlBuffer::getForecastValues(chrono::days fcHor,
 {
     throwIfNotConfigured();
 
-    auto t1 = fcTime1 - fcHor;
-    auto t2 = fcTime2 - fcHor;
-
     auto aggStr = Aggregation::getName(aggr);
-    auto result = _db->getPredictions(t1, t2, _currentModel, stationId, pollutantId, aggStr, fcHor);
+    auto result = _db->getPredictions(fcTime1, fcTime2, _currentModel, stationId, pollutantId, aggStr, fcHor);
 
     if (result.isEmpty())
     {
-        for (auto fct = t1; fct <= t2; fct += _baseTimeResolution)
+        for (auto fct = fcTime1; fct <= fcTime2; fct += _baseTimeResolution)
         {
             result.insert(fct, _noData);
         }
@@ -122,20 +114,18 @@ TimeSeries<double> SqlBuffer::getForecastValues(chrono::days fcHor,
     {
         // fill up with nodata
         auto firstDate = result.firstDateTime();
-        for (auto fct = t1; fct < firstDate; fct += _baseTimeResolution)
+        for (auto fct = fcTime1; fct < firstDate; fct += _baseTimeResolution)
         {
             result.insert(fct, _noData);
         }
 
-        for (auto fct = result.lastDateTime() + _baseTimeResolution; fct <= t2; fct += _baseTimeResolution)
+        for (auto fct = result.lastDateTime() + _baseTimeResolution; fct <= fcTime2; fct += _baseTimeResolution)
         {
             result.insert(fct, _noData);
         }
     }
 
-    auto secs = std::chrono::seconds(_baseTimeResolution);
-    std::cout << result.size() << " <-> " << ((fcTime2 - fcTime1) / secs) + 1 << std::endl;
-    assert(result.size() == static_cast<size_t>(((fcTime2 - fcTime1) / secs) + 1));
+    assert(result.size() == static_cast<size_t>((fcTime2 - fcTime1) / _baseTimeResolution) + 1);
 
     return result;
 }
@@ -162,8 +152,15 @@ std::vector<double> SqlBuffer::getModelValues(const chrono::date_time& baseTime,
 std::vector<std::string> SqlBuffer::getModelNames(const std::string& pollutantId, Aggregation::Type aggr)
 {
     throwIfNotConfigured();
-    return _db->getModelNames(pollutantId, Aggregation::getName(aggr));
+    auto names = _db->getModelNames(pollutantId, Aggregation::getName(aggr));
+    if (names.empty())
+    {
+        throw NotAvailableException("Error reading model list for {}, {}", pollutantId, Aggregation::getName(aggr));
+    }
+
+    return names;
 }
+
 }
 
 OPAQ_REGISTER_PLUGIN(OPAQ::SqlBuffer);

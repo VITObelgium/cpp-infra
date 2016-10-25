@@ -52,11 +52,6 @@ Hdf5Buffer::~Hdf5Buffer()
     _closeFile();
 }
 
-std::string Hdf5Buffer::name()
-{
-    return "Hdf5Buffer";
-}
-
 void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
@@ -112,11 +107,6 @@ void Hdf5Buffer::setNoData(double noData)
 
 double Hdf5Buffer::getNoData()
 {
-    // an alternative would be to read back the no data value from one of the
-    // datasets in the data, but the question is then... which one ?
-
-    // _checkFullyConfigured();
-    // _dataSet.getCreatePlist().getFillValue(H5::PredType::NATIVE_DOUBLE, &out);
     return _noData;
 }
 
@@ -293,102 +283,68 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
     std::cout << "modelIndex= " << modelIndex << ", stationIndex= " << stationIndex << ", dateIndex=" << dateIndex << ", fcIndex = " << fhIndex << std::endl;
 #endif
 
-    // -- store data
-    // a. get data space
-    H5::DataSpace space = dsVals.getSpace();
 
-    // b. get current size
-    hsize_t size[4];
-    space.getSimpleExtentDims(size, nullptr);
-    bool extend = false;
-    if (modelIndex >= size[0]) {
-        size[0] = modelIndex + 1;
-        extend  = true;
-    }
-    if (stationIndex >= size[1]) {
-        size[1] = stationIndex + 1;
-        extend  = true;
-    }
-    if (dateIndex >= size[2]) {
-        size[2] = dateIndex + 1;
-        extend  = true;
-    }
-    if (fhIndex + forecast.size() > size[3]) {
-        size[3] = fhIndex + forecast.size();
-        extend  = true;
-    }
-    // c. extend data set if required
-    if (extend) {
-        dsVals.extend(size);
-        space.close();
-        space = dsVals.getSpace();
-    }
-    // d. select data set hyperslab
-    hsize_t count[4]  = {1, 1, 1, forecast.size()};
-    hsize_t offset[4] = {modelIndex, stationIndex, dateIndex, fhIndex};
-    space.selectHyperslab(H5S_SELECT_SET, count, offset);
-    // e. write data to the hyperslab
-    H5::DataSpace writeMemSpace(4, count);
-    double fileNoData;
-    dsVals.getCreatePlist().getFillValue(H5::PredType::NATIVE_DOUBLE, &fileNoData);
-    if (_noData == fileNoData) {
-        // nodata placeholder in file equals the one used in the values vector
-        dsVals.write(forecast.values().data(), H5::PredType::NATIVE_DOUBLE, writeMemSpace, space);
-    }
-    else
+    try
     {
-        // nodata placeholder in file is different from the one used in the values vector
-        std::vector<double> newValues(count[3]);
-        for (unsigned int i = 0; i < forecast.size(); i++)
-        {
-            newValues[i] = forecast.value(i) == _noData ? fileNoData : forecast.value(i);
+        // -- store data
+        // a. get data space
+        H5::DataSpace space = dsVals.getSpace();
+
+        // b. get current size
+        hsize_t size[4];
+        space.getSimpleExtentDims(size, nullptr);
+        bool extend = false;
+        if (modelIndex >= size[0]) {
+            size[0] = modelIndex + 1;
+            extend  = true;
         }
-        _dataSet.write(newValues.data(), H5::PredType::NATIVE_DOUBLE, writeMemSpace, space);
+        if (stationIndex >= size[1]) {
+            size[1] = stationIndex + 1;
+            extend  = true;
+        }
+        if (dateIndex >= size[2]) {
+            size[2] = dateIndex + 1;
+            extend  = true;
+        }
+        if (fhIndex + forecast.size() > size[3]) {
+            size[3] = fhIndex + forecast.size();
+            extend  = true;
+        }
+        // c. extend data set if required
+        if (extend) {
+            dsVals.extend(size);
+            space.close();
+            space = dsVals.getSpace();
+        }
+        // d. select data set hyperslab
+        hsize_t count[4]  = {1, 1, 1, forecast.size()};
+        hsize_t offset[4] = {modelIndex, stationIndex, dateIndex, fhIndex};
+        space.selectHyperslab(H5S_SELECT_SET, count, offset);
+        // e. write data to the hyperslab
+        H5::DataSpace writeMemSpace(4, count);
+        double fileNoData;
+        dsVals.getCreatePlist().getFillValue(H5::PredType::NATIVE_DOUBLE, &fileNoData);
+        if (_noData == fileNoData) {
+            // nodata placeholder in file equals the one used in the values vector
+            dsVals.write(forecast.values().data(), H5::PredType::NATIVE_DOUBLE, writeMemSpace, space);
+        }
+        else
+        {
+            // nodata placeholder in file is different from the one used in the values vector
+            std::vector<double> newValues(count[3]);
+            for (unsigned int i = 0; i < forecast.size(); i++)
+            {
+                newValues[i] = forecast.value(i) == _noData ? fileNoData : forecast.value(i);
+            }
+            dsVals.write(newValues.data(), H5::PredType::NATIVE_DOUBLE, writeMemSpace, space);
+        }
+        space.close();
+        dsVals.flush(H5F_SCOPE_GLOBAL);
     }
-    space.close();
-    dsVals.flush(H5F_SCOPE_GLOBAL);
-
-    /*
-
-     // TODO store the basetimes as well for convenience...
-
-    // f. write basetimes to hyperslab
-    H5::DataSpace spaceBaseTimes = dataBaseTimes.getSpace();
-
-  // b. get current size
-  hsize_t size1[1];
-  spaceBaseTimes.getSimpleExtentDims(size, NULL);
-  extend = false;
-  if (dateIndex >= size[0]) {
-    size[0] = dateIndex + 1;
-    extend = true;
-  }
-  // c. extend data set if required
-  if (extend) {
-    dataBaseTimes.extend(size);
-    spaceBaseTimes.close();
-    spaceBaseTimes = dataBaseTimes.getSpace();
-  }
-
-  // d. select data set hyperslab
-  hsize_t count1[1]  = { 1 }; //  set chunk size > 1 in fh dim?
-  hsize_t offset1[1] = { dateIndex };
-  spaceBaseTimes.selectHyperslab(H5S_SELECT_SET, count1, offset1);
-
-  // e. write data to the hyperslab
-  std::stringstream ss;
-  ss << _baseTime;
-  std::string writeBuffer[1]; writeBuffer[0] = ss.str();
-  H5::DataSpace writeMemSpace1(1, count);
-  dataBaseTimes.write( writeBuffer, _stringType, writeMemSpace1, spaceBaseTimes);
-
-  spaceBaseTimes.close();
-*/
-
-    // -- close datasets and groups
-    dsVals.close();
-    grpPol.close();
-    grpAggr.close();
+    catch (const H5::Exception& e)
+    {
+        throw NotAvailableException("Failed to write forecast values in forecast buffer: ({})", e.getDetailMsg());
+    }
 }
 
 void Hdf5Buffer::_closeFile()
@@ -445,10 +401,7 @@ void Hdf5Buffer::_createFile(const std::string& filename)
     }
     catch (const H5::FileIException&)
     {
-        std::stringstream ss;
-        ss << "Failed to create file " << filename
-           << " (disk full? no write permissions?)";
-        throw BadConfigurationException(ss.str());
+        throw BadConfigurationException("Failed to create file {} (disk full? no write permissions?)", filename);
     }
 
     // Create OPAQ file creation tag
@@ -613,98 +566,110 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
     auto b2      = fcTime2 - fc_hor;
     size_t nvals = (chrono::to_seconds(b2 - b1).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
-    OPAQ::TimeSeries<double> out;
-    if (b2 < startTime) {
-        // we have no values in the buffer, so return all -9999
-        for (chrono::date_time fct = fcTime1; fct <= fcTime2; fct = fct + _baseTimeResolution)
-            out.insert(fct, _noData);
-    }
-    else if (b1 < startTime)
+    try
     {
-// first forecast time before the start time...
+
+        OPAQ::TimeSeries<double> out;
+        if (b2 < startTime) {
+            // we have no values in the buffer, so return all -9999
+            for (chrono::date_time fct = fcTime1; fct <= fcTime2; fct = fct + _baseTimeResolution)
+                out.insert(fct, _noData);
+        }
+        else if (b1 < startTime)
+        {
+    // first forecast time before the start time...
+
+    #ifdef DEBUG
+            std::cout << "startTime : " << startTime << std::endl;
+            std::cout << "forecat horizon : " << fc_hor.count() << std::endl;
+            std::cout << "basetime for fcTime1 : " << b1 << std::endl;
+            std::cout << "basetime for fcTime2 : " << b2 << std::endl;
+    #endif
+
+            // number of elements before the HDF5 buffer
+            size_t n_before = chrono::to_seconds(startTime - b1).count() / getBaseTimeResolutionInSeconds().count();       // number of steps before buffer start
+            size_t n_inside = (chrono::to_seconds(b2 - startTime).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
+
+            if ((n_before + n_inside) != nvals) {
+    #ifdef DEBUG
+                std::cout << "nvals = " << nvals << std::endl;
+                std::cout << "n_before = " << n_before << std::endl;
+                std::cout << "n_inside = " << n_inside << std::endl;
+    #endif
+                throw RunTimeException("Strange things are happening... everyday... i hear the music... up above my head !");
+            }
+
+            // completely within the period
+            std::vector<double> tmp(n_inside);
+
+            // "model x station x baseTime x fcHorizon"
+            H5::DataSpace space = dsVals.getSpace();
+            hsize_t dc[4]       = {1, 1, n_inside, 1};
+            hsize_t doffset[4]  = {modelIndex, stIndex, 0, fhIndex};
+            space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
+
+            hsize_t mc[1]      = {n_inside};
+            hsize_t moffset[1] = {0};
+            H5::DataSpace memSpace(1, mc);
+            memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
+
+            dsVals.read(tmp.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
+            space.close();
+
+            // TODO make this more efficient !!
+            //      --> enable to directly dump into the timeseries object... let's worry about this later...
+            auto fct = fcTime1;
+            for (unsigned int ii = 0; ii < n_before; ii++)
+            {
+                out.insert(fct, _noData);
+                fct = fct + _baseTimeResolution;
+            }
+            for (unsigned int ii = 0; ii < n_inside; ii++)
+            {
+                out.insert(fct, tmp[ii]);
+                fct = fct + _baseTimeResolution;
+            }
+        }
+        else
+        {
+            // completely within the period
+            std::vector<double> tmp(nvals);
+            size_t btIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
+
+            // "model x station x baseTime x fcHorizon"
+            H5::DataSpace space = dsVals.getSpace();
+            hsize_t dc[4]       = {1, 1, nvals, 1};
+            hsize_t doffset[4]  = {modelIndex, stIndex, btIndex, fhIndex};
+            space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
+
+            hsize_t mc[1]      = {nvals};
+            hsize_t moffset[1] = {0};
+            H5::DataSpace memSpace(1, mc);
+            memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
 
 #ifdef DEBUG
-        std::cout << "startTime : " << startTime << std::endl;
-        std::cout << "forecat horizon : " << fc_hor.count() << std::endl;
-        std::cout << "basetime for fcTime1 : " << b1 << std::endl;
-        std::cout << "basetime for fcTime2 : " << b2 << std::endl;
+            std::cout << "Read values: " << fmt::format("{}x{}x{}x{}", modelIndex, stIndex, btIndex, fhIndex) << std::endl;
 #endif
 
-        // number of elements before the HDF5 buffer
-        size_t n_before = chrono::to_seconds(startTime - b1).count() / getBaseTimeResolutionInSeconds().count();       // number of steps before buffer start
-        size_t n_inside = (chrono::to_seconds(b2 - startTime).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
+            dsVals.read(tmp.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
+            space.close();
 
-        if ((n_before + n_inside) != nvals) {
-#ifdef DEBUG
-            std::cout << "nvals = " << nvals << std::endl;
-            std::cout << "n_before = " << n_before << std::endl;
-            std::cout << "n_inside = " << n_inside << std::endl;
-#endif
-            throw RunTimeException("Strange things are happening... everyday... i hear the music... up above my head !");
+            // TODO make this more efficient !!
+            //      --> enable to directly dump into the timeseries object... let's worry about this later...
+            auto fct = fcTime1;
+            for (unsigned int ii = 0; ii < nvals; ii++)
+            {
+                out.insert(fct, tmp[ii]);
+                fct = fct + _baseTimeResolution;
+            }
         }
 
-        // completely within the period
-        std::vector<double> tmp(n_inside);
-
-        // "model x station x baseTime x fcHorizon"
-        H5::DataSpace space = dsVals.getSpace();
-        hsize_t dc[4]       = {1, 1, n_inside, 1};
-        hsize_t doffset[4]  = {modelIndex, stIndex, 0, fhIndex};
-        space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
-
-        hsize_t mc[1]      = {n_inside};
-        hsize_t moffset[1] = {0};
-        H5::DataSpace memSpace(1, mc);
-        memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
-
-        dsVals.read(tmp.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
-        space.close();
-
-        // TODO make this more efficient !!
-        //      --> enable to directly dump into the timeseries object... let's worry about this later...
-        auto fct = fcTime1;
-        for (unsigned int ii = 0; ii < n_before; ii++)
-        {
-            out.insert(fct, _noData);
-            fct = fct + _baseTimeResolution;
-        }
-        for (unsigned int ii = 0; ii < n_inside; ii++)
-        {
-            out.insert(fct, tmp[ii]);
-            fct = fct + _baseTimeResolution;
-        }
+        return out;
     }
-    else
+    catch (const H5::Exception& e)
     {
-        // completely within the period
-        std::vector<double> tmp(nvals);
-        size_t btIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
-
-        // "model x station x baseTime x fcHorizon"
-        H5::DataSpace space = dsVals.getSpace();
-        hsize_t dc[4]       = {1, 1, nvals, 1};
-        hsize_t doffset[4]  = {modelIndex, stIndex, btIndex, fhIndex};
-        space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
-
-        hsize_t mc[1]      = {nvals};
-        hsize_t moffset[1] = {0};
-        H5::DataSpace memSpace(1, mc);
-        memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
-
-        dsVals.read(tmp.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
-        space.close();
-
-        // TODO make this more efficient !!
-        //      --> enable to directly dump into the timeseries object... let's worry about this later...
-        auto fct = fcTime1;
-        for (unsigned int ii = 0; ii < nvals; ii++)
-        {
-            out.insert(fct, tmp[ii]);
-            fct = fct + _baseTimeResolution;
-        }
+        throw NotAvailableException("Failed to retrieve forecast values in forecast buffer ({})", e.getDetailMsg());
     }
-
-    return out;
 }
 
 // return model values for a given baseTime / forecast horizon
@@ -805,9 +770,7 @@ std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantI
     }
     catch (const H5::Exception&)
     {
-        std::string s = "error reading model list for " + pollutantId + ", " + OPAQ::Aggregation::getName(aggr);
-        _logger->trace(s);
-        throw NotAvailableException(s);
+        throw NotAvailableException("Error reading model list for {}, {}", pollutantId, Aggregation::getName(aggr));
     }
 
     unsigned int bufferSize = Hdf5Tools::getDataSetSize(dsModels);

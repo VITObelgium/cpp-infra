@@ -20,7 +20,10 @@ public:
     Hdf5Buffer();
     virtual ~Hdf5Buffer();
 
-    static std::string name();
+    static std::string name()
+    {
+        return "hdf5buffer";
+    }
 
     static const std::string START_DATE_NAME; // attribute that holds the start date
     static const std::string FORECAST_DATASET_NAME;
@@ -173,7 +176,7 @@ private:
     std::string _filename; //!< filename for the buffer file
     H5::H5File* _h5file;   //!< HDF5 file handle for the buffer file
 
-    H5::DataSet _dataSet, _parametersSet, _stationsSet;
+    H5::DataSet _parametersSet, _stationsSet;
     H5::StrType _stringType;
 
     double _noData;

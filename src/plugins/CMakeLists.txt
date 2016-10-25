@@ -1,7 +1,7 @@
 if (STATIC_PLUGINS)
     set (PLUGIN_TYPE STATIC)
 else ()
-    set (PLUGIN_TYPE MODULE)
+    set (PLUGIN_TYPE SHARED)
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../opaq_core)

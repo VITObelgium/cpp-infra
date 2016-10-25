@@ -5,6 +5,7 @@
  *      Author: vlooys
  */
 
+#include "config.h"
 #include "ConfigurationHandler.h"
 
 namespace OPAQ
@@ -326,11 +327,13 @@ void ConfigurationHandler::validateConfiguration(Config::PollutantManager& pollu
             }
         }
 
+#ifndef STATIC_PLUGINS
         // check if plugin lib file exists
         if (!FileTools::exists(it1->libPath))
         {
             throw BadConfigurationException("Library file not found: {}", it1->libPath);
         }
+#endif
     }
 
     // check for components with the same name

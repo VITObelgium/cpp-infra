@@ -1,0 +1,9 @@
+#pragma once
+
+#define TEST_BINARY_DIR "${EXECUTABLE_OUTPUT_PATH}"
+
+#ifdef NDEBUG
+    #define CONFIG "Release"
+#else
+    #define CONFIG "Debug"
+#endif

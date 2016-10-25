@@ -12,6 +12,7 @@ int main(int argc, char **argv)
     Log::initConsoleLogger();
     Logger log("opaqcoretest");
 
+
     for (auto& plugin : OPAQ::getPluginNames())
     {
         log->debug("Plugin: {}", plugin);

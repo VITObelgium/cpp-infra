@@ -1,5 +1,7 @@
 #pragma once
 
+#include "config.h"
+
 #include "data/AsciiForecastWriter.h"
 #include "data/Hdf5Buffer.h"
 #include "data/RioObsProvider.h"
@@ -19,6 +21,7 @@ namespace OPAQ
 // the static libraries because noone seems to use them
 inline std::vector<std::string> getPluginNames()
 {
+#ifdef STATIC_PLUGINS
     return {
         AsciiForecastWriter::name(),
         RioObsProvider::name(),
@@ -31,6 +34,9 @@ inline std::vector<std::string> getPluginNames()
         OVL_IRCEL_model2::name(),
         OVL_IRCEL_model3::name()
     };
+#else
+    return {};
+#endif
 }
 
 }

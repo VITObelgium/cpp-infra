@@ -18,12 +18,6 @@ XmlGridProvider::XmlGridProvider()
 }
 
 XmlGridProvider::~XmlGridProvider() {
-	std::vector<Cell *> * cells = &(_grid.getCells());
-	std::vector<Cell *>::iterator it = cells->begin();
-	while (it != cells->end()) {
-		Cell * toErase = *it++;
-		delete toErase;
-	}
 }
 
 std::string XmlGridProvider::name()
@@ -79,14 +73,13 @@ void XmlGridProvider::configure(TiXmlElement * configuration, const std::string&
 		}
 
 		// create cell and push into the grid
-		Cell * cell = new Cell(id, xmin, xmax, ymin, ymax, zmin, zmax);
-		_grid.getCells().push_back(cell);
+		_grid.addCell(Cell(id, xmin, xmax, ymin, ymax, zmin, zmax));
 
 
 		cellEl = cellEl->NextSiblingElement("cell");
 	}
 
-	if (_grid.getCells().size() == 0)
+	if (_grid.cellCount() == 0)
 		throw BadConfigurationException("no cells defined in grid");
 }
 
