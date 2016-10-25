@@ -26,6 +26,7 @@ inline std::vector<std::string> getPluginNames()
         AsciiForecastWriter::name(),
         RioObsProvider::name(),
         SqlBuffer::name(),
+        Hdf5Buffer::name(),
         XMLAQNetProvider::name(),
         XmlGridProvider::name(),
 

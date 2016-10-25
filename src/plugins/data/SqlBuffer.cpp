@@ -15,6 +15,11 @@ SqlBuffer::SqlBuffer()
 
 SqlBuffer::~SqlBuffer() = default;
 
+std::string SqlBuffer::name()
+{
+    return "sqlbuffer";
+}
+
 void SqlBuffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);

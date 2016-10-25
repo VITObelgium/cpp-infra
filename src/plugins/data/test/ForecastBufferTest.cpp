@@ -48,7 +48,7 @@ public:
     MOCK_METHOD0(componentManager, ComponentManager&());
 };
 
-class ForecastBufferTest : public TestWithParam<const char*>
+class ForecastBufferTest : public TestWithParam<std::string>
 {
 protected:
     ForecastBufferTest()

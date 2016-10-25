@@ -52,6 +52,11 @@ Hdf5Buffer::~Hdf5Buffer()
     _closeFile();
 }
 
+std::string Hdf5Buffer::name()
+{
+    return "hdf5buffer";
+}
+
 void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);

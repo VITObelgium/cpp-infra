@@ -17,7 +17,18 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINAR
 target_link_libraries(dataplugintest opaqcore ${GTEST_LIBRARY})
 
 if (STATIC_PLUGINS)
-    target_link_libraries(dataplugintest hdf5buffer sqlbuffer)
+    target_link_libraries(dataplugintest
+        hdf5buffer
+        sqlbuffer
+        asciiforecastwriter
+        rioobsprovider
+        ovl
+        ovl_ircel_model1
+        ovl_ircel_model2
+        ovl_ircel_model3
+        xmlgridprovider
+        xmlaqnetprovider
+    )
 endif ()
 
 add_test(NAME dataplugintest COMMAND dataplugintest)

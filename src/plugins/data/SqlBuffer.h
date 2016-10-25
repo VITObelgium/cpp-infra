@@ -24,10 +24,7 @@ public:
     SqlBuffer();
     virtual ~SqlBuffer();
 
-    static constexpr const char* name()
-    {
-        return "sqlbuffer";
-    }
+    static std::string name();
 
     // throws BadConfigurationException
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
