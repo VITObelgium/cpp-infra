@@ -20,7 +20,7 @@ public:
     Hdf5Buffer();
     virtual ~Hdf5Buffer();
 
-    static std::string name()
+    static constexpr const char* name()
     {
         return "hdf5buffer";
     }

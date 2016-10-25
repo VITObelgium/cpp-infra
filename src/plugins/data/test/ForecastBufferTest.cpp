@@ -31,7 +31,7 @@ ostream& operator<< (ostream& os, const time_point<_Clock, _Duration>& dt)
 
 namespace OPAQ
 {
-namespace Test
+namespace test
 {
 
 using namespace date;
@@ -41,9 +41,6 @@ using namespace chrono_literals;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
 
-static const std::string s_station = "40AB01";
-
-
 class EngineMock : public IEngine
 {
 public:
@@ -51,8 +48,7 @@ public:
     MOCK_METHOD0(componentManager, ComponentManager&());
 };
 
-template <typename BufferType>
-class ForecastBufferTest : public testing::Test
+class ForecastBufferTest : public TestWithParam<const char*>
 {
 protected:
     ForecastBufferTest()
@@ -72,8 +68,13 @@ protected:
         doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
         auto* config = doc.FirstChildElement("config");
 
-        _compMgr.loadPlugin(BufferType::name(), TEST_BINARY_DIR "/" CONFIG "/" + BufferType::name() + PLUGIN_EXT);
-        _buffer = &_compMgr.createComponent<ForecastBuffer>("ForecastBuffer", BufferType::name(), config);
+        _compMgr.loadPlugin(GetParam(), fmt::format(TEST_BINARY_DIR "/" PLUGIN_PREFIX "{}" PLUGIN_EXT, GetParam()));
+        _buffer = &_compMgr.createComponent<ForecastBuffer>(GetParam(), GetParam(), config);
+    }
+
+    ~ForecastBufferTest()
+    {
+        _compMgr.destroyComponent(GetParam());
     }
 
     EngineMock _engineMock;
@@ -81,26 +82,23 @@ protected:
     ForecastBuffer* _buffer;
 };
 
-using ForecastBufferTypes = testing::Types<Hdf5Buffer, SqlBuffer>;
-TYPED_TEST_CASE(ForecastBufferTest, ForecastBufferTypes);
-
-TYPED_TEST(ForecastBufferTest, GetTimeResolution)
+TEST_P(ForecastBufferTest, GetTimeResolution)
 {
     EXPECT_EQ(24h, this->_buffer->getTimeResolution());
 }
 
-TYPED_TEST(ForecastBufferTest, GetBaseTimeResolution)
+TEST_P(ForecastBufferTest, GetBaseTimeResolution)
 {
     EXPECT_EQ(24h, this->_buffer->getBaseTimeResolution());
 }
 
-TYPED_TEST(ForecastBufferTest, GetModelNamesEmpty)
+TEST_P(ForecastBufferTest, GetModelNamesEmpty)
 {
     // no data in the buffer
     EXPECT_THROW(this->_buffer->getModelNames("pm10", Aggregation::DayAvg).empty(), NotAvailableException);
 }
 
-TYPED_TEST(ForecastBufferTest, GetModelNames)
+TEST_P(ForecastBufferTest, GetModelNames)
 {
     auto basetime = make_date_time(2015_y/jan/1);
     TimeSeries<double> forecast1, forecast2;
@@ -124,7 +122,7 @@ TYPED_TEST(ForecastBufferTest, GetModelNames)
     EXPECT_THROW(this->_buffer->getModelNames("pm25", Aggregation::Max1h), NotAvailableException);
 }
 
-TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
+TEST_P(ForecastBufferTest, SetGetForecastValues)
 {
     auto basetime1 = make_date_time(2015_y / jan / 1);
     auto basetime2 = make_date_time(2015_y / jan / 2);
@@ -254,6 +252,8 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
 //    auto now = std::chrono::system_clock::now();
 //    EXPECT_THROW(db->getPrediction(now, "model1", "Ukkel", "pm10", "dayavg", 4_d), RunTimeException);
 //}
+
+INSTANTIATE_TEST_CASE_P(Forecast, ForecastBufferTest, Values(Hdf5Buffer::name(), SqlBuffer::name()));
 
 }
 }

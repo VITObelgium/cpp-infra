@@ -1,9 +1,15 @@
 #pragma once
 
-#define TEST_BINARY_DIR "${EXECUTABLE_OUTPUT_PATH}"
-
 #ifdef NDEBUG
     #define CONFIG "Release"
 #else
     #define CONFIG "Debug"
+#endif
+
+#define PLUGIN_PREFIX "${CMAKE_SHARED_LIBRARY_PREFIX}"
+
+#ifdef WIN32
+    #define TEST_BINARY_DIR "${EXECUTABLE_OUTPUT_PATH}"/CONFIG
+#else
+    #define TEST_BINARY_DIR "${EXECUTABLE_OUTPUT_PATH}"
 #endif

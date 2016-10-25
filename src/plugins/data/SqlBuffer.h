@@ -24,7 +24,7 @@ public:
     SqlBuffer();
     virtual ~SqlBuffer();
 
-    static std::string name()
+    static constexpr const char* name()
     {
         return "sqlbuffer";
     }

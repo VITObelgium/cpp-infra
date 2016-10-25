@@ -46,6 +46,11 @@ public:
     {
     }
 
+    ~Logger()
+    {
+        spdlog::drop(_logger->name());
+    }
+
     spdlog::logger* operator->()
     {
         return _logger.get();
