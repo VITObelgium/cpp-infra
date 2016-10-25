@@ -28,7 +28,7 @@ XmlGridProvider::~XmlGridProvider() {
 
 std::string XmlGridProvider::name()
 {
-    return "XmlGridProvider";
+    return "xmlgridprovider";
 }
 
 /**

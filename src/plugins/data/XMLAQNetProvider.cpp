@@ -19,7 +19,7 @@ XMLAQNetProvider::XMLAQNetProvider()
 
 std::string XMLAQNetProvider::name()
 {
-    return "XMLAQNetProvider";
+    return "xmlaqnetprovider";
 }
 
 void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& componentName, IEngine& engine)

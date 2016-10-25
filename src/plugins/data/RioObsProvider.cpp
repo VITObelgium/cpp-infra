@@ -32,7 +32,7 @@ RioObsProvider::RioObsProvider()
 
 std::string RioObsProvider::name()
 {
-    return "RioObsProvider";
+    return "rioobsprovider";
 }
 
 // OPAQ::Component methods

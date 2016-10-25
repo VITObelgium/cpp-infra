@@ -10,5 +10,9 @@ add_executable(opaqcoretest
 )
 
 target_link_libraries(opaqcoretest opaqcore ${GTEST_LIBRARY})
+if (STATIC_PLUGINS)
+    target_link_libraries(opaqcoretest ${PLUGINS})
+endif ()
 
 add_test(NAME opaqcore COMMAND opaqcoretest)
+

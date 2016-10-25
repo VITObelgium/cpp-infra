@@ -32,7 +32,7 @@ AsciiForecastWriter::~AsciiForecastWriter()
 
 std::string AsciiForecastWriter::name()
 {
-    return "AsciiForecastWriter";
+    return "asciiforecastwriter";
 }
 
 void AsciiForecastWriter::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)

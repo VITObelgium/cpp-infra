@@ -64,7 +64,7 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
         throw RunTimeException("There already exists a plugin with name {}", pluginName);
     }
 
-    _factoryMap.emplace(filename, _loadPluginCb(pluginName, filename));
+    _factoryMap.emplace(pluginName, _loadPluginCb(pluginName, filename));
 }
 
 void ComponentManager::destroyComponent(const std::string& componentName)

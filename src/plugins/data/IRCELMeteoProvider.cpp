@@ -34,7 +34,7 @@ IRCELMeteoProvider::~IRCELMeteoProvider()
 
 std::string IRCELMeteoProvider::name()
 {
-    return "IRCELMeteoProvider";
+    return "ircelmeteoprovider";
 }
 
 // OPAQ::Component methods

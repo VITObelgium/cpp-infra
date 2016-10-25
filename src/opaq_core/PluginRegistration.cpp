@@ -19,7 +19,7 @@ FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::stri
 FactoryCallback loadStaticPlugin(const std::string& pluginName, const std::string&)
 {
     auto iter = PluginRegistry::_registeredFactories.find(pluginName);
-    if (iter != PluginRegistry::_registeredFactories.end())
+    if (iter == PluginRegistry::_registeredFactories.end())
     {
         throw RunTimeException("No plugin registered with name {}", pluginName);
     }

@@ -48,8 +48,8 @@ if (MSVC)
     add_definitions(/wd4503)
 endif ()
 
-add_subdirectory(opaq_core)
 add_subdirectory(plugins)
+add_subdirectory(opaq_core)
 
 if (BUILD_UI)
     add_subdirectory(ui)
