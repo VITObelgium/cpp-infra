@@ -12,12 +12,6 @@ namespace test
 using namespace testing;
 using namespace std::string_literals;
 
-#ifdef WIN32
-#define PLUGIN_EXT "dll"
-#else
-#define PLUGIN_EXT "so"
-#endif
-
 class EngineMock : public IEngine
 {
 public:
@@ -39,7 +33,7 @@ protected:
 
 TEST_F(ComponentManagerTest, LoadPlugin)
 {
-    auto configXml = 
+    auto configXml =
         "<config>"
         "    <filename>opaq_fcdb_6UT.h5</filename>"
         "    <basetime_resolution>24</basetime_resolution>"
@@ -49,8 +43,8 @@ TEST_F(ComponentManagerTest, LoadPlugin)
     TiXmlDocument doc;
     doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
     auto* config = doc.FirstChildElement("config");
-    
-    _cmpMgr.loadPlugin("sqlbuffer", "sqlbuffer." PLUGIN_EXT);
+
+    _cmpMgr.loadPlugin("sqlbuffer", "sqlbuffer" PLUGIN_EXT);
     auto& comp = _cmpMgr.createComponent<Component>("sqlbuffer", "sqlbuffer", config);
     EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("sqlbuffer"));
 }

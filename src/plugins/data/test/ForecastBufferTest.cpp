@@ -86,18 +86,18 @@ TYPED_TEST_CASE(ForecastBufferTest, ForecastBufferTypes);
 
 TYPED_TEST(ForecastBufferTest, GetTimeResolution)
 {
-    EXPECT_EQ(24h, _buffer->getTimeResolution());
+    EXPECT_EQ(24h, this->_buffer->getTimeResolution());
 }
 
 TYPED_TEST(ForecastBufferTest, GetBaseTimeResolution)
 {
-    EXPECT_EQ(24h, _buffer->getBaseTimeResolution());
+    EXPECT_EQ(24h, this->_buffer->getBaseTimeResolution());
 }
 
 TYPED_TEST(ForecastBufferTest, GetModelNamesEmpty)
 {
     // no data in the buffer
-    EXPECT_THROW(_buffer->getModelNames("pm10", Aggregation::DayAvg).empty(), NotAvailableException);
+    EXPECT_THROW(this->_buffer->getModelNames("pm10", Aggregation::DayAvg).empty(), NotAvailableException);
 }
 
 TYPED_TEST(ForecastBufferTest, GetModelNames)
@@ -106,22 +106,22 @@ TYPED_TEST(ForecastBufferTest, GetModelNames)
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime, 1.5);
     forecast2.insert(basetime + 24h, 2.5);
-    
-    _buffer->setCurrentModel("model1");
-    _buffer->setValues(basetime, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
-    
-    _buffer->setCurrentModel("model2");
-    _buffer->setValues(basetime, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
-    _buffer->setValues(basetime, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
-    
-    _buffer->setCurrentModel("model3");
-    _buffer->setValues(basetime, forecast1, "Ukkel", "pm25", Aggregation::DayAvg);
-    _buffer->setValues(basetime, forecast2, "Ukkel", "pm25", Aggregation::DayAvg);
-    _buffer->setValues(basetime, forecast2, "Ukkel", "pm25", Aggregation::Max8h);
-    
-    EXPECT_THAT(_buffer->getModelNames("pm10", Aggregation::DayAvg), ContainerEq(std::vector<std::string>{ "model1", "model2" }));
-    EXPECT_THAT(_buffer->getModelNames("pm25", Aggregation::Max8h), ContainerEq(std::vector<std::string>{ "model3" }));
-    EXPECT_THROW(_buffer->getModelNames("pm25", Aggregation::Max1h), NotAvailableException);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    this->_buffer->setCurrentModel("model2");
+    this->_buffer->setValues(basetime, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+    this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    this->_buffer->setCurrentModel("model3");
+    this->_buffer->setValues(basetime, forecast1, "Ukkel", "pm25", Aggregation::DayAvg);
+    this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm25", Aggregation::DayAvg);
+    this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm25", Aggregation::Max8h);
+
+    EXPECT_THAT(this->_buffer->getModelNames("pm10", Aggregation::DayAvg), ContainerEq(std::vector<std::string>{ "model1", "model2" }));
+    EXPECT_THAT(this->_buffer->getModelNames("pm25", Aggregation::Max8h), ContainerEq(std::vector<std::string>{ "model3" }));
+    EXPECT_THROW(this->_buffer->getModelNames("pm25", Aggregation::Max1h), NotAvailableException);
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
@@ -134,12 +134,12 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime1 + fcHor, 1.5);
     forecast2.insert(basetime2 + fcHor, 2.5);
-    
-    _buffer->setCurrentModel("model1");
-    _buffer->setValues(basetime1, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
-    _buffer->setValues(basetime2, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
 
-    auto results = _buffer->getForecastValues(fcHor, basetime1 + fcHor, basetime2 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime1, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+    this->_buffer->setValues(basetime2, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime1 + fcHor, basetime2 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
         basetime1 + fcHor,
