@@ -1,12 +1,17 @@
 if (hdf5_FOUND)
-    add_library(hdf5buffer ${PLUGIN_TYPE}
+    add_library(hdf5buffer STATIC
         Hdf5Buffer.h
         Hdf5Buffer.cpp
         Hdf5Tools.h
         Hdf5Tools.cpp
     )
 
+    add_library(hdf5bufferplugin MODULE
+        Hdf5BufferPlugin.cpp
+    )
+
     target_link_libraries(hdf5buffer opaqcore hdf5_cpp-static)
+    target_link_libraries(hdf5bufferplugin hdf5buffer)
 endif ()
 
 find_library(SQLITE_LIBRARY NAMES sqlite3)
@@ -26,12 +31,16 @@ add_library(asciiforecastwriter ${PLUGIN_TYPE}
     AsciiForecastWriter.cpp
 )
 
-add_library(sqlbuffer ${PLUGIN_TYPE}
+add_library(sqlbuffer STATIC
     SqlBuffer.h
     SqlBuffer.cpp
     PredictionScheme.h
     PredictionDatabase.h
     PredictionDatabase.cpp
+)
+
+add_library(sqlbufferplugin MODULE
+    SqlBufferPlugin.cpp
 )
 
 add_library(ircelmeteoprovider ${PLUGIN_TYPE}
@@ -57,6 +66,8 @@ add_library(xmlgridprovider ${PLUGIN_TYPE}
 )
 
 target_link_libraries(sqlbuffer opaqcore ${SQLPP_CONNECTOR_LIBRARY} ${SQLITE_LIBRARY})
+target_link_libraries(sqlbufferplugin sqlbuffer)
+
 target_link_libraries(asciiforecastwriter opaqcore)
 target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(rioobsprovider opaqcore)

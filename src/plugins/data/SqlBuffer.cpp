@@ -1,6 +1,5 @@
 #include "SqlBuffer.h"
 
-#include "PluginRegistration.h"
 #include "PredictionDatabase.h"
 #include "tools/XmlTools.h"
 
@@ -167,5 +166,3 @@ std::vector<std::string> SqlBuffer::getModelNames(const std::string& pollutantId
 }
 
 }
-
-OPAQ_REGISTER_PLUGIN(OPAQ::SqlBuffer);

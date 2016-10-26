@@ -799,6 +799,4 @@ std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()
     return std::chrono::duration_cast<std::chrono::seconds>(getBaseTimeResolution());
 }
 
-} /* namespace OPAQ */
-
-OPAQ_REGISTER_PLUGIN(OPAQ::Hdf5Buffer);
+}

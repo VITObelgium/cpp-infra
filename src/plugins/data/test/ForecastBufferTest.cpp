@@ -48,12 +48,12 @@ public:
     MOCK_METHOD0(componentManager, ComponentManager&());
 };
 
-class ForecastBufferTest : public TestWithParam<std::string>
+template <typename BufferType>
+class ForecastBufferTest : public Test
 {
 protected:
     ForecastBufferTest()
-    : _compMgr(Factory::createComponentManager(_engineMock))
-    , _buffer(nullptr)
+    : _buffer(&_concreteBuffer)
     {
         FileTools::del("test.db");
 
@@ -68,37 +68,36 @@ protected:
         doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
         auto* config = doc.FirstChildElement("config");
 
-        _compMgr.loadPlugin(GetParam(), fmt::format(TEST_BINARY_DIR "/" PLUGIN_PREFIX "{}" PLUGIN_EXT, GetParam()));
-        _buffer = &_compMgr.createComponent<ForecastBuffer>(GetParam(), GetParam(), config);
-    }
+        auto name = BufferType::name();
 
-    ~ForecastBufferTest()
-    {
-        _compMgr.destroyComponent(GetParam());
+        _buffer->configure(config, name, _engineMock);
     }
 
     EngineMock _engineMock;
-    ComponentManager _compMgr;
+    BufferType _concreteBuffer;
     ForecastBuffer* _buffer;
 };
 
-TEST_P(ForecastBufferTest, GetTimeResolution)
+using BufferTypes = testing::Types<Hdf5Buffer, SqlBuffer>;
+TYPED_TEST_CASE(ForecastBufferTest, BufferTypes);
+
+TYPED_TEST(ForecastBufferTest, GetTimeResolution)
 {
     EXPECT_EQ(24h, this->_buffer->getTimeResolution());
 }
 
-TEST_P(ForecastBufferTest, GetBaseTimeResolution)
+TYPED_TEST(ForecastBufferTest, GetBaseTimeResolution)
 {
     EXPECT_EQ(24h, this->_buffer->getBaseTimeResolution());
 }
 
-TEST_P(ForecastBufferTest, GetModelNamesEmpty)
+TYPED_TEST(ForecastBufferTest, GetModelNamesEmpty)
 {
     // no data in the buffer
     EXPECT_THROW(this->_buffer->getModelNames("pm10", Aggregation::DayAvg).empty(), NotAvailableException);
 }
 
-TEST_P(ForecastBufferTest, GetModelNames)
+TYPED_TEST(ForecastBufferTest, GetModelNames)
 {
     auto basetime = make_date_time(2015_y/jan/1);
     TimeSeries<double> forecast1, forecast2;
@@ -122,7 +121,7 @@ TEST_P(ForecastBufferTest, GetModelNames)
     EXPECT_THROW(this->_buffer->getModelNames("pm25", Aggregation::Max1h), NotAvailableException);
 }
 
-TEST_P(ForecastBufferTest, SetGetForecastValues)
+TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
 {
     auto basetime1 = make_date_time(2015_y / jan / 1);
     auto basetime2 = make_date_time(2015_y / jan / 2);
@@ -252,8 +251,6 @@ TEST_P(ForecastBufferTest, SetGetForecastValues)
 //    auto now = std::chrono::system_clock::now();
 //    EXPECT_THROW(db->getPrediction(now, "model1", "Ukkel", "pm10", "dayavg", 4_d), RunTimeException);
 //}
-
-INSTANTIATE_TEST_CASE_P(Forecast, ForecastBufferTest, Values(Hdf5Buffer::name(), SqlBuffer::name()));
 
 }
 }
