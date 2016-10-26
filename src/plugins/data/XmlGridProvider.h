@@ -1,42 +1,31 @@
-/*
- * XmlGridProvider.h
- *
- *  Created on: 2014
- *      Author: Stijn.VanLooy@vito.be
- */
-
-#ifndef XMLGRIDPROVIDER_H_
-#define XMLGRIDPROVIDER_H_
+#pragma once
 
 #include "Logger.h"
 #include "data/GridProvider.h"
 
-#include <algorithm>		// std::find
+#include <algorithm>
 
-namespace OPAQ {
+namespace OPAQ
+{
 
-class XmlGridProvider: public OPAQ::GridProvider {
+class XmlGridProvider : public GridProvider
+{
 public:
-	XmlGridProvider();
-	virtual ~XmlGridProvider();
+    XmlGridProvider();
 
-	static std::string name();
-
-	// OPAQ::Component methods
+    static std::string name();
 
     // throws BadConfigurationException
-	void configure (TiXmlElement * configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
-	// OPAQ::GridProvider methods
-
-	virtual Grid * getGrid() override {
-		return &_grid;
-	}
+    virtual Grid& getGrid() override
+    {
+        return _grid;
+    }
 
 private:
-	Grid _grid;
-	Logger _logger;
+    Grid _grid;
+    Logger _logger;
 };
 
-} /* namespace OPAQ */
-#endif /* XMLGRIDPROVIDER_H_ */
+}

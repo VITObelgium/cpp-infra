@@ -57,7 +57,6 @@ set (CORE_DATA_SOURCES
     data/DataProvider.cpp
     data/MeteoProvider.h
     data/GridProvider.h
-    data/GridProvider.cpp
     data/ForecastOutputWriter.h
     data/ForecastOutputWriter.cpp
 )

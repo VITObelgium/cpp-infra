@@ -17,9 +17,6 @@ XmlGridProvider::XmlGridProvider()
 : _logger("OPAQ::XmlGridProvider") {
 }
 
-XmlGridProvider::~XmlGridProvider() {
-}
-
 std::string XmlGridProvider::name()
 {
     return "xmlgridprovider";

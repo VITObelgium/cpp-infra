@@ -69,13 +69,10 @@ private:
     // station --> pollutant --> aggregation --> data
     std::map<std::string, std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>>> _buffer; //< the data buffer for the aggregations
 
-    TimeSeries<double>* _getTimeSeries(const std::string& pollutant,
+    TimeSeries<double>& _getTimeSeries(const std::string& pollutant,
                                        const std::string& station, Aggregation::Type aggr);
 
     void readFile(const std::string& pollutant);
-
-    TimeSeries<double>* _getOrInitValues(const std::string& pollutant,
-                                         Aggregation::Type aggr, const std::string& station);
 };
 
 } /* namespace OPAQ */
