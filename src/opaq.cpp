@@ -212,17 +212,13 @@ int main(int argc, char* argv[])
         logger->info(OPAQ::chrono::to_string(basetime));
 #endif
 
-    // validate configuration
-    ch.validateConfiguration(pollutantMgr);
-
-    /* -----------------------------------------------------------------------------------
-     Starting Engine...
-     --------------------------------------------------------------------------------- */
-
     OPAQ::Engine engine(pollutantMgr);
 
     try
     {
+        // validate configuration
+        ch.validateConfiguration(pollutantMgr);
+
         engine.prepareRun(ch.getOpaqRun());
         engine.run(ch.getOpaqRun());
     }

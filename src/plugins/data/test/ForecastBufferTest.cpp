@@ -276,5 +276,30 @@ TYPED_TEST(ForecastBufferTest, SecondTimeBeforeFirstTime)
     EXPECT_THROW(this->_buffer->getForecastValues(1_d, basetime + 24h, basetime, "Ukkel", "pm10", Aggregation::DayAvg), RunTimeException);
 }
 
+TYPED_TEST(ForecastBufferTest, GetModelValues)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast1, forecast2;
+    forecast1.insert(basetime + fcHor, 1.5);
+    forecast1.insert(basetime + fcHor + 24h, 2.5);
+
+    forecast2.insert(basetime + fcHor, 10.5);
+    forecast2.insert(basetime + fcHor + 24h, 20.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    this->_buffer->setCurrentModel("model2");
+    this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getModelValues(basetime, fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
+    EXPECT_THAT(results, ContainerEq(std::vector<double>{ 1.5, 10.5 }));
+
+    results = this->_buffer->getModelValues(basetime, fcHor * 2, "Ukkel", "pm10", Aggregation::DayAvg);
+    EXPECT_THAT(results, ContainerEq(std::vector<double>{ 2.5, 20.5 }));
+}
+
 }
 }

@@ -139,9 +139,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     TiXmlElement* pluginElement = pluginsElement->FirstChildElement("plugin");
     while (pluginElement)
     {
-
-        std::string fullname = pluginElement->GetText();
-        fullname             = pluginPath + "/" + fullname;
+        auto fullname = fmt::format("{}/{}" PLUGIN_EXT, pluginPath, pluginElement->GetText());
 
         Config::Plugin plugin;
         plugin.name    = pluginElement->Attribute("name");
