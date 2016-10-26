@@ -38,7 +38,6 @@ Hdf5Buffer::Hdf5Buffer()
 : _logger("Hdf5Buffer")
 , _stringType(H5::StrType(0, H5T_VARIABLE))
 , _noData(-9999)
-, _baseTimeSet(false)
 {
     // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
     H5::Exception::dontPrint();
@@ -65,7 +64,7 @@ void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& compo
     // forecast time resolution...
     _baseTimeResolution = std::chrono::hours(XmlTools::getChildValue(configuration, "basetime_resolution", 24));
     _fcTimeResolution = std::chrono::hours(XmlTools::getChildValue(configuration, "fctime_resolution", 24));
-    
+
     FileTools::exists(filename) ? openFile(filename) : createFile(filename);
 }
 

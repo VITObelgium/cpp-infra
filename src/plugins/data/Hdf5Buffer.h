@@ -170,7 +170,7 @@ public:
 private:
     std::chrono::seconds getBaseTimeResolutionInSeconds();
     void throwIfNotConfigured() const;
-    
+
     void createFile(const std::string& filename);
     void openFile(const std::string& filename);
 
@@ -194,8 +194,6 @@ private:
 
     chrono::date_time _baseTime; //!< the basetime against which to offset the intervals given by the
                                  //!< getValues and setValues routines
-
-    bool _baseTimeSet; //!< Flag, true if a basetime was given to the
 };
 
 } /* namespace OPAQ */
