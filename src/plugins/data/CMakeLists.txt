@@ -10,6 +10,7 @@ if (hdf5_FOUND)
         Hdf5BufferPlugin.cpp
     )
 
+    set_target_properties(hdf5buffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
     target_link_libraries(hdf5buffer opaqcore hdf5_cpp-static)
     target_link_libraries(hdf5bufferplugin hdf5buffer)
 endif ()
@@ -65,6 +66,7 @@ add_library(xmlgridprovider ${PLUGIN_TYPE}
     XmlGridProvider.cpp
 )
 
+set_target_properties(sqlbuffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(sqlbuffer opaqcore ${SQLPP_CONNECTOR_LIBRARY} ${SQLITE_LIBRARY})
 target_link_libraries(sqlbufferplugin sqlbuffer)
 
