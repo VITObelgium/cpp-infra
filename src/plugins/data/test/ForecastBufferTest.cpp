@@ -150,8 +150,6 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
 TYPED_TEST(ForecastBufferTest, SetGetForecastSingleValue)
 {
     auto basetime1 = make_date_time(2015_y / jan / 1);
-    auto basetime2 = make_date_time(2015_y / jan / 2);
-
     auto fcHor = 1_d;
 
     TimeSeries<double> forecast1;
@@ -186,7 +184,7 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtEnd)
         basetime + fcHor + 48h,
         basetime + fcHor + 72h
     }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ _noData, _noData }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ this->_noData, this->_noData }));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtFront)
@@ -207,7 +205,7 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtFront)
         basetime - 24h,
         basetime
     }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ _noData, _noData }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ this->_noData, this->_noData }));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRangeAtFront)
@@ -228,7 +226,7 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRange
         basetime,
         basetime + fcHor
     }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ _noData, 1.5 }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ this->_noData, 1.5 }));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRangeAtEnd)
@@ -248,7 +246,7 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRange
         basetime + fcHor,
         basetime + fcHor + 24h
     }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, _noData }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, this->_noData }));
 }
 
 TYPED_TEST(ForecastBufferTest, OverwriteValue)

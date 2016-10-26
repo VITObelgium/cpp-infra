@@ -581,7 +581,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
         ssize_t startIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count();
         ssize_t endIndex = startIndex + nvals;
 
-        hsize_t btStartIndex = std::max(0ll, startIndex);
+        hsize_t btStartIndex = std::max(ssize_t(0), startIndex);
         hsize_t btEndIndex = std::min(endIndex, static_cast<ssize_t>(btSize));
 
         // Prepend nodata values
