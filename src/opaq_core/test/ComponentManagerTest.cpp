@@ -3,6 +3,8 @@
 
 #include "Engine.h"
 #include "ComponentManagerFactory.h"
+#include "config.h"
+#include "testconfig.h"
 
 namespace OPAQ
 {
@@ -44,7 +46,7 @@ TEST_F(ComponentManagerTest, LoadPlugin)
     doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
     auto* config = doc.FirstChildElement("config");
 
-    _cmpMgr.loadPlugin("sqlbuffer", "sqlbuffer" PLUGIN_EXT);
+    _cmpMgr.loadPlugin("sqlbuffer", TEST_BINARY_DIR "/" PLUGIN_PREFIX "sqlbufferplugin" PLUGIN_EXT);
     auto& comp = _cmpMgr.createComponent<Component>("sqlbuffer", "sqlbuffer", config);
     EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("sqlbuffer"));
 }
