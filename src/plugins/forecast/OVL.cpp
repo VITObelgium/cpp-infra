@@ -407,6 +407,6 @@ void OVL::run()
     } // loop over the stations
 }
 
-} /* namespace OPAQ */
+OPAQ_REGISTER_STATIC_PLUGIN(OVL)
 
-OPAQ_REGISTER_PLUGIN(OPAQ::OVL);
+} /* namespace OPAQ */

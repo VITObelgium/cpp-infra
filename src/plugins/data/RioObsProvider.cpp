@@ -6,6 +6,7 @@
  */
 
 #include "RioObsProvider.h"
+#include "PluginRegistration.h"
 #include "ObsParser.h"
 
 #include "tools/StringTools.h"
@@ -183,5 +184,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
 
     _buffer[pollutant] = readObservationsFile(file, _aqNetworkProvider->getAQNetwork(), _nvalues, _timeResolution);
 }
+
+OPAQ_REGISTER_STATIC_PLUGIN(RioObsProvider)
 
 }

@@ -93,6 +93,6 @@ OPAQ::AQNetwork& XMLAQNetProvider::getAQNetwork()
     return _net;
 }
 
-} /* namespace OPAQ */
+OPAQ_REGISTER_STATIC_PLUGIN(XMLAQNetProvider)
 
-OPAQ_REGISTER_PLUGIN(OPAQ::XMLAQNetProvider);
+}

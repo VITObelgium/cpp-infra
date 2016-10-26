@@ -1,4 +1,4 @@
 #include "SqlBuffer.h"
 #include "PluginRegistration.h"
 
-OPAQ_REGISTER_PLUGIN(OPAQ::SqlBuffer);
+OPAQ_REGISTER_DYNAMIC_PLUGIN(OPAQ::SqlBuffer);

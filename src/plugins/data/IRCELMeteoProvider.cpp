@@ -299,6 +299,6 @@ OPAQ::TimeSeries<double>* IRCELMeteoProvider::_getOrInit(const std::string& mete
     return out;
 }
 
-} /* namespace OPAQ */
+OPAQ_REGISTER_STATIC_PLUGIN(IRCELMeteoProvider)
 
-OPAQ_REGISTER_PLUGIN(OPAQ::IRCELMeteoProvider);
+} /* namespace OPAQ */

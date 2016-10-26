@@ -139,4 +139,3 @@ int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
 }
 }
 
-OPAQ_REGISTER_PLUGIN(OPAQ::OVL_IRCEL_model1);

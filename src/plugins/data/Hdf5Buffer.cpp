@@ -735,4 +735,6 @@ std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()
     return std::chrono::duration_cast<std::chrono::seconds>(getBaseTimeResolution());
 }
 
+OPAQ_REGISTER_STATIC_PLUGIN(Hdf5Buffer)
+
 }

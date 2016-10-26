@@ -83,6 +83,6 @@ void XmlGridProvider::configure(TiXmlElement * configuration, const std::string&
 		throw BadConfigurationException("no cells defined in grid");
 }
 
-} /* namespace OPAQ */
+OPAQ_REGISTER_STATIC_PLUGIN(XmlGridProvider)
 
-OPAQ_REGISTER_PLUGIN(OPAQ::XmlGridProvider)
+}

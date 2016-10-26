@@ -44,10 +44,6 @@ FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::stri
 
 }
 
-#ifdef STATIC_PLUGINS
-#define OPAQ_REGISTER_PLUGIN(TYPE) \
-    static auto s_pluginReg  = OPAQ::PluginRegistration<TYPE>(TYPE::name());
-#else
 /**
  * \brief Macro to register a class as being an OPAQ component.
  * When writing new components, a user should add this macro statement to
@@ -56,12 +52,14 @@ FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::stri
  *
  *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
  */
-#define OPAQ_REGISTER_PLUGIN(TYPE)                                                       \
+#define OPAQ_REGISTER_DYNAMIC_PLUGIN(TYPE)                                               \
     OPAQ_DLL_API OPAQ::Component* factory(LogConfiguration* logConfig)                   \
     {                                                                                    \
         Log::initLogger(*logConfig);                                                     \
         return new TYPE();                                                               \
     }
 
-#endif
+
+#define OPAQ_REGISTER_STATIC_PLUGIN(TYPE)                                               \
+    static auto s_pluginReg = PluginRegistration<TYPE>(TYPE::name());
 
