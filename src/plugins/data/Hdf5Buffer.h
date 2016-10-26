@@ -18,7 +18,6 @@ class Hdf5Buffer : public OPAQ::ForecastBuffer
 {
 public:
     Hdf5Buffer();
-    virtual ~Hdf5Buffer();
 
     static std::string name();
 
@@ -169,9 +168,18 @@ public:
    */
 
 private:
+    std::chrono::seconds getBaseTimeResolutionInSeconds();
+    void throwIfNotConfigured() const;
+    
+    void createFile(const std::string& filename);
+    void openFile(const std::string& filename);
+
+    //  int _getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &parameter);
+    //  unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
+    //  void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
+
     Logger _logger;
-    std::string _filename; //!< filename for the buffer file
-    H5::H5File* _h5file;   //!< HDF5 file handle for the buffer file
+    std::unique_ptr<H5::H5File> _h5file;   //!< HDF5 file handle for the buffer file
 
     H5::DataSet _parametersSet, _stationsSet;
     H5::StrType _stringType;
@@ -187,36 +195,7 @@ private:
     chrono::date_time _baseTime; //!< the basetime against which to offset the intervals given by the
                                  //!< getValues and setValues routines
 
-    bool _configured;  //!< Flag, true if the OPAQ::Component configuration went well
     bool _baseTimeSet; //!< Flag, true if a basetime was given to the
-
-private:
-    void _closeFile();
-
-    std::chrono::seconds getBaseTimeResolutionInSeconds();
-
-    /**
-   * Checks whether the basetime is set and the configuration is succesful
-   */
-    void _checkFullyConfigured();
-    /**
-   * Checks whether the file exists and open it
-   * Note:: we always ope in RDWR mode, even only for read only operations...
-   *        this might be a bit dangerous...
-   */
-    void _checkIfExistsAndOpen();
-
-    // throws BadConfigurationException
-    void _createOrOpenFile();
-
-    void _createFile(const std::string& filename);
-
-    // throws BadConfigurationException
-    void _openFile(const std::string& filename);
-
-    //  int _getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &parameter);
-    //  unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
-    //  void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
 };
 
 } /* namespace OPAQ */

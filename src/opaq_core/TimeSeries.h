@@ -121,14 +121,14 @@ public:
     }
 
     // throws OutOfBoundsException
-    chrono::date_time datetime(unsigned int i) const
+    chrono::date_time datetime(size_t i) const
     {
         if (i >= size()) throw RunTimeException("index out of range");
         return _datetimes.at(i);
     }
 
     // throws OutOfBoundsException
-    T value(unsigned int i) const
+    T value(size_t i) const
     {
         if (i >= size()) throw RunTimeException("index out of range");
         return _values.at(i);

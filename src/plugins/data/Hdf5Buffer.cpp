@@ -8,9 +8,10 @@
 #include "Hdf5Buffer.h"
 #include "Hdf5Tools.h"
 #include "PluginRegistration.h"
+#include "tools/XmlTools.h"
 
-#include <tinyxml.h>
 #include <algorithm>
+#include <tinyxml.h>
 
 namespace OPAQ
 {
@@ -36,21 +37,11 @@ static const char* s_noData = "n/a";
 Hdf5Buffer::Hdf5Buffer()
 : _logger("Hdf5Buffer")
 , _stringType(H5::StrType(0, H5T_VARIABLE))
+, _noData(-9999)
+, _baseTimeSet(false)
 {
-
     // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
     H5::Exception::dontPrint();
-
-    _h5file      = NULL;
-    _noData      = -9999;
-    _configured  = false;
-    _baseTimeSet = false;
-    //_offset      = 0;
-}
-
-Hdf5Buffer::~Hdf5Buffer()
-{
-    _closeFile();
 }
 
 std::string Hdf5Buffer::name()
@@ -62,48 +53,20 @@ void Hdf5Buffer::configure(TiXmlElement* configuration, const std::string& compo
 {
     setName(componentName);
 
-    if (_configured) _closeFile();
-
     if (!configuration)
+    {
         throw NullPointerException("No configuration element given for Hdf5Buffer...");
-
-    // 1. parse filename
-    TiXmlElement* fileEl = configuration->FirstChildElement("filename");
-    if (!fileEl)
-        throw BadConfigurationException("filename element not found");
-    _filename = fileEl->GetText();
-
-    // 2. parse start date
-    /*
-  TiXmlElement * offsetEl = configuration->FirstChildElement("offset");
-  if (!offsetEl)
-    throw BadConfigurationException("offset element not found");
-  _offset = atoi(offsetEl->GetText());
-   */
-
-    // 3. need to specify the time interval for which to store these values...
-    //    this has to be generic, the baseTime resolution can be different from the
-    //    forecast time resolution...
-    TiXmlElement* baseResEl = configuration->FirstChildElement("basetime_resolution");
-    if (!baseResEl) {
-        _baseTimeResolution = 24h;
-    }
-    else
-    {
-        _baseTimeResolution = std::chrono::hours(atoi(baseResEl->GetText()));
     }
 
-    TiXmlElement* fcResEl = configuration->FirstChildElement("fctime_resolution");
-    if (!fcResEl) {
-        _fcTimeResolution = 24h;
-    }
-    else
-    {
-        _fcTimeResolution = std::chrono::hours(atoi(fcResEl->GetText()));
-    }
+    auto filename = XmlTools::getChildValue<std::string>(configuration, "filename");
 
-    _createOrOpenFile();
-    _configured = true;
+    // need to specify the time interval for which to store these values...
+    // this has to be generic, the baseTime resolution can be different from the
+    // forecast time resolution...
+    _baseTimeResolution = std::chrono::hours(XmlTools::getChildValue(configuration, "basetime_resolution", 24));
+    _fcTimeResolution = std::chrono::hours(XmlTools::getChildValue(configuration, "fctime_resolution", 24));
+    
+    FileTools::exists(filename) ? openFile(filename) : createFile(filename);
 }
 
 void Hdf5Buffer::setNoData(double noData)
@@ -116,44 +79,34 @@ double Hdf5Buffer::getNoData()
     return _noData;
 }
 
-/*
-void Hdf5Buffer::setBaseTime(const DateTime & baseTime)
-  throw (BadConfigurationException) {
-
-  this->_baseTime = DateTimeTools::floor(baseTime, DateTimeTools::FIELD_DAY);
-  if (_configured) _calcStartDateAndOpenFile();
-  _baseTimeSet = true;
-
-  return;
-}
-*/
-
-/* =================================================================================
-   Set the values of the given forecast for the given baseTime
-   ============================================================================== */
 void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
                            const TimeSeries<double>& forecast,
                            const std::string& stationId,
                            const std::string& pollutantId,
                            Aggregation::Type aggr)
 {
+    throwIfNotConfigured();
 
-    // -- check whether we have our configuration
-    if (!_configured) throw RunTimeException("Hdf5Buffer Not fully configured");
-
-    // -- do nothing if no values are given
-    if (forecast.size() == 0) return;
+    if (forecast.isEmpty())
+    {
+        return;
+    }
 
     // -- check whether the forecast array is sequential
-    for (unsigned int i = 0; i < forecast.size(); i++)
+    for (size_t i = 0; i < forecast.size(); ++i)
     {
-        if (forecast.datetime(i) < baseTime) throw RunTimeException("Expecting forecasts in the future");
+        if (forecast.datetime(i) < baseTime)
+        {
+            throw RunTimeException("Expecting forecasts in the future");
+        }
 
         auto secs = chrono::to_seconds(forecast.datetime(i) - baseTime);
 
         // this allows for setting forecast values one by one...
         if ((secs.count() % std::chrono::seconds(_fcTimeResolution).count()) != 0)
+        {
             throw RunTimeException("Provided values should be ordered & spaced by time resolution");
+        }
     }
 
     // -- locate or create the groups in the file, 4 levels
@@ -289,7 +242,6 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
     std::cout << "modelIndex= " << modelIndex << ", stationIndex= " << stationIndex << ", dateIndex=" << dateIndex << ", fcIndex = " << fhIndex << std::endl;
 #endif
 
-
     try
     {
         // -- store data
@@ -353,57 +305,20 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
     }
 }
 
-void Hdf5Buffer::_closeFile()
+void Hdf5Buffer::throwIfNotConfigured() const
 {
-    if (_h5file != nullptr) {
-        _h5file->close();
-        delete _h5file;
+    if (!_h5file)
+    {
+        throw RunTimeException("Hdf5Buffer Not fully configured");
     }
 }
 
-void Hdf5Buffer::_checkFullyConfigured()
+void Hdf5Buffer::createFile(const std::string& filename)
 {
-    if (!_configured) throw RunTimeException("Hdf5Buffer Not fully configured");
-}
-
-void Hdf5Buffer::_checkIfExistsAndOpen()
-{
-    if (_h5file == nullptr) {
-        if (!FileTools::exists(_filename))
-        {
-            throw RunTimeException("Cannot read from non existing file: {}", _filename);
-        }
-
-        _openFile(_filename);
-    }
-
-    return;
-}
-
-void Hdf5Buffer::_createOrOpenFile()
-{
-
-    if (_h5file == NULL) { // don't open a new file if another base time is set
-
-        if (FileTools::exists(_filename)) {
-            _openFile(_filename);
-        }
-        else
-        {
-            _createFile(_filename);
-        }
-    }
-
-    return;
-}
-
-void Hdf5Buffer::_createFile(const std::string& filename)
-{
-
     // Create a new file if not exists file
     try
     {
-        _h5file = new H5::H5File(filename, H5F_ACC_TRUNC);
+        _h5file = std::make_unique<H5::H5File>(filename, H5F_ACC_TRUNC);
     }
     catch (const H5::FileIException&)
     {
@@ -420,64 +335,34 @@ void Hdf5Buffer::_createFile(const std::string& filename)
 
         att = rootGroup.createAttribute("HDF5BUFFER_VERSION", _stringType, att_space);
         att.write(_stringType, Hdf5BufferVersion);
-        att.close();
-
-        rootGroup.close();
     }
-    catch (const H5::FileIException&)
+    catch (const H5::Exception&)
     {
         throw BadConfigurationException("Failed to initialise OPAQ HDF5 forecast buffer...");
     }
 }
 
-void Hdf5Buffer::_openFile(const std::string& filename)
+void Hdf5Buffer::openFile(const std::string& filename)
 {
-
-    // 1. open file
     try
     {
-        _h5file = new H5::H5File(filename, H5F_ACC_RDWR);
+        _h5file = std::make_unique<H5::H5File>(filename, H5F_ACC_RDWR);
     }
     catch (const H5::FileIException&)
     {
-        std::stringstream ss;
-        ss << "Failed to open file " << filename
-           << " (is it a valid HDF5 file?)";
-        throw BadConfigurationException(ss.str());
+        throw BadConfigurationException("Failed to open file {} (is it a valid HDF5 file?)", filename);
     }
 }
 
 std::chrono::hours Hdf5Buffer::getTimeResolution()
 {
-    return _fcTimeResolution; // return time resolution of the forecasts
+    return _fcTimeResolution;
 }
 
 std::chrono::hours Hdf5Buffer::getBaseTimeResolution()
 {
     return _baseTimeResolution;
 }
-
-/*
-std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange() {
-  return getRange(ForecastHorizon(0));
-}
-
-std::pair<const TimeInterval, const TimeInterval> Hdf5Buffer::getRange(
-               const ForecastHorizon & forecastHorizon) {
-
-
-  _checkFullyConfigured();
-  DateTime begin = _startDate;
-  begin.addSeconds(forecastHorizon.getSeconds());
-  DateTime end = begin;
-   end.addDays(size() - 1);
-  TimeInterval beginOffset(_baseTime, begin);
-  TimeInterval endOffset(_baseTime, end);
-  return std::pair<const TimeInterval, const TimeInterval>(beginOffset,
-                               endOffset);
-
-}
-  */
 
 TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
                                          const chrono::date_time& t2,
@@ -487,12 +372,7 @@ TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
 {
     // return the observations stored...
     // this routine is inherited from the DataProvider...
-
-    // what to return here ??
     throw RunTimeException("not sure what to return here, need extra information ???");
-
-    OPAQ::TimeSeries<double> out;
-    return out;
 }
 
 TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& baseTime,
@@ -502,9 +382,6 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& baseTi
                                                  Aggregation::Type aggr)
 {
     throw RunTimeException("IMPLEMENT ME !!");
-
-    OPAQ::TimeSeries<double> out;
-    return out;
 }
 
 // return hindcast vector of model values for a fixed forecast horizon
@@ -516,7 +393,6 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
                                                  const std::string& pollutantId,
                                                  Aggregation::Type aggr)
 {
-
     if (fcTime1 > fcTime2)
     {
         throw RunTimeException("requested fcTime1 is > fcTime2...");
@@ -561,28 +437,25 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
     hsize_t modelSize = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
     hsize_t stSize    = Hdf5Tools::getDataSetSize(dsVals, 1);
     hsize_t btSize    = Hdf5Tools::getDataSetSize(dsVals, 2);
-    hsize_t fhSize = Hdf5Tools::getDataSetSize(dsVals, 3);
+    hsize_t fhSize    = Hdf5Tools::getDataSetSize(dsVals, 3);
 
-    //
-    if (fhIndex >= fhSize ||
-        modelIndex >= modelSize ||
-        stIndex >= stSize) {
+    if (fhIndex >= fhSize || modelIndex >= modelSize || stIndex >= stSize)
+    {
         throw RunTimeException("Could not find requested forecast horizon/model/station in HDF5 buffer");
     }
 
-    // compute the index for the base time of the first forecastTime
-
     try
     {
-        auto b1 = fcTime1 - fc_hor;
+        // compute the index for the base time of the first forecastTime
+        auto b1      = fcTime1 - fc_hor;
         size_t nvals = (chrono::to_seconds(fcTime2 - fcTime1).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
         OPAQ::TimeSeries<double> out;
         ssize_t startIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count();
-        ssize_t endIndex = startIndex + nvals;
+        ssize_t endIndex   = startIndex + nvals;
 
         hsize_t btStartIndex = std::max(ssize_t(0), startIndex);
-        hsize_t btEndIndex = std::min(endIndex, static_cast<ssize_t>(btSize));
+        hsize_t btEndIndex   = std::min(endIndex, static_cast<ssize_t>(btSize));
 
         // Prepend nodata values
         auto currentBasetime = fcTime1;
@@ -600,8 +473,8 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
             // "model x station x baseTime x fcHorizon"
             H5::DataSpace space = dsVals.getSpace();
 
-            hsize_t dc[4] = { 1, 1, valuesWithinDataSet, 1 };
-            hsize_t doffset[4] = { modelIndex, stIndex, btStartIndex, fhIndex };
+            hsize_t dc[4]      = {1, 1, valuesWithinDataSet, 1};
+            hsize_t doffset[4] = {modelIndex, stIndex, btStartIndex, fhIndex};
             space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
 
             hsize_t memOffset = 0;
@@ -666,9 +539,8 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
     }
 
     unsigned int stIndex = Hdf5Tools::getIndexInStringDataSet(dsStations, stationId);
-    size_t btIndex       = chrono::to_seconds(baseTime - startTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
-    size_t fhIndex       = std::chrono::duration_cast<std::chrono::seconds>(fc_hor).count() /
-                     std::chrono::duration_cast<std::chrono::seconds>(_fcTimeResolution).count();
+    size_t btIndex       = (baseTime - startTime) / getBaseTimeResolutionInSeconds();
+    size_t fhIndex       = fc_hor / _fcTimeResolution;
 
 #ifdef DEBUG
     std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << "\n";
@@ -676,51 +548,47 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
 
     hsize_t nvals = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
 
-    // initialize the output array with the number of requested values
-    std::vector<double> out(nvals, getNoData());
-
     // now get the size of the dataset in the buffer
     hsize_t btSize = Hdf5Tools::getDataSetSize(dsVals, 2);
     hsize_t fhSize = Hdf5Tools::getDataSetSize(dsVals, 3);
 
     // is the station/forecast/base time in the datafile ?
-    if (fhIndex < fhSize && btIndex < btSize)
+    if (fhIndex >= fhSize || btIndex >= btSize)
+    {
+        throw RunTimeException("Requested forecast horizon index not in HDF5 buffer");
+    }
+
+    try
     {
         // "model x station x baseTime x fcHorizon"
 
-        H5::DataSpace space = dsVals.getSpace();
-        hsize_t dc[4]       = {nvals, 1, 1, 1};
-        hsize_t doffset[4]  = {0, stIndex, btIndex, fhIndex};
+        // initialize the output array with the number of requested values
+        std::vector<double> out(nvals);
+
+        auto space         = dsVals.getSpace();
+        hsize_t dc[4]      = {nvals, 1, 1, 1};
+        hsize_t doffset[4] = {0, stIndex, btIndex, fhIndex};
         space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
 
         hsize_t memOffset = 0;
         H5::DataSpace memSpace(1, &nvals);
         memSpace.selectHyperslab(H5S_SELECT_SET, &nvals, &memOffset);
 
-        try
-        {
-            dsVals.read(out.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
-            space.close();
-        }
-        catch (const H5::DataSetIException&)
-        {
-            space.close();
-            throw RunTimeException("Failed to read value from HDF5 buffer");
-        }
+        dsVals.read(out.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
+        return out;
     }
-    else
-        throw RunTimeException("Requested forecast horizon index not in HDF5 buffer");
-
-    return out;
+    catch (const H5::DataSetIException& e)
+    {
+        throw RunTimeException("Failed to read value from HDF5 buffer ({})", e.getDetailMsg());
+    }
 }
 
 std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr)
 {
     try
     {
-        auto grpPol  = _h5file->openGroup(pollutantId);
-        auto grpAggr = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
-
+        auto grpPol   = _h5file->openGroup(pollutantId);
+        auto grpAggr  = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
         auto dsModels = grpAggr.openDataSet(MODELS_DATASET_NAME);
         return Hdf5Tools::readStringData(dsModels);
     }
@@ -732,7 +600,7 @@ std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantI
 
 std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()
 {
-    return std::chrono::duration_cast<std::chrono::seconds>(getBaseTimeResolution());
+    return chrono::to_seconds(getBaseTimeResolution());
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(Hdf5Buffer)
