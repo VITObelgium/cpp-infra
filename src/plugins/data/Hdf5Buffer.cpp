@@ -10,6 +10,7 @@
 #include "PluginRegistration.h"
 
 #include <tinyxml.h>
+#include <algorithm>
 
 namespace OPAQ
 {
@@ -516,7 +517,10 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
                                                  Aggregation::Type aggr)
 {
 
-    if (fcTime1 > fcTime2) throw RunTimeException("requested fcTime1 is > fcTime2...");
+    if (fcTime1 > fcTime2)
+    {
+        throw RunTimeException("requested fcTime1 is > fcTime2...");
+    }
 
     H5::DataSet dsVals, dsStations, dsModels;
     H5::Group grpPol, grpAggr;
@@ -556,7 +560,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
 
     hsize_t modelSize = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
     hsize_t stSize    = Hdf5Tools::getDataSetSize(dsVals, 1);
-    //hsize_t btSize    = Hdf5Tools::getDataSetSize(dsVals, 2);
+    hsize_t btSize    = Hdf5Tools::getDataSetSize(dsVals, 2);
     hsize_t fhSize = Hdf5Tools::getDataSetSize(dsVals, 3);
 
     //
@@ -567,106 +571,59 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
     }
 
     // compute the index for the base time of the first forecastTime
-    auto b1      = fcTime1 - fc_hor;
-    auto b2      = fcTime2 - fc_hor;
-    size_t nvals = (chrono::to_seconds(b2 - b1).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
     try
     {
+        auto b1 = fcTime1 - fc_hor;
+        size_t nvals = (chrono::to_seconds(fcTime2 - fcTime1).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
         OPAQ::TimeSeries<double> out;
-        if (b2 < startTime) {
-            // we have no values in the buffer, so return all -9999
-            for (chrono::date_time fct = fcTime1; fct <= fcTime2; fct = fct + _baseTimeResolution)
-                out.insert(fct, _noData);
-        }
-        else if (b1 < startTime)
+        ssize_t startIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count();
+        ssize_t endIndex = startIndex + nvals;
+
+        hsize_t btStartIndex = std::max(0ll, startIndex);
+        hsize_t btEndIndex = std::min(endIndex, static_cast<ssize_t>(btSize));
+
+        // Prepend nodata values
+        auto currentBasetime = fcTime1;
+        for (ssize_t i = startIndex; i < 0; ++i)
         {
-    // first forecast time before the start time...
+            out.insert(currentBasetime, _noData);
+            currentBasetime += _baseTimeResolution;
+        }
 
-    #ifdef DEBUG
-            std::cout << "startTime : " << startTime << std::endl;
-            std::cout << "forecat horizon : " << fc_hor.count() << std::endl;
-            std::cout << "basetime for fcTime1 : " << b1 << std::endl;
-            std::cout << "basetime for fcTime2 : " << b2 << std::endl;
-    #endif
+        if (btEndIndex > btStartIndex)
+        {
+            auto valuesWithinDataSet = btEndIndex - btStartIndex;
 
-            // number of elements before the HDF5 buffer
-            size_t n_before = chrono::to_seconds(startTime - b1).count() / getBaseTimeResolutionInSeconds().count();       // number of steps before buffer start
-            size_t n_inside = (chrono::to_seconds(b2 - startTime).count() / getBaseTimeResolutionInSeconds().count()) + 1; // number of steps inside buffer
-
-            if ((n_before + n_inside) != nvals) {
-    #ifdef DEBUG
-                std::cout << "nvals = " << nvals << std::endl;
-                std::cout << "n_before = " << n_before << std::endl;
-                std::cout << "n_inside = " << n_inside << std::endl;
-    #endif
-                throw RunTimeException("Strange things are happening... everyday... i hear the music... up above my head !");
-            }
-
-            // completely within the period
-            std::vector<double> tmp(n_inside);
-
+            std::vector<double> tmp(valuesWithinDataSet);
             // "model x station x baseTime x fcHorizon"
             H5::DataSpace space = dsVals.getSpace();
-            hsize_t dc[4]       = {1, 1, n_inside, 1};
-            hsize_t doffset[4]  = {modelIndex, stIndex, 0, fhIndex};
+
+            hsize_t dc[4] = { 1, 1, valuesWithinDataSet, 1 };
+            hsize_t doffset[4] = { modelIndex, stIndex, btStartIndex, fhIndex };
             space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
 
-            hsize_t mc[1]      = {n_inside};
-            hsize_t moffset[1] = {0};
-            H5::DataSpace memSpace(1, mc);
-            memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
+            hsize_t memOffset = 0;
+            H5::DataSpace memSpace(1, &valuesWithinDataSet);
+            memSpace.selectHyperslab(H5S_SELECT_SET, &valuesWithinDataSet, &memOffset);
 
             dsVals.read(tmp.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
-            space.close();
 
-            // TODO make this more efficient !!
-            //      --> enable to directly dump into the timeseries object... let's worry about this later...
-            auto fct = fcTime1;
-            for (unsigned int ii = 0; ii < n_before; ii++)
+            for (auto value : tmp)
             {
-                out.insert(fct, _noData);
-                fct = fct + _baseTimeResolution;
-            }
-            for (unsigned int ii = 0; ii < n_inside; ii++)
-            {
-                out.insert(fct, tmp[ii]);
-                fct = fct + _baseTimeResolution;
+                out.insert(currentBasetime, value);
+                currentBasetime += _baseTimeResolution;
             }
         }
-        else
+
+        ssize_t appendCount = endIndex - (btStartIndex > btSize ? startIndex : btSize);
+
+        // Append no data values
+        for (int i = 0; i < appendCount; ++i)
         {
-            // completely within the period
-            std::vector<double> tmp(nvals);
-            size_t btIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count(); // integer division... should be ok !
-
-            // "model x station x baseTime x fcHorizon"
-            H5::DataSpace space = dsVals.getSpace();
-            hsize_t dc[4]       = {1, 1, nvals, 1};
-            hsize_t doffset[4]  = {modelIndex, stIndex, btIndex, fhIndex};
-            space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
-
-            hsize_t mc[1]      = {nvals};
-            hsize_t moffset[1] = {0};
-            H5::DataSpace memSpace(1, mc);
-            memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
-
-#ifdef DEBUG
-            std::cout << "Read values: " << fmt::format("{}x{}x{}x{}", modelIndex, stIndex, btIndex, fhIndex) << std::endl;
-#endif
-
-            dsVals.read(tmp.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
-            space.close();
-
-            // TODO make this more efficient !!
-            //      --> enable to directly dump into the timeseries object... let's worry about this later...
-            auto fct = fcTime1;
-            for (unsigned int ii = 0; ii < nvals; ii++)
-            {
-                out.insert(fct, tmp[ii]);
-                fct = fct + _baseTimeResolution;
-            }
+            out.insert(currentBasetime, _noData);
+            currentBasetime += _baseTimeResolution;
         }
 
         return out;
@@ -717,7 +674,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
     std::cout << "getModelValues : stIndex= " << stIndex << ", btIndex=" << btIndex << ", fhIndex = " << fhIndex << "\n";
 #endif
 
-    unsigned int nvals = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
+    hsize_t nvals = Hdf5Tools::getDataSetSize(dsVals, 0); // index 0 is models
 
     // initialize the output array with the number of requested values
     std::vector<double> out(nvals, getNoData());
@@ -736,14 +693,13 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
         hsize_t doffset[4]  = {0, stIndex, btIndex, fhIndex};
         space.selectHyperslab(H5S_SELECT_SET, dc, doffset);
 
-        hsize_t mc[1]      = {nvals};
-        hsize_t moffset[1] = {0};
-        H5::DataSpace memSpace(1, mc);
-        memSpace.selectHyperslab(H5S_SELECT_SET, mc, moffset);
+        hsize_t memOffset = 0;
+        H5::DataSpace memSpace(1, &nvals);
+        memSpace.selectHyperslab(H5S_SELECT_SET, &nvals, &memOffset);
 
         try
         {
-            dsVals.read(&out[0], H5::PredType::NATIVE_DOUBLE, memSpace, space);
+            dsVals.read(out.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
             space.close();
         }
         catch (const H5::DataSetIException&)
@@ -760,38 +716,18 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
 
 std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr)
 {
-
-    std::vector<std::string> out;
-
-    H5::DataSet dsModels;
-    H5::Group grpPol, grpAggr;
-    // now open groups etc...
     try
     {
-        grpPol  = _h5file->openGroup(pollutantId);
-        grpAggr = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
+        auto grpPol  = _h5file->openGroup(pollutantId);
+        auto grpAggr = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
 
-        dsModels = grpAggr.openDataSet(MODELS_DATASET_NAME);
+        auto dsModels = grpAggr.openDataSet(MODELS_DATASET_NAME);
+        return Hdf5Tools::readStringData(dsModels);
     }
     catch (const H5::Exception&)
     {
         throw NotAvailableException("Error reading model list for {}, {}", pollutantId, Aggregation::getName(aggr));
     }
-
-    unsigned int bufferSize = Hdf5Tools::getDataSetSize(dsModels);
-    std::vector<char*> buffer(bufferSize);
-    Hdf5Tools::readStringData(buffer.data(), dsModels);
-    for (unsigned int i = 0; i < bufferSize; i++)
-    {
-        out.push_back(buffer[i]);
-        free(buffer[i]);
-    }
-
-    dsModels.close();
-    grpAggr.close();
-    grpPol.close();
-
-    return out;
 }
 
 std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()

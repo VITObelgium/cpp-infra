@@ -104,6 +104,11 @@ TimeSeries<double> SqlBuffer::getForecastValues(chrono::days fcHor,
 {
     throwIfNotConfigured();
 
+    if (fcTime1 > fcTime2)
+    {
+        throw RunTimeException("requested fcTime1 is > fcTime2...");
+    }
+
     auto aggStr = Aggregation::getName(aggr);
     auto result = _db->getPredictions(fcTime1, fcTime2, _currentModel, stationId, pollutantId, aggStr, fcHor);
 

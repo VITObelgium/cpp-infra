@@ -40,16 +40,12 @@ add_library(sqlbuffer STATIC
     PredictionDatabase.cpp
 )
 
-add_library(sqlbufferplugin MODULE
-    SqlBufferPlugin.cpp
-)
-
 add_library(ircelmeteoprovider ${PLUGIN_TYPE}
     IRCELMeteoProvider.h
     IRCELMeteoProvider.cpp
 )
 
-add_library(rioobsprovider ${PLUGIN_TYPE}
+add_library(rioobsprovider STATIC
     ObsParser.h
     ObsParser.cpp
     RioObsProvider.h
@@ -66,15 +62,21 @@ add_library(xmlgridprovider ${PLUGIN_TYPE}
     XmlGridProvider.cpp
 )
 
-set_target_properties(sqlbuffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
 target_link_libraries(sqlbuffer opaqcore ${SQLPP_CONNECTOR_LIBRARY} ${SQLITE_LIBRARY})
-target_link_libraries(sqlbufferplugin sqlbuffer)
-
 target_link_libraries(asciiforecastwriter opaqcore)
 target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(xmlgridprovider opaqcore)
 target_link_libraries(xmlaqnetprovider opaqcore)
+
+set_target_properties(sqlbuffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
+set_target_properties(rioobsprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+add_library(sqlbufferplugin MODULE SqlBufferPlugin.cpp)
+add_library(rioobsproviderplugin MODULE RioObsProviderPlugin.cpp)
+
+target_link_libraries(sqlbufferplugin sqlbuffer)
+target_link_libraries(rioobsproviderplugin rioobsprovider)
 
 set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider xmlaqnetprovider PARENT_SCOPE)
 

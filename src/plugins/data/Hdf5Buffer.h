@@ -216,7 +216,6 @@ private:
 
     //  int _getIndexInStringDataSet (H5::DataSet & dataSet, const std::string &parameter);
     //  unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
-    //  void _readStringData (char ** buffer, H5::DataSet & dataSet);
     //  void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
 };
 

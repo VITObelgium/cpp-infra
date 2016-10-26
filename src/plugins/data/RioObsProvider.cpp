@@ -7,7 +7,6 @@
 
 #include "RioObsProvider.h"
 #include "ObsParser.h"
-#include "PluginRegistration.h"
 
 #include "tools/StringTools.h"
 
@@ -186,5 +185,3 @@ void RioObsProvider::readFile(const std::string& pollutant)
 }
 
 }
-
-OPAQ_REGISTER_PLUGIN(OPAQ::RioObsProvider);

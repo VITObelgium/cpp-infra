@@ -6,7 +6,6 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/..)
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(dataplugintest
-    ../ObsParser.cpp
     rioobsprovidertest.cpp
     ForecastBufferTest.cpp
     main.cpp
@@ -18,6 +17,7 @@ target_link_libraries(dataplugintest
     opaqcore
     hdf5buffer
     sqlbuffer
+    rioobsprovider
     ${GTEST_LIBRARY}
 )
 

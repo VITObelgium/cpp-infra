@@ -54,6 +54,7 @@ class ForecastBufferTest : public Test
 protected:
     ForecastBufferTest()
     : _buffer(&_concreteBuffer)
+    , _noData(_buffer->getNoData())
     {
         FileTools::del("test.db");
 
@@ -76,6 +77,7 @@ protected:
     EngineMock _engineMock;
     BufferType _concreteBuffer;
     ForecastBuffer* _buffer;
+    double _noData;
 };
 
 using BufferTypes = testing::Types<Hdf5Buffer, SqlBuffer>;
@@ -140,117 +142,141 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
         basetime1 + fcHor,
-        basetime2 + fcHor,
+        basetime2 + fcHor
     }));
     EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, 2.5 }));
 }
 
-//TEST_F(SqlBufferTest, DuplicatePrediction)
-//{
-//    TimeSeries<double> forecast;
-//
-//    auto basetime = make_date_time(2015_y/jan/1);
-//    forecast.insert(basetime, 0.5);
-//    forecast.insert(basetime, 1.5);
-//
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm10", "dayavg", 4_d, forecast);
-//
-//    auto results = db->getPredictionValues(basetime, "Ukkel", "pm10", "dayavg", 4_d);
-//    EXPECT_THAT(results, ContainerEq(std::vector<double>{ 1.5 }));
-//}
-//
-//TEST_F(SqlBufferTest, DuplicatePredictionMultipleTransactions)
-//{
-//    auto basetime = make_date_time(2015_y/jan/1);
-//
-//    TimeSeries<double> forecast1, forecast2;
-//    forecast1.insert(basetime, 0.5);
-//    forecast2.insert(basetime, 1.5);
-//
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm10", "dayavg", 4_d, forecast1);
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm10", "dayavg", 4_d, forecast2);
-//
-//    auto results = db->getPredictionValues(basetime, "Ukkel", "pm10", "dayavg", 4_d);
-//    EXPECT_THAT(results, ContainerEq(std::vector<double>{ 1.5 }));
-//}
-//
-//TEST_F(SqlBufferTest, GetPredictionValues)
-//{
-//    auto basetime = make_date_time(2015_y/jan/1);
-//
-//    TimeSeries<double> model1Forecast;
-//    model1Forecast.insert(basetime, 0.5);
-//    model1Forecast.insert(basetime + 1h, 2.5);
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm10", "dayavg", 4_d, model1Forecast);
-//
-//    TimeSeries<double> model2Forecast;
-//    model2Forecast.insert(basetime, 1.5);
-//    model2Forecast.insert(basetime + 1h, 3.5);
-//    db->addPredictions(basetime, "model2", "Ukkel", "pm10", "dayavg", 4_d, model2Forecast);
-//
-//    TimeSeries<double> model1ForecastPm25;
-//    model1ForecastPm25.insert(basetime, 10.5);
-//    model1ForecastPm25.insert(basetime + 1h, 12.5);
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm25", "dayavg", 4_d, model1ForecastPm25);
-//
-//    TimeSeries<double> model2ForecastPm25;
-//    model2ForecastPm25.insert(basetime, 11.5);
-//    model2ForecastPm25.insert(basetime + 1h, 13.5);
-//    db->addPredictions(basetime, "model2", "Ukkel", "pm25", "dayavg", 4_d, model2ForecastPm25);
-//
-//    EXPECT_THAT(db->getPredictionValues(basetime, "Ukkel", "pm10", "dayavg", 4_d), ContainerEq(std::vector<double>{ 0.5, 1.5 }));
-//    EXPECT_THAT(db->getPredictionValues(basetime + 1h, "Ukkel", "pm25", "dayavg", 4_d), ContainerEq(std::vector<double>{ 12.5, 13.5 }));
-//}
-//
-//TEST_F(SqlBufferTest, GetModelNames)
-//{
-//    auto basetime = make_date_time(2015_y/jan/1);
-//
-//    TimeSeries<double> forecast1, forecast2;
-//    forecast1.insert(basetime, 1.5);
-//    forecast2.insert(basetime + 1h, 1.5);
-//
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm10", "dayavg", 4_d, forecast1);
-//    db->addPredictions(basetime, "model2", "Ukkel", "pm10", "dayavg", 4_d, forecast1);
-//    db->addPredictions(basetime, "model2", "Ukkel", "pm10", "dayavg", 4_d, forecast2);
-//    db->addPredictions(basetime, "model3", "Ukkel", "pm25", "dayavg", 4_d, forecast1);
-//    db->addPredictions(basetime, "model3", "Ukkel", "pm25", "dayavg", 4_d, forecast2);
-//    db->addPredictions(basetime, "model3", "Ukkel", "pm25", "8h", 4_d, forecast2);
-//
-//    EXPECT_THAT(db->getModelNames("pm10", "dayavg"), ContainerEq(std::vector<std::string>{ "model1", "model2" }));
-//    EXPECT_THAT(db->getModelNames("pm25", "8h"), ContainerEq(std::vector<std::string>{ "model3" }));
-//    EXPECT_TRUE(db->getModelNames("pm25", "9h").empty());
-//}
-//
-//TEST_F(SqlBufferTest, GetPredictionsRange)
-//{
-//    auto basetime = make_date_time(2015_y/jan/1);
-//    TimeSeries<double> forecast;
-//    forecast.insert(basetime, 0.5);
-//    forecast.insert(basetime + 1h, 1.5);
-//    forecast.insert(basetime + 2h, 2.5);
-//    forecast.insert(basetime + 3h, 3.5);
-//    forecast.insert(basetime + 4h, 4.5);
-//
-//    db->addPredictions(basetime, "model1", "Ukkel", "pm10", "dayavg", 4_d, forecast);
-//
-//    auto startTime = basetime + 1h;
-//    auto endTime = basetime + 3h;
-//    auto results = db->getPredictions(startTime, endTime, "model1", "Ukkel", "pm10", "dayavg", 4_d);
-//
-//    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-//        basetime + 1h,
-//        basetime + 2h,
-//        basetime + 3h
-//    }));
-//    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, 2.5, 3.5 }));
-//}
-//
-//TEST_F(SqlBufferTest, GetInvalidPrediction)
-//{
-//    auto now = std::chrono::system_clock::now();
-//    EXPECT_THROW(db->getPrediction(now, "model1", "Ukkel", "pm10", "dayavg", 4_d), RunTimeException);
-//}
+TYPED_TEST(ForecastBufferTest, SetGetForecastSingleValue)
+{
+    auto basetime1 = make_date_time(2015_y / jan / 1);
+    auto basetime2 = make_date_time(2015_y / jan / 2);
+
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast1;
+    forecast1.insert(basetime1 + fcHor, 1.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime1, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime1 + fcHor, basetime1 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
+        basetime1 + fcHor,
+    }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5 }));
+}
+
+TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtEnd)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast;
+    forecast.insert(basetime + fcHor, 1.5);
+    forecast.insert(basetime + fcHor + 24h, 2.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime + fcHor + 48h, basetime + fcHor + 72h, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
+        basetime + fcHor + 48h,
+        basetime + fcHor + 72h
+    }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ _noData, _noData }));
+}
+
+TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtFront)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast;
+    forecast.insert(basetime + fcHor, 1.5);
+    forecast.insert(basetime + fcHor + 24h, 2.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime - 24h, basetime, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
+        basetime - 24h,
+        basetime
+    }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ _noData, _noData }));
+}
+
+TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRangeAtFront)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast;
+    forecast.insert(basetime + fcHor, 1.5);
+    forecast.insert(basetime + fcHor + 24h, 2.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime, basetime + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
+        basetime,
+        basetime + fcHor
+    }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ _noData, 1.5 }));
+}
+
+TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRangeAtEnd)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast;
+    forecast.insert(basetime + fcHor, 1.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime + fcHor, basetime + fcHor + 24h, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
+        basetime + fcHor,
+        basetime + fcHor + 24h
+    }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, _noData }));
+}
+
+TYPED_TEST(ForecastBufferTest, OverwriteValue)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast1, forecast2;
+    forecast1.insert(basetime + fcHor, 1.5);
+    forecast2.insert(basetime + fcHor, 2.5);
+
+    this->_buffer->setCurrentModel("model1");
+    this->_buffer->setValues(basetime, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+    this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    auto results = this->_buffer->getForecastValues(fcHor, basetime + fcHor, basetime + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
+        basetime + fcHor
+    }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 2.5 }));
+}
+
+TYPED_TEST(ForecastBufferTest, SecondTimeBeforeFirstTime)
+{
+    auto basetime = make_date_time(2015_y / jan / 1);
+    EXPECT_THROW(this->_buffer->getForecastValues(1_d, basetime + 24h, basetime, "Ukkel", "pm10", Aggregation::DayAvg), RunTimeException);
+}
 
 }
 }
