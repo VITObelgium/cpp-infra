@@ -19,7 +19,9 @@ public:
     }
 
     void registerPlugin(const std::string& name, FactoryCallback cb);
+    FactoryCallback getPluginFactory(const std::string& name);
 
+private:
     std::unordered_map<std::string, FactoryCallback> _registeredFactories;
 };
 

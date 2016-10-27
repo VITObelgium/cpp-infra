@@ -13,6 +13,17 @@ void PluginRegistry::registerPlugin(const std::string& name, FactoryCallback cb)
     _registeredFactories.emplace(name, cb);
 }
 
+FactoryCallback PluginRegistry::getPluginFactory(const std::string& name)
+{
+    auto iter = PluginRegistry::instance()._registeredFactories.find(name);
+    if (iter == PluginRegistry::instance()._registeredFactories.end())
+    {
+        throw RunTimeException("No plugin registered with name {}", name);
+    }
+
+    return iter->second;
+}
+
 FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::string& filename)
 {
     typedef Component* (FactoryFunc)(LogConfiguration*);
@@ -21,13 +32,7 @@ FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::stri
 
 FactoryCallback loadStaticPlugin(const std::string& pluginName, const std::string&)
 {
-    auto iter = PluginRegistry::instance()._registeredFactories.find(pluginName);
-    if (iter == PluginRegistry::instance()._registeredFactories.end())
-    {
-        throw RunTimeException("No plugin registered with name {}", pluginName);
-    }
-
-    return iter->second;
+    return PluginRegistry::instance().getPluginFactory(pluginName);
 }
 
 }
