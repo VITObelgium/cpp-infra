@@ -56,7 +56,8 @@ EXTERNALPROJECT_ADD(${NAME}
         --with-filesystem
         --with-program_options
         -s NO_BZIP2=1
-        -s NO_ZLIB=0
+        -s ZLIB_LIBRARY_PATH=${CMAKE_INSTALL_PREFIX}/lib
+        -s ZLIB_INCLUDE=${CMAKE_INSTALL_PREFIX}/include
         ${PLATFORM_OPTIONS}
         --prefix=${CMAKE_INSTALL_PREFIX} install
     INSTALL_COMMAND ""
