@@ -13,20 +13,30 @@ namespace chrono
 std::string to_date_string(const date_time& dt)
 {
     std::time_t t = std::chrono::system_clock::to_time_t(dt);
-    std::tm tm = *std::gmtime(&t);
+    std::tm* tm = std::gmtime(&t);
+
+    if (tm == nullptr)
+    {
+        throw InvalidArgumentsException("Invalid date provided");
+    }
 
     std::stringstream ss;
-    ss << std::put_time(&tm, "%Y-%m-%d");
+    ss << std::put_time(tm, "%Y-%m-%d");
     return ss.str();
 }
 
 std::string to_string(const date_time& dt)
 {
     std::time_t t = std::chrono::system_clock::to_time_t(dt);
-    std::tm tm = *std::gmtime(&t);
+    auto* tm = std::gmtime(&t);
+
+    if (tm == nullptr)
+    {
+        throw InvalidArgumentsException("Invalid date provided");
+    }
 
     std::stringstream ss;
-    ss << std::put_time(&tm, "%Y-%m-%d %H:%M:%S");
+    ss << std::put_time(tm, "%Y-%m-%d %H:%M:%S");
     return ss.str();
 }
 

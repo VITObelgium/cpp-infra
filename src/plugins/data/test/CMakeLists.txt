@@ -12,6 +12,7 @@ set (MOCKS
 add_executable(dataplugintest
     RioObsProviderParserTest.cpp
     RioObsProviderTest.cpp
+    IRCELMeteoProviderTest.cpp
     ForecastBufferTest.cpp
     main.cpp
     ${MOCKS}
@@ -26,6 +27,7 @@ target_link_libraries(dataplugintest
     hdf5buffer
     sqlbuffer
     rioobsprovider
+    ircelmeteoprovider
     ${GTEST_LIBRARY}
 )
 

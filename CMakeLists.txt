@@ -36,7 +36,7 @@ if (MSVC)
     # use all cores for compilation
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     # avoid windows specific warnings
-    add_definitions("-D_CRT_SECURE_NO_WARNINGS")
+    add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -Werror -fdiagnostics-color")
 endif()

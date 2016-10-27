@@ -18,25 +18,17 @@ namespace XmlTools
 	 */
     TiXmlElement* getElement(TiXmlElement* parent, const std::string& childName, TiXmlDocument* refDoc = nullptr);
 
-    inline std::string getText(TiXmlElement* parent, const std::string& childName)
-    {
-        TiXmlElement* child = getElement(parent, childName);
-        const char* text = child->GetText();
-        return text ? text : "";
-    }
+    std::string getText(TiXmlElement* parent, const std::string& childName);
+
+    std::string getChildValue(TiXmlElement* parent, const char* childName);
+    std::string getChildValue(TiXmlElement* parent, const char* childName, const char* defaultValue);
 
     template <typename T>
     T getChildValue(TiXmlElement* parent, const char* childName)
     {
-        auto* element = parent->FirstChildElement(childName);
-        if (!element)
-        {
-            throw BadConfigurationException("{} element not found", childName);
-        }
-
         T result;
         std::stringstream ss;
-        ss << element->GetText();
+        ss << getChildValue(parent, childName);
         ss >> result;
 
         return result;

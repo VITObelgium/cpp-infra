@@ -2,6 +2,7 @@
 #include <gmock/gmock.h>
 
 #include "DateTime.h"
+#include "Exceptions.h"
 
 namespace std
 {
@@ -23,8 +24,29 @@ namespace Test
 {
 
 using namespace date;
+using namespace chrono;
 using namespace testing;
 using namespace std::chrono_literals;
+
+TEST(DateTimeTest, DefaultDateToString)
+{
+    EXPECT_EQ(chrono::to_string(chrono::date_time()), "1970-01-01 00:00:00");
+}
+
+TEST(DateTimeTest, DefaultDateToDateString)
+{
+    EXPECT_EQ(chrono::to_date_string(chrono::date_time()), "1970-01-01");
+}
+
+TEST(DateTimeTest, InvalidDateToString)
+{
+    EXPECT_THROW(chrono::to_string(chrono::date_time() - days(1)), InvalidArgumentsException);
+}
+
+TEST(DateTimeTest, InvalidDateToDateString)
+{
+    EXPECT_THROW(chrono::to_date_string(chrono::date_time() - days(1)), InvalidArgumentsException);
+}
 
 TEST(DateTimeTest, ToDateString)
 {

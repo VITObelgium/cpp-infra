@@ -26,6 +26,35 @@ namespace OPAQ
 namespace XmlTools
 {
 
+std::string getText(TiXmlElement* parent, const std::string& childName)
+{
+    TiXmlElement* child = getElement(parent, childName);
+    const char* text = child->GetText();
+    return text ? text : "";
+}
+
+std::string getChildValue(TiXmlElement* parent, const char* childName)
+{
+    auto* element = parent->FirstChildElement(childName);
+    if (!element)
+    {
+        throw BadConfigurationException("{} element not found", childName);
+    }
+
+    return element->GetText();
+}
+
+std::string getChildValue(TiXmlElement* parent, const char* childName, const char* defaultValue)
+{
+    auto* element = parent->FirstChildElement(childName);
+    if (!element)
+    {
+        return defaultValue;
+    }
+
+    return element->GetText();
+}
+
 TiXmlElement* getElementByAttribute(TiXmlElement* parent, const std::string& childName,
                                     const std::string& attrName, const std::string& attrValue,
                                     TiXmlDocument* refDoc)

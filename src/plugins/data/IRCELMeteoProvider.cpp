@@ -8,16 +8,20 @@
 #include "IRCELMeteoProvider.h"
 #include "PluginRegistration.h"
 #include "tools/GzipReader.h"
+#include "tools/XmlTools.h"
 #include "tools/StringTools.h"
 
 #include <tinyxml.h>
+#include <boost/lexical_cast.hpp>
 
 namespace OPAQ
 {
 
-const std::string IRCELMeteoProvider::METEO_PLACEHOLDER     = "%meteo%";
-const std::string IRCELMeteoProvider::PARAMETER_PLACEHOLDER = "%param%";
-const std::string IRCELMeteoProvider::BASETIME_PLACEHOLDER  = "%basetime%";
+static const std::string s_meteo_placeholder     = "%meteo%";
+static const std::string s_parameter_placeholder = "%param%";
+static const std::string s_basetime_placeholder  = "%basetime%";
+
+using namespace std::chrono_literals;
 
 IRCELMeteoProvider::IRCELMeteoProvider()
 : _logger("IRCELMeteoProvider")
@@ -25,10 +29,6 @@ IRCELMeteoProvider::IRCELMeteoProvider()
 , _nsteps(0)
 , _bufferStartReq(false)
 , _backsearch(3)
-{
-}
-
-IRCELMeteoProvider::~IRCELMeteoProvider()
 {
 }
 
@@ -47,49 +47,47 @@ void IRCELMeteoProvider::configure(TiXmlElement* configuration, const std::strin
     _buffer.clear();
 
     // parse parameter configuration
-    TiXmlElement* parametersElement = configuration->FirstChildElement("parameters");
-    if (!parametersElement) throw BadConfigurationException("parameters element not found");
-    TiXmlElement* pEl = parametersElement->FirstChildElement("parameter");
+    auto* parametersElement = configuration->FirstChildElement("parameters");
+    if (!parametersElement)
+    {
+        throw BadConfigurationException("parameters element not found");
+    }
+
+    auto* pEl = parametersElement->FirstChildElement("parameter");
     while (pEl)
     {
         std::string id;
         double nodata;
 
-        if (pEl->QueryStringAttribute("id", &id) != TIXML_SUCCESS ||
-            pEl->QueryDoubleAttribute("nodata", &nodata) != TIXML_SUCCESS)
+        if (pEl->QueryStringAttribute("id", &id) != TIXML_SUCCESS || pEl->QueryDoubleAttribute("nodata", &nodata) != TIXML_SUCCESS)
+        {
             throw BadConfigurationException("parameter must have id and nodata attributes defined");
+        }
 
-        _nodata.insert(std::pair<std::string, double>(id, nodata));
-
+        _nodata.emplace(id, nodata);
         pEl = pEl->NextSiblingElement("parameter");
     }
 
-    // -- parse data file pattern
-    TiXmlElement* patternElement = configuration->FirstChildElement("file_pattern");
-    if (!patternElement) throw BadConfigurationException("file_pattern element not found");
-    _pattern = patternElement->GetText();
+    _pattern = XmlTools::getChildValue(configuration, "file_pattern");
+    _backsearch = XmlTools::getChildValue<int>(configuration, "backward_search", _backsearch);
+    _timeResolution = std::chrono::hours(XmlTools::getChildValue<int>(configuration, "resolution"));
 
-    // -- parsed the backward_search
-    TiXmlElement* backSearchEl    = configuration->FirstChildElement("backward_search");
-    if (backSearchEl) _backsearch = atoi(backSearchEl->GetText());
-
-    // -- parse meteo time resolution, value in hours
-    TiXmlElement* resEl = configuration->FirstChildElement("resolution");
-    if (!resEl) throw BadConfigurationException("resolution not given");
-    int res = atoi(resEl->GetText());
-    if ((res != 1) && (res != 2) && (res != 3) && (res != 4) && (res != 6) && (res != 8))
+    if ((_timeResolution != 1h) && (_timeResolution != 2h) && (_timeResolution != 3h) &&
+        (_timeResolution != 4h) && (_timeResolution != 6h) && (_timeResolution != 8h))
+    {
         throw BadConfigurationException("invalid resolution, valid values are 1, 2, 3, 4, 6 and 8 hours !");
-    _timeResolution = std::chrono::hours(res);
-    _nsteps         = 24 / res;
+    }
+
+    _nsteps = 24h / _timeResolution;
 
     // -- parse start time
     TiXmlElement* dateEl = configuration->FirstChildElement("buffer_start");
-    if (dateEl) {
+    if (dateEl)
+    {
         _bufferStartDate = chrono::from_date_string(dateEl->GetText());
         _bufferStartReq  = true;
     }
 
-    // -- set the configured flag to true
     _configured = true;
 }
 
@@ -100,10 +98,13 @@ std::chrono::hours IRCELMeteoProvider::getTimeResolution()
 
 double IRCELMeteoProvider::getNoData(const std::string& parameterId)
 {
-    _checkConfig();
+    throwIfNotConfigured();
     auto it = _nodata.find(parameterId);
     if (it == _nodata.end())
-        OPAQ::NotAvailableException("Meteo parameter " + parameterId + "is not configured !");
+    {
+        throw OPAQ::NotAvailableException("Meteo parameter {} is not configured!", parameterId);
+    }
+
     return it->second;
 }
 
@@ -112,78 +113,36 @@ OPAQ::TimeSeries<double> IRCELMeteoProvider::getValues(const chrono::date_time& 
                                                        const std::string& meteoId,
                                                        const std::string& paramId)
 {
+    throwIfNotConfigured();
 
-    if (t2 < t1) throw RunTimeException("end date has to be after start date");
-
-    _checkConfig();
-
-    // do we have the data in the buffer for this meteo ID ?
-    auto meteoIt = _buffer.find(meteoId);
-    if (meteoIt == _buffer.end()) {
-        // this partiular meteo id was not found in the buffer, read it from the file
-        _readFile(meteoId, paramId);
-        // and fetch it again
-        meteoIt = _buffer.find(meteoId);
+    if (t2 < t1)
+    {
+        throw RunTimeException("End date has to be after start date");
     }
 
-    // no data available for this meteoId: return empty vector
-    if (meteoIt == _buffer.end()) {
-        OPAQ::TimeSeries<double> empty;
-        empty.clear();
-        return empty;
+    if (_baseTime == chrono::date_time())
+    {
+        throw RunTimeException("No basetime set");
     }
 
-    // get buffered data
-    OPAQ::TimeSeries<double> ts = _getTimeSeries(meteoId, paramId);
+    if (_buffer.find(meteoId) == _buffer.end())
+    {
+        readFile(meteoId, paramId);
+    }
 
-    // return the requested part
-    return ts.select(t1, t2);
+    return _buffer[meteoId][paramId].select(t1, t2);
 }
 
-void IRCELMeteoProvider::_checkConfig()
+void IRCELMeteoProvider::throwIfNotConfigured()
 {
     if (!_configured)
-        throw RunTimeException("IRCELMeteoProvider Not fully configured");
-}
-
-const OPAQ::TimeSeries<double>& IRCELMeteoProvider::_getTimeSeries(const std::string& meteoId,
-                                                                   const std::string& parameterId)
-{
-
-    auto meteoIt = _buffer.find(meteoId);
-    if (meteoIt == _buffer.end()) {
-        // not found: read from data file
-        _readFile(meteoId, parameterId);
-        // and fetch it again
-        meteoIt = _buffer.find(meteoId);
-    }
-    if (meteoIt == _buffer.end()) {
-        // no data available for this meteoId: return empty vector
-        throw NotAvailableException("Requested meteoId not available in ECMWF data set...");
-    }
-
-    std::map<std::string, OPAQ::TimeSeries<double>>* buffer = &(meteoIt->second);
-    auto parameterIt = buffer->find(parameterId);
-    if (parameterIt == buffer->end()) {
-        // not found: read from data file
-        _readFile(meteoId, parameterId);
-        // and fetch it again
-        parameterIt = buffer->find(parameterId);
-    }
-    if (parameterIt == buffer->end()) {
-        // no data available for this meteoId/parameterId combination: return empty vector
-        throw NotAvailableException("Requested parameter not available in ECMWF data set...");
-    }
-    else
     {
-        return parameterIt->second;
+        throw RunTimeException("IRCELMeteoProvider Not fully configured");
     }
 }
 
-void IRCELMeteoProvider::_readFile(const std::string& meteoId,
-                                   const std::string& parameterId)
+void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string& parameterId)
 {
-
     GzipReader reader;
     std::string filename;
 
@@ -193,11 +152,10 @@ void IRCELMeteoProvider::_readFile(const std::string& meteoId,
     bool have_file = false;
     while ((checkDate >= (_baseTime - chrono::days(_backsearch))) && (!have_file))
     {
-
         filename = _pattern;
-        StringTools::replaceAll(filename, METEO_PLACEHOLDER, meteoId);
-        StringTools::replaceAll(filename, PARAMETER_PLACEHOLDER, parameterId);
-        StringTools::replaceAll(filename, BASETIME_PLACEHOLDER, chrono::to_date_string(checkDate));
+        StringTools::replaceAll(filename, s_meteo_placeholder, meteoId);
+        StringTools::replaceAll(filename, s_parameter_placeholder, parameterId);
+        StringTools::replaceAll(filename, s_basetime_placeholder, chrono::to_date_string(checkDate));
 
         // -- Read & parse file
         try
@@ -212,93 +170,59 @@ void IRCELMeteoProvider::_readFile(const std::string& meteoId,
         }
     }
 
-    if (!have_file) {
+    if (!have_file)
+    {
         _logger->error("giving up : no meteo file found for {}, {}", meteoId, parameterId);
         return;
     }
 
-    // -- Get the timeseries for this meteo/parameter buffer
-    TimeSeries<double>* ts = _getOrInit(meteoId, parameterId);
+    auto& ts = _buffer[meteoId][parameterId];
 
     std::string line = reader.readLine();
     while (!reader.eof())
     {
         /*
-		 * line format:
-		 * YYYYMMDD hour0 hour6 hour12 hour18     // older ECMWF data : every 6 hours
-		 * YYYYMMDD hour0 hour3 hour6 hour9 ...   // new ECMWF data : every 3 hours
-		 */
-        std::vector<std::string> tokens = OPAQ::StringTools::tokenize(line);
-        int nh                          = static_cast<int>(tokens.size()) - 1;
+         * line format:
+         * YYYYMMDD hour0 hour6 hour12 hour18     // older ECMWF data : every 6 hours
+         * YYYYMMDD hour0 hour3 hour6 hour9 ...   // new ECMWF data : every 3 hours
+         */
 
-        if (nh == _nsteps) {
-            // parse the first token : the date
-            auto ymd = date::year_month_day(date::year(atoi(tokens[0].substr(0, 4).c_str())),
-                                            date::month(atoi(tokens[0].substr(4, 2).c_str())),
-                                            date::day(atoi(tokens[0].substr(6, 2).c_str())));
+        StringTools::StringSplitter meteoSplitter(line, " \t\r\n\f");
 
-            chrono::date_time begin = date::sys_days(ymd);
+        auto iter = meteoSplitter.begin();
 
-            // check if we are beyond the buffer start (if requested...)
-            if (_bufferStartReq && (begin < _bufferStartDate)) {
-                line = reader.readLine();
-                continue;
-            }
+        // parse the first token : the date
+        auto begin = chrono::make_date_time(boost::lexical_cast<int>(iter->substr(0, 4)),
+                                            boost::lexical_cast<int>(iter->substr(4, 2)),
+                                            boost::lexical_cast<int>(iter->substr(6, 2)));
 
-            // read in the line & insert into the database
-            for (unsigned int i = 1; i < tokens.size(); i++)
-            {
-                if (i > 1) begin += std::chrono::hours(24 / _nsteps);
+        ++iter;
 
-                // insert into the buffer
-                ts->insert(begin, atof(tokens[i].c_str()));
-            }
-        }
-        else
+        // check if we are beyond the buffer start (if requested...)
+        if (_bufferStartReq && (begin < _bufferStartDate))
         {
-            throw RunTimeException("format does not match the configuration");
+            line = reader.readLine();
+            continue;
         }
 
-        // read next line...
+        // read in the line & insert into the database
+        size_t parsedValues = 0;
+        for (; iter != meteoSplitter.end(); ++iter)
+        {
+            ts.insert(begin, boost::lexical_cast<double>(*iter));
+            begin += 24h / _nsteps;
+            ++parsedValues;
+        }
+
+        if (parsedValues != _nsteps)
+        {
+            throw RunTimeException("Meteo format does not match the configuration");
+        }
+
         line = reader.readLine();
     }
 }
 
-OPAQ::TimeSeries<double>* IRCELMeteoProvider::_getOrInit(const std::string& meteoId, const std::string& parameterId)
-{
-
-    // fetch the data array for the given meteoId and parameterId
-    // if not found: create 1 containing all missing values
-    std::map<std::string, OPAQ::TimeSeries<double>>* meteoData;
-    auto meteoIt = _buffer.find(meteoId);
-    if (meteoIt == _buffer.end()) {
-        meteoData = &(_buffer.insert(std::pair<std::string, std::map<std::string, OPAQ::TimeSeries<double>>>(
-                                         meteoId,
-                                         std::map<std::string, OPAQ::TimeSeries<double>>()))
-                          .first->second);
-    }
-    else
-    {
-        meteoData = &(meteoIt->second);
-    }
-
-    // get (or create) vector to store the values, do not initialise, this will be done with the insert...
-    OPAQ::TimeSeries<double>* out;
-    auto parameterIt = meteoData->find(parameterId);
-    if (parameterIt == meteoData->end()) {
-        out = &(meteoData->insert(std::pair<std::string, OPAQ::TimeSeries<double>>(
-                                      parameterId,
-                                      OPAQ::TimeSeries<double>()))
-                    .first->second);
-    }
-    else
-    {
-        out = &(parameterIt->second);
-    }
-
-    return out;
-}
-
 OPAQ_REGISTER_STATIC_PLUGIN(IRCELMeteoProvider)
 
-} /* namespace OPAQ */
+}

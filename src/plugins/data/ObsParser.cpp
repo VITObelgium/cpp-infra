@@ -45,9 +45,9 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
             ++iter;
 
             // get the different aggregations...
-            result[Aggregation::Max1h][station].insert(begin, boost::lexical_cast<float>(*iter++)); // 3rd column is daily max
-            result[Aggregation::Max8h][station].insert(begin, boost::lexical_cast<float>(*iter++)); // 4th column is max 8h
-            result[Aggregation::DayAvg][station].insert(begin, boost::lexical_cast<float>(*iter++)); // 5th column is daily avg
+            result[Aggregation::Max1h][station].insert(begin, boost::lexical_cast<double>(*iter++)); // 3rd column is daily max
+            result[Aggregation::Max8h][station].insert(begin, boost::lexical_cast<double>(*iter++)); // 4th column is max 8h
+            result[Aggregation::DayAvg][station].insert(begin, boost::lexical_cast<double>(*iter++)); // 5th column is daily avg
 
             uint32_t parsedValues = 0;
 
@@ -55,7 +55,7 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
             auto& ts = result[Aggregation::None][station];
             for (; iter != observationSplitter.end(); ++iter)
             {
-                ts.insert(begin, boost::lexical_cast<float>(*iter));
+                ts.insert(begin, boost::lexical_cast<double>(*iter));
                 begin += timeResolution;
                 ++parsedValues;
             }
