@@ -247,8 +247,7 @@ void Engine::loadPlugins(const std::vector<Config::Plugin>& plugins)
         }
         catch (std::exception& e)
         {
-            _logger->critical("Error while loading plugin {} ({})", plugin.name, e.what());
-            throw std::runtime_error("Failed to load plugins");
+            throw RunTimeException("Failed to load plugins {} ({})", plugin.name, e.what());
         }
     }
 }

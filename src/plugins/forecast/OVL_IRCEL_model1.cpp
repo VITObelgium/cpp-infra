@@ -137,5 +137,8 @@ int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
 
     return have_sample;
 }
+
+OPAQ_REGISTER_STATIC_PLUGIN(OVL_IRCEL_model1)
+
 }
 

@@ -225,6 +225,7 @@ int main(int argc, char* argv[])
     catch (const std::exception& e)
     {
         logger->error("Error during run: {}", e.what());
+        std::cerr << "Error during run: " << e.what() << std::endl;
         return EXIT_FAILURE;
     }
 
