@@ -7,6 +7,7 @@ set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(opaqcoretest
     DateTimeTest.cpp
+    TimeSeriesTest.cpp
     ComponentManagerTest.cpp
     main.cpp
 )
