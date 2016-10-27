@@ -81,6 +81,11 @@ void OpaqViewer::setForecastBuffer(ForecastBuffer& buffer)
     _buffer = &buffer;
 }
 
+void OpaqViewer::resetForecastBuffer()
+{
+    _buffer = nullptr;
+}
+
 void OpaqViewer::setForecastHorizon(chrono::days fcHor)
 {
     _forecastHorizon = fcHor;

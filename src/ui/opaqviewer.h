@@ -31,6 +31,8 @@ public:
     void setAggregationModel(QAbstractItemModel& model);
 
     void setForecastBuffer(ForecastBuffer& buffer);
+    void resetForecastBuffer();
+
     void setForecastHorizon(chrono::days fcHor);
 
 private:

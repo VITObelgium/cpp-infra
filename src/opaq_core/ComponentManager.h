@@ -50,6 +50,7 @@ public:
 
     void loadPlugin(const std::string& pluginName, const std::string& filename);
     void destroyComponent(const std::string& componentName);
+    void destroyComponents();
 
 private:
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
@@ -65,7 +66,7 @@ private:
     // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
     // The instance map has to be destroyed before the dll unload
     std::map<std::string, FactoryCallback> _factoryMap;
-    std::map<std::string, std::unique_ptr<Component>> instanceMap;
+    std::map<std::string, std::unique_ptr<Component>> _instanceMap;
     IEngine& _engine;
 };
 

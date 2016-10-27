@@ -31,7 +31,8 @@ if (MSVC)
     set_target_properties(opaqui PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif ()
 
-target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets ${EXTRA_LIBS})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
+target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets ${PLUGINS} ${EXTRA_LIBS})
 
 if (STATIC_QT)
     find_package(OpenGL)

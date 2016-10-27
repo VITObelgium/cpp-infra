@@ -14,11 +14,11 @@ ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallbac
 }
 
 Component& ComponentManager::createGenericComponent(const std::string& componentName,
-                                                        const std::string& pluginName,
-                                                        TiXmlElement* configuration)
+                                                    const std::string& pluginName,
+                                                    TiXmlElement* configuration)
 {
     // 1. check if the component wasn't created previously
-    if (instanceMap.find(componentName) != instanceMap.end())
+    if (_instanceMap.find(componentName) != _instanceMap.end())
     {
         throw ComponentAlreadyExistsException("Component already exists: {}", componentName);
     }
@@ -27,15 +27,15 @@ Component& ComponentManager::createGenericComponent(const std::string& component
     auto component = createComponent(pluginName, componentName, configuration);
 
     // 3. store the instance in the instance map
-    instanceMap.emplace(componentName, std::move(component));
+    _instanceMap.emplace(componentName, std::move(component));
     // 4. and return it
-    return *instanceMap.at(componentName);
+    return *_instanceMap.at(componentName);
 }
 
 Component& ComponentManager::findComponent(const std::string& name)
 {
-    auto it = instanceMap.find(name);
-    if (it == instanceMap.end())
+    auto it = _instanceMap.find(name);
+    if (it == _instanceMap.end())
     {
         throw ComponentNotFoundException("Component not found: {}", name);
     }
@@ -63,7 +63,8 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
     auto it = _factoryMap.find(pluginName);
     if (it != _factoryMap.end())
     {
-        throw RunTimeException("There already exists a plugin with name {}", pluginName);
+        // Plugin already loaded
+        return;
     }
 
     _factoryMap.emplace(pluginName, _loadPluginCb(pluginName, filename));
@@ -71,7 +72,12 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
 
 void ComponentManager::destroyComponent(const std::string& componentName)
 {
-    instanceMap.erase(componentName);
+    _instanceMap.erase(componentName);
+}
+
+void ComponentManager::destroyComponents()
+{
+    _instanceMap.clear();
 }
 
 }

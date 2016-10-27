@@ -88,6 +88,8 @@ void OpaqView::loadConfiguration(const QString& path)
 {
     try
     {
+        _ui.viewerTab->resetForecastBuffer();
+
         updateRecentConfiguration(path);
 
         QFileInfo fileInfo(path);

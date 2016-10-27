@@ -253,6 +253,7 @@ void Engine::loadPlugins(const std::vector<Config::Plugin>& plugins)
 
 void Engine::initComponents(const std::vector<Config::Component>& components)
 {
+    _componentMgr.destroyComponents();
     for (auto& component : components)
     {
         try
