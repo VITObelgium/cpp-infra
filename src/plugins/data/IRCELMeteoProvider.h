@@ -40,7 +40,7 @@ public:
                                                const std::string& paramId) override;
 
 private:
-    
+
     void throwIfNotConfigured();
     void readFile(const std::string& meteoId, const std::string& parameterId);
 
@@ -56,7 +56,7 @@ private:
     Logger _logger;
     bool _configured; //! is the object completely configured
     std::chrono::hours _timeResolution; //! what is the time resolution of the meteo data ?
-    int _nsteps;                        //! number of steps in a line in the datafile
+    size_t _nsteps;                        //! number of steps in a line in the datafile
     chrono::date_time _bufferStartDate;    //! requested buffer start date, if not given, then all file is stored
     bool _bufferStartReq;               //! is this requested ?
     int _backsearch;                    //! how many days are we looking in the past to find data file
