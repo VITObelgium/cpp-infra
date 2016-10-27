@@ -32,6 +32,10 @@ class IRCELMeteoProviderTest : public Test
 protected:
     IRCELMeteoProviderTest()
     {
+        FileTools::del("BEL_096_4800_P07.txt");
+        FileTools::del("BEL_096_4800_P08.txt");
+        FileTools::del("BEL_096_4800_P07.txt.gz");
+
         configure(3h, "./BEL_%meteo%_%param%.txt");
     }
 
@@ -88,6 +92,27 @@ TEST_F(IRCELMeteoProviderTest, GetValues)
         EXPECT_EQ(date, values.datetime(i));
         date += 3h;
     }
+}
+
+TEST_F(IRCELMeteoProviderTest, GetValuesMultiplePollutants)
+{
+    FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
+    FileTools::writeTextFile("BEL_096_4800_P08.txt", referenceData());
+
+    auto values = _meteoProvider.getValues(make_date_time(2015_y/jan/02), make_date_time(2015_y/jan/02) + 23h, "096_4800", "P07");
+    EXPECT_EQ(8u, values.size());
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083 }));
+
+    auto date = make_date_time(2015_y/jan/02);
+    for (auto i = 0; i < 8; ++i)
+    {
+        EXPECT_EQ(date, values.datetime(i));
+        date += 3h;
+    }
+
+    values = _meteoProvider.getValues(make_date_time(2015_y/jan/02), make_date_time(2015_y/jan/02) + 23h, "096_4800", "P08");
+    EXPECT_EQ(8u, values.size());
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083 }));
 }
 
 TEST_F(IRCELMeteoProviderTest, GetValuesCompressed)

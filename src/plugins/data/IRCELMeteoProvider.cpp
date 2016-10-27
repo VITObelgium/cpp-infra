@@ -125,7 +125,7 @@ OPAQ::TimeSeries<double> IRCELMeteoProvider::getValues(const chrono::date_time& 
         throw RunTimeException("No basetime set");
     }
 
-    if (_buffer.find(meteoId) == _buffer.end())
+    if (_buffer[meteoId].find(paramId) == _buffer[meteoId].end())
     {
         readFile(meteoId, paramId);
     }
