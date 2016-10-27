@@ -5,6 +5,8 @@
 #include <iomanip>
 #include <sstream>
 
+#include <fmt/format.h>
+
 namespace OPAQ
 {
 namespace chrono
@@ -12,32 +14,23 @@ namespace chrono
 
 std::string to_date_string(const date_time& dt)
 {
-    std::time_t t = std::chrono::system_clock::to_time_t(dt);
-    std::tm* tm = std::gmtime(&t);
-
-    if (tm == nullptr)
-    {
-        throw InvalidArgumentsException("Invalid date provided");
-    }
-
-    std::stringstream ss;
-    ss << std::put_time(tm, "%Y-%m-%d");
-    return ss.str();
+    const auto ymd = date::year_month_day(date::floor<date::days>(dt));
+    return fmt::format("{}-{:0=2}-{:0=2}", static_cast<int>(ymd.year()), static_cast<unsigned>(ymd.month()), static_cast<unsigned>(ymd.day()));
 }
 
 std::string to_string(const date_time& dt)
 {
-    std::time_t t = std::chrono::system_clock::to_time_t(dt);
-    auto* tm = std::gmtime(&t);
+    const auto days = date::floor<date::days>(dt);
+    const auto ymd = date::year_month_day(days);
+    const auto time = date::make_time(dt-days).make24();
 
-    if (tm == nullptr)
-    {
-        throw InvalidArgumentsException("Invalid date provided");
-    }
-
-    std::stringstream ss;
-    ss << std::put_time(tm, "%Y-%m-%d %H:%M:%S");
-    return ss.str();
+    return fmt::format("{}-{:0=2}-{:0=2} {:0=2}:{:0=2}:{:0=2}",
+                        static_cast<int>(ymd.year()),
+                        static_cast<unsigned>(ymd.month()),
+                        static_cast<unsigned>(ymd.day()),
+                        time.hours().count(),
+                        time.minutes().count(),
+                        time.seconds().count());
 }
 
 date_time from_date_string(const std::string& s)

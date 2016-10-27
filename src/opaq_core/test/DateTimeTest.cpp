@@ -30,34 +30,36 @@ using namespace std::chrono_literals;
 
 TEST(DateTimeTest, DefaultDateToString)
 {
-    EXPECT_EQ(chrono::to_string(chrono::date_time()), "1970-01-01 00:00:00");
+    EXPECT_EQ("1970-01-01 00:00:00", chrono::to_string(chrono::date_time()));
 }
 
 TEST(DateTimeTest, DefaultDateToDateString)
 {
-    EXPECT_EQ(chrono::to_date_string(chrono::date_time()), "1970-01-01");
+    EXPECT_EQ("1970-01-01", chrono::to_date_string(chrono::date_time()));
 }
 
-TEST(DateTimeTest, InvalidDateToString)
+TEST(DateTimeTest, NegativeDateToString)
 {
-    EXPECT_THROW(chrono::to_string(chrono::date_time() - days(1)), InvalidArgumentsException);
+    EXPECT_EQ("1969-12-31 00:00:00", chrono::to_string(chrono::date_time() - days(1)));
+    EXPECT_EQ("1969-12-31 23:00:00", chrono::to_string(chrono::date_time() - 1h));
 }
 
-TEST(DateTimeTest, InvalidDateToDateString)
+TEST(DateTimeTest, NegativeDateToDateString)
 {
-    EXPECT_THROW(chrono::to_date_string(chrono::date_time() - days(1)), InvalidArgumentsException);
+    EXPECT_EQ("1969-12-31", chrono::to_date_string(chrono::date_time() - days(1)));
+    EXPECT_EQ("1969-12-31", chrono::to_date_string(chrono::date_time() - 1h));
 }
 
 TEST(DateTimeTest, ToDateString)
 {
-    EXPECT_EQ(chrono::to_date_string(chrono::make_date_time(2015_y/jan/1)), "2015-01-01");
-    EXPECT_EQ(chrono::to_date_string(chrono::make_date_time(2015_y/feb/3)), "2015-02-03");
+    EXPECT_EQ("2015-01-01", chrono::to_date_string(chrono::make_date_time(2015_y/jan/1)));
+    EXPECT_EQ("2015-02-03", chrono::to_date_string(chrono::make_date_time(2015_y/feb/3)));
 }
 
 TEST(DateTimeTest, ToString)
 {
-    EXPECT_EQ(chrono::to_string(chrono::make_date_time(2015_y / jan / 1)), "2015-01-01 00:00:00");
-    EXPECT_EQ(chrono::to_string(chrono::make_date_time(2015_y / feb / 3) + 1h + 15min + 10s), "2015-02-03 01:15:10");
+    EXPECT_EQ("2015-01-01 00:00:00", chrono::to_string(chrono::make_date_time(2015_y / jan / 1)));
+    EXPECT_EQ("2015-02-03 01:15:10", chrono::to_string(chrono::make_date_time(2015_y / feb / 3) + 1h + 15min + 10s));
 }
 
 TEST(DateTimeTest, FromDateString)
