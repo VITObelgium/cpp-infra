@@ -2,7 +2,7 @@
 * Station.h
 *
 *  Created on: Jan 9, 2014
-*      Author: vlooys, maiheub
+*      Author: vlooys, maiheub
 */
 
 #pragma once
