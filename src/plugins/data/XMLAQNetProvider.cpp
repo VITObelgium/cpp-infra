@@ -57,14 +57,11 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
             meteoId = "";
 
         // create station and push back to network
-        auto st = std::make_unique<OPAQ::Station>();
-        st->setName(name);
+        auto st = std::make_unique<Station>(name, desc, meteoId);
         st->setId(stID++); // and increment Id after assignment
         st->setX(x);
         st->setY(y);
         st->setZ(z);
-        st->setMeteoId(meteoId);
-        st->setDescription(desc);
 
         // get pollutant list from stEl->GetText(); via string tokenizer
         if (stEl->GetText()) {

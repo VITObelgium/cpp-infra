@@ -39,6 +39,17 @@ std::string readFileContents(const std::string& filename)
     return readStreamContents(fileStream);
 }
 
+void writeTextFile(const std::string& filename, const std::string& contents)
+{
+    std::ofstream fs(filename.c_str(), std::ios::trunc);
+    if (!fs.is_open())
+    {
+        throw std::runtime_error("Failed to open file for writing: " + filename);
+    }
+
+    fs << contents;
+}
+
 bool exists(const std::string& filename)
 {
     /*

@@ -26,12 +26,18 @@ FactoryCallback PluginRegistry::getPluginFactory(const std::string& name)
 
 FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::string& filename)
 {
+    Logger logger("Plugins");
+    logger->info("Loading plugin {} from {}", pluginName, filename);
+
     typedef Component* (FactoryFunc)(LogConfiguration*);
     return dll::import<FactoryFunc>(filename.c_str(), "factory", boost::dll::load_mode::rtld_lazy);
 }
 
 FactoryCallback loadStaticPlugin(const std::string& pluginName, const std::string&)
 {
+    Logger logger("Plugins");
+    logger->info("Loading plugin {}", pluginName);
+
     return PluginRegistry::instance().getPluginFactory(pluginName);
 }
 

@@ -8,6 +8,7 @@
 
 #include "config.h"
 #include "testconfig.h"
+#include "EngineMock.h"
 
 #include "Engine.h"
 #include "TimeSeries.h"
@@ -40,13 +41,6 @@ using namespace testing;
 using namespace chrono_literals;
 using namespace std::string_literals;
 using namespace std::chrono_literals;
-
-class EngineMock : public IEngine
-{
-public:
-    MOCK_METHOD0(pollutantManager, Config::PollutantManager&());
-    MOCK_METHOD0(componentManager, ComponentManager&());
-};
 
 template <typename BufferType>
 class ForecastBufferTest : public Test

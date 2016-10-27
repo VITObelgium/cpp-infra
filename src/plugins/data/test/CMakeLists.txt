@@ -5,11 +5,19 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set (MOCKS
+    EngineMock.h
+)
+
 add_executable(dataplugintest
-    rioobsprovidertest.cpp
+    RioObsProviderParserTest.cpp
+    RioObsProviderTest.cpp
     ForecastBufferTest.cpp
     main.cpp
+    ${MOCKS}
 )
+
+source_group(Mocks FILES ${MOCKS})
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.h)
 

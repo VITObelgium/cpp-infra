@@ -5,6 +5,13 @@
 namespace OPAQ
 {
 
+Station::Station(std::string name, std::string desc, std::string meteoId)
+: _name(std::move(name))
+, _desc(std::move(desc))
+, _meteoId(std::move(meteoId))
+{
+}
+
 std::ostream& operator<<(std::ostream& os, const Station& s)
 {
     os << "[station " << s.getId() << " ]: " << s._name

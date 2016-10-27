@@ -242,7 +242,6 @@ void Engine::loadPlugins(const std::vector<Config::Plugin>& plugins)
     {
         try
         {
-            _logger->info("Loading plugin {} from {}", plugin.name, plugin.libPath);
             _componentMgr.loadPlugin(plugin.name, plugin.libPath);
         }
         catch (std::exception& e)

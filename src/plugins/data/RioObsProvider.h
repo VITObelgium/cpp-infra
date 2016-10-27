@@ -35,9 +35,9 @@ public:
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::DataProvider methods
-    virtual std::chrono::hours getTimeResolution() override;
+    std::chrono::hours getTimeResolution() override;
 
-    virtual double getNoData() override;
+    double getNoData() override;
 
     /**
    * Simply return the observations for the station & pollutant Id between the given dates

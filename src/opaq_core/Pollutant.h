@@ -18,12 +18,12 @@ namespace OPAQ
 class Pollutant
 {
 public:
-    /** Empty constructor */
     Pollutant();
+    Pollutant(long id, std::string name, std::string unit, std::string desc);
 
     /** 
-	Constructor from an XML element
-	\param el A const pointer to the TiXmlELement holding the pollutant definitoin
+    Constructor from an XML element
+    \param el A const pointer to the TiXmlELement holding the pollutant definitoin
     */
     Pollutant(TiXmlElement const* el);
 
@@ -34,38 +34,26 @@ public:
     std::string toString() const;
 
     /** returns the ID of the pollutant */
-    long getId() const { return id; }
-
-    /**  sets the ID of the pollutant */
-    void setId(long id) { this->id = id; }
+    long getId() const { return _id; }
 
     /** returns the name of the pollutant */
-    std::string getName() const { return name; }
-
-    /** sets the name of the pollutant */
-    void setName(std::string name) { this->name = name; }
+    std::string getName() const { return _name; }
 
     /** 
-	returns the units of the pollutant
-	\note that this is just a string, there is no real meaning or 
-	functionality assigned to the units (yet)
+    returns the units of the pollutant
+    \note that this is just a string, there is no real meaning or 
+    functionality assigned to the units (yet)
     */
-    std::string getUnit() const { return unit; }
-
-    /** sets the units, see note under setUnit  */
-    void setUnit(std::string unit) { this->unit = unit; }
+    std::string getUnit() const { return _unit; }
 
     /** returns the description */
-    std::string getDescription() const { return desc; }
-
-    /** sets the pollutant description */
-    void setDescription(std::string desc) { this->desc = desc; }
+    std::string getDescription() const { return _desc; }
 
 private:
-    long id;
-    std::string name;
-    std::string unit;
-    std::string desc;
+    long _id;
+    std::string _name;
+    std::string _unit;
+    std::string _desc;
 };
 }
 #endif /* #ifndef OPAQ_POLLUTANT_H_ */
