@@ -33,6 +33,7 @@ ENDIF ()
 EXTERNALPROJECT_ADD(${NAME}
     URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
+    PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
         ${CONFIGURATIONS}
         -platform ${PLATFORM}

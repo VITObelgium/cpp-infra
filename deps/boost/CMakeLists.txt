@@ -50,7 +50,7 @@ EXTERNALPROJECT_ADD(${NAME}
         toolset=${TOOLSET}
         link=static
         threading=multi
-        runtime-link=shared
+        runtime-link=static
         --with-iostreams
         --with-system
         --with-filesystem

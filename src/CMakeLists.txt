@@ -14,6 +14,7 @@ find_package(hdf5 CONFIG)
 find_package(Threads)
 
 set (Boost_USE_STATIC_LIBS ON)
+set (Boost_USE_STATIC_RUNTIME ON)
 add_definitions("-DBOOST_ALL_NO_LIB")
 find_package(Boost REQUIRED COMPONENTS system filesystem iostreams program_options)
 
