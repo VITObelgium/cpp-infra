@@ -35,8 +35,15 @@ public:
         return true;
     }
 
-    const std::vector<T>& values(void) const { return _values; }
-    const std::vector<OPAQ::chrono::date_time>& datetimes(void) const { return _datetimes; }
+    const std::vector<T>& values(void) const
+    {
+        return _values;
+    }
+
+    const std::vector<chrono::date_time>& datetimes() const
+    {
+        return _datetimes;
+    }
 
     // ======================
     // insert functionality
@@ -80,7 +87,10 @@ public:
     // ===================
 
     // does the timeseries contain the given datetime
-    bool contains(const chrono::date_time& dt) const { return std::binary_search(_datetimes.begin(), _datetimes.end(), dt); }
+    bool contains(const chrono::date_time& dt) const
+    {
+        return std::binary_search(_datetimes.begin(), _datetimes.end(), dt);
+    }
 
     // return the first date time in the timeseries
     const chrono::date_time& firstDateTime() const
@@ -193,7 +203,7 @@ void TimeSeries<T>::insert(const chrono::date_time& dt, const T& val)
         _values.push_back(val);
         return;
     }
-    // if the index if before the first inded
+    // if the index is before the first index
     if (dt < firstDateTime()) {
         _datetimes.insert(_datetimes.begin(), dt);
         _values.insert(_values.begin(), val);
@@ -221,14 +231,14 @@ void TimeSeries<T>::merge(const TimeSeries<T>& ts, bool overwrite)
     for (unsigned int i = 0; i < ts.size(); i++)
     {
         if (!contains(ts.datetime(i)))
-            insert(ts.datetime(i), ts.value(i));
-        else
         {
-            if (overwrite) insert(ts.datetime(i), ts.value(i));
+            insert(ts.datetime(i), ts.value(i));
+        }
+        else if (overwrite)
+        {
+            insert(ts.datetime(i), ts.value(i));
         }
     }
-
-    return;
 }
 
 // remove function
