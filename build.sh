@@ -16,7 +16,6 @@ command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }
 
 config=""
 toolchain=""
-static_build="OFF"
 build_ui="OFF"
 
 echo -n "Select configuration: [1:Debug 2:Release 3:Release with debug info]: "
@@ -41,12 +40,11 @@ case $yno in
         ;;
     [2] )
         toolchain="${PWD}/../../deps/cluster.make"
-        static_build="ON"
         ;;
     * ) echo "Invalid selection" exit;;
 esac
 
 echo "Building configuration ${config} in ${builddir} toolchain (${toolchain})"
 
-checkresult cmake ../.. -G "${generator}" -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_BUILD=${static_build} -DSTATIC_PLUGINS=ON
+checkresult cmake ../.. -G "${generator}" -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_PLUGINS=ON
 checkresult cmake --build .
