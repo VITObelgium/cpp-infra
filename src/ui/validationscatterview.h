@@ -16,7 +16,7 @@ namespace opaq
 
 class ValidationResultsModel;
 
-namespace Config
+namespace config
 {
 struct Component;
 }

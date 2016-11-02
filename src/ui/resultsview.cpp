@@ -57,7 +57,7 @@ void ResultsView::setForecastHorizon(chrono::days forecastHorizon)
     _rows = static_cast<int>(forecastHorizon.count()) + 1;
 }
 
-void ResultsView::setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents)
+void ResultsView::setModels(StationResultsModel& model, const std::vector<config::Component>& modelComponents)
 {
     _chart->removeAllSeries();
 

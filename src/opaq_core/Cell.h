@@ -47,6 +47,8 @@ public:
     /** Returns a cell's surface area, i.e. only surface of it's xy plane */
     double getSurfaceArea() const { return getDx() * getDy(); }
 
+    bool operator== (const Cell& other) const noexcept;
+
 private:
     long id;     // a unique grid cell ID
     double xmin; // lower x value

@@ -17,7 +17,7 @@
 
 namespace opaq
 {
-namespace Config
+namespace config
 {
 
 class MappingStage
@@ -31,12 +31,12 @@ public:
         return *_values;
     }
     
-    void setValues(Config::Component* values)
+    void setValues(config::Component* values)
     {
         _values = values;
     }
 
-    Config::Component& getMeteo() const
+    config::Component& getMeteo() const
     {
         throwOnNullPtr(_meteo);
         return *_meteo;
@@ -49,8 +49,8 @@ public:
 
 private:
     // input data provider components
-    Config::Component* _values;
-    Config::Component* _meteo;
+    config::Component* _values;
+    config::Component* _meteo;
 };
 
 }

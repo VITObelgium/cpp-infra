@@ -62,6 +62,11 @@ add_library(xmlgridprovider STATIC
     XmlGridProvider.cpp
 )
 
+add_library(textgridprovider STATIC
+    TextGridProvider.h
+    TextGridProvider.cpp
+)
+
 add_library(stationinfoprovider STATIC
     StationInfoProvider.h
     StationInfoProvider.cpp
@@ -72,6 +77,7 @@ target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(asciiforecastwriter opaqcore)
 target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(xmlgridprovider opaqcore)
+target_link_libraries(textgridprovider opaqcore)
 target_link_libraries(xmlaqnetprovider opaqcore)
 target_link_libraries(stationinfoprovider opaqcore)
 
@@ -84,23 +90,25 @@ if (NOT STATIC_PLUGINS)
     set_target_properties(xmlaqnetprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(stationinfoprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-    add_library(sqlbufferplugin             ${PLUGIN_TYPE} SqlBufferPlugin.cpp)
-    add_library(rioobsproviderplugin        ${PLUGIN_TYPE} RioObsProviderPlugin.cpp)
-    add_library(asciiforecastwriterplugin   ${PLUGIN_TYPE} AsciiforecastwriterPlugin.cpp)
-    add_library(ircelmeteoproviderplugin    ${PLUGIN_TYPE} IrcelMeteoProviderPlugin.cpp)
-    add_library(xmlgridproviderplugin       ${PLUGIN_TYPE} XmlGridProviderPlugin.cpp)
-    add_library(xmlaqnetproviderplugin      ${PLUGIN_TYPE} XmlAQNetproviderPlugin.cpp)
-    add_library(stationinfoproviderplugin   ${PLUGIN_TYPE} StationInfoProviderPlugin.cpp)
+    add_library(sqlbufferplugin             MODULE SqlBufferPlugin.cpp)
+    add_library(rioobsproviderplugin        MODULE RioObsProviderPlugin.cpp)
+    add_library(asciiforecastwriterplugin   MODULE AsciiforecastwriterPlugin.cpp)
+    add_library(ircelmeteoproviderplugin    MODULE IrcelMeteoProviderPlugin.cpp)
+    add_library(xmlgridproviderplugin       MODULE XmlGridProviderPlugin.cpp)
+    add_library(textgridproviderplugin      MODULE TextGridProviderPlugin.cpp)
+    add_library(xmlaqnetproviderplugin      MODULE XmlAQNetproviderPlugin.cpp)
+    add_library(stationinfoproviderplugin   MODULE StationInfoProviderPlugin.cpp)
 
     target_link_libraries(sqlbufferplugin sqlbuffer)
     target_link_libraries(rioobsproviderplugin rioobsprovider)
     target_link_libraries(asciiforecastwriterplugin asciiforecastwriter)
     target_link_libraries(ircelmeteoproviderplugin ircelmeteoprovider)
     target_link_libraries(xmlgridproviderplugin xmlgridprovider)
+    target_link_libraries(textgridproviderplugin textgridprovider)
     target_link_libraries(xmlaqnetproviderplugin xmlaqnetprovider)
     target_link_libraries(stationinfoproviderplugin stationinfoprovider)
 endif ()
 
-set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
+set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider textgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
 
 add_subdirectory(test)

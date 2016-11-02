@@ -55,7 +55,7 @@ set (CORE_DATA_SOURCES
     data/ForecastBuffer.h
     data/DataProvider.h
     data/MeteoProvider.h
-    data/GridProvider.h
+    data/IGridProvider.h
     data/ForecastOutputWriter.h
     data/IStationInfoProvider.h
 )

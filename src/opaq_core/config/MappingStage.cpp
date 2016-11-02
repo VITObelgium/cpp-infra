@@ -2,7 +2,7 @@
 
 namespace opaq
 {
-namespace Config
+namespace config
 {
 
 MappingStage::MappingStage()

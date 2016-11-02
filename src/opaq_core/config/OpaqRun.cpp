@@ -3,11 +3,11 @@
 
 namespace opaq
 {
-namespace Config
+namespace config
 {
 
 OpaqRun::OpaqRun()
-: _logger("OPAQ::Config::OpaqRun")
+: _logger("OPAQ::config::OpaqRun")
 , _aggregation(Aggregation::None)
 , _networkProvider(nullptr)
 , _gridProvider(nullptr)
@@ -38,7 +38,7 @@ void OpaqRun::addComponent(const Component& component)
 
 Plugin OpaqRun::getPlugin(const std::string& pluginName)
 {
-    auto iter = std::find_if(_plugins.begin(), _plugins.end(), [&](Config::Plugin& plugin) {
+    auto iter = std::find_if(_plugins.begin(), _plugins.end(), [&](config::Plugin& plugin) {
         return plugin.name == pluginName;
     });
 
@@ -52,7 +52,7 @@ Plugin OpaqRun::getPlugin(const std::string& pluginName)
 
 const Component& OpaqRun::getComponent(const std::string& componentName)
 {
-    auto iter = std::find_if(_components.begin(), _components.end(), [&](Config::Component& comp) {
+    auto iter = std::find_if(_components.begin(), _components.end(), [&](config::Component& comp) {
         return comp.name == componentName;
     });
 

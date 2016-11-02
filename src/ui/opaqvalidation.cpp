@@ -35,7 +35,7 @@ void OpaqValidation::setEngine(Engine& engine)
     _engine = &engine;
 }
 
-void OpaqValidation::setModels(const std::vector<Config::Component>& models)
+void OpaqValidation::setModels(const std::vector<config::Component>& models)
 {
     for (auto& model : models)
     {

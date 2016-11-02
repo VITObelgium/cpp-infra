@@ -19,9 +19,9 @@ ConfigurationHandler::ConfigurationHandler()
 /* ================================================================================
    Forecast stage parser
    ============================================================================= */
-Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlElement* element)
+config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlElement* element)
 {
-    auto fcStage = std::make_unique<Config::ForecastStage>();
+    auto fcStage = std::make_unique<config::ForecastStage>();
 
     TiXmlElement* modelsElement = element->FirstChildElement("models");
     if (!modelsElement) {
@@ -98,7 +98,7 @@ Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlElement* el
 /* ================================================================================
    Mapping stage parser
    ============================================================================= */
-Config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement* element)
+config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement* element)
 {
     return nullptr;
 }
@@ -106,7 +106,7 @@ Config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement* elem
 /* ===========================================================================
  This is the main configuration file parser
  ======================================================================== */
-void ConfigurationHandler::parseConfigurationFile(const std::string& filename, Config::PollutantManager& pollutantMgr)
+void ConfigurationHandler::parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr)
 {
 
     clearConfig();
@@ -138,7 +138,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     {
         auto fullname = fmt::format("{}/{}" PLUGIN_EXT, pluginPath, pluginElement->GetText());
 
-        Config::Plugin plugin;
+        config::Plugin plugin;
         plugin.name    = pluginElement->Attribute("name");
         plugin.libPath = fullname;
         _opaqRun.addPlugin(plugin);
@@ -153,7 +153,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     {
         _configDocs.push_back(std::make_unique<TiXmlDocument>());
 
-        Config::Component component;
+        config::Component component;
         component.name = componentElement->Attribute("name");
         component.plugin = _opaqRun.getPlugin(componentElement->Attribute("plugin"));
         component.config = XmlTools::getElement(componentElement, "config", _configDocs.back().get());
@@ -281,7 +281,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     try
     {
         TiXmlElement* forecastElement        = XmlTools::getElement(rootElement, "forecast");
-        Config::ForecastStage* forecastStage = parseForecastStage(forecastElement);
+        config::ForecastStage* forecastStage = parseForecastStage(forecastElement);
         _opaqRun.setForecastStage(forecastStage);
     }
     catch (const ElementNotFoundException&)
@@ -296,7 +296,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     try
     {
         TiXmlElement* mappingElement       = XmlTools::getElement(rootElement, "mapping");
-        Config::MappingStage* mappingStage = parseMappingStage(mappingElement);
+        config::MappingStage* mappingStage = parseMappingStage(mappingElement);
         _opaqRun.setMappingStage(mappingStage);
     }
     catch (const ElementNotFoundException&)
@@ -306,7 +306,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, C
     }
 }
 
-void ConfigurationHandler::validateConfiguration(Config::PollutantManager& pollutantMgr)
+void ConfigurationHandler::validateConfiguration(config::PollutantManager& pollutantMgr)
 {
     // check for plugins with the same name
     auto plugins = _opaqRun.getPlugins();

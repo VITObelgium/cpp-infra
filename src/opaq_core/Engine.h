@@ -16,7 +16,6 @@
 
 #include "data/DataProvider.h"
 #include "data/ForecastOutputWriter.h"
-#include "data/GridProvider.h"
 
 #include "AQNetworkProvider.h"
 #include "Logger.h"
@@ -32,7 +31,7 @@ class IEngine
 public:
     virtual ~IEngine() = default;
 
-    virtual Config::PollutantManager& pollutantManager() = 0;
+    virtual config::PollutantManager& pollutantManager() = 0;
     virtual ComponentManager&         componentManager() = 0;
 };
 
@@ -64,7 +63,7 @@ struct PredictionResult
 class Engine : public IEngine
 {
 public:
-    Engine(Config::PollutantManager& pollutantMgr);
+    Engine(config::PollutantManager& pollutantMgr);
 
     /**
     * Prepare an opaq run
@@ -74,7 +73,7 @@ public:
     * -# instantiating and configuring the components
     * After you prepare a run, multiple runs can be executed
     */
-    void prepareRun(Config::OpaqRun& config);
+    void prepareRun(config::OpaqRun& config);
 
     /**
    * The main OPAQ run method given a configuration
@@ -92,24 +91,24 @@ public:
    *      mapping/forecast stages...
    */
 
-    void run(Config::OpaqRun& config);
+    void run(config::OpaqRun& config);
 
     /*
      * Validate the measured values agains the predicted values for the given station
      */
-    std::vector<PredictionResult> validate(Config::OpaqRun& config,
+    std::vector<PredictionResult> validate(config::OpaqRun& config,
                                            chrono::days forecastHorizon,
                                            const std::string& station,
                                            chrono::date_time startTime,
                                            chrono::date_time endTime,
                                            const std::string& model);
 
-    Config::PollutantManager& pollutantManager() override;
+    config::PollutantManager& pollutantManager() override;
     ComponentManager&         componentManager() override;
 
 private:
     Logger                              _logger;
-    Config::PollutantManager&           _pollutantMgr;
+    config::PollutantManager&           _pollutantMgr;
     ComponentManager                    _componentMgr;
 
     /**
@@ -118,10 +117,10 @@ private:
    * loops over the different models which are configured in the forecast config
    * and calls the forecast output writer.
    */
-    void runForecastStage(Config::ForecastStage* cnf, AQNetworkProvider& net, const Pollutant& pol, Aggregation::Type agg, const chrono::date_time& baseTime);
+    void runForecastStage(config::ForecastStage* cnf, AQNetworkProvider& net, const Pollutant& pol, Aggregation::Type agg, const chrono::date_time& baseTime);
 
-    void loadPlugins(const std::vector<Config::Plugin>& plugins);
-    void initComponents(const std::vector<Config::Component>& components);
+    void loadPlugins(const std::vector<config::Plugin>& plugins);
+    void initComponents(const std::vector<config::Component>& components);
 };
 
 }

@@ -48,7 +48,7 @@ void OpaqViewer::setEngine(Engine& engine)
     _engine = &engine;
 }
 
-void OpaqViewer::setModels(const std::vector<Config::Component>& models)
+void OpaqViewer::setModels(const std::vector<config::Component>& models)
 {
     _ui.resultsView->setModels(_model, models);
 }

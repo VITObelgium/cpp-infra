@@ -4,11 +4,11 @@
 
 namespace opaq
 {
-namespace Config
+namespace config
 {
 
 PollutantManager::PollutantManager()
-: _logger("OPAQ::Config::PollutantManager")
+: _logger("OPAQ::config::PollutantManager")
 {
 }
 

@@ -11,14 +11,14 @@
 namespace opaq
 {
 
-Engine::Engine(Config::PollutantManager& pollutantMgr)
+Engine::Engine(config::PollutantManager& pollutantMgr)
 : _logger("OPAQ::Engine")
 , _pollutantMgr(pollutantMgr)
 , _componentMgr(Factory::createComponentManager(*this))
 {
 }
 
-void Engine::runForecastStage(Config::ForecastStage* cnf,
+void Engine::runForecastStage(config::ForecastStage* cnf,
                               AQNetworkProvider& net,
                               const Pollutant& pol,
                               Aggregation::Type aggr,
@@ -79,7 +79,7 @@ void Engine::runForecastStage(Config::ForecastStage* cnf,
    MAIN WORKFLOW OF OPAQ
    ========================================================================== */
 
-void Engine::prepareRun(Config::OpaqRun& config)
+void Engine::prepareRun(config::OpaqRun& config)
 {
     // 1. Load plugins...
     loadPlugins(config.getPlugins());
@@ -88,7 +88,7 @@ void Engine::prepareRun(Config::OpaqRun& config)
     initComponents(config.getComponents());
 }
 
-void Engine::run(Config::OpaqRun& config)
+void Engine::run(config::OpaqRun& config)
 {
     // OPAQ workflow...
     _logger->info("Fetching workflow configuration");
@@ -97,8 +97,8 @@ void Engine::run(Config::OpaqRun& config)
     auto pollutant = _pollutantMgr.find(pollutantName);
 
     // Get stages
-    Config::ForecastStage* forecastStage = config.getForecastStage();
-    Config::MappingStage* mappingStage   = config.getMappingStage();
+    config::ForecastStage* forecastStage = config.getForecastStage();
+    config::MappingStage* mappingStage   = config.getMappingStage();
 
     // Get air quality network provider
     auto name                            = config.getNetworkProvider()->name;
@@ -182,7 +182,7 @@ void Engine::run(Config::OpaqRun& config)
     }
 }
 
-std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
+std::vector<PredictionResult> Engine::validate(config::OpaqRun& config,
                                                chrono::days forecastHorizon,
                                                const std::string& station,
                                                chrono::date_time startTime,
@@ -226,7 +226,7 @@ std::vector<PredictionResult> Engine::validate(Config::OpaqRun& config,
     return results;
 }
 
-Config::PollutantManager& Engine::pollutantManager()
+config::PollutantManager& Engine::pollutantManager()
 {
     return _pollutantMgr;
 }
@@ -236,7 +236,7 @@ ComponentManager& Engine::componentManager()
     return _componentMgr;
 }
 
-void Engine::loadPlugins(const std::vector<Config::Plugin>& plugins)
+void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
 {
     for (auto& plugin : plugins)
     {
@@ -251,7 +251,7 @@ void Engine::loadPlugins(const std::vector<Config::Plugin>& plugins)
     }
 }
 
-void Engine::initComponents(const std::vector<Config::Component>& components)
+void Engine::initComponents(const std::vector<config::Component>& components)
 {
     _componentMgr.destroyComponents();
     for (auto& component : components)

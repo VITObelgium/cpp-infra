@@ -10,7 +10,7 @@
 namespace opaq
 {
 
-namespace Config
+namespace config
 {
 struct Component;
 }
@@ -28,7 +28,7 @@ public:
     void setConfig(ConfigurationHandler& config);
     void setEngine(Engine& engine);
 
-    void setModels(const std::vector<Config::Component>& models);
+    void setModels(const std::vector<config::Component>& models);
     void setStationModel(QAbstractItemModel& model);
     void setPollutantModel(QAbstractItemModel& model);
     void setAggregationModel(QAbstractItemModel& model);

@@ -28,6 +28,8 @@ class StationInfoProviderTest : public Test
 protected:
     StationInfoProviderTest()
     {
+        FileTools::del("pm10_stations_info_GIS_clc06d.txt");
+
         configure();
     }
 
@@ -62,7 +64,7 @@ TEST_F(StationInfoProviderTest, GetStations)
 
     FileTools::writeTextFile("pm10_stations_info_GIS_clc06d.txt", ss.str());
 
-    auto stations = _stationsProvider.getStations(Pollutant(1, "pm10", "unit", "desc"));
+    auto stations = _stationsProvider.getStations(Pollutant(1, "pm10", "unit", "desc"), "clc06d");
     EXPECT_THAT(stations, ContainerEq(std::vector<Station>{
         Station(1, 148580.0, 171157.0, 25.4, "41B004", "", "", 0.824880),
         Station(2, 150397.0, 169802.0, 73.0, "41B006", "", "", 0.702315),
@@ -72,9 +74,9 @@ TEST_F(StationInfoProviderTest, GetStations)
     }));
 }
 
-TEST_F(StationInfoProviderTest, GetValuesInvalidPollutant)
+TEST_F(StationInfoProviderTest, GetStationsInvalidPollutant)
 {
-    EXPECT_TRUE(_stationsProvider.getStations(Pollutant(1, "o3", "unit", "desc")).empty());
+    EXPECT_TRUE(_stationsProvider.getStations(Pollutant(1, "o3", "unit", "desc"), "clc06d").empty());
 }
 
 }

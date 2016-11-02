@@ -7,7 +7,6 @@
 
 #include "data/DataProvider.h"
 #include "data/ForecastBuffer.h"
-#include "data/GridProvider.h"
 #include "data/MeteoProvider.h"
 #include "tools/ExceptionTools.h"
 
@@ -19,6 +18,7 @@ namespace opaq
 
 // forward declaration
 class Component;
+class IGridProvider;
 
 class Model : virtual public Component
 {
@@ -45,7 +45,7 @@ public:
     {
         this->aqNetworkProvider = &aqNetworkProvider;
     }
-    virtual void setGridProvider(GridProvider* gridProvider)
+    virtual void setGridProvider(IGridProvider* gridProvider)
     {
         this->gridProvider = gridProvider;
     }
@@ -87,7 +87,7 @@ public:
     }
 
     // Throws NullPointerException
-    virtual GridProvider* getGridProvider()
+    virtual IGridProvider* getGridProvider()
     {
         throwOnNullPtr(gridProvider);
         return gridProvider;
@@ -126,7 +126,7 @@ protected:
     chrono::days forecastHorizon;  //< maximum forecast horizon to run to
 
     AQNetworkProvider* aqNetworkProvider;
-    GridProvider* gridProvider;
+    IGridProvider* gridProvider;
     DataProvider* input;
     MeteoProvider* meteo;
     ForecastBuffer* buffer;

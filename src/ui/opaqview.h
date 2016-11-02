@@ -15,7 +15,7 @@
 namespace opaq
 {
 
-namespace Config
+namespace config
 {
 struct Component;
 }
@@ -32,7 +32,7 @@ public:
     virtual ~OpaqView();
 
 private:
-    void setModels(const std::vector<Config::Component>& models);
+    void setModels(const std::vector<config::Component>& models);
 
     void showConfigFileSelector();
     void loadConfiguration(const QString& path);
@@ -47,7 +47,7 @@ private:
     QStandardItemModel _pollutantModel;
     QStandardItemModel _aggregationModel;
     
-    Config::PollutantManager _pollutantMgr;
+    config::PollutantManager _pollutantMgr;
     ConfigurationHandler _config;
     Engine _engine;
 };

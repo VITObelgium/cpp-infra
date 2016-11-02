@@ -1,12 +1,4 @@
-/*
- * Grid.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys, maiheub
- */
-
-#ifndef OPAQ_GRID_H_
-#define OPAQ_GRID_H_
+#pragma once
 
 #include <string>
 #include <vector>
@@ -24,18 +16,13 @@ namespace opaq
 class Grid
 {
 public:
-    Grid();
-
     void addCell(const Cell& cell);
 
     size_t cellCount() const noexcept;
-
-    //std::vector<Pollutant*> & getPollutants() { return pollutants; }
+    const Cell& cell(size_t index) const;
 
 private:
     std::vector<Cell> _cells;
-    //std::vector<Pollutant*> pollutants;
 };
 
-} /* namespace opaq */
-#endif /* OPAQ_GRID_H_ */
+}

@@ -11,7 +11,7 @@
 
 namespace opaq
 {
-namespace Config
+namespace config
 {
 
 struct Plugin

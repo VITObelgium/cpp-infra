@@ -21,7 +21,7 @@
 namespace opaq
 {
 
-namespace Config
+namespace config
 {
 
 /**
@@ -36,25 +36,25 @@ public:
    *  Returns the dataprovider for the observed concentration values
    *  Throws OPAQ::NullPointerException
    */
-    const Config::Component& getValues() const
+    const config::Component& getValues() const
     {
         throwOnNullPtr(_values);
         return *_values;
     }
 
-    void setValues(const Config::Component& values)
+    void setValues(const config::Component& values)
     {
         _values = &values;
     }
 
     // Throws OPAQ::NullPointerException
-    const Config::Component& getMeteo() const
+    const config::Component& getMeteo() const
     {
         throwOnNullPtr(_meteo);
         return *_meteo;
     }
 
-    void setMeteo(const Config::Component& meteo)
+    void setMeteo(const config::Component& meteo)
     {
         _meteo = &meteo;
     }
@@ -65,13 +65,13 @@ public:
     }
 
     // Throws OPAQ::NullPointerException
-    const Config::Component& getBuffer() const
+    const config::Component& getBuffer() const
     {
         throwOnNullPtr(_buffer);
         return *_buffer;
     }
 
-    void setBuffer(const Config::Component& buffer)
+    void setBuffer(const config::Component& buffer)
     {
         _buffer = &buffer;
     }
@@ -82,7 +82,7 @@ public:
     }
 
     // Throws OPAQ::NullPointerException
-    const Config::Component& getOutputWriter() const
+    const config::Component& getOutputWriter() const
     {
         throwOnNullPtr(_outputWriter);
         return *_outputWriter;

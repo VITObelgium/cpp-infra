@@ -54,21 +54,21 @@ public:
      *
      * \param filename The name of the master XML configuration file
      */
-    void parseConfigurationFile(const std::string& filename, Config::PollutantManager& pollutantMgr);
+    void parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr);
 
     /** Validates whether the configuration is ok */
-    void validateConfiguration(Config::PollutantManager& pollutantMgr);
+    void validateConfiguration(config::PollutantManager& pollutantMgr);
 
     /** Returns an opaq run object, constructed from the configuration parsing */
-    Config::OpaqRun& getOpaqRun() { return _opaqRun; }
+    config::OpaqRun& getOpaqRun() { return _opaqRun; }
 
 private:
     void clearConfig();
 
-    Config::ForecastStage* parseForecastStage(TiXmlElement* element);
-    Config::MappingStage* parseMappingStage(TiXmlElement* element);
+    config::ForecastStage* parseForecastStage(TiXmlElement* element);
+    config::MappingStage* parseMappingStage(TiXmlElement* element);
 
-    Config::OpaqRun _opaqRun;
+    config::OpaqRun _opaqRun;
     TiXmlDocument _doc;
     std::vector<std::unique_ptr<TiXmlDocument>> _configDocs;
     Logger _logger;

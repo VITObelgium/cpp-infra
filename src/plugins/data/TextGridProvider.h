@@ -8,20 +8,23 @@
 namespace opaq
 {
 
-class XmlGridProvider : public IGridProvider
+class TextGridProvider : public IGridProvider
 {
 public:
-    XmlGridProvider();
+    TextGridProvider();
 
     static std::string name();
 
     // throws BadConfigurationException
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
-    const Grid& getGrid(GridType) override;
+    const Grid& getGrid(GridType type) override;
 
 private:
-    Grid _grid;
+    void readFile(GridType type);
+
     Logger _logger;
+    std::string _pattern;
+    std::map<GridType, Grid> _grid;
 };
 }

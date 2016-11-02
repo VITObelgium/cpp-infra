@@ -36,4 +36,15 @@ Cell::Cell(long ID, double xmin, double xmax, double ymin, double ymax)
 {
 }
 
+bool Cell::operator==(const Cell& other) const noexcept
+{
+    return id == other.id &&
+           xmin == other.xmin &&
+           xmax == other.xmax &&
+           ymin == other.ymin &&
+           ymax == other.ymax &&
+           zmin == other.zmin &&
+           zmax == other.zmax;
+}
+
 }

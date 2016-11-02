@@ -7,7 +7,7 @@ class TiXmlElement;
 
 namespace opaq
 {
-namespace Config
+namespace config
 {
 
 /**

@@ -17,7 +17,7 @@ using namespace std::string_literals;
 class EngineMock : public IEngine
 {
 public:
-    MOCK_METHOD0(pollutantManager, Config::PollutantManager&());
+    MOCK_METHOD0(pollutantManager, config::PollutantManager&());
     MOCK_METHOD0(componentManager, ComponentManager&());
 };
 

@@ -154,7 +154,7 @@ int main(int argc, char* argv[])
     auto logger = Log::createLogger("main");
 
     // -- Parse configuration, after init of the log, otherwise we get errors
-    opaq::Config::PollutantManager pollutantMgr;
+    opaq::config::PollutantManager pollutantMgr;
     opaq::ConfigurationHandler ch;
 
     try

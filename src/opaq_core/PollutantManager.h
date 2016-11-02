@@ -6,7 +6,7 @@
 namespace opaq
 {
 
-namespace Config
+namespace config
 {
 /**
      * Singleton pollutant manager class

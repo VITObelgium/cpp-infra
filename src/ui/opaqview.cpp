@@ -66,7 +66,7 @@ OpaqView::OpaqView(QWidget* parent)
 
 OpaqView::~OpaqView() = default;
 
-void OpaqView::setModels(const std::vector<Config::Component>& models)
+void OpaqView::setModels(const std::vector<config::Component>& models)
 {
     _ui.viewerTab->setModels(models);
     _ui.validationTab->setModels(models);

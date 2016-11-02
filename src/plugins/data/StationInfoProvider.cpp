@@ -19,7 +19,6 @@ static std::string s_gisTypePlaceholder = "%gis%";
 StationInfoProvider::StationInfoProvider()
 : _logger("StationInfoProvider")
 , _configured(false)
-, _gisType("clc06d")
 {
 }
 
@@ -37,36 +36,36 @@ void StationInfoProvider::configure(TiXmlElement* cnf, const std::string& compon
     _configured = true;
 }
 
-std::vector<Station> StationInfoProvider::getStations(Pollutant pollutant)
+std::vector<Station> StationInfoProvider::getStations(Pollutant pollutant, const std::string& gisType)
 {
-    if (_stations[pollutant.getName()].empty())
+    if (_stations[pollutant.getName()][gisType].empty())
     {
-        readFile(pollutant);
+        readFile(pollutant, gisType);
     }
 
-    return _stations[pollutant.getName()];
+    return _stations[pollutant.getName()][gisType];
 }
 
-void StationInfoProvider::readFile(Pollutant pollutant)
+void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisType)
 {
     // create file name & open file stream
     std::string filename = _pattern;
     StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant.getName());
-    StringTools::replaceAll(filename, s_gisTypePlaceholder, _gisType);
+    StringTools::replaceAll(filename, s_gisTypePlaceholder, gisType);
 
     try
     {
         auto contents = FileTools::readFileContents(filename);
         StringTools::StringSplitter lineSplitter(contents, "\r\n");
 
-        auto& stations = _stations[pollutant.getName()];
+        auto& stations = _stations[pollutant.getName()][gisType];
 
         bool first = true;
         for (auto& line : lineSplitter)
         {
             if (first)
             {
-                // skipt header
+                // skip header
                 first = false;
                 continue;
             }
@@ -85,13 +84,7 @@ void StationInfoProvider::readFile(Pollutant pollutant)
 
             auto beta = boost::lexical_cast<double>(*iter);
 
-            Station station(std::move(stationCode), "", "", beta);
-            station.setX(x);
-            station.setY(y);
-            station.setZ(z);
-            station.setId(id);
-
-            stations.push_back(std::move(station));
+            stations.push_back(Station(id, x, y, z, std::move(stationCode), "", "", beta));
         }
     }
     catch (const RunTimeException& e)

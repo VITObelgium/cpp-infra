@@ -13,7 +13,7 @@ namespace opaq
 
 class StationResultsModel;
 
-namespace Config
+namespace config
 {
 
 struct Component;
@@ -29,7 +29,7 @@ public:
     ResultsView(QWidget* parent = 0);
 
     void setForecastHorizon(chrono::days forecastHorizon);
-    void setModels(StationResultsModel& model, const std::vector<Config::Component>& modelComponents);
+    void setModels(StationResultsModel& model, const std::vector<config::Component>& modelComponents);
 
 private:
     void handleMarkerClicked();
