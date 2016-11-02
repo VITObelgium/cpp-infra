@@ -54,42 +54,49 @@ void StationInfoProvider::readFile(Pollutant pollutant)
     StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant.getName());
     StringTools::replaceAll(filename, s_gisTypePlaceholder, _gisType);
 
-    auto contents = FileTools::readFileContents(filename);
-    StringTools::StringSplitter lineSplitter(contents, "\r\n");
-
-    auto& stations = _stations[pollutant.getName()];
-
-    bool first = false;
-    for (auto& line : lineSplitter)
+    try
     {
-        if (first)
+        auto contents = FileTools::readFileContents(filename);
+        StringTools::StringSplitter lineSplitter(contents, "\r\n");
+
+        auto& stations = _stations[pollutant.getName()];
+
+        bool first = true;
+        for (auto& line : lineSplitter)
         {
-            // skipt header
-            first = false;
-            continue;
+            if (first)
+            {
+                // skipt header
+                first = false;
+                continue;
+            }
+
+            // line format: ID STATIONCODE XLAMB YLAMB ALTITUDE TYPE BETA
+            StringTools::StringSplitter stationSplitter(line, " \t\r\n\f");
+            auto iter = stationSplitter.begin();
+
+            auto id = boost::lexical_cast<long>(*iter++);
+            auto stationCode = boost::lexical_cast<std::string>(*iter++);
+            auto x = boost::lexical_cast<double>(*iter++);
+            auto y = boost::lexical_cast<double>(*iter++);
+            auto z = boost::lexical_cast<double>(*iter++);
+
+            ++iter; // skip type
+
+            auto beta = boost::lexical_cast<double>(*iter);
+
+            Station station(std::move(stationCode), "", "", beta);
+            station.setX(x);
+            station.setY(y);
+            station.setZ(z);
+            station.setId(id);
+
+            stations.push_back(std::move(station));
         }
-
-        // line format: ID STATIONCODE XLAMB YLAMB ALTITUDE TYPE BETA
-        StringTools::StringSplitter stationSplitter(line, " \t\r\n\f");
-        auto iter = stationSplitter.begin();
-        
-        auto id = boost::lexical_cast<long>(*iter++);
-        auto stationCode = boost::lexical_cast<std::string>(*iter++);
-        auto x = boost::lexical_cast<double>(*iter++);
-        auto y = boost::lexical_cast<double>(*iter++);
-        auto z = boost::lexical_cast<double>(*iter++);
-
-        ++iter; // skip type
-
-        auto beta = boost::lexical_cast<double>(*iter);
-
-        Station station(std::move(stationCode), "", "", beta);
-        station.setX(x);
-        station.setY(y);
-        station.setZ(z);
-        station.setId(id);
-
-        stations.push_back(std::move(station));
+    }
+    catch (const RunTimeException& e)
+    {
+        _logger->warn(e.what());
     }
 }
 

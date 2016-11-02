@@ -14,6 +14,7 @@ add_executable(dataplugintest
     RioObsProviderTest.cpp
     IRCELMeteoProviderTest.cpp
     ForecastBufferTest.cpp
+    StationInfoProviderTest.cpp
     main.cpp
     ${MOCKS}
 )
@@ -28,6 +29,7 @@ target_link_libraries(dataplugintest
     sqlbuffer
     rioobsprovider
     ircelmeteoprovider
+    stationinfoprovider
     ${GTEST_LIBRARY}
 )
 

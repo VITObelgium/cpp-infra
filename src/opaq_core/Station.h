@@ -50,6 +50,8 @@ public:
 
     bool measuresPollutant(const Pollutant& pol) const noexcept;
 
+    bool operator==(const Station& other) const noexcept;
+
 private:
     std::vector<Pollutant> _pollutants;  //!< a list of pollutants measured by the station
     std::string _name;                   //!< a station name (short code)
