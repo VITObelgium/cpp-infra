@@ -19,80 +19,74 @@ ConfigurationHandler::ConfigurationHandler()
 /* ================================================================================
    Forecast stage parser
    ============================================================================= */
-config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlElement* element)
+config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* element)
 {
-    auto fcStage = std::make_unique<config::ForecastStage>();
+    config::ForecastStage fcStage;
 
-    TiXmlElement* modelsElement = element->FirstChildElement("models");
-    if (!modelsElement) {
+    auto* modelsElement = element->FirstChildElement("models");
+    if (!modelsElement)
+    {
         _logger->error("No models tag given in forecast stage configuration...");
         throw RunTimeException("No models tag given in forecast stage configuration !");
     }
 
-    TiXmlElement* componentElement = modelsElement->FirstChildElement("component");
+    auto* componentElement = modelsElement->FirstChildElement("component");
     while (componentElement)
     {
-        std::string componentName = componentElement->GetText();
-        fcStage->addModel(_opaqRun.getComponent(componentName));
+        fcStage.addModel(_opaqRun.getComponent(componentElement->GetText()));
         componentElement = componentElement->NextSiblingElement("component");
     }
 
     // parse the <input> section
-    TiXmlElement* inputElement = element->FirstChildElement("input");
+    auto* inputElement = element->FirstChildElement("input");
     try
     {
-        std::string componentName = XmlTools::getText(inputElement, "observations");
-        fcStage->setValues(_opaqRun.getComponent(componentName));
+        fcStage.setValues(_opaqRun.getComponent(XmlTools::getText(inputElement, "observations")));
     }
     catch (const ElementNotFoundException&)
     {
         throw BadConfigurationException("No observation data provider in run configuration");
     }
+
     try
     {
-        std::string componentName = XmlTools::getText(inputElement, "meteo");
-        fcStage->setMeteo(_opaqRun.getComponent(componentName));
+        fcStage.setMeteo(_opaqRun.getComponent(XmlTools::getText(inputElement, "meteo")));
     }
     catch (const ElementNotFoundException&)
     {
-        fcStage->resetMeteo();
-        _logger->warn("no meteo dataprovider in the run configuration");
+        _logger->warn("No meteo dataprovider in the run configuration");
     }
 
     try
     {
-        std::string bufferName = XmlTools::getText(element, "buffer");
-        fcStage->setBuffer(_opaqRun.getComponent(bufferName));
+        fcStage.setBuffer(_opaqRun.getComponent(XmlTools::getText(element, "buffer")));
     }
     catch (const ElementNotFoundException&)
     {
-        fcStage->resetBuffer();
-        _logger->warn("no databuffer given in run configuration");
+        _logger->warn("No databuffer given in run configuration");
     }
 
     try
     {
-        std::string outputName = XmlTools::getText(element, "output");
-        fcStage->setOutputWriter(_opaqRun.getComponent(outputName));
+        fcStage.setOutputWriter(_opaqRun.getComponent(XmlTools::getText(element, "output")));
     }
     catch (const ElementNotFoundException&)
     {
-        fcStage->resetOutputWriter();
-        _logger->warn("no output writer given in run configuration");
+        _logger->warn("No output writer given in run configuration");
     }
 
     try
     {
-        int fc_hor_max = atoi(XmlTools::getText(element, "horizon").c_str());
-        fcStage->setHorizon(chrono::days(fc_hor_max));
+        auto fc_hor_max = atoi(XmlTools::getText(element, "horizon").c_str());
+        fcStage.setHorizon(chrono::days(fc_hor_max));
     }
     catch (const ElementNotFoundException&)
     {
         _logger->warn("no forecast <horizon> given in forecast run configuration, using default 2");
-        fcStage->setHorizon(chrono::days(2));
+        fcStage.setHorizon(chrono::days(2));
     }
 
-    return fcStage.release();
+    return fcStage;
 }
 
 /* ================================================================================
@@ -271,7 +265,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
     }
     catch (const ElementNotFoundException&)
     {
-        _logger->warn("no grid provider defined");
+        _logger->warn("No grid provider defined");
         _opaqRun.resetGridProvider();
     }
 
@@ -280,14 +274,11 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
      --------------------------------------------------------------------- */
     try
     {
-        TiXmlElement* forecastElement        = XmlTools::getElement(rootElement, "forecast");
-        config::ForecastStage* forecastStage = parseForecastStage(forecastElement);
-        _opaqRun.setForecastStage(forecastStage);
+        _opaqRun.setForecastStage(parseForecastStage(XmlTools::getElement(rootElement, "forecast")));
     }
     catch (const ElementNotFoundException&)
     {
-        _logger->warn("no forecast stage defined");
-        _opaqRun.setForecastStage(nullptr);
+        _logger->warn("No forecast stage defined");
     }
 
     /* ------------------------------------------------------------------------

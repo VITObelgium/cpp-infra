@@ -9,7 +9,7 @@ namespace opaq
 
 class IEngine;
 
-namespace Factory
+namespace factory
 {
 
 ComponentManager createComponentManager(IEngine&);

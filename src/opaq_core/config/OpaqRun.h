@@ -19,6 +19,7 @@
 #include <string>
 #include <tinyxml.h>
 #include <vector>
+#include <boost/optional.hpp>
 
 namespace opaq
 {
@@ -66,7 +67,7 @@ public:
     Component* getGridProvider() const { return _gridProvider.get(); }
 
     /** Retrieve the forecast configuration object */
-    ForecastStage* getForecastStage() const { return _forecastStage.get(); }
+    boost::optional<ForecastStage> getForecastStage() const { return _forecastStage; }
 
     /** Retrieve the mapping stage object */
     MappingStage* getMappingStage() const { return _mappingStage.get(); }
@@ -101,7 +102,7 @@ public:
 
 
     /** Set the forecast stage */
-    void setForecastStage(ForecastStage* forecastStage) { _forecastStage.reset(forecastStage); }
+    void setForecastStage(ForecastStage forecastStage) { _forecastStage = forecastStage; }
 
     /** Set the mapping stage */
     void setMappingStage(MappingStage* mappingStage) { _mappingStage.reset(mappingStage); }
@@ -120,7 +121,7 @@ private:
     std::unique_ptr<Component> _networkProvider;
     std::unique_ptr<Component> _gridProvider;
 
-    std::unique_ptr<ForecastStage> _forecastStage;
+    boost::optional<ForecastStage> _forecastStage;
     std::unique_ptr<MappingStage> _mappingStage;
 };
 

@@ -38,7 +38,7 @@ inline size_t gridTypeToCellSize(GridType type)
 class IGridProvider : public Component
 {
 public:
-    virtual const Grid& getGrid(GridType type) = 0;
+    virtual const Grid& getGrid(const std::string& pollutant, GridType type) = 0;
 };
 
 }

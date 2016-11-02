@@ -11,6 +11,7 @@ namespace opaq
 {
 
 static std::string s_gridTypePlaceholder = "%grid%";
+static std::string s_pollutantPlaceholder = "%pol%";
 
 TextGridProvider::TextGridProvider()
 : _logger("TextGridProvider")
@@ -29,24 +30,25 @@ void TextGridProvider::configure(TiXmlElement* configuration, const std::string&
     _pattern = XmlTools::getChildValue<std::string>(configuration, "file_pattern");
 }
 
-const Grid& TextGridProvider::getGrid(GridType type)
+const Grid& TextGridProvider::getGrid(const std::string& pollutant, GridType type)
 {
-    if (_grid[type].cellCount() == 0)
+    if (_grid[pollutant][type].cellCount() == 0)
     {
-        readFile(type);
+        readFile(pollutant, type);
     }
 
-    return _grid[type];
+    return _grid[pollutant][type];
 }
 
-void TextGridProvider::readFile(GridType type)
+void TextGridProvider::readFile(const std::string& pollutant, GridType type)
 {
     std::string filename = _pattern;
     StringTools::replaceAll(filename, s_gridTypePlaceholder, gridTypeToString(type));
+    StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant);
 
     try
     {
-        auto& grid = _grid[type];
+        auto& grid = _grid[pollutant][type];
         auto cellSize = gridTypeToCellSize(type) / 1000.0;
 
         auto contents = FileTools::readFileContents(filename);

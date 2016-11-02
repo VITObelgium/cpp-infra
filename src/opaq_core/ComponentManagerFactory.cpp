@@ -5,7 +5,7 @@
 
 namespace opaq
 {
-namespace Factory
+namespace factory
 {
 
 ComponentManager createComponentManager(IEngine& engine)

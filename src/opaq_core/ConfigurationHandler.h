@@ -65,7 +65,7 @@ public:
 private:
     void clearConfig();
 
-    config::ForecastStage* parseForecastStage(TiXmlElement* element);
+    config::ForecastStage parseForecastStage(TiXmlElement* element);
     config::MappingStage* parseMappingStage(TiXmlElement* element);
 
     config::OpaqRun _opaqRun;

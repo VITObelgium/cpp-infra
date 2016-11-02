@@ -25,7 +25,7 @@ class ComponentManagerTest : public Test
 {
 protected:
     ComponentManagerTest()
-    : _cmpMgr(Factory::createComponentManager(_engineMock))
+    : _cmpMgr(factory::createComponentManager(_engineMock))
     {
     }
 

@@ -50,7 +50,8 @@ void XmlGridProvider::configure(TiXmlElement* configuration, const std::string& 
         int id;
         double xmin, xmax, ymin, ymax, zmin, zmax;
 
-        if (cellEl->QueryIntAttribute("id", &id) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("xmin", &xmin) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("xmax", &xmax) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("ymin", &ymin) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("ymax", &ymax) != TIXML_SUCCESS) {
+        if (cellEl->QueryIntAttribute("id", &id) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("xmin", &xmin) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("xmax", &xmax) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("ymin", &ymin) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("ymax", &ymax) != TIXML_SUCCESS)
+        {
             throw BadConfigurationException("cell should at least have id, xmin, xmax, ymin, and ymax defined");
         }
 
@@ -65,10 +66,8 @@ void XmlGridProvider::configure(TiXmlElement* configuration, const std::string& 
         {
             throw BadConfigurationException("Duplicate cell id: {}", id);
         }
-        else
-        {
-            cellIds.push_back(id);
-        }
+
+        cellIds.push_back(id);
 
         // create cell and push into the grid
         _grid.addCell(Cell(id, xmin, xmax, ymin, ymax, zmin, zmax));
@@ -80,7 +79,7 @@ void XmlGridProvider::configure(TiXmlElement* configuration, const std::string& 
         throw BadConfigurationException("no cells defined in grid");
 }
 
-const Grid& XmlGridProvider::getGrid(GridType)
+const Grid& XmlGridProvider::getGrid(const std::string&, GridType)
 {
     return _grid;
 }

@@ -59,11 +59,6 @@ public:
         _meteo = &meteo;
     }
 
-    void resetMeteo()
-    {
-        _meteo = nullptr;
-    }
-
     // Throws OPAQ::NullPointerException
     const config::Component& getBuffer() const
     {
@@ -74,11 +69,6 @@ public:
     void setBuffer(const config::Component& buffer)
     {
         _buffer = &buffer;
-    }
-
-    void resetBuffer()
-    {
-        _buffer = nullptr;
     }
 
     // Throws OPAQ::NullPointerException
@@ -93,24 +83,19 @@ public:
         _outputWriter = &ow;
     }
 
-    void resetOutputWriter()
-    {
-        _outputWriter = nullptr;
-    }
-
     void addModel(const Component& model)
     {
         _models.push_back(model);
     }
 
     // returns a list of models used in the forecast...
-    const std::vector<Component>& getModels() { return _models; }
+    const std::vector<Component>& getModels() const noexcept { return _models; }
 
     /** Set the requested forecast horizon */
     void setHorizon(chrono::days fcHor) { _fcHor = fcHor; }
 
     /** Returns the requested (max) forecast horizon for the forecasts */
-    chrono::days getHorizon() { return _fcHor; }
+    chrono::days getHorizon() const noexcept { return _fcHor; }
 
 private:
     // vector of models to run in the forecast

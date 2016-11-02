@@ -8,6 +8,7 @@
 #include "data/SqlBuffer.h"
 #include "data/XMLAQNetProvider.h"
 #include "data/XmlGridProvider.h"
+#include "data/TextGridProvider.h"
 #include "data/IRCELMeteoProvider.h"
 #include "data/StationInfoProvider.h"
 
@@ -31,6 +32,7 @@ inline std::vector<std::string> getPluginNames()
         Hdf5Buffer::name(),
         XMLAQNetProvider::name(),
         XmlGridProvider::name(),
+        TextGridProvider::name(),
         IRCELMeteoProvider::name(),
         StationInfoProvider::name(),
 

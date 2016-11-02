@@ -111,7 +111,7 @@ void OpaqView::loadConfiguration(const QString& path)
 
         updatePollutantModel();
 
-        auto* fcStage = _config.getOpaqRun().getForecastStage();
+        auto fcStage = _config.getOpaqRun().getForecastStage();
         if (fcStage)
         {
             setModels(fcStage->getModels());

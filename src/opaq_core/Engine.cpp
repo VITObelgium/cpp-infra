@@ -6,6 +6,7 @@
  */
 
 #include "Engine.h"
+#include "data/IGridProvider.h"
 #include "ComponentManagerFactory.h"
 
 namespace opaq
@@ -14,28 +15,28 @@ namespace opaq
 Engine::Engine(config::PollutantManager& pollutantMgr)
 : _logger("OPAQ::Engine")
 , _pollutantMgr(pollutantMgr)
-, _componentMgr(Factory::createComponentManager(*this))
+, _componentMgr(factory::createComponentManager(*this))
 {
 }
 
-void Engine::runForecastStage(config::ForecastStage* cnf,
+void Engine::runForecastStage(const config::ForecastStage& cnf,
                               AQNetworkProvider& net,
                               const Pollutant& pol,
                               Aggregation::Type aggr,
                               const chrono::date_time& baseTime)
 {
     // Get max forecast horizon...
-    auto forecastHorizon = cnf->getHorizon();
+    auto forecastHorizon = cnf.getHorizon();
 
     // Get observation data provider
-    auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getValues().name);
+    auto& obs = _componentMgr.getComponent<DataProvider>(cnf.getValues().name);
     obs.setAQNetworkProvider(net);
 
     // Get meteo data provider (can be missing)
     MeteoProvider* meteo = nullptr;
     try
     {
-        meteo = &_componentMgr.getComponent<MeteoProvider>(cnf->getMeteo().name);
+        meteo = &_componentMgr.getComponent<MeteoProvider>(cnf.getMeteo().name);
         meteo->setBaseTime(baseTime);
     }
     catch (const NullPointerException&)
@@ -43,11 +44,11 @@ void Engine::runForecastStage(config::ForecastStage* cnf,
     }
 
     // Get data buffer (can't be missing)
-    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(cnf->getBuffer().name);
+    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(cnf.getBuffer().name);
     buffer.setAQNetworkProvider(net);
 
     // Get the forecast models to run
-    for (auto& modelConfig : cnf->getModels())
+    for (auto& modelConfig : cnf.getModels())
     {
         auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
 
@@ -68,7 +69,7 @@ void Engine::runForecastStage(config::ForecastStage* cnf,
     }
 
     // Prepare and run the forecast output writer for this basetime & pollutant
-    auto& outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf->getOutputWriter().name);
+    auto& outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf.getOutputWriter().name);
     outWriter.setAQNetworkProvider(net);
     outWriter.setBuffer(&buffer);
     outWriter.setForecastHorizon(forecastHorizon);
@@ -97,7 +98,7 @@ void Engine::run(config::OpaqRun& config)
     auto pollutant = _pollutantMgr.find(pollutantName);
 
     // Get stages
-    config::ForecastStage* forecastStage = config.getForecastStage();
+    auto forecastStage = config.getForecastStage();
     config::MappingStage* mappingStage   = config.getMappingStage();
 
     // Get air quality network provider
@@ -106,12 +107,13 @@ void Engine::run(config::OpaqRun& config)
     _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
-    // GridProvider* gridProvider;
-    // Config::Component* gridProviderDef = config.getGridProvider();
-    // if (gridProviderDef != nullptr) {
-    //     gridProvider = &_componentMgr.getComponent<GridProvider>(gridProviderDef->name);
-    //     _logger->info("Using grid provider {}", gridProviderDef->name);
-    // }
+    IGridProvider* gridProvider;
+    auto* gridProviderDef = config.getGridProvider();
+    if (gridProviderDef != nullptr)
+    {
+        gridProvider = &_componentMgr.getComponent<IGridProvider>(gridProviderDef->name);
+        _logger->info("Using grid provider {}", gridProviderDef->name);
+    }
 
     // Get the base times
     auto baseTimes = config.getBaseTimes();
@@ -123,7 +125,7 @@ void Engine::run(config::OpaqRun& config)
         {
             // A log message
             _logger->info("Forecast stage for {}", chrono::to_date_string(baseTime));
-            runForecastStage(forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
+            runForecastStage(*forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
             if (mappingStage)
             {

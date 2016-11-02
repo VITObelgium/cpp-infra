@@ -18,13 +18,13 @@ public:
     // throws BadConfigurationException
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
-    const Grid& getGrid(GridType type) override;
+    const Grid& getGrid(const std::string& pollutant, GridType type) override;
 
 private:
-    void readFile(GridType type);
+    void readFile(const std::string& pollutant, GridType type);
 
     Logger _logger;
     std::string _pattern;
-    std::map<GridType, Grid> _grid;
+    std::map<std::string, std::map<GridType, Grid>> _grid;
 };
 }
