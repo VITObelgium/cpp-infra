@@ -10,7 +10,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include "StringTools.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 void GzipReader::open(const std::string& filename)

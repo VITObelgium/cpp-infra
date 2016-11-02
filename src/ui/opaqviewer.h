@@ -9,7 +9,7 @@
 #include <string>
 #include <QWidget>
 
-namespace OPAQ
+namespace opaq
 {
 
 class Engine;

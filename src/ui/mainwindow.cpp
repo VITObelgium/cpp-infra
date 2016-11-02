@@ -4,7 +4,7 @@
 
 #include <QMenuBar>
 
-namespace OPAQ
+namespace opaq
 {
 
 MainWindow::MainWindow()

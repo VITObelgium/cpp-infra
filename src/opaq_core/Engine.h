@@ -24,7 +24,7 @@
 #include "PollutantManager.h"
 #include "ComponentManagerFactory.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class IEngine

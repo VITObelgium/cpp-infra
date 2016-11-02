@@ -6,7 +6,7 @@
 #include "config.h"
 #include "testconfig.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

@@ -2,7 +2,7 @@
 
 #include "Exceptions.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace Config
 {
@@ -12,7 +12,7 @@ PollutantManager::PollutantManager()
 {
 }
 
-OPAQ::Pollutant PollutantManager::find(const std::string& name)
+Pollutant PollutantManager::find(const std::string& name)
 {
     auto iter = std::find_if(_pollutants.begin(), _pollutants.end(), [&name] (auto& pollutant) {
         return pollutant.getName() == name;
@@ -32,7 +32,7 @@ void PollutantManager::configure(TiXmlElement const* config)
     const TiXmlElement* pollutantElement = config->FirstChildElement("pollutant");
     while (pollutantElement)
     {
-        OPAQ::Pollutant pol(pollutantElement);
+        Pollutant pol(pollutantElement);
         _pollutants.push_back(pol);
         pollutantElement = pollutantElement->NextSiblingElement("pollutant");
     }

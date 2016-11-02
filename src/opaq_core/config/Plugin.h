@@ -9,7 +9,7 @@
 
 #include <string>
 
-namespace OPAQ
+namespace opaq
 {
 namespace Config
 {

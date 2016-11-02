@@ -3,7 +3,7 @@
 
 #include "MLP_FeedForwardModel.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class OVL_IRCEL_model1 : public MLP_FeedForwardModel
@@ -19,7 +19,7 @@ public:
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     virtual int makeSample(double* sample, const Station& st, const Pollutant& pol,
-                           OPAQ::Aggregation::Type aggr, const chrono::date_time& baseTime,
+                           Aggregation::Type aggr, const chrono::date_time& baseTime,
                            const chrono::date_time& fcTime, chrono::days fc_hor) override;
 
 private:

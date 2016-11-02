@@ -16,7 +16,7 @@
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTableView>
 
-namespace OPAQ
+namespace opaq
 {
 
 QT_CHARTS_USE_NAMESPACE

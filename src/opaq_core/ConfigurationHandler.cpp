@@ -8,7 +8,7 @@
 #include "config.h"
 #include "ConfigurationHandler.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 ConfigurationHandler::ConfigurationHandler()
@@ -19,7 +19,7 @@ ConfigurationHandler::ConfigurationHandler()
 /* ================================================================================
    Forecast stage parser
    ============================================================================= */
-OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlElement* element)
+Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlElement* element)
 {
     auto fcStage = std::make_unique<Config::ForecastStage>();
 
@@ -98,12 +98,9 @@ OPAQ::Config::ForecastStage* ConfigurationHandler::parseForecastStage(TiXmlEleme
 /* ================================================================================
    Mapping stage parser
    ============================================================================= */
-OPAQ::Config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement* element)
+Config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement* element)
 {
-
-    OPAQ::Config::MappingStage* mapStage = nullptr;
-
-    return mapStage;
+    return nullptr;
 }
 
 /* ===========================================================================

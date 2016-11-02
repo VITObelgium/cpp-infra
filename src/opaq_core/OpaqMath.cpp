@@ -8,7 +8,7 @@
 #include "OpaqMath.h"
 #include "Exceptions.h"
 
-namespace OPAQ {
+namespace opaq {
 
 Math::Math() {
 

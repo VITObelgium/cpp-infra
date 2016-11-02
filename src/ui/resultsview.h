@@ -8,7 +8,7 @@
 
 class QTableView;
 
-namespace OPAQ
+namespace opaq
 {
 
 class StationResultsModel;

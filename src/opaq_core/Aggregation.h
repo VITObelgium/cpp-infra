@@ -11,7 +11,7 @@
 #include "Exceptions.h"
 #include <string>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace Aggregation

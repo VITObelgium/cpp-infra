@@ -5,7 +5,7 @@
 #include <ostream>
 #include <chrono>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace chrono

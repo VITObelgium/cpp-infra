@@ -15,7 +15,7 @@
 #include "../tools/ExceptionTools.h"
 #include "Component.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace Config
 {
@@ -31,12 +31,12 @@ public:
         return *_values;
     }
     
-    void setValues(OPAQ::Config::Component* values)
+    void setValues(Config::Component* values)
     {
         _values = values;
     }
 
-    OPAQ::Config::Component& getMeteo() const
+    Config::Component& getMeteo() const
     {
         throwOnNullPtr(_meteo);
         return *_meteo;
@@ -49,8 +49,8 @@ public:
 
 private:
     // input data provider components
-    OPAQ::Config::Component* _values;
-    OPAQ::Config::Component* _meteo;
+    Config::Component* _values;
+    Config::Component* _meteo;
 };
 
 }

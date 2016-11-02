@@ -3,7 +3,7 @@
 
 #include <boost/dll/import.hpp>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace dll = boost::dll;

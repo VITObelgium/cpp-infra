@@ -15,7 +15,7 @@
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

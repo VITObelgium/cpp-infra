@@ -14,7 +14,7 @@
 
 #include <boost/iostreams/filtering_stream.hpp>
 
-namespace OPAQ
+namespace opaq
 {
 
 class GzipReader

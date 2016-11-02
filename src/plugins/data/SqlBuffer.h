@@ -13,7 +13,7 @@ class connection;
 }
 }
 
-namespace OPAQ
+namespace opaq
 {
 
 class PredictionDatabase;
@@ -50,7 +50,7 @@ public:
     // OPAQ::ForecastBuffer methods
     // ==================================================
 
-    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr) override;
+    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, Aggregation::Type aggr) override;
 
     /**
    * Fill the Hdf5 file with the values given by the current basetime & the forecast

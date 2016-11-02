@@ -3,7 +3,7 @@
 #include "Logger.h"
 #include "Pollutant.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace Config
@@ -29,7 +29,7 @@ public:
 
     /** Returns a reference to the list of the available pollutants
        */
-    const std::vector<OPAQ::Pollutant>& getList() { return _pollutants; }
+    const std::vector<Pollutant>& getList() { return _pollutants; }
 
     /** Searches for a pollutant of given name and returns a pointer to the pollutant object */
     Pollutant find(const std::string& name);

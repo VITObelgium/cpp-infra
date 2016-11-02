@@ -9,7 +9,7 @@
 
 #include <tinyxml.h>
 
-namespace OPAQ
+namespace opaq
 {
 
 XMLAQNetProvider::XMLAQNetProvider()
@@ -30,7 +30,7 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
     TiXmlElement* netEl = cnf->FirstChildElement("network");
     if (!netEl) {
         _logger->error("network element not found in configuration");
-        throw OPAQ::BadConfigurationException("network element not found in configuration");
+        throw BadConfigurationException("network element not found in configuration");
     }
 
     // loop over station elements
@@ -43,7 +43,7 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
 
         // get station attributes
         if ((stEl->QueryStringAttribute("name", &name) != TIXML_SUCCESS) || (stEl->QueryDoubleAttribute("x", &x) != TIXML_SUCCESS) || (stEl->QueryDoubleAttribute("y", &y) != TIXML_SUCCESS))
-            throw OPAQ::BadConfigurationException("station " + name + " should at least have name, x and y defined");
+            throw BadConfigurationException("station " + name + " should at least have name, x and y defined");
 
         // z is optional, default is 0.
         if (stEl->QueryDoubleAttribute("z", &z) != TIXML_SUCCESS) z = 0;
@@ -68,7 +68,7 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
 
             std::string str = stEl->GetText();
 
-            auto pol_list = OPAQ::StringTools::tokenize(str, ",:;| \t", 6);
+            auto pol_list = StringTools::tokenize(str, ",:;| \t", 6);
             for (auto& pol : pol_list)
             {
                 // add to the pollutants list for this station
@@ -81,11 +81,13 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
         stEl = stEl->NextSiblingElement("station");
     } /* end while loop over station elements */
 
-    if (_net.getStations().size() == 0)
-        throw OPAQ::BadConfigurationException("no stations defined in network");
+    if (_net.getStations().empty())
+    {
+        throw BadConfigurationException("no stations defined in network");
+    }
 }
 
-OPAQ::AQNetwork& XMLAQNetProvider::getAQNetwork()
+AQNetwork& XMLAQNetProvider::getAQNetwork()
 {
     return _net;
 }

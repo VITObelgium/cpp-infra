@@ -20,7 +20,7 @@
 #include <tinyxml.h>
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace Config

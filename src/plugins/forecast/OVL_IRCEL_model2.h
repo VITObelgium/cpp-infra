@@ -3,7 +3,7 @@
 
 #include "MLP_FeedForwardModel.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class OVL_IRCEL_model2 : public MLP_FeedForwardModel

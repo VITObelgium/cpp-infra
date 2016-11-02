@@ -6,9 +6,9 @@
 #include "uiutils.h"
 #include "ui_opaqvalidation.h"
 
-Q_DECLARE_METATYPE(OPAQ::Aggregation::Type)
+Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
-namespace OPAQ
+namespace opaq
 {
 
 OpaqValidation::OpaqValidation(QWidget* parent)
@@ -126,7 +126,7 @@ void OpaqValidation::runValidation()
         _ui.scatterView->setModel(_model);
         _ui.lineView->setModel(_model);
     }
-    catch (const OPAQ::ParseException& e)
+    catch (const opaq::ParseException& e)
     {
         displayError(this, tr("Failed to parse date"), e.what());
     }

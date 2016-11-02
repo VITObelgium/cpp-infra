@@ -13,7 +13,7 @@
 
 #include <string>
 
-namespace OPAQ
+namespace opaq
 {
 
 class Station;
@@ -24,7 +24,7 @@ class Station;
  * implement their own sample creating routine. This class is an abstract
  * base class for the actuall plugins.
  */
-class MLP_FeedForwardModel : public OPAQ::Model
+class MLP_FeedForwardModel : public Model
 {
 public:
     MLP_FeedForwardModel();
@@ -37,7 +37,7 @@ public:
      *  Workhorse routine which acutally performs the forecast and returns the
      *  value
      */
-    double fcValue(const OPAQ::Pollutant& pol, const Station& station,
+    double fcValue(const Pollutant& pol, const Station& station,
                    Aggregation::Type aggr, const chrono::date_time& baseTime,
                    chrono::days fc_hor);
 

@@ -11,7 +11,7 @@
 #include "Logger.h"
 #include "data/DataProvider.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class RioObsProvider : public DataProvider

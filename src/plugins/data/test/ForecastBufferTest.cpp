@@ -24,13 +24,13 @@ namespace chrono
 template<class _Clock, class _Duration = typename _Clock::duration>
 ostream& operator<< (ostream& os, const time_point<_Clock, _Duration>& dt)
 {
-    return os << OPAQ::chrono::to_string(dt);
+    return os << opaq::chrono::to_string(dt);
 }
 
 }
 }
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

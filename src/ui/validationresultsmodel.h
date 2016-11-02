@@ -4,7 +4,7 @@
 
 #include <QAbstractTableModel>
 
-namespace OPAQ
+namespace opaq
 {
 
 class ValidationResultsModel : public QAbstractTableModel

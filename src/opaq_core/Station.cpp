@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace OPAQ
+namespace opaq
 {
 
 Station::Station(std::string name, std::string desc, std::string meteoId)

@@ -13,7 +13,7 @@
 #include <boost/utility/string_ref.hpp>
 #include <boost/iterator/iterator_facade.hpp>
 
-namespace OPAQ
+namespace opaq
 {
 namespace StringTools
 {

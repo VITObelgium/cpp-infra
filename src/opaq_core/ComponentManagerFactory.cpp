@@ -3,7 +3,7 @@
 #include "config.h"
 #include "PluginRegistration.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace Factory
 {

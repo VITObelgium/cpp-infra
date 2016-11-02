@@ -14,7 +14,7 @@
 #include "AQNetworkProvider.h"
 #include "Pollutant.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 // forward declaration

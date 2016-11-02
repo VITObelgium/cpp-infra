@@ -3,7 +3,7 @@
 #include "../Component.h"
 #include "../Grid.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class GridProvider : public Component

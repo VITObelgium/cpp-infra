@@ -11,10 +11,10 @@
 
 #include <H5Cpp.h>
 
-namespace OPAQ
+namespace opaq
 {
 
-class Hdf5Buffer : public OPAQ::ForecastBuffer
+class Hdf5Buffer : public ForecastBuffer
 {
 public:
     Hdf5Buffer();
@@ -66,7 +66,7 @@ public:
                                          const chrono::date_time& t2,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
-                                         OPAQ::Aggregation::Type aggr = Aggregation::None) override;
+                                         Aggregation::Type aggr = Aggregation::None) override;
 
     // the current model is already set by the DataProvider parent class
 
@@ -74,7 +74,7 @@ public:
     // OPAQ::ForecastBuffer methods
     // ==================================================
 
-    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr) override;
+    virtual std::vector<std::string> getModelNames(const std::string& pollutantId, Aggregation::Type aggr) override;
 
     /**
    * Fill the Hdf5 file with the values given by the current basetime & the forecast
@@ -117,7 +117,7 @@ public:
                                          const chrono::date_time& fcTime2,
                                          const std::string& stationId,
                                          const std::string& pollutantId,
-                                         OPAQ::Aggregation::Type aggr) override;
+                                         Aggregation::Type aggr) override;
 
     /*
   virtual std::vector<double> getValues(const TimeInterval & beginOffset,

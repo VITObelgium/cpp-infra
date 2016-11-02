@@ -2,7 +2,7 @@
 
 #include "../Exceptions.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 inline void throwOnNullPtr(const void* ptr)

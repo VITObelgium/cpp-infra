@@ -5,10 +5,10 @@
 
 #include <map>
 
-namespace OPAQ
+namespace opaq
 {
 
-class IRCELMeteoProvider : public OPAQ::MeteoProvider
+class IRCELMeteoProvider : public MeteoProvider
 {
 public:
     IRCELMeteoProvider();
@@ -34,10 +34,10 @@ public:
     /**
    * Return the values between t1 and t2 including the boundaries !
    */
-    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& t1,
-                                               const chrono::date_time& t2,
-                                               const std::string& meteoId,
-                                               const std::string& paramId) override;
+    virtual TimeSeries<double> getValues(const chrono::date_time& t1,
+                                         const chrono::date_time& t2,
+                                         const std::string& meteoId,
+                                         const std::string& paramId) override;
 
 private:
 
@@ -45,7 +45,7 @@ private:
     void readFile(const std::string& meteoId, const std::string& parameterId);
 
     // -- the dynamic meteo data buffer
-    std::map<std::string, std::map<std::string, OPAQ::TimeSeries<double>>> _buffer;
+    std::map<std::string, std::map<std::string, TimeSeries<double>>> _buffer;
 
     // -- the buffer with nodata values
     std::map<std::string, double> _nodata;

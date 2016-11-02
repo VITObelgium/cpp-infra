@@ -12,7 +12,7 @@
 #include <string>
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 class AsciiForecastWriter : public ForecastOutputWriter

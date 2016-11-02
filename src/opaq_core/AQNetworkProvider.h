@@ -9,7 +9,7 @@
 
 #include "Component.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class AQNetwork;

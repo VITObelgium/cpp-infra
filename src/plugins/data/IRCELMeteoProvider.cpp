@@ -14,7 +14,7 @@
 #include <tinyxml.h>
 #include <boost/lexical_cast.hpp>
 
-namespace OPAQ
+namespace opaq
 {
 
 static const std::string s_meteo_placeholder     = "%meteo%";
@@ -102,16 +102,16 @@ double IRCELMeteoProvider::getNoData(const std::string& parameterId)
     auto it = _nodata.find(parameterId);
     if (it == _nodata.end())
     {
-        throw OPAQ::NotAvailableException("Meteo parameter {} is not configured!", parameterId);
+        throw NotAvailableException("Meteo parameter {} is not configured!", parameterId);
     }
 
     return it->second;
 }
 
-OPAQ::TimeSeries<double> IRCELMeteoProvider::getValues(const chrono::date_time& t1,
-                                                       const chrono::date_time& t2,
-                                                       const std::string& meteoId,
-                                                       const std::string& paramId)
+TimeSeries<double> IRCELMeteoProvider::getValues(const chrono::date_time& t1,
+                                                 const chrono::date_time& t2,
+                                                 const std::string& meteoId,
+                                                 const std::string& paramId)
 {
     throwIfNotConfigured();
 

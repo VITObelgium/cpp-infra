@@ -36,7 +36,7 @@ public:                                                 \
     private : std::string _message;                     \
 };
 
-namespace OPAQ
+namespace opaq
 {
 
 EXCEPTION(BadConfigurationException);

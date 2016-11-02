@@ -6,7 +6,7 @@
 #include <QAbstractTableModel>
 #include <QRect>
 
-namespace OPAQ
+namespace opaq
 {
 
 class ForecastBuffer;

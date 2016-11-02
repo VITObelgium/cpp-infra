@@ -11,7 +11,7 @@ namespace Ui
 class RunSimulationDialog;
 }
 
-namespace OPAQ
+namespace opaq
 {
 
 class Pollutant;

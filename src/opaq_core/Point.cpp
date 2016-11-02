@@ -1,6 +1,6 @@
 #include "Point.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 Point::Point()

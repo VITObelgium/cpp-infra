@@ -10,7 +10,7 @@
 #include <cstdio>
 #include <string>
 
-namespace OPAQ
+namespace opaq
 {
 namespace FileTools
 {

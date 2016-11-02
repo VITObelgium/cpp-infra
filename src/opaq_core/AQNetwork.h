@@ -13,7 +13,7 @@
 #include <vector>
 #include <memory>
 
-namespace OPAQ
+namespace opaq
 {
 
 /**

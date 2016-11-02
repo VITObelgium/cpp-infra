@@ -6,7 +6,7 @@
 
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 class IStationInfoProvider : public Component

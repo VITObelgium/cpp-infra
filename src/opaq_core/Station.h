@@ -13,7 +13,7 @@
 #include "Point.h"
 #include "Pollutant.h"
 
-namespace OPAQ
+namespace opaq
 {
 /** Air quality station class.
 *  This class inherits from a simple point (with ID) and extends it with a

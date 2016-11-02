@@ -3,7 +3,7 @@
 
 #include "Pollutant.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 Pollutant::Pollutant()

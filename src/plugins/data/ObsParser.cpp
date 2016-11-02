@@ -8,7 +8,7 @@
 
 #include <fstream>
 
-namespace OPAQ
+namespace opaq
 {
 
 // parse the file and read in the pollutant //

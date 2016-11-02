@@ -18,7 +18,7 @@
 #include <string>
 #include <tinyxml.h>
 
-namespace OPAQ
+namespace opaq
 {
 
 /**

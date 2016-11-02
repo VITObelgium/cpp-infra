@@ -12,7 +12,7 @@
 #include <cstdlib>
 #include <vector>
 
-namespace OPAQ {
+namespace opaq {
 
 class Hdf5Tools {
 public:

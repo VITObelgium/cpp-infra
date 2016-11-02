@@ -3,7 +3,7 @@
 #include "data/ForecastBuffer.h"
 #include "tools/CalcTools.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 ValidationResultsModel::ValidationResultsModel(QObject* parent)

@@ -1,6 +1,6 @@
 #include "Grid.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 Grid::Grid()

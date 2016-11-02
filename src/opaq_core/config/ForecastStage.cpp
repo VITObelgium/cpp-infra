@@ -1,6 +1,6 @@
 #include "ForecastStage.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace Config
 {

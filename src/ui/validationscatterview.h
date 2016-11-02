@@ -11,7 +11,7 @@ namespace QtCharts
     class QChart;
 }
 
-namespace OPAQ
+namespace opaq
 {
 
 class ValidationResultsModel;

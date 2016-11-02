@@ -9,7 +9,7 @@
 
 #define epsilon 1e-6
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace std::chrono_literals;

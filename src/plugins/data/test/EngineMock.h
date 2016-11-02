@@ -5,7 +5,7 @@
 
 #include "Engine.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

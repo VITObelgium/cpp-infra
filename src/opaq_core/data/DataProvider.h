@@ -16,7 +16,7 @@
 #include <chrono>
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 /**

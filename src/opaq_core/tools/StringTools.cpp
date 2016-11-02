@@ -7,7 +7,7 @@
 
 #include "StringTools.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace StringTools
 {

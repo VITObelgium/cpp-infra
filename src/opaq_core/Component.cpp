@@ -1,6 +1,6 @@
 #include "Component.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 std::string Component::getName() const noexcept

@@ -4,7 +4,7 @@
 
 #include <sqlpp11/sqlpp11.h>
 
-namespace OPAQ
+namespace opaq
 {
 
 //#define DEBUG_QUERIES

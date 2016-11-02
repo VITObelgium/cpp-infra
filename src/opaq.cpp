@@ -25,7 +25,7 @@ static void printPlugins()
 {
 #ifdef STATIC_PLUGINS
     std::cout << "Available Plugins:" << std::endl;
-    for (auto& plugin : OPAQ::getPluginNames())
+    for (auto& plugin : opaq::getPluginNames())
     {
         std::cout << " - " << plugin << std::endl;
     }
@@ -77,7 +77,7 @@ std::string readLogName(const std::string& config_file)
         TiXmlElement* rootElement = doc.FirstChildElement("opaq");
         if (rootElement)
         {
-            return OPAQ::XmlTools::getText(rootElement, "logfile");
+            return opaq::XmlTools::getText(rootElement, "logfile");
         }
     }
     catch (...)
@@ -154,8 +154,8 @@ int main(int argc, char* argv[])
     auto logger = Log::createLogger("main");
 
     // -- Parse configuration, after init of the log, otherwise we get errors
-    OPAQ::Config::PollutantManager pollutantMgr;
-    OPAQ::ConfigurationHandler ch;
+    opaq::Config::PollutantManager pollutantMgr;
+    opaq::ConfigurationHandler ch;
 
     try
     {
@@ -183,7 +183,7 @@ int main(int argc, char* argv[])
     else
         pol = ch.getOpaqRun().getPollutantName();
     logger->info("Requested pollutant ....... : " + pol);
-    logger->info("Requested aggregation ..... : " + OPAQ::Aggregation::getName(ch.getOpaqRun().getAggregation()));
+    logger->info("Requested aggregation ..... : " + opaq::Aggregation::getName(ch.getOpaqRun().getAggregation()));
 
     // 2. base times
     if (!basetime.empty())
@@ -192,14 +192,14 @@ int main(int argc, char* argv[])
 
         try
         {
-            auto baseTime = OPAQ::chrono::from_date_string(basetime);
+            auto baseTime = opaq::chrono::from_date_string(basetime);
             for (uint32_t i = 0; i < days; ++i)
             {
                 ch.getOpaqRun().addBaseTime(baseTime);
-                baseTime += OPAQ::chrono::days(1);
+                baseTime += opaq::chrono::days(1);
             }
         }
-        catch (const OPAQ::ParseException&)
+        catch (const opaq::ParseException&)
         {
             logger->error("Failed to parse base time: {}", basetime);
             exit(EXIT_FAILURE);
@@ -209,10 +209,10 @@ int main(int argc, char* argv[])
 #ifdef DEBUG
     logger->info("Requested base times:");
     for (auto& basetime : ch.getOpaqRun().getBaseTimes())
-        logger->info(OPAQ::chrono::to_string(basetime));
+        logger->info(opaq::chrono::to_string(basetime));
 #endif
 
-    OPAQ::Engine engine(pollutantMgr);
+    opaq::Engine engine(pollutantMgr);
 
     try
     {

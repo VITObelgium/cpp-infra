@@ -12,7 +12,7 @@
 #include <QWidget>
 #include <memory>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace Config

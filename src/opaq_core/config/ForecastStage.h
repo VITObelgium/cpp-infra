@@ -18,7 +18,7 @@
 
 #include "Component.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace Config
@@ -36,25 +36,25 @@ public:
    *  Returns the dataprovider for the observed concentration values
    *  Throws OPAQ::NullPointerException
    */
-    const OPAQ::Config::Component& getValues() const
+    const Config::Component& getValues() const
     {
         throwOnNullPtr(_values);
         return *_values;
     }
 
-    void setValues(const OPAQ::Config::Component& values)
+    void setValues(const Config::Component& values)
     {
         _values = &values;
     }
 
     // Throws OPAQ::NullPointerException
-    const OPAQ::Config::Component& getMeteo() const
+    const Config::Component& getMeteo() const
     {
         throwOnNullPtr(_meteo);
         return *_meteo;
     }
 
-    void setMeteo(const OPAQ::Config::Component& meteo)
+    void setMeteo(const Config::Component& meteo)
     {
         _meteo = &meteo;
     }
@@ -65,13 +65,13 @@ public:
     }
 
     // Throws OPAQ::NullPointerException
-    const OPAQ::Config::Component& getBuffer() const
+    const Config::Component& getBuffer() const
     {
         throwOnNullPtr(_buffer);
         return *_buffer;
     }
 
-    void setBuffer(const OPAQ::Config::Component& buffer)
+    void setBuffer(const Config::Component& buffer)
     {
         _buffer = &buffer;
     }
@@ -82,7 +82,7 @@ public:
     }
 
     // Throws OPAQ::NullPointerException
-    const OPAQ::Config::Component& getOutputWriter() const
+    const Config::Component& getOutputWriter() const
     {
         throwOnNullPtr(_outputWriter);
         return *_outputWriter;

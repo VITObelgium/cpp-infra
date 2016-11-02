@@ -12,9 +12,9 @@
 #include <QSettings>
 #include <QFileDialog>
 
-Q_DECLARE_METATYPE(OPAQ::Aggregation::Type)
+Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
-namespace OPAQ
+namespace opaq
 {
 
 static const int32_t s_maxRecentPaths = 5;

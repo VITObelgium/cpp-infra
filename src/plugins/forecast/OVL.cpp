@@ -12,7 +12,7 @@
 #include <cmath>
 #include <fstream>
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace chrono_literals;
@@ -216,7 +216,7 @@ void OVL::run()
     // some debugging output ?
     std::ofstream fs;
     if (_debug_output) {
-        fs.open(std::string("ovl_debug") + "_" + pol.getName() + "_" + OPAQ::Aggregation::getName(aggr) + "_" + chrono::to_date_string(baseTime) + ".txt");
+        fs.open(std::string("ovl_debug") + "_" + pol.getName() + "_" + Aggregation::getName(aggr) + "_" + chrono::to_date_string(baseTime) + ".txt");
     }
 
     // -- 2. loop over the stations, the C++ 11 way :)
@@ -234,7 +234,7 @@ void OVL::run()
         if (_debug_output) fs << "[STATION] " << station->getName() << " - " << chrono::to_date_string(baseTime) << std::endl;
 
         // store the output in a time series object
-        OPAQ::TimeSeries<double> fc;
+        TimeSeries<double> fc;
 
         for (int fc_hor = 0; fc_hor <= fcHorMax; fc_hor++)
         {
@@ -284,7 +284,7 @@ void OVL::run()
             // to store the output otherwise the RTC messes up
             if (_output_raw) {
                 // now we have all the forecast values for this particular station, set the output values...
-                OPAQ::TimeSeries<double> raw_fc;
+                TimeSeries<double> raw_fc;
                 raw_fc.clear();
                 raw_fc.insert(fcTime, out);
                 buffer->setCurrentModel(model.getName());

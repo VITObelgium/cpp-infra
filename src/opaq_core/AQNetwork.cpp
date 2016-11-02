@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-namespace OPAQ
+namespace opaq
 {
 
 bool AQNetwork::containsStation(const std::string& stationCode) const noexcept

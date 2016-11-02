@@ -8,7 +8,7 @@
 #include <string>
 #include <cinttypes>
 
-namespace OPAQ
+namespace opaq
 {
 
 class AQNetwork;

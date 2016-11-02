@@ -6,7 +6,7 @@
 #include "ObsParser.h"
 #include "AQNetwork.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

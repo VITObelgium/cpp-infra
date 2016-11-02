@@ -7,7 +7,7 @@
 
 #define epsilon 1e-6
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace chrono_literals;
@@ -108,8 +108,8 @@ int OVL_IRCEL_model2::makeSample(double* sample, const Station& st,
     t1 = date::floor<chrono::days>(baseTime);
     t2 = t1 + std::chrono::hours(mor_agg - 1); // mor_agg uur of eentje aftrekken ?
 
-    OPAQ::TimeSeries<double> xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName()); // no aggregation
-    double xx                        = mean_missing(xx_morn.values(), obs->getNoData());
+    TimeSeries<double> xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName()); // no aggregation
+    double xx                  = mean_missing(xx_morn.values(), obs->getNoData());
     if (fabs(xx - obs->getNoData()) > epsilon)
         sample[0] = log(1 + xx);
     else
@@ -169,7 +169,7 @@ int OVL_IRCEL_model2::makeSample(double* sample, const Station& st,
     // Note the above bugfix, firsst determe the average components
     double x_vec, y_vec;
     bool ok;
-    OPAQ::Math::winddir(&x_vec, &y_vec, wdir.values(), meteo->getNoData(p_wdir10m), &ok);
+    Math::winddir(&x_vec, &y_vec, wdir.values(), meteo->getNoData(p_wdir10m), &ok);
     if (!ok) {
         have_sample++;
     }

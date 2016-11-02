@@ -5,7 +5,7 @@
 
 #include <algorithm>
 
-namespace OPAQ
+namespace opaq
 {
 
 class XmlGridProvider : public GridProvider

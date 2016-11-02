@@ -4,7 +4,7 @@
 #include "PredictionDatabase.h"
 #include "tools/XmlTools.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 SqlBuffer::SqlBuffer()

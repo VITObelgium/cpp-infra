@@ -6,7 +6,7 @@
 #include <functional>
 #include <unordered_map>
 
-namespace OPAQ
+namespace opaq
 {
 
 class PluginRegistry
@@ -55,7 +55,7 @@ FactoryCallback loadDynamicPlugin(const std::string& pluginName, const std::stri
  *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
  */
 #define OPAQ_REGISTER_DYNAMIC_PLUGIN(TYPE)                                               \
-    OPAQ_DLL_API OPAQ::Component* factory(LogConfiguration* logConfig)                   \
+    OPAQ_DLL_API opaq::Component* factory(LogConfiguration* logConfig)                   \
     {                                                                                    \
         Log::initLogger(*logConfig);                                                     \
         return new TYPE();                                                               \

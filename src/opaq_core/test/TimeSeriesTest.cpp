@@ -4,7 +4,7 @@
 #include "TimeSeries.h"
 #include "Exceptions.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

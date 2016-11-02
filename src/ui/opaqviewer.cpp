@@ -8,9 +8,9 @@
 
 #include <cassert>
 
-Q_DECLARE_METATYPE(OPAQ::Aggregation::Type)
+Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace chrono_literals;

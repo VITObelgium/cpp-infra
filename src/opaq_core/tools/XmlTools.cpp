@@ -21,7 +21,7 @@ static bool _checkMatch(TiXmlElement* el, const std::vector<std::string>& attrNa
     return (matches == attrNames.size());
 }
 
-namespace OPAQ
+namespace opaq
 {
 namespace XmlTools
 {

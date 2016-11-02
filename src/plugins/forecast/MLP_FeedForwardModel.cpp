@@ -14,7 +14,7 @@ static const std::string STATION_PLACEHOLDER     = "%station%"; // placeholder f
 static const std::string FCHOR_PLACEHOLDER       = "%fc_hor%";  // idem for forecast horizon
 static const std::string MODEL_PLACEHOLDER       = "%model%";   // idem for feature vector model
 
-namespace OPAQ
+namespace opaq
 {
 
 MLP_FeedForwardModel::MLP_FeedForwardModel()
@@ -29,11 +29,11 @@ std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggr
 
     // Building filename...
     std::string fname = this->pattern;
-    OPAQ::StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol_name);
-    OPAQ::StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    OPAQ::StringTools::replaceAll(fname, STATION_PLACEHOLDER, st_name);
-    OPAQ::StringTools::replaceAll(fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor));
-    OPAQ::StringTools::replaceAll(fname, MODEL_PLACEHOLDER, this->getName());
+    StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol_name);
+    StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    StringTools::replaceAll(fname, STATION_PLACEHOLDER, st_name);
+    StringTools::replaceAll(fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor));
+    StringTools::replaceAll(fname, MODEL_PLACEHOLDER, this->getName());
 
     return fname;
 }
@@ -140,7 +140,7 @@ void MLP_FeedForwardModel::run()
             _logger->trace("Forecasting station {}", station->getName());
 
         // store the output in a timeseries object
-        OPAQ::TimeSeries<double> fc;
+        TimeSeries<double> fc;
         fc.clear();
 
         for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor)

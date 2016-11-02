@@ -11,7 +11,7 @@
 
 #include <tinyxml.h>
 
-namespace OPAQ {
+namespace opaq {
 
 XmlGridProvider::XmlGridProvider()
 : _logger("OPAQ::XmlGridProvider") {

@@ -12,7 +12,7 @@
 #include <fstream>
 #include <algorithm>
 
-namespace OPAQ
+namespace opaq
 {
 
 /**

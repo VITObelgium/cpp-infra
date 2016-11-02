@@ -1,6 +1,6 @@
 #include "Model.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 Model::Model()

@@ -1,6 +1,6 @@
 #include "MappingStage.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace Config
 {

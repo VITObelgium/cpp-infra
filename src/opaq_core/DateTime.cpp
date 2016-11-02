@@ -7,7 +7,7 @@
 
 #include <fmt/format.h>
 
-namespace OPAQ
+namespace opaq
 {
 namespace chrono
 {

@@ -8,7 +8,7 @@
 #include "Engine.h"
 #include "ComponentManagerFactory.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 Engine::Engine(Config::PollutantManager& pollutantMgr)

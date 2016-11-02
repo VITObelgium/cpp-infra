@@ -8,7 +8,7 @@
 #include <tinyxml.h>
 #include <boost/lexical_cast.hpp>
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace std::chrono_literals;

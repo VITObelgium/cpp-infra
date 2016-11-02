@@ -13,7 +13,7 @@
 
 #include "Cell.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 /**

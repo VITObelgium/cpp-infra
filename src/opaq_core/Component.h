@@ -4,7 +4,7 @@
 
 class TiXmlElement;
 
-namespace OPAQ
+namespace opaq
 {
 
 class IEngine;

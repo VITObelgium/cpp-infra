@@ -9,7 +9,7 @@
 
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace CalcTools

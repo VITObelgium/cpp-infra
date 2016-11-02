@@ -10,7 +10,7 @@
 
 #include <vector>
 
-namespace OPAQ {
+namespace opaq {
 
 class Math {
 public:

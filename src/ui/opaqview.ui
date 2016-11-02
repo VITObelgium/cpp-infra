@@ -72,12 +72,12 @@
      <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="OPAQ::OpaqViewer" name="viewerTab">
+     <widget class="opaq::OpaqViewer" name="viewerTab">
       <attribute name="title">
        <string>Viewer</string>
       </attribute>
      </widget>
-     <widget class="OPAQ::OpaqValidation" name="validationTab">
+     <widget class="opaq::OpaqValidation" name="validationTab">
       <attribute name="title">
        <string>Validation</string>
       </attribute>
@@ -88,13 +88,13 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>OPAQ::OpaqViewer</class>
+   <class>opaq::OpaqViewer</class>
    <extends>QWidget</extends>
    <header>opaqviewer.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>OPAQ::OpaqValidation</class>
+   <class>opaq::OpaqValidation</class>
    <extends>QWidget</extends>
    <header>opaqvalidation.h</header>
    <container>1</container>

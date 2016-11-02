@@ -5,7 +5,7 @@
 
 #include <map>
 
-namespace OPAQ
+namespace opaq
 {
 
 class StationInfoProvider : public IStationInfoProvider

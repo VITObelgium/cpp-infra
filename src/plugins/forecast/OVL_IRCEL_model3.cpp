@@ -8,7 +8,7 @@
 
 #define epsilon 1e-6
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace chrono_literals;

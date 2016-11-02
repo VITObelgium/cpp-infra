@@ -8,7 +8,7 @@
 #include "Hdf5Tools.h"
 #include "tools/StringTools.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 Hdf5Tools::Hdf5Tools() {}

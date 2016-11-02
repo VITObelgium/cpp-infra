@@ -12,7 +12,7 @@
 #include <tinyxml.h>
 #include <sstream>
 
-namespace OPAQ
+namespace opaq
 {
 namespace test
 {

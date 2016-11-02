@@ -14,7 +14,7 @@
 #include "../DateTime.h"
 #include "ForecastBuffer.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class Pollutant;

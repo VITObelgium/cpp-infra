@@ -95,7 +95,7 @@
       </layout>
      </item>
      <item>
-      <widget class="OPAQ::ResultsView" name="resultsView" native="true">
+      <widget class="opaq::ResultsView" name="resultsView" native="true">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
@@ -116,7 +116,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>OPAQ::ResultsView</class>
+   <class>opaq::ResultsView</class>
    <extends>QWidget</extends>
    <header>resultsview.h</header>
    <container>1</container>

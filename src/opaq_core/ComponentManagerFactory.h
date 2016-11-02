@@ -4,7 +4,7 @@
 
 #include <memory>
 
-namespace OPAQ
+namespace opaq
 {
 
 class IEngine;

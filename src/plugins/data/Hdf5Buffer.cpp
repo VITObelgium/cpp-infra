@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <tinyxml.h>
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace std::chrono_literals;
@@ -135,17 +135,17 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
     //    2. group for the aggregation time
     try
     {
-        grpAggr = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
+        grpAggr = grpPol.openGroup(Aggregation::getName(aggr));
     }
     catch (const H5::Exception&)
     {
         try
         {
-            grpAggr = grpPol.createGroup(OPAQ::Aggregation::getName(aggr));
+            grpAggr = grpPol.createGroup(Aggregation::getName(aggr));
         }
         catch (const H5::Exception&)
         {
-            throw RunTimeException("Unable to create " + OPAQ::Aggregation::getName(aggr) + " group for " + pollutantId + " in H5 forecast store");
+            throw RunTimeException("Unable to create " + Aggregation::getName(aggr) + " group for " + pollutantId + " in H5 forecast store");
         }
     }
 
@@ -404,7 +404,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
     try
     {
         grpPol  = _h5file->openGroup(pollutantId);
-        grpAggr = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
+        grpAggr = grpPol.openGroup(Aggregation::getName(aggr));
         dsVals  = grpAggr.openDataSet(FORECAST_DATASET_NAME);
 
         // retrieve startTime from the stored dataset in this group
@@ -449,7 +449,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
         auto b1      = fcTime1 - fc_hor;
         size_t nvals = (chrono::to_seconds(fcTime2 - fcTime1).count() / getBaseTimeResolutionInSeconds().count()) + 1;
 
-        OPAQ::TimeSeries<double> out;
+        TimeSeries<double> out;
         ssize_t startIndex = chrono::to_seconds(b1 - startTime).count() / getBaseTimeResolutionInSeconds().count();
         ssize_t endIndex   = startIndex + nvals;
 
@@ -519,7 +519,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
     try
     {
         grpPol  = _h5file->openGroup(pollutantId);
-        grpAggr = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
+        grpAggr = grpPol.openGroup(Aggregation::getName(aggr));
         dsVals  = grpAggr.openDataSet(FORECAST_DATASET_NAME);
 
         // retrieve startTime from the stored dataset in this group
@@ -582,12 +582,12 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
     }
 }
 
-std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantId, OPAQ::Aggregation::Type aggr)
+std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantId, Aggregation::Type aggr)
 {
     try
     {
         auto grpPol   = _h5file->openGroup(pollutantId);
-        auto grpAggr  = grpPol.openGroup(OPAQ::Aggregation::getName(aggr));
+        auto grpAggr  = grpPol.openGroup(Aggregation::getName(aggr));
         auto dsModels = grpAggr.openDataSet(MODELS_DATASET_NAME);
         return Hdf5Tools::readStringData(dsModels);
     }

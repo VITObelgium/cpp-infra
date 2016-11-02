@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
 
 #ifdef STATIC_PLUGINS
     logger->debug("Available Plugins:");
-    for (auto& plugin : OPAQ::getPluginNames())
+    for (auto& plugin : opaq::getPluginNames())
     {
         logger->debug(" - {}", plugin);
     }
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setApplicationName("Opaq");
     QCoreApplication::setApplicationVersion(OPAQ_VERSION);
 
-    OPAQ::MainWindow mainWin;
+    opaq::MainWindow mainWin;
     mainWin.setMinimumSize(640, 480);
     mainWin.show();
     return app.exec();

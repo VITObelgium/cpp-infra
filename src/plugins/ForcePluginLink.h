@@ -9,13 +9,14 @@
 #include "data/XMLAQNetProvider.h"
 #include "data/XmlGridProvider.h"
 #include "data/IRCELMeteoProvider.h"
+#include "data/StationInfoProvider.h"
 
 #include "forecast/OVL.h"
 #include "forecast/OVL_IRCEL_model1.h"
 #include "forecast/OVL_IRCEL_model2.h"
 #include "forecast/OVL_IRCEL_model3.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 // by invoking a method on the plugins we avoid the linker from not including
@@ -31,6 +32,7 @@ inline std::vector<std::string> getPluginNames()
         XMLAQNetProvider::name(),
         XmlGridProvider::name(),
         IRCELMeteoProvider::name(),
+        StationInfoProvider::name(),
 
         OVL::name(),
         OVL_IRCEL_model1::name(),

@@ -8,7 +8,7 @@
 #include "Aggregation.h"
 #include <algorithm>
 
-namespace OPAQ
+namespace opaq
 {
 namespace Aggregation
 {

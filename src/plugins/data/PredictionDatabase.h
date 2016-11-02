@@ -15,7 +15,7 @@ class connection;
 }
 }
 
-namespace OPAQ
+namespace opaq
 {
 
 class PredictionDatabase

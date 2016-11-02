@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 /** A simple class to represent a rectangular grid cell location

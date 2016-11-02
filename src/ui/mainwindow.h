@@ -7,7 +7,7 @@
 class ToolBar;
 QT_FORWARD_DECLARE_CLASS(QMenu)
 
-namespace OPAQ
+namespace opaq
 {
 
 class MainWindow : public QMainWindow

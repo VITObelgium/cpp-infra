@@ -4,7 +4,7 @@
 #include "../DateTime.h"
 #include "../TimeSeries.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class MeteoProvider : public Component
@@ -25,7 +25,7 @@ public:
     /**
 	 * Return the values between t1 and t2 including the boundaries !
 	 */
-    virtual OPAQ::TimeSeries<double> getValues(const chrono::date_time& t1,
+    virtual opaq::TimeSeries<double> getValues(const chrono::date_time& t1,
                                                const chrono::date_time& t2,
                                                const std::string& meteoId,
                                                const std::string& paramId) = 0;

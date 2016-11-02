@@ -4,7 +4,7 @@
 
 #include "config.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb)

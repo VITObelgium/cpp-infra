@@ -6,7 +6,7 @@
 #include <sqlpp11/data_types.h>
 #include <sqlpp11/char_sequence.h>
 
-namespace OPAQ
+namespace opaq
 {
   namespace Predictions_
   {

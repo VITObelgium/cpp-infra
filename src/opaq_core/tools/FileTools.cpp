@@ -10,7 +10,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace OPAQ
+namespace opaq
 {
 namespace FileTools
 {

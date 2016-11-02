@@ -4,7 +4,7 @@
 #include "DataProvider.h"
 #include <vector>
 
-namespace OPAQ
+namespace opaq
 {
 
 class ForecastBuffer : public DataProvider

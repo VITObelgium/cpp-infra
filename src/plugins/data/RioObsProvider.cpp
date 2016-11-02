@@ -14,7 +14,7 @@
 
 #include <tinyxml.h>
 
-namespace OPAQ
+namespace opaq
 {
 
 using namespace chrono_literals;
@@ -80,7 +80,7 @@ TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const 
     // TODO to be safe better round down the t1 and t2 to the interval of the timestep, but is not really high priority now..
     // was originally like this in Stijn VL 's code...
 
-    std::chrono::hours step = (aggr == OPAQ::Aggregation::None) ? 1h : 1_d;
+    std::chrono::hours step = (aggr == Aggregation::None) ? 1h : 1_d;
 
     //copy the data to the output time series and insert missing values if still needed (we cannot rely on i)
     data.setNoData(_noData);

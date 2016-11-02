@@ -5,7 +5,7 @@
 
 #include <QColor>
 
-namespace OPAQ
+namespace opaq
 {
 
 StationResultsModel::StationResultsModel(QObject* parent)

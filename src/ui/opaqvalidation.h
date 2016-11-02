@@ -7,7 +7,7 @@
 
 #include <QWidget>
 
-namespace OPAQ
+namespace opaq
 {
 
 namespace Config

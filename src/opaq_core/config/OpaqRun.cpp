@@ -1,14 +1,14 @@
 #include "OpaqRun.h"
 #include "../PollutantManager.h"
 
-namespace OPAQ
+namespace opaq
 {
 namespace Config
 {
 
 OpaqRun::OpaqRun()
 : _logger("OPAQ::Config::OpaqRun")
-, _aggregation(OPAQ::Aggregation::None)
+, _aggregation(Aggregation::None)
 , _networkProvider(nullptr)
 , _gridProvider(nullptr)
 {

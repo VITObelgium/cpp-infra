@@ -12,7 +12,7 @@
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
 
-namespace OPAQ
+namespace opaq
 {
 
 class XMLAQNetProvider : public AQNetworkProvider
@@ -27,7 +27,7 @@ public:
     void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
 
     // AQNetowrk functions
-    virtual OPAQ::AQNetwork& getAQNetwork() override;
+    virtual AQNetwork& getAQNetwork() override;
 
 private:
     AQNetwork _net;
