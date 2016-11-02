@@ -20,7 +20,7 @@ namespace OPAQ
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
-const std::string RioObsProvider::POLLUTANT_PLACEHOLDER = "%pol%";
+static std::string s_pollutantPlaceholder = "%pol%";
 
 RioObsProvider::RioObsProvider()
 : _logger("RioObsProvider")
@@ -112,7 +112,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
 {
     // create file name & open file stream
     std::string filename = _pattern;
-    StringTools::replaceAll(filename, POLLUTANT_PLACEHOLDER, pollutant);
+    StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant);
 
     std::ifstream file(filename.c_str());
     if (!file.is_open())

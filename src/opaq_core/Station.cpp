@@ -6,9 +6,24 @@ namespace OPAQ
 {
 
 Station::Station(std::string name, std::string desc, std::string meteoId)
+: Station(std::move(name), std::move(desc), std::move(meteoId), 0.0)
+{
+}
+
+Station::Station(std::string name, std::string desc, std::string meteoId, double beta)
 : _name(std::move(name))
 , _desc(std::move(desc))
 , _meteoId(std::move(meteoId))
+, _beta(beta)
+{
+}
+
+Station::Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, double beta)
+: Point(id, x, y, z)
+, _name(std::move(name))
+, _desc(std::move(desc))
+, _meteoId(std::move(meteoId))
+, _beta(beta)
 {
 }
 

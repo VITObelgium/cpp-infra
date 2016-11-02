@@ -25,44 +25,42 @@ namespace OPAQ
 class DataProvider : public Component
 {
 public:
-    DataProvider();
-
     // ==================================================================================
     // PUBLIC METHODS
     // ==================================================================================
     /**
-   * Set the Air Quality Network provider
-   */
+     * Set the Air Quality Network provider
+     */
     void setAQNetworkProvider(AQNetworkProvider& net) { _aqNetworkProvider = &net; };
 
     /**
-   * Sets the name of the current active model in the buffer. Not used for observation
-   * data, only for model data...
-   */
+     * Sets the name of the current active model in the buffer. Not used for observation
+     * data, only for model data...
+     */
     void setCurrentModel(const std::string& modelName) { _currentModel = modelName; }
 
     /**
-   * Returns the name of the current active model, not used for observation data
-   */
+     * Returns the name of the current active model, not used for observation data
+     */
     const std::string& getCurrentModel(void) { return _currentModel; }
 
     // ==================================================================================
     // PURE VIRTUAL METHODS
     // ==================================================================================
     /**
-   * Get the time resolution of the provided data, for forecasted data this will be the time resolution
-   * of the forecasts
-   */
+     * Get the time resolution of the provided data, for forecasted data this will be the time resolution
+     * of the forecasts
+     */
     virtual std::chrono::hours getTimeResolution() = 0;
 
     /**
-   * Get the nodata placeholder
-   */
+     * Get the nodata placeholder
+     */
     virtual double getNoData() = 0;
 
     /**
-   * Return an aggregated version of the base data in there..
-   */
+     * Return an aggregated version of the base data in there..
+     */
     virtual TimeSeries<double> getValues(const chrono::date_time& t1,
                                          const chrono::date_time& t2,
                                          const std::string& stationId,
@@ -70,8 +68,8 @@ public:
                                          Aggregation::Type aggr = Aggregation::None) = 0;
 
     /**
-   * This method would typically be used by a mapping model
-   */
+     * This method would typically be used by a mapping model
+     */
     // need routine to return a vector (or a map w.r.t. station) for a given date over all the stations
     // virtual std::vector<double>
     // virtual std::map<std::string, double>
@@ -81,7 +79,7 @@ public:
     // virtual std::map<OPAQ::Station*, double> getValues( const DateTime& t );
 
 protected:
-    std::string _currentModel;             //! name of the current model which provides the data, not used for observations
-    AQNetworkProvider* _aqNetworkProvider; //! the network provider
+    std::string _currentModel;                        //! name of the current model which provides the data, not used for observations
+    AQNetworkProvider* _aqNetworkProvider = nullptr;  //! the network provider
 };
 }

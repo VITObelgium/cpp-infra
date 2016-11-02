@@ -54,11 +54,10 @@ set (CORE_CONFIG_SOURCES
 set (CORE_DATA_SOURCES
     data/ForecastBuffer.h
     data/DataProvider.h
-    data/DataProvider.cpp
     data/MeteoProvider.h
     data/GridProvider.h
     data/ForecastOutputWriter.h
-    data/ForecastOutputWriter.cpp
+    data/IStationInfoProvider.h
 )
 
 set (CORE_TOOLS_SOURCES

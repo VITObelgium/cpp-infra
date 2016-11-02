@@ -26,6 +26,8 @@ class Station : public Point
 {
 public:
     Station(std::string name, std::string desc, std::string meteoId);
+    Station(std::string name, std::string desc, std::string meteoId, double beta);
+    Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, double beta);
 
     /** Output streamer for the station class */
     friend std::ostream& operator<<(std::ostream& os, const Station& s);
@@ -53,6 +55,7 @@ private:
     std::string _name;                   //!< a station name (short code)
     std::string _desc;                   //!< station description (full specification)
     std::string _meteoId;                //!< meteo model forecast id to connect to (typically gridcell or so)
+    double _beta;
 };
 
 }

@@ -62,12 +62,18 @@ add_library(xmlgridprovider STATIC
     XmlGridProvider.cpp
 )
 
+add_library(stationinfoprovider STATIC
+    StationInfoProvider.h
+    StationInfoProvider.cpp
+)
+
 target_link_libraries(sqlbuffer opaqcore ${SQLPP_CONNECTOR_LIBRARY} ${SQLITE_LIBRARY})
 target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(asciiforecastwriter opaqcore)
 target_link_libraries(ircelmeteoprovider opaqcore)
 target_link_libraries(xmlgridprovider opaqcore)
 target_link_libraries(xmlaqnetprovider opaqcore)
+target_link_libraries(stationinfoprovider opaqcore)
 
 if (NOT STATIC_PLUGINS)
     set_target_properties(sqlbuffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
@@ -76,6 +82,7 @@ if (NOT STATIC_PLUGINS)
     set_target_properties(ircelmeteoprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(xmlgridprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
     set_target_properties(xmlaqnetprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
+    set_target_properties(stationinfoprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
     add_library(sqlbufferplugin             ${PLUGIN_TYPE} SqlBufferPlugin.cpp)
     add_library(rioobsproviderplugin        ${PLUGIN_TYPE} RioObsProviderPlugin.cpp)
@@ -83,6 +90,7 @@ if (NOT STATIC_PLUGINS)
     add_library(ircelmeteoproviderplugin    ${PLUGIN_TYPE} IrcelMeteoProviderPlugin.cpp)
     add_library(xmlgridproviderplugin       ${PLUGIN_TYPE} XmlGridProviderPlugin.cpp)
     add_library(xmlaqnetproviderplugin      ${PLUGIN_TYPE} XmlAQNetproviderPlugin.cpp)
+    add_library(stationinfoproviderplugin   ${PLUGIN_TYPE} StationInfoProviderPlugin.cpp)
 
     target_link_libraries(sqlbufferplugin sqlbuffer)
     target_link_libraries(rioobsproviderplugin rioobsprovider)
@@ -90,8 +98,9 @@ if (NOT STATIC_PLUGINS)
     target_link_libraries(ircelmeteoproviderplugin ircelmeteoprovider)
     target_link_libraries(xmlgridproviderplugin xmlgridprovider)
     target_link_libraries(xmlaqnetproviderplugin xmlaqnetprovider)
+    target_link_libraries(stationinfoproviderplugin stationinfoprovider)
 endif ()
 
-set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider xmlaqnetprovider PARENT_SCOPE)
+set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
 
 add_subdirectory(test)

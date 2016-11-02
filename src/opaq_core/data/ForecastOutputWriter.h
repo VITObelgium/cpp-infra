@@ -23,8 +23,6 @@ class ForecastOutputWriter : public Component
 {
 
 public:
-    ForecastOutputWriter();
-
     virtual void write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime) = 0;
 
     // some setters
@@ -38,8 +36,8 @@ protected:
     chrono::days getForecastHorizon() { return _fcHor; }
 
 private:
-    AQNetworkProvider* _net;
-    ForecastBuffer* _buf;
+    AQNetworkProvider* _net = nullptr;
+    ForecastBuffer* _buf = nullptr;
     chrono::days _fcHor;
 };
 
