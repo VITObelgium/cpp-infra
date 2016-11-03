@@ -40,10 +40,11 @@ OpaqView::OpaqView(QWidget* parent)
 
     _aggregationModel.insertRows(0, static_cast<int>(s_aggregationTypes.size()));
     
-    for (int i = 0; i < s_aggregationTypes.size(); ++i)
+    for (size_t i = 0; i < s_aggregationTypes.size(); ++i)
     {
-        _aggregationModel.setItem(i, 0, new QStandardItem(QString(Aggregation::getDisplayName(s_aggregationTypes[i]).c_str())));
-        _aggregationModel.setData(_aggregationModel.index(i, 0), s_aggregationTypes[i], Qt::UserRole);
+        auto index = static_cast<int>(i);
+        _aggregationModel.setItem(index, 0, new QStandardItem(QString(Aggregation::getDisplayName(s_aggregationTypes[index]).c_str())));
+        _aggregationModel.setData(_aggregationModel.index(index, 0), s_aggregationTypes[index], Qt::UserRole);
     }
 
     loadRecentConfigurations();

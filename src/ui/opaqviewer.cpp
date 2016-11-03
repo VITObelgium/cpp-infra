@@ -154,11 +154,6 @@ void OpaqViewer::runSimulation()
     try
     {
         _engine->run(_config->getOpaqRun());
-
-        auto& aqNetworkProvider = _engine->componentManager().getComponent<AQNetworkProvider>(_config->getOpaqRun().getNetworkProvider()->name);
-        auto& buffer = _engine->componentManager().getComponent<ForecastBuffer>(_config->getOpaqRun().getForecastStage()->getBuffer().name);
-        auto forecastHorizon = _config->getOpaqRun().getForecastStage()->getHorizon();
-
         updateResultsForCurrentStation();
     }
     catch (const std::exception& e)
