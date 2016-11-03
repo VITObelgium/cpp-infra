@@ -369,7 +369,8 @@ void OVL::run()
                             fabs(obs_hindcast.value(i) - getInputProvider()->getNoData()) > 1.e-6) {
 
                             // BUGFIX : have to turn the order of i around... !!
-                            double w = _wexp(fc_hindcast.size() - i - 1, fc_hindcast.size(), cf->rtc_param);
+                            const auto fc_hindcast_size = static_cast<int>(fc_hindcast.size());
+                            double w = _wexp(fc_hindcast_size - i - 1, fc_hindcast_size, cf->rtc_param);
 
                             if (_debug_output) {
                                 fs << "\t\tERROR : " << chrono::to_date_string(fc_hindcast.datetime(i)) << "\t"
