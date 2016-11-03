@@ -34,6 +34,8 @@ public:
     static std::shared_ptr<spdlog::logger> getLogger(const std::string& name);
     static std::shared_ptr<spdlog::logger> createLogger(const std::string& filename);
 
+    static void destroyLogger();
+
 private:
     static std::unique_ptr<LogConfiguration> _config;
 };

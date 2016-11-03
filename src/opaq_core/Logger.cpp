@@ -79,3 +79,8 @@ std::shared_ptr<spdlog::logger> Log::createLogger(const std::string& name)
 
     return logger;
 }
+
+void Log::destroyLogger()
+{
+    _config.reset();
+}
