@@ -40,7 +40,7 @@ if (MSVC)
     # avoid windows specific warnings
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
 else ()
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -Werror -fdiagnostics-color")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -fdiagnostics-color")
 endif()
 
 include_directories(
