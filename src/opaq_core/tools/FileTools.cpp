@@ -3,14 +3,11 @@
 
 #include <fstream>
 #include <sstream>
-#include <experimental/filesystem>
 
 namespace opaq
 {
 namespace FileTools
 {
-
-namespace fs = std::experimental::filesystem;
 
 std::string readStreamContents(std::istream& stream)
 {
@@ -49,12 +46,24 @@ void writeTextFile(const std::string& filename, const std::string& contents)
 
 bool exists(const std::string& filename)
 {
-    return fs::exists(filename);
+    // see https://stackoverflow.com/a/12774387
+    if (FILE* file = fopen(filename.c_str(), "r"))
+    {
+        fclose(file);
+        return true;
+    }
+    
+    return false;
 }
 
 bool del(const std::string& filename)
 {
-    return fs::remove(filename);
+    if (exists(filename))
+    {
+        return remove(filename.c_str()) == 0;
+    }
+    
+    return true;
 }
 
 }
