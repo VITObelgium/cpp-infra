@@ -92,11 +92,11 @@ if (NOT STATIC_PLUGINS)
 
     add_library(sqlbufferplugin             MODULE SqlBufferPlugin.cpp)
     add_library(rioobsproviderplugin        MODULE RioObsProviderPlugin.cpp)
-    add_library(asciiforecastwriterplugin   MODULE AsciiForecastwriterPlugin.cpp)
+    add_library(asciiforecastwriterplugin   MODULE AsciiForecastWriterPlugin.cpp)
     add_library(ircelmeteoproviderplugin    MODULE IRCELMeteoProviderPlugin.cpp)
     add_library(xmlgridproviderplugin       MODULE XmlGridProviderPlugin.cpp)
     add_library(textgridproviderplugin      MODULE TextGridProviderPlugin.cpp)
-    add_library(xmlaqnetproviderplugin      MODULE XMLAQNetproviderPlugin.cpp)
+    add_library(xmlaqnetproviderplugin      MODULE XMLAQNetProviderPlugin.cpp)
     add_library(stationinfoproviderplugin   MODULE StationInfoProviderPlugin.cpp)
 
     target_link_libraries(sqlbufferplugin sqlbuffer)
