@@ -1,18 +1,8 @@
-/*
- * ConfigurationHandler.h
- *
- *  Created on: Jan 15, 2014
- *      Author: vlooys
- */
-
-#ifndef CONFIGURATIONHANDLER_H_
-#define CONFIGURATIONHANDLER_H_
+#pragma once
 
 #include "Logger.h"
-#include "PollutantManager.h"
-#include "config/ForecastStage.h"
-#include "config/MappingStage.h"
-#include "config/OpaqRun.h"
+#include "Config/OpaqRun.h"
+
 #include "tools/FileTools.h"
 #include "tools/XmlTools.h"
 #include <string>
@@ -20,6 +10,11 @@
 
 namespace opaq
 {
+
+namespace config
+{
+    class PollutantManager;
+}
 
 /**
    * Parses the master configuration file and constructs the main workflow objects in OPAQ
@@ -63,10 +58,8 @@ public:
     config::OpaqRun& getOpaqRun() { return _opaqRun; }
 
 private:
-    void clearConfig();
-
     config::ForecastStage parseForecastStage(TiXmlElement* element);
-    config::MappingStage* parseMappingStage(TiXmlElement* element);
+    config::MappingStage parseMappingStage(TiXmlElement* element);
 
     config::OpaqRun _opaqRun;
     TiXmlDocument _doc;
@@ -74,5 +67,4 @@ private:
     Logger _logger;
 };
 
-} /* namespace OPAQ */
-#endif /* CONFIGURATIONHANDLER_H_ */
+}

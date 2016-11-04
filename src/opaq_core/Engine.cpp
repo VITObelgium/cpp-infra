@@ -99,7 +99,7 @@ void Engine::run(config::OpaqRun& config)
 
     // Get stages
     auto forecastStage = config.getForecastStage();
-    config::MappingStage* mappingStage   = config.getMappingStage();
+    auto mappingStage  = config.getMappingStage();
 
     // Get air quality network provider
     auto name                            = config.getNetworkProvider()->name;
@@ -108,8 +108,8 @@ void Engine::run(config::OpaqRun& config)
 
     // Get grid provider
     IGridProvider* gridProvider;
-    auto* gridProviderDef = config.getGridProvider();
-    if (gridProviderDef != nullptr)
+    auto gridProviderDef = config.getGridProvider();
+    if (gridProviderDef)
     {
         gridProvider = &_componentMgr.getComponent<IGridProvider>(gridProviderDef->name);
         _logger->info("Using grid provider {}", gridProviderDef->name);

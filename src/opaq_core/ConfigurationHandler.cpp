@@ -7,18 +7,19 @@
 
 #include "config.h"
 #include "ConfigurationHandler.h"
+#include "PollutantManager.h"
+
+#include "config/ForecastStage.h"
+#include "config/MappingStage.h"
 
 namespace opaq
 {
 
 ConfigurationHandler::ConfigurationHandler()
-: _logger("OPAQ::ConfigurationHandler")
+: _logger("ConfigurationHandler")
 {
 }
 
-/* ================================================================================
-   Forecast stage parser
-   ============================================================================= */
 config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* element)
 {
     config::ForecastStage fcStage;
@@ -26,8 +27,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
     auto* modelsElement = element->FirstChildElement("models");
     if (!modelsElement)
     {
-        _logger->error("No models tag given in forecast stage configuration...");
-        throw RunTimeException("No models tag given in forecast stage configuration !");
+        throw RunTimeException("No models tag given in forecast stage configuration!");
     }
 
     auto* componentElement = modelsElement->FirstChildElement("component");
@@ -89,30 +89,52 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
     return fcStage;
 }
 
-/* ================================================================================
-   Mapping stage parser
-   ============================================================================= */
-config::MappingStage* ConfigurationHandler::parseMappingStage(TiXmlElement* element)
+config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)
 {
-    return nullptr;
+    config::Component stations;
+    std::vector<config::Component> models;
+
+    auto* modelsElement = element->FirstChildElement("models");
+    if (!modelsElement)
+    {
+        throw RunTimeException("No models tag given in mapping stage configuration!");
+    }
+
+    auto* componentElement = modelsElement->FirstChildElement("component");
+    while (componentElement)
+    {
+        models.push_back(_opaqRun.getComponent(componentElement->GetText()));
+        componentElement = componentElement->NextSiblingElement("component");
+    }
+
+    // parse the <input> section
+    auto* inputElement = element->FirstChildElement("input");
+    try
+    {
+        stations = _opaqRun.getComponent(XmlTools::getText(inputElement, "stations"));
+    }
+    catch (const ElementNotFoundException&)
+    {
+        throw BadConfigurationException("No station data provider in run configuration");
+    }
+
+    return config::MappingStage(stations, std::move(models));
 }
 
-/* ===========================================================================
- This is the main configuration file parser
- ======================================================================== */
 void ConfigurationHandler::parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr)
 {
-
-    clearConfig();
+    _opaqRun = config::OpaqRun();
 
     _doc = TiXmlDocument(filename);
-    if (!_doc.LoadFile(filename)) {
-        throw BadConfigurationException("Unable to load configuration file : " + filename);
+    if (!_doc.LoadFile(filename))
+    {
+        throw BadConfigurationException("Unable to load configuration file: {}", filename);
     }
-    TiXmlElement* rootElement;
-    rootElement = _doc.FirstChildElement("opaq");
-    if (!rootElement) {
-        throw BadConfigurationException("Unable to find opaq tag in configuration file : " + filename);
+    
+    auto* rootElement = _doc.FirstChildElement("opaq");
+    if (!rootElement)
+    {
+        throw BadConfigurationException("Unable to find opaq tag in configuration file: {}", filename);
     }
 
     /* ------------------------------------------------------------------------
@@ -266,7 +288,6 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
     catch (const ElementNotFoundException&)
     {
         _logger->warn("No grid provider defined");
-        _opaqRun.resetGridProvider();
     }
 
     /* ------------------------------------------------------------------------
@@ -286,14 +307,11 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
      --------------------------------------------------------------------- */
     try
     {
-        TiXmlElement* mappingElement       = XmlTools::getElement(rootElement, "mapping");
-        config::MappingStage* mappingStage = parseMappingStage(mappingElement);
-        _opaqRun.setMappingStage(mappingStage);
+        _opaqRun.setMappingStage(parseMappingStage(XmlTools::getElement(rootElement, "mapping")));
     }
     catch (const ElementNotFoundException&)
     {
         _logger->warn("no mapping stage defined");
-        _opaqRun.setMappingStage(nullptr);
     }
 }
 
@@ -352,10 +370,4 @@ void ConfigurationHandler::validateConfiguration(config::PollutantManager& pollu
     pollutantMgr.find(_opaqRun.getPollutantName());
 }
 
-void ConfigurationHandler::clearConfig()
-{
-    _opaqRun.clear();
-    //_opaqRun.setPollutant(nullptr);
 }
-
-} /* namespace OPAQ */

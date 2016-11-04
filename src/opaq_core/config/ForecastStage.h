@@ -1,22 +1,9 @@
-/*
- * Plugin.h
- *
- *  Created on: Jan 9, 2014
- *      Author: bino.maiheu@vito.be
- */
-
 #pragma once
 
-#include <ratio>
-#include <string>
-#include <vector>
-#include <chrono>
-
-#include "../Exceptions.h"
-#include "../tools/ExceptionTools.h"
 #include "../DateTime.h"
-
 #include "Component.h"
+
+#include <vector>
 
 namespace opaq
 {
@@ -24,78 +11,28 @@ namespace opaq
 namespace config
 {
 
-/**
-   * Forecast configuration class
-   */
 class ForecastStage
 {
 public:
     ForecastStage();
 
-    /**
-   *  Returns the dataprovider for the observed concentration values
-   *  Throws OPAQ::NullPointerException
-   */
-    const config::Component& getValues() const
-    {
-        throwOnNullPtr(_values);
-        return *_values;
-    }
+    const config::Component& getValues() const;
+    void setValues(const config::Component& values);
 
-    void setValues(const config::Component& values)
-    {
-        _values = &values;
-    }
+    const config::Component& getMeteo() const;
+    void setMeteo(const config::Component& meteo);
+    
+    const config::Component& getBuffer() const;
+    void setBuffer(const config::Component& buffer);
+    
+    const config::Component& getOutputWriter() const;
+    void setOutputWriter(const Component& ow);
 
-    // Throws OPAQ::NullPointerException
-    const config::Component& getMeteo() const
-    {
-        throwOnNullPtr(_meteo);
-        return *_meteo;
-    }
+    void addModel(const Component& model);
+    const std::vector<Component>& getModels() const noexcept;
 
-    void setMeteo(const config::Component& meteo)
-    {
-        _meteo = &meteo;
-    }
-
-    // Throws OPAQ::NullPointerException
-    const config::Component& getBuffer() const
-    {
-        throwOnNullPtr(_buffer);
-        return *_buffer;
-    }
-
-    void setBuffer(const config::Component& buffer)
-    {
-        _buffer = &buffer;
-    }
-
-    // Throws OPAQ::NullPointerException
-    const config::Component& getOutputWriter() const
-    {
-        throwOnNullPtr(_outputWriter);
-        return *_outputWriter;
-    }
-
-    void setOutputWriter(const Component& ow)
-    {
-        _outputWriter = &ow;
-    }
-
-    void addModel(const Component& model)
-    {
-        _models.push_back(model);
-    }
-
-    // returns a list of models used in the forecast...
-    const std::vector<Component>& getModels() const noexcept { return _models; }
-
-    /** Set the requested forecast horizon */
-    void setHorizon(chrono::days fcHor) { _fcHor = fcHor; }
-
-    /** Returns the requested (max) forecast horizon for the forecasts */
-    chrono::days getHorizon() const noexcept { return _fcHor; }
+    void setHorizon(chrono::days fcHor);
+    chrono::days getHorizon() const noexcept;
 
 private:
     // vector of models to run in the forecast

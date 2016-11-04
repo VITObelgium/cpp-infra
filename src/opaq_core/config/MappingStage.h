@@ -1,19 +1,8 @@
-/*
- * Plugin.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys
- */
-
 #pragma once
 
-#include <string>
-#include <tinyxml.h>
-#include <vector>
-
-#include "../Exceptions.h"
-#include "../tools/ExceptionTools.h"
 #include "Component.h"
+
+#include <vector>
 
 namespace opaq
 {
@@ -23,34 +12,14 @@ namespace config
 class MappingStage
 {
 public:
-    MappingStage();
+    MappingStage(Component stations, std::vector<Component> models);
 
-    Component& getValues() const
-    {
-        throwOnNullPtr(_values);
-        return *_values;
-    }
-    
-    void setValues(config::Component* values)
-    {
-        _values = values;
-    }
-
-    config::Component& getMeteo() const
-    {
-        throwOnNullPtr(_meteo);
-        return *_meteo;
-    }
-    
-    void setMeteo(Component* meteo)
-    {
-        _meteo = meteo;
-    }
+    Component getStationProvider() const;
+    std::vector<Component> getModels() const;
 
 private:
-    // input data provider components
-    config::Component* _values;
-    config::Component* _meteo;
+    Component _stations;
+    std::vector<Component> _models;
 };
 
 }

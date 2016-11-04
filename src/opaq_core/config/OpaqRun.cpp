@@ -9,21 +9,7 @@ namespace config
 OpaqRun::OpaqRun()
 : _logger("OPAQ::config::OpaqRun")
 , _aggregation(Aggregation::None)
-, _networkProvider(nullptr)
-, _gridProvider(nullptr)
 {
-}
-
-void OpaqRun::clear()
-{
-    _plugins.clear();
-    _components.clear();
-    _baseTimes.clear();
-
-    _networkProvider.reset();
-    _gridProvider.reset();
-    _forecastStage.reset();
-    _mappingStage.reset();
 }
 
 void OpaqRun::addPlugin(const Plugin& plugin)
@@ -72,6 +58,87 @@ std::vector<Plugin> OpaqRun::getPlugins()
 std::vector<Component> OpaqRun::getComponents()
 {
     return _components;
+}
+
+std::string OpaqRun::getPollutantName() const
+{
+    return _pollutantName;
+}
+
+bool OpaqRun::pollutantIsSet() const noexcept
+{
+    return !_pollutantName.empty();
+}
+
+Aggregation::Type OpaqRun::getAggregation() const
+{
+    return _aggregation;
+}
+
+std::vector<chrono::date_time> OpaqRun::getBaseTimes() const
+{
+    return _baseTimes;
+}
+
+void OpaqRun::addBaseTime(const chrono::date_time& dt)
+{
+    _baseTimes.push_back(dt);
+}
+
+void OpaqRun::clearBaseTimes()
+{
+    _baseTimes.clear();
+}
+
+boost::optional<Component> OpaqRun::getNetworkProvider() const
+{
+    return _networkProvider;
+}
+
+boost::optional<Component> OpaqRun::getGridProvider() const
+{
+    return _gridProvider;
+}
+
+boost::optional<ForecastStage> OpaqRun::getForecastStage() const
+{
+    return _forecastStage;
+}
+
+boost::optional<MappingStage> OpaqRun::getMappingStage() const
+{
+    return _mappingStage;
+}
+
+void OpaqRun::setPollutantName(const std::string& name, const std::string& aggr)
+{
+    _pollutantName = name;
+    _aggregation   = Aggregation::fromString(aggr);
+}
+
+void OpaqRun::setAggregation(const std::string& aggr)
+{
+    _aggregation = Aggregation::fromString(aggr);
+}
+
+void OpaqRun::setNetworkProvider(const Component& component)
+{
+    _networkProvider = component;
+}
+
+void OpaqRun::setGridProvider(const Component& component)
+{
+    _gridProvider = component;
+}
+
+void OpaqRun::setForecastStage(ForecastStage forecastStage)
+{
+    _forecastStage = forecastStage;
+}
+
+void OpaqRun::setMappingStage(MappingStage mappingStage)
+{
+    _mappingStage = mappingStage;
 }
 
 }
