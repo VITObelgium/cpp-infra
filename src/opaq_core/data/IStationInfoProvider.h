@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Station.h"
+#include "../Station.h"
 #include "../Pollutant.h"
 #include "../Component.h"
 
