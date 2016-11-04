@@ -4,8 +4,10 @@ SET(REVISION 0)
 SET(NAME spdlog)
 
 IF(HOST MATCHES ".*-musl")
+    MESSAGE (STATUS "Apply musl strerror patch")
     SET (PATCH patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/muslstrerror.patch)
 ELSE ()
+    MESSAGE (STATUS "Musl strerror patch not needed")
     SET (PATCH "")
 ENDIF ()
 
