@@ -17,6 +17,8 @@
 #include "forecast/OVL_IRCEL_model2.h"
 #include "forecast/OVL_IRCEL_model3.h"
 
+#include "mapping/InverseDistanceWeighting.h"
+
 namespace opaq
 {
 
@@ -39,7 +41,9 @@ inline std::vector<std::string> getPluginNames()
         OVL::name(),
         OVL_IRCEL_model1::name(),
         OVL_IRCEL_model2::name(),
-        OVL_IRCEL_model3::name()
+        OVL_IRCEL_model3::name(),
+
+        InverseDistanceWeighting::name()
     };
 #else
     return {};
