@@ -5,7 +5,7 @@ SET(VERSION ${MAJOR}.${MINOR})
 SET(PACKAGE ${NAME}-${VERSION})
 
 IF (UNIX)
-  SET (PATCH patch -p1 < optionaltests.patch)
+  SET (PATCH patch -p1 < ${CMAKE_CURRENT_SOURCE_DIR}/optionaltests.patch)
 ENDIF ()
 
 EXTERNALPROJECT_ADD(${NAME}
