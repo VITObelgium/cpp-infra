@@ -2,7 +2,10 @@
 
 #include "Station.h"
 #include "AQNetwork.h"
+#include "AQNetworkProvider.h"
+#include "TimeSeries.h"
 #include "feedforwardnet.h"
+#include "data/ForecastBuffer.h"
 #include "tools/StringTools.h"
 
 #include <limits>

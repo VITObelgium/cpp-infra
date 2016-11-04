@@ -3,6 +3,8 @@
 #include "Station.h"
 #include "OpaqMath.h"
 #include "PluginRegistration.h"
+#include "data/MeteoProvider.h"
+#include "data/DataProvider.h"
 #include "tools/XmlTools.h"
 
 #define epsilon 1e-6

@@ -1,13 +1,8 @@
-/*
- * Engine.cpp
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys
- */
-
 #include "Engine.h"
 #include "data/IGridProvider.h"
+#include "data/MeteoProvider.h"
 #include "ComponentManagerFactory.h"
+#include "data/IStationInfoProvider.h"
 
 namespace opaq
 {
@@ -162,24 +157,27 @@ void Engine::run(config::OpaqRun& config)
             }
         }
     }
-    else
+    else if (mappingStage)
     {
-        for (auto& bt : baseTimes)
-        {
-            _logger->info(">> Mapping {}", chrono::to_date_string(bt));
-            _logger->critical("No mapping stage implemented yet");
-            exit(1);
+        _logger->info("Mapping");
 
-            /*
-  ForecastHorizon fh (0); // when mapping observations, the forecast horizon is always 0
-  try {
-    runStage(mappingStage, aqNetworkProvider, gridProvider, baseTime, pollutant, &fh, NULL);
-  } catch (std::exception & e) {
-    _logger->fatal("Unexpected error during mapping stage");
-    _logger->error(e.what());
-    exit(1);
-  }
-      */
+        auto cnf = config.getMappingStage();
+        auto& stationProvider = _componentMgr.getComponent<IStationInfoProvider>(cnf->getStationProvider().name);
+
+        for (auto& modelConfig : mappingStage->getModels())
+        {
+            auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
+
+            // set ins and outs for the model
+            //model.setBaseTime(baseTime);
+            model.setPollutant(pollutant);
+            model.setGridProvider(gridProvider);
+            model.setStationInfoProvider(stationProvider);
+            //model.setMeteoProvider(meteo);
+            //model.setBuffer(&buffer);
+
+            _logger->info("Running {}", model.getName());
+            model.run();
         }
     }
 }

@@ -1,17 +1,9 @@
 #pragma once
 
-#include <string>
-#include <tinyxml.h>
-
+#include "DateTime.h"
 #include "Component.h"
-
-#include "data/DataProvider.h"
-#include "data/ForecastBuffer.h"
-#include "data/MeteoProvider.h"
-#include "tools/ExceptionTools.h"
-
-#include "AQNetworkProvider.h"
 #include "Pollutant.h"
+#include "Aggregation.h"
 
 namespace opaq
 {
@@ -19,119 +11,60 @@ namespace opaq
 // forward declaration
 class Component;
 class IGridProvider;
+class IGridProvider;
+class IStationInfoProvider;
+class MeteoProvider;
+class DataProvider;
+class ForecastBuffer;
+class AQNetworkProvider;
 
-class Model : virtual public Component
+class Model : public Component
 {
 public:
     Model();
 
-    virtual void setBaseTime(const chrono::date_time& baseTime)
-    {
-        this->baseTime = baseTime;
-    }
-    virtual void setPollutant(const Pollutant& pollutant)
-    {
-        this->pollutant = pollutant;
-    }
-    virtual void setAggregation(Aggregation::Type aggr)
-    {
-        this->aggregation = aggr;
-    }
-    virtual void setForecastHorizon(chrono::days forecastHorizon)
-    {
-        this->forecastHorizon = forecastHorizon;
-    }
-    virtual void setAQNetworkProvider(AQNetworkProvider& aqNetworkProvider)
-    {
-        this->aqNetworkProvider = &aqNetworkProvider;
-    }
-    virtual void setGridProvider(IGridProvider* gridProvider)
-    {
-        this->gridProvider = gridProvider;
-    }
-    virtual void setInputProvider(DataProvider* input)
-    {
-        this->input = input;
-    }
-    virtual void setMeteoProvider(MeteoProvider* meteo)
-    {
-        this->meteo = meteo;
-    }
-    virtual void setBuffer(ForecastBuffer* buffer)
-    {
-        this->buffer = buffer;
-    }
-
-    virtual const chrono::date_time& getBaseTime()
-    {
-        return baseTime;
-    }
-    virtual const Pollutant& getPollutant()
-    {
-        return pollutant;
-    }
-    virtual const Aggregation::Type& getAggregation()
-    {
-        return aggregation;
-    }
-    virtual chrono::days getForecastHorizon()
-    {
-        return forecastHorizon;
-    }
-
-    // Throws NullPointerException
-    virtual AQNetworkProvider& getAQNetworkProvider()
-    {
-        throwOnNullPtr(aqNetworkProvider);
-        return *aqNetworkProvider;
-    }
-
-    // Throws NullPointerException
-    virtual IGridProvider* getGridProvider()
-    {
-        throwOnNullPtr(gridProvider);
-        return gridProvider;
-    }
-
-    // Throws NullPointerException
-    virtual DataProvider* getInputProvider()
-    {
-        throwOnNullPtr(input);
-        return input;
-    }
-
-    // Throws NullPointerException
-    virtual MeteoProvider* getMeteoProvider()
-    {
-        throwOnNullPtr(meteo);
-        return meteo;
-    }
-
-    // Throws NullPointerException
-    virtual ForecastBuffer* getBuffer()
-    {
-        throwOnNullPtr(buffer);
-        return buffer;
-    }
+    void setBaseTime(const chrono::date_time& baseTime);
+    void setPollutant(const Pollutant& pollutant);
+    void setAggregation(Aggregation::Type aggr);
+    void setForecastHorizon(chrono::days forecastHorizon);
+    void setAQNetworkProvider(AQNetworkProvider& aqNetworkProvider);
+    void setGridProvider(IGridProvider* gridProvider);
+    void setInputProvider(DataProvider* input);
+    void setMeteoProvider(MeteoProvider* meteo);
+    void setBuffer(ForecastBuffer* buffer);
+    void setStationInfoProvider(IStationInfoProvider& provider);
 
     virtual void run() = 0;
 
-    int getNoData() { return _missing_value; }
-    void setNoData(int missing) { _missing_value = missing; }
+    int getNoData() const noexcept;
+    void setNoData(int missing);
 
 protected:
-    chrono::date_time baseTime;    //< run for this basetime
-    Pollutant pollutant;           //< run for this pollutant
-    Aggregation::Type aggregation; //< run for this aggregation
-    chrono::days forecastHorizon;  //< maximum forecast horizon to run to
+    chrono::date_time getBaseTime();
+    const Pollutant& getPollutant();
+    Aggregation::Type getAggregation();
+    chrono::days getForecastHorizon();
 
-    AQNetworkProvider* aqNetworkProvider;
-    IGridProvider* gridProvider;
-    DataProvider* input;
-    MeteoProvider* meteo;
-    ForecastBuffer* buffer;
+    AQNetworkProvider& getAQNetworkProvider();
+    IGridProvider* getGridProvider();
+    DataProvider* getInputProvider();
+    MeteoProvider* getMeteoProvider();
+    ForecastBuffer* getBuffer();
+    IStationInfoProvider& getStationInfoProvider();
 
 private:
+    chrono::date_time _baseTime;    //< run for this basetime
+    Pollutant _pollutant;           //< run for this pollutant
+    Aggregation::Type _aggregation; //< run for this aggregation
+    chrono::days _forecastHorizon;  //< maximum forecast horizon to run to
+
+    AQNetworkProvider* _aqNetworkProvider;
+    IGridProvider* _gridProvider;
+    DataProvider* _input;
+    MeteoProvider* _meteo;
+    ForecastBuffer* _buffer;
+    IStationInfoProvider* _stationInfoProvider;
+
     int _missing_value; //!< missing value, can be set in configuration, default set here
 };
 

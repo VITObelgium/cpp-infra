@@ -8,6 +8,7 @@
 #include "RioObsProvider.h"
 #include "ObsParser.h"
 #include "PluginRegistration.h"
+#include "AQNetworkProvider.h"
 
 #include "tools/StringTools.h"
 #include "tools/XmlTools.h"

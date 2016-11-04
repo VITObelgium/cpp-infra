@@ -2,6 +2,8 @@
 #include "Station.h"
 #include "PluginRegistration.h"
 #include "OpaqMath.h"
+#include "data/MeteoProvider.h"
+#include "data/DataProvider.h"
 #include "tools/XmlTools.h"
 
 #include <tinyxml.h>

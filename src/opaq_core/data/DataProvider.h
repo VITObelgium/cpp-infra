@@ -7,7 +7,6 @@
 
 #pragma once
 
-#include "../AQNetworkProvider.h"
 #include "../Aggregation.h"
 #include "../Component.h"
 #include "../DateTime.h"
@@ -18,6 +17,8 @@
 
 namespace opaq
 {
+
+class AQNetworkProvider;
 
 /**
  * Observation data provider
