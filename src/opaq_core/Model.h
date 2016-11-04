@@ -28,7 +28,7 @@ public:
     void setAggregation(Aggregation::Type aggr);
     void setForecastHorizon(chrono::days forecastHorizon);
     void setAQNetworkProvider(AQNetworkProvider& aqNetworkProvider);
-    void setGridProvider(IGridProvider* gridProvider);
+    void setGridProvider(IGridProvider& gridProvider);
     void setInputProvider(DataProvider* input);
     void setMeteoProvider(MeteoProvider* meteo);
     void setBuffer(ForecastBuffer* buffer);
@@ -46,7 +46,7 @@ protected:
     chrono::days getForecastHorizon();
 
     AQNetworkProvider& getAQNetworkProvider();
-    IGridProvider* getGridProvider();
+    IGridProvider& getGridProvider();
     DataProvider* getInputProvider();
     MeteoProvider* getMeteoProvider();
     ForecastBuffer* getBuffer();

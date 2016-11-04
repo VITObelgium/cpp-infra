@@ -41,9 +41,9 @@ void Model::setAQNetworkProvider(AQNetworkProvider& aqNetworkProvider)
     _aqNetworkProvider = &aqNetworkProvider;
 }
 
-void Model::setGridProvider(IGridProvider* gridProvider)
+void Model::setGridProvider(IGridProvider& gridProvider)
 {
-    _gridProvider = gridProvider;
+    _gridProvider = &gridProvider;
 }
 
 void Model::setInputProvider(DataProvider* input)
@@ -92,10 +92,10 @@ AQNetworkProvider& Model::getAQNetworkProvider()
     return *_aqNetworkProvider;
 }
 
-IGridProvider* Model::getGridProvider()
+IGridProvider& Model::getGridProvider()
 {
     throwOnNullPtr(_gridProvider);
-    return _gridProvider;
+    return *_gridProvider;
 }
 
 DataProvider* Model::getInputProvider()

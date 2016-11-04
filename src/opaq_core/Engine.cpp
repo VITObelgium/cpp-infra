@@ -8,7 +8,7 @@ namespace opaq
 {
 
 Engine::Engine(config::PollutantManager& pollutantMgr)
-: _logger("OPAQ::Engine")
+: _logger("Engine")
 , _pollutantMgr(pollutantMgr)
 , _componentMgr(factory::createComponentManager(*this))
 {
@@ -171,7 +171,7 @@ void Engine::run(config::OpaqRun& config)
             // set ins and outs for the model
             //model.setBaseTime(baseTime);
             model.setPollutant(pollutant);
-            model.setGridProvider(gridProvider);
+            model.setGridProvider(*gridProvider);
             model.setStationInfoProvider(stationProvider);
             //model.setMeteoProvider(meteo);
             //model.setBuffer(&buffer);
