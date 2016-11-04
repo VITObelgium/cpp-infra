@@ -73,9 +73,9 @@ set (CORE_TOOLS_SOURCES
     tools/CalcTools.h
 )
 
-source_group(Config FILES ${CORE_CONFIG_SOURCES})
-source_group(Tools FILES ${CORE_TOOLS_SOURCES})
-source_group(Data FILES ${CORE_DATA_SOURCES})
+source_group(config FILES ${CORE_CONFIG_SOURCES})
+source_group(tools FILES ${CORE_TOOLS_SOURCES})
+source_group(data FILES ${CORE_DATA_SOURCES})
 
 add_library(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES} ${CORE_DATA_SOURCES})
 target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Logger.h"
-#include "Config/OpaqRun.h"
+#include "config/OpaqRun.h"
 
 #include "tools/FileTools.h"
 #include "tools/XmlTools.h"
