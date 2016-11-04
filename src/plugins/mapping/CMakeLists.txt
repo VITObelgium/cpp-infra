@@ -8,7 +8,7 @@ target_link_libraries(idwmodel opaqcore)
 if (NOT STATIC_PLUGINS)
     set_target_properties(idwmodel PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
-    add_library(idwmodel MODULE InverseDistanceWeightingModelPlugin.cpp)
+    add_library(idwmodelplugin MODULE InverseDistanceWeightingModelPlugin.cpp)
 
     target_link_libraries(idwmodelplugin idwmodel)
 endif ()
