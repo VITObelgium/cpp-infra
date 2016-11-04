@@ -4,10 +4,15 @@ SET(NAME sqlpp11-connector-sqlite3)
 SET(VERSION ${MAJOR}.${MINOR})
 SET(PACKAGE ${NAME}-${VERSION})
 
+IF (UNIX)
+  SET (PATCH patch -p1 < optionaltests.patch)
+ENDIF ()
+
 EXTERNALPROJECT_ADD(${NAME}
     DEPENDS sqlpp11 sqlite date
     URL http://github.com/rbock/${NAME}/archive/${VERSION}.tar.gz TIMEOUT 180
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
+    PATCH_COMMAND ${PATCH}
     CMAKE_ARGS -G ${CMAKE_GENERATOR}
                -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
