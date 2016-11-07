@@ -23,7 +23,7 @@ public:
     virtual double getNoData(const std::string& id) = 0;
 
     /**
-	 * Return the values between t1 and t2 including the boundaries !
+	 * Return the values between t1 and t2 including the boundaries!
 	 */
     virtual opaq::TimeSeries<double> getValues(const chrono::date_time& t1,
                                                const chrono::date_time& t2,

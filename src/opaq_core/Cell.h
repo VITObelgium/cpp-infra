@@ -23,29 +23,29 @@ public:
     Cell(long ID, double xmin, double xmax, double ymin, double ymax);
 
     /** Return the Cell ID */
-    long getId() const { return id; }
+    long getId() const;
 
     /** Returns the cell center in x direction */
-    double getXc() const { return .5 * (xmax + xmin); }
+    double getXc() const;
     /** Returns the cell center in y direction */
-    double getYc() const { return .5 * (ymax + ymin); }
+    double getYc() const;
     /** Returns the cell center in z direction */
-    double getZc() const { return .5 * (zmax + zmin); }
+    double getZc() const;
 
     /** Returns the cell x dimension */
-    double getDx() const { return (xmax - xmin); }
+    double getDx() const;
     /** Returns the cell y dimension */
-    double getDy() const { return (ymax - ymin); }
+    double getDy() const;
     /** Returns the cell z dimension */
-    double getDz() const { return (zmax - zmin); }
+    double getDz() const;
 
     /** Returns the cell volume
-  \note only for 3D cells as it assumes a dz != 0
-    */
-    double getVolume() const { return getDx() * getDy() * getDz(); }
+     *  \note only for 3D cells as it assumes a dz != 0
+     */
+    double getVolume() const;
 
     /** Returns a cell's surface area, i.e. only surface of it's xy plane */
-    double getSurfaceArea() const { return getDx() * getDy(); }
+    double getSurfaceArea() const;
 
     bool operator== (const Cell& other) const noexcept;
 

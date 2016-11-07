@@ -29,16 +29,12 @@ public:
     Station(std::string name, std::string desc, std::string meteoId, double beta);
     Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, double beta);
 
-    /** Output streamer for the station class */
     friend std::ostream& operator<<(std::ostream& os, const Station& s);
 
-    void addPollutant(const Pollutant& p) { _pollutants.push_back(p); }
+    void addPollutant(const Pollutant& p);
 
-    /** Get the station name */
-    std::string getName() const { return _name; }
-
-    /** Get the station description */
-    std::string getDescription() const { return _desc; }
+    std::string getName() const;
+    std::string getDescription() const;
 
     /** Get the id for the meteo model that this station corresponds to.
     \note This is just a string or a tag indicating what meteo forecasts to take,
@@ -46,7 +42,9 @@ public:
     model gridcel. This was inspired by the OVL matlab code which had per
     station a certain tag such as 510_45 for ECMWF gridcell 51.0 N, 4.5 E
     */
-    std::string getMeteoId() const { return _meteoId; }
+    std::string getMeteoId() const;
+
+    double getBeta() const noexcept;
 
     bool measuresPollutant(const Pollutant& pol) const noexcept;
 

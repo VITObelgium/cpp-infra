@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.h"
+#include "Logger.h"
 
 namespace opaq
 {
@@ -17,6 +18,8 @@ public:
     void run() override;
 
 private:
+    double _powerParam;
+    std::string _gisType;
 };
 
 }

@@ -5,8 +5,9 @@
 namespace opaq
 {
 
-Model::Model()
-: _aggregation(Aggregation::None)
+Model::Model(const std::string& name)
+: _logger(name)
+, _aggregation(Aggregation::None)
 , _aqNetworkProvider(0)
 , _gridProvider(0)
 , _input(0)
@@ -46,9 +47,9 @@ void Model::setGridProvider(IGridProvider& gridProvider)
     _gridProvider = &gridProvider;
 }
 
-void Model::setInputProvider(DataProvider* input)
+void Model::setInputProvider(DataProvider& input)
 {
-    _input = input;
+    _input = &input;
 }
 
 void Model::setMeteoProvider(MeteoProvider* meteo)
@@ -98,10 +99,10 @@ IGridProvider& Model::getGridProvider()
     return *_gridProvider;
 }
 
-DataProvider* Model::getInputProvider()
+DataProvider& Model::getInputProvider()
 {
     throwOnNullPtr(_input);
-    return _input;
+    return *_input;
 }
 
 MeteoProvider* Model::getMeteoProvider()

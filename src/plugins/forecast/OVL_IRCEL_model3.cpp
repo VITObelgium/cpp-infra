@@ -17,7 +17,8 @@ using namespace chrono_literals;
 using namespace std::chrono_literals;
 
 OVL_IRCEL_model3::OVL_IRCEL_model3()
-: p_t2m("P01") // t2m in IRCEL meteo provider
+: MLP_FeedForwardModel("OVL_IRCEL_model3")
+, p_t2m("P01") // t2m in IRCEL meteo provider
 , p_wsp10m("P03") // wind speed 10 m in IRCEL meteo provider
 , p_wdir10m("P04") // wind direction 10 m
 , p_blh("P07") // boundary layer height
@@ -85,8 +86,8 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     // -----------------------
     // Getting data providers --> stored in main model...
     // -----------------------
-    DataProvider* obs    = getInputProvider();
-    MeteoProvider* meteo = getMeteoProvider();
+    auto& obs   = getInputProvider();
+    auto* meteo = getMeteoProvider();
 
     // -----------------------
     // Get the meteo input
@@ -117,9 +118,9 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     t1 = date::floor<chrono::days>(baseTime);
     t2 = t1 + std::chrono::hours(mor_agg - 1); // mor_agg uur of eentje aftrekken ?
 
-    auto xx_morn = obs->getValues(t1, t2, st.getName(), pol.getName()); // no aggregation
-    double xx    = mean_missing(xx_morn.values(), obs->getNoData());
-    if (fabs(xx - obs->getNoData()) > epsilon)
+    auto xx_morn = obs.getValues(t1, t2, st.getName(), pol.getName()); // no aggregation
+    double xx    = mean_missing(xx_morn.values(), obs.getNoData());
+    if (fabs(xx - obs.getNoData()) > epsilon)
         sample[0] = log(1 + xx);
     else
         have_sample++;
@@ -127,11 +128,11 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     // 1. -------------------------------------------------------------------------------
     // sample[1] is the mean concentration of the measured pollutant of day-1
     t1 = date::floor<chrono::days>(baseTime) - 1_d;
-    t2 = date::floor<chrono::days>(baseTime) - obs->getTimeResolution(); // 1x meteto TimeResultion aftrekken : - getTimeResolution();
+    t2 = date::floor<chrono::days>(baseTime) - obs.getTimeResolution(); // 1x meteto TimeResultion aftrekken : - getTimeResolution();
 
-    auto xx_yest = obs->getValues(t1, t2, st.getName(), pol.getName());
-    xx           = mean_missing(xx_yest.values(), obs->getNoData());
-    if (fabs(xx - obs->getNoData()) > epsilon)
+    auto xx_yest = obs.getValues(t1, t2, st.getName(), pol.getName());
+    xx           = mean_missing(xx_yest.values(), obs.getNoData());
+    if (fabs(xx - obs.getNoData()) > epsilon)
         sample[1] = log(1 + xx);
     else
         have_sample++;

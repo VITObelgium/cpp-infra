@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Logger.h"
 #include "DateTime.h"
 #include "Component.h"
 #include "Pollutant.h"
@@ -21,7 +22,7 @@ class AQNetworkProvider;
 class Model : public Component
 {
 public:
-    Model();
+    Model(const std::string& name);
 
     void setBaseTime(const chrono::date_time& baseTime);
     void setPollutant(const Pollutant& pollutant);
@@ -29,7 +30,7 @@ public:
     void setForecastHorizon(chrono::days forecastHorizon);
     void setAQNetworkProvider(AQNetworkProvider& aqNetworkProvider);
     void setGridProvider(IGridProvider& gridProvider);
-    void setInputProvider(DataProvider* input);
+    void setInputProvider(DataProvider& input);
     void setMeteoProvider(MeteoProvider* meteo);
     void setBuffer(ForecastBuffer* buffer);
     void setStationInfoProvider(IStationInfoProvider& provider);
@@ -47,10 +48,12 @@ protected:
 
     AQNetworkProvider& getAQNetworkProvider();
     IGridProvider& getGridProvider();
-    DataProvider* getInputProvider();
+    DataProvider& getInputProvider();
     MeteoProvider* getMeteoProvider();
     ForecastBuffer* getBuffer();
     IStationInfoProvider& getStationInfoProvider();
+
+    Logger _logger;
 
 private:
     chrono::date_time _baseTime;    //< run for this basetime

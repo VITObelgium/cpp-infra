@@ -47,4 +47,45 @@ bool Cell::operator==(const Cell& other) const noexcept
            zmax == other.zmax;
 }
 
+long Cell::getId() const
+{
+    return id;
+}
+
+double Cell::getXc() const
+{
+    return .5 * (xmax + xmin);
+}
+double Cell::getYc() const
+{
+    return .5 * (ymax + ymin);
+}
+double Cell::getZc() const
+{
+    return .5 * (zmax + zmin);
+}
+
+double Cell::getDx() const
+{
+    return (xmax - xmin);
+}
+double Cell::getDy() const
+{
+    return (ymax - ymin);
+}
+double Cell::getDz() const
+{
+    return (zmax - zmin);
+}
+
+double Cell::getVolume() const
+{
+    return getDx() * getDy() * getDz();
+}
+
+double Cell::getSurfaceArea() const
+{
+    return getDx() * getDy();
+}
+
 }

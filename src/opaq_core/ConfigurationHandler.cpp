@@ -91,7 +91,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
 
 config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)
 {
-    config::Component stations;
+    config::Component stations, observations;
     std::vector<config::Component> models;
 
     auto* modelsElement = element->FirstChildElement("models");
@@ -118,7 +118,16 @@ config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* eleme
         throw BadConfigurationException("No station data provider in run configuration");
     }
 
-    return config::MappingStage(stations, std::move(models));
+    try
+    {
+        observations = _opaqRun.getComponent(XmlTools::getText(inputElement, "observations"));
+    }
+    catch (const ElementNotFoundException&)
+    {
+        throw BadConfigurationException("No observations data provider in run configuration");
+    }
+
+    return config::MappingStage(stations, observations, std::move(models));
 }
 
 void ConfigurationHandler::parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr)

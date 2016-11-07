@@ -2,6 +2,9 @@
 #include "InverseDistanceWeighting.h"
 #include "PluginRegistration.h"
 #include "data/IGridProvider.h"
+#include "data/IStationInfoProvider.h"
+#include "data/DataProvider.h"
+#include "tools/XmlTools.h"
 
 #include <tinyxml.h>
 
@@ -11,6 +14,8 @@ namespace opaq
 using namespace std::chrono_literals;
 
 InverseDistanceWeighting::InverseDistanceWeighting()
+: Model("IDWModel")
+, _powerParam(0.0)
 {
 }
 
@@ -22,18 +27,75 @@ std::string InverseDistanceWeighting::name()
 void InverseDistanceWeighting::configure(TiXmlElement* cnf, const std::string& componentName, IEngine&)
 {
     setName(componentName);
+
+    _powerParam = XmlTools::getChildValue<double>(cnf, "power_parameter", 5.0);
+    _gisType = XmlTools::getChildValue<std::string>(cnf, "gis_type", "clc06d");
+}
+
+static double calculateDistance(double x1, double y1, double x2, double y2)
+{
+    return std::sqrt(std::pow(x2 - x1, 2) + std::pow(y2 - y1, 2));
 }
 
 void InverseDistanceWeighting::run()
 {
-    // for each cell in the grid
-    // calculate the iwd based on all the stations
+    auto basetime = getBaseTime();
+    auto& dataProvider = getInputProvider();
+    auto stations = getStationInfoProvider().getStations(getPollutant(), _gisType);
 
-    /*auto& grid = getGridProvider().getGrid(getPollutant().getName(), GridType::Grid4x4);
-    for (size_t i = 0; i < grid.cellCount(); ++i)
+    std::vector<double> results;
+    results.reserve(stations.size());
+
+    for (auto& cell : getGridProvider().getGrid(getPollutant().getName(), GridType::Grid4x4))
     {
-        auto cell = grid.cell(i);
-    }*/
+        const auto x = cell.getXc();
+        const auto y = cell.getYc();
+
+        double num = 0.0;
+        double den = 0.0;
+        double idw = 0.0;
+        bool onStation = false;
+
+        for (auto& station : stations)
+        {
+            auto values = dataProvider.getValues(basetime, basetime + 23h, station.getName(), getPollutant().getName(), Aggregation::Max1h);
+            if (values.isEmpty())
+            {
+                continue;
+            }
+            
+            auto distance = calculateDistance(x, y, station.getX(), station.getY());
+            if (distance == 0.0)
+            {
+                idw = values.valueAt(basetime);
+                onStation = true;
+                continue;
+            }
+            else
+            {
+                const auto value = values.valueAt(basetime);
+                if (std::abs(value - dataProvider.getNoData()) <= std::numeric_limits<double>::epsilon())
+                {
+                    continue; // nodata
+                }
+
+                const auto wix = 1.0 / std::pow(distance, _powerParam);
+                num += wix * values.valueAt(basetime);
+                den += wix;
+            }
+        }
+
+        if (!onStation)
+        {
+            idw = num / den;
+        }
+
+        results.push_back(idw);
+
+        _logger->info("Cell: {} idw: {}", cell.getId(), idw);
+    }
+
+    // TODO: write to output buffer
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(InverseDistanceWeighting)

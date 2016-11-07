@@ -51,7 +51,6 @@ private:
     void parseTuneList(TiXmlElement* lst);
     void parseTuneElement(TiXmlElement* el);
 
-    Logger _logger;
     ComponentManager* _componentMgr;
 
     std::string _tune_mode; //! the selected tune mode for how OVL was optimized.

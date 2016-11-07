@@ -20,9 +20,9 @@ static const std::string MODEL_PLACEHOLDER       = "%model%";   // idem for feat
 namespace opaq
 {
 
-MLP_FeedForwardModel::MLP_FeedForwardModel()
-: sample_size(0)
-, _logger("OPAQ::MLP_FeedForwardModel")
+MLP_FeedForwardModel::MLP_FeedForwardModel(const std::string& name)
+: Model(name)
+, sample_size(0)
 {
 }
 

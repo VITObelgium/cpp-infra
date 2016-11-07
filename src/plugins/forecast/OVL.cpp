@@ -18,7 +18,7 @@ namespace opaq
 using namespace chrono_literals;
 
 OVL::OVL()
-: _logger("OPAQ::OVL")
+: Model("OVL")
 , _componentMgr(nullptr)
 , _output_raw(false)
 , _debug_output(false)
@@ -317,7 +317,7 @@ void OVL::run()
                 // get the observed values from the input provider
                 // we could also implement it in such way to get them back from the forecast buffer...
                 // here a user should simply make sure we have enough data available in the data provider...
-                auto obs_hindcast = getInputProvider()->getValues(t1, t2, station->getName(), pol.getName(), aggr);
+                auto obs_hindcast = getInputProvider().getValues(t1, t2, station->getName(), pol.getName(), aggr);
 
                 if (_debug_output) {
                     fs << "\t\tOBSERVATIONS : " << std::endl;
@@ -342,7 +342,7 @@ void OVL::run()
                     for (unsigned int i = 0; i < fc_hindcast.size(); i++)
                     {
                         if (fabs(fc_hindcast.value(i) - buffer->getNoData()) > 1.e-6 &&
-                            fabs(obs_hindcast.value(i) - getInputProvider()->getNoData()) > 1.e-6) {
+                            fabs(obs_hindcast.value(i) - getInputProvider().getNoData()) > 1.e-6) {
 
                             if (_debug_output) {
                                 fs << "\t\tERROR : " << chrono::to_date_string(fc_hindcast.datetime(i)) << "\t" << fc_hindcast.value(i) - obs_hindcast.value(i) << std::endl;
@@ -366,7 +366,7 @@ void OVL::run()
                     for (unsigned int i = 0; i < fc_hindcast.size(); i++)
                     {
                         if (fabs(fc_hindcast.value(i) - buffer->getNoData()) > 1.e-6 &&
-                            fabs(obs_hindcast.value(i) - getInputProvider()->getNoData()) > 1.e-6) {
+                            fabs(obs_hindcast.value(i) - getInputProvider().getNoData()) > 1.e-6) {
 
                             // BUGFIX : have to turn the order of i around... !!
                             const auto fc_hindcast_size = static_cast<int>(fc_hindcast.size());

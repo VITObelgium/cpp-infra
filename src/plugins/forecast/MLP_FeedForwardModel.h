@@ -27,7 +27,7 @@ class Station;
 class MLP_FeedForwardModel : public Model
 {
 public:
-    MLP_FeedForwardModel();
+    MLP_FeedForwardModel(const std::string& name);
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
@@ -64,9 +64,6 @@ protected:
 
     std::string pattern;      //! needs to be set by the daughter class configure method
     unsigned int sample_size; //! needs to be set by daughter class
-
-private:
-    Logger _logger;
 };
 
 } /* namespace OPAQ */

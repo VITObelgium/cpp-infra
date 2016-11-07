@@ -43,6 +43,31 @@ std::ostream& operator<<(std::ostream& os, const Station& s)
     return os;
 }
 
+void Station::addPollutant(const Pollutant& p)
+{
+    _pollutants.push_back(p);
+}
+
+std::string Station::getName() const
+{
+    return _name;
+}
+
+std::string Station::getDescription() const
+{
+    return _desc;
+}
+
+std::string Station::getMeteoId() const
+{
+    return _meteoId;
+}
+
+double Station::getBeta() const noexcept
+{
+    return _beta;
+}
+
 bool Station::measuresPollutant(const Pollutant& pol) const noexcept
 {
     auto iter = std::find_if(_pollutants.begin(), _pollutants.end(), [&pol](const Pollutant& polIter) {
@@ -63,5 +88,4 @@ bool Station::operator==(const Station& other) const noexcept
            _meteoId == other._meteoId &&
            _beta == other._beta;
 }
-
 }

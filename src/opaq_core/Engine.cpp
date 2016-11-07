@@ -53,7 +53,7 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
         model.setAggregation(aggr);
         model.setAQNetworkProvider(net);
         model.setForecastHorizon(forecastHorizon);
-        model.setInputProvider(&obs);
+        model.setInputProvider(obs);
         model.setMeteoProvider(meteo);
         model.setBuffer(&buffer);
 
@@ -98,7 +98,7 @@ void Engine::run(config::OpaqRun& config)
 
     // Get air quality network provider
     auto name                            = config.getNetworkProvider()->name;
-    AQNetworkProvider& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
+    auto& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
     _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
@@ -163,21 +163,26 @@ void Engine::run(config::OpaqRun& config)
 
         auto cnf = config.getMappingStage();
         auto& stationProvider = _componentMgr.getComponent<IStationInfoProvider>(cnf->getStationProvider().name);
+        auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getDataProvider().name);
+        obs.setAQNetworkProvider(aqNetworkProvider);
 
-        for (auto& modelConfig : mappingStage->getModels())
+        for (auto& baseTime : baseTimes)
         {
-            auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
+            for (auto& modelConfig : mappingStage->getModels())
+            {
+                auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
 
-            // set ins and outs for the model
-            //model.setBaseTime(baseTime);
-            model.setPollutant(pollutant);
-            model.setGridProvider(*gridProvider);
-            model.setStationInfoProvider(stationProvider);
-            //model.setMeteoProvider(meteo);
-            //model.setBuffer(&buffer);
+                // set ins and outs for the model
+                model.setBaseTime(baseTime);
+                model.setPollutant(pollutant);
+                model.setGridProvider(*gridProvider);
+                model.setStationInfoProvider(stationProvider);
+                model.setInputProvider(obs);
+                //model.setBuffer(&buffer);
 
-            _logger->info("Running {}", model.getName());
-            model.run();
+                _logger->info("Running {}", model.getName());
+                model.run();
+            }
         }
     }
 }
