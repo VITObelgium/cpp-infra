@@ -19,6 +19,7 @@ if (hdf5_FOUND)
     target_link_libraries(riooutputbuffer opaqcore hdf5tools hdf5_cpp-static)
 
     if (NOT STATIC_PLUGINS)
+        set_target_properties(hdf5tools PROPERTIES POSITION_INDEPENDENT_CODE ON)
         set_target_properties(hdf5buffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
         set_target_properties(riooutputbuffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
