@@ -134,9 +134,11 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
 
         auto timeGroup = rootGroup.createGroup(s_timeGroupName);
 
-        writeGrid(start, end, grid, rootGroup.createGroup(s_gridGroupName));
-        writeStations(stations, rootGroup.createGroup(s_stationsGroupName));
-        _h5File->flush(H5F_SCOPE_GLOBAL);
+        auto gridGroup = rootGroup.createGroup(s_gridGroupName);
+        writeGrid(start, end, grid, gridGroup);
+
+        auto stationsGroup = rootGroup.createGroup(s_stationsGroupName);
+        writeStations(stations, stationsGroup);
     }
     catch (const H5::FileIException& e)
     {
