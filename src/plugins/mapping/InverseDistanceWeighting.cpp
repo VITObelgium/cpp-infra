@@ -3,6 +3,7 @@
 #include "PluginRegistration.h"
 #include "data/IGridProvider.h"
 #include "data/IStationInfoProvider.h"
+#include "data/IMappingBuffer.h"
 #include "data/DataProvider.h"
 #include "tools/XmlTools.h"
 
@@ -11,6 +12,7 @@
 namespace opaq
 {
 
+using namespace chrono_literals;
 using namespace std::chrono_literals;
 
 InverseDistanceWeighting::InverseDistanceWeighting()
@@ -28,7 +30,7 @@ void InverseDistanceWeighting::configure(TiXmlElement* cnf, const std::string& c
 {
     setName(componentName);
 
-    _powerParam = XmlTools::getChildValue<double>(cnf, "power_parameter", 5.0);
+    _powerParam = XmlTools::getChildValue<double>(cnf, "power_parameter", 1.0);
     _gisType = XmlTools::getChildValue<std::string>(cnf, "gis_type", "clc06d");
 }
 
@@ -41,12 +43,16 @@ void InverseDistanceWeighting::run()
 {
     auto basetime = getBaseTime();
     auto& dataProvider = getInputProvider();
+    auto& grid = getGridProvider().getGrid(getPollutant().getName(), GridType::Grid4x4);
     auto stations = getStationInfoProvider().getStations(getPollutant(), _gisType);
 
     std::vector<double> results;
     results.reserve(stations.size());
 
-    for (auto& cell : getGridProvider().getGrid(getPollutant().getName(), GridType::Grid4x4))
+    auto& buffer = getMappingBuffer();
+    buffer.openResultsFile(basetime, basetime + 1_d, getPollutant(), getAggregation(), stations, grid);
+
+    for (auto& cell : grid)
     {
         const auto x = cell.getXc();
         const auto y = cell.getYc();
@@ -95,7 +101,8 @@ void InverseDistanceWeighting::run()
         _logger->info("Cell: {} idw: {}", cell.getId(), idw);
     }
 
-    // TODO: write to output buffer
+    buffer.addResults(0, results);
+    buffer.closeResultsFile();
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(InverseDistanceWeighting)

@@ -1,23 +1,12 @@
-/*
- * Hdf5Tools.cpp
- *
- *  Created on: 2014
- *      Author: Stijn.VanLooy@vito.be
- */
-
 #include "Hdf5Tools.h"
 #include "tools/StringTools.h"
 
 namespace opaq
 {
+namespace Hdf5Tools
+{
 
-Hdf5Tools::Hdf5Tools() {}
-
-Hdf5Tools::~Hdf5Tools() {}
-
-//const H5::StrType Hdf5Tools::stringType = H5::StrType(0, H5T_VARIABLE);
-
-unsigned int Hdf5Tools::getDataSetSize(const H5::DataSet& dataSet, const unsigned int dimIndex)
+unsigned int getDataSetSize(const H5::DataSet& dataSet, const unsigned int dimIndex)
 {
     H5::DataSpace space = dataSet.getSpace();
     unsigned int rank   = space.getSimpleExtentNdims();
@@ -27,8 +16,7 @@ unsigned int Hdf5Tools::getDataSetSize(const H5::DataSet& dataSet, const unsigne
     return static_cast<unsigned int>(size[dimIndex]);
 }
 
-void Hdf5Tools::createStringAttribute(const H5::DataSet& dataSet, const std::string& attname,
-                                      const std::string& attvalue)
+void createStringAttribute(const H5::DataSet& dataSet, const std::string& attname, const std::string& attvalue)
 {
 
     static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
@@ -38,7 +26,7 @@ void Hdf5Tools::createStringAttribute(const H5::DataSet& dataSet, const std::str
     att.write(stringType, attvalue);
 }
 
-std::string Hdf5Tools::readStringAttribute(const H5::DataSet& dataSet, const std::string& name)
+std::string readStringAttribute(const H5::DataSet& dataSet, const std::string& name)
 {
     std::string out;
     static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
@@ -49,7 +37,7 @@ std::string Hdf5Tools::readStringAttribute(const H5::DataSet& dataSet, const std
     return out;
 }
 
-int Hdf5Tools::getIndexInStringDataSet(H5::DataSet& dataSet, const std::string& str, bool create)
+int getIndexInStringDataSet(H5::DataSet& dataSet, const std::string& str, bool create)
 {
     // 1. read parameter data set
     auto buffer = readStringData(dataSet);
@@ -66,7 +54,7 @@ int Hdf5Tools::getIndexInStringDataSet(H5::DataSet& dataSet, const std::string& 
     return static_cast<int>(std::distance(buffer.begin(), iter));
 }
 
-std::vector<std::string> Hdf5Tools::readStringData(const H5::DataSet& dataSet)
+std::vector<std::string> readStringData(const H5::DataSet& dataSet)
 {
     std::vector<std::string> result;
 
@@ -86,7 +74,7 @@ std::vector<std::string> Hdf5Tools::readStringData(const H5::DataSet& dataSet)
     static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
     std::vector<char*> strData(size);
     dataSet.read(strData.data(), stringType, memSpace, space);
-    
+
     result.reserve(size);
     for (auto* str : strData)
     {
@@ -97,7 +85,7 @@ std::vector<std::string> Hdf5Tools::readStringData(const H5::DataSet& dataSet)
     return result;
 }
 
-void Hdf5Tools::readLongData(long* buffer, const H5::DataSet& dataSet)
+void readLongData(long* buffer, const H5::DataSet& dataSet)
 {
     // get data set data space
     H5::DataSpace space = dataSet.getSpace();
@@ -120,7 +108,7 @@ void Hdf5Tools::readLongData(long* buffer, const H5::DataSet& dataSet)
     memSpace.close();
 }
 
-void Hdf5Tools::addToStringDataSet(H5::DataSet& dataSet, const std::string& value)
+void addToStringDataSet(H5::DataSet& dataSet, const std::string& value)
 {
     // get data set data space
     H5::DataSpace space = dataSet.getSpace();
@@ -150,7 +138,7 @@ void Hdf5Tools::addToStringDataSet(H5::DataSet& dataSet, const std::string& valu
     dataSet.flush(H5F_SCOPE_GLOBAL);
 }
 
-void Hdf5Tools::addToLongDataSet(H5::DataSet& dataSet, const long& value)
+void addToLongDataSet(H5::DataSet& dataSet, const long& value)
 {
     // get data set data space
     H5::DataSpace space = dataSet.getSpace();
@@ -177,4 +165,5 @@ void Hdf5Tools::addToLongDataSet(H5::DataSet& dataSet, const long& value)
     dataSet.flush(H5F_SCOPE_GLOBAL);
 }
 
-} /* namespace OPAQ */
+}
+}

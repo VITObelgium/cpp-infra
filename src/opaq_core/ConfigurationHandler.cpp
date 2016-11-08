@@ -91,7 +91,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
 
 config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)
 {
-    config::Component stations, observations;
+    config::Component stations, observations, buffer;
     std::vector<config::Component> models;
 
     auto* modelsElement = element->FirstChildElement("models");
@@ -127,7 +127,17 @@ config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* eleme
         throw BadConfigurationException("No observations data provider in run configuration");
     }
 
-    return config::MappingStage(stations, observations, std::move(models));
+    // parse the <buffer> section
+    try
+    {
+        buffer = _opaqRun.getComponent(XmlTools::getText(element, "buffer"));
+    }
+    catch (const ElementNotFoundException&)
+    {
+        _logger->warn("No databuffer given in run configuration");
+    }
+
+    return config::MappingStage(stations, observations, buffer, std::move(models));
 }
 
 void ConfigurationHandler::parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr)

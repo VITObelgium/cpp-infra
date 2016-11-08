@@ -21,16 +21,6 @@ public:
 
     static std::string name();
 
-    static const std::string START_DATE_NAME; // attribute that holds the start date
-    static const std::string FORECAST_DATASET_NAME;
-    static const std::string BASETIME_DATASET_NAME;
-    static const std::string DIMENSIONS_NAME;
-    static const std::string DIMENSIONS;
-    static const std::string DESCRIPTION_NAME;
-    static const std::string DESCRIPTION;
-    static const std::string MODELS_DATASET_NAME;
-    static const std::string STATION_DATASET_NAME;
-
     // ==================================================
     // OPAQ::Component methods
     // ==================================================

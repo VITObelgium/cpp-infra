@@ -1,6 +1,7 @@
 #include "Engine.h"
 #include "data/IGridProvider.h"
 #include "data/MeteoProvider.h"
+#include "data/IMappingBuffer.h"
 #include "ComponentManagerFactory.h"
 #include "data/IStationInfoProvider.h"
 
@@ -163,6 +164,7 @@ void Engine::run(config::OpaqRun& config)
 
         auto cnf = config.getMappingStage();
         auto& stationProvider = _componentMgr.getComponent<IStationInfoProvider>(cnf->getStationProvider().name);
+        auto& buffer = _componentMgr.getComponent<IMappingBuffer>(cnf->getMappingBuffer().name);
         auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getDataProvider().name);
         obs.setAQNetworkProvider(aqNetworkProvider);
 
@@ -178,7 +180,7 @@ void Engine::run(config::OpaqRun& config)
                 model.setGridProvider(*gridProvider);
                 model.setStationInfoProvider(stationProvider);
                 model.setInputProvider(obs);
-                //model.setBuffer(&buffer);
+                model.setMappingBuffer(buffer);
 
                 _logger->info("Running {}", model.getName());
                 model.run();

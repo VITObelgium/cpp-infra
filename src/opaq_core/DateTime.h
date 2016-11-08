@@ -25,7 +25,11 @@ namespace chrono
         return std::chrono::duration_cast<chrono::days>(timePoint);
     }
 
+    // to YYYYMMDD format
+    std::string to_dense_date_string(const date_time& dt);
+    // to YYYY-MM-DD format
     std::string to_date_string(const date_time& dt);
+    // to YYYY-MM-DD HH:MM:SS format
     std::string to_string(const date_time& dt);
 
     date_time from_date_string(const std::string& s);

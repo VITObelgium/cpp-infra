@@ -6,24 +6,17 @@ namespace opaq
 {
 
 Station::Station(std::string name, std::string desc, std::string meteoId)
-: Station(std::move(name), std::move(desc), std::move(meteoId), 0.0)
-{
-}
-
-Station::Station(std::string name, std::string desc, std::string meteoId, double beta)
 : _name(std::move(name))
 , _desc(std::move(desc))
 , _meteoId(std::move(meteoId))
-, _beta(beta)
 {
 }
 
-Station::Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, double beta)
+Station::Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId)
 : Point(id, x, y, z)
 , _name(std::move(name))
 , _desc(std::move(desc))
 , _meteoId(std::move(meteoId))
-, _beta(beta)
 {
 }
 
@@ -35,11 +28,6 @@ std::ostream& operator<<(std::ostream& os, const Station& s)
        << ", z=" << s.getZ()
        << ", meteo fc ID=" << s.getMeteoId();
 
-    if (s._beta != 0.0)
-    {
-        os << ", beta=" << s._beta;
-    }
-
     return os;
 }
 
@@ -48,24 +36,19 @@ void Station::addPollutant(const Pollutant& p)
     _pollutants.push_back(p);
 }
 
-std::string Station::getName() const
+const std::string& Station::getName() const
 {
     return _name;
 }
 
-std::string Station::getDescription() const
+const std::string& Station::getDescription() const
 {
     return _desc;
 }
 
-std::string Station::getMeteoId() const
+const std::string& Station::getMeteoId() const
 {
     return _meteoId;
-}
-
-double Station::getBeta() const noexcept
-{
-    return _beta;
 }
 
 bool Station::measuresPollutant(const Pollutant& pol) const noexcept
@@ -85,7 +68,6 @@ bool Station::operator==(const Station& other) const noexcept
            getZ() == other.getZ() &&
            _name == other._name &&
            _desc == other._desc &&
-           _meteoId == other._meteoId &&
-           _beta == other._beta;
+           _meteoId == other._meteoId;
 }
 }

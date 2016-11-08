@@ -66,11 +66,11 @@ TEST_F(StationInfoProviderTest, GetStations)
 
     auto stations = _stationsProvider.getStations(Pollutant(1, "pm10", "unit", "desc"), "clc06d");
     EXPECT_THAT(stations, ContainerEq(std::vector<Station>{
-        Station(1, 148580.0, 171157.0, 25.4, "41B004", "", "", 0.824880),
-        Station(2, 150397.0, 169802.0, 73.0, "41B006", "", "", 0.702315),
-        Station(3, 144338.0, 171963.0, 62.1, "41B011", "", "", 0.738767),
-        Station(4, 151000.0, 174800.0, 14.6, "41N043", "", "", 1.035592),
-        Station(5, 147540.0, 171030.0, 23.2, "41R001", "", "", 0.754189)
+        Station(1, 148580.0, 171157.0, 25.4, "41B004", "", ""),
+        Station(2, 150397.0, 169802.0, 73.0, "41B006", "", ""),
+        Station(3, 144338.0, 171963.0, 62.1, "41B011", "", ""),
+        Station(4, 151000.0, 174800.0, 14.6, "41N043", "", ""),
+        Station(5, 147540.0, 171030.0, 23.2, "41R001", "", "")
     }));
 }
 

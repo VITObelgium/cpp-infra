@@ -53,6 +53,7 @@ set (CORE_CONFIG_SOURCES
 
 set (CORE_DATA_SOURCES
     data/ForecastBuffer.h
+    data/IMappingBuffer.h
     data/DataProvider.h
     data/MeteoProvider.h
     data/IGridProvider.h

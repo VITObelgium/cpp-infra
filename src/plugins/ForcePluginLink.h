@@ -11,6 +11,7 @@
 #include "data/TextGridProvider.h"
 #include "data/IRCELMeteoProvider.h"
 #include "data/StationInfoProvider.h"
+#include "data/RioOutputBuffer.h"
 
 #include "forecast/OVL.h"
 #include "forecast/OVL_IRCEL_model1.h"
@@ -37,6 +38,7 @@ inline std::vector<std::string> getPluginNames()
         TextGridProvider::name(),
         IRCELMeteoProvider::name(),
         StationInfoProvider::name(),
+        RioOutputBuffer::name(),
 
         OVL::name(),
         OVL_IRCEL_model1::name(),

@@ -8,11 +8,12 @@ namespace opaq
 Model::Model(const std::string& name)
 : _logger(name)
 , _aggregation(Aggregation::None)
-, _aqNetworkProvider(0)
-, _gridProvider(0)
-, _input(0)
-, _meteo(0)
-, _buffer(0)
+, _aqNetworkProvider(nullptr)
+, _gridProvider(nullptr)
+, _input(nullptr)
+, _meteo(nullptr)
+, _buffer(nullptr)
+, _mappingBuffer(nullptr)
 , _missing_value(-9999)
 {
 }
@@ -60,6 +61,11 @@ void Model::setMeteoProvider(MeteoProvider* meteo)
 void Model::setBuffer(ForecastBuffer* buffer)
 {
     _buffer = buffer;
+}
+
+void Model::setMappingBuffer(IMappingBuffer& buffer)
+{
+    _mappingBuffer = &buffer;
 }
 
 void Model::setStationInfoProvider(IStationInfoProvider& provider)
@@ -115,6 +121,12 @@ ForecastBuffer* Model::getBuffer()
 {
     throwOnNullPtr(_buffer);
     return _buffer;
+}
+
+IMappingBuffer& Model::getMappingBuffer()
+{
+    throwOnNullPtr(_mappingBuffer);
+    return *_mappingBuffer;
 }
 
 IStationInfoProvider& Model::getStationInfoProvider()

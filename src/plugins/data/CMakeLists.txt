@@ -1,18 +1,35 @@
 if (hdf5_FOUND)
-    add_library(hdf5buffer STATIC
-        Hdf5Buffer.h
-        Hdf5Buffer.cpp
+    add_library(hdf5tools STATIC
         Hdf5Tools.h
         Hdf5Tools.cpp
     )
 
-    add_library(hdf5bufferplugin ${PLUGIN_TYPE}
-        Hdf5BufferPlugin.cpp
+    add_library(hdf5buffer STATIC
+        Hdf5Buffer.h
+        Hdf5Buffer.cpp
     )
 
-    set_target_properties(hdf5buffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
-    target_link_libraries(hdf5buffer opaqcore hdf5_cpp-static)
-    target_link_libraries(hdf5bufferplugin hdf5buffer)
+    target_link_libraries(hdf5buffer opaqcore hdf5tools hdf5_cpp-static)
+
+    add_library(riooutputbuffer STATIC
+        RioOutputBuffer.h
+        RioOutputBuffer.cpp
+    )
+
+    target_link_libraries(riooutputbuffer opaqcore hdf5tools hdf5_cpp-static)
+
+    if (NOT STATIC_PLUGINS)
+        set_target_properties(hdf5buffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
+        set_target_properties(riooutputbuffer PROPERTIES POSITION_INDEPENDENT_CODE ON)
+
+        add_library(hdf5bufferplugin MODULE Hdf5BufferPlugin.cpp)
+        add_library(riooutputbufferplugin MODULE Hdf5BufferPlugin.cpp)
+
+        target_link_libraries(hdf5bufferplugin hdf5buffer)
+        target_link_libraries(riooutputbufferplugin riooutputbuffer)
+    endif ()
+
+    set (OPTIONAL_PLUGINS hdf5buffer riooutputbuffer)
 endif ()
 
 find_library(SQLITE_LIBRARY NAMES sqlite3)
@@ -109,6 +126,6 @@ if (NOT STATIC_PLUGINS)
     target_link_libraries(stationinfoproviderplugin stationinfoprovider)
 endif ()
 
-set (PLUGINS ${PLUGINS} hdf5buffer sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider textgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
+set (PLUGINS ${PLUGINS} ${OPTIONAL_PLUGINS} sqlbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider textgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
 
 add_subdirectory(test)

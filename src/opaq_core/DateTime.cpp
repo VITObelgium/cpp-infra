@@ -12,6 +12,12 @@ namespace opaq
 namespace chrono
 {
 
+std::string to_dense_date_string(const date_time& dt)
+{
+    const auto ymd = date::year_month_day(date::floor<date::days>(dt));
+    return fmt::format("{}{:0=2}{:0=2}", static_cast<int>(ymd.year()), static_cast<unsigned>(ymd.month()), static_cast<unsigned>(ymd.day()));
+}
+
 std::string to_date_string(const date_time& dt)
 {
     const auto ymd = date::year_month_day(date::floor<date::days>(dt));

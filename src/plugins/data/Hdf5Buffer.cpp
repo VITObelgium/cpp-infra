@@ -18,16 +18,15 @@ namespace opaq
 
 using namespace std::chrono_literals;
 
-const std::string Hdf5Buffer::BASETIME_DATASET_NAME("basetime");
-
-const std::string Hdf5Buffer::START_DATE_NAME("start_date");
-const std::string Hdf5Buffer::FORECAST_DATASET_NAME("fc_value");
-const std::string Hdf5Buffer::DIMENSIONS_NAME("dimensions");
-const std::string Hdf5Buffer::DIMENSIONS("model x station x baseTime x fcHorizon");
-const std::string Hdf5Buffer::DESCRIPTION_NAME("description");
-const std::string Hdf5Buffer::DESCRIPTION("OPAQ forecasts");
-const std::string Hdf5Buffer::MODELS_DATASET_NAME("models");
-const std::string Hdf5Buffer::STATION_DATASET_NAME("stations");
+static const std::string BASETIME_DATASET_NAME("basetime");
+static const std::string START_DATE_NAME("start_date");
+static const std::string FORECAST_DATASET_NAME("fc_value");
+static const std::string DIMENSIONS_NAME("dimensions");
+static const std::string DIMENSIONS("model x station x baseTime x fcHorizon");
+static const std::string DESCRIPTION_NAME("description");
+static const std::string DESCRIPTION("OPAQ forecasts");
+static const std::string MODELS_DATASET_NAME("models");
+static const std::string STATION_DATASET_NAME("stations");
 
 // set version information for this H5 store plugin
 const std::string Hdf5BufferVersion("0.1");
