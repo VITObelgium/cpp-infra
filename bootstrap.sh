@@ -17,6 +17,7 @@ PWD=`pwd`
 
 config=""
 toolchain=""
+generator="Ninja"
 
 echo -n "Select configuration: [1:Debug 2:Release]: "
 read yno
@@ -26,15 +27,16 @@ case $yno in
     * ) echo "Invalid selection" exit;;
 esac
 
-echo -n "Select toolchain to use: [1:Default 2:Musl (static linking)]: "
+echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw]: "
 read yno
 case $yno in
     [1] ) toolchain="";;
     [2] ) toolchain="${PWD}/../../deps/cluster.make";;
+    [3] ) generator="MSYS Makefiles";;
     * ) echo "Invalid selection" exit;;
 esac
 
-checkresult cmake ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
+checkresult cmake -G "${generator}" ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
 checkresult cmake --build .
 
 cd ..

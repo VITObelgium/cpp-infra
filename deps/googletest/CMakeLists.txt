@@ -5,7 +5,8 @@ SET(NAME googletest)
 
 EXTERNALPROJECT_ADD(${NAME}
     PREFIX ${NAME}
-    URL https://github.com/google/${NAME}/archive/release-${MAJOR}.${MINOR}.${REVISION}.tar.gz TIMEOUT 30
+    #URL https://github.com/google/${NAME}/archive/release-${MAJOR}.${MINOR}.${REVISION}.tar.gz TIMEOUT 30
+    GIT_REPOSITORY https://github.com/google/googletest.git
     INSTALL_DIR ${CMAKE_INSTALL_PREFIX}
     CMAKE_ARGS -DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}
                -DCMAKE_TOOLCHAIN_FILE=${CMAKE_TOOLCHAIN_FILE}
