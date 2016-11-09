@@ -17,18 +17,10 @@ std::string getName(Aggregation::Type agg)
 {
     switch (agg)
     {
-    case Type::None:
-        return std::string("none");
-        break;
-    case Type::DayAvg:
-        return std::string("dayavg");
-        break;
-    case Type::Max1h:
-        return std::string("max1h");
-        break;
-    case Type::Max8h:
-        return std::string("max8h");
-        break;
+    case Type::None:    return std::string("none");
+    case Type::DayAvg:  return std::string("dayavg");
+    case Type::Max1h:   return std::string("max1h");
+    case Type::Max8h:   return std::string("max8h");
     }
 
     return std::string("n/a");
@@ -38,18 +30,10 @@ std::string getDisplayName(Aggregation::Type agg)
 {
     switch (agg)
     {
-    case Type::None:
-        return std::string("None");
-        break;
-    case Type::DayAvg:
-        return std::string("Dayly average");
-        break;
-    case Type::Max1h:
-        return std::string("Maximum 1 hour");
-        break;
-    case Type::Max8h:
-        return std::string("Maximum 8 hours");
-        break;
+    case Type::None:    return std::string("None");
+    case Type::DayAvg:  return std::string("Dayly average");
+    case Type::Max1h:   return std::string("Maximum 1 hour");
+    case Type::Max8h:   return std::string("Maximum 8 hours");
     }
 
     throw std::invalid_argument("Invalid aggregation type");

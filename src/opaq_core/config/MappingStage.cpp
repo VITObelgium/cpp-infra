@@ -8,17 +8,11 @@ namespace opaq
 namespace config
 {
 
-MappingStage::MappingStage(Component stations, Component obsProvider, Component buffer, std::vector<Component> models)
-: _stations(stations)
-, _obsProvider(obsProvider)
+MappingStage::MappingStage(Component obsProvider, Component buffer, std::vector<Component> models)
+: _obsProvider(obsProvider)
 , _buffer(buffer)
 , _models(std::move(models))
 {
-}
-
-Component MappingStage::getStationProvider() const
-{
-    return _stations;
 }
 
 Component MappingStage::getDataProvider() const

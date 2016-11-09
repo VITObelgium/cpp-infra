@@ -13,7 +13,6 @@ namespace opaq
 class Component;
 class IGridProvider;
 class IGridProvider;
-class IStationInfoProvider;
 class MeteoProvider;
 class DataProvider;
 class ForecastBuffer;
@@ -35,7 +34,6 @@ public:
     void setMeteoProvider(MeteoProvider* meteo);
     void setBuffer(ForecastBuffer* buffer);
     void setMappingBuffer(IMappingBuffer& buffer);
-    void setStationInfoProvider(IStationInfoProvider& provider);
 
     virtual void run() = 0;
 
@@ -54,7 +52,6 @@ protected:
     MeteoProvider* getMeteoProvider();
     ForecastBuffer* getBuffer();
     IMappingBuffer& getMappingBuffer();
-    IStationInfoProvider& getStationInfoProvider();
 
     Logger _logger;
 
@@ -70,7 +67,6 @@ private:
     MeteoProvider* _meteo;
     ForecastBuffer* _buffer;
     IMappingBuffer* _mappingBuffer;
-    IStationInfoProvider* _stationInfoProvider;
 
     int _missing_value; //!< missing value, can be set in configuration, default set here
 };

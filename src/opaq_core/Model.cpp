@@ -68,11 +68,6 @@ void Model::setMappingBuffer(IMappingBuffer& buffer)
     _mappingBuffer = &buffer;
 }
 
-void Model::setStationInfoProvider(IStationInfoProvider& provider)
-{
-    _stationInfoProvider = &provider;
-}
-
 chrono::date_time Model::getBaseTime()
 {
     return _baseTime;
@@ -127,12 +122,6 @@ IMappingBuffer& Model::getMappingBuffer()
 {
     throwOnNullPtr(_mappingBuffer);
     return *_mappingBuffer;
-}
-
-IStationInfoProvider& Model::getStationInfoProvider()
-{
-    throwOnNullPtr(_stationInfoProvider);
-    return *_stationInfoProvider;
 }
 
 int Model::getNoData() const noexcept

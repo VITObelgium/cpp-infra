@@ -36,9 +36,9 @@ class RioObsProviderTest : public Test
 protected:
     RioObsProviderTest()
     {
-        auto station = std::make_unique<Station>(s_station, "Ukkel", "123");
-        station->addPollutant(Pollutant(81102, "pm10", "ug/m3", "PM with diameter below 10 micron"));
-        _aqNetwork.addStation(std::move(station));
+        Station station(s_station, "Ukkel", "123");
+        station.addPollutant(Pollutant(81102, "pm10", "ug/m3", "PM with diameter below 10 micron"));
+        _aqNetwork.addStation(station);
 
         EXPECT_CALL(_aqProviderMock, getAQNetwork()).Times(AnyNumber()).WillRepeatedly(ReturnRef(_aqNetwork));
 

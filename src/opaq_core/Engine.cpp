@@ -163,7 +163,6 @@ void Engine::run(config::OpaqRun& config)
         _logger->info("Mapping");
 
         auto cnf = config.getMappingStage();
-        auto& stationProvider = _componentMgr.getComponent<IStationInfoProvider>(cnf->getStationProvider().name);
         auto& buffer = _componentMgr.getComponent<IMappingBuffer>(cnf->getMappingBuffer().name);
         auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getDataProvider().name);
         obs.setAQNetworkProvider(aqNetworkProvider);
@@ -178,7 +177,7 @@ void Engine::run(config::OpaqRun& config)
                 model.setBaseTime(baseTime);
                 model.setPollutant(pollutant);
                 model.setGridProvider(*gridProvider);
-                model.setStationInfoProvider(stationProvider);
+                model.setAQNetworkProvider(aqNetworkProvider);
                 model.setInputProvider(obs);
                 model.setMappingBuffer(buffer);
 

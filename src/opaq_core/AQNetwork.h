@@ -30,20 +30,14 @@ public:
     */
     bool containsStation(const std::string& stationCode) const noexcept;
 
-    void addStation(std::unique_ptr<Station> station);
+    void addStation(Station station);
 
     /** 
     Return a reference to the list of stations in the network
     */
-    const std::vector<std::unique_ptr<Station>>& getStations() const { return _stations; }
-
-    /**
-       Finds the requested station in the network and returns a pointer to it
-       The routine compares the given string and the station name
-    */
-    Station* findStation(const std::string& name) const noexcept;
+    const std::vector<Station>& getStations() const { return _stations; }
 
 private:
-    std::vector<std::unique_ptr<Station>> _stations;
+    std::vector<Station> _stations;
 };
 }

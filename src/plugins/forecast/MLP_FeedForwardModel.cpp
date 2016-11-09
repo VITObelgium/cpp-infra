@@ -135,12 +135,12 @@ void MLP_FeedForwardModel::run()
     for (auto& station : stations)
     {
         // check if we have a valid meteo id, otherwise skip the station
-        if (station->getMeteoId().empty()) {
-            _logger->trace("Skipping station {}, no meteo id given", station->getName());
+        if (station.getMeteoId().empty()) {
+            _logger->trace("Skipping station {}, no meteo id given", station.getName());
             continue;
         }
         else
-            _logger->trace("Forecasting station {}", station->getName());
+            _logger->trace("Forecasting station {}", station.getName());
 
         // store the output in a timeseries object
         TimeSeries<double> fc;
@@ -152,12 +152,12 @@ void MLP_FeedForwardModel::run()
             auto fcTime = baseTime + fcHor;
             _logger->trace(" -- basetime: {}, horizon: day {}, dayN is: {}", chrono::to_date_string(baseTime), fc_hor, chrono::to_date_string(fcTime));
 
-            fc.insert(fcTime, fcValue(pol, *station, aggr, baseTime, fcHor));
+            fc.insert(fcTime, fcValue(pol, station, aggr, baseTime, fcHor));
         }
 
         // now we have all the forecast values for this particular station, set the output values...
         buffer->setCurrentModel(this->getName());
-        buffer->setValues(baseTime, fc, station->getName(), pol.getName(), aggr);
+        buffer->setValues(baseTime, fc, station.getName(), pol.getName(), aggr);
     }
 }
 

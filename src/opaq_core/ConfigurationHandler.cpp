@@ -91,7 +91,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
 
 config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)
 {
-    config::Component stations, observations, buffer;
+    config::Component observations, buffer;
     std::vector<config::Component> models;
 
     auto* modelsElement = element->FirstChildElement("models");
@@ -111,15 +111,6 @@ config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* eleme
     auto* inputElement = element->FirstChildElement("input");
     try
     {
-        stations = _opaqRun.getComponent(XmlTools::getText(inputElement, "stations"));
-    }
-    catch (const ElementNotFoundException&)
-    {
-        throw BadConfigurationException("No station data provider in run configuration");
-    }
-
-    try
-    {
         observations = _opaqRun.getComponent(XmlTools::getText(inputElement, "observations"));
     }
     catch (const ElementNotFoundException&)
@@ -137,7 +128,7 @@ config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* eleme
         _logger->warn("No databuffer given in run configuration");
     }
 
-    return config::MappingStage(stations, observations, buffer, std::move(models));
+    return config::MappingStage(observations, buffer, std::move(models));
 }
 
 void ConfigurationHandler::parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr)

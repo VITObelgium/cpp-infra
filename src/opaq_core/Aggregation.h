@@ -1,12 +1,4 @@
-/*
- * Aggregation.h
- *
- *  Created on: Dec 21, 2015
- *      Author: bino
- */
-
-#ifndef SRC_OPAQ_CORE_AGGREGATION_H_
-#define SRC_OPAQ_CORE_AGGREGATION_H_
+#pragma once
 
 #include "Exceptions.h"
 #include <string>
@@ -16,6 +8,7 @@ namespace opaq
 
 namespace Aggregation
 {
+
 enum Type
 {
     None,
@@ -40,8 +33,7 @@ std::string getDisplayName(Aggregation::Type agg);
 	 * \param s input string
 	 */
 Aggregation::Type fromString(std::string s);
+
 }
 
-} /* namespace OPAQ */
-
-#endif /* SRC_OPAQ_CORE_AGGREGATION_H_ */
+}

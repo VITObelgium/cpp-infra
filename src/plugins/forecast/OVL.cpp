@@ -224,14 +224,14 @@ void OVL::run()
     {
 
         // check if we have a valid meteo id, otherwise skip the station
-        if (station->getMeteoId().length() == 0) {
-            _logger->trace("Skipping station " + station->getName() + ", no meteo id given");
+        if (station.getMeteoId().length() == 0) {
+            _logger->trace("Skipping station " + station.getName() + ", no meteo id given");
             continue;
         }
         else
-            _logger->trace("Forecasting station " + station->getName());
+            _logger->trace("Forecasting station " + station.getName());
 
-        if (_debug_output) fs << "[STATION] " << station->getName() << " - " << chrono::to_date_string(baseTime) << std::endl;
+        if (_debug_output) fs << "[STATION] " << station.getName() << " - " << chrono::to_date_string(baseTime) << std::endl;
 
         // store the output in a time series object
         TimeSeries<double> fc;
@@ -245,10 +245,10 @@ void OVL::run()
             if (_debug_output) fs << "\t[DAY+" << fc_hor << "]" << std::endl;
 
             // lookup the station configuration
-            auto stIt = _conf.find(std::make_tuple(pol.getName(), aggr, _tune_mode, station->getName(), fc_hor));
+            auto stIt = _conf.find(std::make_tuple(pol.getName(), aggr, _tune_mode, station.getName(), fc_hor));
             if (stIt == _conf.end()) {
                 // no configuration for this station, returning -9999 or something
-                _logger->warn("Model configuration not found for " + pol.getName() + ", st = " + station->getName() + ", skipping...");
+                _logger->warn("Model configuration not found for " + pol.getName() + ", st = " + station.getName() + ", skipping...");
                 fc.insert(fcTime, getNoData());
                 continue;
             }
@@ -272,7 +272,7 @@ void OVL::run()
             model.setBuffer(getBuffer());
 
             // run the model
-            double out = model.fcValue(pol, *station, aggr, baseTime, fcHor);
+            double out = model.fcValue(pol, station, aggr, baseTime, fcHor);
 
             if (_debug_output) {
                 fs << "\t\tNN MODEL    : " << model.getName() << std::endl;
@@ -288,7 +288,7 @@ void OVL::run()
                 raw_fc.clear();
                 raw_fc.insert(fcTime, out);
                 buffer->setCurrentModel(model.getName());
-                buffer->setValues(baseTime, raw_fc, station->getName(), pol.getName(), aggr);
+                buffer->setValues(baseTime, raw_fc, station.getName(), pol.getName(), aggr);
             }
 
             // now handle the RTC, if the mode is larger than 0, otherwise we already have out output !!!
@@ -304,7 +304,7 @@ void OVL::run()
                 auto t2 = baseTime - 1_d;
 
                 buffer->setCurrentModel(model.getName());
-                TimeSeries<double> fc_hindcast = buffer->getForecastValues(fcHor, t1, t2, station->getName(), pol.getName(), aggr);
+                TimeSeries<double> fc_hindcast = buffer->getForecastValues(fcHor, t1, t2, station.getName(), pol.getName(), aggr);
 
                 if (_debug_output) {
                     fs << "\t\tHINDCAST : " << std::endl;
@@ -317,7 +317,7 @@ void OVL::run()
                 // get the observed values from the input provider
                 // we could also implement it in such way to get them back from the forecast buffer...
                 // here a user should simply make sure we have enough data available in the data provider...
-                auto obs_hindcast = getInputProvider().getValues(t1, t2, station->getName(), pol.getName(), aggr);
+                auto obs_hindcast = getInputProvider().getValues(t1, t2, station.getName(), pol.getName(), aggr);
 
                 if (_debug_output) {
                     fs << "\t\tOBSERVATIONS : " << std::endl;
@@ -403,7 +403,7 @@ void OVL::run()
 
         // now we have all the forecast values for this particular station, set the output values...
         buffer->setCurrentModel(getName());
-        buffer->setValues(baseTime, fc, station->getName(), pol.getName(), aggr);
+        buffer->setValues(baseTime, fc, station.getName(), pol.getName(), aggr);
 
     } // loop over the stations
 }

@@ -1,6 +1,8 @@
 
 #include "InverseDistanceWeighting.h"
 #include "PluginRegistration.h"
+#include "AQNetwork.h"
+#include "AQNetworkProvider.h"
 #include "data/IGridProvider.h"
 #include "data/IStationInfoProvider.h"
 #include "data/IMappingBuffer.h"
@@ -44,7 +46,7 @@ void InverseDistanceWeighting::run()
     auto basetime = getBaseTime();
     auto& dataProvider = getInputProvider();
     auto& grid = getGridProvider().getGrid(getPollutant().getName(), GridType::Grid4x4);
-    auto stations = getStationInfoProvider().getStations(getPollutant(), _gisType);
+    auto stations = getAQNetworkProvider().getAQNetwork().getStations();
 
     std::vector<double> results;
     results.reserve(stations.size());

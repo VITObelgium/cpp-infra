@@ -214,7 +214,7 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
         {
             // check whether this station acutally measures the pollutant requested,
             // if not then we skip this station
-            if (!station->measuresPollutant(pol))
+            if (!station.measuresPollutant(pol))
             {
                 continue;
             }
@@ -229,16 +229,16 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
 
             if (_fctime_full)
             {
-                fprintf(fp, "%s%c%s%c%s", chrono::to_date_string(baseTime).c_str(), _sepchar, station->getName().c_str(), _sepchar, chrono::to_date_string(fcTime).c_str());
+                fprintf(fp, "%s%c%s%c%s", chrono::to_date_string(baseTime).c_str(), _sepchar, station.getName().c_str(), _sepchar, chrono::to_date_string(fcTime).c_str());
             }
             else
             {
-                fprintf(fp, "%s%c%s%c%d", chrono::to_date_string(baseTime).c_str(), _sepchar, station->getName().c_str(), _sepchar, fc_hor);
+                fprintf(fp, "%s%c%s%c%d", chrono::to_date_string(baseTime).c_str(), _sepchar, station.getName().c_str(), _sepchar, fc_hor);
             }
 
             try
             {
-                auto modelVals = getBuffer()->getModelValues(baseTime, fcHor, station->getName(), pol.getName(), aggr);
+                auto modelVals = getBuffer()->getModelValues(baseTime, fcHor, station.getName(), pol.getName(), aggr);
                 if (modelVals.size() != modelNames.size())
                     throw RunTimeException("data size doesn't match the number of models...");
 
