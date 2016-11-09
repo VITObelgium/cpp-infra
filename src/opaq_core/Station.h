@@ -25,12 +25,10 @@ namespace opaq
 class Station : public Point
 {
 public:
-    Station(std::string name, std::string desc, std::string meteoId);
-    Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId);
+    Station(std::string name, std::string desc, std::string meteoId, std::vector<Pollutant> pollutants);
+    Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, std::vector<Pollutant> pollutants);
 
     friend std::ostream& operator<<(std::ostream& os, const Station& s);
-
-    void addPollutant(const Pollutant& p);
 
     const std::string& getName() const;
     const std::string& getDescription() const;

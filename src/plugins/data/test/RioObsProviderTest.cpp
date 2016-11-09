@@ -36,9 +36,7 @@ class RioObsProviderTest : public Test
 protected:
     RioObsProviderTest()
     {
-        Station station(s_station, "Ukkel", "123");
-        station.addPollutant(Pollutant(81102, "pm10", "ug/m3", "PM with diameter below 10 micron"));
-        _aqNetwork.addStation(station);
+        _aqNetwork.addStation(Station(s_station, "Ukkel", "123", { Pollutant(81102, "pm10", "ug/m3", "PM with diameter below 10 micron") }));
 
         EXPECT_CALL(_aqProviderMock, getAQNetwork()).Times(AnyNumber()).WillRepeatedly(ReturnRef(_aqNetwork));
 

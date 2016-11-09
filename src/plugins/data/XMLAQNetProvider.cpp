@@ -57,7 +57,7 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
             meteoId = "";
 
         // create station and push back to network
-        Station station(stID++, x, y, z, name, desc, meteoId);
+        std::vector<Pollutant> pollutants;
 
         // get pollutant list from stEl->GetText(); via string tokenizer
         if (stEl->GetText())
@@ -68,11 +68,11 @@ void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& component
             for (auto& pol : pol_list)
             {
                 // add to the pollutants list for this station
-                station.addPollutant(engine.pollutantManager().find(pol));
+                pollutants.push_back(engine.pollutantManager().find(pol));
             }
         }
 
-        _net.addStation(station);
+        _net.addStation(Station(stID++, x, y, z, name, desc, meteoId, std::move(pollutants)));
 
         stEl = stEl->NextSiblingElement("station");
     } /* end while loop over station elements */

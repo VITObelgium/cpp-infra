@@ -80,7 +80,7 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
             auto y = boost::lexical_cast<double>(*iter++);
             auto z = boost::lexical_cast<double>(*iter++);
 
-            stations.push_back(Station(id, x, y, z, std::move(stationCode), "", ""));
+            stations.push_back(Station(id, x, y, z, std::move(stationCode), "", "", {}));
         }
     }
     catch (const RunTimeException& e)

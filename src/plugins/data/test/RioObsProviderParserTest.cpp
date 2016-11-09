@@ -21,7 +21,7 @@ class RioObsProviderParserTest : public Test
 protected:
     RioObsProviderParserTest()
     {
-        network.addStation(Station(s_station, "Ukkel", "123"));
+        network.addStation(Station(s_station, "Ukkel", "123", {}));
     }
 
     AQNetwork network;
@@ -105,7 +105,7 @@ TEST_F(RioObsProviderParserTest, DISABLED_ParseFile1)
     ASSERT_TRUE(fs.is_open());
 
     AQNetwork network;
-    network.addStation(Station(s_station, "Ukkel", "123"));
+    network.addStation(Station(s_station, "Ukkel", "123", {}));
 
     auto result = readObservationsFile(fs, network, 24, 1h);
     EXPECT_EQ(4u, result.size()); // one result for each aggregation

@@ -5,18 +5,20 @@
 namespace opaq
 {
 
-Station::Station(std::string name, std::string desc, std::string meteoId)
+Station::Station(std::string name, std::string desc, std::string meteoId, std::vector<Pollutant> pollutants)
 : _name(std::move(name))
 , _desc(std::move(desc))
 , _meteoId(std::move(meteoId))
+, _pollutants(std::move(pollutants))
 {
 }
 
-Station::Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId)
+Station::Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, std::vector<Pollutant> pollutants)
 : Point(id, x, y, z)
 , _name(std::move(name))
 , _desc(std::move(desc))
 , _meteoId(std::move(meteoId))
+, _pollutants(std::move(pollutants))
 {
 }
 
@@ -29,11 +31,6 @@ std::ostream& operator<<(std::ostream& os, const Station& s)
        << ", meteo fc ID=" << s.getMeteoId();
 
     return os;
-}
-
-void Station::addPollutant(const Pollutant& p)
-{
-    _pollutants.push_back(p);
 }
 
 const std::string& Station::getName() const
