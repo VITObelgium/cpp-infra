@@ -48,6 +48,19 @@ public:
         return dynamic_cast<T&>(findComponent(componentName));
     }
 
+    template <typename T>
+    T* getOptionalComponent(const std::string& componentName)
+    {
+        try
+        {
+            return &dynamic_cast<T&>(findComponent(componentName));
+        }
+        catch (NullPointerException&)
+        {
+            return nullptr;
+        }
+    }
+
     void loadPlugin(const std::string& pluginName, const std::string& filename);
     void destroyComponent(const std::string& componentName);
     void destroyComponents();

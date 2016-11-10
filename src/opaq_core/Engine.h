@@ -3,7 +3,7 @@
 #include "Logger.h"
 #include "DateTime.h"
 #include "Aggregation.h"
-#include "ComponentManagerFactory.h"
+#include "ComponentManager.h"
 
 namespace opaq
 {

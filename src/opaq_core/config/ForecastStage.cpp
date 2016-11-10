@@ -10,15 +10,15 @@ namespace config
 
 ForecastStage::ForecastStage(chrono::days fcHor,
                              config::Component values,
-                             config::Component meteo,
                              config::Component buffer,
                              config::Component outputWriter,
+                             boost::optional<config::Component> meteo,
                              std::vector<Component> models)
 : _fcHor(fcHor)
 , _values(std::move(values))
-, _meteo(std::move(meteo))
 , _buffer(std::move(buffer))
 , _outputWriter(std::move(outputWriter))
+, _meteo(std::move(meteo))
 , _models(std::move(models))
 {
 }
@@ -26,11 +26,6 @@ ForecastStage::ForecastStage(chrono::days fcHor,
 config::Component ForecastStage::getValues() const
 {
     return _values;
-}
-
-config::Component ForecastStage::getMeteo() const
-{
-    return _meteo;
 }
 
 config::Component ForecastStage::getBuffer() const
@@ -41,6 +36,11 @@ config::Component ForecastStage::getBuffer() const
 config::Component ForecastStage::getOutputWriter() const
 {
     return _outputWriter;
+}
+
+boost::optional<config::Component> ForecastStage::getMeteo() const
+{
+    return _meteo;
 }
 
 const std::vector<Component>& ForecastStage::getModels() const noexcept

@@ -18,7 +18,8 @@ ConfigurationHandler::ConfigurationHandler()
 
 config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* element)
 {
-    config::Component values, meteo, buffer, outputWriter;
+    config::Component values, buffer, outputWriter;
+    boost::optional<config::Component> meteo;
     std::vector<config::Component> models;
 
     auto* modelsElement = element->FirstChildElement("models");
@@ -60,7 +61,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
     }
     catch (const ElementNotFoundException&)
     {
-        _logger->warn("No databuffer given in run configuration");
+        throw BadConfigurationException("No databuffer given in run configuration");
     }
 
     try
@@ -69,12 +70,12 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
     }
     catch (const ElementNotFoundException&)
     {
-        _logger->warn("No output writer given in run configuration");
+        throw BadConfigurationException("No outputWriter given in run configuration");
     }
 
     auto fcHor = chrono::days(XmlTools::getChildValue<int>(element, "horizon", 2));
 
-    return config::ForecastStage(fcHor, values, meteo, buffer, outputWriter, models);
+    return config::ForecastStage(fcHor, values, buffer, outputWriter, meteo, models);
 }
 
 config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)

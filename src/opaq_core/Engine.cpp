@@ -41,13 +41,10 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
 
     // Get meteo data provider (can be missing)
     MeteoProvider* meteo = nullptr;
-    try
+    if (cnf.getMeteo())
     {
-        meteo = &_compMgr.getComponent<MeteoProvider>(cnf.getMeteo().name);
+        meteo = &_compMgr.getComponent<MeteoProvider>(cnf.getMeteo()->name);
         meteo->setBaseTime(baseTime);
-    }
-    catch (const NullPointerException&)
-    {
     }
 
     // Get data buffer (can't be missing)
