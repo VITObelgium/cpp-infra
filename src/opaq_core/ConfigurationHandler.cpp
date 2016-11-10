@@ -1,10 +1,3 @@
-/*
- * ConfigurationHandler.cpp
- *
- *  Created on: Jan 15, 2014
- *      Author: vlooys
- */
-
 #include "config.h"
 #include "ConfigurationHandler.h"
 #include "PollutantManager.h"
@@ -12,6 +5,8 @@
 #include "config/ForecastStage.h"
 #include "config/MappingStage.h"
 #include "tools/XmlTools.h"
+
+#include <tinyxml.h>
 
 namespace opaq
 {

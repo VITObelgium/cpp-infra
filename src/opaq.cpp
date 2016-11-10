@@ -16,6 +16,7 @@
 #include "PollutantManager.h"
 #include "config.h"
 #include "plugins/ForcePluginLink.h"
+#include "tools/XmlTools.h"
 
 #include <boost/program_options.hpp>
 

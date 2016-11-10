@@ -2,6 +2,7 @@
 
 #include "Station.h"
 #include "AQNetwork.h"
+#include "AQNetworkProvider.h"
 #include "data/ForecastBuffer.h"
 #include "uiutils.h"
 

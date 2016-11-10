@@ -4,6 +4,7 @@
 #include "Aggregation.h"
 #include "ConfigurationHandler.h"
 #include "Engine.h"
+#include "PollutantManager.h"
 
 #include "ui_opaqview.h"
 

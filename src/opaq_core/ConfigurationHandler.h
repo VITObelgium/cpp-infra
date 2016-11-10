@@ -3,10 +3,9 @@
 #include "Logger.h"
 #include "config/OpaqRun.h"
 
-#include "tools/FileTools.h"
-#include "tools/XmlTools.h"
 #include <string>
-#include <tinyxml.h>
+
+class TiXmlElement;
 
 namespace opaq
 {
