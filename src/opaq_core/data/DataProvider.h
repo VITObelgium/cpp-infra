@@ -45,9 +45,6 @@ public:
      */
     const std::string& getCurrentModel(void) { return _currentModel; }
 
-    // ==================================================================================
-    // PURE VIRTUAL METHODS
-    // ==================================================================================
     /**
      * Get the time resolution of the provided data, for forecasted data this will be the time resolution
      * of the forecasts
@@ -83,4 +80,5 @@ protected:
     std::string _currentModel;                        //! name of the current model which provides the data, not used for observations
     AQNetworkProvider* _aqNetworkProvider = nullptr;  //! the network provider
 };
+
 }

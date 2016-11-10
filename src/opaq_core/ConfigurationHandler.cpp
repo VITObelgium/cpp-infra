@@ -11,6 +11,7 @@
 
 #include "config/ForecastStage.h"
 #include "config/MappingStage.h"
+#include "tools/XmlTools.h"
 
 namespace opaq
 {
@@ -22,7 +23,8 @@ ConfigurationHandler::ConfigurationHandler()
 
 config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* element)
 {
-    config::ForecastStage fcStage;
+    config::Component values, meteo, buffer, outputWriter;
+    std::vector<config::Component> models;
 
     auto* modelsElement = element->FirstChildElement("models");
     if (!modelsElement)
@@ -33,7 +35,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
     auto* componentElement = modelsElement->FirstChildElement("component");
     while (componentElement)
     {
-        fcStage.addModel(_opaqRun.getComponent(componentElement->GetText()));
+        models.push_back(_opaqRun.getComponent(componentElement->GetText()));
         componentElement = componentElement->NextSiblingElement("component");
     }
 
@@ -41,7 +43,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
     auto* inputElement = element->FirstChildElement("input");
     try
     {
-        fcStage.setValues(_opaqRun.getComponent(XmlTools::getText(inputElement, "observations")));
+        values = _opaqRun.getComponent(XmlTools::getText(inputElement, "observations"));
     }
     catch (const ElementNotFoundException&)
     {
@@ -50,7 +52,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
 
     try
     {
-        fcStage.setMeteo(_opaqRun.getComponent(XmlTools::getText(inputElement, "meteo")));
+        meteo = _opaqRun.getComponent(XmlTools::getText(inputElement, "meteo"));
     }
     catch (const ElementNotFoundException&)
     {
@@ -59,7 +61,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
 
     try
     {
-        fcStage.setBuffer(_opaqRun.getComponent(XmlTools::getText(element, "buffer")));
+        buffer = _opaqRun.getComponent(XmlTools::getText(element, "buffer"));
     }
     catch (const ElementNotFoundException&)
     {
@@ -68,25 +70,16 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* ele
 
     try
     {
-        fcStage.setOutputWriter(_opaqRun.getComponent(XmlTools::getText(element, "output")));
+        outputWriter = _opaqRun.getComponent(XmlTools::getText(element, "output"));
     }
     catch (const ElementNotFoundException&)
     {
         _logger->warn("No output writer given in run configuration");
     }
 
-    try
-    {
-        auto fc_hor_max = atoi(XmlTools::getText(element, "horizon").c_str());
-        fcStage.setHorizon(chrono::days(fc_hor_max));
-    }
-    catch (const ElementNotFoundException&)
-    {
-        _logger->warn("no forecast <horizon> given in forecast run configuration, using default 2");
-        fcStage.setHorizon(chrono::days(2));
-    }
+    auto fcHor = chrono::days(XmlTools::getChildValue<int>(element, "horizon", 2));
 
-    return fcStage;
+    return config::ForecastStage(fcHor, values, meteo, buffer, outputWriter, models);
 }
 
 config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)
@@ -140,7 +133,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
     {
         throw BadConfigurationException("Unable to load configuration file: {}", filename);
     }
-    
+
     auto* rootElement = _doc.FirstChildElement("opaq");
     if (!rootElement)
     {

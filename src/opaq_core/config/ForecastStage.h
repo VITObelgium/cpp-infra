@@ -14,41 +14,31 @@ namespace config
 class ForecastStage
 {
 public:
-    ForecastStage();
+    ForecastStage(chrono::days fcHor,
+                  config::Component values,
+                  config::Component meteo,
+                  config::Component buffer,
+                  config::Component outputWriter,
+                  std::vector<Component> models);
 
-    const config::Component& getValues() const;
-    void setValues(const config::Component& values);
-
-    const config::Component& getMeteo() const;
-    void setMeteo(const config::Component& meteo);
-    
-    const config::Component& getBuffer() const;
-    void setBuffer(const config::Component& buffer);
-    
-    const config::Component& getOutputWriter() const;
-    void setOutputWriter(const Component& ow);
-
-    void addModel(const Component& model);
+    config::Component getValues() const;
+    config::Component getMeteo() const;
+    config::Component getBuffer() const;
+    config::Component getOutputWriter() const;
     const std::vector<Component>& getModels() const noexcept;
 
-    void setHorizon(chrono::days fcHor);
     chrono::days getHorizon() const noexcept;
 
 private:
-    // vector of models to run in the forecast
-    std::vector<Component> _models;
-
-    // input data provider components
-    const Component* _values;
-    const Component* _meteo;
-
-    // forecast buffer component
-    const Component* _buffer;
-
-    // output writer component
-    const Component* _outputWriter;
-
     chrono::days _fcHor; //!< requested max forecast horizon
+
+    Component _values;
+    Component _meteo;
+
+    Component _buffer;
+    Component _outputWriter;
+
+    std::vector<Component> _models;
 };
 
 }

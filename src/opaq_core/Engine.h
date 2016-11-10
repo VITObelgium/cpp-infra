@@ -105,7 +105,7 @@ public:
 private:
     Logger                              _logger;
     config::PollutantManager&           _pollutantMgr;
-    ComponentManager                    _componentMgr;
+    ComponentManager                    _compMgr;
 
     /**
    * This runs the forecast stage with the given configuration, network,

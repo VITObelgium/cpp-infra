@@ -22,7 +22,7 @@ namespace opaq
 Engine::Engine(config::PollutantManager& pollutantMgr)
 : _logger("Engine")
 , _pollutantMgr(pollutantMgr)
-, _componentMgr(factory::createComponentManager(*this))
+, _compMgr(factory::createComponentManager(*this))
 {
 }
 
@@ -36,14 +36,14 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     auto forecastHorizon = cnf.getHorizon();
 
     // Get observation data provider
-    auto& obs = _componentMgr.getComponent<DataProvider>(cnf.getValues().name);
+    auto& obs = _compMgr.getComponent<DataProvider>(cnf.getValues().name);
     obs.setAQNetworkProvider(net);
 
     // Get meteo data provider (can be missing)
     MeteoProvider* meteo = nullptr;
     try
     {
-        meteo = &_componentMgr.getComponent<MeteoProvider>(cnf.getMeteo().name);
+        meteo = &_compMgr.getComponent<MeteoProvider>(cnf.getMeteo().name);
         meteo->setBaseTime(baseTime);
     }
     catch (const NullPointerException&)
@@ -51,13 +51,13 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     }
 
     // Get data buffer (can't be missing)
-    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(cnf.getBuffer().name);
+    auto& buffer = _compMgr.getComponent<ForecastBuffer>(cnf.getBuffer().name);
     buffer.setAQNetworkProvider(net);
 
     // Get the forecast models to run
     for (auto& modelConfig : cnf.getModels())
     {
-        auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
+        auto& model = _compMgr.getComponent<Model>(modelConfig.name);
 
         // set ins and outs for the model
         model.setBaseTime(baseTime);
@@ -76,7 +76,7 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     }
 
     // Prepare and run the forecast output writer for this basetime & pollutant
-    auto& outWriter = _componentMgr.getComponent<ForecastOutputWriter>(cnf.getOutputWriter().name);
+    auto& outWriter = _compMgr.getComponent<ForecastOutputWriter>(cnf.getOutputWriter().name);
     outWriter.setAQNetworkProvider(net);
     outWriter.setBuffer(&buffer);
     outWriter.setForecastHorizon(forecastHorizon);
@@ -92,13 +92,13 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
 {
     _logger->info("Mapping");
 
-    auto& buffer = _componentMgr.getComponent<IMappingBuffer>(cnf.getMappingBuffer().name);
-    auto& obs = _componentMgr.getComponent<DataProvider>(cnf.getDataProvider().name);
+    auto& buffer = _compMgr.getComponent<IMappingBuffer>(cnf.getMappingBuffer().name);
+    auto& obs = _compMgr.getComponent<DataProvider>(cnf.getDataProvider().name);
     obs.setAQNetworkProvider(aqNetworkProvider);
 
     for (auto& modelConfig : cnf.getModels())
     {
-        auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
+        auto& model = _compMgr.getComponent<Model>(modelConfig.name);
 
         // set ins and outs for the model
         model.setBaseTime(baseTime);
@@ -113,34 +113,21 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
     }
 }
 
-/* =============================================================================
-   MAIN WORKFLOW OF OPAQ
-   ========================================================================== */
-
 void Engine::prepareRun(config::OpaqRun& config)
 {
-    // 1. Load plugins...
     loadPlugins(config.getPlugins());
-
-    // 2. Instantiate and configure components...
     initComponents(config.getComponents());
 }
 
 void Engine::run(config::OpaqRun& config)
 {
-    // OPAQ workflow...
     _logger->info("Fetching workflow configuration");
-    auto pollutantName = config.getPollutantName();
+    auto pollutant = _pollutantMgr.find(config.getPollutantName());
 
-    auto pollutant = _pollutantMgr.find(pollutantName);
-
-    // Get stages
     auto forecastStage = config.getForecastStage();
     auto mappingStage  = config.getMappingStage();
 
-    // Get air quality network provider
-    auto name                            = config.getNetworkProvider()->name;
-    auto& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(name);
+    auto& aqNetworkProvider = _compMgr.getComponent<AQNetworkProvider>(config.getNetworkProvider()->name);
     _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
@@ -148,7 +135,7 @@ void Engine::run(config::OpaqRun& config)
     auto gridProviderConfig = config.getGridProvider();
     if (gridProviderConfig)
     {
-        gridProvider = &_componentMgr.getComponent<IGridProvider>(gridProviderConfig->name);
+        gridProvider = &_compMgr.getComponent<IGridProvider>(gridProviderConfig->name);
         _logger->info("Using grid provider {}", gridProviderConfig->name);
     }
 
@@ -200,13 +187,13 @@ std::vector<PredictionResult> Engine::validate(config::OpaqRun& config,
     std::vector<PredictionResult> results;
     results.reserve(days.count());
 
-    auto& valuesConfig = config.getForecastStage()->getValues();
-    auto& bufferConfig = config.getForecastStage()->getBuffer();
+    auto valuesConfig = config.getForecastStage()->getValues();
+    auto bufferConfig = config.getForecastStage()->getBuffer();
 
-    auto& values = _componentMgr.getComponent<DataProvider>(valuesConfig.name);
-    auto& buffer = _componentMgr.getComponent<ForecastBuffer>(bufferConfig.name);
+    auto& values = _compMgr.getComponent<DataProvider>(valuesConfig.name);
+    auto& buffer = _compMgr.getComponent<ForecastBuffer>(bufferConfig.name);
 
-    auto& aqNetworkProvider = _componentMgr.getComponent<AQNetworkProvider>(config.getNetworkProvider()->name);
+    auto& aqNetworkProvider = _compMgr.getComponent<AQNetworkProvider>(config.getNetworkProvider()->name);
     values.setAQNetworkProvider(aqNetworkProvider);
     buffer.setAQNetworkProvider(aqNetworkProvider);
     buffer.setCurrentModel(model);
@@ -234,7 +221,7 @@ config::PollutantManager& Engine::pollutantManager()
 
 ComponentManager& Engine::componentManager()
 {
-    return _componentMgr;
+    return _compMgr;
 }
 
 void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
@@ -243,7 +230,7 @@ void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
     {
         try
         {
-            _componentMgr.loadPlugin(plugin.name, plugin.libPath);
+            _compMgr.loadPlugin(plugin.name, plugin.libPath);
         }
         catch (std::exception& e)
         {
@@ -254,13 +241,13 @@ void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
 
 void Engine::initComponents(const std::vector<config::Component>& components)
 {
-    _componentMgr.destroyComponents();
+    _compMgr.destroyComponents();
     for (auto& component : components)
     {
         try
         {
             _logger->info("Creating component {} from plugin {}", component.name, component.plugin.name);
-            _componentMgr.createComponent<Component>(component.name, component.plugin.name, component.config);
+            _compMgr.createComponent<Component>(component.name, component.plugin.name, component.config);
         }
         catch (const std::exception& e)
         {
