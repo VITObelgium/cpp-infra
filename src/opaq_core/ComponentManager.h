@@ -3,6 +3,7 @@
 #include "config.h"
 #include "Component.h"
 #include "Logger.h"
+#include "Exceptions.h"
 
 #include <map>
 #include <iostream>

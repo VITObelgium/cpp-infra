@@ -160,6 +160,7 @@ void Engine::run(config::OpaqRun& config)
     }
     else if (mappingStage)
     {
+        assert(gridProvider);
         for (auto& baseTime : baseTimes)
         {
             runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
