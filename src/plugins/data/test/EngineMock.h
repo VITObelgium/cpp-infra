@@ -4,6 +4,7 @@
 #include <gmock/gmock.h>
 
 #include "Engine.h"
+#include "PollutantManager.h"
 
 namespace opaq
 {

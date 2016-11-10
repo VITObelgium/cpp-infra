@@ -4,6 +4,7 @@
 #include "Station.h"
 #include "Engine.h"
 #include "Exceptions.h"
+#include "PollutantManager.h"
 #include "PluginRegistration.h"
 #include "tools/StringTools.h"
 

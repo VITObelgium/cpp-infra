@@ -1,30 +1,26 @@
-/*
- * Engine.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys
- */
-
 #pragma once
 
-#include <tinyxml.h>
-#include <vector>
-
-#include "config/ForecastStage.h"
-#include "config/MappingStage.h"
-#include "config/OpaqRun.h"
-
-#include "data/DataProvider.h"
-#include "data/ForecastOutputWriter.h"
-
-#include "AQNetworkProvider.h"
 #include "Logger.h"
-#include "Model.h"
-#include "PollutantManager.h"
+#include "DateTime.h"
+#include "Aggregation.h"
 #include "ComponentManagerFactory.h"
 
 namespace opaq
 {
+
+namespace config
+{
+    struct Plugin;
+    struct Component;
+    class OpaqRun;
+    class ForecastStage;
+    class MappingStage;
+    class PollutantManager;
+}
+
+class Pollutant;
+class IGridProvider;
+class AQNetworkProvider;
 
 class IEngine
 {
@@ -118,6 +114,12 @@ private:
    * and calls the forecast output writer.
    */
     void runForecastStage(const config::ForecastStage& cnf, AQNetworkProvider& net, const Pollutant& pol, Aggregation::Type agg, const chrono::date_time& baseTime);
+    void runMappingStage(const config::MappingStage& cnf,
+                         AQNetworkProvider& net,
+                         IGridProvider& gridProvider,
+                         const Pollutant& pollutant,
+                         Aggregation::Type aggr,
+                         const chrono::date_time& baseTime);
 
     void loadPlugins(const std::vector<config::Plugin>& plugins);
     void initComponents(const std::vector<config::Component>& components);

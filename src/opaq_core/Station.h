@@ -46,10 +46,10 @@ public:
     bool operator==(const Station& other) const noexcept;
 
 private:
-    std::vector<Pollutant> _pollutants;  //!< a list of pollutants measured by the station
     std::string _name;                   //!< a station name (short code)
     std::string _desc;                   //!< station description (full specification)
     std::string _meteoId;                //!< meteo model forecast id to connect to (typically gridcell or so)
+    std::vector<Pollutant> _pollutants;  //!< a list of pollutants measured by the station
 };
 
 }

@@ -6,7 +6,11 @@
 #include "Engine.h"
 #include "Station.h"
 #include "AQNetwork.h"
+#include "AQNetworkProvider.h"
+#include "PollutantManager.h"
 #include "PluginRegistration.h"
+#include "TimeSeries.h"
+#include "data/ForecastBuffer.h"
 #include "tools/XmlTools.h"
 
 #include <cmath>

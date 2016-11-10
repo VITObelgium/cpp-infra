@@ -5,6 +5,9 @@
 #include "ComponentManagerFactory.h"
 #include "config.h"
 #include "testconfig.h"
+#include "PollutantManager.h"
+
+#include <tinyxml.h>
 
 namespace opaq
 {

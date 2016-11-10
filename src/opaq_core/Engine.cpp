@@ -5,6 +5,17 @@
 #include "ComponentManagerFactory.h"
 #include "data/IStationInfoProvider.h"
 
+#include "config/ForecastStage.h"
+#include "config/MappingStage.h"
+#include "config/OpaqRun.h"
+
+#include "data/DataProvider.h"
+#include "data/ForecastOutputWriter.h"
+
+#include "AQNetworkProvider.h"
+#include "Model.h"
+#include "PollutantManager.h"
+
 namespace opaq
 {
 
@@ -72,6 +83,36 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     outWriter.write(pol, aggr, baseTime);
 }
 
+void Engine::runMappingStage(const config::MappingStage& cnf,
+                             AQNetworkProvider& aqNetworkProvider,
+                             IGridProvider& gridProvider,
+                             const Pollutant& pollutant,
+                             Aggregation::Type aggr,
+                             const chrono::date_time& baseTime)
+{
+    _logger->info("Mapping");
+
+    auto& buffer = _componentMgr.getComponent<IMappingBuffer>(cnf.getMappingBuffer().name);
+    auto& obs = _componentMgr.getComponent<DataProvider>(cnf.getDataProvider().name);
+    obs.setAQNetworkProvider(aqNetworkProvider);
+
+    for (auto& modelConfig : cnf.getModels())
+    {
+        auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
+
+        // set ins and outs for the model
+        model.setBaseTime(baseTime);
+        model.setPollutant(pollutant);
+        model.setGridProvider(gridProvider);
+        model.setAQNetworkProvider(aqNetworkProvider);
+        model.setInputProvider(obs);
+        model.setMappingBuffer(buffer);
+
+        _logger->info("Running {}", model.getName());
+        model.run();
+    }
+}
+
 /* =============================================================================
    MAIN WORKFLOW OF OPAQ
    ========================================================================== */
@@ -104,11 +145,11 @@ void Engine::run(config::OpaqRun& config)
 
     // Get grid provider
     IGridProvider* gridProvider;
-    auto gridProviderDef = config.getGridProvider();
-    if (gridProviderDef)
+    auto gridProviderConfig = config.getGridProvider();
+    if (gridProviderConfig)
     {
-        gridProvider = &_componentMgr.getComponent<IGridProvider>(gridProviderDef->name);
-        _logger->info("Using grid provider {}", gridProviderDef->name);
+        gridProvider = &_componentMgr.getComponent<IGridProvider>(gridProviderConfig->name);
+        _logger->info("Using grid provider {}", gridProviderConfig->name);
     }
 
     // Get the base times
@@ -119,71 +160,25 @@ void Engine::run(config::OpaqRun& config)
     {
         for (auto& baseTime : baseTimes)
         {
-            // A log message
             _logger->info("Forecast stage for {}", chrono::to_date_string(baseTime));
             runForecastStage(*forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
             if (mappingStage)
             {
-
-                // a log message
                 _logger->info(">> Mapping forecast {}", chrono::to_date_string(baseTime));
+                assert(gridProvider);
 
                 // Buffer is input provider for the mapping models
-
-                _logger->critical("No mapping stage implemented yet");
-                exit(1);
-
-                // we know what forecast horizons are requested by the user, no collector needed...
-
-                /*
-  _logger->info("running mapping stage");
-  const std::vector<ForecastHorizon> * fhs =
-    &(fhCollector.getForecastHorizons());
-  std::vector<ForecastHorizon>::const_iterator it = fhs->begin();
-  while (it != fhs->end()) {
-    ForecastHorizon fh = *it++;
-    ss.str(std::string(""));
-    ss << "forecast horizon = " << fh;
-    _logger->info(ss.str());
-    try {
-      runStage(mappingStage, aqNetworkProvider, gridProvider, baseTime, pollutant, &fh, NULL);
-    } catch (std::exception & e) {
-      _logger->fatal("Unexpected error during mapping stage");
-      _logger->error(e.what());
-      exit(1);
-    }
-  }
-  */
+                // set the forecast horizon on the hdf5 dataprovider, then run the mapping stage
+                runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
             }
         }
     }
     else if (mappingStage)
     {
-        _logger->info("Mapping");
-
-        auto cnf = config.getMappingStage();
-        auto& buffer = _componentMgr.getComponent<IMappingBuffer>(cnf->getMappingBuffer().name);
-        auto& obs = _componentMgr.getComponent<DataProvider>(cnf->getDataProvider().name);
-        obs.setAQNetworkProvider(aqNetworkProvider);
-
         for (auto& baseTime : baseTimes)
         {
-            for (auto& modelConfig : mappingStage->getModels())
-            {
-                auto& model = _componentMgr.getComponent<Model>(modelConfig.name);
-
-                // set ins and outs for the model
-                model.setBaseTime(baseTime);
-                model.setPollutant(pollutant);
-                model.setGridProvider(*gridProvider);
-                model.setAQNetworkProvider(aqNetworkProvider);
-                model.setInputProvider(obs);
-                model.setMappingBuffer(buffer);
-
-                _logger->info("Running {}", model.getName());
-                model.run();
-            }
+            runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
         }
     }
 }
