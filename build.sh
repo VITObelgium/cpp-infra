@@ -32,15 +32,12 @@ mkdir -p ${builddir}
 cd ${builddir}
 PWD=`pwd`
 
-echo -n "Select toolchain to use: [1:Default 2:Musl (static linking)]: "
+echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 4: Mingw linux]: "
 read yno
 case $yno in
-    [1] )
-        toolchain=""
-        ;;
-    [2] )
-        toolchain="${PWD}/../../deps/cluster.make"
-        ;;
+    [1] ) toolchain="";;
+    [2] ) toolchain="${PWD}/../../deps/cluster.make";;
+    [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
     * ) echo "Invalid selection" exit;;
 esac
 

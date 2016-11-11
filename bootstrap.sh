@@ -17,7 +17,7 @@ PWD=`pwd`
 
 config=""
 toolchain=""
-generator="Ninja"
+generator="Unix Makefiles"
 
 echo -n "Select configuration: [1:Debug 2:Release]: "
 read yno
@@ -27,12 +27,13 @@ case $yno in
     * ) echo "Invalid selection" exit;;
 esac
 
-echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw]: "
+echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4:Mingw linux]: "
 read yno
 case $yno in
     [1] ) toolchain="";;
     [2] ) toolchain="${PWD}/../../deps/cluster.make";;
     [3] ) generator="MSYS Makefiles";;
+    [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
     * ) echo "Invalid selection" exit;;
 esac
 
