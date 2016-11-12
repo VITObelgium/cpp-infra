@@ -43,6 +43,10 @@ else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -fdiagnostics-color")
 endif()
 
+if (MINGW)
+	add_definitions("-DMINGW_HAS_SECURE_API")
+endif ()
+
 include_directories(
     ${CMAKE_BINARY_DIR}
 )
