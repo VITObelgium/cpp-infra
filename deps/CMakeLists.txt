@@ -24,8 +24,8 @@ ADD_SUBDIRECTORY(sqlpp11)
 ADD_SUBDIRECTORY(sqlpp11-connector-sqlite3)
 ADD_SUBDIRECTORY(tinyxml)
 
-IF (NOT CMAKE_CROSSCOMPILING AND NOT MINGW)
-    # hdf5 build system does not support cross compiling or mingw
+IF (NOT CMAKE_CROSSCOMPILING OR MINGW)
+    # hdf5 build system does not support cross compiling, but we created patches in case of mingw
     ADD_SUBDIRECTORY(hdf5)
 ENDIF ()
 
