@@ -17,6 +17,7 @@
 #include "AQNetworkProvider.h"
 #include "Model.h"
 #include "PollutantManager.h"
+#include "tools/ScopeGuard.h"
 
 namespace opaq
 {
@@ -143,6 +144,21 @@ void Engine::run(config::OpaqRun& config)
     // Get the base times
     auto baseTimes = config.getBaseTimes();
 
+    IMappingBuffer* mappingBuffer = nullptr;
+    if (mappingStage)
+    {
+        mappingBuffer = &_compMgr.getComponent<IMappingBuffer>(mappingStage->getMappingBuffer().name);
+        auto& grid = gridProvider->getGrid(pollutant.getName(), GridType::Grid4x4);
+        mappingBuffer->openResultsFile(baseTimes.front(), baseTimes.back() + 1_d, pollutant, config.getAggregation(), aqNetworkProvider.getAQNetwork().getStations(), grid);
+    }
+
+    auto closeBuffer = make_scope_guard([mappingBuffer] () {
+        if (mappingBuffer)
+        {
+            mappingBuffer->closeResultsFile();
+        }
+    });
+
     _logger->info("Starting OPAQ workflow...");
     if (forecastStage)
     {
@@ -165,25 +181,11 @@ void Engine::run(config::OpaqRun& config)
     else if (mappingStage)
     {
         assert(gridProvider);
-        auto& buffer = _compMgr.getComponent<IMappingBuffer>(mappingStage->getMappingBuffer().name);
-        auto& grid = gridProvider->getGrid(pollutant.getName(), GridType::Grid4x4);
         
-        buffer.openResultsFile(baseTimes.front(), baseTimes.back() + 1_d, pollutant, config.getAggregation(), aqNetworkProvider.getAQNetwork().getStations(), grid);
-        
-        try
+        for (auto& baseTime : baseTimes)
         {
-            for (auto& baseTime : baseTimes)
-            {
-                runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
-            }
+            runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
         }
-        catch (const std::exception&)
-        {
-            buffer.closeResultsFile();
-            throw;
-        }
-
-        buffer.closeResultsFile();
     }
 }
 

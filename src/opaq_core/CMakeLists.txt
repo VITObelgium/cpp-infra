@@ -72,6 +72,7 @@ set (CORE_TOOLS_SOURCES
     tools/XmlTools.h
     tools/XmlTools.cpp
     tools/CalcTools.h
+    tools/ScopeGuard.h
 )
 
 source_group(config FILES ${CORE_CONFIG_SOURCES})
