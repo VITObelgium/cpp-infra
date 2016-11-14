@@ -31,7 +31,7 @@ echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4:M
 read yno
 case $yno in
     [1] ) toolchain="";;
-    [2] ) toolchain="${PWD}/../../deps/cluster.make";;
+    [2] ) toolchain="${PWD}/../../deps/musl-linux.make";;
     [3] ) generator="MSYS Makefiles";;
     [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
     * ) echo "Invalid selection" exit;;
