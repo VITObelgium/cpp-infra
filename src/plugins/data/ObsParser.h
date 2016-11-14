@@ -3,19 +3,18 @@
 #include "Aggregation.h"
 #include "TimeSeries.h"
 
-#include <map>
+#include <cinttypes>
 #include <fstream>
 #include <string>
-#include <cinttypes>
+#include <unordered_map>
 
 namespace opaq
 {
 
 class AQNetwork;
 
-std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObservationsFile(std::istream& file,
-                                                                                            const AQNetwork& aqNetwork,
-                                                                                            uint32_t numberOfValues,
-                                                                                            std::chrono::hours timeResolution);
-
+std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>> readObservationsFile(std::istream& file,
+                                                                                                                const AQNetwork& aqNetwork,
+                                                                                                                uint32_t numberOfValues,
+                                                                                                                std::chrono::hours timeResolution);
 }

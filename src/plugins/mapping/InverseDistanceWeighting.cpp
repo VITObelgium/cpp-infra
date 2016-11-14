@@ -100,7 +100,7 @@ void InverseDistanceWeighting::run()
         _logger->info("Cell: {} idw: {}", cell.getId(), idw);
     }
 
-    getMappingBuffer().addResults(0, results);
+    getMappingBuffer().addResults(results);
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(InverseDistanceWeighting)

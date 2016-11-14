@@ -24,13 +24,14 @@ public:
     void openResultsFile(chrono::date_time begin, chrono::date_time end,
                          const Pollutant& pol, Aggregation::Type agg,
                          const std::vector<Station>& stations, const Grid& grid, GridType gridType) override;
-    void addResults(size_t index, const std::vector<double>& results) override;
+    void addResults(const std::vector<double>& results) override;
     void closeResultsFile() override;
 
 private:
     void throwIfNotConfigured() const;
 
     Logger _logger;
+    size_t _index;
     H5::StrType _stringType;
     std::string _filePattern;
     std::unique_ptr<H5::H5File> _h5File;

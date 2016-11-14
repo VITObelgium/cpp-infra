@@ -65,7 +65,7 @@ private:
     // note that in the RIO files, these aggregations are pre-calculated, but this
     // does not necessarily have to be the case...
     // station --> pollutant --> aggregation --> data
-    std::map<std::string, std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>>> _buffer; //< the data buffer for the aggregations
+    std::unordered_map<std::string, std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>>> _buffer; //< the data buffer for the aggregations
 
     TimeSeries<double>& _getTimeSeries(const std::string& pollutant,
                                        const std::string& station, Aggregation::Type aggr);

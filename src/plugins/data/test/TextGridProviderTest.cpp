@@ -63,10 +63,10 @@ TEST_F(TextGridProviderTest, GetGridCells)
 
     auto grid = _gridProvider.getGrid("pm10", GridType::Grid4x4);
     EXPECT_EQ(4u, grid.cellCount());
-    EXPECT_EQ(Cell(1, 24.0, 28.0, 174.0, 178.0), grid.cell(0));
-    EXPECT_EQ(Cell(2, 24.0, 28.0, 178.0, 182.0), grid.cell(1));
-    EXPECT_EQ(Cell(3, 24.0, 28.0, 182.0, 186.0), grid.cell(2));
-    EXPECT_EQ(Cell(4, 24.0, 28.0, 190.0, 194.0), grid.cell(3));
+    EXPECT_EQ(Cell(1, 24000.0, 28000.0, 174000.0, 178000.0), grid.cell(0));
+    EXPECT_EQ(Cell(2, 24000.0, 28000.0, 178000.0, 182000.0), grid.cell(1));
+    EXPECT_EQ(Cell(3, 24000.0, 28000.0, 182000.0, 186000.0), grid.cell(2));
+    EXPECT_EQ(Cell(4, 24000.0, 28000.0, 190000.0, 194000.0), grid.cell(3));
 }
 
 TEST_F(TextGridProviderTest, GetGridInvalidGridSize)

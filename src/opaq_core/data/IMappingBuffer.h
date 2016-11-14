@@ -20,7 +20,7 @@ public:
     virtual void openResultsFile(chrono::date_time begin, chrono::date_time end,
                                  const Pollutant& pol, Aggregation::Type agg,
                                  const std::vector<Station>& stations, const Grid& grid, GridType gridType) = 0;
-    virtual void addResults(size_t index, const std::vector<double>& results) = 0;
+    virtual void addResults(const std::vector<double>& results) = 0;
     virtual void closeResultsFile() = 0;
 };
 }

@@ -49,7 +49,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
     try
     {
         auto& grid = _grid[pollutant][type];
-        auto cellSize = gridTypeToCellSize(type) / 1000.0;
+        auto cellSize = gridTypeToCellSize(type);
 
         auto contents = FileTools::readFileContents(filename);
         StringTools::StringSplitter lineSplitter(contents, "\r\n");
@@ -69,8 +69,8 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
             auto iter = cellSplitter.begin();
 
             auto id = boost::lexical_cast<long>(*iter++);
-            auto x = boost::lexical_cast<double>(*iter++) / 1000.0;
-            auto y = boost::lexical_cast<double>(*iter++) / 1000.0;
+            auto x = boost::lexical_cast<double>(*iter++);
+            auto y = boost::lexical_cast<double>(*iter++);
             //auto beta = boost::lexical_cast<double>(*iter);
 
             grid.addCell(Cell(id, x, x + cellSize, y, y + cellSize));

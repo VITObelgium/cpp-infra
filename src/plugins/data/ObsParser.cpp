@@ -1,8 +1,8 @@
 #include "ObsParser.h"
 
 #include "AQNetwork.h"
-#include "tools/StringTools.h"
 #include "tools/FileTools.h"
+#include "tools/StringTools.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -14,12 +14,12 @@ namespace opaq
 // parse the file and read in the pollutant //
 // no need to specify the aggregation time since we load the whole file in memory and build the
 // map in one go...
-std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObservationsFile(std::istream& file,
-                                                                                            const AQNetwork& aqNetwork,
-                                                                                            uint32_t numberOfValues,
-                                                                                            std::chrono::hours timeResolution)
+std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>> readObservationsFile(std::istream& file,
+                                                                                                                const AQNetwork& aqNetwork,
+                                                                                                                uint32_t numberOfValues,
+                                                                                                                std::chrono::hours timeResolution)
 {
-    std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> result;
+    std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>> result;
 
     auto contents = FileTools::readStreamContents(file);
     StringTools::StringSplitter lineSplitter(contents, "\r\n");
@@ -30,7 +30,7 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
 
         StringTools::StringSplitter observationSplitter(line, " \t\r\n\f");
 
-        auto iter = observationSplitter.begin();
+        auto iter          = observationSplitter.begin();
         const auto station = std::string(iter->begin(), iter->end());
 
         if (aqNetwork.containsStation(station))
@@ -45,8 +45,8 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
             ++iter;
 
             // get the different aggregations...
-            result[Aggregation::Max1h][station].insert(begin, boost::lexical_cast<double>(*iter++)); // 3rd column is daily max
-            result[Aggregation::Max8h][station].insert(begin, boost::lexical_cast<double>(*iter++)); // 4th column is max 8h
+            result[Aggregation::Max1h][station].insert(begin, boost::lexical_cast<double>(*iter++));  // 3rd column is daily max
+            result[Aggregation::Max8h][station].insert(begin, boost::lexical_cast<double>(*iter++));  // 4th column is max 8h
             result[Aggregation::DayAvg][station].insert(begin, boost::lexical_cast<double>(*iter++)); // 5th column is daily avg
 
             uint32_t parsedValues = 0;
@@ -69,5 +69,4 @@ std::map<Aggregation::Type, std::map<std::string, TimeSeries<double>>> readObser
 
     return result;
 }
-
 }

@@ -86,6 +86,7 @@ static void writeStations(const std::vector<Station>& stations, H5::Group& group
 
 RioOutputBuffer::RioOutputBuffer()
 : _logger("RioOutputBuffer")
+, _index(0)
 , _stringType(H5::StrType(0, H5T_VARIABLE))
 {
     // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
@@ -114,6 +115,8 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
                                       const std::vector<Station>& stations, const Grid& grid, GridType gridType)
 {
     throwIfNotConfigured();
+
+    _index = 0;
 
     auto filename = _filePattern;
     boost::algorithm::replace_all(filename, s_pollutantPlaceholder, pol.getName());
@@ -150,7 +153,7 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
     }
 }
 
-void RioOutputBuffer::addResults(size_t index, const std::vector<double>& results)
+void RioOutputBuffer::addResults(const std::vector<double>& results)
 {
     assert(_h5File);
 
@@ -163,14 +166,16 @@ void RioOutputBuffer::addResults(size_t index, const std::vector<double>& result
         auto space = ds.getSpace();
         space.getSimpleExtentDims(size);
 
-        assert(index <= size[1]);
+        assert(_index <= size[1]);
 
         hsize_t count[4] = { size[0], 1, 1, 1 };
-        hsize_t offset[4] = { 0, index, 0, 0 };
+        hsize_t offset[4] = { 0, _index, 0, 0 };
         space.selectHyperslab(H5S_SELECT_SET, count, offset);
 
         H5::DataSpace writeMemSpace(4, count);
         ds.write(results.data(), H5::PredType::NATIVE_DOUBLE, writeMemSpace, space);
+
+        ++_index;
     }
     catch (const H5::Exception& e)
     {
