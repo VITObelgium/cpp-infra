@@ -8,6 +8,7 @@ namespace opaq
 Model::Model(const std::string& name)
 : _logger(name)
 , _aggregation(Aggregation::None)
+, _gridType(GridType::Grid4x4)
 , _aqNetworkProvider(nullptr)
 , _gridProvider(nullptr)
 , _input(nullptr)
@@ -68,6 +69,11 @@ void Model::setMappingBuffer(IMappingBuffer& buffer)
     _mappingBuffer = &buffer;
 }
 
+void Model::setGridType(GridType gridType)
+{
+    _gridType = gridType;
+}
+
 chrono::date_time Model::getBaseTime()
 {
     return _baseTime;
@@ -86,6 +92,11 @@ Aggregation::Type Model::getAggregation()
 chrono::days Model::getForecastHorizon()
 {
     return _forecastHorizon;
+}
+
+GridType Model::getGridType()
+{
+    return _gridType;
 }
 
 AQNetworkProvider& Model::getAQNetworkProvider()

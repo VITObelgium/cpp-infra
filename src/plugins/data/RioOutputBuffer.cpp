@@ -111,7 +111,7 @@ void RioOutputBuffer::configure(TiXmlElement* configuration, const std::string& 
 
 void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time end,
                                       const Pollutant& pol, Aggregation::Type agg,
-                                      const std::vector<Station>& stations, const Grid& grid)
+                                      const std::vector<Station>& stations, const Grid& grid, GridType gridType)
 {
     throwIfNotConfigured();
 
@@ -119,7 +119,7 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
     boost::algorithm::replace_all(filename, s_pollutantPlaceholder, pol.getName());
     boost::algorithm::replace_all(filename, s_aggregationPlaceholder, Aggregation::getName(agg));
     boost::algorithm::replace_all(filename, s_gisPlaceholder, "GIS");
-    boost::algorithm::replace_all(filename, s_gridPlaceholder, "4x4");
+    boost::algorithm::replace_all(filename, s_gridPlaceholder, gridTypeToString(gridType));
     boost::algorithm::replace_all(filename, s_startDatePlaceholder, chrono::to_dense_date_string(start));
     boost::algorithm::replace_all(filename, s_endDatePlaceholder, chrono::to_dense_date_string(end));
     

@@ -5,6 +5,7 @@
 #include "Component.h"
 #include "Pollutant.h"
 #include "Aggregation.h"
+#include "GridType.h"
 
 namespace opaq
 {
@@ -34,6 +35,7 @@ public:
     void setMeteoProvider(MeteoProvider* meteo);
     void setBuffer(ForecastBuffer* buffer);
     void setMappingBuffer(IMappingBuffer& buffer);
+    void setGridType(GridType gridType);
 
     virtual void run() = 0;
 
@@ -45,6 +47,7 @@ protected:
     const Pollutant& getPollutant();
     Aggregation::Type getAggregation();
     chrono::days getForecastHorizon();
+    GridType getGridType();
 
     AQNetworkProvider& getAQNetworkProvider();
     IGridProvider& getGridProvider();
@@ -60,6 +63,7 @@ private:
     Pollutant _pollutant;           //< run for this pollutant
     Aggregation::Type _aggregation; //< run for this aggregation
     chrono::days _forecastHorizon;  //< maximum forecast horizon to run to
+    GridType _gridType;
 
     AQNetworkProvider* _aqNetworkProvider;
     IGridProvider* _gridProvider;

@@ -8,11 +8,17 @@ namespace opaq
 namespace config
 {
 
-MappingStage::MappingStage(Component obsProvider, Component buffer, std::vector<Component> models)
-: _obsProvider(obsProvider)
-, _buffer(buffer)
+MappingStage::MappingStage(GridType gridType, Component obsProvider, Component buffer, std::vector<Component> models)
+: _gridType(std::move(gridType))
+, _obsProvider(std::move(obsProvider))
+, _buffer(std::move(buffer))
 , _models(std::move(models))
 {
+}
+
+GridType MappingStage::getGridType() const
+{
+    return _gridType;
 }
 
 Component MappingStage::getDataProvider() const

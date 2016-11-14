@@ -23,7 +23,7 @@ public:
 
     void openResultsFile(chrono::date_time begin, chrono::date_time end,
                          const Pollutant& pol, Aggregation::Type agg,
-                         const std::vector<Station>& stations, const Grid& grid) override;
+                         const std::vector<Station>& stations, const Grid& grid, GridType gridType) override;
     void addResults(size_t index, const std::vector<double>& results) override;
     void closeResultsFile() override;
 

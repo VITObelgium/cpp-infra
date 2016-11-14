@@ -109,6 +109,7 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
         model.setAQNetworkProvider(aqNetworkProvider);
         model.setInputProvider(obs);
         model.setMappingBuffer(buffer);
+        model.setGridType(cnf.getGridType());
 
         _logger->info("Running {}", model.getName());
         model.run();
@@ -148,8 +149,8 @@ void Engine::run(config::OpaqRun& config)
     if (mappingStage)
     {
         mappingBuffer = &_compMgr.getComponent<IMappingBuffer>(mappingStage->getMappingBuffer().name);
-        auto& grid = gridProvider->getGrid(pollutant.getName(), GridType::Grid4x4);
-        mappingBuffer->openResultsFile(baseTimes.front(), baseTimes.back() + 1_d, pollutant, config.getAggregation(), aqNetworkProvider.getAQNetwork().getStations(), grid);
+        auto& grid = gridProvider->getGrid(pollutant.getName(), mappingStage->getGridType());
+        mappingBuffer->openResultsFile(baseTimes.front(), baseTimes.back() + 1_d, pollutant, config.getAggregation(), aqNetworkProvider.getAQNetwork().getStations(), grid, mappingStage->getGridType());
     }
 
     auto closeBuffer = make_scope_guard([mappingBuffer] () {

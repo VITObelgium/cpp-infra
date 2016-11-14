@@ -1,3 +1,5 @@
+set (CMAKE_INCLUDE_CURRENT_DIR ON)
+
 set (CORE_SOURCES
     Aggregation.h
     Aggregation.cpp
@@ -19,6 +21,7 @@ set (CORE_SOURCES
     Engine.h
     Engine.cpp
     Exceptions.h
+    GridType.h
     Grid.h
     Grid.cpp
     OpaqDllExports.h

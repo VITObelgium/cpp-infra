@@ -1,6 +1,7 @@
 #include "config.h"
 #include "ConfigurationHandler.h"
 #include "PollutantManager.h"
+#include "GridType.h"
 
 #include "config/ForecastStage.h"
 #include "config/MappingStage.h"
@@ -83,6 +84,8 @@ config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* eleme
     config::Component observations, buffer;
     std::vector<config::Component> models;
 
+    auto gridType = gridTypeFromString(XmlTools::getChildValue<std::string>(element, "gridtype"));
+
     auto* modelsElement = element->FirstChildElement("models");
     if (!modelsElement)
     {
@@ -117,7 +120,7 @@ config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* eleme
         _logger->warn("No databuffer given in run configuration");
     }
 
-    return config::MappingStage(observations, buffer, std::move(models));
+    return config::MappingStage(gridType, observations, buffer, std::move(models));
 }
 
 void ConfigurationHandler::parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr)

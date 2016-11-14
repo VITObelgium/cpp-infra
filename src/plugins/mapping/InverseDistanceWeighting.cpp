@@ -45,7 +45,7 @@ void InverseDistanceWeighting::run()
 {
     auto basetime = getBaseTime();
     auto& dataProvider = getInputProvider();
-    auto& grid = getGridProvider().getGrid(getPollutant().getName(), GridType::Grid4x4);
+    auto& grid = getGridProvider().getGrid(getPollutant().getName(), getGridType());
     auto stations = getAQNetworkProvider().getAQNetwork().getStations();
 
     std::vector<double> results;
