@@ -11,13 +11,17 @@
 
 #include "data/DataProvider.h"
 #include "data/ForecastOutputWriter.h"
+#include "data/IGridProvider.h"
 
+#include "AQNetwork.h"
 #include "AQNetworkProvider.h"
 #include "Model.h"
 #include "PollutantManager.h"
 
 namespace opaq
 {
+
+using namespace chrono_literals;
 
 Engine::Engine(config::PollutantManager& pollutantMgr)
 : _logger("Engine")
@@ -128,7 +132,7 @@ void Engine::run(config::OpaqRun& config)
     _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
-    IGridProvider* gridProvider;
+    IGridProvider* gridProvider = nullptr;
     auto gridProviderConfig = config.getGridProvider();
     if (gridProviderConfig)
     {
@@ -161,10 +165,25 @@ void Engine::run(config::OpaqRun& config)
     else if (mappingStage)
     {
         assert(gridProvider);
-        for (auto& baseTime : baseTimes)
+        auto& buffer = _compMgr.getComponent<IMappingBuffer>(mappingStage->getMappingBuffer().name);
+        auto& grid = gridProvider->getGrid(pollutant.getName(), GridType::Grid4x4);
+        
+        buffer.openResultsFile(baseTimes.front(), baseTimes.back() + 1_d, pollutant, config.getAggregation(), aqNetworkProvider.getAQNetwork().getStations(), grid);
+        
+        try
         {
-            runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
+            for (auto& baseTime : baseTimes)
+            {
+                runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
+            }
         }
+        catch (const std::exception&)
+        {
+            buffer.closeResultsFile();
+            throw;
+        }
+
+        buffer.closeResultsFile();
     }
 }
 

@@ -51,9 +51,6 @@ void InverseDistanceWeighting::run()
     std::vector<double> results;
     results.reserve(stations.size());
 
-    auto& buffer = getMappingBuffer();
-    buffer.openResultsFile(basetime, basetime + 1_d, getPollutant(), getAggregation(), stations, grid);
-
     for (auto& cell : grid)
     {
         const auto x = cell.getXc();
@@ -103,8 +100,7 @@ void InverseDistanceWeighting::run()
         _logger->info("Cell: {} idw: {}", cell.getId(), idw);
     }
 
-    buffer.addResults(0, results);
-    buffer.closeResultsFile();
+    getMappingBuffer().addResults(0, results);
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(InverseDistanceWeighting)

@@ -11,11 +11,8 @@
 #include "data/TextGridProvider.h"
 #include "data/IRCELMeteoProvider.h"
 #include "data/StationInfoProvider.h"
-
-#ifdef HAVE_HDF5
 #include "data/Hdf5Buffer.h"
 #include "data/RioOutputBuffer.h"
-#endif
 
 #include "forecast/OVL.h"
 #include "forecast/OVL_IRCEL_model1.h"
@@ -41,10 +38,8 @@ inline std::vector<std::string> getPluginNames()
         TextGridProvider::name(),
         IRCELMeteoProvider::name(),
         StationInfoProvider::name(),
-#ifdef HAVE_HDF5
         Hdf5Buffer::name(),
         RioOutputBuffer::name(),
-#endif
 
         OVL::name(),
         OVL_IRCEL_model1::name(),

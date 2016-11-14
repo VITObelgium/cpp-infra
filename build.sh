@@ -8,8 +8,6 @@ function checkresult {
     return $status
 }
 
-export PATH="/tools/toolchains/x86_64-multilib-linux-musl/bin/:$PATH"
-
 generator="Ninja"
 # fall back to make if ninja is not installed
 command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }

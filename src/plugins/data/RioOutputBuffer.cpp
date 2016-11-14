@@ -14,7 +14,7 @@
 namespace opaq
 {
 
-using namespace std::chrono_literals;
+using namespace chrono_literals;
 
 static const std::string s_gridGroupName("grid");
 static const std::string s_stationsGroupName("stations");

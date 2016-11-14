@@ -5,18 +5,14 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
 
-
-set (TEST_SOURCES 
+set (TEST_SOURCES
     RioObsProviderParserTest.cpp
     RioObsProviderTest.cpp
     IRCELMeteoProviderTest.cpp
     StationInfoProviderTest.cpp
     TextGridProviderTest.cpp
+    ForecastBufferTest.cpp
 )
-
-if (hdf5_FOUND)
-    list (APPEND TEST_SOURCES ForecastBufferTest.cpp)
-endif ()
 
 set (MOCKS
     EngineMock.h
@@ -35,17 +31,12 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINAR
 target_link_libraries(dataplugintest
     opaqcore
     sqlbuffer
+    hdf5buffer
     rioobsprovider
     ircelmeteoprovider
     stationinfoprovider
     textgridprovider
     ${GTEST_LIBRARY}
 )
-
-if (hdf5_FOUND)
-target_link_libraries(dataplugintest
-    hdf5buffer
-)
-endif ()
 
 add_test(NAME dataplugintest COMMAND dataplugintest)

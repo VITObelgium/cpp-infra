@@ -44,16 +44,16 @@ else ()
 endif()
 
 if (MINGW)
-	add_definitions("-DMINGW_HAS_SECURE_API")
+    add_definitions("-DMINGW_HAS_SECURE_API")
 endif ()
 
 include_directories(
     ${CMAKE_BINARY_DIR}
 )
 
-configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
-
 set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 add_subdirectory(src)
+
+configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
