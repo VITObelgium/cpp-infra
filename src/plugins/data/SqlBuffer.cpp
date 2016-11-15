@@ -7,6 +7,8 @@
 namespace opaq
 {
 
+using namespace chrono_literals;
+
 SqlBuffer::SqlBuffer()
 : _logger("SqlBuffer")
 , _noData(-9999)
