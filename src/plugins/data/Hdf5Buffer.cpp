@@ -16,6 +16,7 @@
 namespace opaq
 {
 
+using namespace chrono_literals;
 using namespace std::chrono_literals;
 
 static const std::string BASETIME_DATASET_NAME("basetime");
