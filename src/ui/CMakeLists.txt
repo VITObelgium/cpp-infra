@@ -4,6 +4,8 @@ find_package(Qt5Gui)
 find_package(Qt5Charts)
 find_package(Qt5Widgets)
 
+option(STATIC_QT "Statically link qt" OFF)
+
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -29,34 +31,39 @@ source_group(ui FILES ${OPAQ_FORMS_HEADERS} opaqui_automoc.cpp)
 
 if (MSVC)
     set_target_properties(opaqui PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+elseif (MINGW)
+    set_target_properties(opaqui PROPERTIES LINK_FLAGS "-Wl,-subsystem,windows")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets ${PLUGINS} ${EXTRA_LIBS})
+target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Widgets Qt5::Charts Qt5::Core ${PLUGINS} ${EXTRA_LIBS})
+
+install(TARGETS opaqui
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
 
 if (STATIC_QT)
+    add_definitions("-DQT_CHARTS_STATICLIB")
+
     find_package(OpenGL)
 
     find_package(Qt5PrintSupport)
-    find_library(QT_PLATFORMSUPPORT_LIBRARY NAMES Qt5PlatformSupport)
-    find_library(QT_PLATFORMSUPPORT_LIBRARY_DEBUG NAMES Qt5PlatformSupportd)
+    find_dependency(NAME QT_PLATFORMSUPPORT LIBNAMES Qt5PlatformSupport DEBUGLIBNAMES Qt5PlatformSupportd)
+    find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzzng DEBUGLIBNAMES qtharfbuzzngd)
+    find_dependency(NAME QT_PCRE LIBNAMES qtpcre DEBUGLIBNAMES qtpcred)
 
-    find_library(QT_HARFBUZZ_LIBRARY NAMES qtharfbuzzng)
-    find_library(QT_HARFBUZZ_LIBRARY_DEBUG NAMES qtharfbuzzngd)
-
-    find_library(QT_FREETYPE_LIBRARY NAMES qtfreetype)
-    find_library(QT_FREETYPE_LIBRARY_DEBUG NAMES qtfreetyped)
-
-    find_library(QT_PCRE_LIBRARY NAMES qtpcre)
-    find_library(QT_PCRE_LIBRARY_DEBUG NAMES qtpcred)
+    #find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
 
     if (WIN32)
         target_link_libraries(opaqui
-            Qt5::QWindowsIntegrationPlugin ${OPENGL_LIBRARIES} imm32 winmm
-            debug ${QT_HARFBUZZ_LIBRARY_DEBUG} optimized ${QT_HARFBUZZ_LIBRARY}
-            debug ${QT_PLATFORMSUPPORT_LIBRARY_DEBUG} optimized ${QT_PLATFORMSUPPORT_LIBRARY}
-            debug ${QT_FREETYPE_LIBRARY_DEBUG} optimized ${QT_FREETYPE_LIBRARY}
-            debug ${QT_PCRE_LIBRARY_DEBUG} optimized ${QT_PCRE_LIBRARY})
+            Qt5::QWindowsIntegrationPlugin
+            #${QT_FREETYPE_LIBRARY}
+            ${QT_PCRE_LIBRARY}
+            ${QT_HARFBUZZ_LIBRARY}
+            ${QT_PLATFORMSUPPORT_LIBRARY}
+            imm32 winmm ws2_32)
     elseif (APPLE)
         target_link_libraries(opaqui Qt5::QCocoaIntegrationPlugin ${OPENGL_LIBRARIES})
     endif ()

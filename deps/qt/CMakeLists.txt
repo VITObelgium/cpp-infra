@@ -15,35 +15,39 @@ IF (MSVC)
     SET(BUILD_CMD nmake)
     SET(CONFIGURE_CMD call configure)
     SET(TARBALL_EXTENSION zip)
-    SET(PLATFORM_OPTIONS -mp -opengl desktop)
+    SET(PLATFORM_OPTIONS -mp)
 ELSE ()
     IF (APPLE)
         SET(PLATFORM macx-clang)
         SET(PLATFORM_OPTIONS -opengl desktop)
     ELSEIF (MINGW)
         SET(PLATFORM win32-g++)
-        SET(PLATFORM_OPTIONS -static)
+        SET(PLATFORM_OPTIONS -static -opengl desktop -no-opengl)
     ELSE ()
         SET(PLATFORM linux-g++)
         SET(PLATFORM_OPTIONS -qt-xcb)
     ENDIF ()
 
-    SET(BUILD_CMD make)
+    SET(BUILD_CMD make -j3)
     SET(CONFIGURE_CMD "./configure")
     SET(TARBALL_EXTENSION tar.xz)
 ENDIF ()
 
 EXTERNALPROJECT_ADD(${NAME}
+    DEPENDS zlib sqlite
     URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
+        -I${CMAKE_INSTALL_PREFIX}/include
+        -L${CMAKE_INSTALL_PREFIX}/lib
         ${CONFIGURATIONS}
         -platform ${PLATFORM}
         -prefix ${CMAKE_INSTALL_PREFIX}
         ${PLATFORM_OPTIONS}
         -opensource -confirm-license -nomake tools -nomake examples -nomake tests
-        -no-dbus -no-audio-backend -no-qml-debug
+        -no-openssl -no-dbus -no-audio-backend -no-qml-debug
+        -qt-sql-sqlite -system-sqlite
         -skip qtconnectivity
         -skip qtdeclarative
         -skip qtgamepad

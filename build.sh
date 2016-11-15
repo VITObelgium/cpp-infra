@@ -15,6 +15,7 @@ command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }
 config=""
 toolchain=""
 build_ui="OFF"
+static_qt="OFF"
 
 echo -n "Select configuration: [1:Debug 2:Release 3:Release with debug info]: "
 read yno
@@ -35,12 +36,12 @@ read yno
 case $yno in
     [1] ) toolchain="";;
     [2] ) toolchain="${PWD}/../../deps/musl-linux.make";;
-    [3] ) generator="MSYS Makefiles";;
+    [3] ) toolchain="${PWD}/../../deps/mingw.make" build_ui="ON" static_qt="ON";;
     [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
     * ) echo "Invalid selection" exit;;
 esac
 
 echo "Building configuration ${config} in ${builddir} toolchain (${toolchain})"
 
-checkresult cmake ../.. -G "${generator}" -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_PLUGINS=ON
+checkresult cmake ../.. -G "${generator}" -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_QT=${static_qt} -DSTATIC_PLUGINS=ON
 checkresult cmake --build .

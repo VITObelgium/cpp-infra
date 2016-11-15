@@ -18,6 +18,7 @@ PWD=`pwd`
 config=""
 toolchain=""
 generator="Unix Makefiles"
+build_ui="OFF"
 
 echo -n "Select configuration: [1:Debug 2:Release]: "
 read yno
@@ -30,14 +31,14 @@ esac
 echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4:Mingw linux]: "
 read yno
 case $yno in
-    [1] ) toolchain="";;
+    [1] ) toolchain="${PWD}/../../deps/toolchain-native.make";;
     [2] ) toolchain="${PWD}/../../deps/musl-linux.make";;
-    [3] ) generator="MSYS Makefiles";;
+    [3] ) toolchain="${PWD}/../../deps/mingw.make" build_ui="ON";;
     [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
     * ) echo "Invalid selection" exit;;
 esac
 
-checkresult cmake -G "${generator}" ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=OFF
+checkresult cmake -G "${generator}" ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui}
 checkresult cmake --build .
 
 cd ..
