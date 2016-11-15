@@ -157,6 +157,8 @@ public:
        const std::string & parameter, const std::string & station);
    */
 
+    void setForecastHorizon(chrono::days fcHor) override;
+
 private:
     std::chrono::seconds getBaseTimeResolutionInSeconds();
     void throwIfNotConfigured() const;
@@ -184,6 +186,8 @@ private:
 
     chrono::date_time _baseTime; //!< the basetime against which to offset the intervals given by the
                                  //!< getValues and setValues routines
+
+    chrono::days _fcHor;
 };
 
 } /* namespace OPAQ */

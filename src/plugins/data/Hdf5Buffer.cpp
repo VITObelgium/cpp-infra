@@ -37,6 +37,7 @@ Hdf5Buffer::Hdf5Buffer()
 : _logger("Hdf5Buffer")
 , _stringType(H5::StrType(0, H5T_VARIABLE))
 , _noData(-9999)
+, _fcHor(0)
 {
     // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
     H5::Exception::dontPrint();
@@ -368,9 +369,8 @@ TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
                                          const std::string& pollutantId,
                                          Aggregation::Type aggr)
 {
-    // return the observations stored...
-    // this routine is inherited from the DataProvider...
-    throw RunTimeException("not sure what to return here, need extra information ???");
+    assert(_fcHor > 0_d);
+    return getForecastValues(_fcHor, t1, t2, stationId, pollutantId, aggr);
 }
 
 TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& baseTime,
@@ -594,6 +594,11 @@ std::vector<std::string> Hdf5Buffer::getModelNames(const std::string& pollutantI
     {
         throw NotAvailableException("Error reading model list for {}, {}", pollutantId, Aggregation::getName(aggr));
     }
+}
+
+void Hdf5Buffer::setForecastHorizon(chrono::days fcHor)
+{
+    _fcHor = fcHor;
 }
 
 std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()

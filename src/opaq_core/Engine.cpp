@@ -55,6 +55,7 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     // Get data buffer (can't be missing)
     auto& buffer = _compMgr.getComponent<ForecastBuffer>(cnf.getBuffer().name);
     buffer.setAQNetworkProvider(net);
+    buffer.setForecastHorizon(forecastHorizon);
 
     // Get the forecast models to run
     for (auto& modelConfig : cnf.getModels())

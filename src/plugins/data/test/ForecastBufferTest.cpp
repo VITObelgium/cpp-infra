@@ -295,5 +295,27 @@ TYPED_TEST(ForecastBufferTest, GetModelValues)
     EXPECT_THAT(results, ContainerEq(std::vector<double>{ 2.5, 20.5 }));
 }
 
+TYPED_TEST(ForecastBufferTest, GetValuesFromSetForecastHorizon)
+{
+    auto basetime1 = make_date_time(2015_y / jan / 1);
+    auto basetime2 = make_date_time(2015_y / jan / 2);
+    auto fcHor = 1_d;
+
+    TimeSeries<double> forecast1, forecast2;
+    forecast1.insert(basetime1 + fcHor, 1.5);
+    forecast1.insert(basetime1 + fcHor + 1_d, 2.5);
+    
+    forecast2.insert(basetime2 + fcHor, 3.5);
+    forecast2.insert(basetime2 + fcHor + 1_d, 4.5);
+
+    this->_buffer->setCurrentModel("model");
+    this->_buffer->setValues(basetime1, forecast1, "Ukkel", "pm10", Aggregation::DayAvg);
+    this->_buffer->setValues(basetime2, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
+
+    this->_buffer->setForecastHorizon(fcHor);
+    auto results = this->_buffer->getValues(basetime1 + fcHor, basetime2 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, 3.5 }));
+}
+
 }
 }

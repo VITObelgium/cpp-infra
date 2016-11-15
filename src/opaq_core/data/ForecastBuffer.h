@@ -75,8 +75,6 @@ public:
                                                  const std::string& pollutantId,
                                                  Aggregation::Type aggr) = 0;
 
-    // need also routines for retrieving data for mapping, this
-    // has to be
-    // - for a given model and a given fcdate and fc horizon
+    virtual void setForecastHorizon(chrono::days fcHor) = 0;
 };
 }

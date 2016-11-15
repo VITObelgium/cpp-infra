@@ -95,6 +95,8 @@ public:
                                                  const std::string& pollutantId,
                                                  Aggregation::Type aggr) override;
 
+    void setForecastHorizon(chrono::days fcHor) override;
+
     // OPAQ::DataBuffer methods
     virtual void setNoData(double noData) override;
 
@@ -112,5 +114,7 @@ private:
     chrono::date_time _startDate; //!< the start stored in the file (cannot add values before it)
     chrono::date_time _baseTime;  //!< the basetime against which to offset the intervals given by the
                                   //!< getValues and setValues routines
+
+    chrono::days _fcHor;
 };
 }

@@ -10,6 +10,7 @@ namespace opaq
 SqlBuffer::SqlBuffer()
 : _logger("SqlBuffer")
 , _noData(-9999)
+, _fcHor(0)
 {
 }
 
@@ -86,7 +87,8 @@ TimeSeries<double> SqlBuffer::getValues(const chrono::date_time& t1,
                                         const std::string& pollutantId,
                                         Aggregation::Type aggr)
 {
-    throw RunTimeException("not sure what to return here, need extra information ???");
+    assert(_fcHor > 0_d);
+    return getForecastValues(_fcHor, t1, t2, stationId, pollutantId, aggr);
 }
 
 TimeSeries<double> SqlBuffer::getForecastValues(const chrono::date_time& baseTime,
@@ -169,6 +171,11 @@ std::vector<std::string> SqlBuffer::getModelNames(const std::string& pollutantId
     }
 
     return names;
+}
+
+void SqlBuffer::setForecastHorizon(chrono::days fcHor)
+{
+    _fcHor = fcHor;
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(SqlBuffer)
