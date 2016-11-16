@@ -56,6 +56,7 @@ EXTERNALPROJECT_ADD(${NAME}
         -skip qtconnectivity
         -skip qtdeclarative
         -skip qtgamepad
+        -skip qtactiveqt
         -skip qtmultimedia
         -skip qtpurchasing
         -skip qtquickcontrols
