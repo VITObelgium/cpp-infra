@@ -30,7 +30,9 @@ ELSE ()
         ENDIF ()
     ELSE ()
         SET(PLATFORM -platform linux-g++)
-        SET(PLATFORM_OPTIONS -qt-xcb)
+        # qt zlib should not be necessary, should be system zlib. Seems to be a bug in qt build system
+        # try to replace it in the next qt version
+        SET(PLATFORM_OPTIONS -qt-xcb -qt-zlib)
     ENDIF ()
 
     SET(BUILD_CMD make -j3)
