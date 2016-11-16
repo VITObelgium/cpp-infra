@@ -36,7 +36,7 @@ elseif (MINGW)
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Widgets Qt5::Charts Qt5::Core ${PLUGINS} ${EXTRA_LIBS})
+target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets Qt5::Core ${PLUGINS} ${EXTRA_LIBS})
 
 install(TARGETS opaqui
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -48,7 +48,6 @@ if (STATIC_QT)
     add_definitions("-DQT_CHARTS_STATICLIB")
 
     find_package(OpenGL)
-
     find_package(Qt5PrintSupport)
     find_dependency(NAME QT_PLATFORMSUPPORT LIBNAMES Qt5PlatformSupport DEBUGLIBNAMES Qt5PlatformSupportd)
     find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzzng DEBUGLIBNAMES qtharfbuzzngd)
@@ -57,13 +56,18 @@ if (STATIC_QT)
     #find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
 
     if (WIN32)
+        # Hack to force opengl lib behind Qt5Gui lib
+        list (APPEND Qt5Gui_LIBRARIES ${OPENGL_LIBRARIES})
+
         target_link_libraries(opaqui
             Qt5::QWindowsIntegrationPlugin
             #${QT_FREETYPE_LIBRARY}
             ${QT_PCRE_LIBRARY}
             ${QT_HARFBUZZ_LIBRARY}
             ${QT_PLATFORMSUPPORT_LIBRARY}
-            imm32 winmm ws2_32)
+            imm32 winmm ws2_32
+            ${Qt5Gui_LIBRARIES}
+        )
     elseif (APPLE)
         target_link_libraries(opaqui Qt5::QCocoaIntegrationPlugin ${OPENGL_LIBRARIES})
     endif ()
