@@ -11,23 +11,25 @@ ELSE ()
 ENDIF()
 
 IF (MSVC)
-    SET(PLATFORM win32-msvc2015)
+    SET(PLATFORM -platform win32-msvc2015)
     SET(BUILD_CMD nmake)
     SET(CONFIGURE_CMD call configure)
     SET(TARBALL_EXTENSION zip)
     SET(PLATFORM_OPTIONS -mp)
 ELSE ()
     IF (APPLE)
-        SET(PLATFORM macx-clang)
+        SET(PLATFORM -platform macx-clang)
         SET(PLATFORM_OPTIONS -opengl desktop)
     ELSEIF (MINGW)
-        SET(PLATFORM win32-g++)
         SET(PLATFORM_OPTIONS -static -opengl desktop -no-opengl)
         IF (CMAKE_CROSSCOMPILING)
-            SET(PLATFORM_OPTIONS ${PLATFORM_OPTIONS} -device-option CROSS_COMPILE=x86_64-w64-mingw32-)
+            SET(PLATFORM -xplatform win32-g++)
+            SET(PLATFORM_OPTIONS ${PLATFORM_OPTIONS} -device-option CROSS_COMPILE=${CROSS_COMPILE})
+        ELSE ()
+            SET(PLATFORM -platform win32-g++)
         ENDIF ()
     ELSE ()
-        SET(PLATFORM linux-g++)
+        SET(PLATFORM -platform linux-g++)
         SET(PLATFORM_OPTIONS -qt-xcb)
     ENDIF ()
 
@@ -45,7 +47,7 @@ EXTERNALPROJECT_ADD(${NAME}
         -I${CMAKE_INSTALL_PREFIX}/include
         -L${CMAKE_INSTALL_PREFIX}/lib
         ${CONFIGURATIONS}
-        -platform ${PLATFORM}
+        ${PLATFORM}
         -prefix ${CMAKE_INSTALL_PREFIX}
         ${PLATFORM_OPTIONS}
         -opensource -confirm-license -nomake tools -nomake examples -nomake tests

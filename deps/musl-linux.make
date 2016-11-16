@@ -1,5 +1,6 @@
-set(CMAKE_C_COMPILER x86_64-multilib-linux-musl-gcc)
-set(CMAKE_CXX_COMPILER x86_64-multilib-linux-musl-g++)
+set(CROSS_COMPILE x86_64-multilib-linux-musl-)
+set(CMAKE_C_COMPILER ${CROSS_COMPILE}gcc)
+set(CMAKE_CXX_COMPILER ${CROSS_COMPILE}g++)
 
 set(HOST x86_64-multilib-linux-musl)
 
