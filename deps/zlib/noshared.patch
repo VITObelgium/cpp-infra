@@ -1,5 +1,6 @@
---- CMakeLists.txt	2013-04-29 00:57:10.000000000 +0200
-+++ CMakeLists.txt.noshared	2015-08-18 14:14:56.000000000 +0200
+diff -Naur zlib-1.2.8/CMakeLists.txt zlib-1.2.8.mod/CMakeLists.txt
+--- zlib-1.2.8/CMakeLists.txt	2013-04-29 00:57:10.000000000 +0200
++++ zlib-1.2.8.mod/CMakeLists.txt	2016-11-16 10:21:50.432847836 +0100
 @@ -183,35 +183,18 @@
      set(ZLIB_DLL_SRCS ${CMAKE_CURRENT_BINARY_DIR}/zlib1rc.obj)
  endif(MINGW)
@@ -8,7 +9,7 @@
  add_library(zlibstatic STATIC ${ZLIB_SRCS} ${ZLIB_ASMS} ${ZLIB_PUBLIC_HDRS} ${ZLIB_PRIVATE_HDRS})
 -set_target_properties(zlib PROPERTIES DEFINE_SYMBOL ZLIB_DLL)
 -set_target_properties(zlib PROPERTIES SOVERSION 1)
--
+ 
 -if(NOT CYGWIN)
 -    # This property causes shared libraries on Linux to have the full version
 -    # encoded into their final filename.  We disable this on Cygwin because
@@ -19,8 +20,9 @@
 -    # the DLL comes from the resource file win32/zlib1.rc
 -    set_target_properties(zlib PROPERTIES VERSION ${ZLIB_FULL_VERSION})
 -endif()
- 
- if(UNIX)
+-
+-if(UNIX)
++if(UNIX OR MINGW)
      # On unix-like platforms the library is almost always called libz
 -   set_target_properties(zlib zlibstatic PROPERTIES OUTPUT_NAME z)
 -   if(NOT APPLE)
