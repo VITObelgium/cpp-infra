@@ -54,7 +54,6 @@ EXTERNALPROJECT_ADD(${NAME}
         ${PLATFORM_OPTIONS}
         -opensource -confirm-license -nomake tools -nomake examples -nomake tests
         -no-openssl -no-dbus -no-audio-backend -no-qml-debug
-        -qt-sql-sqlite -system-sqlite
         -skip qtconnectivity
         -skip qtdeclarative
         -skip qtgamepad
