@@ -52,16 +52,20 @@ if (STATIC_QT)
     find_dependency(NAME QT_PLATFORMSUPPORT LIBNAMES Qt5PlatformSupport DEBUGLIBNAMES Qt5PlatformSupportd)
     find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzzng DEBUGLIBNAMES qtharfbuzzngd)
     find_dependency(NAME QT_PCRE LIBNAMES qtpcre DEBUGLIBNAMES qtpcred)
-
-    #find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
+    
+    if (MSVC)
+        find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
+    endif ()
 
     if (WIN32)
         # Hack to force opengl lib behind Qt5Gui lib
         list (APPEND Qt5Gui_LIBRARIES ${OPENGL_LIBRARIES})
+        if (MSVC)
+            list (APPEND Qt5Gui_LIBRARIES ${QT_FREETYPE_LIBRARY})
+        endif ()
 
         target_link_libraries(opaqui
             Qt5::QWindowsIntegrationPlugin
-            #${QT_FREETYPE_LIBRARY}
             ${QT_PCRE_LIBRARY}
             ${QT_HARFBUZZ_LIBRARY}
             ${QT_PLATFORMSUPPORT_LIBRARY}

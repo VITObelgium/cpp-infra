@@ -15,7 +15,9 @@ int main(int argc, char* argv[])
 {
     //Q_INIT_RESOURCE(application);
 
+#ifndef STATIC_QT
     QCoreApplication::addLibraryPath("./plugins");
+#endif
 
     Log::initLogger("");
     Logger logger("main");
