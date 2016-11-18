@@ -98,7 +98,7 @@ QVariant StationResultsModel::headerData(int section, Qt::Orientation orientatio
 
     if (orientation == Qt::Vertical)
     {
-        if (section == 0)
+        if (section == 0 || _headers.empty())
         {
             return QVariant();
         }
