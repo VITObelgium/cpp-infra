@@ -15,7 +15,7 @@ IF (MSVC)
     SET(BUILD_CMD nmake)
     SET(CONFIGURE_CMD call configure)
     SET(TARBALL_EXTENSION zip)
-    SET(PLATFORM_OPTIONS -mp)
+    SET(PLATFORM_OPTIONS -static -mp -system-zlib ZLIB_LIBS=zlibstatic.lib)
 ELSE ()
     IF (APPLE)
         SET(PLATFORM -platform macx-clang)
@@ -46,8 +46,8 @@ EXTERNALPROJECT_ADD(${NAME}
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
-        -I${CMAKE_INSTALL_PREFIX}/include
-        -L${CMAKE_INSTALL_PREFIX}/lib
+        -I ${CMAKE_INSTALL_PREFIX}/include
+        -L ${CMAKE_INSTALL_PREFIX}/lib
         ${CONFIGURATIONS}
         ${PLATFORM}
         -prefix ${CMAKE_INSTALL_PREFIX}
