@@ -40,17 +40,24 @@ QVariant StationResultsModel::data(const QModelIndex& index, int role) const
             return QString::number(index.column());
         }
 
-        int forecastDay = index.column();
-        int modelIndex  = index.row() - 1;
-        auto values     = _buffer->getModelValues(_baseTime, chrono::days(forecastDay), _stationName, _pollutantId, _aggregationType);
+        try
+        {
+            int forecastDay = index.column();
+            int modelIndex  = index.row() - 1;
+            auto values     = _buffer->getModelValues(_baseTime, chrono::days(forecastDay), _stationName, _pollutantId, _aggregationType);
 
-        auto value = values.at(modelIndex);
-        if (std::fabs(value - _buffer->getNoData()) < std::numeric_limits<double>::epsilon())
+            auto value = values.at(modelIndex);
+            if (std::fabs(value - _buffer->getNoData()) < std::numeric_limits<double>::epsilon())
+            {
+                return tr("No data");
+            }
+
+            return QString::number(value, 'f', 6);
+        }
+        catch (const std::exception&)
         {
             return tr("No data");
         }
-
-        return QString::number(value, 'f', 6);
     }
     else if (role == Qt::BackgroundRole)
     {
