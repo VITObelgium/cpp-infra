@@ -1,2 +1,2 @@
-using gcc : musl : x86_64-multilib-linux-musl-g++ : <cxxflags>"-std=c++14 -fPIC" ;
+using gcc : musl : x86_64-multilib-linux-musl-g++ : <cxxflags>"-flto -std=c++14 -fPIC" ;
 using zlib ;
