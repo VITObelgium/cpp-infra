@@ -48,7 +48,6 @@ if (STATIC_QT)
     add_definitions("-DQT_CHARTS_STATICLIB")
 
     find_package(OpenGL)
-    find_package(Qt5PrintSupport)
     find_dependency(NAME QT_PLATFORMSUPPORT LIBNAMES Qt5PlatformSupport DEBUGLIBNAMES Qt5PlatformSupportd)
     find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzzng DEBUGLIBNAMES qtharfbuzzngd)
     find_dependency(NAME QT_PCRE LIBNAMES qtpcre DEBUGLIBNAMES qtpcred)

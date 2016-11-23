@@ -55,7 +55,6 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     // Get data buffer (can't be missing)
     auto& buffer = _compMgr.getComponent<ForecastBuffer>(cnf.getBuffer().name);
     buffer.setAQNetworkProvider(net);
-    buffer.setForecastHorizon(forecastHorizon);
 
     // Get the forecast models to run
     for (auto& modelConfig : cnf.getModels())
@@ -164,6 +163,9 @@ void Engine::run(config::OpaqRun& config)
     _logger->info("Starting OPAQ workflow...");
     if (forecastStage)
     {
+        // Get data buffer
+        auto& buffer = _compMgr.getComponent<ForecastBuffer>(forecastStage->getBuffer().name);
+
         for (auto& baseTime : baseTimes)
         {
             _logger->info("Forecast stage for {}", chrono::to_date_string(baseTime));
@@ -174,9 +176,14 @@ void Engine::run(config::OpaqRun& config)
                 _logger->info(">> Mapping forecast {}", chrono::to_date_string(baseTime));
                 assert(gridProvider);
 
-                // Buffer is input provider for the mapping models
-                // set the forecast horizon on the hdf5 dataprovider, then run the mapping stage
-                runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
+                // loop over the forecast horizons and call the mapping stage for each horizon
+                for (auto fcHor = 0_d; fcHor <= forecastStage->getHorizon(); fcHor += 1_d)
+                {
+                    // Buffer is input provider for the mapping models
+                    // set the forecast horizon on the hdf5 dataprovider, then run the mapping stage
+                    buffer.setForecastHorizon(fcHor);
+                    runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
+                }
             }
         }
     }
