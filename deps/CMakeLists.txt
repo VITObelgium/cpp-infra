@@ -12,9 +12,10 @@ IF (MSVC)
     ADD_SUBDIRECTORY(benchmark)
 ENDIF ()
 
-message (STATUS "Host: ${CMAKE_HOST_SYSTEM}")
+message (STATUS "System Host: ${CMAKE_HOST_SYSTEM}")
 message (STATUS "Target: ${CMAKE_SYSTEM_NAME}")
 message (STATUS "Cross compiling: ${CMAKE_CROSSCOMPILING}")
+message (STATUS "User Host: ${HOST}")
 
 ADD_SUBDIRECTORY(googletest)
 ADD_SUBDIRECTORY(zlib)

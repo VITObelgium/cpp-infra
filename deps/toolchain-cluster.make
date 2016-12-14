@@ -1,5 +1,7 @@
 set(CROSS x86_64-unknown-linux-gnu-)
 
+set(HOST x86_64-unknown-linux-gnu)
+
 set(CMAKE_C_COMPILER ${CROSS}gcc)
 set(CMAKE_CXX_COMPILER ${CROSS}g++)
 set(CMAKE_LINKER ${CROSS}ld CACHE FILEPATH "")

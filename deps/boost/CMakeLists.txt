@@ -41,6 +41,11 @@ IF(HOST MATCHES ".*-musl")
     SET(USER_CONFIG user-config-musl.jam)
 ENDIF ()
 
+IF(HOST MATCHES "x86_64-unknown-linux-gnu")
+    SET(TOOLSET gcc-cluster)
+    SET(USER_CONFIG user-config-gcc-cluster.jam)
+ENDIF ()
+
 EXTERNALPROJECT_ADD(${NAME}
     DEPENDS zlib
     URL http://downloads.sourceforge.net/project/${NAME}/${NAME}/${VERSION}/${NAME}_${VERSION_UNDERSCORE}.${TARBALL_EXTENSION} TIMEOUT 6000
