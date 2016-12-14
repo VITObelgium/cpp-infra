@@ -30,6 +30,7 @@ ELSE ()
         ENDIF ()
     ELSE ()
         SET(PLATFORM -platform linux-g++)
+        SET(BUILD_ARGS "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} LINK=${CMAKE_CXX_COMPILER}")
         # qt zlib should not be necessary, should be system zlib. Seems to be a bug in qt build system
         # try to replace it in the next qt version
         SET(PLATFORM_OPTIONS -qt-xcb -qt-zlib)
@@ -74,6 +75,6 @@ EXTERNALPROJECT_ADD(${NAME}
         -skip qtwebview
         -skip qtwinextras
         -skip qtxmlpatterns
-    BUILD_COMMAND ${BUILD_CMD}
+    BUILD_COMMAND ${BUILD_ARGS} ${BUILD_CMD}
     INSTALL_COMMAND ${BUILD_CMD} install
 )
