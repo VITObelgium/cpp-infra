@@ -75,6 +75,6 @@ EXTERNALPROJECT_ADD(${NAME}
         -skip qtwebview
         -skip qtwinextras
         -skip qtxmlpatterns
-    BUILD_COMMAND ${BUILD_ARGS} ${BUILD_CMD}
+    BUILD_COMMAND ${BUILD_CMD} ${BUILD_ARGS}
     INSTALL_COMMAND ${BUILD_CMD} install
 )
