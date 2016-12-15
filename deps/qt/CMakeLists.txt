@@ -33,7 +33,7 @@ ELSE ()
         SET(BUILD_ARGS "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} LINK=${CMAKE_CXX_COMPILER}")
         # qt zlib should not be necessary, should be system zlib. Seems to be a bug in qt build system
         # try to replace it in the next qt version
-        SET(PLATFORM_OPTIONS -qt-xcb -qt-zlib)
+        SET(PLATFORM_OPTIONS -no-xcb -qt-zlib)
     ENDIF ()
 
     SET(BUILD_CMD make -j3)
