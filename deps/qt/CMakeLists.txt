@@ -45,7 +45,7 @@ EXTERNALPROJECT_ADD(${NAME}
     URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake &&
-                  ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/linux-g++-cluster ${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src/qt/qtbase/mkspecs/
+                  ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/linux-g++-cluster ${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src/qt/qtbase/mkspecs/linux-g++-cluster
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
         -I ${CMAKE_INSTALL_PREFIX}/include
         -L ${CMAKE_INSTALL_PREFIX}/lib
