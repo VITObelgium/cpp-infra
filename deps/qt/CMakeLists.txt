@@ -45,7 +45,8 @@ EXTERNALPROJECT_ADD(${NAME}
     DEPENDS zlib sqlite
     URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
-    PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake
+    PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake &&
+                  ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/cluster_gcc.cmake
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
         -I ${CMAKE_INSTALL_PREFIX}/include
         -L ${CMAKE_INSTALL_PREFIX}/lib
@@ -75,6 +76,6 @@ EXTERNALPROJECT_ADD(${NAME}
         -skip qtwebview
         -skip qtwinextras
         -skip qtxmlpatterns
-    BUILD_COMMAND ${BUILD_CMD} ${BUILD_ARGS}
+    BUILD_COMMAND ${BUILD_CMD}
     INSTALL_COMMAND ${BUILD_CMD} install
 )
