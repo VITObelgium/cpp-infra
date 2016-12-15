@@ -29,8 +29,7 @@ ELSE ()
             SET(PLATFORM -platform win32-g++)
         ENDIF ()
     ELSE ()
-        SET(PLATFORM -platform linux-g++)
-        SET(BUILD_ARGS "CC=${CMAKE_C_COMPILER} CXX=${CMAKE_CXX_COMPILER} LINK=${CMAKE_CXX_COMPILER}")
+        SET(PLATFORM -platform linux-g++-cluster)
         # qt zlib should not be necessary, should be system zlib. Seems to be a bug in qt build system
         # try to replace it in the next qt version
         SET(PLATFORM_OPTIONS -no-xcb -qt-zlib)
@@ -46,12 +45,13 @@ EXTERNALPROJECT_ADD(${NAME}
     URL http://download.qt.io/official_releases/${NAME}/${MAJOR}.${MINOR}/${VERSION}/single/qt-everywhere-opensource-src-${VERSION}.${TARBALL_EXTENSION} TIMEOUT 6000
     BUILD_IN_SOURCE 1
     PATCH_COMMAND ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/static_runtime.cmake &&
-                  ${CMAKE_COMMAND} -DQT_SRC_ROOT=${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src -P ${CMAKE_CURRENT_SOURCE_DIR}/cluster_gcc.cmake
+                  ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/linux-g++-cluster ${CMAKE_CURRENT_BINARY_DIR}/qt-prefix/src/qt/qtbase/mkspecs/
     CONFIGURE_COMMAND ${CONFIGURE_CMD}
         -I ${CMAKE_INSTALL_PREFIX}/include
         -L ${CMAKE_INSTALL_PREFIX}/lib
         ${CONFIGURATIONS}
         ${PLATFORM}
+        -verbose
         -prefix ${CMAKE_INSTALL_PREFIX}
         ${PLATFORM_OPTIONS}
         -opensource -confirm-license -nomake tools -nomake examples -nomake tests
