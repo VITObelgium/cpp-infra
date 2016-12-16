@@ -24,7 +24,7 @@ ELSE ()
         SET(PLATFORM_OPTIONS -static -opengl desktop)
         IF (CMAKE_CROSSCOMPILING)
             SET(PLATFORM -xplatform win32-g++)
-            SET(PLATFORM_OPTIONS ${PLATFORM_OPTIONS} -device-option CROSS_COMPILE=${CROSS_COMPILE})
+            SET(PLATFORM_OPTIONS ${PLATFORM_OPTIONS} -no-pch -device-option CROSS_COMPILE=${CROSS_COMPILE})
         ELSE ()
             SET(PLATFORM -platform win32-g++)
         ENDIF ()
@@ -51,7 +51,6 @@ EXTERNALPROJECT_ADD(${NAME}
         -L ${CMAKE_INSTALL_PREFIX}/lib
         ${CONFIGURATIONS}
         ${PLATFORM}
-        -verbose
         -prefix ${CMAKE_INSTALL_PREFIX}
         ${PLATFORM_OPTIONS}
         -opensource -confirm-license -nomake tools -nomake examples -nomake tests
