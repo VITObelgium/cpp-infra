@@ -8,9 +8,11 @@ function checkresult {
     return $status
 }
 
-generator="Ninja"
+#generator="Ninja"
 # fall back to make if ninja is not installed
-command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }
+# command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }
+
+generator="Unix Makefiles"
 
 config=""
 toolchain=""
@@ -34,10 +36,10 @@ PWD=`pwd`
 echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4: Mingw linux]: "
 read yno
 case $yno in
-    [1] ) toolchain="";;
-    [2] ) toolchain="${PWD}/../../deps/musl-linux.make";;
-    [3] ) toolchain="${PWD}/../../deps/mingw.make" build_ui="ON" static_qt="ON";;
-    [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
+    [1] ) toolchain="${pwd}/../../deps/toolchain-cluster.cmake";;
+    [2] ) toolchain="${pwd}/../../deps/toolchain-musl.cmake";;
+    [3] ) toolchain="${pwd}/../../deps/toolchain-mingw.cmake" build_ui="ON" static_qt="ON";;
+    [4] ) toolchain="${pwd}/../../deps/toolchain-mingw-cross.cmake";;
     * ) echo "Invalid selection" exit;;
 esac
 
