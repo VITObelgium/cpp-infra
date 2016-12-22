@@ -31,10 +31,10 @@ esac
 echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4:Mingw linux]: "
 read yno
 case $yno in
-    [1] ) toolchain="${PWD}/../../deps/toolchain-native.make";;
-    [2] ) toolchain="${PWD}/../../deps/musl-linux.make";;
-    [3] ) toolchain="${PWD}/../../deps/mingw.make" build_ui="ON";;
-    [4] ) toolchain="${PWD}/../../deps/mingw-linux.make";;
+    [1] ) toolchain="${PWD}/../../deps/toolchain-cluster.cmake";;
+    [2] ) toolchain="${PWD}/../../deps/toolchain-musl.cmake";;
+    [3] ) toolchain="${PWD}/../../deps/toolchain-native.cmake" build_ui="ON";;
+    [4] ) toolchain="${PWD}/../../deps/toolchain-mingw-cross.cmake";;
     * ) echo "Invalid selection" exit;;
 esac
 

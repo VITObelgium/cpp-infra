@@ -13,7 +13,7 @@ mkdir build\deps
 mkdir build\deps_d
 
 cd build\deps
-cmake ..\..\deps -G %GENERATOR% -DCMAKE_TOOLCHAIN_FILE=%cd%\..\..\deps\msvc.make -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Release -DBUILD_UI=ON
+cmake ..\..\deps -G %GENERATOR% -DCMAKE_TOOLCHAIN_FILE=%cd%\..\..\deps\toolchain-msvc.cmake -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Release -DBUILD_UI=ON
 IF %errorlevel% NEQ 0 (
     ECHO Failed to perform Release configuration
     EXIT /b 1
@@ -26,7 +26,7 @@ IF %errorlevel% NEQ 0 (
 )
 
 cd ..\deps_d
-cmake ..\..\deps -G %GENERATOR% -DCMAKE_TOOLCHAIN_FILE=%cd%\..\..\deps\msvc.make -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Debug -DBUILD_UI=ON
+cmake ..\..\deps -G %GENERATOR% -DCMAKE_TOOLCHAIN_FILE=%cd%\..\..\deps\toolchain-msvc.cmake -DCMAKE_INSTALL_PREFIX=%cd%\..\local -DCMAKE_PREFIX_PATH=%cd%\..\local -DCMAKE_BUILD_TYPE=Debug -DBUILD_UI=ON
 IF %errorlevel% NEQ 0 (
     ECHO Failed to perform Debug configuration
     EXIT /b 1
