@@ -31,14 +31,14 @@ esac
 builddir="build/opaq_`echo "${config}" | tr '[:upper:]' '[:lower:]'`"
 mkdir -p ${builddir}
 cd ${builddir}
-PWD=`pwd`
+pwd=`pwd`
 
 echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4: Mingw linux]: "
 read yno
 case $yno in
     [1] ) toolchain="${pwd}/../../deps/toolchain-cluster.cmake";;
     [2] ) toolchain="${pwd}/../../deps/toolchain-musl.cmake";;
-    [3] ) toolchain="${pwd}/../../deps/toolchain-mingw.cmake" build_ui="ON" static_qt="ON";;
+    [3] ) toolchain="${pwd}/../../deps/toolchain-native.cmake" build_ui="ON" static_qt="ON";;
     [4] ) toolchain="${pwd}/../../deps/toolchain-mingw-cross.cmake";;
     * ) echo "Invalid selection" exit;;
 esac

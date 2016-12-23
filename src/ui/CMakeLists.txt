@@ -51,9 +51,12 @@ if (STATIC_QT)
     find_dependency(NAME QT_PLATFORMSUPPORT LIBNAMES Qt5PlatformSupport DEBUGLIBNAMES Qt5PlatformSupportd)
     find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzzng DEBUGLIBNAMES qtharfbuzzngd)
     find_dependency(NAME QT_PCRE LIBNAMES qtpcre DEBUGLIBNAMES qtpcred)
-    
+
     if (MSVC)
         find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
+    else ()
+        find_dependency(NAME QT_PNG LIBNAMES qtpng DEBUGLIBNAMES qtpngd)
+        list (APPEND Qt5Gui_LIBRARIES ${QT_PNG_LIBRARY})
     endif ()
 
     if (WIN32)

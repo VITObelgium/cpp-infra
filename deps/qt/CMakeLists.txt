@@ -54,7 +54,7 @@ EXTERNALPROJECT_ADD(${NAME}
         -prefix ${CMAKE_INSTALL_PREFIX}
         ${PLATFORM_OPTIONS}
         -opensource -confirm-license -nomake tools -nomake examples -nomake tests
-        -no-openssl -no-dbus -no-audio-backend -no-qml-debug
+        -no-openssl -no-dbus -no-audio-backend -no-qml-debug -no-icu
         -skip qtconnectivity
         -skip qtdeclarative
         -skip qtgamepad
