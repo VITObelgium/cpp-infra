@@ -1,0 +1,60 @@
+option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
+option(INFRA_LOGGING "Enable logging functionality" ON)
+option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
+
+find_package(fmt CONFIG REQUIRED)
+
+add_library(infra
+    include/infra/generator.h
+    include/infra/point.h
+    include/infra/cell.h
+    include/infra/exception.h
+    include/infra/colormap.h colormap.cpp
+)
+
+target_include_directories(infra
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
+target_link_libraries(infra fmt::fmt)
+
+if (INFRA_GDAL)
+    find_package(Gdal REQUIRED)
+
+    target_sources(infra PRIVATE
+        include/infra/gdal.h gdal.cpp
+        include/infra/internal/gdalinternal.h
+    )
+
+    if (INFRA_EMBED_GDAL_DATA)
+        target_sources(infra PRIVATE
+            embedgdaldata.h
+            embedgdaldata.cpp
+            ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.h
+            ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.cpp
+            embedgdaldata.cmake
+        )
+
+        target_compile_definitions(infra PRIVATE -DEMBED_GDAL_DATA)
+
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.h ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.cpp
+                           COMMAND ${CMAKE_COMMAND} ARGS -DGDAL_DATA_PATH=${GDAL_DATA_PATH} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/gdal_data -P ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
+                           DEPENDS ${GDAL_DATA_PATH}/gcs.csv ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
+                           COMMENT "Generate embedded gdal data"
+        )
+    endif ()
+
+    target_link_libraries(infra PRIVATE Gdal::Gdal)
+endif ()
+
+if (INFRA_LOGGING)
+    target_sources(infra PRIVATE
+        include/infra/log.h log.cpp
+    )
+
+    target_link_libraries(infra PRIVATE spdlog::spdlog)
+endif ()
