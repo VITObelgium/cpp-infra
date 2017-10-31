@@ -1,6 +1,7 @@
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
+option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 
 find_package(fmt CONFIG REQUIRED)
 
@@ -57,4 +58,12 @@ if (INFRA_LOGGING)
     )
 
     target_link_libraries(infra PRIVATE spdlog::spdlog)
+endif ()
+
+if (INFRA_LICENSE_MANAGER)
+    find_package(Rlm CONFIG REQUIRED)
+
+    target_sources(infra PRIVATE
+        include/infra/licensemanager.h licensemanager.cpp
+    )
 endif ()
