@@ -20,7 +20,7 @@ target_include_directories(infra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
-target_link_libraries(infra fmt::fmt)
+target_link_libraries(infra PRIVATE fmt::fmt)
 
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
@@ -48,7 +48,7 @@ if (INFRA_GDAL)
         )
     endif ()
 
-    target_link_libraries(infra PRIVATE Gdal::Gdal)
+    target_link_libraries(infra PUBLIC Gdal::Gdal)
 endif ()
 
 if (INFRA_LOGGING)
