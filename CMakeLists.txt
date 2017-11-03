@@ -25,7 +25,7 @@ target_link_libraries(infra PRIVATE fmt::fmt)
 
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
-    find_package(gsl REQUIRED)
+    find_package(Gsl REQUIRED)
 
     target_sources(infra PRIVATE
         include/infra/gdal.h gdal.cpp
