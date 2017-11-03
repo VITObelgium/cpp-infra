@@ -25,6 +25,7 @@ target_link_libraries(infra PRIVATE fmt::fmt)
 
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
+    find_package(gsl REQUIRED)
 
     target_sources(infra PRIVATE
         include/infra/gdal.h gdal.cpp
@@ -49,10 +50,12 @@ if (INFRA_GDAL)
         )
     endif ()
 
-    target_link_libraries(infra PUBLIC Gdal::Gdal)
+    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl)
 endif ()
 
 if (INFRA_LOGGING)
+    find_package(spdlog CONFIG REQUIRED)
+
     target_sources(infra PRIVATE
         include/infra/log.h log.cpp
     )
