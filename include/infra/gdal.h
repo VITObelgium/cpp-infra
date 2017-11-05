@@ -103,7 +103,7 @@ public:
     void readRasterData(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize) const
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
-        checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, type_resolve<T>::value, 0, 0),
+        checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
             "Failed to read raster data");
     }
 
@@ -112,7 +112,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
-        checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, type_resolve<T>::value, 0, 0),
+        checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
             "Failed to write raster data");
     }
 
@@ -127,7 +127,7 @@ public:
         auto pointerString = fmt::format("DATAPOINTER={}", buf.data());
         std::array<const char*, 2> options{{pointerString.c_str(), nullptr}};
 
-        _ptr->AddBand(type_resolve<typename std::remove_cv<T>::type>::value, options.empty() ? nullptr : const_cast<char**>(options.data()));
+        _ptr->AddBand(TypeResolve<typename std::remove_cv<T>::type>::value, options.empty() ? nullptr : const_cast<char**>(options.data()));
     }
 
     template <typename T>
@@ -159,7 +159,7 @@ public:
     template <typename T>
     DataSet createDataSet(uint32_t rows, uint32_t cols, uint32_t numBands, const std::string& filename)
     {
-        return DataSet(checkPointer(_driver->Create(filename.c_str(), cols, rows, numBands, type_resolve<T>::value, nullptr), "Failed to create data set"));
+        return DataSet(checkPointer(_driver->Create(filename.c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
     template <typename T>

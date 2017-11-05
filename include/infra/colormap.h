@@ -68,7 +68,7 @@ private:
     std::array<Color, 256> _cmap;
 };
 
-struct cmap
+struct Cmap
 {
     static const ColorDict bone;
     static const ColorDict cool;

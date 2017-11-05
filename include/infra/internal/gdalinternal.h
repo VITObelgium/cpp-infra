@@ -5,49 +5,49 @@
 namespace infra::gdal {
 
 template <typename T>
-struct type_resolve
+struct TypeResolve
 {
     static constexpr GDALDataType value = GDT_Unknown;
 };
 
 template <>
-struct type_resolve<uint8_t>
+struct TypeResolve<uint8_t>
 {
     static constexpr GDALDataType value = GDT_Byte;
 };
 
 template <>
-struct type_resolve<uint16_t>
+struct TypeResolve<uint16_t>
 {
     static constexpr GDALDataType value = GDT_UInt16;
 };
 
 template <>
-struct type_resolve<int16_t>
+struct TypeResolve<int16_t>
 {
     static constexpr GDALDataType value = GDT_Int16;
 };
 
 template <>
-struct type_resolve<uint32_t>
+struct TypeResolve<uint32_t>
 {
     static constexpr GDALDataType value = GDT_UInt32;
 };
 
 template <>
-struct type_resolve<int32_t>
+struct TypeResolve<int32_t>
 {
     static constexpr GDALDataType value = GDT_Int32;
 };
 
 template <>
-struct type_resolve<float>
+struct TypeResolve<float>
 {
     static constexpr GDALDataType value = GDT_Float32;
 };
 
 template <>
-struct type_resolve<double>
+struct TypeResolve<double>
 {
     static constexpr GDALDataType value = GDT_Float64;
 };
