@@ -190,7 +190,7 @@ private:
 class MemoryFile
 {
 public:
-    MemoryFile(const std::string& path, gsl::span<const uint8_t> dataBuffer);
+    MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer);
     ~MemoryFile();
 
     const std::string& path() const;

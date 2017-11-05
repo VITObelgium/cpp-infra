@@ -11,6 +11,7 @@
 #include <cassert>
 #include <stdexcept>
 #include <unordered_map>
+#include <utility>
 
 #ifdef HAVE_EXP_FILESYSTEM_H
 #include <experimental/filesystem>
@@ -486,8 +487,8 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
     return VectorType::Unknown;
 }
 
-MemoryFile::MemoryFile(const std::string& path, gsl::span<const uint8_t> dataBuffer)
-: _path(path)
+MemoryFile::MemoryFile(std::string  path, gsl::span<const uint8_t> dataBuffer)
+: _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
                             const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
                             dataBuffer.size(), FALSE /*no ownership*/)) {
