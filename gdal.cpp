@@ -175,7 +175,8 @@ EmbeddedDataRegistration::~EmbeddedDataRegistration()
     destroyEmbeddedData();
 }
 
-void registerGdal() {
+void registerGdal()
+{
 #ifdef EMBED_GDAL_DATA
     createEmbeddedData();
 #endif
@@ -190,7 +191,8 @@ void registerGdal() {
 #endif
 }
 
-void unregisterGdal() {
+void unregisterGdal()
+{
 #ifdef EMBED_GDAL_DATA
     destroyEmbeddedData();
 #endif
@@ -487,19 +489,21 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
     return VectorType::Unknown;
 }
 
-MemoryFile::MemoryFile(std::string  path, gsl::span<const uint8_t> dataBuffer)
+MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-                            dataBuffer.size(), FALSE /*no ownership*/)) {
+      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+      dataBuffer.size(), FALSE /*no ownership*/))
+{
 }
 
-const std::string& MemoryFile::path() const {
+const std::string& MemoryFile::path() const
+{
     return _path;
 }
 
-MemoryFile::~MemoryFile() {
+MemoryFile::~MemoryFile()
+{
     VSIFCloseL(_ptr);
 }
-
-} 
+}

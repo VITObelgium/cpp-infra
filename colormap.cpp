@@ -1,64 +1,52 @@
 #include "infra/colormap.h"
 
-#include <cmath>
 #include <cassert>
+#include <cmath>
 
-namespace infra
-{
+namespace infra {
 
-const ColorDict cmap::bone {
-    { {0.0f, 0.0f, 0.0f},
-      {0.746032f, 0.652778f, 0.652778f},
-      {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 0.0f, 0.0f},
-      {0.365079f, 0.319444f, 0.319444f},
-      {0.746032f, 0.777778f, 0.777778f},
-      {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 0.0f, 0.0f},
-      {0.365079f, 0.444444f, 0.444444f},
-      {1.0f, 1.0f, 1.0f} }
-};
+const ColorDict cmap::bone{
+    {{0.0f, 0.0f, 0.0f},
+        {0.746032f, 0.652778f, 0.652778f},
+        {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f},
+        {0.365079f, 0.319444f, 0.319444f},
+        {0.746032f, 0.777778f, 0.777778f},
+        {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f},
+        {0.365079f, 0.444444f, 0.444444f},
+        {1.0f, 1.0f, 1.0f}}};
 
-const ColorDict cmap::cool {
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f} },
-    { {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f} }
-};
+const ColorDict cmap::cool{
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}},
+    {{0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}}};
 
-const ColorDict cmap::copper {
-    { {0.0f, 0.0f, 0.0f},
-      {0.809524f, 1.000000f, 1.000000f},
-      {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 0.7812f, 0.7812f} },
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 0.4975f, 0.4975f} }
-};
+const ColorDict cmap::copper{
+    {{0.0f, 0.0f, 0.0f},
+        {0.809524f, 1.000000f, 1.000000f},
+        {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 0.7812f, 0.7812f}},
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 0.4975f, 0.4975f}}};
 
-const ColorDict cmap::gray {
+const ColorDict cmap::gray{
     {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
     {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
-    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}
-};
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}};
 
-const ColorDict cmap::hot {
-    {
-        {0.0f, 0.0416f, 0.0416f},
+const ColorDict cmap::hot{
+    {{0.0f, 0.0416f, 0.0416f},
         {0.365079f, 1.0f, 1.0f},
-        {1.0f, 1.0f, 1.0f}
-    },
-    {
-        {0.0f, 0.0f, 0.},
+        {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.},
         {0.365079f, 0.0f, 0.0f},
         {0.746032f, 1.0f, 1.0f},
-        {1.0f, 1.0f, 1.0f}
-    },
-    {
-        {0.0f, 0.0f, 0.0f},
+        {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f},
         {0.746032f, 0.0f, 0.0f},
-        {1.0f, 1.0f, 1.0f}
-    }
-};
+        {1.0f, 1.0f, 1.0f}}};
 
-const ColorDict cmap::hsv {
+const ColorDict cmap::hsv{
     {
         {0.0f, 1.0f, 1.0f},
         {0.158730f, 1.000000f, 1.000000f},
@@ -80,18 +68,15 @@ const ColorDict cmap::hsv {
         {0.682540f, 0.000000f, 0.000000f},
         {1.0f, 0.0f, 0.0f},
     },
-    {
-        {0.0f, 0.0f, 0.0f},
+    {{0.0f, 0.0f, 0.0f},
         {0.333333f, 0.000000f, 0.000000f},
         {0.349206f, 0.062500f, 0.062500f},
         {0.507937f, 1.000000f, 1.000000f},
         {0.841270f, 1.000000f, 1.000000f},
         {0.857143f, 0.937500f, 0.937500f},
-        {1.0f, 0.09375, 0.09375}
-    }
-};
+        {1.0f, 0.09375, 0.09375}}};
 
-const ColorDict cmap::jet {
+const ColorDict cmap::jet{
     {
         {0.0f, 0.0f, 0.0f},
         {0.35f, 0.0f, 0.0f},
@@ -107,16 +92,13 @@ const ColorDict cmap::jet {
         {0.91f, 0.0f, 0.0f},
         {1.0f, 0.0f, 0.0f},
     },
-    {
-        {0.0f, 0.5f, 0.5f},
+    {{0.0f, 0.5f, 0.5f},
         {0.11f, 1.0f, 1.0f},
         {0.34f, 1.0f, 1.0f},
         {0.65f, 0.0f, 0.0f},
-        {1.0f, 0.0f, 0.0f}
-    }
-};
+        {1.0f, 0.0f, 0.0f}}};
 
-const ColorDict cmap::pink {
+const ColorDict cmap::pink{
     {
         {0.0f, 0.1178f, 0.1178f},
         {0.015873f, 0.195857f, 0.195857f},
@@ -249,8 +231,7 @@ const ColorDict cmap::pink {
         {0.984127f, 0.994695f, 0.994695f},
         {1.0f, 1.0f, 1.0f},
     },
-    {
-        {0.0f, 0.0f, 0.0f},
+    {{0.0f, 0.0f, 0.0f},
         {0.015873f, 0.102869f, 0.102869f},
         {0.031746f, 0.145479f, 0.145479f},
         {0.047619f, 0.178174f, 0.178174f},
@@ -313,37 +294,31 @@ const ColorDict cmap::pink {
         {0.952381f, 0.951711f, 0.951711f},
         {0.968254f, 0.968075f, 0.968075f},
         {0.984127f, 0.984167f, 0.984167f},
-        {1.0f, 1.0f, 1.0f}
-    }
+        {1.0f, 1.0f, 1.0f}}};
+
+const ColorDict cmap::spring{
+    {{0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f}}};
+
+const ColorDict cmap::summer{
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}}, // red
+    {{0.0f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}, // green
+    {{0.0f, 0.4f, 0.4f}, {1.0f, 0.4f, 0.4f}}  // blue
 };
 
-const ColorDict cmap::spring {
-    { {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 1.0f, 1.0f}, {1.0f, 0.0f, 0.0f} }
-};
+const ColorDict cmap::autumn{
+    {{0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}}};
 
-const ColorDict cmap::summer {
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} }, // red
-    { {0.0f, 0.5f, 0.5f}, {1.0f, 1.0f, 1.0f} }, // green
-    { {0.0f, 0.4f, 0.4f}, {1.0f, 0.4f, 0.4f} }  // blue
-};
+const ColorDict cmap::winter{
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
+    {{0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f}},
+    {{0.0f, 1.0f, 1.0f}, {1.0f, 0.5f, 0.5f}}};
 
-const ColorDict cmap::autumn {
-    { {0.0f, 1.0f, 1.0f}, {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f} }
-};
-
-const ColorDict cmap::winter {
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f} },
-    { {0.0f, 0.0f, 0.0f}, {1.0f, 1.0f, 1.0f} },
-    { {0.0f, 1.0f, 1.0f}, {1.0f, 0.5f, 0.5f} }
-};
-
-const ColorDict cmap::spectral {
-    {
-        {0.0f, 0.0f, 0.0f},
+const ColorDict cmap::spectral{
+    {{0.0f, 0.0f, 0.0f},
         {0.05f, 0.4667f, 0.4667f},
         {0.10f, 0.5333f, 0.5333f},
         {0.15f, 0.0f, 0.0f},
@@ -363,10 +338,8 @@ const ColorDict cmap::spectral {
         {0.85f, 1.0f, 1.0f},
         {0.90f, 0.8667f, 0.8667f},
         {0.95f, 0.80f, 0.80f},
-        {1.0f, 0.80f, 0.80f}
-    },
-    {
-        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.80f, 0.80f}},
+    {{0.0f, 0.0f, 0.0f},
         {0.05f, 0.0f, 0.0f},
         {0.10f, 0.0f, 0.0f},
         {0.15f, 0.0f, 0.0f},
@@ -386,10 +359,8 @@ const ColorDict cmap::spectral {
         {0.85f, 0.0f, 0.0f},
         {0.90f, 0.0f, 0.0f},
         {0.95f, 0.0f, 0.0f},
-        {1.0f, 0.80f, 0.80f}
-    },
-    {
-        {0.0f, 0.0f, 0.0f},
+        {1.0f, 0.80f, 0.80f}},
+    {{0.0f, 0.0f, 0.0f},
         {0.05f, 0.5333f, 0.5333f},
         {0.10f, 0.6000f, 0.6000f},
         {0.15f, 0.6667f, 0.6667f},
@@ -409,124 +380,113 @@ const ColorDict cmap::spectral {
         {0.85f, 0.0f, 0.0f},
         {0.90f, 0.0f, 0.0f},
         {0.95f, 0.0f, 0.0f},
-        {1.0f, 0.80f, 0.80f}
-    }
-};
+        {1.0f, 0.80f, 0.80f}}};
 
-const ColorDict cmap::gistEarth {
-    {
-         {0.0f, 0.0f, 0.0000f},
-         {0.2824f, 0.1882f, 0.1882f},
-         {0.4588f, 0.2714f, 0.2714f},
-         {0.5490f, 0.4719f, 0.4719f},
-         {0.6980f, 0.7176f, 0.7176f},
-         {0.7882f, 0.7553f, 0.7553f},
-         {1.0000f, 0.9922f, 0.9922f}
-    },
-    {
-         {0.0f, 0.0f, 0.0000f},
-         {0.0275f, 0.0000f, 0.0000f},
-         {0.1098f, 0.1893f, 0.1893f},
-         {0.1647f, 0.3035f, 0.3035f},
-         {0.2078f, 0.3841f, 0.3841f},
-         {0.2824f, 0.5020f, 0.5020f},
-         {0.5216f, 0.6397f, 0.6397f},
-         {0.6980f, 0.7171f, 0.7171f},
-         {0.7882f, 0.6392f, 0.6392f},
-         {0.7922f, 0.6413f, 0.6413f},
-         {0.8000f, 0.6447f, 0.6447f},
-         {0.8078f, 0.6481f, 0.6481f},
-         {0.8157f, 0.6549f, 0.6549f},
-         {0.8667f, 0.6991f, 0.6991f},
-         {0.8745f, 0.7103f, 0.7103f},
-         {0.8824f, 0.7216f, 0.7216f},
-         {0.8902f, 0.7323f, 0.7323f},
-         {0.8980f, 0.7430f, 0.7430f},
-         {0.9412f, 0.8275f, 0.8275f},
-         {0.9569f, 0.8635f, 0.8635f},
-         {0.9647f, 0.8816f, 0.8816f},
-         {0.9961f, 0.9733f, 0.9733f},
-         {1.0000f, 0.9843f, 0.9843f}
-    },
-    {
-         {0.0f, 0.0f, 0.0000f},
-         {0.0039f, 0.1684f, 0.1684f},
-         {0.0078f, 0.2212f, 0.2212f},
-         {0.0275f, 0.4329f, 0.4329f},
-         {0.0314f, 0.4549f, 0.4549f},
-         {0.2824f, 0.5004f, 0.5004f},
-         {0.4667f, 0.2748f, 0.2748f},
-         {0.5451f, 0.3205f, 0.3205f},
-         {0.7843f, 0.3961f, 0.3961f},
-         {0.8941f, 0.6651f, 0.6651f},
-         {1.0000f, 0.9843f, 0.9843f}
-    }
-};
+const ColorDict cmap::gistEarth{
+    {{0.0f, 0.0f, 0.0000f},
+        {0.2824f, 0.1882f, 0.1882f},
+        {0.4588f, 0.2714f, 0.2714f},
+        {0.5490f, 0.4719f, 0.4719f},
+        {0.6980f, 0.7176f, 0.7176f},
+        {0.7882f, 0.7553f, 0.7553f},
+        {1.0000f, 0.9922f, 0.9922f}},
+    {{0.0f, 0.0f, 0.0000f},
+        {0.0275f, 0.0000f, 0.0000f},
+        {0.1098f, 0.1893f, 0.1893f},
+        {0.1647f, 0.3035f, 0.3035f},
+        {0.2078f, 0.3841f, 0.3841f},
+        {0.2824f, 0.5020f, 0.5020f},
+        {0.5216f, 0.6397f, 0.6397f},
+        {0.6980f, 0.7171f, 0.7171f},
+        {0.7882f, 0.6392f, 0.6392f},
+        {0.7922f, 0.6413f, 0.6413f},
+        {0.8000f, 0.6447f, 0.6447f},
+        {0.8078f, 0.6481f, 0.6481f},
+        {0.8157f, 0.6549f, 0.6549f},
+        {0.8667f, 0.6991f, 0.6991f},
+        {0.8745f, 0.7103f, 0.7103f},
+        {0.8824f, 0.7216f, 0.7216f},
+        {0.8902f, 0.7323f, 0.7323f},
+        {0.8980f, 0.7430f, 0.7430f},
+        {0.9412f, 0.8275f, 0.8275f},
+        {0.9569f, 0.8635f, 0.8635f},
+        {0.9647f, 0.8816f, 0.8816f},
+        {0.9961f, 0.9733f, 0.9733f},
+        {1.0000f, 0.9843f, 0.9843f}},
+    {{0.0f, 0.0f, 0.0000f},
+        {0.0039f, 0.1684f, 0.1684f},
+        {0.0078f, 0.2212f, 0.2212f},
+        {0.0275f, 0.4329f, 0.4329f},
+        {0.0314f, 0.4549f, 0.4549f},
+        {0.2824f, 0.5004f, 0.5004f},
+        {0.4667f, 0.2748f, 0.2748f},
+        {0.5451f, 0.3205f, 0.3205f},
+        {0.7843f, 0.3961f, 0.3961f},
+        {0.8941f, 0.6651f, 0.6651f},
+        {1.0000f, 0.9843f, 0.9843f}}};
 
-const std::vector<ColorInfo> cmap::terrain {
+const std::vector<ColorInfo> cmap::terrain{
     {0.00f, {51, 51, 154}},
     {0.15f, {0, 154, 255}},
     {0.25f, {0, 204, 102}},
     {0.50f, {255, 255, 93}},
     {0.75f, {128, 92, 84}},
-    {1.00f, {255, 255, 255}}
-};
+    {1.00f, {255, 255, 255}}};
 
-const ColorDict cmap::gistNcar {
+const ColorDict cmap::gistNcar{
     {
-         {0.0f, 0.0f, 0.0000f},
-         {0.3098f, 0.0000f, 0.0000f},
-         {0.3725f, 0.3993f, 0.3993f},
-         {0.4235f, 0.5003f, 0.5003f},
-         {0.5333f, 1.0000f, 1.0000f},
-         {0.7922f, 1.0000f, 1.0000f},
-         {0.8471f, 0.6218f, 0.6218f},
-         {0.8980f, 0.9235f, 0.9235f},
-         {1.0000f, 0.9961f, 0.9961f},
+        {0.0f, 0.0f, 0.0000f},
+        {0.3098f, 0.0000f, 0.0000f},
+        {0.3725f, 0.3993f, 0.3993f},
+        {0.4235f, 0.5003f, 0.5003f},
+        {0.5333f, 1.0000f, 1.0000f},
+        {0.7922f, 1.0000f, 1.0000f},
+        {0.8471f, 0.6218f, 0.6218f},
+        {0.8980f, 0.9235f, 0.9235f},
+        {1.0000f, 0.9961f, 0.9961f},
     },
     {
-         {0.0f, 0.0f, 0.0000f},
-         {0.0510f, 0.3722f, 0.3722f},
-         {0.1059f, 0.0000f, 0.0000f},
-         {0.1569f, 0.7202f, 0.7202f},
-         {0.1608f, 0.7537f, 0.7537f},
-         {0.1647f, 0.7752f, 0.7752f},
-         {0.2157f, 1.0000f, 1.0000f},
-         {0.2588f, 0.9804f, 0.9804f},
-         {0.2706f, 0.9804f, 0.9804f},
-         {0.3176f, 1.0000f, 1.0000f},
-         {0.3686f, 0.8081f, 0.8081f},
-         {0.4275f, 1.0000f, 1.0000f},
-         {0.5216f, 1.0000f, 1.0000f},
-         {0.6314f, 0.7292f, 0.7292f},
-         {0.6863f, 0.2796f, 0.2796f},
-         {0.7451f, 0.0000f, 0.0000f},
-         {0.7922f, 0.0000f, 0.0000f},
-         {0.8431f, 0.1753f, 0.1753f},
-         {0.8980f, 0.5000f, 0.5000f},
-         {1.0000f, 0.9725f, 0.9725f},
+        {0.0f, 0.0f, 0.0000f},
+        {0.0510f, 0.3722f, 0.3722f},
+        {0.1059f, 0.0000f, 0.0000f},
+        {0.1569f, 0.7202f, 0.7202f},
+        {0.1608f, 0.7537f, 0.7537f},
+        {0.1647f, 0.7752f, 0.7752f},
+        {0.2157f, 1.0000f, 1.0000f},
+        {0.2588f, 0.9804f, 0.9804f},
+        {0.2706f, 0.9804f, 0.9804f},
+        {0.3176f, 1.0000f, 1.0000f},
+        {0.3686f, 0.8081f, 0.8081f},
+        {0.4275f, 1.0000f, 1.0000f},
+        {0.5216f, 1.0000f, 1.0000f},
+        {0.6314f, 0.7292f, 0.7292f},
+        {0.6863f, 0.2796f, 0.2796f},
+        {0.7451f, 0.0000f, 0.0000f},
+        {0.7922f, 0.0000f, 0.0000f},
+        {0.8431f, 0.1753f, 0.1753f},
+        {0.8980f, 0.5000f, 0.5000f},
+        {1.0000f, 0.9725f, 0.9725f},
     },
     {
-         {0.0f, 0.5020f, 0.5020f},
-         {0.0510f, 0.0222f, 0.0222f},
-         {0.1098f, 1.0000f, 1.0000f},
-         {0.2039f, 1.0000f, 1.0000f},
-         {0.2627f, 0.6145f, 0.6145f},
-         {0.3216f, 0.0000f, 0.0000f},
-         {0.4157f, 0.0000f, 0.0000f},
-         {0.4745f, 0.2342f, 0.2342f},
-         {0.5333f, 0.0000f, 0.0000f},
-         {0.5804f, 0.0000f, 0.0000f},
-         {0.6314f, 0.0549f, 0.0549f},
-         {0.6902f, 0.0000f, 0.0000f},
-         {0.7373f, 0.0000f, 0.0000f},
-         {0.7922f, 0.9738f, 0.9738f},
-         {0.8000f, 1.0000f, 1.0000f},
-         {0.8431f, 1.0000f, 1.0000f},
-         {0.8980f, 0.9341f, 0.9341f},
-         {1.0000f, 0.9961f, 0.9961f},
-    }
-};
+        {0.0f, 0.5020f, 0.5020f},
+        {0.0510f, 0.0222f, 0.0222f},
+        {0.1098f, 1.0000f, 1.0000f},
+        {0.2039f, 1.0000f, 1.0000f},
+        {0.2627f, 0.6145f, 0.6145f},
+        {0.3216f, 0.0000f, 0.0000f},
+        {0.4157f, 0.0000f, 0.0000f},
+        {0.4745f, 0.2342f, 0.2342f},
+        {0.5333f, 0.0000f, 0.0000f},
+        {0.5804f, 0.0000f, 0.0000f},
+        {0.6314f, 0.0549f, 0.0549f},
+        {0.6902f, 0.0000f, 0.0000f},
+        {0.7373f, 0.0000f, 0.0000f},
+        {0.7922f, 0.9738f, 0.9738f},
+        {0.8000f, 1.0000f, 1.0000f},
+        {0.8431f, 1.0000f, 1.0000f},
+        {0.8980f, 0.9341f, 0.9341f},
+        {1.0000f, 0.9961f, 0.9961f},
+    }};
 
 // _gist_rainbow_data = ((0.000, (1.00, 0.00, 0.16)),
 //                       (0.030, (1.00, 0.00, 0.00)),
@@ -538,23 +498,16 @@ const ColorDict cmap::gistNcar {
 //                       (1.000, (1.00, 0.00, 0.75)))
 
 const ColorDict cmap::gistStern{
-    {
-        {0.000f, 0.000f, 0.000f},
+    {{0.000f, 0.000f, 0.000f},
         {0.0547f, 1.000f, 1.000f},
         {0.250f, 0.027f, 0.250f},
-        {1.000f, 1.000f, 1.000f}
-    },
-    {
-        {0, 0, 0},
-        {1, 1, 1}
-    },
-    {
-        {0.000f, 0.000f, 0.000f},
+        {1.000f, 1.000f, 1.000f}},
+    {{0, 0, 0},
+        {1, 1, 1}},
+    {{0.000f, 0.000f, 0.000f},
         {0.500f, 1.000f, 1.000f},
         {0.735f, 0.000f, 0.000f},
-        {1.000f, 1.000f, 1.000f}
-    }
-};
+        {1.000f, 1.000f, 1.000f}}};
 
 const std::vector<Color> cmap::Blues{{{247, 251, 255},
     {222, 235, 247},
@@ -564,11 +517,9 @@ const std::vector<Color> cmap::Blues{{{247, 251, 255},
     {66, 146, 198},
     {33, 113, 181},
     {8, 81, 156},
-    {8, 48, 107}
-}};
+    {8, 48, 107}}};
 
-const std::vector<Color> cmap::BrBG{{
-    {84, 48, 5},
+const std::vector<Color> cmap::BrBG{{{84, 48, 5},
     {140, 81, 10},
     {191, 129, 45},
     {223, 194, 125},
@@ -578,11 +529,9 @@ const std::vector<Color> cmap::BrBG{{
     {128, 205, 193},
     {53, 151, 143},
     {1, 102, 94},
-    {0, 60, 48}
-}};
+    {0, 60, 48}}};
 
-const std::vector<Color> cmap::BuGn{{
-    {247, 252, 253},
+const std::vector<Color> cmap::BuGn{{{247, 252, 253},
     {229, 245, 249},
     {204, 236, 230},
     {153, 216, 201},
@@ -590,11 +539,9 @@ const std::vector<Color> cmap::BuGn{{
     {65, 174, 118},
     {35, 139, 69},
     {0, 109, 44},
-    {0, 68, 27}
-}};
+    {0, 68, 27}}};
 
-const std::vector<Color> cmap::BuPu{{
-    {247, 252, 253},
+const std::vector<Color> cmap::BuPu{{{247, 252, 253},
     {224, 236, 244},
     {191, 211, 230},
     {158, 188, 218},
@@ -602,10 +549,8 @@ const std::vector<Color> cmap::BuPu{{
     {140, 107, 177},
     {136, 65, 157},
     {129, 15, 124},
-    {77, 0, 75}
-}};
-const std::vector<Color> cmap::GnBu{{
-    {247, 252, 240},
+    {77, 0, 75}}};
+const std::vector<Color> cmap::GnBu{{{247, 252, 240},
     {224, 243, 219},
     {204, 235, 197},
     {168, 221, 181},
@@ -613,10 +558,8 @@ const std::vector<Color> cmap::GnBu{{
     {78, 179, 211},
     {43, 140, 190},
     {8, 104, 172},
-    {8, 64, 129}
-}};
-const std::vector<Color> cmap::Greens{{
-    {247, 252, 245},
+    {8, 64, 129}}};
+const std::vector<Color> cmap::Greens{{{247, 252, 245},
     {229, 245, 224},
     {199, 233, 192},
     {161, 217, 155},
@@ -624,10 +567,8 @@ const std::vector<Color> cmap::Greens{{
     {65, 171, 93},
     {35, 139, 69},
     {0, 109, 44},
-    {0, 68, 27}
-}};
-const std::vector<Color> cmap::Greys{{
-    {255, 255, 255},
+    {0, 68, 27}}};
+const std::vector<Color> cmap::Greys{{{255, 255, 255},
     {240, 240, 240},
     {217, 217, 217},
     {189, 189, 189},
@@ -635,10 +576,8 @@ const std::vector<Color> cmap::Greys{{
     {115, 115, 115},
     {82, 82, 82},
     {37, 37, 37},
-    {0, 0, 0}
-}};
-const std::vector<Color> cmap::Oranges{{
-    {255, 245, 235},
+    {0, 0, 0}}};
+const std::vector<Color> cmap::Oranges{{{255, 245, 235},
     {254, 230, 206},
     {253, 208, 162},
     {253, 174, 107},
@@ -646,10 +585,8 @@ const std::vector<Color> cmap::Oranges{{
     {241, 105, 19},
     {217, 72, 1},
     {166, 54, 3},
-    {127, 39, 4}
-}};
-const std::vector<Color> cmap::OrRd{{
-    {255, 247, 236},
+    {127, 39, 4}}};
+const std::vector<Color> cmap::OrRd{{{255, 247, 236},
     {254, 232, 200},
     {253, 212, 158},
     {253, 187, 132},
@@ -657,10 +594,8 @@ const std::vector<Color> cmap::OrRd{{
     {239, 101, 72},
     {215, 48, 31},
     {179, 0, 0},
-    {127, 0, 0}
-}};
-const std::vector<Color> cmap::PiYG{{
-    {142, 1, 82},
+    {127, 0, 0}}};
+const std::vector<Color> cmap::PiYG{{{142, 1, 82},
     {197, 27, 125},
     {222, 119, 174},
     {241, 182, 218},
@@ -670,10 +605,8 @@ const std::vector<Color> cmap::PiYG{{
     {184, 225, 134},
     {127, 188, 65},
     {77, 146, 33},
-    {39, 100, 25}
-}};
-const std::vector<Color> cmap::PRGn{{
-    {64, 0, 75},
+    {39, 100, 25}}};
+const std::vector<Color> cmap::PRGn{{{64, 0, 75},
     {118, 42, 131},
     {153, 112, 171},
     {194, 165, 207},
@@ -683,10 +616,8 @@ const std::vector<Color> cmap::PRGn{{
     {166, 219, 160},
     {90, 174, 97},
     {27, 120, 55},
-    {0, 68, 27}
-}};
-const std::vector<Color> cmap::PuBu{{
-    {255, 247, 251},
+    {0, 68, 27}}};
+const std::vector<Color> cmap::PuBu{{{255, 247, 251},
     {236, 231, 242},
     {208, 209, 230},
     {166, 189, 219},
@@ -694,10 +625,8 @@ const std::vector<Color> cmap::PuBu{{
     {54, 144, 192},
     {5, 112, 176},
     {4, 90, 141},
-    {2, 56, 88}
-}};
-const std::vector<Color> cmap::PuBuGn{{
-    {255, 247, 251},
+    {2, 56, 88}}};
+const std::vector<Color> cmap::PuBuGn{{{255, 247, 251},
     {236, 226, 240},
     {208, 209, 230},
     {166, 189, 219},
@@ -705,10 +634,8 @@ const std::vector<Color> cmap::PuBuGn{{
     {54, 144, 192},
     {2, 129, 138},
     {1, 108, 89},
-    {1, 70, 54}
-}};
-const std::vector<Color> cmap::PuOr{{
-    {127, 59, 8},
+    {1, 70, 54}}};
+const std::vector<Color> cmap::PuOr{{{127, 59, 8},
     {179, 88, 6},
     {224, 130, 20},
     {253, 184, 99},
@@ -718,10 +645,8 @@ const std::vector<Color> cmap::PuOr{{
     {178, 171, 210},
     {128, 115, 172},
     {84, 39, 136},
-    {45, 0, 75}
-}};
-const std::vector<Color> cmap::PuRd{{
-    {247, 244, 249},
+    {45, 0, 75}}};
+const std::vector<Color> cmap::PuRd{{{247, 244, 249},
     {231, 225, 239},
     {212, 185, 218},
     {201, 148, 199},
@@ -729,10 +654,8 @@ const std::vector<Color> cmap::PuRd{{
     {231, 41, 138},
     {206, 18, 86},
     {152, 0, 67},
-    {103, 0, 31}
-}};
-const std::vector<Color> cmap::Purples{{
-    {252, 251, 253},
+    {103, 0, 31}}};
+const std::vector<Color> cmap::Purples{{{252, 251, 253},
     {239, 237, 245},
     {218, 218, 235},
     {188, 189, 220},
@@ -740,10 +663,8 @@ const std::vector<Color> cmap::Purples{{
     {128, 125, 186},
     {106, 81, 163},
     {84, 39, 143},
-    {63, 0, 125}
-}};
-const std::vector<Color> cmap::RdBu{{
-    {252, 251, 253},
+    {63, 0, 125}}};
+const std::vector<Color> cmap::RdBu{{{252, 251, 253},
     {239, 237, 245},
     {218, 218, 235},
     {188, 189, 220},
@@ -751,10 +672,8 @@ const std::vector<Color> cmap::RdBu{{
     {128, 125, 186},
     {106, 81, 163},
     {84, 39, 143},
-    {63, 0, 125}
-}};
-const std::vector<Color> cmap::RdGy{{
-    {103, 0, 31},
+    {63, 0, 125}}};
+const std::vector<Color> cmap::RdGy{{{103, 0, 31},
     {178, 24, 43},
     {214, 96, 77},
     {244, 165, 130},
@@ -764,10 +683,8 @@ const std::vector<Color> cmap::RdGy{{
     {186, 186, 186},
     {135, 135, 135},
     {77, 77, 77},
-    {26, 26, 26}
-}};
-const std::vector<Color> cmap::RdPu{{
-    {255, 247, 243},
+    {26, 26, 26}}};
+const std::vector<Color> cmap::RdPu{{{255, 247, 243},
     {253, 224, 221},
     {252, 197, 192},
     {250, 159, 181},
@@ -775,10 +692,8 @@ const std::vector<Color> cmap::RdPu{{
     {221, 52, 151},
     {174, 1, 126},
     {122, 1, 119},
-    {73, 0, 106}
-}};
-const std::vector<Color> cmap::RdYlBu{{
-    {165, 0, 38},
+    {73, 0, 106}}};
+const std::vector<Color> cmap::RdYlBu{{{165, 0, 38},
     {215, 48, 39},
     {244, 109, 67},
     {253, 174, 97},
@@ -788,10 +703,8 @@ const std::vector<Color> cmap::RdYlBu{{
     {171, 217, 233},
     {116, 173, 209},
     {69, 117, 180},
-    {49, 54, 149}
-}};
-const std::vector<Color> cmap::RdYlGn{{
-    {165, 0, 38},
+    {49, 54, 149}}};
+const std::vector<Color> cmap::RdYlGn{{{165, 0, 38},
     {215, 48, 39},
     {244, 109, 67},
     {253, 174, 97},
@@ -801,10 +714,8 @@ const std::vector<Color> cmap::RdYlGn{{
     {166, 217, 106},
     {102, 189, 99},
     {26, 152, 80},
-    {0, 104, 55}
-}};
-const std::vector<Color> cmap::Reds{{
-    {255, 245, 240},
+    {0, 104, 55}}};
+const std::vector<Color> cmap::Reds{{{255, 245, 240},
     {254, 224, 210},
     {252, 187, 161},
     {252, 146, 114},
@@ -812,10 +723,8 @@ const std::vector<Color> cmap::Reds{{
     {239, 59, 44},
     {203, 24, 29},
     {165, 15, 21},
-    {103, 0, 13}
-}};
-const std::vector<Color> cmap::Spectral{{
-    {158, 1, 66},
+    {103, 0, 13}}};
+const std::vector<Color> cmap::Spectral{{{158, 1, 66},
     {213, 62, 79},
     {244, 109, 67},
     {253, 174, 97},
@@ -825,10 +734,8 @@ const std::vector<Color> cmap::Spectral{{
     {171, 221, 164},
     {102, 194, 165},
     {50, 136, 189},
-    {94, 79, 162}
-}};
-const std::vector<Color> cmap::YlGn{{
-    {255, 255, 229},
+    {94, 79, 162}}};
+const std::vector<Color> cmap::YlGn{{{255, 255, 229},
     {247, 252, 185},
     {217, 240, 163},
     {173, 221, 142},
@@ -836,10 +743,8 @@ const std::vector<Color> cmap::YlGn{{
     {65, 171, 93},
     {35, 132, 67},
     {0, 104, 55},
-    {0, 69, 41}
-}};
-const std::vector<Color> cmap::YlGnBu{{
-    {255, 255, 217},
+    {0, 69, 41}}};
+const std::vector<Color> cmap::YlGnBu{{{255, 255, 217},
     {237, 248, 177},
     {199, 233, 180},
     {127, 205, 187},
@@ -847,10 +752,8 @@ const std::vector<Color> cmap::YlGnBu{{
     {29, 145, 192},
     {34, 94, 168},
     {37, 52, 148},
-    {8, 29, 88}
-}};
-const std::vector<Color> cmap::YlOrBr{{
-    {255, 255, 229},
+    {8, 29, 88}}};
+const std::vector<Color> cmap::YlOrBr{{{255, 255, 229},
     {255, 247, 188},
     {254, 227, 145},
     {254, 196, 79},
@@ -858,10 +761,8 @@ const std::vector<Color> cmap::YlOrBr{{
     {236, 112, 20},
     {204, 76, 2},
     {153, 52, 4},
-    {102, 37, 6}
-}};
-const std::vector<Color> cmap::YlOrRd{{
-    {255, 255, 204},
+    {102, 37, 6}}};
+const std::vector<Color> cmap::YlOrRd{{{255, 255, 204},
     {255, 237, 160},
     {254, 217, 118},
     {254, 178, 76},
@@ -869,34 +770,28 @@ const std::vector<Color> cmap::YlOrRd{{
     {252, 78, 42},
     {227, 26, 28},
     {189, 0, 38},
-    {128, 0, 38}
-}};
+    {128, 0, 38}}};
 
 // Qualitative maps
-const std::vector<Color> cmap::Accent{{
-    {127, 201, 127},
+const std::vector<Color> cmap::Accent{{{127, 201, 127},
     {190, 174, 212},
     {253, 192, 134},
     {255, 255, 153},
     {56, 108, 176},
     {240, 2, 127},
     {191, 91, 23},
-    {102, 102, 102}
-}};
+    {102, 102, 102}}};
 
-const std::vector<Color> cmap::Dark2{{
-    {27, 158, 119},
+const std::vector<Color> cmap::Dark2{{{27, 158, 119},
     {217, 95, 2},
     {117, 112, 179},
     {231, 41, 138},
     {102, 166, 30},
     {230, 171, 2},
     {166, 118, 29},
-    {102, 102, 102}
-}};
+    {102, 102, 102}}};
 
-const std::vector<Color> cmap::Paired{{
-    {166, 206, 227},
+const std::vector<Color> cmap::Paired{{{166, 206, 227},
     {31, 120, 180},
     {178, 223, 138},
     {51, 160, 44},
@@ -907,11 +802,9 @@ const std::vector<Color> cmap::Paired{{
     {202, 178, 214},
     {106, 61, 154},
     {255, 255, 153},
-    {177, 89, 40}
-}};
+    {177, 89, 40}}};
 
-const std::vector<Color> cmap::Pastel1{{
-    {251, 180, 174},
+const std::vector<Color> cmap::Pastel1{{{251, 180, 174},
     {179, 205, 227},
     {204, 235, 197},
     {222, 203, 228},
@@ -919,22 +812,18 @@ const std::vector<Color> cmap::Pastel1{{
     {255, 255, 204},
     {229, 216, 189},
     {253, 218, 236},
-    {242, 242, 242}
-}};
+    {242, 242, 242}}};
 
-const std::vector<Color> cmap::Pastel2{{
-    {179, 226, 205},
+const std::vector<Color> cmap::Pastel2{{{179, 226, 205},
     {253, 205, 172},
     {203, 213, 232},
     {244, 202, 228},
     {230, 245, 201},
     {255, 242, 174},
     {241, 226, 204},
-    {204, 204, 204}
-}};
+    {204, 204, 204}}};
 
-const std::vector<Color> cmap::Set1{{
-    {228, 26, 28},
+const std::vector<Color> cmap::Set1{{{228, 26, 28},
     {55, 126, 184},
     {77, 175, 74},
     {152, 78, 163},
@@ -942,22 +831,18 @@ const std::vector<Color> cmap::Set1{{
     {255, 255, 51},
     {166, 86, 40},
     {247, 129, 191},
-    {153, 153, 153}
-}};
+    {153, 153, 153}}};
 
-const std::vector<Color> cmap::Set2{{
-    {102, 194, 165},
+const std::vector<Color> cmap::Set2{{{102, 194, 165},
     {252, 141, 98},
     {141, 160, 203},
     {231, 138, 195},
     {166, 216, 84},
     {255, 217, 47},
     {229, 196, 148},
-    {179, 179, 179}
-}};
+    {179, 179, 179}}};
 
-const std::vector<Color> cmap::Set3{{
-    {141, 211, 199},
+const std::vector<Color> cmap::Set3{{{141, 211, 199},
     {255, 255, 179},
     {190, 186, 218},
     {251, 128, 114},
@@ -968,8 +853,7 @@ const std::vector<Color> cmap::Set3{{
     {217, 217, 217},
     {188, 128, 189},
     {204, 235, 197},
-    {255, 237, 111}
-}};
+    {255, 237, 111}}};
 
 // Qualitative maps from https://github.com/vega/vega/wiki/Scales
 const std::vector<Color> cmap::Tab10{{
@@ -1081,13 +965,12 @@ static uint8_t remap(float start, float end, float mapStart, float mapEnd, float
     assert(mapStart >= 0.f && mapStart <= 1.f);
     assert(mapEnd >= 0.f && mapEnd <= 1.f);
 
-    if (mapStart == mapEnd)
-    {
+    if (mapStart == mapEnd) {
         return static_cast<uint8_t>(mapStart * 255.f);
     }
 
     const auto rangeWidth = end - start;
-    const auto pos = (value - start) / rangeWidth;
+    const auto pos        = (value - start) / rangeWidth;
 
     const auto mapWidth = mapEnd - mapStart;
     return static_cast<uint8_t>(std::round((mapStart + (mapWidth * pos)) * 255.f));
@@ -1099,9 +982,8 @@ static ColorDict colorListToDict(const std::vector<Color>& clist)
 
     ColorDict cdict;
     const auto bandWidth = 1.f / (clist.size() - 1);
-    float val = 0.f;
-    for (auto& color : clist)
-    {
+    float val            = 0.f;
+    for (auto& color : clist) {
         const auto r = color.r / 255.f;
         const auto g = color.g / 255.f;
         const auto b = color.b / 255.f;
@@ -1120,8 +1002,7 @@ static ColorDict colorListToDict(const std::vector<ColorInfo>& clist)
     assert(clist.size() > 1);
 
     ColorDict cdict;
-    for (auto& colorInfo : clist)
-    {
+    for (auto& colorInfo : clist) {
         const auto r = colorInfo.color.r / 255.f;
         const auto g = colorInfo.color.g / 255.f;
         const auto b = colorInfo.color.b / 255.f;
@@ -1135,10 +1016,9 @@ static ColorDict colorListToDict(const std::vector<ColorInfo>& clist)
 
 ColorMap::ColorMap(const ColorDict& cdict)
 {
-    for (size_t i = 0; i < _cmap.size(); ++i)
-    {
+    for (size_t i = 0; i < _cmap.size(); ++i) {
         const auto value = static_cast<float>(i) / (_cmap.size() - 1);
-        _cmap[i] = Color(processBand(value, cdict.red), processBand(value, cdict.green), processBand(value, cdict.blue));
+        _cmap[i]         = Color(processBand(value, cdict.red), processBand(value, cdict.green), processBand(value, cdict.blue));
     }
 }
 
@@ -1160,10 +1040,9 @@ ColorMap::ColorMap(const std::array<Color, 256>& cmap)
 ColorMap ColorMap::qualitative(const std::vector<Color>& clist)
 {
     std::array<Color, 256> cmap;
-    for (size_t i = 0; i < cmap.size(); ++i)
-    {
+    for (size_t i = 0; i < cmap.size(); ++i) {
         const auto index = static_cast<int>(static_cast<float>(i) / cmap.size() * clist.size());
-        cmap[i] = clist[index];
+        cmap[i]          = clist[index];
     }
 
     return ColorMap(cmap);
@@ -1183,18 +1062,15 @@ uint8_t ColorMap::processBand(float value, const std::vector<ColorDict::Entry>& 
 {
     assert(dict.size() >= 2);
 
-    for (size_t i = 0; i < dict.size() - 1; ++i)
-    {
-        if (value >= dict[i].x && value < dict[i + 1].x)
-        {
-            return remap(dict[i].x, dict[i+1].x, dict[i].y1, dict[i+1].y0, value);
+    for (size_t i = 0; i < dict.size() - 1; ++i) {
+        if (value >= dict[i].x && value < dict[i + 1].x) {
+            return remap(dict[i].x, dict[i + 1].x, dict[i].y1, dict[i + 1].y0, value);
         }
     }
 
-    if (value == dict.back().x)
-    {
+    if (value == dict.back().x) {
         auto i = dict.size() - 2;
-        return remap(dict[i].x, dict[i+1].x, dict[i].y1, dict[i+1].y0, value);
+        return remap(dict[i].x, dict[i + 1].x, dict[i].y1, dict[i + 1].y0, value);
     }
 
     return 0;
@@ -1204,5 +1080,4 @@ std::ostream& operator<<(std::ostream& os, const Color& c)
 {
     return os << '(' << int(c.r) << ", " << int(c.g) << ", " << int(c.b) << ')';
 }
-
 }
