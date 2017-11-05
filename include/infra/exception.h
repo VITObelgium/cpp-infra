@@ -5,15 +5,12 @@
 #include <string>
 
 #define EXCEPTION(NAME, BASE)                             \
-    \
-class NAME : public std::exception                        \
-    \
-{                                                    \
-    \
-public:                                                   \
+    class NAME : public std::exception                    \
+    {                                                     \
+    public:                                               \
         NAME() = default;                                 \
                                                           \
-        template <typename... T>                          \
+        template <typename T>                             \
         NAME(T&&... args)                                 \
         : _message(fmt::format(std::forward<T>(args)...)) \
         {                                                 \
@@ -24,15 +21,14 @@ public:                                                   \
         {                                                 \
         }                                                 \
                                                           \
-        const char* what() const throw()                  \
+        const char* what() const noexcept                 \
         {                                                 \
             return _message.c_str();                      \
         }                                                 \
-    \
-private:                                                  \
+                                                          \
+    private:                                              \
         std::string _message;                             \
-    \
-};
+    };
 
 namespace infra {
 
