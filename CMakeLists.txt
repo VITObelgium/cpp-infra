@@ -10,6 +10,7 @@ add_library(infra
     include/infra/point.h
     include/infra/cell.h
     include/infra/exception.h
+    include/infra/filesystem.h
     include/infra/colormap.h colormap.cpp
     include/infra/geometadata.h geometadata.cpp
 )
