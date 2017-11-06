@@ -10,7 +10,7 @@
     public:                                               \
         NAME() = default;                                 \
                                                           \
-        template <typename T>                             \
+        template <typename... T>                          \
         NAME(T&&... args)                                 \
         : _message(fmt::format(std::forward<T>(args)...)) \
         {                                                 \
