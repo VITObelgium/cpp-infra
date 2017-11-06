@@ -1,11 +1,12 @@
 #pragma once
 
-#include <array>
-#include <vector>
-#include <ostream>
+#include "infra/color.h"
 
-namespace infra
-{
+#include <array>
+#include <ostream>
+#include <vector>
+
+namespace infra {
 
 struct ColorDict
 {
@@ -19,20 +20,6 @@ struct ColorDict
     std::vector<Entry> red;
     std::vector<Entry> green;
     std::vector<Entry> blue;
-};
-
-struct Color
-{
-    Color() = default;
-    Color(uint8_t r_, uint8_t g_, uint8_t b_) noexcept;
-    Color(uint8_t r_, uint8_t g_, uint8_t b_, uint8_t a_) noexcept;
-
-    bool operator==(const Color& other) const noexcept;
-
-    uint8_t r;
-    uint8_t g;
-    uint8_t b;
-    uint8_t a;
 };
 
 struct ColorInfo
@@ -132,5 +119,4 @@ struct Cmap
     static const std::vector<Color> Tab20b;
     static const std::vector<Color> Tab20c;
 };
-
 }
