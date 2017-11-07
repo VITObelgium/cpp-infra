@@ -16,6 +16,16 @@ struct Point
     {
     }
 
+    bool operator==(const Point<T>& other)
+    {
+        return x == other.x && y == other.y;
+    }
+
+    bool operator!=(const Point<T>& other)
+    {
+        return !(*this == other);
+    }
+
     T x = std::numeric_limits<T>::max();
     T y = std::numeric_limits<T>::max();
 };
