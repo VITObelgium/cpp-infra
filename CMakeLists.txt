@@ -27,9 +27,9 @@ target_include_directories(infra
 target_link_libraries(infra PRIVATE fmt::fmt)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
-    target_link_libraries(infra stdc++fs)
+    target_link_libraries(infra PRIVATE stdc++fs)
 elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-    target_link_libraries(infra c++experimental)
+    target_link_libraries(infra PRIVATE c++experimental)
 endif ()
 
 if (INFRA_GDAL)
