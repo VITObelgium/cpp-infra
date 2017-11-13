@@ -1,5 +1,6 @@
 #include "infra/gdal.h"
 #include "infra/exception.h"
+#include "infra/filesystem.h"
 #include "infra/log.h"
 
 #ifdef EMBED_GDAL_DATA
@@ -13,12 +14,8 @@
 #include <unordered_map>
 #include <utility>
 
-#ifdef HAVE_EXP_FILESYSTEM_H
-#include <experimental/filesystem>
-namespace fs = std::experimental::filesystem;
-#endif
-
 #include <ogr_spatialref.h>
+#include <ogrsf_frmts.h>
 
 namespace infra::gdal {
 
@@ -27,16 +24,16 @@ using namespace std::string_literals;
 namespace {
 
 static const std::unordered_map<MapType, const char*> s_driverLookup{{{MapType::Memory, "MEM"},
-    {MapType::ArcAscii, "AAIGrid"},
-    {MapType::GeoTiff, "GTiff"},
-    {MapType::Gif, "GIF"},
-    {MapType::Png, "PNG"}}};
+                                                                      {MapType::ArcAscii, "AAIGrid"},
+                                                                      {MapType::GeoTiff, "GTiff"},
+                                                                      {MapType::Gif, "GIF"},
+                                                                      {MapType::Png, "PNG"}}};
 
 static const std::unordered_map<std::string, MapType> s_driverDescLookup{{{"MEM", MapType::Memory},
-    {"AAIGrid", MapType::ArcAscii},
-    {"GTiff", MapType::GeoTiff},
-    {"GIF", MapType::Gif},
-    {"PNG", MapType::Png}}};
+                                                                          {"AAIGrid", MapType::ArcAscii},
+                                                                          {"GTiff", MapType::GeoTiff},
+                                                                          {"GIF", MapType::Gif},
+                                                                          {"PNG", MapType::Png}}};
 
 static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
     {VectorType::Csv, "CSV"},
@@ -78,7 +75,7 @@ Point<double> convertPointProjected(int32_t sourceEpsg, int32_t destEpsg, Point<
     targetSRS.importFromEPSG(destEpsg);
 
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&sourceSRS, &targetSRS),
-        "Failed to create transformation");
+                              "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -97,7 +94,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-        "Failed to create transformation");
+                              "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -271,6 +268,192 @@ MapType Driver::mapType() const
     }
 }
 
+Line::Line(OGRCurve* curve)
+: _curve(curve)
+{
+}
+
+Point<double> Line::startPoint()
+{
+    OGRPoint point;
+    _curve->StartPoint(&point);
+    return Point<double>(point.getX(), point.getY());
+}
+
+Point<double> Line::endPoint()
+{
+    OGRPoint point;
+    _curve->EndPoint(&point);
+    return Point<double>(point.getX(), point.getY());
+}
+
+Feature::Feature(OGRFeature* feature)
+: _feature(feature)
+{
+}
+
+Feature::Feature(Feature&& other)
+: _feature(other._feature)
+{
+    other._feature = nullptr;
+}
+
+Feature::~Feature()
+{
+    OGRFeature::DestroyFeature(_feature);
+}
+
+Feature& Feature::operator=(Feature&& other)
+{
+    _feature       = other._feature;
+    other._feature = nullptr;
+    return *this;
+}
+
+OGRFeature* Feature::get()
+{
+    return _feature;
+}
+
+const OGRFeature* Feature::get() const
+{
+    return _feature;
+}
+
+Geometry Feature::geometry()
+{
+    auto* geometry = _feature->GetGeometryRef();
+    assert(geometry);
+
+    switch (wkbFlatten(geometry->getGeometryType())) {
+    case wkbPoint: {
+        auto* point = reinterpret_cast<OGRPoint*>(geometry);
+        return Point<double>(point->getX(), point->getY());
+    }
+    case wkbLineString:
+        return Line(reinterpret_cast<OGRLineString*>(geometry));
+    default:
+        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
+    }
+}
+
+const Geometry Feature::geometry() const
+{
+    auto* geometry = _feature->GetGeometryRef();
+    assert(geometry);
+
+    switch (wkbFlatten(geometry->getGeometryType())) {
+    case wkbPoint: {
+        auto* point = reinterpret_cast<OGRPoint*>(geometry);
+        return Point<double>(point->getX(), point->getY());
+    }
+    case wkbLineString:
+        return Line(reinterpret_cast<OGRLineString*>(geometry));
+    default:
+        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
+    }
+}
+
+bool Feature::operator==(const Feature& other) const
+{
+    if (_feature && other._feature) {
+        return _feature->Equal(other._feature);
+    } else if (!_feature && !other._feature) {
+        return true;
+    }
+
+    return false;
+}
+
+Layer::Layer(OGRLayer* layer)
+: _layer(layer)
+{
+    _layer->Reference();
+}
+
+Layer::Layer(Layer&& other)
+: _layer(other._layer)
+{
+    other._layer = nullptr;
+}
+
+Layer::~Layer()
+{
+    if (_layer) {
+        _layer->Dereference();
+    }
+}
+
+const char* Layer::name() const
+{
+    return _layer->GetName();
+}
+
+OGRLayer* Layer::get()
+{
+    return _layer;
+}
+
+const OGRLayer* Layer::get() const
+{
+    return _layer;
+}
+
+LayerIterator::LayerIterator()
+: _layer(nullptr)
+, _currentFeature(nullptr)
+{
+}
+
+LayerIterator::LayerIterator(Layer& layer)
+: _layer(&layer)
+, _currentFeature(nullptr)
+{
+    _layer->get()->ResetReading();
+    next();
+}
+
+void LayerIterator::next()
+{
+    _currentFeature = Feature(_layer->get()->GetNextFeature());
+}
+
+const Feature& LayerIterator::operator*()
+{
+    return _currentFeature;
+}
+
+const Feature* LayerIterator::operator->()
+{
+    return &_currentFeature;
+}
+
+LayerIterator& LayerIterator::operator++()
+{
+    next();
+    return *this;
+}
+
+LayerIterator& LayerIterator::operator=(LayerIterator&& other)
+{
+    if (this != &other) {
+        _layer          = std::move(other._layer);
+        _currentFeature = std::move(other._currentFeature);
+    }
+
+    return *this;
+}
+
+bool LayerIterator::operator==(const LayerIterator& other) const
+{
+    return _currentFeature == other._currentFeature;
+}
+
+bool LayerIterator::operator!=(const LayerIterator& other) const
+{
+    return !(*this == other);
+}
+
 DataSet DataSet::create(const std::string& filePath)
 {
     return DataSet(filePath);
@@ -287,7 +470,7 @@ DataSet DataSet::create(const std::string& filePath, VectorType type, const std:
                                     drivers.data(),
                                     options.size() == 1 ? nullptr : options.data(),
                                     nullptr)),
-        "Failed to open vector file"));
+                                "Failed to open vector file"));
 }
 
 DataSet::DataSet(GDALDataset* ptr) noexcept
@@ -412,10 +595,10 @@ void DataSet::setProjection(const std::string& proj)
     }
 }
 
-OGRLayer& DataSet::getLayer(int index)
+Layer DataSet::getLayer(int index)
 {
     assert(_ptr);
-    return *checkPointer(_ptr->GetLayer(index), "Invalid layer index");
+    return Layer(checkPointer(_ptr->GetLayer(index), "Invalid layer index"));
 }
 
 GDALDataType DataSet::getBandDataType(int bandNr) const
@@ -492,8 +675,8 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-      dataBuffer.size(), FALSE /*no ownership*/))
+                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+                            dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

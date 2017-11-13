@@ -16,12 +16,12 @@ struct Point
     {
     }
 
-    bool operator==(const Point<T>& other)
+    bool operator==(const Point<T>& other) const
     {
         return x == other.x && y == other.y;
     }
 
-    bool operator!=(const Point<T>& other)
+    bool operator!=(const Point<T>& other) const
     {
         return !(*this == other);
     }

@@ -9,7 +9,11 @@
 #include <fmt/format.h>
 #include <gdal_priv.h>
 #include <gsl/span>
+#include <variant>
 //#include <optional>
+
+class OGRCurve;
+class OGRGeometryCollection;
 
 namespace infra::gdal {
 
@@ -63,6 +67,92 @@ std::vector<const char*> createOptionsArray(const std::vector<std::string>& driv
 MapType guessMapTypeFromFileName(const std::string& filePath);
 VectorType guessVectorTypeFromFileName(const std::string& filePath);
 
+class Line
+{
+public:
+    Line(OGRCurve* curve);
+
+    Point<double> startPoint();
+    Point<double> endPoint();
+
+private:
+    OGRCurve* _curve;
+};
+
+using Geometry = std::variant<Point<double>, Line>;
+
+class Feature
+{
+public:
+    explicit Feature(OGRFeature* feature);
+    Feature(const Feature&) = delete;
+    Feature(Feature&&);
+    ~Feature();
+
+    Feature& operator=(const Feature&) = delete;
+    Feature& operator                  =(Feature&&);
+
+    OGRFeature* get();
+    const OGRFeature* get() const;
+
+    Geometry geometry();
+    const Geometry geometry() const;
+
+    bool operator==(const Feature& other) const;
+
+private:
+    OGRFeature* _feature;
+};
+
+class Layer
+{
+public:
+    explicit Layer(OGRLayer* layer);
+    Layer(const Layer&) = delete;
+    Layer(Layer&&);
+    ~Layer();
+
+    const char* name() const;
+    OGRLayer* get();
+    const OGRLayer* get() const;
+
+private:
+    OGRLayer* _layer;
+};
+
+class LayerIterator
+{
+public:
+    LayerIterator();
+    LayerIterator(Layer& layer);
+    LayerIterator(const LayerIterator&) = delete;
+    LayerIterator(LayerIterator&&)      = default;
+
+    LayerIterator& operator++();
+    LayerIterator& operator=(LayerIterator&& other);
+    bool operator==(const LayerIterator& other) const;
+    bool operator!=(const LayerIterator& other) const;
+    const Feature& operator*();
+    const Feature* operator->();
+
+private:
+    void next();
+
+    Layer* _layer;
+    Feature _currentFeature;
+};
+
+// support for range based for loops
+inline LayerIterator begin(Layer& layer)
+{
+    return LayerIterator(layer);
+}
+
+inline LayerIterator end(Layer& /*layer*/)
+{
+    return LayerIterator();
+}
+
 class DataSet
 {
 public:
@@ -95,7 +185,7 @@ public:
     std::string projection() const;
     void setProjection(const std::string& proj);
 
-    OGRLayer& getLayer(int index);
+    Layer getLayer(int index);
 
     GDALDataType getBandDataType(int index) const;
 
@@ -104,7 +194,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to read raster data");
+                   "Failed to read raster data");
     }
 
     template <typename T>
@@ -113,7 +203,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                   "Failed to write raster data");
     }
 
     template <typename T>
@@ -173,7 +263,7 @@ public:
                                         options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                         nullptr,
                                         nullptr),
-            "Failed to create data set copy"));
+                                    "Failed to create data set copy"));
     }
 
     MapType mapType() const;
