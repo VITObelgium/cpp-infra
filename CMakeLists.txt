@@ -9,7 +9,7 @@ add_library(infra
     include/infra/algo.h
     include/infra/cell.h
     include/infra/generator.h
-    include/infra/line.h
+    #include/infra/line.h
     include/infra/point.h
     include/infra/exception.h
     include/infra/filesystem.h filesystem.cpp

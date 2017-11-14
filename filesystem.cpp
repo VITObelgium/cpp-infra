@@ -26,7 +26,7 @@ fs::path getFullPath(const fs::path& base, const fs::path& file)
 
     return fs::canonical(par);
 #else
-    return fs::canonical((base.parent_path() / file).make_prefered());
+    return fs::canonical((base.parent_path() / file).make_preferred());
 #endif
 }
 }

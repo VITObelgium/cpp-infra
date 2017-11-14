@@ -20,7 +20,8 @@ TEST(FilesystemTest, getFullPath)
     fs::path base(pwd / "test1/test/file.txt");
     fs::path rel("./file.db");
 
-    EXPECT_EQ(pwd.string() + "/test1/test/file.db", getFullPath(base, rel).string());
+    auto expected = (pwd / "/test1/test/file.db").make_preferred();
+    EXPECT_EQ(expected.string(), getFullPath(base, rel).string());
     fs::remove_all("./test1/test");
 }
 
@@ -39,7 +40,10 @@ TEST(FilesystemTest, getFullPathBackslash)
     fs::path base(pwd / "test1/test/file.txt");
     fs::path rel(".\\file.db");
 
-    EXPECT_EQ(pwd.string() + "/test1/test/file.db", getFullPath(base, rel).string());
+    rel.make_preferred();
+
+    auto expected = (pwd / "/test1/test/file.db").make_preferred();
+    EXPECT_EQ(expected.string(), getFullPath(base, rel).string());
     fs::remove_all("./test1/test");
 }
 }

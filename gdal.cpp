@@ -368,6 +368,14 @@ bool Feature::operator==(const Feature& other) const
 Layer::Layer(OGRLayer* layer)
 : _layer(layer)
 {
+    if (_layer) {
+        _layer->Reference();
+    }
+}
+
+Layer::Layer(const Layer& other)
+{
+    _layer = other._layer;
     _layer->Reference();
 }
 
@@ -405,17 +413,17 @@ LayerIterator::LayerIterator()
 {
 }
 
-LayerIterator::LayerIterator(Layer& layer)
-: _layer(&layer)
+LayerIterator::LayerIterator(Layer layer)
+: _layer(std::move(layer))
 , _currentFeature(nullptr)
 {
-    _layer->get()->ResetReading();
+    _layer.get()->ResetReading();
     next();
 }
 
 void LayerIterator::next()
 {
-    _currentFeature = Feature(_layer->get()->GetNextFeature());
+    _currentFeature = Feature(_layer.get()->GetNextFeature());
 }
 
 const Feature& LayerIterator::operator*()

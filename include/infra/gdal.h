@@ -108,9 +108,11 @@ class Layer
 {
 public:
     explicit Layer(OGRLayer* layer);
-    Layer(const Layer&) = delete;
+    Layer(const Layer&);
     Layer(Layer&&);
     ~Layer();
+
+    Layer& operator=(Layer&&) = default;
 
     const char* name() const;
     OGRLayer* get();
@@ -120,11 +122,13 @@ private:
     OGRLayer* _layer;
 };
 
+// Iteration is not thread safe!
+// Do not iterate simultaneously from different threads.
 class LayerIterator
 {
 public:
     LayerIterator();
-    LayerIterator(Layer& layer);
+    LayerIterator(Layer layer);
     LayerIterator(const LayerIterator&) = delete;
     LayerIterator(LayerIterator&&)      = default;
 
@@ -138,17 +142,23 @@ public:
 private:
     void next();
 
-    Layer* _layer;
+    Layer _layer;
     Feature _currentFeature;
 };
 
 // support for range based for loops
 inline LayerIterator begin(Layer& layer)
 {
+    // TODO: fix the const cast
     return LayerIterator(layer);
 }
 
-inline LayerIterator end(Layer& /*layer*/)
+inline LayerIterator begin(Layer&& layer)
+{
+    return LayerIterator(layer);
+}
+
+inline LayerIterator end(const infra::gdal::Layer& /*layer*/)
 {
     return LayerIterator();
 }
