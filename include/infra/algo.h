@@ -33,6 +33,12 @@ const typename Container::value_type* findInContainer(const Container& c, Predic
 }
 
 template <typename Container, typename Predicate>
+void removeFromContainer(Container& c, Predicate&& pred) noexcept
+{
+    c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
+}
+
+template <typename Container, typename Predicate>
 const typename Container::value_type* findInContainerOptional(const Container& c, Predicate&& pred) noexcept
 {
     return asOptional(findInContainer(c, pred));
