@@ -71,6 +71,6 @@ const typename MapType::mapped_type* findInMap(const MapType& m, const typename 
         return nullptr;
     }
 
-    return &(*iter);
+    return &(iter->second);
 }
 }
