@@ -13,6 +13,7 @@
 //#include <optional>
 
 class OGRCurve;
+class OGRFieldDefn;
 class OGRGeometryCollection;
 
 namespace infra::gdal {
@@ -81,6 +82,17 @@ private:
 
 using Geometry = std::variant<Point<double>, Line>;
 
+class FieldDefinition
+{
+public:
+    FieldDefinition(OGRFieldDefn* def);
+    std::string_view name() const;
+    const std::type_info& type() const;
+
+private:
+    OGRFieldDefn* _def;
+};
+
 class Feature
 {
 public:
@@ -98,6 +110,16 @@ public:
     Geometry geometry();
     const Geometry geometry() const;
 
+    int fieldCount() const;
+    int fieldIndex(std::string_view name) const;
+    FieldDefinition fieldDefinition(int index) const;
+
+    template <typename T>
+    T getFieldAs(int index) const;
+
+    template <typename T>
+    T getFieldAs(std::string_view name) const;
+
     bool operator==(const Feature& other) const;
 
 private:
@@ -113,6 +135,9 @@ public:
     ~Layer();
 
     Layer& operator=(Layer&&) = default;
+
+    int64_t featureCount() const;
+    Feature operator[](int64_t index) const;
 
     const char* name() const;
     OGRLayer* get();

@@ -1,5 +1,6 @@
 add_executable(infratest
     filesystemtest.cpp
+    main.cpp
 )
 
 if (INFRA_GDAL)
@@ -11,7 +12,6 @@ endif ()
 target_link_libraries(infratest
     infra
     GTest::GTest
-    GTest::Main
 )
 
 target_compile_definitions(infratest PRIVATE -DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")

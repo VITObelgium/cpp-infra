@@ -287,6 +287,40 @@ Point<double> Line::endPoint()
     return Point<double>(point.getX(), point.getY());
 }
 
+FieldDefinition::FieldDefinition(OGRFieldDefn* def)
+: _def(def)
+{
+}
+
+std::string_view FieldDefinition::name() const
+{
+    return std::string_view(_def->GetNameRef());
+}
+
+const std::type_info& FieldDefinition::type() const
+{
+    switch (_def->GetType()) {
+    case OFTInteger:
+        return typeid(int);
+    case OFTReal:
+        return typeid(double);
+    case OFTInteger64:
+        return typeid(long long);
+    case OFTString:
+    case OFTIntegerList:
+    case OFTRealList:
+    case OFTStringList:
+    case OFTWideString:
+    case OFTBinary:
+    case OFTDate:
+    case OFTTime:
+    case OFTDateTime:
+    case OFTInteger64List:
+    default:
+        throw std::runtime_error("Type not implemented");
+    }
+}
+
 Feature::Feature(OGRFeature* feature)
 : _feature(feature)
 {
@@ -354,6 +388,70 @@ const Geometry Feature::geometry() const
     }
 }
 
+int Feature::fieldCount() const
+{
+    return _feature->GetFieldCount();
+}
+
+int Feature::fieldIndex(std::string_view name) const
+{
+    return _feature->GetFieldIndex(name.data());
+}
+
+FieldDefinition Feature::fieldDefinition(int index) const
+{
+    return FieldDefinition(_feature->GetFieldDefnRef(index));
+}
+
+template <typename T>
+T Feature::getFieldAs(int index) const
+{
+    if constexpr (std::is_same_v<double, T>) {
+        return _feature->GetFieldAsDouble(index);
+    } else if constexpr (std::is_same_v<float, T>) {
+        return static_cast<float>(_feature->GetFieldAsDouble(index));
+    } else if constexpr (std::is_same_v<int, T>) {
+        return _feature->GetFieldAsInteger(index);
+    } else if constexpr (std::is_same_v<long long, T>) {
+        return _feature->GetFieldAsInteger64(index);
+    } else if constexpr (std::is_same_v<std::string_view, T>) {
+        return _feature->GetFieldAsString(index);
+    }
+
+    throw std::invalid_argument("Invalid field type");
+}
+
+template <typename T>
+T Feature::getFieldAs(std::string_view name) const
+{
+    if constexpr (std::is_same_v<double, T>) {
+        return _feature->GetFieldAsDouble(name.data());
+    } else if constexpr (std::is_same_v<float, T>) {
+        return static_cast<float>(_feature->GetFieldAsDouble(name.data()));
+    } else if constexpr (std::is_same_v<int, T>) {
+        return _feature->GetFieldAsInteger(name.data());
+    } else if constexpr (std::is_same_v<long long, T>) {
+        return _feature->GetFieldAsInteger64(name.data());
+    } else if constexpr (std::is_same_v<std::string_view, T>) {
+        return _feature->GetFieldAsString(name.data());
+    }
+
+    throw std::invalid_argument("Invalid field type");
+}
+
+// template instantiations to avoid linker errors
+template double Feature::getFieldAs<double>(int index) const;
+template float Feature::getFieldAs<float>(int index) const;
+template int Feature::getFieldAs<int>(int index) const;
+template long long Feature::getFieldAs<long long>(int index) const;
+template std::string_view Feature::getFieldAs<std::string_view>(int index) const;
+
+template double Feature::getFieldAs<double>(std::string_view index) const;
+template float Feature::getFieldAs<float>(std::string_view index) const;
+template int Feature::getFieldAs<int>(std::string_view index) const;
+template long long Feature::getFieldAs<long long>(std::string_view index) const;
+template std::string_view Feature::getFieldAs<std::string_view>(std::string_view index) const;
+
 bool Feature::operator==(const Feature& other) const
 {
     if (_feature && other._feature) {
@@ -390,6 +488,16 @@ Layer::~Layer()
     if (_layer) {
         _layer->Dereference();
     }
+}
+
+int64_t Layer::featureCount() const
+{
+    return _layer->GetFeatureCount();
+}
+
+Feature Layer::operator[](int64_t index) const
+{
+    return Feature(_layer->GetFeature(index));
 }
 
 const char* Layer::name() const
