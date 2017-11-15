@@ -73,4 +73,15 @@ const typename MapType::mapped_type* findInMap(const MapType& m, const typename 
 
     return &(iter->second);
 }
+
+template <typename MapType>
+typename MapType::mapped_type* findInMap(MapType& m, const typename MapType::key_type& key) noexcept
+{
+    auto iter = m.find(key);
+    if (iter == m.end()) {
+        return nullptr;
+    }
+
+    return &(iter->second);
+}
 }
