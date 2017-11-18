@@ -8,6 +8,7 @@ find_package(fmt CONFIG REQUIRED)
 add_library(infra
     include/infra/algo.h
     include/infra/cell.h
+    include/infra/enumutils.h
     include/infra/generator.h
     #include/infra/line.h
     include/infra/point.h
