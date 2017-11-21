@@ -97,6 +97,7 @@ if (INFRA_UI_COMPONENTS)
     add_library(uiinfra
         include/uiinfra/toolboxitem.h toolboxitem.cpp
         include/uiinfra/toolboxview.h toolboxview.cpp
+        include/uiinfra/mdisubwindow.h mdisubwindow.cpp
         ${FORMS_HEADERS}
     )
 
