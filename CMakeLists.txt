@@ -2,6 +2,7 @@ option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
+option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 
 find_package(fmt CONFIG REQUIRED)
 
@@ -82,6 +83,32 @@ if (INFRA_LICENSE_MANAGER)
     target_sources(infra PRIVATE
         include/infra/licensemanager.h licensemanager.cpp
     )
+endif ()
+
+if (INFRA_UI_COMPONENTS)
+    find_package(Qt5Gui CONFIG REQUIRED)
+    find_package(Qt5Widgets CONFIG REQUIRED)
+
+    set(CMAKE_AUTOMOC ON)
+    set(AUTOGEN_SOURCE_GROUP moc)
+
+    qt5_wrap_ui(FORMS_HEADERS toolboxitem.ui)
+
+    add_library(uiinfra
+        include/uiinfra/toolboxitem.h toolboxitem.cpp
+        include/uiinfra/toolboxview.h toolboxview.cpp
+        ${FORMS_HEADERS}
+    )
+
+    target_include_directories(uiinfra
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+    PRIVATE
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    )
+
+    target_link_libraries(uiinfra PRIVATE Qt5::Gui Qt5::Widgets)
 endif ()
 
 add_subdirectory(test)
