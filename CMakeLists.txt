@@ -89,7 +89,6 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
     find_package(Qt5Widgets CONFIG REQUIRED)
 
-    set(CMAKE_AUTOMOC ON)
     set(AUTOGEN_SOURCE_GROUP moc)
 
     qt5_wrap_ui(FORMS_HEADERS toolboxitem.ui)
@@ -100,6 +99,8 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/mdisubwindow.h mdisubwindow.cpp
         ${FORMS_HEADERS}
     )
+
+    set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
 
     target_include_directories(uiinfra
     PUBLIC
