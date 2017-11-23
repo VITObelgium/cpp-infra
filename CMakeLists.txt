@@ -97,6 +97,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/toolboxitem.h toolboxitem.cpp
         include/uiinfra/toolboxview.h toolboxview.cpp
         include/uiinfra/mdisubwindow.h mdisubwindow.cpp
+        include/uiinfra/userinput.h
         ${FORMS_HEADERS}
     )
 
