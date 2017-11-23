@@ -2,6 +2,7 @@
 
 #include "infra/exception.h"
 
+#include <algorithm>
 #include <optional>
 #include <stdexcept>
 
