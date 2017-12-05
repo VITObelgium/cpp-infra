@@ -139,6 +139,9 @@ public:
     int64_t featureCount() const;
     Feature operator[](int64_t index) const;
 
+    int fieldIndex(std::string_view name) const;
+    void setSpatialFilter(Point<double> point);
+
     const char* name() const;
     OGRLayer* get();
     const OGRLayer* get() const;

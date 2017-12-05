@@ -500,6 +500,18 @@ Feature Layer::operator[](int64_t index) const
     return Feature(_layer->GetFeature(index));
 }
 
+int Layer::fieldIndex(std::string_view name) const
+{
+
+    return _layer->FindFieldIndex(name.data(), 1 /*exact match*/);
+}
+
+void Layer::setSpatialFilter(Point<double> point)
+{
+    OGRPoint p(point.x, point.y);
+    _layer->SetSpatialFilter(&p);
+}
+
 const char* Layer::name() const
 {
     return _layer->GetName();
