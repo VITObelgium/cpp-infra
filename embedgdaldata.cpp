@@ -1,7 +1,6 @@
 #include "embedgdaldata.h"
 #include "gdal_data.h"
 #include "infra/gdal.h"
-#include "infra/log.h"
 
 #include <cpl_conv.h>
 
@@ -20,15 +19,12 @@ struct MemoryFiles
 
 static std::unique_ptr<MemoryFiles> s_memFiles;
 
-static const char* findFile(const char* className, const char* fileName)
+static const char* findFile(const char* /*className*/, const char* fileName)
 {
     if (!s_memFiles) {
         return nullptr;
     }
 
-    Log::debug("{} : {}", className, fileName);
-
-    //if ("epsdata::csv"s == className) {
     if ("gdal_datum.csv"s == fileName || "datum.csv"s == fileName) {
         return s_memFiles->gdalDatum.path().c_str();
     } else if ("gcs.csv"s == fileName) {
@@ -40,7 +36,6 @@ static const char* findFile(const char* className, const char* fileName)
     } else if ("coordinate_axis.csv"s == fileName) {
         return s_memFiles->coordinateAxis.path().c_str();
     }
-    //}
 
     return nullptr;
 }
