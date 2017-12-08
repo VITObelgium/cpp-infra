@@ -13,6 +13,7 @@ add_library(infra
     include/infra/generator.h
     #include/infra/line.h
     include/infra/point.h
+    include/infra/string.h
     include/infra/exception.h
     include/infra/filesystem.h filesystem.cpp
     include/infra/color.h color.cpp

@@ -39,12 +39,14 @@ std::ostream& operator<<(std::ostream& os, const Color& c);
 class ColorMap
 {
 public:
-    explicit ColorMap(const ColorDict& cdict);
-    explicit ColorMap(const std::vector<Color>& clist);
-    explicit ColorMap(const std::vector<ColorInfo>& clist);
-    explicit ColorMap(const std::array<Color, 256>& cmap);
+    ColorMap() = default;
+    explicit ColorMap(const ColorDict& cdict, bool reverse = false);
+    explicit ColorMap(const std::vector<Color>& clist, bool reverse = false);
+    explicit ColorMap(const std::vector<ColorInfo>& clist, bool reverse = false);
+    explicit ColorMap(const std::array<Color, 256>& cmap, bool reverse = false);
 
     static ColorMap qualitative(const std::vector<Color>& cdict);
+    static ColorMap create(std::string_view name);
 
     const Color& getColor(float value) const noexcept;
     const Color& getColor(uint8_t value) const noexcept;
