@@ -19,6 +19,7 @@ public:
 
     static void initialize();
     static void initialize(const std::shared_ptr<spdlog::sinks::sink>& sink);
+    static void uninitialize();
 
     static void setLevel(Level level);
 

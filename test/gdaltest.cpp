@@ -39,19 +39,31 @@ TEST(GdalTest, getField)
 
     int index = 0;
     for (const auto& feature : ds.getLayer(0)) {
-        EXPECT_EQ(index, feature.getFieldAs<int>(1));
-        EXPECT_EQ(index, feature.getFieldAs<long long>(1));
+        EXPECT_EQ(index, feature.getFieldAs<int32_t>(1));
+        EXPECT_EQ(index, feature.getFieldAs<int64_t>(1));
         EXPECT_DOUBLE_EQ(double(index), feature.getFieldAs<double>(1));
         EXPECT_FLOAT_EQ(float(index), feature.getFieldAs<float>(1));
         EXPECT_EQ(std::to_string(index), feature.getFieldAs<std::string_view>(1));
 
-        EXPECT_EQ(index, feature.getFieldAs<int>("FID"));
-        EXPECT_EQ(index, feature.getFieldAs<long long>("FID"));
+        EXPECT_EQ(index, feature.getFieldAs<int32_t>("FID"));
+        EXPECT_EQ(index, feature.getFieldAs<int64_t>("FID"));
         EXPECT_DOUBLE_EQ(double(index), feature.getFieldAs<double>("FID"));
         EXPECT_FLOAT_EQ(float(index), feature.getFieldAs<float>("FID"));
         EXPECT_EQ(std::to_string(index), feature.getFieldAs<std::string_view>("FID"));
 
         ++index;
     }
+}
+
+TEST(GdalTest, convertPointProjected)
+{
+    // Check conversion of bottom left corner of flanders map
+
+    // 22000.000 153000.000 (x,y) lambert 72 EPSG:31370 should be converted to 2.55772472781224 50.6735631138308 (lat,long) EPSG:4326
+
+    // Bottom left coordinate
+    auto point = gdal::convertPointProjected(31370, 4326, Point<double>(22000.000, 153000.000));
+    EXPECT_NEAR(2.55772472781224, point.x, 1e-10);
+    EXPECT_NEAR(50.6735631138308, point.y, 1e-10);
 }
 }

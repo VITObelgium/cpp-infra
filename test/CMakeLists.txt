@@ -1,5 +1,6 @@
 add_executable(infratest
     filesystemtest.cpp
+    colormaptest.cpp
     main.cpp
 )
 

@@ -25,6 +25,12 @@ void Log::initializeConsoleLogger()
     _log->set_level(spdlog::level::warn);
 }
 
+void Log::uninitialize()
+{
+    spdlog::drop_all();
+    _log.reset();
+}
+
 void Log::setLevel(Level level)
 {
     auto spdLevel = spdlog::level::off;

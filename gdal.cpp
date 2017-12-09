@@ -268,9 +268,22 @@ MapType Driver::mapType() const
     }
 }
 
-Line::Line(OGRCurve* curve)
+Line::Line(OGRSimpleCurve* curve)
 : _curve(curve)
 {
+    assert(curve);
+}
+
+int Line::pointCount() const
+{
+    return _curve->getNumPoints();
+}
+
+Point<double> Line::pointAt(int index) const
+{
+    OGRPoint p;
+    _curve->getPoint(index, &p);
+    return Point<double>(p.getX(), p.getY());
 }
 
 Point<double> Line::startPoint()
@@ -287,6 +300,95 @@ Point<double> Line::endPoint()
     return Point<double>(point.getX(), point.getY());
 }
 
+OGRSimpleCurve* Line::get()
+{
+    return _curve;
+}
+
+LineIterator::LineIterator(Line line)
+: _iter(line.get()->getPointIterator())
+{
+    next();
+}
+
+LineIterator::~LineIterator()
+{
+    OGRPointIterator::destroy(_iter);
+}
+
+void LineIterator::next()
+{
+    OGRPoint p;
+    if (!_iter->getNextPoint(&p)) {
+        OGRPointIterator::destroy(_iter);
+        _iter = nullptr;
+    } else {
+        _point.x = p.getX();
+        _point.y = p.getY();
+    }
+}
+
+const Point<double>& LineIterator::operator*()
+{
+    return _point;
+}
+
+const Point<double>* LineIterator::operator->()
+{
+    return &_point;
+}
+
+LineIterator& LineIterator::operator++()
+{
+    next();
+    return *this;
+}
+
+LineIterator& LineIterator::operator=(LineIterator&& other)
+{
+    if (this != &other) {
+        if (_iter) {
+            OGRPointIterator::destroy(_iter);
+        }
+
+        _iter       = std::move(other._iter);
+        other._iter = nullptr;
+    }
+
+    return *this;
+}
+
+bool LineIterator::operator==(const LineIterator& other) const
+{
+    return _iter == other._iter;
+}
+
+bool LineIterator::operator!=(const LineIterator& other) const
+{
+    return !(*this == other);
+}
+
+MultiLine::MultiLine(OGRMultiLineString* multiLine)
+: _multiLine(multiLine)
+{
+    assert(_multiLine);
+}
+
+OGRMultiLineString* MultiLine::get()
+{
+    return _multiLine;
+}
+
+int MultiLine::geometryCount() const
+{
+    return _multiLine->getNumGeometries();
+}
+
+Line MultiLine::geometry(int index) const
+{
+    return Line(reinterpret_cast<OGRLineString*>(_multiLine->getGeometryRef(index)));
+}
+
 FieldDefinition::FieldDefinition(OGRFieldDefn* def)
 : _def(def)
 {
@@ -301,12 +403,13 @@ const std::type_info& FieldDefinition::type() const
 {
     switch (_def->GetType()) {
     case OFTInteger:
-        return typeid(int);
+        return typeid(int32_t);
     case OFTReal:
         return typeid(double);
     case OFTInteger64:
-        return typeid(long long);
+        return typeid(int64_t);
     case OFTString:
+        return typeid(std::string_view);
     case OFTIntegerList:
     case OFTRealList:
     case OFTStringList:
@@ -366,6 +469,8 @@ Geometry Feature::geometry()
     }
     case wkbLineString:
         return Line(reinterpret_cast<OGRLineString*>(geometry));
+    case wkbMultiLineString:
+        return MultiLine(reinterpret_cast<OGRMultiLineString*>(geometry));
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
     }
@@ -383,6 +488,8 @@ const Geometry Feature::geometry() const
     }
     case wkbLineString:
         return Line(reinterpret_cast<OGRLineString*>(geometry));
+    case wkbMultiLineString:
+        return MultiLine(reinterpret_cast<OGRMultiLineString*>(geometry));
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
     }
@@ -403,6 +510,22 @@ FieldDefinition Feature::fieldDefinition(int index) const
     return FieldDefinition(_feature->GetFieldDefnRef(index));
 }
 
+Field Feature::getField(int index) const noexcept
+{
+    auto& type = fieldDefinition(index).type();
+    if (type == typeid(double)) {
+        return Field(getFieldAs<double>(index));
+    } else if (type == typeid(int32_t)) {
+        return Field(getFieldAs<int32_t>(index));
+    } else if (type == typeid(int64_t)) {
+        return Field(getFieldAs<int64_t>(index));
+    } else if (type == typeid(std::string_view)) {
+        return Field(getFieldAs<std::string_view>(index));
+    }
+
+    return Field();
+}
+
 template <typename T>
 T Feature::getFieldAs(int index) const
 {
@@ -410,12 +533,12 @@ T Feature::getFieldAs(int index) const
         return _feature->GetFieldAsDouble(index);
     } else if constexpr (std::is_same_v<float, T>) {
         return static_cast<float>(_feature->GetFieldAsDouble(index));
-    } else if constexpr (std::is_same_v<int, T>) {
+    } else if constexpr (std::is_same_v<int32_t, T>) {
         return _feature->GetFieldAsInteger(index);
-    } else if constexpr (std::is_same_v<long long, T>) {
+    } else if constexpr (std::is_same_v<int64_t, T>) {
         return _feature->GetFieldAsInteger64(index);
     } else if constexpr (std::is_same_v<std::string_view, T>) {
-        return _feature->GetFieldAsString(index);
+        return std::string_view(_feature->GetFieldAsString(index));
     }
 
     throw std::invalid_argument("Invalid field type");
@@ -433,7 +556,7 @@ T Feature::getFieldAs(std::string_view name) const
     } else if constexpr (std::is_same_v<long long, T>) {
         return _feature->GetFieldAsInteger64(name.data());
     } else if constexpr (std::is_same_v<std::string_view, T>) {
-        return _feature->GetFieldAsString(name.data());
+        return std::string_view(_feature->GetFieldAsString(name.data()));
     }
 
     throw std::invalid_argument("Invalid field type");
@@ -442,14 +565,14 @@ T Feature::getFieldAs(std::string_view name) const
 // template instantiations to avoid linker errors
 template double Feature::getFieldAs<double>(int index) const;
 template float Feature::getFieldAs<float>(int index) const;
-template int Feature::getFieldAs<int>(int index) const;
-template long long Feature::getFieldAs<long long>(int index) const;
+template int Feature::getFieldAs<int32_t>(int index) const;
+template long long Feature::getFieldAs<int64_t>(int index) const;
 template std::string_view Feature::getFieldAs<std::string_view>(int index) const;
 
 template double Feature::getFieldAs<double>(std::string_view index) const;
 template float Feature::getFieldAs<float>(std::string_view index) const;
-template int Feature::getFieldAs<int>(std::string_view index) const;
-template long long Feature::getFieldAs<long long>(std::string_view index) const;
+template int Feature::getFieldAs<int32_t>(std::string_view index) const;
+template long long Feature::getFieldAs<int64_t>(std::string_view index) const;
 template std::string_view Feature::getFieldAs<std::string_view>(std::string_view index) const;
 
 bool Feature::operator==(const Feature& other) const
@@ -581,6 +704,52 @@ bool LayerIterator::operator!=(const LayerIterator& other) const
     return !(*this == other);
 }
 
+FeatureIterator::FeatureIterator(int fieldCount)
+: _currentFieldIndex(fieldCount)
+{
+}
+
+FeatureIterator::FeatureIterator(const Feature& feature)
+: _feature(&feature)
+, _fieldCount(feature.fieldCount())
+{
+    next();
+}
+
+void FeatureIterator::next()
+{
+    if (_currentFieldIndex < _fieldCount) {
+        _currentField = _feature->getField(_currentFieldIndex);
+    }
+}
+
+const Field& FeatureIterator::operator*()
+{
+    return _currentField;
+}
+
+const Field* FeatureIterator::operator->()
+{
+    return &_currentField;
+}
+
+FeatureIterator& FeatureIterator::operator++()
+{
+    ++_currentFieldIndex;
+    next();
+    return *this;
+}
+
+bool FeatureIterator::operator==(const FeatureIterator& other) const
+{
+    return _currentFieldIndex == other._currentFieldIndex;
+}
+
+bool FeatureIterator::operator!=(const FeatureIterator& other) const
+{
+    return !(*this == other);
+}
+
 DataSet DataSet::create(const fs::path& filePath)
 {
     return DataSet(filePath);
@@ -666,39 +835,39 @@ void DataSet::setGeoTransform(const std::array<double, 6>& trans)
     checkError(_ptr->SetGeoTransform(const_cast<double*>(trans.data())), "Failed to set geo transform");
 }
 
-//std::optional<double> DataSet::noDataValue(int bandNr) const
-//{
-//    assert(bandNr > 0);
-//
-//    auto* band = _ptr->GetRasterBand(bandNr);
-//    if (band == nullptr) {
-//        throw RuntimeError("Invalid dataset band number: {}", bandNr);
-//    }
-//
-//    int success = 0;
-//    auto value  = band->GetNoDataValue(&success);
-//    if (success) {
-//        return std::make_optional(value);
-//    }
-//
-//    return std::optional<double>();
-//}
-//
-//void DataSet::setNoDataValue(int bandNr, std::optional<double> value) const
-//{
-//    assert(bandNr > 0);
-//
-//    auto* band = _ptr->GetRasterBand(bandNr);
-//    if (band == nullptr) {
-//        throw RuntimeError("Invalid dataset band number: {}", bandNr);
-//    }
-//
-//    if (value) {
-//        checkError(band->SetNoDataValue(*value), "Failed to set nodata value");
-//    } else {
-//        checkError(band->DeleteNoDataValue(), "Failed to delete nodata value");
-//    }
-//}
+std::optional<double> DataSet::noDataValue(int bandNr) const
+{
+    assert(bandNr > 0);
+
+    auto* band = _ptr->GetRasterBand(bandNr);
+    if (band == nullptr) {
+        throw RuntimeError("Invalid dataset band number: {}", bandNr);
+    }
+
+    int success = 0;
+    auto value  = band->GetNoDataValue(&success);
+    if (success) {
+        return std::make_optional(value);
+    }
+
+    return std::optional<double>();
+}
+
+void DataSet::setNoDataValue(int bandNr, std::optional<double> value) const
+{
+    assert(bandNr > 0);
+
+    auto* band = _ptr->GetRasterBand(bandNr);
+    if (band == nullptr) {
+        throw RuntimeError("Invalid dataset band number: {}", bandNr);
+    }
+
+    if (value) {
+        checkError(band->SetNoDataValue(*value), "Failed to set nodata value");
+    } else {
+        checkError(band->DeleteNoDataValue(), "Failed to delete nodata value");
+    }
+}
 
 void DataSet::setColorTable(int bandNr, const GDALColorTable* ct)
 {

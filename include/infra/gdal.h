@@ -10,12 +10,14 @@
 #include <fmt/format.h>
 #include <gdal_priv.h>
 #include <gsl/span>
+#include <optional>
 #include <variant>
-//#include <optional>
 
-class OGRCurve;
+class OGRSimpleCurve;
 class OGRFieldDefn;
+class OGRPointIterator;
 class OGRGeometryCollection;
+class OGRMultiLineString;
 
 namespace infra::gdal {
 
@@ -72,16 +74,74 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath);
 class Line
 {
 public:
-    Line(OGRCurve* curve);
+    Line(OGRSimpleCurve* curve);
+
+    int pointCount() const;
+    Point<double> pointAt(int index) const;
 
     Point<double> startPoint();
     Point<double> endPoint();
 
+    OGRSimpleCurve* get();
+
 private:
-    OGRCurve* _curve;
+    OGRSimpleCurve* _curve;
 };
 
-using Geometry = std::variant<Point<double>, Line>;
+class LineIterator
+{
+public:
+    LineIterator() = default;
+    LineIterator(Line line);
+    LineIterator(const LineIterator&) = delete;
+    LineIterator(LineIterator&&)      = default;
+    ~LineIterator();
+
+    LineIterator& operator++();
+    LineIterator& operator=(LineIterator&& other);
+    bool operator==(const LineIterator& other) const;
+    bool operator!=(const LineIterator& other) const;
+    const Point<double>& operator*();
+    const Point<double>* operator->();
+
+private:
+    void next();
+
+    OGRPointIterator* _iter = nullptr;
+    Point<double> _point;
+};
+
+inline LineIterator begin(const Line& line)
+{
+    return LineIterator(line);
+}
+
+inline LineIterator begin(Line&& line)
+{
+    return LineIterator(line);
+}
+
+inline LineIterator end(const Line&)
+{
+    return LineIterator();
+}
+
+class MultiLine
+{
+public:
+    MultiLine(OGRMultiLineString* multiLine);
+
+    OGRMultiLineString* get();
+
+    int geometryCount() const;
+    Line geometry(int index) const;
+
+private:
+    OGRMultiLineString* _multiLine;
+};
+
+using Geometry = std::variant<Point<double>, Line, MultiLine>;
+using Field    = std::variant<int32_t, int64_t, double, std::string_view>;
 
 class FieldDefinition
 {
@@ -114,6 +174,8 @@ public:
     int fieldCount() const;
     int fieldIndex(std::string_view name) const;
     FieldDefinition fieldDefinition(int index) const;
+
+    Field getField(int index) const noexcept;
 
     template <typename T>
     T getFieldAs(int index) const;
@@ -178,7 +240,6 @@ private:
 // support for range based for loops
 inline LayerIterator begin(Layer& layer)
 {
-    // TODO: fix the const cast
     return LayerIterator(layer);
 }
 
@@ -190,6 +251,46 @@ inline LayerIterator begin(Layer&& layer)
 inline LayerIterator end(const infra::gdal::Layer& /*layer*/)
 {
     return LayerIterator();
+}
+
+class FeatureIterator
+{
+public:
+    FeatureIterator(int _count);
+    FeatureIterator(const Feature& feature);
+    FeatureIterator(const FeatureIterator&) = delete;
+    FeatureIterator(FeatureIterator&&)      = default;
+
+    FeatureIterator& operator++();
+    FeatureIterator& operator=(FeatureIterator&& other) = default;
+    bool operator==(const FeatureIterator& other) const;
+    bool operator!=(const FeatureIterator& other) const;
+    const Field& operator*();
+    const Field* operator->();
+
+private:
+    void next();
+
+    const Feature* _feature = nullptr;
+    int _fieldCount         = 0;
+    int _currentFieldIndex  = 0;
+    Field _currentField;
+};
+
+// support for range based for loops
+inline FeatureIterator begin(const Feature& feat)
+{
+    return FeatureIterator(feat);
+}
+
+inline FeatureIterator begin(Feature&& feat)
+{
+    return FeatureIterator(feat);
+}
+
+inline FeatureIterator end(const Feature& feat)
+{
+    return FeatureIterator(feat.fieldCount());
 }
 
 class DataSet
@@ -216,8 +317,8 @@ public:
     std::array<double, 6> geoTransform() const;
     void setGeoTransform(const std::array<double, 6>& trans);
 
-    /*std::optional<double> noDataValue(int bandNr) const;
-    void setNoDataValue(int bandNr, std::optional<double> value) const;*/
+    std::optional<double> noDataValue(int bandNr) const;
+    void setNoDataValue(int bandNr, std::optional<double> value) const;
 
     void setColorTable(int bandNr, const GDALColorTable* ct);
 
@@ -229,10 +330,10 @@ public:
     GDALDataType getBandDataType(int index) const;
 
     template <typename T>
-    void readRasterData(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize) const
+    void readRasterData(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
-        checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
+        checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
             "Failed to read raster data");
     }
 
