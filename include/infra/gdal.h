@@ -296,10 +296,10 @@ inline FeatureIterator end(const Feature& feat)
 class DataSet
 {
 public:
-    static DataSet create(const fs::path& filePath);
+    static DataSet create(const std::string& filePath);
     // if you know the type of the dataset, this will be faster as not all
     // drivers are queried
-    static DataSet create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
+    static DataSet create(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
 
     DataSet() = default;
     explicit DataSet(GDALDataset* ptr) noexcept;
@@ -374,7 +374,7 @@ public:
     }
 
 private:
-    explicit DataSet(const fs::path& filename);
+    explicit DataSet(const std::string& filename);
 
     GDALDataset* _ptr = nullptr;
 };

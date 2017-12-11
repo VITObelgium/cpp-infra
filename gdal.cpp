@@ -750,18 +750,18 @@ bool FeatureIterator::operator!=(const FeatureIterator& other) const
     return !(*this == other);
 }
 
-DataSet DataSet::create(const fs::path& filePath)
+DataSet DataSet::create(const std::string& filePath)
 {
     return DataSet(filePath);
 }
 
-DataSet DataSet::create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions)
+DataSet DataSet::create(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions)
 {
     std::array<const char*, 2> drivers{{s_shapeDriverLookup.at(type), nullptr}};
 
     auto options = createOptionsArray(driverOptions);
     return DataSet(checkPointer(reinterpret_cast<GDALDataset*>(GDALOpenEx(
-                                    filePath.string().c_str(),
+                                    filePath.c_str(),
                                     GDAL_OF_READONLY | GDAL_OF_VECTOR,
                                     drivers.data(),
                                     options.size() == 1 ? nullptr : options.data(),
@@ -774,8 +774,8 @@ DataSet::DataSet(GDALDataset* ptr) noexcept
 {
 }
 
-DataSet::DataSet(const fs::path& filename)
-: _ptr(checkPointer(reinterpret_cast<GDALDataset*>(GDALOpen(filename.string().c_str(), GA_ReadOnly)), "Failed to open file"))
+DataSet::DataSet(const std::string& filename)
+: _ptr(checkPointer(reinterpret_cast<GDALDataset*>(GDALOpen(filename.c_str(), GA_ReadOnly)), "Failed to open file"))
 {
 }
 
