@@ -565,14 +565,14 @@ T Feature::getFieldAs(std::string_view name) const
 // template instantiations to avoid linker errors
 template double Feature::getFieldAs<double>(int index) const;
 template float Feature::getFieldAs<float>(int index) const;
-template int Feature::getFieldAs<int32_t>(int index) const;
-template long long Feature::getFieldAs<int64_t>(int index) const;
+template int32_t Feature::getFieldAs<int32_t>(int index) const;
+template int64_t Feature::getFieldAs<int64_t>(int index) const;
 template std::string_view Feature::getFieldAs<std::string_view>(int index) const;
 
 template double Feature::getFieldAs<double>(std::string_view index) const;
 template float Feature::getFieldAs<float>(std::string_view index) const;
-template int Feature::getFieldAs<int32_t>(std::string_view index) const;
-template long long Feature::getFieldAs<int64_t>(std::string_view index) const;
+template int32_t Feature::getFieldAs<int32_t>(std::string_view index) const;
+template int64_t Feature::getFieldAs<int64_t>(std::string_view index) const;
 template std::string_view Feature::getFieldAs<std::string_view>(std::string_view index) const;
 
 bool Feature::operator==(const Feature& other) const
