@@ -551,9 +551,9 @@ T Feature::getFieldAs(std::string_view name) const
         return _feature->GetFieldAsDouble(name.data());
     } else if constexpr (std::is_same_v<float, T>) {
         return static_cast<float>(_feature->GetFieldAsDouble(name.data()));
-    } else if constexpr (std::is_same_v<int, T>) {
+    } else if constexpr (std::is_same_v<int32_t, T>) {
         return _feature->GetFieldAsInteger(name.data());
-    } else if constexpr (std::is_same_v<long long, T>) {
+    } else if constexpr (std::is_same_v<int64_t, T>) {
         return _feature->GetFieldAsInteger64(name.data());
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(name.data()));

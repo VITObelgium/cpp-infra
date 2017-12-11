@@ -30,7 +30,7 @@ TEST(GdalTest, fieldInfo)
     EXPECT_EQ(9, layer.featureCount());
     EXPECT_EQ(1, layer[0].fieldCount());
     EXPECT_EQ("FID", layer[0].fieldDefinition(0).name());
-    EXPECT_EQ(typeid(long long), layer[0].fieldDefinition(0).type());
+    EXPECT_EQ(typeid(int64_t), layer[0].fieldDefinition(0).type());
 }
 
 TEST(GdalTest, getField)
