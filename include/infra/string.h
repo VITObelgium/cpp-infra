@@ -26,4 +26,22 @@ inline bool endsWith(std::string_view aString, std::string_view search)
 
     return aString.rfind(search) == (aString.size() - search.size());
 }
+
+inline std::vector<std::string> tokenize(std::string_view str, std::string_view delimiter)
+{
+    std::vector<std::string> tokens;
+    size_t pos   = 0;
+    size_t index = 0;
+
+    while ((pos = str.find(delimiter, index)) != std::string::npos) {
+        tokens.emplace_back(str.substr(index, pos - index));
+        index = pos + delimiter.size();
+    }
+
+    if (index < str.size()) {
+        tokens.emplace_back(str.substr(index));
+    }
+
+    return tokens;
+}
 }
