@@ -3,6 +3,7 @@ option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
+option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 
 find_package(fmt CONFIG REQUIRED)
 
@@ -48,6 +49,10 @@ if (INFRA_GDAL)
     )
 
     if (INFRA_EMBED_GDAL_DATA)
+        if (NOT GDAL_DATA_PATH)
+            message(FATAL_ERROR "Gdal data path location not set for embedding data")
+        endif ()
+
         target_sources(infra PRIVATE
             embedgdaldata.h
             embedgdaldata.cpp
@@ -115,4 +120,6 @@ if (INFRA_UI_COMPONENTS)
     target_link_libraries(uiinfra PRIVATE Qt5::Gui Qt5::Widgets)
 endif ()
 
-add_subdirectory(test)
+if (INFRA_ENABLE_TESTS)
+    add_subdirectory(test)
+endif ()
