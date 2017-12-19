@@ -10,17 +10,22 @@ function checkresult {
     return $status
 }
 
-mkdir -p build/deps
-cd build/deps
+pwd=`pwd`
 
-PWD=`pwd`
+platform='unknown'
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+   platform='linux'
+elif [[ "$unamestr" == 'darwin' ]]; then
+   platform='apple'
+fi
 
 config=""
 toolchain=""
-generator="Unix Makefiles"
-build_ui="OFF"
+generator="Ninja"
+emscripten=0
 
-echo -n "Select configuration: [1:Debug 2:Release]: "
+printf "Select configuration: [1:Debug 2:Release]: "
 read yno
 case $yno in
     [1] ) config="Debug";;
@@ -28,24 +33,55 @@ case $yno in
     * ) echo "Invalid selection" exit;;
 esac
 
-echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4:Mingw linux]: "
+printf "Select toolchain to use:\n1:Default\n2:Musl (static linking)\n3:Mingw\n4:Gcc7\n5:Clang\n6:emscripten\n"
 read yno
 case $yno in
-    [1] ) toolchain="${PWD}/../../deps/toolchain-cluster.cmake";;
-    [2] ) toolchain="${PWD}/../../deps/toolchain-musl.cmake";;
-    [3] ) toolchain="${PWD}/../../deps/toolchain-native.cmake" build_ui="ON";;
-    [4] ) toolchain="${PWD}/../../deps/toolchain-mingw-cross.cmake";;
+    [1] ) toolchain="toolchain-cluster";;
+    [2] ) toolchain="toolchain-musl";;
+    [3] )
+        if [[ "$platform" == "linux" ]]; then
+            toolchain="toolchain-mingw-cross"
+        else
+            toolchain="toolchain-mingw"
+            generator="Unix Makefiles"
+        fi
+        ;;
+    [4] ) toolchain="toolchain-gcc7";;
+    [5] )
+        if [[ "$platform" == "linux" ]]; then
+            toolchain="toolchain-cluster-clang"
+        elif [[ $platform == MINGW64* ]]; then
+            toolchain="toolchain-mingw-clang"
+        else
+            toolchain="toolchain-clang"
+        fi
+        ;;
+    [6] ) toolchain="toolchain-wasm"; emscripten=1;;
     * ) echo "Invalid selection" exit;;
 esac
 
-checkresult cmake -G "${generator}" ../../deps -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui}
-checkresult cmake --build .
+mkdir -p build/deps-${toolchain}
+cd build/deps-${toolchain}
 
-cd ..
-# overwrite invalid cmake files to avoid configuration errors
-if [ "${config}" = "Debug" ]; then
-    cp ./local/share/cmake/hdf5-targets-debug.cmake ./local/share/cmake/hdf5-targets-release.cmake
+if [ ${emscripten} -eq 0 ];
+then
+checkresult cmake -G "${generator}" \
+    -DCMAKE_INSTALL_PREFIX=${pwd}/build/local-${toolchain} \
+    -DCMAKE_FIND_ROOT_PATH=${pwd}/build/local-${toolchain} \
+    -DCMAKE_TOOLCHAIN_FILE=${pwd}/deps/cmake-scripts/${toolchain}.cmake \
+    -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain} \
+    -DCMAKE_BUILD_TYPE=${config} \
+    -BUILD_UI=OFF \
+    ../../deps
 else
-    cp ./local/share/cmake/hdf5-targets-release.cmake ./local/share/cmake/hdf5-targets-debug.cmake
+checkresult emcmake cmake -G "${generator}" \
+    -DCMAKE_INSTALL_PREFIX=${pwd}/build/local-${toolchain} \
+    -DCMAKE_FIND_ROOT_PATH=${pwd}/build/local-${toolchain} \
+    -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain} \
+    -DCMAKE_BUILD_TYPE=${config} \
+    -DCMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE=ON \
+    ../../deps
 fi
 
+checkresult cmake --build . -- "$@"
+cd ..

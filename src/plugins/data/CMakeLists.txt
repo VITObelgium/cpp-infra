@@ -1,16 +1,5 @@
-find_package(hdf5 CONFIG)
-
-find_library(SQLITE_LIBRARY NAMES sqlite3)
-find_library(SQLITE_LIBRARY_DEBUG NAMES sqlite3_d)
-if (SQLITE_LIBRARY AND SQLITE_LIBRARY_DEBUG)
-    set(SQLITE_LIBRARY optimized ${SQLITE_LIBRARY} debug ${SQLITE_LIBRARY_DEBUG})
-endif ()
-
-find_library(SQLPP_CONNECTOR_LIBRARY NAMES sqlpp11-connector-sqlite3)
-find_library(SQLPP_CONNECTOR_LIBRARY_DEBUG NAMES sqlpp11-connector-sqlite3_d)
-if (SQLPP_CONNECTOR_LIBRARY AND SQLPP_CONNECTOR_LIBRARY_DEBUG)
-    set(SQLPP_CONNECTOR_LIBRARY optimized ${SQLPP_CONNECTOR_LIBRARY} debug ${SQLPP_CONNECTOR_LIBRARY_DEBUG})
-endif ()
+find_package(hdf5 CONFIG REQUIRED)
+find_package(Sqlpp11)
 
 add_library(hdf5tools STATIC
     Hdf5Tools.h
@@ -23,9 +12,9 @@ add_library(hdf5buffer STATIC
 )
 
 add_library(riooutputbuffer STATIC
-        RioOutputBuffer.h
-        RioOutputBuffer.cpp
-    )
+    RioOutputBuffer.h
+    RioOutputBuffer.cpp
+)
 
 add_library(asciiforecastwriter STATIC
     AsciiForecastWriter.h
@@ -74,7 +63,7 @@ add_library(stationinfoprovider STATIC
 
 target_link_libraries(hdf5buffer opaqcore hdf5tools hdf5_cpp-static)
 target_link_libraries(riooutputbuffer opaqcore hdf5tools hdf5_cpp-static)
-target_link_libraries(sqlbuffer opaqcore ${SQLPP_CONNECTOR_LIBRARY} ${SQLITE_LIBRARY})
+target_link_libraries(sqlbuffer opaqcore Sqlpp11::Sqlpp11 Sqlpp11::Sqlite3)
 target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(asciiforecastwriter opaqcore)
 target_link_libraries(ircelmeteoprovider opaqcore)

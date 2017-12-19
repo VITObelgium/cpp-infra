@@ -1,7 +1,8 @@
-cmake_minimum_required(VERSION 2.8)
-cmake_policy(VERSION 2.8)
+cmake_minimum_required(VERSION 3.9)
+cmake_policy(VERSION 3.9)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/deps/cmake-scripts/scripts")
 include(FindDependency)
 
 set(PACKAGE "opaq")
@@ -37,6 +38,7 @@ enable_testing()
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
 option(BUILD_UI "Build the user interface" OFF)
@@ -57,8 +59,6 @@ if (ENABLE_WERROR)
 endif ()
 
 if (MSVC)
-    # use all cores for compilation
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP")
     # avoid windows specific warnings
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
 else ()

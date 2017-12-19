@@ -8,42 +8,75 @@ function checkresult {
     return $status
 }
 
-#generator="Ninja"
+platform='unknown'
+unamestr=`uname`
+if [[ "$unamestr" == 'Linux' ]]; then
+   platform='linux'
+elif [[ "$unamestr" == 'darwin' ]]; then
+   platform='apple'
+fi
+
+emscripten=0
+generator="Ninja"
 # fall back to make if ninja is not installed
-# command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }
+command -v ninja >/dev/null 2>&1 || { generator="Unix Makefiles"; }
 
-generator="Unix Makefiles"
-
-config=""
-toolchain=""
-build_ui="OFF"
-static_qt="OFF"
-
-echo -n "Select configuration: [1:Debug 2:Release 3:Release with debug info]: "
+printf "Select configuration: [1:Debug 2:Release]: "
 read yno
 case $yno in
     [1] ) config="Debug";;
     [2] ) config="Release";;
-    [3] ) config="RelWithDebInfo";;
     * ) echo "Invalid selection" exit;;
 esac
 
-builddir="build/opaq_`echo "${config}" | tr '[:upper:]' '[:lower:]'`"
-mkdir -p ${builddir}
-cd ${builddir}
-pwd=`pwd`
-
-echo -n "Select toolchain to use: [1:Default 2:Musl (static linking) 3:Mingw 4: Mingw linux]: "
+printf "Select toolchain to use:\n1:Default\n2:Musl (static linking)\n3:Mingw\n4:Gcc7\n5:Clang\n6:emscripten\n"
 read yno
 case $yno in
-    [1] ) toolchain="${pwd}/../../deps/toolchain-cluster.cmake";;
-    [2] ) toolchain="${pwd}/../../deps/toolchain-musl.cmake";;
-    [3] ) toolchain="${pwd}/../../deps/toolchain-native.cmake" build_ui="ON" static_qt="ON";;
-    [4] ) toolchain="${pwd}/../../deps/toolchain-mingw-cross.cmake";;
+    [1] ) toolchain="toolchain-cluster";;
+    [2] ) toolchain="toolchain-musl";;
+    [3] ) toolchain="toolchain-mingw"
+        if [[ "$platform" == "linux" ]]; then
+            toolchain="toolchain-mingw-cross"
+        else
+            toolchain="toolchain-mingw"
+        fi
+        ;;
+    [4] ) toolchain="toolchain-gcc7";;
+    [5] )
+        if [[ "$platform" == "linux" ]]; then
+            toolchain="toolchain-cluster-clang"
+        elif [[ $platform == MINGW64* ]]; then
+            toolchain="toolchain-mingw-clang"
+        else
+            toolchain="toolchain-clang"
+        fi
+        ;;
+    [6] ) toolchain="toolchain-wasm"; emscripten=1;;
     * ) echo "Invalid selection" exit;;
 esac
 
-echo "Building configuration ${config} in ${builddir} toolchain (${toolchain})"
+pwd=$(pwd)
+printf "Platform $platform\n"
+printf "Platform Using toolchain: ${pwd}/deps/cmake-scripts/${toolchain}.cmake\n"
 
-checkresult cmake ../.. -G "${generator}" -DCMAKE_INSTALL_PREFIX=${PWD}/../local -DCMAKE_PREFIX_PATH=${PWD}/../local -DCMAKE_TOOLCHAIN_FILE=${toolchain} -DCMAKE_BUILD_TYPE=${config} -DBUILD_UI=${build_ui} -DSTATIC_QT=${static_qt} -DSTATIC_PLUGINS=ON
+builddir="build"
+projectdir="opaq-"$(echo ${toolchain} | cut -d'-' -f 2,3)
+mkdir -p ${builddir}/${projectdir}
+cd ${builddir}/${projectdir}
+
+if [ ${emscripten} -eq 0 ];
+then
+checkresult cmake ../.. -G ${generator} \
+    -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain}/ \
+    -DCMAKE_TOOLCHAIN_FILE=${pwd}/deps/cmake-scripts/${toolchain}.cmake \
+    -DCMAKE_BUILD_TYPE=${config} \
+    -DSTATIC_PLUGINS=ON
+else
+checkresult emcmake cmake ../.. -G ${generator} \
+    -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain}/ \
+    -DCMAKE_FIND_ROOT_PATH=${pwd}/build/local-${toolchain} \
+    -DCMAKE_BUILD_TYPE=${config}
+fi
+
+
 checkresult cmake --build .

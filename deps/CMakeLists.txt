@@ -1,0 +1,43 @@
+cmake_minimum_required(VERSION 3.9)
+project(Dependencies)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-scripts/scripts")
+
+include(ExternalProject)
+include(Autotools)
+
+option(BUILD_UI "Build the user interface" OFF)
+option(STATIC_RUNTIME "Use static msvc runtime" ON)
+option(VS2017 "Use Visual Studio 2017" ON)
+option(32BIT "32 bit build" OFF)
+
+if (WIN32)
+    set (POSTFIX_CONFIG -DCMAKE_DEBUG_POSTFIX=d)
+endif ()
+
+message (STATUS "System Host: ${CMAKE_HOST_SYSTEM}")
+message (STATUS "Target: ${CMAKE_SYSTEM_NAME}")
+message (STATUS "Cross compiling: ${CMAKE_CROSSCOMPILING}")
+message (STATUS "User Host: ${HOST}")
+
+set(BOOST_COMPONENTS filesystem system program_options iostreams)
+
+add_subdirectory(cmake-scripts/googletest)
+add_subdirectory(cmake-scripts/zlib)
+add_subdirectory(cmake-scripts/fmt)
+add_subdirectory(cmake-scripts/spdlog)
+add_subdirectory(cmake-scripts/eigen)
+add_subdirectory(cmake-scripts/sqlite)
+add_subdirectory(cmake-scripts/boost)
+add_subdirectory(cmake-scripts/date)
+add_subdirectory(cmake-scripts/sqlpp11)
+add_subdirectory(cmake-scripts/sqlpp11-connector-sqlite3)
+add_subdirectory(cmake-scripts/tinyxml)
+
+if (NOT CMAKE_CROSSCOMPILING OR MINGW)
+    # hdf5 build system does not support cross compiling, but we created patches in case of mingw
+    add_subdirectory(cmake-scripts/hdf5)
+endif ()
+
+if (BUILD_UI)
+    add_subdirectory(cmake-scripts/qt)
+endif ()

@@ -1,7 +1,5 @@
-find_path(ZLIB_INCLUDE_DIR NAMES zlib.h)
 find_path(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
 
-find_dependency(NAME ZLIB LIBNAMES zlibstatic z DEBUGLIBNAMES zlibstaticd)
 find_dependency(NAME TINYXML LIBNAMES tinyxml DEBUGLIBNAMES tinyxml_d)
 
 if (UNIX)
@@ -10,6 +8,7 @@ endif ()
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
+find_package(Zlib REQUIRED)
 find_package(Threads)
 
 set (Boost_USE_STATIC_LIBS ON)
@@ -26,17 +25,9 @@ endif ()
 
 list(APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
-find_path(EIGEN3_INCLUDE_DIR
-    NAMES Eigen/Dense
-    PATH_SUFFIXES eigen3
-)
-
-if (NOT EIGEN3_INCLUDE_DIR)
-    message(FATAL_ERROR "Could not find eigen headers")
-endif ()
+find_package(Eigen3 REQUIRED)
 
 include_directories(SYSTEM
-    ${EIGEN3_INCLUDE_DIR}
     ${ZLIB_INCLUDE_DIR}
     ${TINYXML_INCLUDE_DIR}
 )
@@ -56,7 +47,7 @@ if (BUILD_UI)
 endif ()
 
 add_executable(opaq opaq.cpp)
-target_link_libraries(opaq opaqcore)
+target_link_libraries(opaq opaqcore Eigen3::Eigen Zlib::Zlib)
 
 if (STATIC_PLUGINS)
     target_link_libraries(opaq ${PLUGINS})
