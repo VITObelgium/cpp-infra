@@ -1,2 +1,0 @@
-using clang : : : <cxxflags>"-std=c++14 -fPIC" ;
-using zlib ;
