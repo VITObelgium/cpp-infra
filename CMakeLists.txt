@@ -61,6 +61,7 @@ endif ()
 if (MSVC)
     # avoid windows specific warnings
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17 /bigobj /w34100 /w34101 /w35038 /w34127")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -fdiagnostics-color")
 endif()
