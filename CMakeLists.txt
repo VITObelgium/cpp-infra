@@ -3,6 +3,7 @@ option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
+option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 
 find_package(fmt CONFIG REQUIRED)
@@ -76,11 +77,21 @@ endif ()
 if (INFRA_LOGGING)
     find_package(spdlog CONFIG REQUIRED)
 
-    target_sources(infra PRIVATE
+    target_sources(infra PUBLIC
         include/infra/log.h log.cpp
     )
 
     target_link_libraries(infra PRIVATE spdlog::spdlog)
+endif ()
+
+if (INFRA_NUMERIC)
+    find_package(Eigen3 CONFIG REQUIRED)
+
+    target_sources(infra PUBLIC
+        include/infra/polyfit.h
+    )
+
+    target_link_libraries(infra PUBLIC Eigen3::Eigen)
 endif ()
 
 if (INFRA_LICENSE_MANAGER)
