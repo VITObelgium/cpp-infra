@@ -77,20 +77,15 @@ endif ()
 if (INFRA_LOGGING)
     find_package(spdlog CONFIG REQUIRED)
 
-    target_sources(infra PUBLIC
-        include/infra/log.h log.cpp
-    )
-
-    target_link_libraries(infra PRIVATE spdlog::spdlog)
+    target_sources(infra PUBLIC include/infra/log.h)
+    target_sources(infra PRIVATE log.cpp)
+    target_link_libraries(infra PUBLIC spdlog::spdlog)
 endif ()
 
 if (INFRA_NUMERIC)
     find_package(Eigen3 CONFIG REQUIRED)
 
-    target_sources(infra PUBLIC
-        include/infra/polyfit.h
-    )
-
+    target_sources(infra PUBLIC include/infra/polyfit.h)
     target_link_libraries(infra PUBLIC Eigen3::Eigen)
 endif ()
 
