@@ -74,9 +74,7 @@ Point<double> convertPointProjected(int32_t sourceEpsg, int32_t destEpsg, Point<
     sourceSRS.importFromEPSG(sourceEpsg);
     targetSRS.importFromEPSG(destEpsg);
 
-    auto trans = checkPointer(OGRCreateCoordinateTransformation(&sourceSRS, &targetSRS),
-        "Failed to create transformation");
-
+    auto trans = std::unique_ptr<OGRCoordinateTransformation>(checkPointer(OGRCreateCoordinateTransformation(&sourceSRS, &targetSRS), "Failed to create transformation"));
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
     }
@@ -442,6 +440,7 @@ Feature::~Feature()
 
 Feature& Feature::operator=(Feature&& other)
 {
+    OGRFeature::DestroyFeature(_feature);
     _feature       = other._feature;
     other._feature = nullptr;
     return *this;
@@ -792,6 +791,10 @@ DataSet::~DataSet() noexcept
 
 DataSet& DataSet::operator=(DataSet&& rhs)
 {
+    if (_ptr) {
+        GDALClose(reinterpret_cast<GDALDatasetH>(_ptr));
+    }
+
     _ptr     = rhs._ptr;
     rhs._ptr = nullptr;
     return *this;
