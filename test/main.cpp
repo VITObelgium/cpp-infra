@@ -10,7 +10,8 @@ using namespace testing;
 
 int main(int argc, char** argv)
 {
-    infra::Log::initialize();
+    infra::Log::addConsoleSink(infra::Log::Colored::On);
+    infra::LogRegistration logReg("InfraTest");
     infra::gdal::Registration reg;
 
     InitGoogleTest(&argc, argv);

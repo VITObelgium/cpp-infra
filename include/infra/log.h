@@ -17,9 +17,19 @@ public:
         Critical
     };
 
-    static void initialize();
-    static void initialize(const std::shared_ptr<spdlog::sinks::sink>& sink);
+    enum class Colored
+    {
+        On,
+        Off
+    };
+
+    static void initializeConsoleOnly(const std::string& name, Colored colored);
+    static void initialize(const std::string& name);
     static void uninitialize();
+
+    static void addFileSink(const std::string& filePath);
+    static void addConsoleSink(Colored option);
+    static void addCustomSink(const spdlog::sink_ptr& sink);
 
     static void setLevel(Level level);
 
@@ -64,8 +74,20 @@ public:
     }
 
 private:
-    static void initializeConsoleLogger();
-
     static std::shared_ptr<spdlog::logger> _log;
+    static std::vector<spdlog::sink_ptr> _sinks;
+};
+
+struct LogRegistration
+{
+    LogRegistration(const std::string& name)
+    {
+        Log::initialize(name);
+    }
+
+    ~LogRegistration()
+    {
+        Log::uninitialize();
+    }
 };
 }
