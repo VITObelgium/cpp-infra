@@ -5,7 +5,11 @@
 #include <string_view>
 #include <vector>
 
+#include "internal/traits.h"
+
 namespace infra::str {
+
+void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
 
 std::string lowercase(std::string_view str);
 std::string uppercase(std::string_view str);
@@ -20,25 +24,9 @@ bool endsWith(std::string_view aString, std::string_view search);
 [[nodiscard]] std::string trim(std::string_view str);
 void trimInPlace(std::string& str);
 
-// Join implementation for objects that have a streaming operator implemented
-template <typename Container, typename = std::enable_if_t<is_streamable_v<typename Container::value_type> && !can_cast_to_string_view_v<typename Container::value_type>>>
-std::string join(const Container& items, const std::string& joinString)
-{
-    std::ostringstream ss;
-    for (auto iter = items.cbegin(); iter != items.cend(); ++iter) {
-        ss << *iter;
-        if (iter + 1 != items.cend()) {
-            ss << joinString;
-        }
-    }
-
-    return ss.str();
-}
-
-// Join implementation for objects that implement: std::basic_string::operator basic_string_view
-// This implementation is roughly 10 times faster the ostream version for strings
+// Join items in the container with the provided join string
 // e.g.: join(std::vector<std::string>({"one", "two"}), ", ") == "one, two"
-template <typename Container, typename = std::enable_if_t<can_cast_to_string_view_v<typename Container::value_type>>>
+template <typename Container>
 std::string join(const Container& items, std::string_view joinString)
 {
     std::string result;
@@ -47,20 +35,38 @@ std::string join(const Container& items, std::string_view joinString)
         return result;
     }
 
-    size_t inputSize = 0;
-    for (auto& item : items) {
-        inputSize += static_cast<std::string_view>(item).size();
-    }
+    if constexpr (can_cast_to_string_view_v<typename Container::value_type>) {
+        // Join implementation for objects that implement: std::basic_string::operator basic_string_view
+        // This implementation is roughly 10 times faster the ostream version for strings
 
-    size_t resultSize = inputSize + ((items.size() - 1) * joinString.size());
-    result.reserve(resultSize);
-
-    for (auto& item : items) {
-        result += static_cast<std::string_view>(item);
-
-        if (result.size() < resultSize) {
-            result += joinString;
+        size_t inputSize = 0;
+        for (auto& item : items) {
+            inputSize += static_cast<std::string_view>(item).size();
         }
+
+        size_t resultSize = inputSize + ((items.size() - 1) * joinString.size());
+        result.reserve(resultSize);
+
+        for (auto& item : items) {
+            result += static_cast<std::string_view>(item);
+
+            if (result.size() < resultSize) {
+                result += joinString;
+            }
+        }
+    } else if constexpr (is_streamable_v<typename Container::value_type>) {
+        // Join implementation for objects that have a streaming operator implemented
+        std::ostringstream ss;
+        for (auto iter = items.cbegin(); iter != items.cend(); ++iter) {
+            ss << *iter;
+            if (iter + 1 != items.cend()) {
+                ss << joinString;
+            }
+        }
+
+        result = ss.str();
+    } else {
+        static_assert(false, "Items to join in container should be streamable or convertible to string_view")
     }
 
     return result;

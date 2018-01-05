@@ -8,6 +8,17 @@
 
 namespace infra::str {
 
+void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
+{
+    size_t startPos = 0;
+    size_t foundPos;
+
+    while (std::string::npos != (foundPos = aString.find(toSearch, startPos))) {
+        aString.replace(foundPos, toSearch.length(), toReplace);
+        startPos = foundPos + toReplace.size();
+    }
+}
+
 std::string lowercase(std::string_view str)
 {
     std::string result(str.size(), '\0');
