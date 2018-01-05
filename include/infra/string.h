@@ -30,13 +30,17 @@ void trimInPlace(std::string& str);
 template <typename Container>
 std::string join(const Container& items, std::string_view joinString)
 {
+    using ValueType = typename Container::value_type;
+	//static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
+	//              "Items to join should be streamable or convertible to string_view");
+
     std::string result;
 
     if (items.empty()) {
         return result;
     }
-
-    if constexpr (can_cast_to_string_view_v<typename Container::value_type>) {
+	
+    if constexpr (can_cast_to_string_view_v<ValueType>) {
         // Join implementation for objects that implement: std::basic_string::operator basic_string_view
         // This implementation is roughly 10 times faster the ostream version for strings
 
@@ -55,7 +59,7 @@ std::string join(const Container& items, std::string_view joinString)
                 result += joinString;
             }
         }
-    } else if constexpr (is_streamable_v<typename Container::value_type>) {
+    } else if constexpr (is_streamable_v<ValueType>) {
         // Join implementation for objects that have a streaming operator implemented
         std::ostringstream ss;
         for (auto iter = items.cbegin(); iter != items.cend(); ++iter) {
@@ -66,8 +70,6 @@ std::string join(const Container& items, std::string_view joinString)
         }
 
         result = ss.str();
-    } else {
-        static_assert(false, "Items to join in container should be streamable or convertible to string_view");
     }
 
     return result;
