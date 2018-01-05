@@ -31,15 +31,15 @@ template <typename Container>
 std::string join(const Container& items, std::string_view joinString)
 {
     using ValueType = typename Container::value_type;
-	//static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
-	//              "Items to join should be streamable or convertible to string_view");
+    static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
+        "Items to join should be streamable or convertible to string_view");
 
     std::string result;
 
     if (items.empty()) {
         return result;
     }
-	
+
     if constexpr (can_cast_to_string_view_v<ValueType>) {
         // Join implementation for objects that implement: std::basic_string::operator basic_string_view
         // This implementation is roughly 10 times faster the ostream version for strings
