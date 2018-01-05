@@ -219,7 +219,7 @@ TEST(StringTest, JoinStringViews)
     };
 
     static_assert(can_cast_to_string_view_v<StringViewable>, "StringViewable should be convertible to string_view");
-    static_assert(is_streamable_v<StringViewable>, "StringViewable should be streamable");
+    static_assert(!is_streamable_v<StringViewable>, "StringViewable should not be streamable");
 
     EXPECT_EQ("one,two,three", str::join<std::vector<StringViewable>>({{"one"}, {"two"}, {"three"}}, ","));
 }

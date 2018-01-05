@@ -31,7 +31,7 @@ class is_streamable
     template <typename U>
     static auto test(int) -> decltype(std::declval<std::ostream>() << std::declval<U>(), std::true_type());
 
-    template <typename, typename>
+    template <typename>
     static std::false_type test(...);
 
 public:
