@@ -15,12 +15,14 @@ add_library(infra
     include/infra/generator.h
     include/infra/line.h
     include/infra/point.h
-    include/infra/string.h
+    include/infra/string.h string.cpp
     include/infra/exception.h
     include/infra/filesystem.h filesystem.cpp
     include/infra/color.h color.cpp
     include/infra/colormap.h colormap.cpp
     include/infra/geometadata.h geometadata.cpp
+
+    include/infra/internal/traits.h
 )
 
 target_include_directories(infra
