@@ -1,4 +1,4 @@
-#pragma once
+#include "infra/string.h"
 
 #include <algorithm>
 #include <cassert>
@@ -11,25 +11,25 @@ namespace infra::str {
 std::string lowercase(std::string_view str)
 {
     std::string result(str.size(), '\0');
-    std::transform(str.begin(), str.end(), result.begin(), std::tolower);
+    std::transform(str.begin(), str.end(), result.begin(), ::tolower);
     return result;
 }
 
 std::string uppercase(std::string_view str)
 {
     std::string result(str.size(), '\0');
-    std::transform(str.begin(), str.end(), result.begin(), std::toupper);
+    std::transform(str.begin(), str.end(), result.begin(), ::toupper);
     return result;
 }
 
 void lowercaseInPlace(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), std::tolower);
+    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 }
 
 void uppercaseInPlace(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), std::toupper);
+    std::transform(str.begin(), str.end(), str.begin(), ::toupper);
 }
 
 bool startsWith(std::string_view aString, std::string_view search)
