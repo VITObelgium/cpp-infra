@@ -1,6 +1,7 @@
 #pragma once
 
 #include <algorithm>
+#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -11,8 +12,8 @@ namespace infra::str {
 
 void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
 
-std::string lowercase(std::string_view str);
-std::string uppercase(std::string_view str);
+[[nodiscard]] std::string lowercase(std::string_view str);
+[[nodiscard]] std::string uppercase(std::string_view str);
 
 void lowercaseInPlace(std::string& str);
 void uppercaseInPlace(std::string& str);
@@ -66,7 +67,7 @@ std::string join(const Container& items, std::string_view joinString)
 
         result = ss.str();
     } else {
-        static_assert(false, "Items to join in container should be streamable or convertible to string_view")
+        static_assert(false, "Items to join in container should be streamable or convertible to string_view");
     }
 
     return result;
