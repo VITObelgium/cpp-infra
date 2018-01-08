@@ -39,6 +39,7 @@ static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
     {VectorType::Csv, "CSV"},
     {VectorType::Tab, "CSV"},
     {VectorType::ShapeFile, "ESRI Shapefile"},
+    {VectorType::Xlsx, "XLSX"},
 }};
 
 static std::string getExtenstion(const std::string& path)
@@ -633,6 +634,11 @@ void Layer::setSpatialFilter(Point<double> point)
     _layer->SetSpatialFilter(&p);
 }
 
+void Layer::createFeature(Feature& feature)
+{
+    checkError(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
+}
+
 const char* Layer::name() const
 {
     return _layer->GetName();
@@ -900,6 +906,13 @@ Layer DataSet::getLayer(int index)
     return Layer(checkPointer(_ptr->GetLayer(index), "Invalid layer index"));
 }
 
+Layer DataSet::createLayer(const std::string& name, const std::vector<std::string>& driverOptions)
+{
+    assert(_ptr);
+    auto options = createOptionsArray(driverOptions);
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, wkbUnknown, const_cast<char**>(options.data())), "Layer creation failed"));
+}
+
 GDALDataType DataSet::getBandDataType(int bandNr) const
 {
     assert(_ptr);
@@ -966,6 +979,8 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
         return VectorType::Tab;
     } else if (ext == ".tab") {
         return VectorType::ShapeFile;
+    } else if (ext == ".xlsx") {
+        return VectorType::Xlsx;
     }
 
     return VectorType::Unknown;

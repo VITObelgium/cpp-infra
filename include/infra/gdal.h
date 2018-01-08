@@ -57,6 +57,7 @@ enum class VectorType
     Csv,
     Tab,
     ShapeFile,
+    Xlsx,
     Unknown
 };
 
@@ -205,6 +206,8 @@ public:
     int fieldIndex(std::string_view name) const;
     void setSpatialFilter(Point<double> point);
 
+    void createFeature(Feature& feature);
+
     const char* name() const;
     OGRLayer* get();
     const OGRLayer* get() const;
@@ -326,6 +329,7 @@ public:
     void setProjection(const std::string& proj);
 
     Layer getLayer(int index);
+    Layer createLayer(const std::string& name, const std::vector<std::string>& driverOptions = {});
 
     GDALDataType getBandDataType(int index) const;
 
