@@ -65,118 +65,161 @@ TEST(StringTest, Replace)
     EXPECT_EQ("stringstring", testString);
 }
 
-//TEST(StringTest, Split)
-//{
-//    string         testString = "A-B-C";
-//    vector<string> tokenized;
-//    tokenized = split(testString, "-");
-//    ASSERT_EQ(3u, tokenized.size());
-//    EXPECT_EQ("A"s, tokenized[0]);
-//    EXPECT_EQ("B"s, tokenized[1]);
-//    EXPECT_EQ("C"s, tokenized[2]);
-//
-//    testString = ";";
-//    tokenized  = split(testString, ";");
-//    ASSERT_EQ(2u, tokenized.size());
-//    EXPECT_EQ(""s, tokenized[0]);
-//    EXPECT_EQ(""s, tokenized[1]);
-//
-//    testString = ";";
-//    tokenized  = split(testString, ';');
-//    ASSERT_EQ(2u, tokenized.size());
-//    EXPECT_EQ(""s, tokenized[0]);
-//    EXPECT_EQ(""s, tokenized[1]);
-//
-//    testString = "A_*_B_*_C";
-//    tokenized  = split(testString, "_*_");
-//    ASSERT_EQ(3u, tokenized.size());
-//    EXPECT_EQ("A"s, tokenized[0]);
-//    EXPECT_EQ("B"s, tokenized[1]);
-//    EXPECT_EQ("C"s, tokenized[2]);
-//
-//    testString = "A_*_B_*_C";
-//    tokenized  = split(testString, "_**_");
-//    ASSERT_EQ(1u, tokenized.size());
-//    EXPECT_EQ("A_*_B_*_C"s, tokenized[0]);
-//
-//    testString = "A_*_B_*_C";
-//    tokenized  = split(testString, "_C");
-//    ASSERT_EQ(2u, tokenized.size());
-//    EXPECT_EQ("A_*_B_*"s, tokenized[0]);
-//    EXPECT_EQ(""s, tokenized[1]);
-//
-//    testString = "";
-//    tokenized  = split(testString, ";");
-//    ASSERT_EQ(1u, tokenized.size());
-//    EXPECT_EQ(""s, tokenized[0]);
-//
-//    testString = "string";
-//    tokenized  = split(testString, ";");
-//    ASSERT_EQ(1u, tokenized.size());
-//    EXPECT_EQ("string"s, tokenized[0]);
-//
-//    testString = "";
-//    tokenized  = split(testString, ';');
-//    ASSERT_EQ(1u, tokenized.size());
-//    EXPECT_EQ(""s, tokenized[0]);
-//}
+TEST(StringOperationsTest, Split)
+{
+    string testString = "A-B-C";
+    vector<string> tokenized;
+    tokenized = str::split(testString, "-");
+    ASSERT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("B"s, tokenized[1]);
+    EXPECT_EQ("C"s, tokenized[2]);
 
-//TEST(StringTest, SplittedView)
-//{
-//    string              testString = "A-B-C";
-//    vector<string_view> tokenized;
-//    tokenized = str::splitView(testString, '-');
-//    EXPECT_EQ(3u, tokenized.size());
-//    EXPECT_EQ("A", tokenized[0]);
-//    EXPECT_EQ("B", tokenized[1]);
-//    EXPECT_EQ("C", tokenized[2]);
-//
-//    testString = ";";
-//    tokenized  = str::splitView(testString, ';');
-//    EXPECT_EQ(2u, tokenized.size());
-//    EXPECT_EQ("", tokenized[0]);
-//    EXPECT_EQ("", tokenized[1]);
-//
-//    testString = ";";
-//    tokenized  = str::splitView(testString, ";");
-//    ASSERT_EQ(2u, tokenized.size());
-//    EXPECT_EQ("", tokenized[0]);
-//    EXPECT_EQ("", tokenized[1]);
-//
-//    testString = ";;";
-//    tokenized  = str::splitView(testString, ';');
-//    EXPECT_EQ(3u, tokenized.size());
-//    EXPECT_EQ("", tokenized[0]);
-//    EXPECT_EQ("", tokenized[1]);
-//    EXPECT_EQ("", tokenized[2]);
-//
-//    testString = "A_*_B_*_C";
-//    tokenized  = str::splitView(testString, "_*_");
-//    EXPECT_EQ(3u, tokenized.size());
-//    EXPECT_EQ("A", tokenized[0]);
-//    EXPECT_EQ("B", tokenized[1]);
-//    EXPECT_EQ("C", tokenized[2]);
-//
-//    testString = "A_*_B_*_C";
-//    tokenized  = str::splitView(testString, "_**_");
-//    EXPECT_EQ(1u, tokenized.size());
-//    EXPECT_EQ("A_*_B_*_C", tokenized[0]);
-//
-//    testString = "";
-//    tokenized  = str::splitView(testString, ',');
-//    EXPECT_EQ(1u, tokenized.size());
-//    EXPECT_EQ("", tokenized[0]);
-//
-//    testString = "string";
-//    tokenized  = str::splitView(testString, ',');
-//    EXPECT_EQ(1u, tokenized.size());
-//    EXPECT_EQ("string", tokenized[0]);
-//
-//    testString = "";
-//    tokenized  = str::splitView(testString, ",");
-//    EXPECT_EQ(1u, tokenized.size());
-//    EXPECT_EQ("", tokenized[0]);
-//}
+    testString = ";";
+    tokenized  = str::split(testString, ";");
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ(""s, tokenized[0]);
+    EXPECT_EQ(""s, tokenized[1]);
+
+    testString = ";";
+    tokenized  = str::split(testString, ';');
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ(""s, tokenized[0]);
+    EXPECT_EQ(""s, tokenized[1]);
+
+    testString = "A_*_B_*_C";
+    tokenized  = str::split(testString, "_*_");
+    ASSERT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("B"s, tokenized[1]);
+    EXPECT_EQ("C"s, tokenized[2]);
+
+    testString = "A_*_B_*_C";
+    tokenized  = str::split(testString, "_**_");
+    ASSERT_EQ(1u, tokenized.size());
+    EXPECT_EQ("A_*_B_*_C"s, tokenized[0]);
+
+    testString = "A_*_B_*_C";
+    tokenized  = str::split(testString, "_C");
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A_*_B_*"s, tokenized[0]);
+    EXPECT_EQ(""s, tokenized[1]);
+
+    testString = "";
+    tokenized  = str::split(testString, ";");
+    ASSERT_EQ(1u, tokenized.size());
+    EXPECT_EQ(""s, tokenized[0]);
+
+    testString = "string";
+    tokenized  = str::split(testString, ";");
+    ASSERT_EQ(1u, tokenized.size());
+    EXPECT_EQ("string"s, tokenized[0]);
+
+    testString = "";
+    tokenized  = str::split(testString, ';');
+    ASSERT_EQ(1u, tokenized.size());
+    EXPECT_EQ(""s, tokenized[0]);
+
+    testString = "A,,C";
+    tokenized  = str::split(testString, ",");
+    ASSERT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ(""s, tokenized[1]);
+    EXPECT_EQ("C"s, tokenized[2]);
+}
+
+TEST(StringOperationsTest, SplitAndTrim)
+{
+    string testString = "A - B - C";
+    vector<string> tokenized;
+    tokenized = str::split(testString, "-", str::SplitOpt::Trim);
+    ASSERT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("B"s, tokenized[1]);
+    EXPECT_EQ("C"s, tokenized[2]);
+}
+
+TEST(StringOperationsTest, SplitNoEmpty)
+{
+    string testString = "A,,C";
+    vector<string> tokenized;
+    tokenized = str::split(testString, ",", str::SplitOpt::NoEmpty);
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("C"s, tokenized[1]);
+}
+
+TEST(StringOperationsTest, SplitAndTrimNoEmpty)
+{
+    string testString        = " A,  ,C  ";
+    vector<string> tokenized = str::split(testString, ',', str::SplitOpt::Trim | str::SplitOpt::NoEmpty);
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("C"s, tokenized[1]);
+
+    testString = " A , , ,  C  ";
+    tokenized  = str::split(testString, ", ", str::SplitOpt::Trim | str::SplitOpt::NoEmpty);
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("A"s, tokenized[0]);
+    EXPECT_EQ("C"s, tokenized[1]);
+}
+
+TEST(StringOperationsTest, SplittedView)
+{
+    string testString = "A-B-C";
+    vector<string_view> tokenized;
+    tokenized = str::splitView(testString, '-');
+    EXPECT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A", tokenized[0]);
+    EXPECT_EQ("B", tokenized[1]);
+    EXPECT_EQ("C", tokenized[2]);
+
+    testString = ";";
+    tokenized  = str::splitView(testString, ';');
+    EXPECT_EQ(2u, tokenized.size());
+    EXPECT_EQ("", tokenized[0]);
+    EXPECT_EQ("", tokenized[1]);
+
+    testString = ";";
+    tokenized  = str::splitView(testString, ";");
+    ASSERT_EQ(2u, tokenized.size());
+    EXPECT_EQ("", tokenized[0]);
+    EXPECT_EQ("", tokenized[1]);
+
+    testString = ";;";
+    tokenized  = str::splitView(testString, ';');
+    EXPECT_EQ(3u, tokenized.size());
+    EXPECT_EQ("", tokenized[0]);
+    EXPECT_EQ("", tokenized[1]);
+    EXPECT_EQ("", tokenized[2]);
+
+    testString = "A_*_B_*_C";
+    tokenized  = str::splitView(testString, "_*_");
+    EXPECT_EQ(3u, tokenized.size());
+    EXPECT_EQ("A", tokenized[0]);
+    EXPECT_EQ("B", tokenized[1]);
+    EXPECT_EQ("C", tokenized[2]);
+
+    testString = "A_*_B_*_C";
+    tokenized  = str::splitView(testString, "_**_");
+    EXPECT_EQ(1u, tokenized.size());
+    EXPECT_EQ("A_*_B_*_C", tokenized[0]);
+
+    testString = "";
+    tokenized  = str::splitView(testString, ',');
+    EXPECT_EQ(1u, tokenized.size());
+    EXPECT_EQ("", tokenized[0]);
+
+    testString = "string";
+    tokenized  = str::splitView(testString, ',');
+    EXPECT_EQ(1u, tokenized.size());
+    EXPECT_EQ("string", tokenized[0]);
+
+    testString = "";
+    tokenized  = str::splitView(testString, ",");
+    EXPECT_EQ(1u, tokenized.size());
+    EXPECT_EQ("", tokenized[0]);
+}
 
 TEST(StringTest, Trim)
 {

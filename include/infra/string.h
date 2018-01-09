@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include "infra/enumflags.h"
 #include "internal/traits.h"
 
 namespace infra::str {
@@ -90,21 +91,20 @@ std::string join(const Container& items, const std::string& joinString, ToString
     return ss.str();
 }
 
-inline std::vector<std::string> tokenize(std::string_view str, std::string_view delimiter)
+enum class SplitOpt
 {
-    std::vector<std::string> tokens;
-    size_t pos   = 0;
-    size_t index = 0;
+    NoEmpty = 1 << 0,
+    Trim    = 1 << 1
+};
 
-    while ((pos = str.find(delimiter, index)) != std::string::npos) {
-        tokens.emplace_back(str.substr(index, pos - index));
-        index = pos + delimiter.size();
-    }
+std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+std::vector<std::string> split(std::string_view str, const std::string& delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
-    if (index < str.size()) {
-        tokens.emplace_back(str.substr(index));
-    }
+std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
-    return tokens;
+inline constexpr Flags<SplitOpt> operator|(SplitOpt lhs, SplitOpt rhs) noexcept
+{
+    return Flags<SplitOpt>() | lhs | rhs;
 }
 }
