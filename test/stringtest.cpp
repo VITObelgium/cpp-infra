@@ -2,14 +2,13 @@
 
 #include <gtest/gtest.h>
 
-namespace infra {
+namespace infra::test {
 
 using std::string;
 using std::string_view;
 using std::vector;
 using std::wstring;
 
-using namespace infra;
 using namespace std::string_literals;
 
 TEST(StringTest, LowerCase)

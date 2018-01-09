@@ -22,25 +22,33 @@ void replace(std::string& aString, std::string_view toSearch, std::string_view t
 std::string lowercase(std::string_view str)
 {
     std::string result(str.size(), '\0');
-    std::transform(str.begin(), str.end(), result.begin(), ::tolower);
+    std::transform(str.begin(), str.end(), result.begin(), [](char c) {
+        return static_cast<char>(::tolower(c));
+    });
     return result;
 }
 
 std::string uppercase(std::string_view str)
 {
     std::string result(str.size(), '\0');
-    std::transform(str.begin(), str.end(), result.begin(), ::toupper);
+    std::transform(str.begin(), str.end(), result.begin(), [](char c) {
+        return static_cast<char>(::toupper(c));
+    });
     return result;
 }
 
 void lowercaseInPlace(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), ::tolower);
+    std::transform(str.begin(), str.end(), str.begin(), [](char c) {
+        return static_cast<char>(::tolower(c));
+    });
 }
 
 void uppercaseInPlace(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), ::toupper);
+    std::transform(str.begin(), str.end(), str.begin(), [](char c) {
+        return static_cast<char>(::toupper(c));
+    });
 }
 
 bool startsWith(std::string_view aString, std::string_view search)

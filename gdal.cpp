@@ -539,9 +539,9 @@ T Feature::getFieldAs(int index) const
         return _feature->GetFieldAsInteger64(index);
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(index));
+    } else {
+        throw std::invalid_argument("Invalid field type");
     }
-
-    throw std::invalid_argument("Invalid field type");
 }
 
 template <typename T>
@@ -557,9 +557,9 @@ T Feature::getFieldAs(std::string_view name) const
         return _feature->GetFieldAsInteger64(name.data());
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(name.data()));
+    } else {
+        throw std::invalid_argument("Invalid field type");
     }
-
-    throw std::invalid_argument("Invalid field type");
 }
 
 // template instantiations to avoid linker errors
