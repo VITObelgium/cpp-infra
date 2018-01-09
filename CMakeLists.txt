@@ -107,9 +107,10 @@ if (INFRA_UI_COMPONENTS)
     qt5_wrap_ui(FORMS_HEADERS toolboxitem.ui)
 
     add_library(uiinfra
+        include/uiinfra/readonlyproxy.h
+        include/uiinfra/mdisubwindow.h mdisubwindow.cpp
         include/uiinfra/toolboxitem.h toolboxitem.cpp
         include/uiinfra/toolboxview.h toolboxview.cpp
-        include/uiinfra/mdisubwindow.h mdisubwindow.cpp
         include/uiinfra/userinput.h
         ${FORMS_HEADERS}
     )
