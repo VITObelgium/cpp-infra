@@ -12,11 +12,13 @@ public:
     explicit ScopedCursor(const QCursor& cursor)
     {
         QApplication::setOverrideCursor(cursor);
+        QApplication::processEvents();
     }
 
     ~ScopedCursor()
     {
         QApplication::restoreOverrideCursor();
+        QApplication::processEvents();
     }
 };
 }

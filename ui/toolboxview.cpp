@@ -1,5 +1,5 @@
 #include "uiinfra/toolboxview.h"
-#include "uiinfra/toolboxitem.h"
+#include "toolboxitem.h"
 
 #include <cassert>
 #include <qtoolbutton.h>

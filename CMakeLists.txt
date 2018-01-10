@@ -105,15 +105,17 @@ if (INFRA_UI_COMPONENTS)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
-    qt5_wrap_ui(FORMS_HEADERS toolboxitem.ui)
+    qt5_wrap_ui(FORMS_HEADERS ui/toolboxitem.ui ui/aboutdialog.ui)
 
     add_library(uiinfra
+        include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
         include/uiinfra/readonlyproxy.h
-        include/uiinfra/mdisubwindow.h mdisubwindow.cpp
+        include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/scopedcursor.h
-        include/uiinfra/toolboxitem.h toolboxitem.cpp
-        include/uiinfra/toolboxview.h toolboxview.cpp
+        include/uiinfra/toolboxview.h ui/toolboxview.cpp
         include/uiinfra/userinput.h
+        include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
+        ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
     )
 
@@ -123,7 +125,7 @@ if (INFRA_UI_COMPONENTS)
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
     PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 

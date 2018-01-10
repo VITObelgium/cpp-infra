@@ -1,4 +1,4 @@
-#include "uiinfra/toolboxitem.h"
+#include "toolboxitem.h"
 
 namespace uiinfra {
 

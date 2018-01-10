@@ -23,7 +23,5 @@ signals:
 private:
     QFrame* addSection(const QString& name);
     void onItemSelected();
-
-    //std::unordered_map<QString, QVBoxLayout*> _sections;
 };
 }
