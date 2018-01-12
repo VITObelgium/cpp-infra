@@ -388,9 +388,38 @@ Line MultiLine::geometry(int index) const
     return Line(reinterpret_cast<OGRLineString*>(_multiLine->getGeometryRef(index)));
 }
 
-FieldDefinition::FieldDefinition(OGRFieldDefn* def)
-: _def(def)
+static const OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
 {
+    if (typeInfo == typeid(int32_t)) {
+        return OFTInteger;
+    } else if (typeInfo == typeid(int64_t)) {
+        return OFTInteger64;
+    } else if (typeInfo == typeid(float) || typeInfo == typeid(double)) {
+        return OFTReal;
+    } else if (typeInfo == typeid(std::string_view) || typeInfo == typeid(std::string)) {
+        return OFTString;
+    }
+
+    throw InvalidArgument("Invalid field type provided");
+}
+
+FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInfo)
+: _hasOwnerShip(true)
+, _def(new OGRFieldDefn(name, fieldTypeFromTypeInfo(typeInfo)))
+{
+}
+
+FieldDefinition::FieldDefinition(OGRFieldDefn* def)
+: _hasOwnerShip(false)
+, _def(def)
+{
+}
+
+FieldDefinition::~FieldDefinition()
+{
+    if (_hasOwnerShip) {
+        delete _def;
+    }
 }
 
 std::string_view FieldDefinition::name() const
@@ -421,6 +450,16 @@ const std::type_info& FieldDefinition::type() const
     default:
         throw std::runtime_error("Type not implemented");
     }
+}
+
+OGRFieldDefn* FieldDefinition::get() noexcept
+{
+    return _def;
+}
+
+Feature::Feature(Layer& layer)
+: _feature(OGRFeature::CreateFeature(layer.get()->GetLayerDefn()))
+{
 }
 
 Feature::Feature(OGRFeature* feature)
@@ -632,6 +671,11 @@ void Layer::setSpatialFilter(Point<double> point)
 {
     OGRPoint p(point.x, point.y);
     _layer->SetSpatialFilter(&p);
+}
+
+void Layer::createField(FieldDefinition& field)
+{
+    checkError(_layer->CreateField(field.get()), "Failed to create layer field");
 }
 
 void Layer::createFeature(Feature& feature)

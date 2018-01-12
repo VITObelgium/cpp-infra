@@ -41,6 +41,8 @@ void MdiSubWindow::restoreSettings()
     if (windowState() & Qt::WindowMaximized) {
         setLayoutMargin(0);
     }
+
+    repaint();
 }
 
 void MdiSubWindow::onMdiWindowStateChange(Qt::WindowStates oldState, Qt::WindowStates newState)

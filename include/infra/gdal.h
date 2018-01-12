@@ -42,6 +42,8 @@ public:
 void registerGdal();
 void unregisterGdal();
 
+class Layer;
+
 enum class MapType
 {
     Memory,
@@ -147,17 +149,23 @@ using Field    = std::variant<int32_t, int64_t, double, std::string_view>;
 class FieldDefinition
 {
 public:
+    FieldDefinition(const char* name, const std::type_info& typeInfo);
     FieldDefinition(OGRFieldDefn* def);
+    ~FieldDefinition();
     std::string_view name() const;
     const std::type_info& type() const;
 
+    OGRFieldDefn* get() noexcept;
+
 private:
+    bool _hasOwnerShip;
     OGRFieldDefn* _def;
 };
 
 class Feature
 {
 public:
+    Feature(Layer& layer);
     explicit Feature(OGRFeature* feature);
     Feature(const Feature&) = delete;
     Feature(Feature&&);
@@ -184,6 +192,12 @@ public:
     template <typename T>
     T getFieldAs(std::string_view name) const;
 
+    template <typename T>
+    void setField(std::string_view name, const T& value)
+    {
+        _feature->SetField(name.data(), value);
+    }
+
     bool operator==(const Feature& other) const;
 
 private:
@@ -206,6 +220,7 @@ public:
     int fieldIndex(std::string_view name) const;
     void setSpatialFilter(Point<double> point);
 
+    void createField(FieldDefinition& field);
     void createFeature(Feature& feature);
 
     const char* name() const;

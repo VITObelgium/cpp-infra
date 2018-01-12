@@ -66,4 +66,20 @@ TEST(GdalTest, convertPointProjected)
     EXPECT_NEAR(2.55772472781224, point.x, 1e-10);
     EXPECT_NEAR(50.6735631138308, point.y, 1e-10);
 }
+
+TEST(GdalTest, createExcelFile)
+{
+    auto ds = gdal::DataSet::create("sheet.xlsx", gdal::VectorType::Xlsx);
+
+    auto layer = ds.createLayer("Workbook");
+    layer.createField(gdal::FieldDefinition("Column1", typeid(std::string)));
+    layer.createField(gdal::FieldDefinition("Column2", typeid(int32_t)));
+
+    gdal::Feature feat1(layer);
+    gdal::Feature feat2(layer);
+
+    //feat1.setField("Column1", )
+
+    //layer.createFeature()
+}
 }
