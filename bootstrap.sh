@@ -33,7 +33,7 @@ case $yno in
     * ) echo "Invalid selection" exit;;
 esac
 
-printf "Select toolchain to use:\n1:Default\n2:Musl (static linking)\n3:Mingw\n4:Gcc7\n5:Clang\n6:emscripten\n"
+printf "Select toolchain to use:\n1:Default\n2:Musl (static linking)\n3:Mingw\n4:Gcc6\n5:Gcc7\n6:Clang\n7:emscripten\n"
 read yno
 case $yno in
     [1] ) toolchain="toolchain-cluster";;
@@ -46,8 +46,9 @@ case $yno in
             generator="Unix Makefiles"
         fi
         ;;
-    [4] ) toolchain="toolchain-gcc7";;
-    [5] )
+    [4] ) toolchain="toolchain-gcc6";; 
+    [5] ) toolchain="toolchain-gcc7";;
+    [6] )
         if [[ "$platform" == "linux" ]]; then
             toolchain="toolchain-cluster-clang"
         elif [[ $platform == MINGW64* ]]; then
@@ -56,7 +57,7 @@ case $yno in
             toolchain="toolchain-clang"
         fi
         ;;
-    [6] ) toolchain="toolchain-wasm"; emscripten=1;;
+    [7] ) toolchain="toolchain-wasm"; emscripten=1;;
     * ) echo "Invalid selection" exit;;
 esac
 
