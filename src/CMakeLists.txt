@@ -47,7 +47,7 @@ if (BUILD_UI)
 endif ()
 
 add_executable(opaq opaq.cpp)
-target_link_libraries(opaq opaqcore Eigen3::Eigen Zlib::Zlib)
+target_link_libraries(opaq opaqcore Eigen3::Eigen)
 
 if (STATIC_PLUGINS)
     target_link_libraries(opaq ${PLUGINS})
