@@ -48,6 +48,19 @@ def get_include_guard_name(namespace, inputfile):
   val = re.sub("[^A-Za-z]+", "_", namespace + '_' + os.path.basename(inputfile))
   return val.upper()
 
+def escape_if_reserved(name):
+    reserved_names = [
+        'GROUP',
+        'ORDER'
+    ]
+
+    if name.upper() in reserved_names:
+        return '\\"{}\\"'.format(name)
+
+    if name[0] == '%':
+        return '\\"{}\\"'.format(name)
+
+    return name
 
 def repl_func(m):
   if m.group(1) == '_':
@@ -63,11 +76,11 @@ def repl_func_for_args(m):
     return m.group(1) + m.group(2).upper()
 
 def toClassName(s):
-  return re.sub("(^|\s|[_0-9])(\S)", repl_func, s)
+  return re.sub("(^|\s|[_%0-9])(\S)", repl_func, s).replace('%', '')
 
 
 def toMemberName(s):
-  return re.sub("(\s|_|[0-9])(\S)", repl_func, s)
+  return re.sub("(\s|_|[%0-9])(\S)", repl_func, s).replace('%', '')
 
 
 def setArgumentBool(s, bool_value):
@@ -112,6 +125,7 @@ optionalArgs = {
     # '-no-time-stamp-warning'  # timeStampWarning = False
     '-fail-on-parse': "abort instead of silent genereation of unusable headers",  # failOnParse = True
     '-warn-on-parse': "warn about unusable headers, but continue",  # warnOnParse = True
+    '-auto-id': "Assume column 'id' to have an automatic value as if AUTO_INCREMENT was specified (e.g. implicit for SQLite ROWID)",  # autoId = True
     '-help': "show this help"
 }
 
@@ -127,6 +141,7 @@ timestampWarning = True
 failOnParse = False
 warnOnParse = False
 parseError = "Parsing error, possible reason: can't parse default value for a field"
+autoId = False
 
 
 if len(sys.argv) >= 4:
@@ -164,12 +179,17 @@ def ddlFunctionWord(string):
 ddlString = Or([QuotedString("'"), QuotedString("\"", escQuote='""'), QuotedString("`")])
 negativeSign = Literal('-')
 ddlNum = Combine(Optional(negativeSign) + Word(nums + "."))
-ddlTerm = Word(alphanums + "_$")
+ddlTerm = Word(alphanums + "_$%")
 ddlName = Or([ddlTerm, ddlString])
 ddlArguments = "(" + delimitedList(Or([ddlString, ddlTerm, ddlNum])) + ")"
 ddlNotNull = Group(ddlWord("NOT") + ddlWord("NULL")).setResultsName("notNull")
 ddlDefaultValue = ddlWord("DEFAULT").setResultsName("hasDefaultValue")
-ddlAutoValue = ddlWord("AUTO_INCREMENT").setResultsName("hasAutoValue")
+ddlAutoValue = Or([
+    ddlWord("AUTO_INCREMENT"),
+    ddlWord("SMALLSERIAL"),
+    ddlWord("SERIAL"),
+    ddlWord("BIGSERIAL"),
+    ]).setResultsName("hasAutoValue")
 ddlColumnComment = Group(ddlWord("COMMENT") + ddlString).setResultsName("comment")
 ddlConstraint = Or([
         ddlWord("CONSTRAINT"),
@@ -180,7 +200,8 @@ ddlConstraint = Or([
         ddlWord("UNIQUE"),
         ])
 ddlColumn = Group(Optional(ddlConstraint).setResultsName("isConstraint") + OneOrMore(MatchFirst([ddlNotNull, ddlAutoValue, ddlDefaultValue, ddlFunctionWord("NOW"), ddlTerm, ddlNum, ddlColumnComment, ddlString, ddlArguments])))
-createTable = Group(ddlWord("CREATE") + ddlWord("TABLE") + ddlName.setResultsName("tableName") + "(" + Group(delimitedList(ddlColumn)).setResultsName("columns") + ")").setResultsName("create")
+ddlIfNotExists = Optional(Group(ddlWord("IF") + ddlWord("NOT") + ddlWord("EXISTS")).setResultsName("ifNotExists"))
+createTable = Group(ddlWord("CREATE") + ddlWord("TABLE") + ddlIfNotExists + ddlName.setResultsName("tableName") + "(" + Group(delimitedList(ddlColumn)).setResultsName("columns") + ")").setResultsName("create")
 #ddlString.setDebug(True) #uncomment to debug pyparsing
 
 ddl = ZeroOrMore(Suppress(SkipTo(createTable, False)) + createTable)
@@ -192,9 +213,13 @@ ddl.ignore(ddlComment)
 types = {
     'tinyint': 'tinyint',
     'smallint': 'smallint',
+    'smallserial': 'smallint', # PostgreSQL
     'integer': 'integer',
     'int': 'integer',
+    'serial': 'integer', # PostgreSQL
+    'mediumint' : 'integer',
     'bigint': 'bigint',
+    'bigserial': 'bigint', # PostgreSQL
     'char': 'char_',
     'varchar': 'varchar',
     'text': 'text',
@@ -206,6 +231,7 @@ types = {
     'boolean': 'boolean',
     'double': 'floating_point',
     'float': 'floating_point',
+    'real': 'floating_point',
     'date': 'day_point',
     'datetime': 'time_point',
     'timestamp': 'time_point',
@@ -214,7 +240,7 @@ types = {
     }
 
 ddlColumn = Group(Optional(ddlConstraint).setResultsName("isConstraint") + OneOrMore(MatchFirst([ddlNotNull, ddlAutoValue, ddlDefaultValue, ddlFunctionWord("NOW"), ddlTerm, ddlNum, ddlColumnComment, ddlString, ddlArguments])))
-createTable = Group(ddlWord("CREATE") + ddlWord("TABLE") + ddlName.setResultsName("tableName") + "(" + Group(delimitedList(ddlColumn)).setResultsName("columns") + ")").setResultsName("create")
+createTable = Group(ddlWord("CREATE") + ddlWord("TABLE") + ddlIfNotExists + ddlName.setResultsName("tableName") + "(" + Group(delimitedList(ddlColumn)).setResultsName("columns") + ")").setResultsName("create")
 ddlComment = oneOf(["--", "#"]) + restOfLine
 
 if failOnParse:
@@ -233,6 +259,7 @@ else:
 if warnOnParse:
     print(parseError + '. Continuing [-no-warn-on-parse]')
 
+nsList = namespace.split('::')
 
 # PROCESS DDL
 tableCreations = ddl.parseFile(pathToDdl)
@@ -246,8 +273,9 @@ print('#include <' + INCLUDE + '/table.h>', file=header)
 print('#include <' + INCLUDE + '/data_types.h>', file=header)
 print('#include <' + INCLUDE + '/char_sequence.h>', file=header)
 print('', file=header)
-print('namespace ' + namespace, file=header)
-print('{', file=header)
+for ns in nsList:
+    print('namespace ' + ns, file=header)
+    print('{', file=header)
 DataTypeError = False
 for create in tableCreations:
     sqlTableName = create.tableName
@@ -274,7 +302,7 @@ for create in tableCreations:
         print('    {', file=header)
         print('      struct _alias_t', file=header)
         print('      {', file=header)
-        print('        static constexpr const char _literal[] =  "' + sqlColumnName + '";', file=header)
+        print('        static constexpr const char _literal[] =  "' + escape_if_reserved(sqlColumnName) + '";', file=header)
         print('        using _name_t = sqlpp::make_char_sequence<sizeof(_literal), _literal>;', file=header)
         print('        template<typename T>', file=header)
         print('        struct _member_t', file=header)
@@ -290,6 +318,7 @@ for create in tableCreations:
             print ('Error: datatype "'  + sqlColumnType + '"" is not supported.')
             DataTypeError = True
         requireInsert = True
+        column.hasAutoValue = column.hasAutoValue or (autoId and sqlColumnName == 'id')
         if column.hasAutoValue:
             traitslist.append(NAMESPACE + '::tag::must_not_insert')
             traitslist.append(NAMESPACE + '::tag::must_not_update')
@@ -303,7 +332,7 @@ for create in tableCreations:
             traitslist.append(NAMESPACE + '::tag::require_insert')
         print('      using _traits = ' + NAMESPACE + '::make_traits<' + ', '.join(traitslist) + '>;', file=header)
         print('    };', file=header)
-    print('  }', file=header)
+    print('  } // namespace ' + tableNamespace, file=header)
     print('', file=header)
 
     print('  struct ' + tableClass + ': ' + NAMESPACE + '::table_t<' + tableTemplateParameters + '>', file=header)
@@ -322,7 +351,8 @@ for create in tableCreations:
     print('    };', file=header)
     print('  };', file=header)
 
-print('}', file=header)
+for ns in nsList:
+    print('} // namespace ' + ns, file=header)
 print('#endif', file=header)
 if (DataTypeError):
     print("Error: unsupported datatypes." )
