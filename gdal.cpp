@@ -10,11 +10,10 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <ogrsf_frmts.h>
 #include <stdexcept>
 #include <unordered_map>
 #include <utility>
-
-#include <ogrsf_frmts.h>
 
 namespace infra::gdal {
 
