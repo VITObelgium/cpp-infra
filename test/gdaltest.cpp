@@ -67,7 +67,7 @@ TEST(GdalTest, convertPointProjected)
     EXPECT_NEAR(50.6735631138308, point.y, 1e-10);
 }
 
-TEST(GdalTest, createExcelFile)
+TEST(GdalTest, DISABLED_createExcelFile)
 {
     auto ds = gdal::DataSet::create("sheet.xlsx", gdal::VectorType::Xlsx);
 
