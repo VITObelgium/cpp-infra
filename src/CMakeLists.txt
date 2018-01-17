@@ -1,6 +1,6 @@
 find_path(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
 
-find_dependency(NAME TINYXML LIBNAMES tinyxml DEBUGLIBNAMES tinyxml_d)
+find_dependency(NAME TINYXML LIBNAMES tinyxml DEBUGLIBNAMES tinyxmld)
 
 if (UNIX)
     set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
@@ -12,8 +12,7 @@ find_package(Zlib REQUIRED)
 find_package(Threads)
 
 set (Boost_USE_STATIC_LIBS ON)
-set (Boost_USE_STATIC_RUNTIME ON)
-add_definitions("-DBOOST_ALL_NO_LIB")
+set (Boost_USE_STATIC_RUNTIME OFF)
 find_package(Boost REQUIRED COMPONENTS system filesystem iostreams program_options)
 
 # We use our own version of FMT, let spdlog use the same version
@@ -47,7 +46,7 @@ if (BUILD_UI)
 endif ()
 
 add_executable(opaq opaq.cpp)
-target_link_libraries(opaq opaqcore Eigen3::Eigen)
+target_link_libraries(opaq opaqcore Eigen3::Eigen Boost::program_options)
 
 if (STATIC_PLUGINS)
     target_link_libraries(opaq ${PLUGINS})

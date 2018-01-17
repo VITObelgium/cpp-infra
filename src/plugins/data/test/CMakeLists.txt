@@ -1,6 +1,6 @@
-find_dependency(NAME GTEST LIBNAMES gmock DEBUGLIBNAMES gmock_d)
+find_package(GTest REQUIRED)
+find_package(GMock REQUIRED)
 
-include_directories(SYSTEM ${GTEST_INCLUDE_DIRS})
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
@@ -36,7 +36,8 @@ target_link_libraries(dataplugintest
     ircelmeteoprovider
     stationinfoprovider
     textgridprovider
-    ${GTEST_LIBRARY}
+    GTest::GTest
+    GMock::GMock
 )
 
 add_test(NAME dataplugintest COMMAND dataplugintest)

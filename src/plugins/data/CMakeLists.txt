@@ -85,7 +85,7 @@ if (NOT STATIC_PLUGINS)
     set_target_properties(stationinfoprovider PROPERTIES POSITION_INDEPENDENT_CODE ON)
 
     add_library(hdf5bufferplugin            MODULE Hdf5BufferPlugin.cpp)
-    add_library(riooutputbufferplugin       MODULE Hdf5BufferPlugin.cpp)
+    add_library(riooutputbufferplugin       MODULE RioOutputBufferPlugin.cpp)
     add_library(sqlbufferplugin             MODULE SqlBufferPlugin.cpp)
     add_library(rioobsproviderplugin        MODULE RioObsProviderPlugin.cpp)
     add_library(asciiforecastwriterplugin   MODULE AsciiForecastWriterPlugin.cpp)
