@@ -10,6 +10,7 @@
 #include <fmt/format.h>
 #include <gdal_priv.h>
 #include <gsl/span>
+#include <ogr_spatialref.h>
 #include <optional>
 #include <variant>
 

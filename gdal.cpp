@@ -14,7 +14,6 @@
 #include <unordered_map>
 #include <utility>
 
-#include <ogr_spatialref.h>
 #include <ogrsf_frmts.h>
 
 namespace infra::gdal {
