@@ -69,14 +69,14 @@ TEST(GdalTest, convertPointProjected)
 
 TEST(GdalTest, DISABLED_createExcelFile)
 {
-    auto ds = gdal::DataSet::create("sheet.xlsx", gdal::VectorType::Xlsx);
+    /*auto ds = gdal::DataSet::create("sheet.xlsx", gdal::VectorType::Xlsx);
 
     auto layer = ds.createLayer("Workbook");
     layer.createField(gdal::FieldDefinition("Column1", typeid(std::string)));
     layer.createField(gdal::FieldDefinition("Column2", typeid(int32_t)));
 
     gdal::Feature feat1(layer);
-    gdal::Feature feat2(layer);
+    gdal::Feature feat2(layer);*/
 
     //feat1.setField("Column1", )
 
