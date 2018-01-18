@@ -13,3 +13,4 @@ doc/.tag
 doc/doxygen_sqlite3.db
 
 build/
+.vs/
