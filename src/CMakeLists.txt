@@ -8,7 +8,6 @@ endif ()
 
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
-find_package(Zlib REQUIRED)
 find_package(Threads)
 
 set (Boost_USE_STATIC_LIBS ON)

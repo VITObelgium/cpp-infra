@@ -91,7 +91,6 @@ target_link_libraries(opaqcore
     Boost::iostreams
     Boost::disable_autolinking 
     ${TINYXML_LIBRARY}
-    Zlib::Zlib
     ${EXTRA_LIBS}
     ${CMAKE_DL_LIBS}
 )

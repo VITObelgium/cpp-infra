@@ -6,7 +6,6 @@ find_package(Qt5Widgets)
 
 option(STATIC_QT "Statically link qt" OFF)
 
-set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 qt5_wrap_ui(OPAQ_FORMS_HEADERS runsimulationdialog.ui opaqview.ui opaqviewer.ui opaqvalidation.ui)
@@ -28,6 +27,7 @@ add_executable(opaqui
 )
 
 source_group(ui FILES ${OPAQ_FORMS_HEADERS} opaqui_automoc.cpp)
+set_target_properties(opaqui PROPERTIES AUTOMOC ON)
 
 if (MSVC)
     set_target_properties(opaqui PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")

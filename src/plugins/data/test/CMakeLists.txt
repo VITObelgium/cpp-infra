@@ -36,6 +36,7 @@ target_link_libraries(dataplugintest
     ircelmeteoprovider
     stationinfoprovider
     textgridprovider
+    Boost::iostreams
     GTest::GTest
     GMock::GMock
 )
