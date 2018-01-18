@@ -9,6 +9,7 @@ endif ()
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Threads)
+find_package(OpenSSL REQUIRED)
 
 set (Boost_USE_STATIC_LIBS ON)
 set (Boost_USE_STATIC_RUNTIME OFF)
