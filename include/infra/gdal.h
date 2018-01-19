@@ -478,14 +478,14 @@ public:
     template <typename T>
     DataSet createDataSet(uint32_t rows, uint32_t cols, uint32_t numBands, const std::string& filename)
     {
-        return DataSet(checkPointer(_driver->Create(filename.c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
+        return DataSet(checkPointer(_driver.Create(filename.c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
     template <typename T>
     DataSet createDataSetCopy(const DataSet& reference, const std::string& filename, const std::vector<std::string>& driverOptions = {})
     {
         auto options = createOptionsArray(driverOptions);
-        return DataSet(checkPointer(_driver->CreateCopy(
+        return DataSet(checkPointer(_driver.CreateCopy(
                                         filename.c_str(),
                                         reference.get(),
                                         FALSE,
