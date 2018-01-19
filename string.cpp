@@ -8,6 +8,24 @@
 
 namespace infra::str {
 
+bool containsValidInteger(std::string_view str)
+{
+    std::string s(str);
+
+    char* end = 0;
+    std::strtol(s.c_str(), &end, 10);
+    return (end != 0 && *end == 0);
+}
+
+bool containsValidFloatingPoint(std::string_view str)
+{
+    std::string s(str);
+
+    char* end = 0;
+    std::strtod(s.c_str(), &end);
+    return (end != 0 && *end == 0);
+}
+
 void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
 {
     size_t startPos = 0;

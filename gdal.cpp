@@ -22,22 +22,29 @@ using namespace std::string_literals;
 namespace {
 
 static const std::unordered_map<MapType, const char*> s_driverLookup{{{MapType::Memory, "MEM"},
-    {MapType::ArcAscii, "AAIGrid"},
-    {MapType::GeoTiff, "GTiff"},
-    {MapType::Gif, "GIF"},
-    {MapType::Png, "PNG"}}};
+                                                                      {MapType::ArcAscii, "AAIGrid"},
+                                                                      {MapType::GeoTiff, "GTiff"},
+                                                                      {MapType::Gif, "GIF"},
+                                                                      {MapType::Png, "PNG"}}};
 
 static const std::unordered_map<std::string, MapType> s_driverDescLookup{{{"MEM", MapType::Memory},
-    {"AAIGrid", MapType::ArcAscii},
-    {"GTiff", MapType::GeoTiff},
-    {"GIF", MapType::Gif},
-    {"PNG", MapType::Png}}};
+                                                                          {"AAIGrid", MapType::ArcAscii},
+                                                                          {"GTiff", MapType::GeoTiff},
+                                                                          {"GIF", MapType::Gif},
+                                                                          {"PNG", MapType::Png}}};
 
 static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
     {VectorType::Csv, "CSV"},
     {VectorType::Tab, "CSV"},
     {VectorType::ShapeFile, "ESRI Shapefile"},
     {VectorType::Xlsx, "XLSX"},
+}};
+
+static const std::unordered_map<std::string, VectorType> s_shapeDriverDescLookup{{
+    {"CSV", VectorType::Csv},
+    {"CSV", VectorType::Tab},
+    {"ESRI Shapefile", VectorType::ShapeFile},
+    {"XLSX", VectorType::Xlsx},
 }};
 
 static std::string getExtenstion(const std::string& path)
@@ -91,7 +98,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-        "Failed to create transformation");
+                              "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -223,7 +230,7 @@ Driver Driver::create(MapType mt)
     //        throw RuntimeError("{} does not support map creation", driverName);
     //    }
 
-    return Driver(driverPtr);
+    return Driver(*driverPtr);
 }
 
 Driver Driver::create(VectorType mt)
@@ -238,7 +245,7 @@ Driver Driver::create(VectorType mt)
         throw RuntimeError("Failed to get driver: {}", driverName);
     }
 
-    return Driver(driverPtr);
+    return Driver(*driverPtr);
 }
 
 Driver Driver::create(const std::string& filename)
@@ -256,12 +263,26 @@ Driver Driver::create(const std::string& filename)
     throw RuntimeError("Failed to determine type from filename: {}", filename);
 }
 
+Driver::Driver(GDALDriver& driver)
+: _driver(driver)
+{
+}
+
 MapType Driver::mapType() const
 {
     try {
-        return s_driverDescLookup.at(_driver->GetDescription());
+        return s_driverDescLookup.at(_driver.GetDescription());
     } catch (const std::out_of_range&) {
-        throw RuntimeError("Failed to determine map type for driver: {}", _driver->GetDescription());
+        throw RuntimeError("Failed to determine map type for driver: {}", _driver.GetDescription());
+    }
+}
+
+VectorType Driver::vectorType() const
+{
+    try {
+        return s_shapeDriverDescLookup.at(_driver.GetDescription());
+    } catch (const std::out_of_range&) {
+        throw RuntimeError("Failed to determine vector type for driver: {}", _driver.GetDescription());
     }
 }
 
@@ -436,12 +457,13 @@ const std::type_info& FieldDefinition::type() const
         return typeid(int64_t);
     case OFTString:
         return typeid(std::string_view);
+    case OFTDate:
+        return typeid(date_point);
     case OFTIntegerList:
     case OFTRealList:
     case OFTStringList:
     case OFTWideString:
     case OFTBinary:
-    case OFTDate:
     case OFTTime:
     case OFTDateTime:
     case OFTInteger64List:
@@ -451,6 +473,44 @@ const std::type_info& FieldDefinition::type() const
 }
 
 OGRFieldDefn* FieldDefinition::get() noexcept
+{
+    return _def;
+}
+
+FeatureDefinition::FeatureDefinition(OGRFeatureDefn* def)
+: _hasOwnerShip(false)
+, _def(def)
+{
+}
+
+FeatureDefinition::~FeatureDefinition()
+{
+    if (_hasOwnerShip) {
+        delete _def;
+    }
+}
+
+std::string_view FeatureDefinition::name() const
+{
+    return std::string_view(_def->GetName());
+}
+
+int FeatureDefinition::fieldCount() const
+{
+    return _def->GetFieldCount();
+}
+
+int FeatureDefinition::fieldIndex(std::string_view name) const
+{
+    return _def->GetFieldIndex(name.data());
+}
+
+FieldDefinition FeatureDefinition::fieldDefinition(int index) const
+{
+    return FieldDefinition(checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
+}
+
+OGRFeatureDefn* FeatureDefinition::get() noexcept
 {
     return _def;
 }
@@ -655,9 +715,10 @@ int64_t Layer::featureCount() const
     return _layer->GetFeatureCount();
 }
 
-Feature Layer::operator[](int64_t index) const
+Feature Layer::feature(int64_t index) const
 {
-    return Feature(_layer->GetFeature(index));
+    assert(index < _layer->GetFeatureCount());
+    return Feature(checkPointer(_layer->GetFeature(index), "Failed to get feature from layer"));
 }
 
 int Layer::fieldIndex(std::string_view name) const
@@ -679,6 +740,11 @@ void Layer::createField(FieldDefinition& field)
 void Layer::createFeature(Feature& feature)
 {
     checkError(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
+}
+
+FeatureDefinition Layer::layerDefinition() const
+{
+    return FeatureDefinition(checkPointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
 }
 
 const char* Layer::name() const
@@ -797,6 +863,52 @@ bool FeatureIterator::operator!=(const FeatureIterator& other) const
     return !(*this == other);
 }
 
+FeatureDefinitionIterator::FeatureDefinitionIterator(int fieldCount)
+: _currentFieldIndex(fieldCount)
+{
+}
+
+FeatureDefinitionIterator::FeatureDefinitionIterator(const FeatureDefinition& featureDef)
+: _featureDef(&featureDef)
+, _fieldCount(featureDef.fieldCount())
+{
+    next();
+}
+
+void FeatureDefinitionIterator::next()
+{
+    if (_currentFieldIndex < _fieldCount) {
+        _currentField = _featureDef->fieldDefinition(_currentFieldIndex);
+    }
+}
+
+const FieldDefinition& FeatureDefinitionIterator::operator*()
+{
+    return _currentField;
+}
+
+const FieldDefinition* FeatureDefinitionIterator::operator->()
+{
+    return &_currentField;
+}
+
+FeatureDefinitionIterator& FeatureDefinitionIterator::operator++()
+{
+    ++_currentFieldIndex;
+    next();
+    return *this;
+}
+
+bool FeatureDefinitionIterator::operator==(const FeatureDefinitionIterator& other) const
+{
+    return _currentFieldIndex == other._currentFieldIndex;
+}
+
+bool FeatureDefinitionIterator::operator!=(const FeatureDefinitionIterator& other) const
+{
+    return !(*this == other);
+}
+
 DataSet DataSet::create(const std::string& filePath)
 {
     return DataSet(filePath);
@@ -804,6 +916,10 @@ DataSet DataSet::create(const std::string& filePath)
 
 DataSet DataSet::create(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions)
 {
+    if (type == VectorType::Unknown) {
+        type = guessVectorTypeFromFileName(filePath);
+    }
+
     std::array<const char*, 2> drivers{{s_shapeDriverLookup.at(type), nullptr}};
 
     auto options = createOptionsArray(driverOptions);
@@ -813,7 +929,7 @@ DataSet DataSet::create(const std::string& filePath, VectorType type, const std:
                                     drivers.data(),
                                     options.size() == 1 ? nullptr : options.data(),
                                     nullptr)),
-        "Failed to open vector file"));
+                                "Failed to open vector file"));
 }
 
 DataSet::DataSet(GDALDataset* ptr) noexcept
@@ -962,6 +1078,16 @@ GDALDataType DataSet::getBandDataType(int bandNr) const
     return checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index")->GetRasterDataType();
 }
 
+GDALDataset* DataSet::get() const
+{
+    return _ptr;
+}
+
+Driver DataSet::driver()
+{
+    return Driver(*_ptr->GetDriver());
+}
+
 void throwLastError(const char* msg)
 {
     auto* errorMsg = CPLGetLastErrorMsg();
@@ -1019,7 +1145,7 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
         return VectorType::Csv;
     } else if (ext == ".tab") {
         return VectorType::Tab;
-    } else if (ext == ".tab") {
+    } else if (ext == ".shp" || ext == ".dbf") {
         return VectorType::ShapeFile;
     } else if (ext == ".xlsx") {
         return VectorType::Xlsx;
@@ -1031,8 +1157,8 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-      dataBuffer.size(), FALSE /*no ownership*/))
+                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+                            dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

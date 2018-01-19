@@ -28,9 +28,9 @@ TEST(GdalTest, fieldInfo)
     auto ds    = gdal::DataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
     auto layer = ds.getLayer(0);
     EXPECT_EQ(9, layer.featureCount());
-    EXPECT_EQ(1, layer[0].fieldCount());
-    EXPECT_EQ("FID", layer[0].fieldDefinition(0).name());
-    EXPECT_EQ(typeid(int64_t), layer[0].fieldDefinition(0).type());
+    EXPECT_EQ(1, layer.feature(0).fieldCount());
+    EXPECT_EQ("FID", layer.feature(0).fieldDefinition(0).name());
+    EXPECT_EQ(typeid(int64_t), layer.feature(0).fieldDefinition(0).type());
 }
 
 TEST(GdalTest, getField)

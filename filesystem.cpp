@@ -22,11 +22,10 @@ fs::path getFullPath(const fs::path& base, const fs::path& file)
             c = '/';
         }
     }
-    auto par = base.parent_path() / fileStr;
 
-    return fs::canonical(par);
+    return fs::canonical(fs::absolute(file, base.parent_path()));
 #else
-    return fs::canonical((base.parent_path() / file).make_preferred());
+    return fs::canonical(fs::absolute(file, base.parent_path())).make_preferred();
 #endif
 }
 }

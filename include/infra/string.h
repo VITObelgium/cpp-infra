@@ -11,6 +11,9 @@
 
 namespace infra::str {
 
+bool containsValidInteger(std::string_view str);
+bool containsValidFloatingPoint(std::string_view str);
+
 void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
 
 [[nodiscard]] std::string lowercase(std::string_view str);
@@ -33,7 +36,7 @@ std::string join(const Container& items, std::string_view joinString)
 {
     using ValueType = typename Container::value_type;
     static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
-        "Items to join should be streamable or convertible to string_view");
+                  "Items to join should be streamable or convertible to string_view");
 
     std::string result;
 

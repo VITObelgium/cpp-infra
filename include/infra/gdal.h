@@ -13,6 +13,7 @@
 #include <ogr_feature.h>
 #include <ogr_spatialref.h>
 
+#include <chrono>
 #include <optional>
 #include <variant>
 
@@ -25,6 +26,9 @@ class OGRMultiLineString;
 namespace infra::gdal {
 
 using namespace std::string_literals;
+
+using days       = std::chrono::duration<int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
+using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 
 // RAII wrapper for gdal registration
 class Registration
@@ -46,6 +50,7 @@ void registerGdal();
 void unregisterGdal();
 
 class Layer;
+class Driver;
 
 enum class MapType
 {
@@ -152,6 +157,7 @@ using Field    = std::variant<int32_t, int64_t, double, std::string_view>;
 class FieldDefinition
 {
 public:
+    FieldDefinition() = default;
     FieldDefinition(const char* name, const std::type_info& typeInfo);
     FieldDefinition(OGRFieldDefn* def);
     ~FieldDefinition();
@@ -161,8 +167,26 @@ public:
     OGRFieldDefn* get() noexcept;
 
 private:
+    bool _hasOwnerShip = false;
+    OGRFieldDefn* _def = nullptr;
+};
+
+class FeatureDefinition
+{
+public:
+    FeatureDefinition(OGRFeatureDefn* def);
+    ~FeatureDefinition();
+    std::string_view name() const;
+
+    int fieldCount() const;
+    int fieldIndex(std::string_view name) const;
+    FieldDefinition fieldDefinition(int index) const;
+
+    OGRFeatureDefn* get() noexcept;
+
+private:
     bool _hasOwnerShip;
-    OGRFieldDefn* _def;
+    OGRFeatureDefn* _def;
 };
 
 class Feature
@@ -218,13 +242,15 @@ public:
     Layer& operator=(Layer&&) = default;
 
     int64_t featureCount() const;
-    Feature operator[](int64_t index) const;
+    Feature feature(int64_t index) const;
 
     int fieldIndex(std::string_view name) const;
     void setSpatialFilter(Point<double> point);
 
     void createField(FieldDefinition& field);
     void createFeature(Feature& feature);
+
+    FeatureDefinition layerDefinition() const;
 
     const char* name() const;
     OGRLayer* get();
@@ -314,12 +340,53 @@ inline FeatureIterator end(const Feature& feat)
     return FeatureIterator(feat.fieldCount());
 }
 
+class FeatureDefinitionIterator
+{
+public:
+    FeatureDefinitionIterator(int fieldCount);
+    FeatureDefinitionIterator(const FeatureDefinition& featureDef);
+    FeatureDefinitionIterator(const FeatureDefinitionIterator&) = delete;
+    FeatureDefinitionIterator(FeatureDefinitionIterator&&)      = default;
+
+    FeatureDefinitionIterator& operator++();
+    FeatureDefinitionIterator& operator=(FeatureDefinitionIterator&& other) = default;
+    bool operator==(const FeatureDefinitionIterator& other) const;
+    bool operator!=(const FeatureDefinitionIterator& other) const;
+    const FieldDefinition& operator*();
+    const FieldDefinition* operator->();
+
+private:
+    void next();
+
+    const FeatureDefinition* _featureDef = nullptr;
+    int _fieldCount                      = 0;
+    int _currentFieldIndex               = 0;
+    FieldDefinition _currentField;
+};
+
+// support for range based for loops
+inline FeatureDefinitionIterator begin(const FeatureDefinition& featDef)
+{
+    return FeatureDefinitionIterator(featDef);
+}
+
+inline FeatureDefinitionIterator begin(FeatureDefinition&& featDef)
+{
+    return FeatureDefinitionIterator(featDef);
+}
+
+inline FeatureDefinitionIterator end(const FeatureDefinition& featDef)
+{
+    return FeatureDefinitionIterator(featDef.fieldCount());
+}
+
 class DataSet
 {
 public:
+    // This can only be used for raster types
     static DataSet create(const std::string& filePath);
-    // if you know the type of the dataset, this will be faster as not all
-    // drivers are queried
+    // if you know the type of the dataset, this will be faster as not all drivers are queried
+    // pass VectorType::Unknown to to guess the format based on the extension
     static DataSet create(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
 
     DataSet() = default;
@@ -356,7 +423,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-            "Failed to read raster data");
+                   "Failed to read raster data");
     }
 
     template <typename T>
@@ -365,7 +432,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                   "Failed to write raster data");
     }
 
     template <typename T>
@@ -390,10 +457,8 @@ public:
         band->SetColorInterpretation(colorInterp);
     }
 
-    GDALDataset* get() const
-    {
-        return _ptr;
-    }
+    GDALDataset* get() const;
+    Driver driver();
 
 private:
     explicit DataSet(const std::string& filename);
@@ -407,6 +472,8 @@ public:
     static Driver create(MapType);
     static Driver create(VectorType);
     static Driver create(const std::string& filename);
+
+    explicit Driver(GDALDriver& driver);
 
     template <typename T>
     DataSet createDataSet(uint32_t rows, uint32_t cols, uint32_t numBands, const std::string& filename)
@@ -425,18 +492,14 @@ public:
                                         options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                         nullptr,
                                         nullptr),
-            "Failed to create data set copy"));
+                                    "Failed to create data set copy"));
     }
 
     MapType mapType() const;
+    VectorType vectorType() const;
 
 private:
-    explicit Driver(GDALDriver* driver)
-    : _driver(driver)
-    {
-    }
-
-    GDALDriver* _driver;
+    GDALDriver& _driver;
 };
 
 class MemoryFile
