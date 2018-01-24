@@ -26,9 +26,9 @@ public:
 	 * Returns true if the item in the row indicated by the given source_row and source_parent contains a unique value in the model; otherwise returns false.
 	 * @note By default, the Qt::DisplayRole is used to determine if the row should be accepted or not.
 	 */
-    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
+    bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const override;
 
-    virtual bool insertRows(int row, int count, const QModelIndex& parent = QModelIndex());
+    virtual bool insertRows(int row, int count, const QModelIndex& parent = QModelIndex()) override;
     /**
 	 * Returns model column used to determine unique value.
 	 */
@@ -38,7 +38,7 @@ public:
 	 * Set the model column used to determine unique value.
 	 */
     void setModelColumn(int colum);
-    void setSourceModel(QAbstractItemModel* sourceModel);
+    void setSourceModel(QAbstractItemModel* sourceModel) override;
 
 private slots:
     bool isDuplicate(int row) const;

@@ -407,7 +407,7 @@ Line MultiLine::geometry(int index) const
     return Line(reinterpret_cast<OGRLineString*>(_multiLine->getGeometryRef(index)));
 }
 
-static const OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
+static OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
 {
     if (typeInfo == typeid(int32_t)) {
         return OFTInteger;
