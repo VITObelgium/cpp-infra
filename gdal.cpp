@@ -918,6 +918,9 @@ DataSet DataSet::create(const std::string& filePath, VectorType type, const std:
 {
     if (type == VectorType::Unknown) {
         type = guessVectorTypeFromFileName(filePath);
+        if (type == VectorType::Unknown) {
+            throw RuntimeError("Failed to determine vector type for file ('{}')", filePath);
+        }
     }
 
     std::array<const char*, 2> drivers{{s_shapeDriverLookup.at(type), nullptr}};
