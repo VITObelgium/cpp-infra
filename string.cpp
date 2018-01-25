@@ -26,6 +26,21 @@ bool containsValidFloatingPoint(std::string_view str)
     return (end != 0 && *end == 0);
 }
 
+bool iequals(std::string_view str1, std::string_view str2)
+{
+    if (str1.size() != str2.size()) {
+        return false;
+    }
+
+    for (size_t i = 0; i < str1.size(); ++i) {
+        if (tolower(str1[i]) != tolower(str2[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
 {
     size_t startPos = 0;

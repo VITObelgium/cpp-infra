@@ -53,6 +53,18 @@ TEST(StringTest, UpperCase)
     EXPECT_EQ(std::string("HELLO"), str::uppercase("HeLLo"));
 }
 
+TEST(StringTest, Iequals)
+{
+    EXPECT_TRUE(str::iequals("TEST", "test"));
+    EXPECT_TRUE(str::iequals("TEST", "TEST"));
+    EXPECT_TRUE(str::iequals("test", "test"));
+    EXPECT_TRUE(str::iequals("", ""));
+
+    EXPECT_FALSE(str::iequals("TEST", "TOST"));
+    EXPECT_FALSE(str::iequals("TEST", ""));
+    EXPECT_FALSE(str::iequals("", "TEST"));
+}
+
 TEST(StringTest, Replace)
 {
     string testString = "abcaabbabbab";
