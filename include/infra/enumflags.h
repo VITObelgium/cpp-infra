@@ -55,9 +55,9 @@ private:
     value_type _value = value_type(0);
 };
 
-template <typename EnumType, typename = std::enable_if<std::is_enum_v<EnumType>>>
-constexpr Flags<EnumType> operator|(EnumType lhs, EnumType rhs)
-{
-    return Flags<EnumType>() | lhs | rhs;
-}
+//template <typename EnumType, typename = std::enable_if<std::is_enum_v<EnumType>>>
+//constexpr Flags<EnumType> operator|(EnumType lhs, EnumType rhs)
+//{
+//    return Flags<EnumType>() | lhs | rhs;
+//}
 }
