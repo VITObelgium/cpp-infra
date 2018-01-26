@@ -2,6 +2,18 @@
 
 namespace infra {
 
+fs::path make_preferred(const fs::path& p)
+{
+    auto pStr = p.string();
+    for (auto& c : pStr) {
+        if (c == '\\') {
+            c = '/';
+        }
+    }
+
+    return fs::path(pStr);
+}
+
 bool createDirectoryIfNotExists(const fs::path& path)
 {
     if (fs::exists(path)) {
@@ -14,21 +26,17 @@ bool createDirectoryIfNotExists(const fs::path& path)
 fs::path combineAbsoluteWithRelativePath(const fs::path& base, const fs::path& file)
 {
     assert(base.has_parent_path());
-    return combinePath(base.parent_path(), file);
+    return combinePath(make_preferred(base).parent_path(), file);
 }
 
 fs::path combinePath(const fs::path& base, const fs::path& file)
 {
 #ifndef WIN32
-    auto fileStr = file.string();
-    for (auto& c : fileStr) {
-        if (c == '\\') {
-            c = '/';
-        }
-    }
+    auto basePref = base;
+    auto filePref = file;
 
     //return fs::canonical(fs::absolute(file, base.parent_path()));
-    return fs::absolute(fileStr, base);
+    return fs::absolute(make_preferred(file), make_preferred(basePref));
 #else
     return fs::canonical(fs::absolute(file, base)).make_preferred();
 #endif
