@@ -53,7 +53,7 @@ void unregisterGdal();
 class Layer;
 class Driver;
 
-enum class MapType
+enum class RasterType
 {
     Memory,
     ArcAscii,
@@ -80,7 +80,7 @@ int32_t projectionToGeoEpsg(const std::string& projection);
 int32_t projectionToEpsg(const std::string& projection);
 std::vector<const char*> createOptionsArray(const std::vector<std::string>& driverOptions);
 
-MapType guessMapTypeFromFileName(const std::string& filePath);
+RasterType guessRasterTypeFromFileName(const std::string& filePath);
 VectorType guessVectorTypeFromFileName(const std::string& filePath);
 
 class Line
@@ -410,10 +410,11 @@ class DataSet
 {
 public:
     // This can only be used for raster types
-    static DataSet create(const std::string& filePath);
+    static DataSet createRaster(const std::string& filePath, const std::vector<std::string>& driverOpts = {});
+    static DataSet createRaster(const std::string& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
     // if you know the type of the dataset, this will be faster as not all drivers are queried
-    // pass VectorType::Unknown to to guess the format based on the extension
-    static DataSet create(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
+    static DataSet createVector(const std::string& filePath, const std::vector<std::string>& driverOptions = {});
+    static DataSet createVector(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
 
     DataSet() = default;
     explicit DataSet(GDALDataset* ptr) noexcept;
@@ -487,6 +488,10 @@ public:
     Driver driver();
 
 private:
+    static GDALDataset* create(const std::string& filename,
+                               unsigned int openFlags,
+                               const char* const* drivers,
+                               const std::vector<std::string>& driverOpts);
     explicit DataSet(const std::string& filename);
 
     GDALDataset* _ptr = nullptr;
@@ -495,7 +500,7 @@ private:
 class Driver
 {
 public:
-    static Driver create(MapType);
+    static Driver create(RasterType);
     static Driver create(VectorType);
     static Driver create(const std::string& filename);
 
@@ -521,7 +526,7 @@ public:
                                     "Failed to create data set copy"));
     }
 
-    MapType mapType() const;
+    RasterType rasterType() const;
     VectorType vectorType() const;
 
 private:

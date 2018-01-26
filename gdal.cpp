@@ -21,17 +21,21 @@ using namespace std::string_literals;
 
 namespace {
 
-static const std::unordered_map<MapType, const char*> s_driverLookup{{{MapType::Memory, "MEM"},
-                                                                      {MapType::ArcAscii, "AAIGrid"},
-                                                                      {MapType::GeoTiff, "GTiff"},
-                                                                      {MapType::Gif, "GIF"},
-                                                                      {MapType::Png, "PNG"}}};
+static const std::unordered_map<RasterType, const char*> s_driverLookup{{
+    {RasterType::Memory, "MEM"},
+    {RasterType::ArcAscii, "AAIGrid"},
+    {RasterType::GeoTiff, "GTiff"},
+    {RasterType::Gif, "GIF"},
+    {RasterType::Png, "PNG"},
+}};
 
-static const std::unordered_map<std::string, MapType> s_driverDescLookup{{{"MEM", MapType::Memory},
-                                                                          {"AAIGrid", MapType::ArcAscii},
-                                                                          {"GTiff", MapType::GeoTiff},
-                                                                          {"GIF", MapType::Gif},
-                                                                          {"PNG", MapType::Png}}};
+static const std::unordered_map<std::string, RasterType> s_driverDescLookup{{
+    {"MEM", RasterType::Memory},
+    {"AAIGrid", RasterType::ArcAscii},
+    {"GTiff", RasterType::GeoTiff},
+    {"GIF", RasterType::Gif},
+    {"PNG", RasterType::Png},
+}};
 
 static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
     {VectorType::Csv, "CSV"},
@@ -212,9 +216,9 @@ std::vector<const char*> createOptionsArray(const std::vector<std::string>& driv
     return options;
 }
 
-Driver Driver::create(MapType mt)
+Driver Driver::create(RasterType mt)
 {
-    if (mt == MapType::Unknown) {
+    if (mt == RasterType::Unknown) {
         throw InvalidArgument("Invalid map type specified");
     }
 
@@ -250,9 +254,9 @@ Driver Driver::create(VectorType mt)
 
 Driver Driver::create(const std::string& filename)
 {
-    auto mapType = guessMapTypeFromFileName(filename);
-    if (mapType != MapType::Unknown) {
-        return create(mapType);
+    auto rasterType = guessRasterTypeFromFileName(filename);
+    if (rasterType != RasterType::Unknown) {
+        return create(rasterType);
     }
 
     auto shapeType = guessVectorTypeFromFileName(filename);
@@ -268,7 +272,7 @@ Driver::Driver(GDALDriver& driver)
 {
 }
 
-MapType Driver::mapType() const
+RasterType Driver::rasterType() const
 {
     try {
         return s_driverDescLookup.at(_driver.GetDescription());
@@ -928,12 +932,41 @@ bool FeatureDefinitionIterator::operator!=(const FeatureDefinitionIterator& othe
     return !(*this == other);
 }
 
-DataSet DataSet::create(const std::string& filePath)
+DataSet DataSet::createRaster(const std::string& filePath, const std::vector<std::string>& driverOpts)
 {
-    return DataSet(filePath);
+    return DataSet(checkPointer(create(filePath,
+                                       GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                       nullptr,
+                                       driverOpts),
+                                "Failed to open raster file"));
 }
 
-DataSet DataSet::create(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions)
+DataSet DataSet::createRaster(const std::string& filePath, RasterType type, const std::vector<std::string>& driverOpts)
+{
+    if (type == RasterType::Unknown) {
+        type = guessRasterTypeFromFileName(filePath);
+        if (type == RasterType::Unknown) {
+            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath);
+        }
+    }
+
+    return DataSet(checkPointer(create(filePath,
+                                       GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                       nullptr,
+                                       driverOpts),
+                                "Failed to open raster file"));
+}
+
+DataSet DataSet::createVector(const std::string& filePath, const std::vector<std::string>& driverOptions)
+{
+    return DataSet(checkPointer(create(filePath,
+                                       GDAL_OF_READONLY | GDAL_OF_VECTOR,
+                                       nullptr,
+                                       driverOptions),
+                                "Failed to open vector file"));
+}
+
+DataSet DataSet::createVector(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions)
 {
     if (type == VectorType::Unknown) {
         type = guessVectorTypeFromFileName(filePath);
@@ -944,14 +977,25 @@ DataSet DataSet::create(const std::string& filePath, VectorType type, const std:
 
     std::array<const char*, 2> drivers{{s_shapeDriverLookup.at(type), nullptr}};
 
-    auto options = createOptionsArray(driverOptions);
-    return DataSet(checkPointer(reinterpret_cast<GDALDataset*>(GDALOpenEx(
-                                    filePath.c_str(),
-                                    GDAL_OF_READONLY | GDAL_OF_VECTOR,
-                                    drivers.data(),
-                                    options.size() == 1 ? nullptr : options.data(),
-                                    nullptr)),
+    return DataSet(checkPointer(create(filePath,
+                                       GDAL_OF_READONLY | GDAL_OF_VECTOR,
+                                       drivers.data(),
+                                       driverOptions),
                                 "Failed to open vector file"));
+}
+
+GDALDataset* DataSet::create(const std::string& filePath,
+                             unsigned int openFlags,
+                             const char* const* drivers,
+                             const std::vector<std::string>& driverOpts)
+{
+    auto options = createOptionsArray(driverOpts);
+    return reinterpret_cast<GDALDataset*>(GDALOpenEx(
+        filePath.c_str(),
+        openFlags,
+        drivers,
+        options.size() == 1 ? nullptr : options.data(),
+        nullptr));
 }
 
 DataSet::DataSet(GDALDataset* ptr) noexcept
@@ -1144,20 +1188,20 @@ void checkError(OGRErr err, const std::string& msg)
     checkError(err, msg.c_str());
 }
 
-MapType guessMapTypeFromFileName(const std::string& filePath)
+RasterType guessRasterTypeFromFileName(const std::string& filePath)
 {
     auto ext = getExtenstion(filePath);
     if (ext == ".asc") {
-        return MapType::ArcAscii;
+        return RasterType::ArcAscii;
     } else if (ext == ".tiff" || ext == ".tif") {
-        return MapType::GeoTiff;
+        return RasterType::GeoTiff;
     } else if (ext == ".gif") {
-        return MapType::Gif;
+        return RasterType::Gif;
     } else if (ext == ".png") {
-        return MapType::Png;
+        return RasterType::Png;
     }
 
-    return MapType::Unknown;
+    return RasterType::Unknown;
 }
 
 VectorType guessVectorTypeFromFileName(const std::string& filePath)
