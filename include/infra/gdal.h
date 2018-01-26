@@ -22,6 +22,7 @@ class OGRFieldDefn;
 class OGRPointIterator;
 class OGRGeometryCollection;
 class OGRMultiLineString;
+class OGRLinearRing;
 
 namespace infra::gdal {
 
@@ -151,7 +152,32 @@ private:
     OGRMultiLineString* _multiLine;
 };
 
-using Geometry = std::variant<Point<double>, Line, MultiLine>;
+class LinearRing : public Line
+{
+public:
+    LinearRing(OGRLinearRing* ring);
+
+    OGRLinearRing* get();
+
+private:
+    OGRLinearRing* _ring;
+};
+
+class Polygon
+{
+public:
+    Polygon(OGRPolygon* poly);
+
+    LinearRing exteriorRing();
+    LinearRing interiorRing(int index);
+
+    OGRPolygon* get();
+
+private:
+    OGRPolygon* _poly;
+};
+
+using Geometry = std::variant<Point<double>, Line, MultiLine, Polygon>;
 using Field    = std::variant<int32_t, int64_t, double, std::string_view>;
 
 class FieldDefinition

@@ -407,6 +407,37 @@ Line MultiLine::geometry(int index) const
     return Line(reinterpret_cast<OGRLineString*>(_multiLine->getGeometryRef(index)));
 }
 
+LinearRing::LinearRing(OGRLinearRing* ring)
+: Line(ring)
+, _ring(ring)
+{
+}
+
+OGRLinearRing* LinearRing::get()
+{
+    return _ring;
+}
+
+Polygon::Polygon(OGRPolygon* poly)
+: _poly(poly)
+{
+}
+
+LinearRing Polygon::exteriorRing()
+{
+    return LinearRing(_poly->getExteriorRing());
+}
+
+LinearRing Polygon::interiorRing(int index)
+{
+    return LinearRing(_poly->getInteriorRing(index));
+}
+
+OGRPolygon* Polygon::get()
+{
+    return _poly;
+}
+
 static OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
 {
     if (typeInfo == typeid(int32_t)) {
@@ -566,6 +597,8 @@ Geometry Feature::geometry()
     }
     case wkbLineString:
         return Line(reinterpret_cast<OGRLineString*>(geometry));
+    case wkbPolygon:
+        return Polygon(reinterpret_cast<OGRPolygon*>(geometry));
     case wkbMultiLineString:
         return MultiLine(reinterpret_cast<OGRMultiLineString*>(geometry));
     default:
@@ -575,21 +608,7 @@ Geometry Feature::geometry()
 
 const Geometry Feature::geometry() const
 {
-    auto* geometry = _feature->GetGeometryRef();
-    assert(geometry);
-
-    switch (wkbFlatten(geometry->getGeometryType())) {
-    case wkbPoint: {
-        auto* point = reinterpret_cast<OGRPoint*>(geometry);
-        return Point<double>(point->getX(), point->getY());
-    }
-    case wkbLineString:
-        return Line(reinterpret_cast<OGRLineString*>(geometry));
-    case wkbMultiLineString:
-        return MultiLine(reinterpret_cast<OGRMultiLineString*>(geometry));
-    default:
-        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
-    }
+    return const_cast<Feature*>(this)->geometry();
 }
 
 int Feature::fieldCount() const
