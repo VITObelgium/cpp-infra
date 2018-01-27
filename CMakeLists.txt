@@ -26,6 +26,7 @@ add_library(infra
     include/infra/geometadata.h geometadata.cpp
 
     include/infra/internal/traits.h
+    include/infra/inireader.h inireader.cpp
 )
 
 target_include_directories(infra
