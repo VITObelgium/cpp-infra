@@ -78,18 +78,40 @@ Unsigned signedToUnsigned(Signed value, const char* valueDesc)
 
 } // namespace
 
-Point<double> convertPointProjected(int32_t sourceEpsg, int32_t destEpsg, Point<double> point)
+CoordinateTransformer::CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg)
 {
-    OGRSpatialReference sourceSRS, targetSRS;
-    sourceSRS.importFromEPSG(sourceEpsg);
-    targetSRS.importFromEPSG(destEpsg);
+    _sourceSRS.importFromEPSG(sourceEpsg);
+    _targetSRS.importFromEPSG(destEpsg);
 
-    auto trans = std::unique_ptr<OGRCoordinateTransformation>(checkPointer(OGRCreateCoordinateTransformation(&sourceSRS, &targetSRS), "Failed to create transformation"));
-    if (!trans->Transform(1, &point.x, &point.y)) {
-        throw RuntimeError("Failed to perform transformation");
+    auto* transformation = OGRCreateCoordinateTransformation(&_sourceSRS, &_targetSRS);
+    if (!transformation) {
+        throw RuntimeError("Failed to create transformation from EPSG:{} to EPSG:{}", sourceEpsg, destEpsg);
     }
 
-    return Point<double>(point.x, point.y);
+    _transformer.reset(transformation);
+}
+
+Point<double> CoordinateTransformer::transform(const Point<double>& point) const
+{
+    Point<double> result = point;
+    if (!_transformer->Transform(1, &result.x, &result.y)) {
+        throw RuntimeError("Failed to transform point ({}, {})", point.x, point.y);
+    }
+
+    return result;
+}
+
+void CoordinateTransformer::transformInPlace(Point<double>& point) const
+{
+    if (!_transformer->Transform(1, &point.x, &point.y)) {
+        throw RuntimeError("Failed to perform transformation");
+    }
+}
+
+Point<double> convertPointProjected(int32_t sourceEpsg, int32_t destEpsg, Point<double> point)
+{
+    CoordinateTransformer transformer(sourceEpsg, destEpsg);
+    return transformer.transform(point);
 }
 
 Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)

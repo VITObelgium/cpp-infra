@@ -72,6 +72,24 @@ enum class VectorType
     Unknown
 };
 
+class CoordinateTransformer
+{
+public:
+    CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg);
+
+    Point<double> transform(const Point<double>& point) const;
+    void transformInPlace(Point<double>& point) const;
+
+private:
+    OGRSpatialReference _sourceSRS;
+    OGRSpatialReference _targetSRS;
+    std::unique_ptr<OGRCoordinateTransformation> _transformer;
+};
+
+/* convenience function to convert a single point (internally creates a CoordinateTransformer)
+ * Don't use this function for converting a lot of points as there is a significant overhead
+ * in creating a CoordinateTransformer instance for every point
+ */
 Point<double> convertPointProjected(int32_t sourceEpsg, int32_t destEpsg, Point<double> point);
 Point<double> projectedToGeoGraphic(int32_t epsg, Point<double>);
 std::string projectionToFriendlyName(const std::string& projection);
