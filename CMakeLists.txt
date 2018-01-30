@@ -112,6 +112,7 @@ if (INFRA_UI_COMPONENTS)
 
     add_library(uiinfra
         include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
+        include/uiinfra/checkcombobox.h ui/checkcombobox.cpp
         include/uiinfra/readonlyproxy.h
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/scopedcursor.h

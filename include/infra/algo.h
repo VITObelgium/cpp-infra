@@ -44,6 +44,13 @@ typename Container::value_type* findInContainer(Container& c, Predicate&& pred) 
     return &(*iter);
 }
 
+template <typename Container>
+bool containerContains(const Container& c, const typename Container::value_type& value) noexcept
+{
+    auto iter = std::find(c.begin(), c.end(), value);
+    return iter != c.end();
+}
+
 template <typename Container, typename Predicate>
 void removeFromContainer(Container& c, Predicate&& pred) noexcept
 {
