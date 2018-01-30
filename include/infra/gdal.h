@@ -65,6 +65,7 @@ enum class RasterType
 
 enum class VectorType
 {
+    Memory,
     Csv,
     Tab,
     ShapeFile,
@@ -424,6 +425,18 @@ inline FeatureDefinitionIterator end(const FeatureDefinition& featDef)
     return FeatureDefinitionIterator(featDef.fieldCount());
 }
 
+class RasterBand
+{
+public:
+    RasterBand(GDALRasterBand* ptr);
+
+    GDALRasterBand* get();
+    const GDALRasterBand* get() const;
+
+private:
+    GDALRasterBand* _band;
+};
+
 class DataSet
 {
 public:
@@ -460,6 +473,8 @@ public:
 
     Layer getLayer(int index);
     Layer createLayer(const std::string& name, const std::vector<std::string>& driverOptions = {});
+
+    RasterBand rasterBand(int index) const;
 
     GDALDataType getBandDataType(int index) const;
 

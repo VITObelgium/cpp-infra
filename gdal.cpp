@@ -38,6 +38,7 @@ static const std::unordered_map<std::string, RasterType> s_driverDescLookup{{
 }};
 
 static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
+    {VectorType::Memory, "Memory"},
     {VectorType::Csv, "CSV"},
     {VectorType::Tab, "CSV"},
     {VectorType::ShapeFile, "ESRI Shapefile"},
@@ -45,6 +46,7 @@ static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
 }};
 
 static const std::unordered_map<std::string, VectorType> s_shapeDriverDescLookup{{
+    {"Memory", VectorType::Memory},
     {"CSV", VectorType::Csv},
     {"CSV", VectorType::Tab},
     {"ESRI Shapefile", VectorType::ShapeFile},
@@ -954,6 +956,21 @@ bool FeatureDefinitionIterator::operator!=(const FeatureDefinitionIterator& othe
     return !(*this == other);
 }
 
+RasterBand::RasterBand(GDALRasterBand* ptr)
+: _band(ptr)
+{
+}
+
+GDALRasterBand* RasterBand::get()
+{
+    return _band;
+}
+
+const GDALRasterBand* RasterBand::get() const
+{
+    return _band;
+}
+
 DataSet DataSet::createRaster(const std::string& filePath, const std::vector<std::string>& driverOpts)
 {
     return DataSet(checkPointer(create(filePath,
@@ -1157,6 +1174,11 @@ Layer DataSet::createLayer(const std::string& name, const std::vector<std::strin
     assert(_ptr);
     auto options = createOptionsArray(driverOptions);
     return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, wkbUnknown, const_cast<char**>(options.data())), "Layer creation failed"));
+}
+
+RasterBand DataSet::rasterBand(int bandNr) const
+{
+    return RasterBand(checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index"));
 }
 
 GDALDataType DataSet::getBandDataType(int bandNr) const

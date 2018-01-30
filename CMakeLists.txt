@@ -52,6 +52,7 @@ if (INFRA_GDAL)
 
     target_sources(infra PRIVATE
         include/infra/gdal.h gdal.cpp
+        include/infra/gdalalgo.h gdalalgo.cpp
         include/infra/internal/gdalinternal.h
     )
 
