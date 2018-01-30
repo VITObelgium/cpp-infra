@@ -35,7 +35,7 @@ private Q_SLOTS:
     void toggleCheckState(int index);
 
 private:
-    bool eventFilter(QObject* receiver, QEvent* event);
+    bool eventFilter(QObject* receiver, QEvent* event) override;
 
     QString _defaultText;
     bool _containerMousePress = false;
