@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/cell.h"
+#include "infra/point.h"
 
 #include <optional>
 #include <sstream>
@@ -28,6 +29,10 @@ struct GeoMetadata
     bool isOnMap(const Cell<int32_t>& cell) const;
     bool isOnMap(int32_t r, int32_t c) const;
     void computeRectOnMapAround(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
+
+    Point<double> center() const;
+    Point<double> topLeft() const;
+    Point<double> bottomRight() const;
 
     std::string toString() const;
 

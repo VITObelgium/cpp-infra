@@ -123,6 +123,21 @@ void GeoMetadata::computeRectOnMapAround(const int32_t row, const int32_t col, c
     }
 }
 
+Point<double> GeoMetadata::center() const
+{
+    return Point<double>(xll + ((rows * cellSize) / 2), yll + ((rows * cellSize) / 2));
+}
+
+Point<double> GeoMetadata::topLeft() const
+{
+    return Point<double>(xll, yll + (rows * cellSize));
+}
+
+Point<double> GeoMetadata::bottomRight() const
+{
+    return Point<double>(xll + (cols * cellSize), yll);
+}
+
 std::string GeoMetadata::toString() const
 {
     std::ostringstream os;
