@@ -1,5 +1,6 @@
 #include "uiinfra/multicombobox.h"
 
+#include <cassert>
 #include <qapplication.h>
 #include <qboxlayout.h>
 #include <qdesktopwidget.h>
@@ -100,7 +101,7 @@ void MultiComboBox::showPopup()
 
     QRect rec2;
     rec2.setTopLeft(below);
-    rec2.setWidth(requiredWidth + 50);
+    rec2.setWidth(requiredWidth + 60);
     _popupFrame->setGeometry(rec2);
 
     // determine rect

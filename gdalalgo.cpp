@@ -12,7 +12,7 @@ DataSet polygonize(const DataSet& ds)
     FieldDefinition def("Value", typeid(int32_t));
     layer.createField(def);
 
-    checkError(GDALPolygonize(ds.rasterBand(1).get(), nullptr, layer.get(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
+    checkError(GDALPolygonize(ds.rasterBand(1).get(), ds.rasterBand(1).get(), layer.get(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
     return memDataSet;
 }
 }
