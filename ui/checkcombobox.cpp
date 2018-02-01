@@ -52,8 +52,8 @@ QStringList CheckComboBox::checkedItems() const
     if (model()) {
         QModelIndex index       = model()->index(0, modelColumn(), rootModelIndex());
         QModelIndexList indexes = model()->match(index, Qt::CheckStateRole, Qt::Checked, -1, Qt::MatchExactly);
-        foreach (const QModelIndex& index, indexes) {
-            items += index.data().toString();
+        foreach (const QModelIndex& modelIndex, indexes) {
+            items += modelIndex.data().toString();
         }
     }
     return items;

@@ -12,7 +12,7 @@ namespace infra {
 
 /* Typedef for prototype of handler function. */
 typedef int (*ini_handler)(void* user, const char* section,
-                           const char* name, const char* value);
+    const char* name, const char* value);
 
 /* Typedef for prototype of fgets-style reader function. */
 typedef char* (*ini_reader)(char* str, int num, void* stream);
@@ -105,7 +105,7 @@ inline static char* strncpy0(char* dest, const char* src, size_t size)
 /* Same as ini_parse(), but takes an ini_reader function pointer instead of
    filename. Used for implementing custom or string-based I/O. */
 inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
-                            void* user)
+    void* user)
 {
 /* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK
@@ -317,9 +317,8 @@ std::optional<bool> IniReader::getBool(std::string_view section, std::string_vie
 
     auto valueStr = getString(section, name);
     if (valueStr) {
-        std::string lower(*valueStr);
         // Convert to lower case to make string comparisons case-insensitive
-        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+        std::string lower = str::lowercase(*valueStr);
         if (lower == "true" || lower == "yes" || lower == "on" || lower == "1") {
             result = true;
         } else if (lower == "false" || lower == "no" || lower == "off" || lower == "0") {
