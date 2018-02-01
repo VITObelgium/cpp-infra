@@ -47,8 +47,15 @@ public:
     ~EmbeddedDataRegistration();
 };
 
+// Free function versions of the registration handling
+// Call this ones in each application that wishes to use gdal
 void registerGdal();
 void unregisterGdal();
+
+// Call this on each thread that requires access to the proj.4 data
+// Not needed on the thread that did the gdal registration
+void registerEmbeddedData();
+void unregisterEmbeddedData();
 
 class Layer;
 class Driver;

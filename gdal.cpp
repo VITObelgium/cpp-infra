@@ -230,6 +230,16 @@ void unregisterGdal()
     GDALDestroy();
 }
 
+void registerEmbeddedData()
+{
+    createEmbeddedData();
+}
+
+void unregisterEmbeddedData()
+{
+    destroyEmbeddedData();
+}
+
 std::vector<const char*> createOptionsArray(const std::vector<std::string>& driverOptions)
 {
     std::vector<const char*> options(driverOptions.size());

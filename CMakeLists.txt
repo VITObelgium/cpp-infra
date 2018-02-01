@@ -24,6 +24,7 @@ add_library(infra
     include/infra/color.h color.cpp
     include/infra/colormap.h colormap.cpp
     include/infra/geometadata.h geometadata.cpp
+    include/infra/threadpool.h threadpool.cpp
 
     include/infra/internal/traits.h
     include/infra/inireader.h inireader.cpp

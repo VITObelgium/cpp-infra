@@ -1,8 +1,13 @@
+find_package(GTest REQUIRED)
+find_package(GMock REQUIRED)
+
 add_executable(infratest
-    filesystemtest.cpp
     colormaptest.cpp
-    stringtest.cpp
     inireadertest.cpp
+    filesystemtest.cpp
+    signaltest.cpp
+    stringtest.cpp
+    threadpooltest.cpp
     main.cpp
 )
 
@@ -15,6 +20,7 @@ endif ()
 target_link_libraries(infratest
     infra
     GTest::GTest
+    GMock::GMock
 )
 
 target_compile_definitions(infratest PRIVATE -DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
