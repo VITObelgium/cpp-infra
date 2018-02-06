@@ -12,53 +12,58 @@ AboutDialog::AboutDialog(QWidget* parent)
 {
     setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
     _ui->setupUi(this);
+
+    _ui->logoLabel->setScaledContents(true);
+    _ui->copyrightLabel->setStyleSheet("QLabel { color : grey; }");
+    _ui->acknowledgementsButton->setVisible(false);
+    _ui->licenseEdit->hide();
+    _ui->hideButton->hide();
+
+    setFixedSize(463, 204);
 }
 
 AboutDialog::~AboutDialog() = default;
 
-void AboutDialog::setHeaderImage(QString resourceId)
+void AboutDialog::setTitle(QString title)
 {
-    _ui->headerLabel->setPixmap(QPixmap(resourceId));
-}
-
-void AboutDialog::setFooterImage(QString resourceId)
-{
-    _ui->footerLabel->setPixmap(QPixmap(resourceId));
-}
-
-void AboutDialog::setHeaderBackgroundColor(QColor color)
-{
-    QPalette palette;
-    palette.setColor(QPalette::Window, color);
-
-    _ui->headerLabel->setAutoFillBackground(true);
-    _ui->headerLabel->setPalette(palette);
-}
-
-void AboutDialog::setFooterBackgroundColor(QColor color)
-{
-    QPalette palette;
-    palette.setColor(QPalette::Window, color);
-
-    _ui->footerLabel->setAutoFillBackground(true);
-    _ui->footerLabel->setPalette(palette);
-}
-
-void AboutDialog::setLicenseFromResourceTextFile(QString resourceId)
-{
-    QFile myFile(resourceId);
-    myFile.open(QIODevice::ReadOnly);
-    QTextStream textStream(&myFile);
-    setLicenseText(textStream.readAll());
-}
-
-void AboutDialog::setLicenseText(QString licenseString)
-{
-    _ui->licenseTextBox->setText(licenseString);
+    _ui->titleLabel->setText(title);
 }
 
 void AboutDialog::setVersion(QString versionString)
 {
     _ui->versionLabel->setText(versionString);
+}
+
+void AboutDialog::setLogo(QString resourceId)
+{
+    _ui->logoLabel->setPixmap(QPixmap(resourceId));
+}
+
+void AboutDialog::setCopyrightInfo(QString copyright)
+{
+    _ui->copyrightLabel->setText(copyright);
+}
+
+void AboutDialog::addOpenSourceUsage(OpenSourceInfo info)
+{
+    _ui->acknowledgementsButton->setVisible(true);
+    _openSource.push_back(info);
+}
+
+void AboutDialog::createOpensourceMessage()
+{
+    QString openSourceInfo;
+
+    openSourceInfo.append("<center><b>Open Source Libraries</b></center>");
+
+    for (auto& info : _openSource) {
+        openSourceInfo.append(QString("<center><p><a href=\"%1\">%2</a> (<a href=\"%3\">%4</a>)</p></center>")
+                                  .arg(info.website)
+                                  .arg(info.name)
+                                  .arg(info.licenseLink)
+                                  .arg(info.license));
+    }
+
+    _ui->licenseEdit->setHtml(openSourceInfo);
 }
 }

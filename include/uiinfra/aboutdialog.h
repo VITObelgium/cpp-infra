@@ -12,20 +12,28 @@ namespace uiinfra {
 class AboutDialog : public QDialog
 {
 public:
+    struct OpenSourceInfo
+    {
+        QString name;
+        QString website;
+        QString license;
+        QString licenseLink;
+    };
+
     AboutDialog(QWidget* parent = nullptr);
     ~AboutDialog();
 
-    void setHeaderImage(QString resourceId);
-    void setFooterImage(QString resourceId);
-
-    void setHeaderBackgroundColor(QColor color);
-    void setFooterBackgroundColor(QColor color);
-
-    void setLicenseFromResourceTextFile(QString resourceId);
-    void setLicenseText(QString licenseString);
+    void setTitle(QString title);
     void setVersion(QString versionString);
+
+    void setLogo(QString resourceId);
+    void setCopyrightInfo(QString copyright);
+
+    void addOpenSourceUsage(OpenSourceInfo info);
+    void createOpensourceMessage();
 
 private:
     std::unique_ptr<Ui::AboutDialog> _ui;
+    std::vector<OpenSourceInfo> _openSource;
 };
 }
