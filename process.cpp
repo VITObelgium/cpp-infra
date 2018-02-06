@@ -47,7 +47,7 @@ int runProcess(std::string_view cmdLine)
     CloseHandle(pi.hThread);
     return int(exitCode);
 #endif
-
+    (void)cmdLine;
     throw RuntimeError("runProcess not implemented");
 }
 }
