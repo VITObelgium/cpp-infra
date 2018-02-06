@@ -22,6 +22,7 @@ public:
 
     void addItem(const QString& text, const QVariant& userData = QVariant());
     void addItems(const QStringList& texts);
+    void clearItems();
 
     void paintEvent(QPaintEvent* e) override;
 

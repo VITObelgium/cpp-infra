@@ -153,6 +153,11 @@ void MultiComboBox::addItems(const QStringList& texts)
     }
 }
 
+void MultiComboBox::clearItems()
+{
+    _listWidget->clear();
+}
+
 int MultiComboBox::count()
 {
     return _listWidget->count();
