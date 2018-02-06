@@ -17,6 +17,7 @@ add_library(infra
     include/infra/generator.h
     include/infra/line.h
     include/infra/point.h
+    include/infra/process.h process.cpp
     include/infra/signal.h
     include/infra/string.h string.cpp
     include/infra/exception.h
