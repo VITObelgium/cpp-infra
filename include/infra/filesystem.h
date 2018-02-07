@@ -6,6 +6,11 @@ namespace fs = std::experimental::filesystem;
 
 namespace infra {
 
+/*! Create the specified directory and all parent directories if it does
+ *  not exist.
+ * /param path should specify a directory, not a file path
+ * /return true if the directory was created, false otherwise
+ */
 bool createDirectoryIfNotExists(const fs::path& path);
 
 /*!Create a full absolute path based on the base path and a relative file path
