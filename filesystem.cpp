@@ -16,7 +16,7 @@ fs::path make_preferred(const fs::path& p)
 
 bool createDirectoryIfNotExists(const fs::path& path)
 {
-    if (fs::exists(path)) {
+    if (path.empty() || fs::exists(path)) {
         return true;
     }
 
