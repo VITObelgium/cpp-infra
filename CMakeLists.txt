@@ -108,6 +108,7 @@ endif ()
 if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
     find_package(Qt5Widgets CONFIG REQUIRED)
+    find_package(Qt5Core CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -123,6 +124,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/toolboxview.h ui/toolboxview.cpp
         include/uiinfra/userinput.h
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
+        include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
         ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
     )
@@ -137,9 +139,10 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
-    target_link_libraries(uiinfra PRIVATE Qt5::Gui Qt5::Widgets)
+    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core)
 endif ()
 
 if (INFRA_ENABLE_TESTS)
     add_subdirectory(test)
+    add_subdirectory(ui/test)
 endif ()
