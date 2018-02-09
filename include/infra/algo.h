@@ -79,28 +79,30 @@ const typename Container::value_type& findInContainerRequired(const Container& c
 }
 
 /* Search for an entry in the map that matches the predicate
- * The entry is returned as a pointer (nullptr when not founc)
+ * The entry is returned as a pointer (nullptr when not found)
  * This funtion never throws
  */
 template <typename MapType>
-const typename MapType::mapped_type* findInMap(const MapType& m, const typename MapType::key_type& key) noexcept
+const auto findInMap(const MapType& m, const typename MapType::key_type& key) noexcept
 {
     auto iter = m.find(key);
-    if (iter == m.end()) {
-        return nullptr;
-    }
 
-    return &(iter->second);
+    if constexpr (std::is_pointer_v<MapType::mapped_type>) {
+        return iter == m.end() ? nullptr : iter->second;
+    } else {
+        return iter == m.end() ? nullptr : &(iter->second);
+    }
 }
 
 template <typename MapType>
-typename MapType::mapped_type* findInMap(MapType& m, const typename MapType::key_type& key) noexcept
+typename auto findInMap(MapType& m, const typename MapType::key_type& key) noexcept
 {
     auto iter = m.find(key);
-    if (iter == m.end()) {
-        return nullptr;
-    }
 
-    return &(iter->second);
+    if constexpr (std::is_pointer_v<MapType::mapped_type>) {
+        return iter == m.end() ? nullptr : iter->second;
+    } else {
+        return iter == m.end() ? nullptr : &(iter->second);
+    }
 }
 }
