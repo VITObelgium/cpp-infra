@@ -1,5 +1,7 @@
 #include "uiinfra/fixeditemproxymodel.h"
 
+#include <cassert>
+
 namespace uiinfra {
 
 FixedItemProxyModel::FixedItemProxyModel(QObject* parent)
@@ -12,46 +14,70 @@ void FixedItemProxyModel::setFixedItems(const QStringList& items)
     _items = items;
 }
 
-int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
+void FixedItemProxyModel::setRootModelIndex(const QModelIndex& root)
 {
-    return sourceModel()->rowCount(parent) + _items.size();
+    _rootIndex = root;
 }
 
-int FixedItemProxyModel::columnCount(const QModelIndex& parent) const
+int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
 {
-    if (parent.isValid() && parent.row() < _items.count()) {
+    assert(!parent.isValid()); // don't expect this to work with hierarchies
+    if (!sourceModel()) {
+        return _items.size();
+    }
+
+    return sourceModel()->rowCount(_rootIndex) + _items.size();
+}
+
+int FixedItemProxyModel::columnCount(const QModelIndex& /*parent*/) const
+{
+    if (!sourceModel()) {
         return 1;
     }
 
-    return sourceModel()->columnCount(parent);
+    return sourceModel()->columnCount();
 }
 
-QModelIndex FixedItemProxyModel::parent(const QModelIndex& index) const
+QModelIndex FixedItemProxyModel::parent(const QModelIndex& /*index*/) const
 {
-    if (index.isValid() && index.row() < _items.count()) {
-        sourceModel()->parent(sourceModel()->index(0, index.column()));
+    return QModelIndex();
+}
+
+Qt::ItemFlags FixedItemProxyModel::flags(const QModelIndex& proxyIndex) const
+{
+    if (proxyIndex.row() < _items.count()) {
+        return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
 
-    return sourceModel()->parent(mapToSource(index));
+    if (!sourceModel()) {
+        return Qt::NoItemFlags;
+    }
+
+    return sourceModel()->flags(mapToSource(proxyIndex));
 }
 
 QVariant FixedItemProxyModel::data(const QModelIndex& proxyIndex, int role) const
 {
+    assert(!proxyIndex.parent().isValid());
     if (proxyIndex.row() < _items.count()) {
         if (role != Qt::DisplayRole) {
             return QVariant();
         }
 
-        //Log::info("{} {} {}", proxyIndex.row(), proxyIndex.column(), _items.at(proxyIndex.row()).toStdString());
         return _items.at(proxyIndex.row());
     }
 
-    return QAbstractProxyModel::data(proxyIndex, role);
+    if (!sourceModel()) {
+        return QVariant();
+    }
+
+    return sourceModel()->data(mapToSource(proxyIndex), role);
 }
 
 QModelIndex FixedItemProxyModel::index(int row, int column, const QModelIndex& parent) const
 {
-    return createIndex(row, column, parent.internalId());
+    assert(!parent.isValid());
+    return createIndex(row, column);
 }
 
 QModelIndex FixedItemProxyModel::mapFromSource(const QModelIndex& sourceIndex) const
@@ -60,7 +86,7 @@ QModelIndex FixedItemProxyModel::mapFromSource(const QModelIndex& sourceIndex) c
         return QModelIndex();
     }
 
-    return sourceModel()->index(sourceIndex.row() + _items.size(), sourceIndex.column());
+    return createIndex(sourceIndex.row() + _items.size(), sourceIndex.column());
 }
 
 QModelIndex FixedItemProxyModel::mapToSource(const QModelIndex& proxyIndex) const
@@ -70,6 +96,6 @@ QModelIndex FixedItemProxyModel::mapToSource(const QModelIndex& proxyIndex) cons
         return QModelIndex();
     }
 
-    return sourceModel()->index(proxyIndex.row() - _items.size(), proxyIndex.column());
+    return sourceModel()->index(proxyIndex.row() - _items.size(), proxyIndex.column(), _rootIndex);
 }
 }

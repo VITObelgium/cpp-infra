@@ -17,7 +17,17 @@ using namespace testing;
 
 class FixedItemProxyModelTest : public Test
 {
-public:
+protected:
+    FixedItemProxyModelTest()
+    : modelData(QStringLiteral("Level1\tValue1\n"
+                               "   Level2.1\tValue2.1\n"
+                               "   Level2.2\tValue2.2\n"
+                               "      Level3\tValue3.1\n"
+                               "   Level2.3\tValue2.3\n"))
+    {
+    }
+
+    QString modelData;
 };
 
 TEST_F(FixedItemProxyModelTest, listModel)
@@ -36,23 +46,35 @@ TEST_F(FixedItemProxyModelTest, listModel)
     EXPECT_EQ(QString("Three"), proxyModel.index(3, 0).data().toString());
 }
 
-TEST_F(FixedItemProxyModelTest, DISABLED_treeModel)
+TEST_F(FixedItemProxyModelTest, treeModel)
 {
-    QString modelData = "Level1\tValue1\n"
-                        "   Level2\tValue2.1\n"
-                        "   Level2\tValue2.2\n"
-                        "      Level3\tValue3.1\n"
-                        "   Level2\tValue2.3\n";
+    TreeModel sourceModel(modelData);
+    FixedItemProxyModel proxyModel;
+    proxyModel.setFixedItems({"All", "None"});
+    proxyModel.setSourceModel(&sourceModel);
 
+    EXPECT_EQ(3, proxyModel.rowCount());
+    EXPECT_EQ(QString("All"), proxyModel.index(0, 0).data().toString());
+    EXPECT_EQ(QString("None"), proxyModel.index(1, 0).data().toString());
+    EXPECT_EQ(QString("Level1"), proxyModel.index(2, 0).data().toString());
+}
+
+TEST_F(FixedItemProxyModelTest, treeModelRootIndex)
+{
     TreeModel sourceModel(modelData);
     FixedItemProxyModel proxyModel;
     proxyModel.setFixedItems({"All"});
     proxyModel.setSourceModel(&sourceModel);
 
-    EXPECT_EQ(2, proxyModel.rowCount());
+    proxyModel.setRootModelIndex(sourceModel.index(0, 0));
+    EXPECT_EQ(4, proxyModel.rowCount());
     EXPECT_EQ(QString("All"), proxyModel.index(0, 0).data().toString());
-    EXPECT_EQ(QString("Level1"), proxyModel.index(1, 0).data().toString());
+    EXPECT_EQ(QString("Level2.1"), proxyModel.index(1, 0).data().toString());
+    EXPECT_EQ(QString("Level2.2"), proxyModel.index(2, 0).data().toString());
+    EXPECT_EQ(QString("Level2.3"), proxyModel.index(3, 0).data().toString());
 
-    EXPECT_EQ(4, proxyModel.rowCount(proxyModel.index(0, 0)));
+    EXPECT_EQ(QString("Value2.1"), proxyModel.index(1, 1).data().toString());
+    EXPECT_EQ(QString("Value2.2"), proxyModel.index(2, 1).data().toString());
+    EXPECT_EQ(QString("Value2.3"), proxyModel.index(3, 1).data().toString());
 }
 }
