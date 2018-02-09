@@ -144,5 +144,7 @@ endif ()
 
 if (INFRA_ENABLE_TESTS)
     add_subdirectory(test)
-    add_subdirectory(ui/test)
+    if (INFRA_UI_COMPONENTS)
+        add_subdirectory(ui/test)
+    endif ()
 endif ()
