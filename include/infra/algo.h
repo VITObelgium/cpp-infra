@@ -83,23 +83,11 @@ const typename Container::value_type& findInContainerRequired(const Container& c
  * This funtion never throws
  */
 template <typename MapType>
-const auto findInMap(const MapType& m, const typename MapType::key_type& key) noexcept
+auto findInMap(MapType&& m, const typename std::decay_t<MapType>::key_type& key) noexcept
 {
     auto iter = m.find(key);
 
-    if constexpr (std::is_pointer_v<MapType::mapped_type>) {
-        return iter == m.end() ? nullptr : iter->second;
-    } else {
-        return iter == m.end() ? nullptr : &(iter->second);
-    }
-}
-
-template <typename MapType>
-typename auto findInMap(MapType& m, const typename MapType::key_type& key) noexcept
-{
-    auto iter = m.find(key);
-
-    if constexpr (std::is_pointer_v<MapType::mapped_type>) {
+    if constexpr (std::is_pointer_v<typename std::decay_t<MapType>::mapped_type>) {
         return iter == m.end() ? nullptr : iter->second;
     } else {
         return iter == m.end() ? nullptr : &(iter->second);
