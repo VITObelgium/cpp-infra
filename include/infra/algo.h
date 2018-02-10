@@ -23,32 +23,20 @@ std::optional<T> asOptional(const T* ptr)
  * This funtion never throws
  */
 template <typename Container, typename Predicate>
-const typename Container::value_type* findInContainer(const Container& c, Predicate&& pred) noexcept
+auto findInContainer(Container&& c, Predicate&& pred) noexcept
 {
     auto iter = std::find_if(c.begin(), c.end(), pred);
-    if (iter == c.end()) {
-        return nullptr;
+    if constexpr (std::is_pointer_v<typename std::decay_t<Container>::value_type>) {
+        return iter == c.end() ? nullptr : *iter;
+    } else {
+        return iter == c.end() ? nullptr : &(*iter);
     }
-
-    return &(*iter);
-}
-
-template <typename Container, typename Predicate>
-typename Container::value_type* findInContainer(Container& c, Predicate&& pred) noexcept
-{
-    auto iter = std::find_if(c.begin(), c.end(), pred);
-    if (iter == c.end()) {
-        return nullptr;
-    }
-
-    return &(*iter);
 }
 
 template <typename Container>
 bool containerContains(const Container& c, const typename Container::value_type& value) noexcept
 {
-    auto iter = std::find(c.begin(), c.end(), value);
-    return iter != c.end();
+    return std::find(begin(c), end(c), value) != end(c);
 }
 
 template <typename Container, typename Predicate>
