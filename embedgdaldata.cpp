@@ -43,11 +43,20 @@ static const char* findFile(const char* /*className*/, const char* fileName)
 void createEmbeddedData()
 {
     s_memFiles = std::make_unique<MemoryFiles>();
-    CPLPushFileFinder(findFile);
 }
 
 void destroyEmbeddedData()
 {
     s_memFiles.reset();
+}
+
+void registerEmbeddedDataFileFinder()
+{
+    CPLPushFileFinder(findFile);
+}
+
+void unregisterEmbeddedDataFileFinder()
+{
+    CPLPopFileFinder();
 }
 }

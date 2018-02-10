@@ -208,6 +208,7 @@ void registerGdal()
 {
 #ifdef EMBED_GDAL_DATA
     createEmbeddedData();
+    registerEmbeddedData();
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -223,21 +224,25 @@ void registerGdal()
 void unregisterGdal()
 {
 #ifdef EMBED_GDAL_DATA
+    unregisterEmbeddedData();
     destroyEmbeddedData();
 #endif
 
-    //CPLCleanupTLS();
     GDALDestroy();
 }
 
 void registerEmbeddedData()
 {
-    createEmbeddedData();
+#ifdef EMBED_GDAL_DATA
+    registerEmbeddedDataFileFinder();
+#endif
 }
 
 void unregisterEmbeddedData()
 {
-    destroyEmbeddedData();
+#ifdef EMBED_GDAL_DATA
+    unregisterEmbeddedDataFileFinder();
+#endif
 }
 
 std::vector<const char*> createOptionsArray(const std::vector<std::string>& driverOptions)
