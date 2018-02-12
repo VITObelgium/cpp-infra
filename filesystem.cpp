@@ -1,4 +1,8 @@
 #include "infra/filesystem.h"
+#include "infra/exception.h"
+
+#include <fstream>
+#include <sstream>
 
 namespace infra {
 
@@ -40,5 +44,18 @@ fs::path combinePath(const fs::path& base, const fs::path& file)
 #else
     return fs::canonical(fs::absolute(file, base)).make_preferred();
 #endif
+}
+
+std::string readTextFile(const fs::path& filename)
+{
+    std::ifstream fileStream(filename.c_str(), std::ifstream::binary);
+
+    if (!fileStream.is_open()) {
+        throw RuntimeError("Failed to open file for reading: {}", filename.c_str());
+    }
+
+    std::stringstream buffer;
+    buffer << fileStream.rdbuf();
+    return buffer.str();
 }
 }

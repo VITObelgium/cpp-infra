@@ -26,4 +26,6 @@ fs::path combineAbsoluteWithRelativePath(const fs::path& baseFile, const fs::pat
  * /return the full absolute path of the relative file argument
  */
 fs::path combinePath(const fs::path& baseDir, const fs::path& file);
+
+std::string readTextFile(const fs::path& filename);
 }
