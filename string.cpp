@@ -1,4 +1,5 @@
 #include "infra/string.h"
+#include "infra/exception.h"
 
 #include <algorithm>
 #include <cassert>
@@ -12,18 +13,44 @@ bool containsValidInteger(std::string_view str)
 {
     std::string s(str);
 
-    char* end = 0;
+    char* end = nullptr;
     std::strtol(s.c_str(), &end, 10);
-    return (end != 0 && *end == 0);
+    return (end != nullptr && *end == 0);
 }
 
 bool containsValidFloatingPoint(std::string_view str)
 {
     std::string s(str);
 
-    char* end = 0;
+    char* end = nullptr;
     std::strtod(s.c_str(), &end);
-    return (end != 0 && *end == 0);
+    return (end != nullptr && *end == 0);
+}
+
+long toInt(std::string_view str)
+{
+    std::string s(str);
+
+    char* end   = nullptr;
+    long result = std::strtol(s.c_str(), &end, 10);
+    if (end == s.c_str()) {
+        throw InvalidArgument("Failed to convert '{}' to integer");
+    }
+
+    return result;
+}
+
+double toFloatingPoint(std::string_view str)
+{
+    std::string s(str);
+
+    char* end     = nullptr;
+    double result = std::strtod(s.c_str(), &end);
+    if (end == s.c_str()) {
+        throw InvalidArgument("Failed to convert '{}' to floating point");
+    }
+
+    return result;
 }
 
 bool iequals(std::string_view str1, std::string_view str2)

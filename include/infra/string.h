@@ -14,6 +14,9 @@ namespace infra::str {
 bool containsValidInteger(std::string_view str);
 bool containsValidFloatingPoint(std::string_view str);
 
+long toInt(std::string_view str);
+double toFloatingPoint(std::string_view str);
+
 bool iequals(std::string_view str1, std::string_view str2);
 void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
 
