@@ -51,7 +51,7 @@ std::string readTextFile(const fs::path& filename)
     std::ifstream fileStream(filename.c_str(), std::ifstream::binary);
 
     if (!fileStream.is_open()) {
-        throw RuntimeError("Failed to open file for reading: {}", filename.c_str());
+        throw RuntimeError("Failed to open file for reading: {}", filename.string());
     }
 
     std::stringstream buffer;
