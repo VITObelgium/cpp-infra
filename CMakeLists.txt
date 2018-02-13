@@ -88,6 +88,8 @@ if (INFRA_LOGGING)
 
     target_sources(infra PRIVATE include/infra/log.h log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
+    # make sure spdlog does not use its internal version of fmt
+    target_compile_definitions(infra PUBLIC -DSPDLOG_FMT_EXTERNAL)
 endif ()
 
 if (INFRA_NUMERIC)
