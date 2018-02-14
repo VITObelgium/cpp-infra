@@ -7,6 +7,8 @@ option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 
 find_package(fmt CONFIG REQUIRED)
+# make sure we use release versions of fmt lib when building relwithdebinfo
+set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
 add_library(infra
     include/infra/algo.h
