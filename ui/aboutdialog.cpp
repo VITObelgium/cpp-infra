@@ -29,6 +29,13 @@ void AboutDialog::setTitle(QString title)
     _ui->titleLabel->setText(title);
 }
 
+void AboutDialog::setTitleFontSize(int size)
+{
+    auto font = _ui->titleLabel->font();
+    font.setPointSize(size);
+    _ui->titleLabel->setFont(font);
+}
+
 void AboutDialog::setVersion(QString versionString)
 {
     _ui->versionLabel->setText(versionString);

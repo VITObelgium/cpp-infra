@@ -24,6 +24,7 @@ public:
     ~AboutDialog();
 
     void setTitle(QString title);
+    void setTitleFontSize(int size);
     void setVersion(QString versionString);
 
     void setLogo(QString resourceId);
