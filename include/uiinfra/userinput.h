@@ -15,9 +15,9 @@ inline bool askForConfirmation(const QString& title, const QString& message)
     return mb.exec() == QMessageBox::Yes;
 }
 
-inline bool displayError(const QString& title, const QString& message)
+inline void displayError(const QString& title, const QString& message)
 {
     QMessageBox mb(title, message, QMessageBox::Critical, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
-    return mb.exec() == QMessageBox::Yes;
+    mb.exec();
 }
 }

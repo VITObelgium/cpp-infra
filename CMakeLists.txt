@@ -113,6 +113,7 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
     find_package(Qt5Widgets CONFIG REQUIRED)
     find_package(Qt5Core CONFIG REQUIRED)
+    find_package(HinnantDate REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -121,6 +122,7 @@ if (INFRA_UI_COMPONENTS)
     add_library(uiinfra
         include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
         include/uiinfra/checkcombobox.h ui/checkcombobox.cpp
+        include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/readonlyproxy.h
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
@@ -143,7 +145,7 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
-    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core)
+    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core HinnantDate::Date)
 endif ()
 
 if (INFRA_ENABLE_TESTS)
