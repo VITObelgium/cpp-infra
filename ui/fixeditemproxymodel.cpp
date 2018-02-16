@@ -21,6 +21,7 @@ void FixedItemProxyModel::setRootModelIndex(const QModelIndex& root)
 
 int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
 {
+    Q_UNUSED(parent)
     assert(!parent.isValid()); // don't expect this to work with hierarchies
     if (!sourceModel()) {
         return _items.size();
@@ -76,6 +77,7 @@ QVariant FixedItemProxyModel::data(const QModelIndex& proxyIndex, int role) cons
 
 QModelIndex FixedItemProxyModel::index(int row, int column, const QModelIndex& parent) const
 {
+    Q_UNUSED(parent)
     assert(!parent.isValid());
     return createIndex(row, column);
 }
