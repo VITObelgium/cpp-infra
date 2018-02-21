@@ -17,16 +17,16 @@ int runProcess(std::string_view cmdLine)
     std::string cmd(cmdLine);
 
     // Start the child process.
-    if (!CreateProcess(nullptr,          // No module name (use command line)
-                       &cmd[0],          // Command line
-                       nullptr,          // Process handle not inheritable
-                       nullptr,          // Thread handle not inheritable
-                       FALSE,            // Set handle inheritance to FALSE
-                       CREATE_NO_WINDOW, // Hide the window
-                       nullptr,          // Use parent's environment block
-                       nullptr,          // Use parent's starting directory
-                       &si,              // Pointer to STARTUPINFO structure
-                       &pi)              // Pointer to PROCESS_INFORMATION structure
+    if (!CreateProcess(nullptr, // No module name (use command line)
+            &cmd[0],            // Command line
+            nullptr,            // Process handle not inheritable
+            nullptr,            // Thread handle not inheritable
+            FALSE,              // Set handle inheritance to FALSE
+            CREATE_NO_WINDOW,   // Hide the window
+            nullptr,            // Use parent's environment block
+            nullptr,            // Use parent's starting directory
+            &si,                // Pointer to STARTUPINFO structure
+            &pi)                // Pointer to PROCESS_INFORMATION structure
     ) {
         throw RuntimeError("Failed to create process ({}).", GetLastError());
     }
@@ -46,8 +46,9 @@ int runProcess(std::string_view cmdLine)
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
     return int(exitCode);
-#endif
+#else
     (void)cmdLine;
     throw RuntimeError("runProcess not implemented");
+#endif
 }
 }

@@ -45,7 +45,7 @@ TEST_F(ThreadPoolTest, stopTwice)
 
 TEST_F(ThreadPoolTest, RunJobs)
 {
-    const long jobCount = g_poolSize * 100;
+    const uint32_t jobCount = g_poolSize * 100;
 
     std::mutex mutex;
     std::condition_variable cond;
@@ -53,7 +53,7 @@ TEST_F(ThreadPoolTest, RunJobs)
     uint32_t count = 0;
     std::set<std::thread::id> threadIds;
 
-    for (auto i = 0; i < jobCount; ++i) {
+    for (auto i = 0u; i < jobCount; ++i) {
         tp.addJob([&]() {
             std::unique_lock<std::mutex> lock(mutex);
             threadIds.insert(std::this_thread::get_id());
