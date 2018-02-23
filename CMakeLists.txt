@@ -117,11 +117,15 @@ if (INFRA_UI_COMPONENTS)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
-    qt5_wrap_ui(FORMS_HEADERS ui/toolboxitem.ui ui/aboutdialog.ui)
+    set(INFRA_UI_FILES ui/toolboxitem.ui ui/aboutdialog.ui)
+    if (INFRA_LOGGING)
+        list(APPEND INFRA_UI_FILES ui/logview.ui)
+    endif ()
+
+    qt5_wrap_ui(FORMS_HEADERS ${INFRA_UI_FILES})
 
     add_library(uiinfra
         include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
-        include/uiinfra/checkcombobox.h ui/checkcombobox.cpp
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/readonlyproxy.h
@@ -135,6 +139,13 @@ if (INFRA_UI_COMPONENTS)
         ${FORMS_HEADERS}
     )
 
+    if (INFRA_LOGGING)
+        target_sources(uiinfra PRIVATE
+            include/uiinfra/logview.h ui/logview.cpp
+            include/uiinfra/logsinkmodel.h ui/logsinkmodel.cpp
+        )
+    endif ()
+
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
 
     target_include_directories(uiinfra
@@ -146,6 +157,10 @@ if (INFRA_UI_COMPONENTS)
     )
 
     target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core HinnantDate::Date)
+
+    if (INFRA_LOGGING)
+        target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core HinnantDate::Date)
+    endif ()
 endif ()
 
 if (INFRA_ENABLE_TESTS)
