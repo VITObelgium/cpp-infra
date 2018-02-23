@@ -36,11 +36,14 @@ QVariant LogSinkModel::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DecorationRole) {
         switch (_messages.at(size_t(index.row())).level) {
+        case spdlog::level::debug:
+            return QIcon(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_MessageBoxQuestion));
         case spdlog::level::info:
             return QIcon(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_MessageBoxInformation));
         case spdlog::level::warn:
             return QIcon(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_MessageBoxWarning));
         case spdlog::level::err:
+        case spdlog::level::critical:
             return QIcon(QApplication::style()->standardIcon(QStyle::StandardPixmap::SP_MessageBoxCritical));
         default:
             break;
