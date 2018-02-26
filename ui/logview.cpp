@@ -17,12 +17,15 @@ LogView::~LogView() = default;
 void LogView::setModel(QAbstractItemModel* model)
 {
     _ui->tableView->setModel(model);
+
+    connect(model, &QAbstractItemModel::rowsInserted, this, [this, model](const QModelIndex& /*parent*/, int first, int /*last*/) {
+        _ui->tableView->scrollTo(model->index(first, 0));
+    });
 }
 
 void LogView::resizeEvent(QResizeEvent* event)
 {
     _ui->tableView->horizontalHeader()->resizeSection(0, event->size().width());
-
     QWidget::resizeEvent(event);
 }
 }
