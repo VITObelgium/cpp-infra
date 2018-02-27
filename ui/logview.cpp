@@ -18,8 +18,8 @@ void LogView::setModel(QAbstractItemModel* model)
 {
     _ui->tableView->setModel(model);
 
-    connect(model, &QAbstractItemModel::rowsInserted, this, [this, model](const QModelIndex& /*parent*/, int first, int /*last*/) {
-        _ui->tableView->scrollTo(model->index(first, 0));
+    connect(model, &QAbstractItemModel::rowsInserted, this, [this, model](const QModelIndex& /*parent*/, int /*first*/, int /*last*/) {
+        _ui->tableView->scrollToBottom();
     });
 }
 
