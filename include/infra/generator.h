@@ -3,30 +3,35 @@
 #include <experimental/coroutine>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
-namespace infra
-{
-template<typename T>
+namespace infra {
+template <typename T>
 class generator;
 
-namespace detail
-{
-template<typename T>
+namespace detail {
+template <typename T>
 class generator_promise
 {
 public:
-    using value_type = std::remove_reference_t<T>;
+    using value_type     = std::remove_reference_t<T>;
     using reference_type = std::conditional_t<std::is_reference_v<T>, T, T&>;
-    using pointer_type = value_type*;
+    using pointer_type   = value_type*;
 
     generator_promise() = default;
 
     generator<T> get_return_object() noexcept;
 
-    constexpr std::experimental::suspend_always initial_suspend() const { return {}; }
-    constexpr std::experimental::suspend_always final_suspend() const { return {}; }
+    constexpr std::experimental::suspend_always initial_suspend() const
+    {
+        return {};
+    }
+    constexpr std::experimental::suspend_always final_suspend() const
+    {
+        return {};
+    }
 
-    template<typename U, typename = std::enable_if_t<std::is_same<U, T>::value>>
+    template <typename U, typename = std::enable_if_t<std::is_same<U, T>::value>>
     std::experimental::suspend_always yield_value(U& value) noexcept
     {
         m_value = std::addressof(value);
@@ -54,14 +59,14 @@ public:
     }
 
     // Don't allow any use of 'co_await' inside the generator coroutine.
-    template<typename U>
+    template <typename U>
     std::experimental::suspend_never await_transform(U&& value) = delete;
 
 private:
     pointer_type m_value;
 };
 
-template<typename T>
+template <typename T>
 class generator_iterator
 {
     using coroutine_handle = std::experimental::coroutine_handle<generator_promise<T>>;
@@ -70,17 +75,19 @@ public:
     using iterator_category = std::input_iterator_tag;
     // What type should we use for counting elements of a potentially infinite sequence?
     using difference_type = std::size_t;
-    using value_type = std::remove_reference_t<T>;
-    using reference = value_type&;
-    using pointer = value_type*;
+    using value_type      = std::remove_reference_t<T>;
+    using reference       = value_type&;
+    using pointer         = value_type*;
 
     explicit generator_iterator(std::nullptr_t) noexcept
     : m_coroutine(nullptr)
-    {}
+    {
+    }
 
     explicit generator_iterator(coroutine_handle coroutine) noexcept
     : m_coroutine(coroutine)
-    {}
+    {
+    }
 
     bool operator==(const generator_iterator& other) const noexcept
     {
@@ -95,8 +102,7 @@ public:
     generator_iterator& operator++()
     {
         m_coroutine.resume();
-        if (m_coroutine.done())
-        {
+        if (m_coroutine.done()) {
             m_coroutine = nullptr;
         }
 
@@ -124,16 +130,17 @@ private:
 };
 }
 
-template<typename T>
+template <typename T>
 class generator
 {
 public:
     using promise_type = detail::generator_promise<T>;
-    using iterator = detail::generator_iterator<T>;
+    using iterator     = detail::generator_iterator<T>;
 
     generator() noexcept
     : m_coroutine(nullptr)
-    {}
+    {
+    }
 
     generator(generator&& other) noexcept
     : m_coroutine(other.m_coroutine)
@@ -145,8 +152,7 @@ public:
 
     ~generator()
     {
-        if (m_coroutine)
-        {
+        if (m_coroutine) {
             m_coroutine.destroy();
         }
     }
@@ -159,21 +165,19 @@ public:
 
     iterator begin()
     {
-        if (m_coroutine)
-        {
+        if (m_coroutine) {
             m_coroutine.resume();
-            if (!m_coroutine.done())
-            {
-                return iterator{ m_coroutine };
+            if (!m_coroutine.done()) {
+                return iterator{m_coroutine};
             }
         }
 
-        return iterator{ nullptr };
+        return iterator{nullptr};
     }
 
     iterator end() noexcept
     {
-        return iterator{ nullptr };
+        return iterator{nullptr};
     }
 
     void swap(generator& other) noexcept
@@ -186,33 +190,40 @@ private:
 
     explicit generator(std::experimental::coroutine_handle<promise_type> coroutine) noexcept
     : m_coroutine(coroutine)
-    {}
+    {
+    }
 
     std::experimental::coroutine_handle<promise_type> m_coroutine;
 };
 
-template<typename T>
+template <typename T>
 void swap(generator<T>& a, generator<T>& b)
 {
     a.swap(b);
 }
 
-namespace detail
+namespace detail {
+template <typename T>
+generator<T> generator_promise<T>::get_return_object() noexcept
 {
-    template<typename T>
-    generator<T> generator_promise<T>::get_return_object() noexcept
-    {
-        using coroutine_handle = std::experimental::coroutine_handle<generator_promise<T>>;
-        return generator<T>{ coroutine_handle::from_promise(*this) };
+    using coroutine_handle = std::experimental::coroutine_handle<generator_promise<T>>;
+    return generator<T>{coroutine_handle::from_promise(*this)};
+}
+}
+
+template <typename FUNC, typename T>
+generator<std::result_of_t<FUNC && (T&)>> fmap(FUNC func, generator<T> source)
+{
+    for (auto& value : source) {
+        co_yield std::invoke(func, value);
     }
 }
 
-template<typename FUNC, typename T>
-generator<std::result_of_t<FUNC&&(T&)>> fmap(FUNC func, generator<T> source)
+template <typename T>
+std::vector<T> toVector(generator<T>&& gen)
 {
-    for (auto& value : source)
-    {
-        co_yield std::invoke(func, value);
-    }
+    std::vector<T> result;
+    std::copy(gen.begin(), gen.end(), std::back_inserter(result));
+    return result;
 }
 }
