@@ -14,6 +14,8 @@ class ToolboxView : public QToolBox
 public:
     explicit ToolboxView(QWidget* parent = nullptr);
 
+    void addSection(const QString& name);
+
     void addItemToSection(const QString& sectionName, int itemId, const QString& itemName, QIcon icon);
     void setItemsVisible(bool visible);
 
@@ -21,7 +23,7 @@ signals:
     void itemClicked(int);
 
 private:
-    QFrame* addSection(const QString& name);
+    QFrame* appendSection(const QString& name);
     void onItemSelected();
 };
 }

@@ -11,11 +11,16 @@ ToolboxView::ToolboxView(QWidget* parent)
 {
 }
 
+void ToolboxView::addSection(const QString& name)
+{
+    appendSection(name);
+}
+
 void ToolboxView::addItemToSection(const QString& sectionName, int itemId, const QString& itemName, QIcon icon)
 {
     auto* section = findChild<QFrame*>(sectionName);
     if (!section) {
-        section = addSection(sectionName);
+        section = appendSection(sectionName);
     }
 
     auto* item = new ToolboxItem(itemName, icon, this);
@@ -32,7 +37,7 @@ void ToolboxView::setItemsVisible(bool visible)
     }
 }
 
-QFrame* ToolboxView::addSection(const QString& name)
+QFrame* ToolboxView::appendSection(const QString& name)
 {
     auto* sectionFrame = new QFrame(this);
     auto* layout       = new QVBoxLayout(sectionFrame);
