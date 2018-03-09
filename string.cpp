@@ -27,27 +27,27 @@ bool containsValidFloatingPoint(std::string_view str)
     return (end != nullptr && *end == 0);
 }
 
-long toInt(std::string_view str)
+std::optional<long> toInt(std::string_view str) noexcept
 {
     std::string s(str);
 
     char* end   = nullptr;
     long result = std::strtol(s.c_str(), &end, 10);
     if (end == s.c_str()) {
-        throw InvalidArgument("Failed to convert '{}' to integer");
+        return std::optional<long>();
     }
 
     return result;
 }
 
-double toFloatingPoint(std::string_view str)
+std::optional<double> toFloatingPoint(std::string_view str) noexcept
 {
     std::string s(str);
 
     char* end     = nullptr;
     double result = std::strtod(s.c_str(), &end);
     if (end == s.c_str()) {
-        throw InvalidArgument("Failed to convert '{}' to floating point");
+        return std::optional<double>();
     }
 
     return result;
