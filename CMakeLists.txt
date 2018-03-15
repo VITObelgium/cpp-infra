@@ -107,6 +107,7 @@ if (INFRA_LICENSE_MANAGER)
     target_sources(infra PRIVATE
         include/infra/licensemanager.h licensemanager.cpp
     )
+    target_link_libraries(infra PRIVATE Rlm::Rlm)
 endif ()
 
 if (INFRA_UI_COMPONENTS)
