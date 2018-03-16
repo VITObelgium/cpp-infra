@@ -126,7 +126,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-        "Failed to create transformation");
+                              "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -990,11 +990,12 @@ const GDALRasterBand* RasterBand::get() const
 
 DataSet DataSet::createRaster(const std::string& filePath, const std::vector<std::string>& driverOpts)
 {
-    return DataSet(checkPointer(create(filePath,
-                                    GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                    nullptr,
-                                    driverOpts),
-        "Failed to open raster file"));
+    auto* dataSet = create(filePath, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, driverOpts);
+    if (!dataSet) {
+        throw RuntimeError("Failed to open raster file '{}'", filePath);
+    }
+
+    return DataSet(dataSet);
 }
 
 DataSet DataSet::createRaster(const std::string& filePath, RasterType type, const std::vector<std::string>& driverOpts)
@@ -1007,19 +1008,19 @@ DataSet DataSet::createRaster(const std::string& filePath, RasterType type, cons
     }
 
     return DataSet(checkPointer(create(filePath,
-                                    GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                    nullptr,
-                                    driverOpts),
-        "Failed to open raster file"));
+                                       GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                       nullptr,
+                                       driverOpts),
+                                "Failed to open raster file"));
 }
 
 DataSet DataSet::createVector(const std::string& filePath, const std::vector<std::string>& driverOptions)
 {
     return DataSet(checkPointer(create(filePath,
-                                    GDAL_OF_READONLY | GDAL_OF_VECTOR,
-                                    nullptr,
-                                    driverOptions),
-        "Failed to open vector file"));
+                                       GDAL_OF_READONLY | GDAL_OF_VECTOR,
+                                       nullptr,
+                                       driverOptions),
+                                "Failed to open vector file"));
 }
 
 DataSet DataSet::createVector(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions)
@@ -1034,16 +1035,16 @@ DataSet DataSet::createVector(const std::string& filePath, VectorType type, cons
     std::array<const char*, 2> drivers{{s_shapeDriverLookup.at(type), nullptr}};
 
     return DataSet(checkPointer(create(filePath,
-                                    GDAL_OF_READONLY | GDAL_OF_VECTOR,
-                                    drivers.data(),
-                                    driverOptions),
-        "Failed to open vector file"));
+                                       GDAL_OF_READONLY | GDAL_OF_VECTOR,
+                                       drivers.data(),
+                                       driverOptions),
+                                "Failed to open vector file"));
 }
 
 GDALDataset* DataSet::create(const std::string& filePath,
-    unsigned int openFlags,
-    const char* const* drivers,
-    const std::vector<std::string>& driverOpts)
+                             unsigned int openFlags,
+                             const char* const* drivers,
+                             const std::vector<std::string>& driverOpts)
 {
     auto options = createOptionsArray(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
@@ -1281,11 +1282,39 @@ VectorType guessVectorTypeFromFileName(const std::string& filePath)
     return VectorType::Unknown;
 }
 
+static void fillMetadataFromGeoTransform(infra::GeoMetadata& meta, const std::array<double, 6>& geoTrans)
+{
+    if (geoTrans[2] == 0.0 && geoTrans[4] == 0.0) {
+        meta.cellSize = geoTrans[1];
+    }
+
+    // transform the lower left coordinate (0.0, meta.rows)
+    meta.xll = geoTrans[0] + geoTrans[1] * 0.0 + geoTrans[2] * meta.rows;
+    meta.yll = geoTrans[3] + geoTrans[4] * 0.0 + geoTrans[5] * meta.rows;
+}
+
+infra::GeoMetadata readMetadataFromDataset(const gdal::DataSet& dataSet)
+{
+    infra::GeoMetadata meta;
+
+    if (dataSet.rasterCount() != 1) {
+        throw RuntimeError("Only rasters with a single band are currently supported");
+    }
+
+    meta.cols       = dataSet.rasterXSize();
+    meta.rows       = dataSet.rasterYSize();
+    meta.nodata     = dataSet.noDataValue(1);
+    meta.projection = dataSet.projection();
+    fillMetadataFromGeoTransform(meta, dataSet.geoTransform());
+
+    return meta;
+}
+
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-      dataBuffer.size(), FALSE /*no ownership*/))
+                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+                            dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

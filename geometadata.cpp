@@ -155,4 +155,9 @@ std::string GeoMetadata::toString() const
 
     return os.str();
 }
+
+std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta)
+{
+    return {{meta.xll, meta.cellSize, 0.0, meta.yll + (meta.cellSize * meta.rows), 0.0, -meta.cellSize}};
+}
 }

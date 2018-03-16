@@ -3,6 +3,7 @@
 #include "infra/cell.h"
 #include "infra/point.h"
 
+#include <array>
 #include <optional>
 #include <sstream>
 
@@ -44,4 +45,6 @@ struct GeoMetadata
     std::optional<double> nodata;
     std::string projection;
 };
+
+std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta);
 }
