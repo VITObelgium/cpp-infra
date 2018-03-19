@@ -65,9 +65,9 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
     return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
 }
 
-template std::pair<DataSet, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template<> std::pair<DataSet, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
-template std::pair<DataSet, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template<> std::pair<DataSet, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
-template std::pair<DataSet, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template<> std::pair<DataSet, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 }
