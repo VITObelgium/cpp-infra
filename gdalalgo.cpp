@@ -49,8 +49,8 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
 
     std::vector<T> data(meta.rows * meta.cols);
 
-    auto memDriver = gdal::Driver::create(gdal::VectorType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet<T>(0, 0, 0u, "dummy"));
+    auto memDriver = gdal::Driver::create(gdal::RasterType::Memory);
+    gdal::DataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0u, "dummy"));
     memDataSet.addBand(data.data());
     memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
     memDataSet.setNoDataValue(1, meta.nodata);
@@ -65,9 +65,9 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
     return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
 }
 
-template<> std::pair<DataSet, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
-template<> std::pair<DataSet, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
-template<> std::pair<DataSet, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 }

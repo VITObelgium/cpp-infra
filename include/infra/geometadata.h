@@ -13,6 +13,7 @@ struct GeoMetadata
 {
     GeoMetadata() = default;
     GeoMetadata(int32_t _rows, int32_t _cols);
+    GeoMetadata(int32_t _rows, int32_t _cols, std::optional<double> _nodatavalue);
     GeoMetadata(int32_t _rows, int32_t _cols, double _xll, double _yll, double _cellsize, std::optional<double> _nodatavalue);
 
     bool operator==(const GeoMetadata& other) const noexcept;
@@ -37,6 +38,11 @@ struct GeoMetadata
 
     std::string toString() const;
 
+    std::optional<int32_t> projectionGeoEpsg() const;
+    std::optional<int32_t> projectionEpsg() const;
+    std::string projectionFrienlyName() const;
+    void setProjectionFromEpsg(int32_t epsg);
+
     int32_t rows    = 0;
     int32_t cols    = 0;
     double xll      = 0.0;
@@ -47,4 +53,5 @@ struct GeoMetadata
 };
 
 std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta);
+std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta);
 }

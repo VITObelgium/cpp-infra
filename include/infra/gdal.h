@@ -68,6 +68,7 @@ enum class RasterType
     GeoTiff,
     Gif,
     Png,
+    PcRaster,
     Unknown
 };
 
@@ -478,6 +479,8 @@ public:
 
     std::string projection() const;
     void setProjection(const std::string& proj);
+
+    void setMetadata(const std::string& name, const std::string& value, const std::string& domain = "");
 
     Layer getLayer(int index);
     Layer createLayer(const std::string& name, const std::vector<std::string>& driverOptions = {});

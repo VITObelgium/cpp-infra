@@ -27,6 +27,7 @@ static const std::unordered_map<RasterType, const char*> s_driverLookup{{
     {RasterType::GeoTiff, "GTiff"},
     {RasterType::Gif, "GIF"},
     {RasterType::Png, "PNG"},
+    {RasterType::PcRaster, "PCRaster"},
 }};
 
 static const std::unordered_map<std::string, RasterType> s_driverDescLookup{{
@@ -35,6 +36,7 @@ static const std::unordered_map<std::string, RasterType> s_driverDescLookup{{
     {"GTiff", RasterType::GeoTiff},
     {"GIF", RasterType::Gif},
     {"PNG", RasterType::Png},
+    {"PCRaster", RasterType::PcRaster},
 }};
 
 static const std::unordered_map<VectorType, const char*> s_shapeDriverLookup{{
@@ -1181,6 +1183,11 @@ void DataSet::setProjection(const std::string& proj)
     }
 }
 
+void DataSet::setMetadata(const std::string& name, const std::string& value, const std::string& domain)
+{
+    checkError(_ptr->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set metadata");
+}
+
 Layer DataSet::getLayer(int index)
 {
     assert(_ptr);
@@ -1261,6 +1268,8 @@ RasterType guessRasterTypeFromFileName(const std::string& filePath)
         return RasterType::Gif;
     } else if (ext == ".png") {
         return RasterType::Png;
+    } else if (ext == ".map") {
+        return RasterType::PcRaster;
     }
 
     return RasterType::Unknown;

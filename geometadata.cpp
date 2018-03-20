@@ -1,4 +1,5 @@
 #include "infra/geometadata.h"
+#include "infra/gdal.h"
 
 #include <cmath>
 #include <limits>
@@ -8,6 +9,11 @@ namespace infra {
 
 GeoMetadata::GeoMetadata(int32_t _rows, int32_t _cols)
 : GeoMetadata(_rows, _cols, 0.0, 0.0, 0.0, std::optional<double>())
+{
+}
+
+GeoMetadata::GeoMetadata(int32_t _rows, int32_t _cols, std::optional<double> _nodatavalue)
+: GeoMetadata(_rows, _cols, 0.0, 0.0, 0.0, _nodatavalue)
 {
 }
 
@@ -156,8 +162,43 @@ std::string GeoMetadata::toString() const
     return os.str();
 }
 
+std::optional<int32_t> GeoMetadata::projectionGeoEpsg() const
+{
+    std::optional<int32_t> epsg;
+    if (!projection.empty()) {
+        epsg = infra::gdal::projectionToGeoEpsg(projection);
+    }
+
+    return epsg;
+}
+
+std::optional<int32_t> GeoMetadata::projectionEpsg() const
+{
+    std::optional<int32_t> epsg;
+    if (!projection.empty()) {
+        epsg = infra::gdal::projectionToEpsg(projection);
+    }
+
+    return epsg;
+}
+
+std::string GeoMetadata::projectionFrienlyName() const
+{
+    return fmt::format("EPSG:{}", projectionEpsg().value());
+}
+
+void GeoMetadata::setProjectionFromEpsg(int32_t epsg)
+{
+    projection = infra::gdal::projectionFromEpsg(epsg);
+}
+
 std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta)
 {
     return {{meta.xll, meta.cellSize, 0.0, meta.yll + (meta.cellSize * meta.rows), 0.0, -meta.cellSize}};
+}
+
+std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta)
+{
+    return os << meta.toString();
 }
 }
