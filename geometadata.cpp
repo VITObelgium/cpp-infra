@@ -176,7 +176,10 @@ std::optional<int32_t> GeoMetadata::projectionEpsg() const
 {
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
-        epsg = infra::gdal::projectionToEpsg(projection);
+        try {
+            epsg = infra::gdal::projectionToEpsg(projection);
+        } catch (const std::exception&) {
+        }
     }
 
     return epsg;
