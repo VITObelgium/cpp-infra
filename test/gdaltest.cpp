@@ -14,7 +14,11 @@ TEST(GdalTest, iteratePoints)
     int count = 0;
     int index = 1;
     for (const auto& feature : ds.getLayer(0)) {
-        EXPECT_EQ(Point<double>(index, index + 1), std::get<Point<double>>(feature.geometry()));
+        auto geometry = feature.geometry();
+        EXPECT_EQ(gdal::Geometry::Type::Point, geometry.type());
+
+        auto point = geometry.asType<gdal::PointGeometry>();
+        EXPECT_EQ(Point<double>(index, index + 1), point.point());
 
         index += 2;
         ++count;

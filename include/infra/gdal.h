@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/filesystem.h"
+#include "infra/gdalgeometry.h"
 #include "infra/geometadata.h"
 #include "infra/internal/gdalinternal.h"
 #include "infra/point.h"
@@ -18,19 +19,9 @@
 #include <optional>
 #include <variant>
 
-class OGRSimpleCurve;
-class OGRFieldDefn;
-class OGRPointIterator;
-class OGRGeometryCollection;
-class OGRMultiLineString;
-class OGRLinearRing;
-
 namespace infra::gdal {
 
 using namespace std::string_literals;
-
-using days       = std::chrono::duration<int, std::ratio_multiply<std::ratio<24>, std::chrono::hours::period>>;
-using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 
 // RAII wrapper for gdal registration
 class Registration
@@ -111,329 +102,6 @@ std::vector<const char*> createOptionsArray(const std::vector<std::string>& driv
 RasterType guessRasterTypeFromFileName(const std::string& filePath);
 VectorType guessVectorTypeFromFileName(const std::string& filePath);
 
-class Line
-{
-public:
-    Line(OGRSimpleCurve* curve);
-
-    int pointCount() const;
-    Point<double> pointAt(int index) const;
-
-    Point<double> startPoint();
-    Point<double> endPoint();
-
-    OGRSimpleCurve* get();
-
-private:
-    OGRSimpleCurve* _curve;
-};
-
-class LineIterator
-{
-public:
-    LineIterator() = default;
-    LineIterator(Line line);
-    LineIterator(const LineIterator&) = delete;
-    LineIterator(LineIterator&&)      = default;
-    ~LineIterator();
-
-    LineIterator& operator++();
-    LineIterator& operator=(LineIterator&& other);
-    bool operator==(const LineIterator& other) const;
-    bool operator!=(const LineIterator& other) const;
-    const Point<double>& operator*();
-    const Point<double>* operator->();
-
-private:
-    void next();
-
-    OGRPointIterator* _iter = nullptr;
-    Point<double> _point;
-};
-
-inline LineIterator begin(const Line& line)
-{
-    return LineIterator(line);
-}
-
-inline LineIterator begin(Line&& line)
-{
-    return LineIterator(line);
-}
-
-inline LineIterator end(const Line&)
-{
-    return LineIterator();
-}
-
-class MultiLine
-{
-public:
-    MultiLine(OGRMultiLineString* multiLine);
-
-    OGRMultiLineString* get();
-
-    int geometryCount() const;
-    Line geometry(int index) const;
-
-private:
-    OGRMultiLineString* _multiLine;
-};
-
-class LinearRing : public Line
-{
-public:
-    LinearRing(OGRLinearRing* ring);
-
-    OGRLinearRing* get();
-
-private:
-    OGRLinearRing* _ring;
-};
-
-class Polygon
-{
-public:
-    Polygon(OGRPolygon* poly);
-
-    LinearRing exteriorRing();
-    LinearRing interiorRing(int index);
-
-    OGRPolygon* get();
-
-private:
-    OGRPolygon* _poly;
-};
-
-using Geometry = std::variant<std::monostate, Point<double>, Line, MultiLine, Polygon>;
-using Field    = std::variant<int32_t, int64_t, double, std::string_view>;
-
-class FieldDefinition
-{
-public:
-    FieldDefinition() = default;
-    FieldDefinition(const char* name, const std::type_info& typeInfo);
-    FieldDefinition(OGRFieldDefn* def);
-    ~FieldDefinition();
-    std::string_view name() const;
-    const std::type_info& type() const;
-
-    OGRFieldDefn* get() noexcept;
-
-private:
-    bool _hasOwnerShip = false;
-    OGRFieldDefn* _def = nullptr;
-};
-
-class FeatureDefinition
-{
-public:
-    FeatureDefinition(OGRFeatureDefn* def);
-    ~FeatureDefinition();
-    std::string_view name() const;
-
-    int fieldCount() const;
-    int fieldIndex(std::string_view name) const;
-    FieldDefinition fieldDefinition(int index) const;
-
-    OGRFeatureDefn* get() noexcept;
-
-private:
-    bool _hasOwnerShip;
-    OGRFeatureDefn* _def;
-};
-
-class Feature
-{
-public:
-    Feature(Layer& layer);
-    explicit Feature(OGRFeature* feature);
-    Feature(const Feature&) = delete;
-    Feature(Feature&&);
-    ~Feature();
-
-    Feature& operator=(const Feature&) = delete;
-    Feature& operator                  =(Feature&&);
-
-    OGRFeature* get();
-    const OGRFeature* get() const;
-
-    Geometry geometry();
-    const Geometry geometry() const;
-
-    int fieldCount() const;
-    int fieldIndex(std::string_view name) const;
-    FieldDefinition fieldDefinition(int index) const;
-
-    Field getField(int index) const noexcept;
-
-    template <typename T>
-    T getFieldAs(int index) const;
-
-    template <typename T>
-    T getFieldAs(std::string_view name) const;
-
-    template <typename T>
-    void setField(std::string_view name, const T& value)
-    {
-        _feature->SetField(name.data(), value);
-    }
-
-    bool operator==(const Feature& other) const;
-
-private:
-    OGRFeature* _feature;
-};
-
-class Layer
-{
-public:
-    explicit Layer(OGRLayer* layer);
-    Layer(const Layer&);
-    Layer(Layer&&);
-    ~Layer();
-
-    Layer& operator=(Layer&&) = default;
-
-    int64_t featureCount() const;
-    Feature feature(int64_t index) const;
-
-    int fieldIndex(std::string_view name) const;
-    void setSpatialFilter(Point<double> point);
-
-    void createField(FieldDefinition& field);
-    void createFeature(Feature& feature);
-
-    FeatureDefinition layerDefinition() const;
-
-    const char* name() const;
-    OGRLayer* get();
-    const OGRLayer* get() const;
-
-private:
-    OGRLayer* _layer;
-};
-
-// Iteration is not thread safe!
-// Do not iterate simultaneously from different threads.
-class LayerIterator
-{
-public:
-    LayerIterator();
-    LayerIterator(Layer layer);
-    LayerIterator(const LayerIterator&) = delete;
-    LayerIterator(LayerIterator&&)      = default;
-
-    LayerIterator& operator++();
-    LayerIterator& operator=(LayerIterator&& other);
-    bool operator==(const LayerIterator& other) const;
-    bool operator!=(const LayerIterator& other) const;
-    const Feature& operator*();
-    const Feature* operator->();
-
-private:
-    void next();
-
-    Layer _layer;
-    Feature _currentFeature;
-};
-
-// support for range based for loops
-inline LayerIterator begin(Layer& layer)
-{
-    return LayerIterator(layer);
-}
-
-inline LayerIterator begin(Layer&& layer)
-{
-    return LayerIterator(layer);
-}
-
-inline LayerIterator end(const infra::gdal::Layer& /*layer*/)
-{
-    return LayerIterator();
-}
-
-class FeatureIterator
-{
-public:
-    FeatureIterator(int _count);
-    FeatureIterator(const Feature& feature);
-    FeatureIterator(const FeatureIterator&) = delete;
-    FeatureIterator(FeatureIterator&&)      = default;
-
-    FeatureIterator& operator++();
-    FeatureIterator& operator=(FeatureIterator&& other) = default;
-    bool operator==(const FeatureIterator& other) const;
-    bool operator!=(const FeatureIterator& other) const;
-    const Field& operator*();
-    const Field* operator->();
-
-private:
-    void next();
-
-    const Feature* _feature = nullptr;
-    int _fieldCount         = 0;
-    int _currentFieldIndex  = 0;
-    Field _currentField;
-};
-
-// support for range based for loops
-inline FeatureIterator begin(const Feature& feat)
-{
-    return FeatureIterator(feat);
-}
-
-inline FeatureIterator begin(Feature&& feat)
-{
-    return FeatureIterator(feat);
-}
-
-inline FeatureIterator end(const Feature& feat)
-{
-    return FeatureIterator(feat.fieldCount());
-}
-
-class FeatureDefinitionIterator
-{
-public:
-    FeatureDefinitionIterator(int fieldCount);
-    FeatureDefinitionIterator(const FeatureDefinition& featureDef);
-    FeatureDefinitionIterator(const FeatureDefinitionIterator&) = delete;
-    FeatureDefinitionIterator(FeatureDefinitionIterator&&)      = default;
-
-    FeatureDefinitionIterator& operator++();
-    FeatureDefinitionIterator& operator=(FeatureDefinitionIterator&& other) = default;
-    bool operator==(const FeatureDefinitionIterator& other) const;
-    bool operator!=(const FeatureDefinitionIterator& other) const;
-    const FieldDefinition& operator*();
-    const FieldDefinition* operator->();
-
-private:
-    void next();
-
-    const FeatureDefinition* _featureDef = nullptr;
-    int _fieldCount                      = 0;
-    int _currentFieldIndex               = 0;
-    FieldDefinition _currentField;
-};
-
-// support for range based for loops
-inline FeatureDefinitionIterator begin(const FeatureDefinition& featDef)
-{
-    return FeatureDefinitionIterator(featDef);
-}
-
-inline FeatureDefinitionIterator begin(FeatureDefinition&& featDef)
-{
-    return FeatureDefinitionIterator(featDef);
-}
-
-inline FeatureDefinitionIterator end(const FeatureDefinition& featDef)
-{
-    return FeatureDefinitionIterator(featDef.fieldCount());
-}
-
 class RasterBand
 {
 public:
@@ -455,6 +123,7 @@ public:
     // if you know the type of the dataset, this will be faster as not all drivers are queried
     static DataSet createVector(const std::string& filePath, const std::vector<std::string>& driverOptions = {});
     static DataSet createVector(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
+    static DataSet createVectorInMemory();
 
     DataSet() = default;
     explicit DataSet(GDALDataset* ptr) noexcept;
@@ -484,6 +153,7 @@ public:
 
     Layer getLayer(int index);
     Layer createLayer(const std::string& name, const std::vector<std::string>& driverOptions = {});
+    Layer createLayer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
 
     RasterBand rasterBand(int index) const;
 
