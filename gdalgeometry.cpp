@@ -62,26 +62,26 @@ Geometry::Geometry(OGRGeometry* instance)
 
 template <typename WrappedType>
 GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* collection)
-: GeometryPtr(collection)
+: GeometryPtr<WrappedType>(collection)
 {
 }
 
 template <typename WrappedType>
 void GeometryCollectionWrapper<WrappedType>::addGeometry(const Geometry& geometry)
 {
-    ptr()->addGeometry(geometry.getGeometry());
+    this->ptr()->addGeometry(geometry.getGeometry());
 }
 
 template <typename WrappedType>
 int GeometryCollectionWrapper<WrappedType>::size() const
 {
-    return ptr()->getNumGeometries();
+    return this->ptr()->getNumGeometries();
 }
 
 template <typename WrappedType>
 Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 {
-    return fromPtr(ptr()->getGeometryRef(index));
+    return fromPtr(this->ptr()->getGeometryRef(index));
 }
 
 Line::Line(OGRSimpleCurve* curve)
