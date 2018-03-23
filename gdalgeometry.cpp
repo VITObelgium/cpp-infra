@@ -99,7 +99,7 @@ GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* c
 
 template <typename WrappedType>
 GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType& collection)
-: GeometryPtr(collection)
+: GeometryPtr<WrappedType>(collection)
 {
 }
 
@@ -118,7 +118,7 @@ int GeometryCollectionWrapper<WrappedType>::size() const
 template <typename WrappedType>
 Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 {
-    return fromNonOwningPtr(ptr()->getGeometryRef(index));
+    return fromNonOwningPtr(this->ptr()->getGeometryRef(index));
 }
 
 Line::Line(OGRSimpleCurve* curve)

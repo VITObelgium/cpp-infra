@@ -144,7 +144,7 @@ public:
     template <typename GeometryType>
     void addGeometry(GeometryPtr<GeometryType>&& geometry)
     {
-        ptr()->addGeometryDirectly(geometry.release());
+        this->ptr()->addGeometryDirectly(geometry.release());
     }
 
     int size() const;
