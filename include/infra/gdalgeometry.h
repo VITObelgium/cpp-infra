@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/exception.h"
 #include "infra/point.h"
 
 #include <gdal_priv.h>
