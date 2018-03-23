@@ -123,7 +123,6 @@ public:
     // if you know the type of the dataset, this will be faster as not all drivers are queried
     static DataSet createVector(const std::string& filePath, const std::vector<std::string>& driverOptions = {});
     static DataSet createVector(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
-    static DataSet createVectorInMemory();
 
     DataSet() = default;
     explicit DataSet(GDALDataset* ptr) noexcept;

@@ -9,7 +9,7 @@ namespace infra::gdal {
 
 using namespace std::string_literals;
 
-static Geometry fromPtr(OGRGeometry* geometry)
+static Geometry fromOwningPtr(OGRGeometry* geometry)
 {
     if (!geometry) {
         throw RuntimeError("No geometry present");
@@ -17,13 +17,37 @@ static Geometry fromPtr(OGRGeometry* geometry)
 
     switch (wkbFlatten(geometry->getGeometryType())) {
     case wkbPoint:
-        return PointGeometry(reinterpret_cast<OGRPoint*>(geometry));
+        return PointGeometry(static_cast<OGRPoint*>(geometry));
     case wkbLineString:
-        return Line(reinterpret_cast<OGRLineString*>(geometry));
+        return Line(static_cast<OGRLineString*>(geometry));
     case wkbPolygon:
-        return Polygon(reinterpret_cast<OGRPolygon*>(geometry));
+        return Polygon(static_cast<OGRPolygon*>(geometry));
+    case wkbMultiPolygon:
+        return MultiPolygon(static_cast<OGRMultiPolygon*>(geometry));
     case wkbMultiLineString:
-        return MultiLine(reinterpret_cast<OGRMultiLineString*>(geometry));
+        return MultiLine(static_cast<OGRMultiLineString*>(geometry));
+    default:
+        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
+    }
+}
+
+static Geometry fromNonOwningPtr(OGRGeometry* geometry)
+{
+    if (!geometry) {
+        throw RuntimeError("No geometry present");
+    }
+
+    switch (wkbFlatten(geometry->getGeometryType())) {
+    case wkbPoint:
+        return PointGeometry(dynamic_cast<OGRPoint&>(*geometry));
+    case wkbLineString:
+        return Line(dynamic_cast<OGRLineString&>(*geometry));
+    case wkbPolygon:
+        return Polygon(dynamic_cast<OGRPolygon&>(*geometry));
+    case wkbMultiPolygon:
+        return MultiPolygon(dynamic_cast<OGRMultiPolygon&>(*geometry));
+    case wkbMultiLineString:
+        return MultiLine(dynamic_cast<OGRMultiLineString&>(*geometry));
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
     }
@@ -48,11 +72,18 @@ Geometry::Type Geometry::type() const
         return Geometry::Type::Line;
     case wkbPolygon:
         return Geometry::Type::Polygon;
+    case wkbMultiPolygon:
+        return Geometry::Type::MultiPolygon;
     case wkbMultiLineString:
         return Geometry::Type::MultiLine;
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(_geometry->getGeometryType()));
     }
+}
+
+std::string_view Geometry::typeName() const
+{
+    return _geometry->getGeometryName();
 }
 
 Geometry::Geometry(OGRGeometry* instance)
@@ -63,6 +94,12 @@ Geometry::Geometry(OGRGeometry* instance)
 template <typename WrappedType>
 GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* collection)
 : GeometryPtr<WrappedType>(collection)
+{
+}
+
+template <typename WrappedType>
+GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType& collection)
+: GeometryPtr(collection)
 {
 }
 
@@ -81,13 +118,18 @@ int GeometryCollectionWrapper<WrappedType>::size() const
 template <typename WrappedType>
 Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 {
-    return fromPtr(this->ptr()->getGeometryRef(index));
+    return fromNonOwningPtr(ptr()->getGeometryRef(index));
 }
 
 Line::Line(OGRSimpleCurve* curve)
 : GeometryPtr(curve)
 {
     assert(curve);
+}
+
+Line::Line(OGRSimpleCurve& curve)
+: GeometryPtr(curve)
+{
 }
 
 int Line::pointCount() const
@@ -116,7 +158,7 @@ Point<double> Line::endPoint()
     return Point<double>(point.getX(), point.getY());
 }
 
-LineIterator::LineIterator(Line line)
+LineIterator::LineIterator(const Line& line)
 : _iter(line.ptr()->getPointIterator())
 {
     next();
@@ -140,6 +182,11 @@ LineIterator begin(Line&& line)
 LineIterator end(const Line&)
 {
     return LineIterator();
+}
+
+MultiLine forceToMultiLine(Geometry& geom)
+{
+    return MultiLine(static_cast<OGRMultiLineString*>(OGRGeometryFactory::forceToMultiLineString(geom.getGeometry())));
 }
 
 void LineIterator::next()
@@ -199,6 +246,11 @@ PointGeometry::PointGeometry(OGRPoint* point)
 {
 }
 
+PointGeometry::PointGeometry(OGRPoint& point)
+: GeometryPtr(point)
+{
+}
+
 Point<double> PointGeometry::point() const
 {
     return Point<double>(ptr()->getX(), ptr()->getY());
@@ -208,6 +260,11 @@ MultiLine::MultiLine(OGRMultiLineString* multiLine)
 : GeometryCollectionWrapper(multiLine)
 {
     assert(multiLine);
+}
+
+MultiLine::MultiLine(OGRMultiLineString& multiLine)
+: GeometryCollectionWrapper(multiLine)
+{
 }
 
 Line MultiLine::lineAt(int index)
@@ -225,6 +282,11 @@ Polygon::Polygon(OGRPolygon* poly)
 {
 }
 
+Polygon::Polygon(OGRPolygon& poly)
+: GeometryPtr(poly)
+{
+}
+
 LinearRing Polygon::exteriorRing()
 {
     return LinearRing(ptr()->getExteriorRing());
@@ -233,6 +295,31 @@ LinearRing Polygon::exteriorRing()
 LinearRing Polygon::interiorRing(int index)
 {
     return LinearRing(ptr()->getInteriorRing(index));
+}
+
+GeometryPtr<OGRGeometry> Polygon::getLinearGeometry()
+{
+    return GeometryPtr<OGRGeometry>(ptr()->getLinearGeometry());
+}
+
+bool Polygon::hasCurveGeometry() const
+{
+    return ptr()->hasCurveGeometry();
+}
+
+MultiPolygon::MultiPolygon(OGRMultiPolygon* multiLine)
+: GeometryCollectionWrapper(multiLine)
+{
+}
+
+MultiPolygon::MultiPolygon(OGRMultiPolygon& multiLine)
+: GeometryCollectionWrapper(multiLine)
+{
+}
+
+Polygon MultiPolygon::polygonAt(int index)
+{
+    return geometry(index).asType<Polygon>();
 }
 
 static OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
@@ -343,8 +430,8 @@ OGRFeatureDefn* FeatureDefinition::get() noexcept
     return _def;
 }
 
-Feature::Feature(Layer& layer)
-: _feature(OGRFeature::CreateFeature(layer.get()->GetLayerDefn()))
+Feature::Feature(FeatureDefinition& featurDef)
+: _feature(OGRFeature::CreateFeature(featurDef.get()))
 {
 }
 
@@ -366,7 +453,7 @@ Feature::~Feature()
 
 Feature& Feature::operator=(Feature&& other)
 {
-    OGRFeature::DestroyFeature(_feature);
+    //OGRFeature::DestroyFeature(_feature);
     _feature       = other._feature;
     other._feature = nullptr;
     return *this;
@@ -384,7 +471,7 @@ const OGRFeature* Feature::get() const
 
 Geometry Feature::geometry()
 {
-    return fromPtr(_feature->GetGeometryRef());
+    return fromNonOwningPtr(_feature->GetGeometryRef());
 }
 
 Geometry Feature::geometry() const
@@ -714,6 +801,7 @@ bool FeatureDefinitionIterator::operator!=(const FeatureDefinitionIterator& othe
     return !(*this == other);
 }
 
+template class GeometryCollectionWrapper<OGRMultiPolygon>;
 template class GeometryCollectionWrapper<OGRMultiLineString>;
 template class GeometryCollectionWrapper<OGRGeometryCollection>;
 }

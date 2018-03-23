@@ -34,6 +34,7 @@ public:
         Line,
         MultiLine,
         Polygon,
+        MultiPolygon,
         Unknown
     };
 
@@ -42,10 +43,13 @@ public:
     virtual ~Geometry() = default;
 
     Type type() const;
+    std::string_view typeName() const;
+
     template <typename T>
     T asType() const
     {
-        return T(static_cast<typename T::WrappedType*>(_geometry));
+        assert(_geometry);
+        return T(dynamic_cast<typename T::WrappedType&>(*_geometry));
     }
 
 protected:
@@ -73,28 +77,57 @@ public:
 
     virtual ~GeometryPtr()
     {
-        if (_hasOwnerShip) {
+        if (_ownership == Ownership::Owner) {
             delete _ogrPtr;
         }
     }
 
+    OGRType* release()
+    {
+        if (_ownership == Ownership::Reference) {
+            throw RuntimeError("Invalid release of non owning geometry");
+        }
+
+        _ownership = Ownership::Reference;
+        return _ogrPtr;
+    }
+
     GeometryPtr()
     : Geometry(new OGRType())
-    , _hasOwnerShip(true)
-    , _ogrPtr(static_cast<OGRType*>(ptr()))
+    , _ownership(Ownership::Owner)
+    , _ogrPtr(static_cast<OGRType*>(getGeometry()))
     {
     }
 
     GeometryPtr(OGRType* instance)
     : Geometry(instance)
-    , _hasOwnerShip(false)
+    , _ownership(Ownership::Owner)
     , _ogrPtr(instance)
     {
     }
 
+    GeometryPtr(OGRType& instance)
+    : Geometry(&instance)
+    , _ownership(Ownership::Reference)
+    , _ogrPtr(&instance)
+    {
+    }
+
+    GeometryPtr(const GeometryPtr&) = delete;
+    GeometryPtr& operator=(const GeometryPtr&) = delete;
+
+    GeometryPtr(GeometryPtr&&) = default;
+    GeometryPtr& operator=(GeometryPtr&&) = default;
+
 private:
-    bool _hasOwnerShip = false;
-    OGRType* _ogrPtr   = nullptr;
+    enum class Ownership
+    {
+        Owner,
+        Reference
+    };
+
+    Ownership _ownership = Ownership::Reference;
+    OGRType* _ogrPtr     = nullptr;
 };
 
 template <typename WrappedType>
@@ -103,8 +136,15 @@ class GeometryCollectionWrapper : public GeometryPtr<WrappedType>
 public:
     GeometryCollectionWrapper() = default;
     GeometryCollectionWrapper(WrappedType* collection);
+    GeometryCollectionWrapper(WrappedType& collection);
 
     void addGeometry(const Geometry& geometry);
+
+    template <typename GeometryType>
+    void addGeometry(GeometryPtr<GeometryType>&& geometry)
+    {
+        ptr()->addGeometryDirectly(geometry.release());
+    }
 
     int size() const;
     Geometry geometry(int index);
@@ -116,6 +156,7 @@ class Line : public GeometryPtr<OGRSimpleCurve>
 {
 public:
     Line(OGRSimpleCurve* curve);
+    Line(OGRSimpleCurve& curve);
 
     int pointCount() const;
     Point<double> pointAt(int index) const;
@@ -128,6 +169,7 @@ class PointGeometry : public GeometryPtr<OGRPoint>
 {
 public:
     PointGeometry(OGRPoint* point);
+    PointGeometry(OGRPoint& point);
 
     Point<double> point() const;
 };
@@ -136,7 +178,7 @@ class LineIterator
 {
 public:
     LineIterator() = default;
-    LineIterator(Line line);
+    LineIterator(const Line& line);
     LineIterator(const LineIterator&) = delete;
     LineIterator(LineIterator&&)      = default;
     ~LineIterator();
@@ -162,7 +204,9 @@ LineIterator end(const Line&);
 class MultiLine : public GeometryCollectionWrapper<OGRMultiLineString>
 {
 public:
+    MultiLine() = default;
     MultiLine(OGRMultiLineString* multiLine);
+    MultiLine(OGRMultiLineString& multiLine);
 
     Line lineAt(int index);
 };
@@ -177,9 +221,22 @@ class Polygon : public GeometryPtr<OGRPolygon>
 {
 public:
     Polygon(OGRPolygon* poly);
+    Polygon(OGRPolygon& poly);
 
     LinearRing exteriorRing();
     LinearRing interiorRing(int index);
+
+    GeometryPtr<OGRGeometry> getLinearGeometry();
+    bool hasCurveGeometry() const;
+};
+
+class MultiPolygon : public GeometryCollectionWrapper<OGRMultiPolygon>
+{
+public:
+    MultiPolygon(OGRMultiPolygon* multiLine);
+    MultiPolygon(OGRMultiPolygon& multiLine);
+
+    Polygon polygonAt(int index);
 };
 
 using Field = std::variant<int32_t, int64_t, double, std::string_view>;
@@ -222,7 +279,7 @@ private:
 class Feature
 {
 public:
-    Feature(Layer& layer);
+    Feature(FeatureDefinition& featurDef);
     explicit Feature(OGRFeature* feature);
     Feature(const Feature&) = delete;
     Feature(Feature&&);
@@ -238,6 +295,12 @@ public:
     Geometry geometry() const;
 
     void setGeometry(const Geometry& geom);
+
+    template <typename GeometryType>
+    void setGeometry(GeometryPtr<GeometryType>&& geom)
+    {
+        get()->SetGeometryDirectly(geom.release());
+    }
 
     int fieldCount() const;
     int fieldIndex(std::string_view name) const;
@@ -411,4 +474,6 @@ inline FeatureDefinitionIterator end(const FeatureDefinition& featDef)
 {
     return FeatureDefinitionIterator(featDef.fieldCount());
 }
+
+MultiLine forceToMultiLine(Geometry& geom);
 }

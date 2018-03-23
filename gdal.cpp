@@ -399,11 +399,6 @@ DataSet DataSet::createVector(const std::string& filePath, VectorType type, cons
                                 "Failed to open vector file"));
 }
 
-DataSet DataSet::createVectorInMemory()
-{
-    return createVector("InMemory", VectorType::Memory);
-}
-
 GDALDataset* DataSet::create(const std::string& filePath,
                              unsigned int openFlags,
                              const char* const* drivers,
@@ -573,6 +568,8 @@ static OGRwkbGeometryType toGdalType(Geometry::Type type)
         return wkbMultiLineString;
     case Geometry::Type::Polygon:
         return wkbPolygon;
+    case Geometry::Type::MultiPolygon:
+        return wkbMultiPolygon;
     case Geometry::Type::Unknown:
     default:
         return wkbUnknown;

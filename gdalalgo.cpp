@@ -65,9 +65,48 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
     return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
 }
 
+class VectorTranslateOptionsWrapper
+{
+public:
+    VectorTranslateOptionsWrapper(const std::vector<std::string>& opts)
+    : _options(nullptr)
+    {
+        auto optionValues = createOptionsArray(opts);
+        _options          = GDALVectorTranslateOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
+    }
+
+    ~VectorTranslateOptionsWrapper()
+    {
+        GDALVectorTranslateOptionsFree(_options);
+    }
+
+    GDALVectorTranslateOptions* get()
+    {
+        return _options;
+    }
+
+private:
+    GDALVectorTranslateOptions* _options;
+};
+
+DataSet translateVector(const DataSet& ds, const std::vector<std::string>& options)
+{
+    VectorTranslateOptionsWrapper gdalOptions(options);
+
+    auto memDriver = gdal::Driver::create(gdal::VectorType::Memory);
+    gdal::DataSet memDataSet(memDriver.createDataSet<double>(0u, 0u, 0u, "dummy"));
+
+    int errorCode              = CE_None;
+    GDALDatasetH srcDataSetPtr = ds.get();
+    GDALVectorTranslate(nullptr, memDataSet.get(), 1, &srcDataSetPtr, gdalOptions.get(), &errorCode);
+    if (errorCode != CE_None) {
+        throw RuntimeError("Failed to translate vector dataset {}", errorCode);
+    }
+
+    return memDataSet;
+}
+
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
-
 template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
-
 template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 }
