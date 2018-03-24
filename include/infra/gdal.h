@@ -81,6 +81,8 @@ public:
     Point<double> transform(const Point<double>& point) const;
     void transformInPlace(Point<double>& point) const;
 
+    OGRCoordinateTransformation* get();
+
 private:
     OGRSpatialReference _sourceSRS;
     OGRSpatialReference _targetSRS;
@@ -99,8 +101,8 @@ int32_t projectionToGeoEpsg(const std::string& projection);
 int32_t projectionToEpsg(const std::string& projection);
 std::vector<const char*> createOptionsArray(const std::vector<std::string>& driverOptions);
 
-RasterType guessRasterTypeFromFileName(const std::string& filePath);
-VectorType guessVectorTypeFromFileName(const std::string& filePath);
+RasterType guessRasterTypeFromFileName(const fs::path& filePath);
+VectorType guessVectorTypeFromFileName(const fs::path& filePath);
 
 class RasterBand
 {
@@ -198,7 +200,7 @@ public:
     }
 
     GDALDataset* get() const;
-    Driver driver();
+    //Driver driver();
 
 private:
     static GDALDataset* create(const std::string& filename,
@@ -210,27 +212,26 @@ private:
     GDALDataset* _ptr = nullptr;
 };
 
-class Driver
+class RasterDriver
 {
 public:
-    static Driver create(RasterType);
-    static Driver create(VectorType);
-    static Driver create(const std::string& filename);
+    static RasterDriver create(RasterType);
+    static RasterDriver create(const fs::path& filename);
 
-    explicit Driver(GDALDriver& driver);
+    explicit RasterDriver(GDALDriver& driver);
 
     template <typename T>
-    DataSet createDataSet(uint32_t rows, uint32_t cols, uint32_t numBands, const std::string& filename)
+    DataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename)
     {
-        return DataSet(checkPointer(_driver.Create(filename.c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
+        return DataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
     template <typename T>
-    DataSet createDataSetCopy(const DataSet& reference, const std::string& filename, const std::vector<std::string>& driverOptions = {})
+    DataSet createDataSetCopy(const DataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {})
     {
         auto options = createOptionsArray(driverOptions);
         return DataSet(checkPointer(_driver.CreateCopy(
-                                        filename.c_str(),
+                                        filename.string().c_str(),
                                         reference.get(),
                                         FALSE,
                                         options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
@@ -239,8 +240,7 @@ public:
             "Failed to create data set copy"));
     }
 
-    RasterType rasterType() const;
-    VectorType vectorType() const;
+    RasterType type() const;
 
 private:
     GDALDriver& _driver;

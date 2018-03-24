@@ -22,14 +22,44 @@ using namespace std::string_literals;
 
 namespace {
 
-static const std::unordered_map<RasterType, const char*> s_rasterDriverLookup{{
-    {RasterType::Memory, "MEM"},
-    {RasterType::ArcAscii, "AAIGrid"},
-    {RasterType::GeoTiff, "GTiff"},
-    {RasterType::Gif, "GIF"},
-    {RasterType::Png, "PNG"},
-    {RasterType::PcRaster, "PCRaster"},
-}};
+template <typename T>
+class CplPointer
+{
+public:
+    CplPointer() = default;
+    CplPointer(T* ptr)
+    : _ptr(ptr)
+    {
+    }
+
+    ~CplPointer()
+    {
+        CPLFree(_ptr);
+    }
+
+    T** ptrAddress()
+    {
+        return &_ptr;
+    }
+
+    operator T*()
+    {
+        return _ptr;
+    }
+
+private:
+    T* _ptr = nullptr;
+};
+
+static const std::unordered_map<RasterType, const char*>
+    s_rasterDriverLookup{{
+        {RasterType::Memory, "MEM"},
+        {RasterType::ArcAscii, "AAIGrid"},
+        {RasterType::GeoTiff, "GTiff"},
+        {RasterType::Gif, "GIF"},
+        {RasterType::Png, "PNG"},
+        {RasterType::PcRaster, "PCRaster"},
+    }};
 
 static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLookup{{
     {"MEM", RasterType::Memory},
@@ -56,12 +86,13 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
     {"XLSX", VectorType::Xlsx},
 }};
 
-static std::string getExtenstion(const std::string& path)
+static std::string getExtenstion(const fs::path& filepath)
 {
 #ifdef HAVE_EXP_FILESYSTEM_H
-    return fs::path(path.begin(), path.end()).extension().string();
+    return filepath.extension().string();
 #else
     std::string extension;
+    auto path                  = filepath.string();
     std::string::size_type pos = path.find_last_of('.');
     if (pos != std::string::npos && pos != path.size()) {
         extension = std::string(path.substr(pos, path.size()));
@@ -113,6 +144,11 @@ void CoordinateTransformer::transformInPlace(Point<double>& point) const
     }
 }
 
+OGRCoordinateTransformation* CoordinateTransformer::get()
+{
+    return _transformer.get();
+}
+
 Point<double> convertPointProjected(int32_t sourceEpsg, int32_t destEpsg, Point<double> point)
 {
     CoordinateTransformer transformer(sourceEpsg, destEpsg);
@@ -143,12 +179,10 @@ std::string projectionToFriendlyName(const std::string& projection)
     OGRSpatialReference spatialRef;
     auto projectionPtr = projection.c_str();
     checkError(spatialRef.importFromWkt(const_cast<char**>(&projectionPtr)), "Failed to import projection WKT");
-    char* friendlyWkt = nullptr;
-    checkError(spatialRef.exportToPrettyWkt(&friendlyWkt, TRUE), "Failed to export projection to pretty WKT");
+    CplPointer<char> friendlyWkt;
+    checkError(spatialRef.exportToPrettyWkt(friendlyWkt.ptrAddress(), TRUE), "Failed to export projection to pretty WKT");
 
-    std::string result(friendlyWkt);
-    CPLFree(friendlyWkt);
-    return result;
+    return std::string(friendlyWkt);
 }
 
 std::string projectionFromEpsg(int32_t epsg)
@@ -156,11 +190,9 @@ std::string projectionFromEpsg(int32_t epsg)
     OGRSpatialReference spatialRef;
     checkError(spatialRef.importFromEPSG(epsg), fmt::format("Failed to create projection from epsg:{}", epsg));
 
-    char* friendlyWkt = nullptr;
-    spatialRef.exportToWkt(&friendlyWkt);
-    std::string result(friendlyWkt);
-    CPLFree(friendlyWkt);
-    return result;
+    CplPointer<char> friendlyWkt;
+    spatialRef.exportToWkt(friendlyWkt.ptrAddress());
+    return std::string(friendlyWkt);
 }
 
 int32_t projectionToGeoEpsg(const std::string& projection)
@@ -258,77 +290,42 @@ std::vector<const char*> createOptionsArray(const std::vector<std::string>& driv
     return options;
 }
 
-Driver Driver::create(RasterType mt)
+RasterDriver RasterDriver::create(RasterType type)
 {
-    if (mt == RasterType::Unknown) {
-        throw InvalidArgument("Invalid map type specified");
+    if (type == RasterType::Unknown) {
+        throw InvalidArgument("Invalid raster type specified");
     }
 
-    auto driverName = s_rasterDriverLookup.at(mt);
+    auto driverName = s_rasterDriverLookup.at(type);
     auto* driverPtr = GetGDALDriverManager()->GetDriverByName(driverName);
     if (driverPtr == nullptr) {
-        throw RuntimeError("Failed to get driver: {}", driverName);
+        throw RuntimeError("Failed to get raster driver: {}", driverName);
     }
 
-    //    auto meta = driverPtr->GetMetadata();
-    //    if (!CSLFetchBoolean(meta, GDAL_DCAP_CREATECOPY, FALSE))
-    //    {
-    //        throw RuntimeError("{} does not support map creation", driverName);
-    //    }
-
-    return Driver(*driverPtr);
+    return RasterDriver(*driverPtr);
 }
 
-Driver Driver::create(VectorType mt)
-{
-    if (mt == VectorType::Unknown) {
-        throw InvalidArgument("Invalid vector type specified");
-    }
-
-    auto driverName = s_vectorDriverLookup.at(mt);
-    auto* driverPtr = GetGDALDriverManager()->GetDriverByName(driverName);
-    if (driverPtr == nullptr) {
-        throw RuntimeError("Failed to get driver: {}", driverName);
-    }
-
-    return Driver(*driverPtr);
-}
-
-Driver Driver::create(const std::string& filename)
+RasterDriver RasterDriver::create(const fs::path& filename)
 {
     auto rasterType = guessRasterTypeFromFileName(filename);
     if (rasterType != RasterType::Unknown) {
         return create(rasterType);
     }
 
-    auto shapeType = guessVectorTypeFromFileName(filename);
-    if (shapeType != VectorType::Unknown) {
-        return create(shapeType);
-    }
-
-    throw RuntimeError("Failed to determine type from filename: {}", filename);
+    throw RuntimeError("Failed to determine raster type from filename: {}", filename);
 }
 
-Driver::Driver(GDALDriver& driver)
+RasterDriver::RasterDriver(GDALDriver& driver)
 : _driver(driver)
 {
 }
 
-RasterType Driver::rasterType() const
+RasterType RasterDriver::type() const
 {
     try {
         return s_rasterDriverDescLookup.at(_driver.GetDescription());
     } catch (const std::out_of_range&) {
-        throw RuntimeError("Failed to determine map type for driver: {}", _driver.GetDescription());
-    }
-}
-
-VectorType Driver::vectorType() const
-{
-    try {
-        return s_vectorDriverDescLookup.at(_driver.GetDescription());
-    } catch (const std::out_of_range&) {
-        throw RuntimeError("Failed to determine vector type for driver: {}", _driver.GetDescription());
+        throw RuntimeError("Failed to determine raster type for driver: {}", _driver.GetDescription());
     }
 }
 
@@ -659,10 +656,10 @@ GDALDataset* DataSet::get() const
     return _ptr;
 }
 
-Driver DataSet::driver()
-{
-    return Driver(*_ptr->GetDriver());
-}
+//Driver DataSet::driver()
+//{
+//    return Driver(*_ptr->GetDriver());
+//}
 
 void throwLastError(const char* msg)
 {
@@ -698,7 +695,7 @@ void checkError(OGRErr err, const std::string& msg)
     checkError(err, msg.c_str());
 }
 
-RasterType guessRasterTypeFromFileName(const std::string& filePath)
+RasterType guessRasterTypeFromFileName(const fs::path& filePath)
 {
     auto ext = getExtenstion(filePath);
     if (ext == ".asc") {
@@ -716,7 +713,7 @@ RasterType guessRasterTypeFromFileName(const std::string& filePath)
     return RasterType::Unknown;
 }
 
-VectorType guessVectorTypeFromFileName(const std::string& filePath)
+VectorType guessVectorTypeFromFileName(const fs::path& filePath)
 {
     auto ext = getExtenstion(filePath);
     if (ext == ".csv") {

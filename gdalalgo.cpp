@@ -8,8 +8,8 @@ namespace infra::gdal {
 
 DataSet polygonize(const DataSet& ds)
 {
-    auto memDriver = gdal::Driver::create(gdal::VectorType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet<int32_t>(0, 0, 0u, "dummy"));
+    auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
+    gdal::DataSet memDataSet(memDriver.createDataSet("dummy"));
     auto layer = memDataSet.createLayer("Polygons");
     FieldDefinition def("Value", typeid(int32_t));
     layer.createField(def);
@@ -49,8 +49,8 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
 
     std::vector<T> data(meta.rows * meta.cols);
 
-    auto memDriver = gdal::Driver::create(gdal::RasterType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0u, "dummy"));
+    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
+    gdal::DataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0, "dummy"));
     memDataSet.addBand(data.data());
     memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
     memDataSet.setNoDataValue(1, meta.nodata);
@@ -93,8 +93,8 @@ DataSet translateVector(const DataSet& ds, const std::vector<std::string>& optio
 {
     VectorTranslateOptionsWrapper gdalOptions(options);
 
-    auto memDriver = gdal::Driver::create(gdal::VectorType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet<double>(0u, 0u, 0u, "dummy"));
+    auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
+    gdal::DataSet memDataSet(memDriver.createDataSet("dummy"));
 
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
