@@ -57,7 +57,7 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
     memDataSet.setProjection(meta.projection);
 
     int errorCode = CE_None;
-    auto result   = GDALRasterize(nullptr, memDataSet.get(), ds.get(), gdalOptions.get(), &errorCode);
+    GDALRasterize(nullptr, memDataSet.get(), ds.get(), gdalOptions.get(), &errorCode);
     if (errorCode != CE_None) {
         throw RuntimeError("Failed to rasterize dataset {}", errorCode);
     }

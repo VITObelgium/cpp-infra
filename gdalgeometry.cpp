@@ -9,57 +9,30 @@ namespace infra::gdal {
 
 using namespace std::string_literals;
 
-static Geometry fromOwningPtr(OGRGeometry* geometry)
+Geometry::~Geometry()
 {
-    if (!geometry) {
-        throw RuntimeError("No geometry present");
-    }
-
-    switch (wkbFlatten(geometry->getGeometryType())) {
-    case wkbPoint:
-        return PointGeometry(static_cast<OGRPoint*>(geometry));
-    case wkbLineString:
-        return Line(static_cast<OGRLineString*>(geometry));
-    case wkbPolygon:
-        return Polygon(static_cast<OGRPolygon*>(geometry));
-    case wkbMultiPolygon:
-        return MultiPolygon(static_cast<OGRMultiPolygon*>(geometry));
-    case wkbMultiLineString:
-        return MultiLine(static_cast<OGRMultiLineString*>(geometry));
-    default:
-        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
+    if (_ownership == Ownership::Owner) {
+        delete _geometry;
     }
 }
 
-static Geometry fromNonOwningPtr(OGRGeometry* geometry)
-{
-    if (!geometry) {
-        throw RuntimeError("No geometry present");
-    }
-
-    switch (wkbFlatten(geometry->getGeometryType())) {
-    case wkbPoint:
-        return PointGeometry(dynamic_cast<OGRPoint&>(*geometry));
-    case wkbLineString:
-        return Line(dynamic_cast<OGRLineString&>(*geometry));
-    case wkbPolygon:
-        return Polygon(dynamic_cast<OGRPolygon&>(*geometry));
-    case wkbMultiPolygon:
-        return MultiPolygon(dynamic_cast<OGRMultiPolygon&>(*geometry));
-    case wkbMultiLineString:
-        return MultiLine(dynamic_cast<OGRMultiLineString&>(*geometry));
-    default:
-        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(geometry->getGeometryType()));
-    }
-}
-
-OGRGeometry* Geometry::getGeometry() noexcept
+OGRGeometry* Geometry::get() noexcept
 {
     return _geometry;
 }
 
-const OGRGeometry* Geometry::getGeometry() const noexcept
+const OGRGeometry* Geometry::get() const noexcept
 {
+    return _geometry;
+}
+
+OGRGeometry* Geometry::release()
+{
+    if (_ownership == Ownership::Reference) {
+        throw RuntimeError("Invalid release of non owning geometry");
+    }
+
+    _ownership = Ownership::Reference;
     return _geometry;
 }
 
@@ -86,8 +59,30 @@ std::string_view Geometry::typeName() const
     return _geometry->getGeometryName();
 }
 
+Geometry Geometry::clone() const
+{
+    return Geometry(_geometry->clone());
+}
+
+bool Geometry::empty() const
+{
+    return _geometry->IsEmpty();
+}
+
+void Geometry::clear()
+{
+    _geometry->empty();
+}
+
 Geometry::Geometry(OGRGeometry* instance)
 : _geometry(instance)
+, _ownership(Ownership::Owner)
+{
+}
+
+Geometry::Geometry(OGRGeometry& instance)
+: _geometry(&instance)
+, _ownership(Ownership::Reference)
 {
 }
 
@@ -106,19 +101,25 @@ GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType& c
 template <typename WrappedType>
 void GeometryCollectionWrapper<WrappedType>::addGeometry(const Geometry& geometry)
 {
-    this->ptr()->addGeometry(geometry.getGeometry());
+    this->get()->addGeometry(geometry.get());
+}
+
+template <typename WrappedType>
+void GeometryCollectionWrapper<WrappedType>::addGeometry(Geometry&& geometry)
+{
+    this->get()->addGeometryDirectly(geometry.release());
 }
 
 template <typename WrappedType>
 int GeometryCollectionWrapper<WrappedType>::size() const
 {
-    return this->ptr()->getNumGeometries();
+    return this->get()->getNumGeometries();
 }
 
 template <typename WrappedType>
 Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 {
-    return fromNonOwningPtr(this->ptr()->getGeometryRef(index));
+    return Geometry(*checkPointer(this->get()->getGeometryRef(index), "No geometry present"));
 }
 
 Line::Line(OGRSimpleCurve* curve)
@@ -134,32 +135,32 @@ Line::Line(OGRSimpleCurve& curve)
 
 int Line::pointCount() const
 {
-    return ptr()->getNumPoints();
+    return get()->getNumPoints();
 }
 
 Point<double> Line::pointAt(int index) const
 {
     OGRPoint p;
-    ptr()->getPoint(index, &p);
+    get()->getPoint(index, &p);
     return Point<double>(p.getX(), p.getY());
 }
 
 Point<double> Line::startPoint()
 {
     OGRPoint point;
-    ptr()->StartPoint(&point);
+    get()->StartPoint(&point);
     return Point<double>(point.getX(), point.getY());
 }
 
 Point<double> Line::endPoint()
 {
     OGRPoint point;
-    ptr()->EndPoint(&point);
+    get()->EndPoint(&point);
     return Point<double>(point.getX(), point.getY());
 }
 
 LineIterator::LineIterator(const Line& line)
-: _iter(line.ptr()->getPointIterator())
+: _iter(line.get()->getPointIterator())
 {
     next();
 }
@@ -186,7 +187,7 @@ LineIterator end(const Line&)
 
 MultiLine forceToMultiLine(Geometry& geom)
 {
-    return MultiLine(static_cast<OGRMultiLineString*>(OGRGeometryFactory::forceToMultiLineString(geom.getGeometry())));
+    return MultiLine(static_cast<OGRMultiLineString*>(OGRGeometryFactory::forceToMultiLineString(geom.get())));
 }
 
 void LineIterator::next()
@@ -253,7 +254,7 @@ PointGeometry::PointGeometry(OGRPoint& point)
 
 Point<double> PointGeometry::point() const
 {
-    return Point<double>(ptr()->getX(), ptr()->getY());
+    return Point<double>(get()->getX(), get()->getY());
 }
 
 MultiLine::MultiLine(OGRMultiLineString* multiLine)
@@ -269,7 +270,7 @@ MultiLine::MultiLine(OGRMultiLineString& multiLine)
 
 Line MultiLine::lineAt(int index)
 {
-    return geometry(index).asType<Line>();
+    return geometry(index).as<Line>();
 }
 
 LinearRing::LinearRing(OGRLinearRing* ring)
@@ -289,22 +290,22 @@ Polygon::Polygon(OGRPolygon& poly)
 
 LinearRing Polygon::exteriorRing()
 {
-    return LinearRing(ptr()->getExteriorRing());
+    return LinearRing(get()->getExteriorRing());
 }
 
 LinearRing Polygon::interiorRing(int index)
 {
-    return LinearRing(ptr()->getInteriorRing(index));
+    return LinearRing(get()->getInteriorRing(index));
 }
 
 GeometryPtr<OGRGeometry> Polygon::getLinearGeometry()
 {
-    return GeometryPtr<OGRGeometry>(ptr()->getLinearGeometry());
+    return GeometryPtr<OGRGeometry>(get()->getLinearGeometry());
 }
 
 bool Polygon::hasCurveGeometry() const
 {
-    return ptr()->hasCurveGeometry();
+    return get()->hasCurveGeometry();
 }
 
 MultiPolygon::MultiPolygon(OGRMultiPolygon* multiLine)
@@ -319,7 +320,7 @@ MultiPolygon::MultiPolygon(OGRMultiPolygon& multiLine)
 
 Polygon MultiPolygon::polygonAt(int index)
 {
-    return geometry(index).asType<Polygon>();
+    return geometry(index).as<Polygon>();
 }
 
 static OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
@@ -344,8 +345,14 @@ FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInf
 }
 
 FieldDefinition::FieldDefinition(OGRFieldDefn* def)
-: _hasOwnerShip(false)
+: _hasOwnerShip(true)
 , _def(def)
+{
+}
+
+FieldDefinition::FieldDefinition(OGRFieldDefn& def)
+: _hasOwnerShip(false)
+, _def(&def)
 {
 }
 
@@ -422,7 +429,7 @@ int FeatureDefinition::fieldIndex(std::string_view name) const
 
 FieldDefinition FeatureDefinition::fieldDefinition(int index) const
 {
-    return FieldDefinition(checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
+    return FieldDefinition(*checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
 }
 
 OGRFeatureDefn* FeatureDefinition::get() noexcept
@@ -471,7 +478,7 @@ const OGRFeature* Feature::get() const
 
 Geometry Feature::geometry()
 {
-    return fromNonOwningPtr(_feature->GetGeometryRef());
+    return Geometry(*checkPointer(_feature->GetGeometryRef(), "No geometry present"));
 }
 
 Geometry Feature::geometry() const
@@ -481,7 +488,7 @@ Geometry Feature::geometry() const
 
 void Feature::setGeometry(const Geometry& geom)
 {
-    checkError(_feature->SetGeometry(geom.getGeometry()), "Failed to set geometry");
+    checkError(_feature->SetGeometry(geom.get()), "Failed to set geometry");
 }
 
 int Feature::fieldCount() const
@@ -496,7 +503,7 @@ int Feature::fieldIndex(std::string_view name) const
 
 FieldDefinition Feature::fieldDefinition(int index) const
 {
-    return FieldDefinition(_feature->GetFieldDefnRef(index));
+    return FieldDefinition(*checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
 }
 
 Field Feature::getField(int index) const noexcept

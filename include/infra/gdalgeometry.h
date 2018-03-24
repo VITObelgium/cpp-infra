@@ -39,86 +39,36 @@ public:
         Unknown
     };
 
-    OGRGeometry* getGeometry() noexcept;
-    const OGRGeometry* getGeometry() const noexcept;
-    virtual ~Geometry() = default;
+    Geometry(OGRGeometry* instance);
+    Geometry(OGRGeometry& instance);
+    ~Geometry();
+
+    OGRGeometry* get() noexcept;
+    const OGRGeometry* get() const noexcept;
+    OGRGeometry* release();
 
     Type type() const;
     std::string_view typeName() const;
 
+    // The returned type does not have ownership of the geometry
+    // the geometry instance has to stay alive
     template <typename T>
-    T asType() const
+    T as() const
     {
         assert(_geometry);
         return T(dynamic_cast<typename T::WrappedType&>(*_geometry));
     }
 
-protected:
-    Geometry(OGRGeometry* instance);
+    Geometry(const Geometry&) = delete;
+    Geometry& operator=(const Geometry&) = delete;
 
-private:
-    OGRGeometry* _geometry = nullptr;
-};
+    Geometry(Geometry&&) = default;
+    Geometry& operator=(Geometry&&) = default;
 
-template <typename OGRType>
-class GeometryPtr : public Geometry
-{
-public:
-    using WrappedType = OGRType;
+    Geometry clone() const;
 
-    OGRType* ptr() noexcept
-    {
-        return _ogrPtr;
-    }
-
-    const OGRType* ptr() const noexcept
-    {
-        return _ogrPtr;
-    }
-
-    virtual ~GeometryPtr()
-    {
-        if (_ownership == Ownership::Owner) {
-            delete _ogrPtr;
-        }
-    }
-
-    OGRType* release()
-    {
-        if (_ownership == Ownership::Reference) {
-            throw RuntimeError("Invalid release of non owning geometry");
-        }
-
-        _ownership = Ownership::Reference;
-        return _ogrPtr;
-    }
-
-    GeometryPtr()
-    : Geometry(new OGRType())
-    , _ownership(Ownership::Owner)
-    , _ogrPtr(static_cast<OGRType*>(getGeometry()))
-    {
-    }
-
-    GeometryPtr(OGRType* instance)
-    : Geometry(instance)
-    , _ownership(Ownership::Owner)
-    , _ogrPtr(instance)
-    {
-    }
-
-    GeometryPtr(OGRType& instance)
-    : Geometry(&instance)
-    , _ownership(Ownership::Reference)
-    , _ogrPtr(&instance)
-    {
-    }
-
-    GeometryPtr(const GeometryPtr&) = delete;
-    GeometryPtr& operator=(const GeometryPtr&) = delete;
-
-    GeometryPtr(GeometryPtr&&) = default;
-    GeometryPtr& operator=(GeometryPtr&&) = default;
+    bool empty() const;
+    void clear();
 
 private:
     enum class Ownership
@@ -127,8 +77,46 @@ private:
         Reference
     };
 
-    Ownership _ownership = Ownership::Reference;
-    OGRType* _ogrPtr     = nullptr;
+    OGRGeometry* _geometry = nullptr;
+    Ownership _ownership   = Ownership::Reference;
+};
+
+template <typename OGRType>
+class GeometryPtr : public Geometry
+{
+public:
+    using WrappedType = OGRType;
+
+    OGRType* get() noexcept
+    {
+        return static_cast<OGRType*>(Geometry::get());
+    }
+
+    const OGRType* get() const noexcept
+    {
+        return static_cast<const OGRType*>(Geometry::get());
+    }
+
+    OGRType* release()
+    {
+        return static_cast<OGRType*>(Geometry::release());
+    }
+
+    GeometryPtr()
+    : Geometry(new OGRType())
+    {
+        static_assert(!std::is_same_v<OGRGeometry, OGRType>());
+    }
+
+    GeometryPtr(OGRType* instance)
+    : Geometry(instance)
+    {
+    }
+
+    GeometryPtr(OGRType& instance)
+    : Geometry(instance)
+    {
+    }
 };
 
 template <typename WrappedType>
@@ -140,12 +128,7 @@ public:
     GeometryCollectionWrapper(WrappedType& collection);
 
     void addGeometry(const Geometry& geometry);
-
-    template <typename GeometryType>
-    void addGeometry(GeometryPtr<GeometryType>&& geometry)
-    {
-        this->ptr()->addGeometryDirectly(geometry.release());
-    }
+    void addGeometry(Geometry&& geometry);
 
     int size() const;
     Geometry geometry(int index);
@@ -248,6 +231,7 @@ public:
     FieldDefinition() = default;
     FieldDefinition(const char* name, const std::type_info& typeInfo);
     FieldDefinition(OGRFieldDefn* def);
+    FieldDefinition(OGRFieldDefn& def);
     ~FieldDefinition();
     std::string_view name() const;
     const std::type_info& type() const;
@@ -316,9 +300,21 @@ public:
     T getFieldAs(std::string_view name) const;
 
     template <typename T>
-    void setField(std::string_view name, const T& value)
+    void setField(const std::string& name, const T& value)
     {
-        _feature->SetField(name.data(), value);
+        _feature->SetField(name.c_str(), value);
+    }
+
+    template <typename T>
+    void setField(const char* name, const T& value)
+    {
+        _feature->SetField(name, value);
+    }
+
+    template <typename T>
+    void setField(int index, const T& value)
+    {
+        _feature->SetField(index, value);
     }
 
     bool operator==(const Feature& other) const;
@@ -326,6 +322,15 @@ public:
 private:
     OGRFeature* _feature;
 };
+
+/*
+ * Data Hierarchy
+ * DataSet:
+ *  - Layer [*]
+ *      - FieldDefinition [1]
+ *      - Feature [*]
+ *          - Geometry[*]
+ */
 
 class Layer
 {

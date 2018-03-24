@@ -7,7 +7,7 @@ namespace infra {
 
 TEST(GdalTest, iteratePoints)
 {
-    auto ds = gdal::DataSet::createVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds = gdal::DataSet::openVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     EXPECT_EQ(1, ds.layerCount());
 
@@ -17,7 +17,7 @@ TEST(GdalTest, iteratePoints)
         auto geometry = feature.geometry();
         EXPECT_EQ(gdal::Geometry::Type::Point, geometry.type());
 
-        auto point = geometry.asType<gdal::PointGeometry>();
+        auto point = geometry.as<gdal::PointGeometry>();
         EXPECT_EQ(Point<double>(index, index + 1), point.point());
 
         index += 2;
@@ -29,7 +29,7 @@ TEST(GdalTest, iteratePoints)
 
 TEST(GdalTest, fieldInfo)
 {
-    auto ds    = gdal::DataSet::createVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds    = gdal::DataSet::openVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
     auto layer = ds.getLayer(0);
     EXPECT_EQ(9, layer.featureCount());
     EXPECT_EQ(1, layer.feature(0).fieldCount());
@@ -39,7 +39,7 @@ TEST(GdalTest, fieldInfo)
 
 TEST(GdalTest, getField)
 {
-    auto ds = gdal::DataSet::createVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds = gdal::DataSet::openVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     int index = 0;
     for (const auto& feature : ds.getLayer(0)) {
@@ -71,19 +71,32 @@ TEST(GdalTest, convertPointProjected)
     EXPECT_NEAR(50.6735631138308, point.y, 1e-10);
 }
 
-TEST(GdalTest, DISABLED_createExcelFile)
+TEST(GdalTest, createExcelFile)
 {
-    /*auto ds = gdal::DataSet::create("sheet.xlsx", gdal::VectorType::Xlsx);
+    auto shapeDriver = gdal::VectorDriver::create(gdal::VectorType::Xlsx);
+    auto ds          = shapeDriver.createDataSet("sheet.xlsx");
 
-    auto layer = ds.createLayer("Workbook");
-    layer.createField(gdal::FieldDefinition("Column1", typeid(std::string)));
-    layer.createField(gdal::FieldDefinition("Column2", typeid(int32_t)));
+    // Each field definition defines a column in the spreadsheet
+    auto layer   = ds.createLayer("Workbook");
+    auto col1Def = gdal::FieldDefinition("Column1", typeid(std::string));
+    auto col2Def = gdal::FieldDefinition("Column2", typeid(int32_t));
 
-    gdal::Feature feat1(layer);
-    gdal::Feature feat2(layer);*/
+    layer.createField(col1Def);
+    layer.createField(col2Def);
+    auto fieldDef = layer.layerDefinition();
 
-    //feat1.setField("Column1", )
+    // Each feature is a line in the spreadsheet
 
-    //layer.createFeature()
+    // Values can be set using column numbers
+    gdal::Feature feat1(fieldDef);
+    feat1.setField(0, "Test line 1");
+    feat1.setField(1, 1);
+    layer.createFeature(feat1);
+
+    // Values can be set using column names
+    gdal::Feature feat2(fieldDef);
+    feat2.setField("Column1", "Test line 2");
+    feat2.setField("Column2", 2);
+    layer.createFeature(feat2);
 }
 }
