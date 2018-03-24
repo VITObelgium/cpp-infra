@@ -105,7 +105,7 @@ public:
     GeometryPtr()
     : Geometry(new OGRType())
     {
-        static_assert(!std::is_same_v<OGRGeometry, OGRType>());
+        static_assert(!std::is_same_v<OGRGeometry, OGRType>, "Call with concrete geometry type");
     }
 
     GeometryPtr(OGRType* instance)
