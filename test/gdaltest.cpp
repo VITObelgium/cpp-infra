@@ -83,18 +83,17 @@ TEST(GdalTest, createExcelFile)
 
     layer.createField(col1Def);
     layer.createField(col2Def);
-    auto fieldDef = layer.layerDefinition();
 
     // Each feature is a line in the spreadsheet
 
     // Values can be set using column numbers
-    gdal::Feature feat1(fieldDef);
+    gdal::Feature feat1(layer.layerDefinition());
     feat1.setField(0, "Test line 1");
     feat1.setField(1, 1);
     layer.createFeature(feat1);
 
     // Values can be set using column names
-    gdal::Feature feat2(fieldDef);
+    gdal::Feature feat2(layer.layerDefinition());
     feat2.setField("Column1", "Test line 2");
     feat2.setField("Column2", 2);
     layer.createFeature(feat2);

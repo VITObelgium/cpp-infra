@@ -338,37 +338,18 @@ static OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
     throw InvalidArgument("Invalid field type provided");
 }
 
-FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInfo)
-: _hasOwnerShip(true)
-, _def(new OGRFieldDefn(name, fieldTypeFromTypeInfo(typeInfo)))
+FieldDefinitionRef::FieldDefinitionRef(OGRFieldDefn* def)
+: _def(def)
 {
+    assert(def);
 }
 
-FieldDefinition::FieldDefinition(OGRFieldDefn* def)
-: _hasOwnerShip(true)
-, _def(def)
-{
-}
-
-FieldDefinition::FieldDefinition(OGRFieldDefn& def)
-: _hasOwnerShip(false)
-, _def(&def)
-{
-}
-
-FieldDefinition::~FieldDefinition()
-{
-    if (_hasOwnerShip) {
-        delete _def;
-    }
-}
-
-std::string_view FieldDefinition::name() const
+std::string_view FieldDefinitionRef::name() const
 {
     return std::string_view(_def->GetNameRef());
 }
 
-const std::type_info& FieldDefinition::type() const
+const std::type_info& FieldDefinitionRef::type() const
 {
     switch (_def->GetType()) {
     case OFTInteger:
@@ -394,50 +375,71 @@ const std::type_info& FieldDefinition::type() const
     }
 }
 
-OGRFieldDefn* FieldDefinition::get() noexcept
+OGRFieldDefn* FieldDefinitionRef::get() noexcept
 {
     return _def;
 }
 
-FeatureDefinition::FeatureDefinition(OGRFeatureDefn* def)
-: _hasOwnerShip(false)
-, _def(def)
+FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInfo)
+: FieldDefinitionRef(new OGRFieldDefn(name, fieldTypeFromTypeInfo(typeInfo)))
 {
 }
 
-FeatureDefinition::~FeatureDefinition()
+FieldDefinition::FieldDefinition(OGRFieldDefn* def)
+: FieldDefinitionRef(def)
 {
-    if (_hasOwnerShip) {
-        delete _def;
-    }
 }
 
-std::string_view FeatureDefinition::name() const
+FieldDefinition::~FieldDefinition()
+{
+    delete get();
+}
+
+FieldDefinition::FieldDefinition(FieldDefinition&& other)
+: FieldDefinitionRef(other._def)
+{
+    other._def = nullptr;
+}
+
+FieldDefinition& FieldDefinition::operator=(FieldDefinition&& other)
+{
+    _def       = other._def;
+    other._def = nullptr;
+    return *this;
+}
+
+FeatureDefinitionRef::FeatureDefinitionRef(OGRFeatureDefn* def)
+: _def(def)
+{
+    assert(def);
+}
+
+std::string_view FeatureDefinitionRef::name() const
 {
     return std::string_view(_def->GetName());
 }
 
-int FeatureDefinition::fieldCount() const
+int FeatureDefinitionRef::fieldCount() const
 {
     return _def->GetFieldCount();
 }
 
-int FeatureDefinition::fieldIndex(std::string_view name) const
+int FeatureDefinitionRef::fieldIndex(std::string_view name) const
 {
     return _def->GetFieldIndex(name.data());
 }
 
-FieldDefinition FeatureDefinition::fieldDefinition(int index) const
+FieldDefinitionRef FeatureDefinitionRef::fieldDefinition(int index) const
 {
-    return FieldDefinition(*checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
+    return FieldDefinitionRef(checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
 }
 
-OGRFeatureDefn* FeatureDefinition::get() noexcept
+OGRFeatureDefn* FeatureDefinitionRef::get() noexcept
 {
     return _def;
 }
 
-Feature::Feature(FeatureDefinition& featurDef)
+Feature::Feature(FeatureDefinitionRef featurDef)
 : _feature(OGRFeature::CreateFeature(featurDef.get()))
 {
 }
@@ -501,9 +503,9 @@ int Feature::fieldIndex(std::string_view name) const
     return _feature->GetFieldIndex(name.data());
 }
 
-FieldDefinition Feature::fieldDefinition(int index) const
+FieldDefinitionRef Feature::fieldDefinition(int index) const
 {
-    return FieldDefinition(*checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
+    return FieldDefinitionRef(checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
 }
 
 Field Feature::getField(int index) const noexcept
@@ -641,9 +643,9 @@ void Layer::createFeature(Feature& feature)
     checkError(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
 }
 
-FeatureDefinition Layer::layerDefinition() const
+FeatureDefinitionRef Layer::layerDefinition() const
 {
-    return FeatureDefinition(checkPointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
+    return FeatureDefinitionRef(checkPointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
 }
 
 const char* Layer::name() const
@@ -767,8 +769,8 @@ FeatureDefinitionIterator::FeatureDefinitionIterator(int fieldCount)
 {
 }
 
-FeatureDefinitionIterator::FeatureDefinitionIterator(const FeatureDefinition& featureDef)
-: _featureDef(&featureDef)
+FeatureDefinitionIterator::FeatureDefinitionIterator(FeatureDefinitionRef featureDef)
+: _featureDef(featureDef)
 , _fieldCount(featureDef.fieldCount())
 {
     next();
@@ -777,16 +779,16 @@ FeatureDefinitionIterator::FeatureDefinitionIterator(const FeatureDefinition& fe
 void FeatureDefinitionIterator::next()
 {
     if (_currentFieldIndex < _fieldCount) {
-        _currentField = _featureDef->fieldDefinition(_currentFieldIndex);
+        _currentField = _featureDef.fieldDefinition(_currentFieldIndex);
     }
 }
 
-const FieldDefinition& FeatureDefinitionIterator::operator*()
+const FieldDefinitionRef& FeatureDefinitionIterator::operator*()
 {
     return _currentField;
 }
 
-const FieldDefinition* FeatureDefinitionIterator::operator->()
+const FieldDefinitionRef* FeatureDefinitionIterator::operator->()
 {
     return &_currentField;
 }

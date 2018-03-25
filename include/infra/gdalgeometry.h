@@ -225,46 +225,56 @@ public:
 
 using Field = std::variant<int32_t, int64_t, double, std::string_view>;
 
-class FieldDefinition
+class FieldDefinitionRef
 {
 public:
-    FieldDefinition() = default;
-    FieldDefinition(const char* name, const std::type_info& typeInfo);
-    FieldDefinition(OGRFieldDefn* def);
-    FieldDefinition(OGRFieldDefn& def);
-    ~FieldDefinition();
+    FieldDefinitionRef() = default;
+    FieldDefinitionRef(OGRFieldDefn* def);
     std::string_view name() const;
     const std::type_info& type() const;
 
     OGRFieldDefn* get() noexcept;
 
-private:
-    bool _hasOwnerShip = false;
+protected:
     OGRFieldDefn* _def = nullptr;
 };
 
-class FeatureDefinition
+class FieldDefinition : public FieldDefinitionRef
 {
 public:
-    FeatureDefinition(OGRFeatureDefn* def);
-    ~FeatureDefinition();
+    FieldDefinition() = default;
+    FieldDefinition(const char* name, const std::type_info& typeInfo);
+    FieldDefinition(OGRFieldDefn* def);
+    ~FieldDefinition();
+
+    FieldDefinition(const FieldDefinition&) = delete;
+    FieldDefinition& operator=(const FieldDefinition&) = delete;
+
+    FieldDefinition(FieldDefinition&&);
+    FieldDefinition& operator=(FieldDefinition&&);
+};
+
+class FeatureDefinitionRef
+{
+public:
+    FeatureDefinitionRef() = default;
+    FeatureDefinitionRef(OGRFeatureDefn* def);
     std::string_view name() const;
 
     int fieldCount() const;
     int fieldIndex(std::string_view name) const;
-    FieldDefinition fieldDefinition(int index) const;
+    FieldDefinitionRef fieldDefinition(int index) const;
 
     OGRFeatureDefn* get() noexcept;
 
 private:
-    bool _hasOwnerShip;
-    OGRFeatureDefn* _def;
+    OGRFeatureDefn* _def = nullptr;
 };
 
 class Feature
 {
 public:
-    Feature(FeatureDefinition& featurDef);
+    Feature(FeatureDefinitionRef featurDef);
     explicit Feature(OGRFeature* feature);
     Feature(const Feature&) = delete;
     Feature(Feature&&);
@@ -289,7 +299,7 @@ public:
 
     int fieldCount() const;
     int fieldIndex(std::string_view name) const;
-    FieldDefinition fieldDefinition(int index) const;
+    FieldDefinitionRef fieldDefinition(int index) const;
 
     Field getField(int index) const noexcept;
 
@@ -351,7 +361,7 @@ public:
     void createField(FieldDefinition& field);
     void createFeature(Feature& feature);
 
-    FeatureDefinition layerDefinition() const;
+    FeatureDefinitionRef layerDefinition() const;
 
     const char* name() const;
     OGRLayer* get();
@@ -445,7 +455,7 @@ class FeatureDefinitionIterator
 {
 public:
     FeatureDefinitionIterator(int fieldCount);
-    FeatureDefinitionIterator(const FeatureDefinition& featureDef);
+    FeatureDefinitionIterator(FeatureDefinitionRef featureDef);
     FeatureDefinitionIterator(const FeatureDefinitionIterator&) = delete;
     FeatureDefinitionIterator(FeatureDefinitionIterator&&)      = default;
 
@@ -453,30 +463,25 @@ public:
     FeatureDefinitionIterator& operator=(FeatureDefinitionIterator&& other) = default;
     bool operator==(const FeatureDefinitionIterator& other) const;
     bool operator!=(const FeatureDefinitionIterator& other) const;
-    const FieldDefinition& operator*();
-    const FieldDefinition* operator->();
+    const FieldDefinitionRef& operator*();
+    const FieldDefinitionRef* operator->();
 
 private:
     void next();
 
-    const FeatureDefinition* _featureDef = nullptr;
-    int _fieldCount                      = 0;
-    int _currentFieldIndex               = 0;
-    FieldDefinition _currentField;
+    FeatureDefinitionRef _featureDef;
+    int _fieldCount        = 0;
+    int _currentFieldIndex = 0;
+    FieldDefinitionRef _currentField;
 };
 
 // support for range based for loops
-inline FeatureDefinitionIterator begin(const FeatureDefinition& featDef)
+inline FeatureDefinitionIterator begin(FeatureDefinitionRef featDef)
 {
     return FeatureDefinitionIterator(featDef);
 }
 
-inline FeatureDefinitionIterator begin(FeatureDefinition&& featDef)
-{
-    return FeatureDefinitionIterator(featDef);
-}
-
-inline FeatureDefinitionIterator end(const FeatureDefinition& featDef)
+inline FeatureDefinitionIterator end(FeatureDefinitionRef featDef)
 {
     return FeatureDefinitionIterator(featDef.fieldCount());
 }
