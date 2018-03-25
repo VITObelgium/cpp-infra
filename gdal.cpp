@@ -1,6 +1,7 @@
 #include "infra/gdal.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
+#include "infra/gdallog.h"
 #include "infra/log.h"
 
 #ifdef EMBED_GDAL_DATA
@@ -165,7 +166,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-                              "Failed to create transformation");
+        "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -254,6 +255,8 @@ void registerGdal()
 #else
     GDALAllRegister();
 #endif
+
+    setLogHandler();
 }
 
 void unregisterGdal()
@@ -375,7 +378,7 @@ DataSet VectorDriver::createDataSetCopy(const DataSet& reference, const fs::path
                                     options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                     nullptr,
                                     nullptr),
-                                "Failed to create data set copy"));
+        "Failed to create data set copy"));
 }
 
 VectorType VectorDriver::type() const
@@ -422,19 +425,19 @@ DataSet DataSet::createRaster(const std::string& filePath, RasterType type, cons
     }
 
     return DataSet(checkPointer(create(filePath,
-                                       GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                       nullptr,
-                                       driverOpts),
-                                "Failed to open raster file"));
+                                    GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                    nullptr,
+                                    driverOpts),
+        "Failed to open raster file"));
 }
 
 DataSet DataSet::openVector(const std::string& filePath, const std::vector<std::string>& driverOptions)
 {
     return DataSet(checkPointer(create(filePath,
-                                       GDAL_OF_READONLY | GDAL_OF_VECTOR,
-                                       nullptr,
-                                       driverOptions),
-                                "Failed to open vector file"));
+                                    GDAL_OF_READONLY | GDAL_OF_VECTOR,
+                                    nullptr,
+                                    driverOptions),
+        "Failed to open vector file"));
 }
 
 DataSet DataSet::openVector(const std::string& filePath, VectorType type, const std::vector<std::string>& driverOptions)
@@ -449,16 +452,16 @@ DataSet DataSet::openVector(const std::string& filePath, VectorType type, const 
     std::array<const char*, 2> drivers{{s_vectorDriverLookup.at(type), nullptr}};
 
     return DataSet(checkPointer(create(filePath,
-                                       GDAL_OF_READONLY | GDAL_OF_VECTOR,
-                                       drivers.data(),
-                                       driverOptions),
-                                "Failed to open vector file"));
+                                    GDAL_OF_READONLY | GDAL_OF_VECTOR,
+                                    drivers.data(),
+                                    driverOptions),
+        "Failed to open vector file"));
 }
 
 GDALDataset* DataSet::create(const std::string& filePath,
-                             unsigned int openFlags,
-                             const char* const* drivers,
-                             const std::vector<std::string>& driverOpts)
+    unsigned int openFlags,
+    const char* const* drivers,
+    const std::vector<std::string>& driverOpts)
 {
     auto options = createOptionsArray(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
@@ -765,8 +768,8 @@ infra::GeoMetadata readMetadataFromDataset(const gdal::DataSet& dataSet)
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-                            dataBuffer.size(), FALSE /*no ownership*/))
+      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+      dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

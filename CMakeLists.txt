@@ -50,6 +50,15 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     target_link_libraries(infra PRIVATE ${CPP_EXP_LIB})
 endif ()
 
+if (INFRA_LOGGING)
+    find_package(spdlog CONFIG REQUIRED)
+
+    target_sources(infra PRIVATE include/infra/log.h log.cpp)
+    target_link_libraries(infra PUBLIC spdlog::spdlog)
+    # make sure spdlog does not use its internal version of fmt
+    target_compile_definitions(infra PUBLIC -DSPDLOG_FMT_EXTERNAL)
+endif ()
+
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
     find_package(Gsl REQUIRED)
@@ -83,16 +92,13 @@ if (INFRA_GDAL)
         )
     endif ()
 
+    if (INFRA_LOGGING)
+        target_sources(infra PRIVATE
+            include/infra/gdallog.h gdallog.cpp
+        )
+    endif ()
+
     target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl)
-endif ()
-
-if (INFRA_LOGGING)
-    find_package(spdlog CONFIG REQUIRED)
-
-    target_sources(infra PRIVATE include/infra/log.h log.cpp)
-    target_link_libraries(infra PUBLIC spdlog::spdlog)
-    # make sure spdlog does not use its internal version of fmt
-    target_compile_definitions(infra PUBLIC -DSPDLOG_FMT_EXTERNAL)
 endif ()
 
 if (INFRA_NUMERIC)
