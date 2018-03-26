@@ -14,4 +14,8 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMet
 
 // convert a vector dataset
 DataSet translateVector(const DataSet& ds, const std::vector<std::string>& options = {});
+
+// convert a raster dataset
+template <typename T>
+std::pair<GeoMetadata, std::vector<T>> translate(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options = {});
 }

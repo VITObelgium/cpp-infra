@@ -106,7 +106,59 @@ DataSet translateVector(const DataSet& ds, const std::vector<std::string>& optio
     return memDataSet;
 }
 
+class WarpOptionsWrapper
+{
+public:
+    WarpOptionsWrapper(const std::vector<std::string>& opts)
+    : _options(nullptr)
+    {
+        auto optionValues = createOptionsArray(opts);
+        _options          = GDALWarpAppOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
+    }
+
+    ~WarpOptionsWrapper()
+    {
+        GDALWarpAppOptionsFree(_options);
+    }
+
+    GDALWarpAppOptions* get()
+    {
+        return _options;
+    }
+
+private:
+    GDALWarpAppOptions* _options;
+};
+
+template <typename T>
+std::pair<GeoMetadata, std::vector<T>> translate(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options)
+{
+    WarpOptionsWrapper gdalOptions(options);
+
+    std::vector<T> data(meta.rows * meta.cols);
+
+    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
+    gdal::DataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
+    memDataSet.addBand(data.data());
+    memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
+    memDataSet.setNoDataValue(1, meta.nodata);
+    memDataSet.setProjection(meta.projection);
+
+    int errorCode              = CE_None;
+    GDALDatasetH srcDataSetPtr = ds.get();
+    GDALWarp(nullptr, memDataSet.get(), 1, &srcDataSetPtr, gdalOptions.get(), &errorCode);
+    if (errorCode != CE_None) {
+        throw RuntimeError("Failed to translate dataset {}", errorCode);
+    }
+
+    return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
+}
+
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+
+template std::pair<GeoMetadata, std::vector<float>> translate<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<int32_t>> translate<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<uint8_t>> translate<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 }
