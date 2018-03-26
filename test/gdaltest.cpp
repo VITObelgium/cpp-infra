@@ -7,7 +7,7 @@ namespace infra {
 
 TEST(GdalTest, iteratePoints)
 {
-    auto ds = gdal::DataSet::openVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     EXPECT_EQ(1, ds.layerCount());
 
@@ -29,7 +29,7 @@ TEST(GdalTest, iteratePoints)
 
 TEST(GdalTest, fieldInfo)
 {
-    auto ds    = gdal::DataSet::openVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds    = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
     auto layer = ds.getLayer(0);
     EXPECT_EQ(9, layer.featureCount());
     EXPECT_EQ(1, layer.feature(0).fieldCount());
@@ -39,7 +39,7 @@ TEST(GdalTest, fieldInfo)
 
 TEST(GdalTest, getField)
 {
-    auto ds = gdal::DataSet::openVector(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     int index = 0;
     for (const auto& feature : ds.getLayer(0)) {

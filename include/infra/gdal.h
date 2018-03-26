@@ -117,29 +117,24 @@ private:
     GDALRasterBand* _band;
 };
 
-class DataSet
+class RasterDataSet
 {
 public:
-    // This can only be used for raster types
-    static DataSet createRaster(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
-    static DataSet createRaster(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
-    // if you know the type of the dataset, this will be faster as not all drivers are queried
-    static DataSet openVector(const fs::path& filePath, const std::vector<std::string>& driverOptions = {});
-    static DataSet openVector(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
+    static RasterDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
+    static RasterDataSet create(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
 
-    DataSet() = default;
-    explicit DataSet(GDALDataset* ptr) noexcept;
+    RasterDataSet() = default;
+    explicit RasterDataSet(GDALDataset* ptr) noexcept;
 
-    DataSet(DataSet&&);
-    ~DataSet() noexcept;
+    RasterDataSet(RasterDataSet&&);
+    ~RasterDataSet() noexcept;
 
-    DataSet& operator=(DataSet&&);
+    RasterDataSet& operator=(RasterDataSet&&);
 
     int32_t rasterCount() const;
-    int32_t layerCount() const;
 
-    int32_t rasterXSize() const;
-    int32_t rasterYSize() const;
+    int32_t xSize() const;
+    int32_t ySize() const;
     std::array<double, 6> geoTransform() const;
     void setGeoTransform(const std::array<double, 6>& trans);
 
@@ -153,10 +148,6 @@ public:
 
     void setMetadata(const std::string& name, const std::string& value, const std::string& domain = "");
 
-    Layer getLayer(int index);
-    Layer createLayer(const std::string& name, const std::vector<std::string>& driverOptions = {});
-    Layer createLayer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
-
     RasterBand rasterBand(int index) const;
 
     GDALDataType getBandDataType(int index) const;
@@ -166,7 +157,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-                   "Failed to read raster data");
+            "Failed to read raster data");
     }
 
     template <typename T>
@@ -175,7 +166,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-                   "Failed to write raster data");
+            "Failed to write raster data");
     }
 
     template <typename T>
@@ -201,16 +192,41 @@ public:
     }
 
     GDALDataset* get() const;
-    RasterDriver rasterDriver();
-    VectorDriver vectorDriver();
+    RasterDriver driver();
 
 private:
-    static GDALDataset* create(const fs::path& filename,
-                               unsigned int openFlags,
-                               const char* const* drivers,
-                               const std::vector<std::string>& driverOpts);
-    explicit DataSet(const fs::path& filename);
+    GDALDataset* _ptr = nullptr;
+};
 
+class VectorDataSet
+{
+public:
+    static VectorDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOptions = {});
+    static VectorDataSet create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
+
+    VectorDataSet() = default;
+    explicit VectorDataSet(GDALDataset* ptr) noexcept;
+
+    VectorDataSet(VectorDataSet&&);
+    ~VectorDataSet() noexcept;
+
+    VectorDataSet& operator=(VectorDataSet&&);
+
+    int32_t layerCount() const;
+
+    std::string projection() const;
+    void setProjection(const std::string& proj);
+
+    void setMetadata(const std::string& name, const std::string& value, const std::string& domain = "");
+
+    Layer getLayer(int index);
+    Layer createLayer(const std::string& name, const std::vector<std::string>& driverOptions = {});
+    Layer createLayer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
+
+    GDALDataset* get() const;
+    VectorDriver driver();
+
+private:
     GDALDataset* _ptr = nullptr;
 };
 
@@ -223,30 +239,30 @@ public:
     explicit RasterDriver(GDALDriver& driver);
 
     template <typename T>
-    DataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename)
+    RasterDataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename)
     {
-        return DataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
+        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
     // Use for the memory driver, when there is no path
     template <typename T>
-    DataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands)
+    RasterDataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands)
     {
-        return DataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
+        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
     template <typename T>
-    DataSet createDataSetCopy(const DataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {})
+    RasterDataSet createDataSetCopy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {})
     {
         auto options = createOptionsArray(driverOptions);
-        return DataSet(checkPointer(_driver.CreateCopy(
-                                        filename.string().c_str(),
-                                        reference.get(),
-                                        FALSE,
-                                        options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
-                                        nullptr,
-                                        nullptr),
-                                    "Failed to create data set copy"));
+        return RasterDataSet(checkPointer(_driver.CreateCopy(
+                                              filename.string().c_str(),
+                                              reference.get(),
+                                              FALSE,
+                                              options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
+                                              nullptr,
+                                              nullptr),
+            "Failed to create data set copy"));
     }
 
     RasterType type() const;
@@ -262,8 +278,8 @@ public:
     static VectorDriver create(const fs::path& filename);
     explicit VectorDriver(GDALDriver& driver);
 
-    DataSet createDataSet(const fs::path& filename);
-    DataSet createDataSetCopy(const DataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {});
+    VectorDataSet createDataSet(const fs::path& filename);
+    VectorDataSet createDataSetCopy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {});
 
     VectorType type() const;
 
@@ -284,5 +300,5 @@ private:
     VSILFILE* _ptr;
 };
 
-infra::GeoMetadata readMetadataFromDataset(const gdal::DataSet& dataSet);
+infra::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet);
 }

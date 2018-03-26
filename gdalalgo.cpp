@@ -6,10 +6,10 @@
 
 namespace infra::gdal {
 
-DataSet polygonize(const DataSet& ds)
+VectorDataSet polygonize(const RasterDataSet& ds)
 {
     auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet("dummy"));
+    gdal::VectorDataSet memDataSet(memDriver.createDataSet("dummy"));
     auto layer = memDataSet.createLayer("Polygons");
     FieldDefinition def("Value", typeid(int32_t));
     layer.createField(def);
@@ -43,14 +43,14 @@ private:
 };
 
 template <typename T>
-std::pair<GeoMetadata, std::vector<T>> rasterize(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options)
+std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options)
 {
     RasterizeOptionsWrapper gdalOptions(options);
 
     std::vector<T> data(meta.rows * meta.cols);
 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0, "dummy"));
+    gdal::RasterDataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
     memDataSet.addBand(data.data());
     memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
     memDataSet.setNoDataValue(1, meta.nodata);
@@ -89,12 +89,12 @@ private:
     GDALVectorTranslateOptions* _options;
 };
 
-DataSet translateVector(const DataSet& ds, const std::vector<std::string>& options)
+VectorDataSet translateVector(const VectorDataSet& ds, const std::vector<std::string>& options)
 {
     VectorTranslateOptionsWrapper gdalOptions(options);
 
     auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet("dummy"));
+    gdal::VectorDataSet memDataSet(memDriver.createDataSet("dummy"));
 
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
@@ -131,14 +131,14 @@ private:
 };
 
 template <typename T>
-std::pair<GeoMetadata, std::vector<T>> translate(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options)
+std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options)
 {
     WarpOptionsWrapper gdalOptions(options);
 
     std::vector<T> data(meta.rows * meta.cols);
 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::DataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
+    gdal::RasterDataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
     memDataSet.addBand(data.data());
     memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
     memDataSet.setNoDataValue(1, meta.nodata);
@@ -154,11 +154,11 @@ std::pair<GeoMetadata, std::vector<T>> translate(const DataSet& ds, const GeoMet
     return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
 }
 
-template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
-template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
-template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
-template std::pair<GeoMetadata, std::vector<float>> translate<float>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
-template std::pair<GeoMetadata, std::vector<int32_t>> translate<int32_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
-template std::pair<GeoMetadata, std::vector<uint8_t>> translate<uint8_t>(const DataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<float>> translate<float>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<int32_t>> translate<int32_t>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<uint8_t>> translate<uint8_t>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 }
