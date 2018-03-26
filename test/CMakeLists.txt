@@ -14,6 +14,7 @@ add_executable(infratest
 if (INFRA_GDAL)
     target_sources(infratest PRIVATE
         gdaltest.cpp
+        gdalgeometrytest.cpp
     )
 endif ()
 
