@@ -157,7 +157,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-            "Failed to read raster data");
+                   "Failed to read raster data");
     }
 
     template <typename T>
@@ -166,7 +166,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                   "Failed to write raster data");
     }
 
     template <typename T>
@@ -262,7 +262,7 @@ public:
                                               options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                               nullptr,
                                               nullptr),
-            "Failed to create data set copy"));
+                                          "Failed to create data set copy"));
     }
 
     RasterType type() const;
@@ -276,8 +276,11 @@ class VectorDriver
 public:
     static VectorDriver create(VectorType);
     static VectorDriver create(const fs::path& filename);
+
     explicit VectorDriver(GDALDriver& driver);
 
+    // Use for the memory driver, when there is no path
+    VectorDataSet createDataSet();
     VectorDataSet createDataSet(const fs::path& filename);
     VectorDataSet createDataSetCopy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {});
 
