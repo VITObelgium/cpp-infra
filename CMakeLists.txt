@@ -143,6 +143,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/userinput.h
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
+        include/uiinfra/floatingpointitemdelegate.h ui/floatingpointitemdelegate.cpp
         ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
     )
