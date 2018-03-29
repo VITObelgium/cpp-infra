@@ -48,6 +48,7 @@ public:
     static ColorMap qualitative(const std::vector<Color>& cdict);
     static ColorMap create(std::string_view name);
 
+    // float value in range [0.0-1.0]
     const Color& getColor(float value) const noexcept;
     const Color& getColor(uint8_t value) const noexcept;
 
