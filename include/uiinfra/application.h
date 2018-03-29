@@ -4,7 +4,8 @@
 
 namespace uiinfra {
 
-//! Application implementation that handles uncaugh exceptions.
+//! Application implementation that handles uncaught exceptions
+// and routes the qt logging to the infra logging
 class Application : public QApplication
 {
     Q_OBJECT
