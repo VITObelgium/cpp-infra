@@ -22,7 +22,7 @@ add_library(infra
     include/infra/process.h process.cpp
     include/infra/signal.h
     include/infra/string.h string.cpp
-    include/infra/exception.h
+    include/infra/exception.h exception.cpp
     include/infra/filesystem.h filesystem.cpp
     include/infra/color.h color.cpp
     include/infra/colormap.h colormap.cpp

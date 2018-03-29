@@ -2,37 +2,20 @@
 
 #include <fmt/format.h>
 #include <stdexcept>
-#include <string>
+#include <string_view>
 
-#define EXCEPTION(NAME, BASE)                                     \
-    class NAME : public std::exception                            \
-    {                                                             \
-    public:                                                       \
-        NAME() = default;                                         \
-                                                                  \
-        template <typename... T>                                  \
-        NAME(const char* fmtStr, T&&... args)                     \
-        : _message(fmt::format(fmtStr, std::forward<T>(args)...)) \
-        {                                                         \
-        }                                                         \
-                                                                  \
-        NAME(std::string message)                                 \
-        : _message(std::move(message))                            \
-        {                                                         \
-        }                                                         \
-                                                                  \
-        NAME(const char* message)                                 \
-        : _message(message)                                       \
-        {                                                         \
-        }                                                         \
-                                                                  \
-        const char* what() const noexcept                         \
-        {                                                         \
-            return _message.c_str();                              \
-        }                                                         \
-                                                                  \
-    private:                                                      \
-        std::string _message;                                     \
+#define EXCEPTION(NAME, BASE)                                \
+    class NAME : public BASE                                 \
+    {                                                        \
+    public:                                                  \
+        NAME() = default;                                    \
+        NAME(std::string_view message);                      \
+                                                             \
+        template <typename... Args>                          \
+        NAME(fmt::CStringRef formatStr, const Args&... args) \
+        : BASE(fmt::format(formatStr, args...))              \
+        {                                                    \
+        }                                                    \
     };
 
 namespace infra {
