@@ -145,6 +145,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
         include/uiinfra/floatingpointitemdelegate.h ui/floatingpointitemdelegate.cpp
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
+        include/uiinfra/application.h ui/application.cpp
         ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
     )
