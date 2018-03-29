@@ -166,7 +166,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-                              "Failed to create transformation");
+        "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -384,7 +384,7 @@ VectorDataSet VectorDriver::createDataSetCopy(const VectorDataSet& reference, co
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-                                      "Failed to create data set copy"));
+        "Failed to create data set copy"));
 }
 
 VectorType VectorDriver::type() const
@@ -412,13 +412,26 @@ const GDALRasterBand* RasterBand::get() const
 }
 
 static GDALDataset* createDataSet(const fs::path& filePath,
-                                  unsigned int openFlags,
-                                  const char* const* drivers,
-                                  const std::vector<std::string>& driverOpts)
+    unsigned int openFlags,
+    const char* const* drivers,
+    const std::vector<std::string>& driverOpts)
 {
+    std::string path = filePath.string();
+#ifdef WIN32
+    // on windows the /vsimem/file.asc in memory path is translated to \\vsimem\\file.asc by fs::path
+    // which is not recognized by gdal, translate it back to forward slashes
+    if (path.find("\\vsimem\\") == 0) {
+        for (auto& c : path) {
+            if (c == '\\') {
+                c = '/';
+            }
+        }
+    }
+#endif
+
     auto options = createOptionsArray(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
-        filePath.string().c_str(),
+        path.c_str(),
         openFlags,
         drivers,
         options.size() == 1 ? nullptr : options.data(),
@@ -445,10 +458,10 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
     }
 
     return RasterDataSet(checkPointer(createDataSet(filePath,
-                                                    GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                                    nullptr,
-                                                    driverOpts),
-                                      "Failed to open raster file"));
+                                          GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                          nullptr,
+                                          driverOpts),
+        "Failed to open raster file"));
 }
 
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
@@ -822,8 +835,8 @@ infra::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet)
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-                            dataBuffer.size(), FALSE /*no ownership*/))
+      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+      dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 
