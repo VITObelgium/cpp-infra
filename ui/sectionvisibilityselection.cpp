@@ -1,4 +1,5 @@
 #include "uiinfra/sectionvisibilityselection.h"
+#include "infra/algo.h"
 
 #include <qheaderview.h>
 #include <qmenu.h>
@@ -7,53 +8,31 @@
 
 namespace uiinfra {
 
-void setSectionVisibilitySelector(QTableView* tableView)
+void setSectionVisibilitySelector(QHeaderView* headerView, const std::vector<int>& fixedSections)
 {
-    auto* header = tableView->horizontalHeader();
-    header->setContextMenuPolicy(Qt::CustomContextMenu);
+    headerView->setContextMenuPolicy(Qt::CustomContextMenu);
 
-    QObject::connect(header, &QHeaderView::customContextMenuRequested, [header, tableView](const QPoint& pos) {
-        QMenu contextMenu(QObject::tr("Zichtbare kolommen"), header);
+    QObject::connect(headerView, &QHeaderView::customContextMenuRequested, [headerView, fixedSections](const QPoint& pos) {
+        QMenu contextMenu(QObject::tr("Zichtbare kolommen"), headerView);
 
-        for (int i = 0; i < header->count(); ++i) {
-            auto name = tableView->model()->headerData(i, Qt::Orientation::Horizontal).toString();
+        for (int i = 0; i < headerView->count(); ++i) {
+            if (infra::containerContains(fixedSections, i)) {
+                continue;
+            }
 
-            auto action = new QAction(name, header);
+            auto name = headerView->model()->headerData(i, Qt::Orientation::Horizontal).toString();
+
+            auto action = new QAction(name, headerView);
             action->setCheckable(true);
-            action->setChecked(!header->isSectionHidden(i));
+            action->setChecked(!headerView->isSectionHidden(i));
 
-            QObject::connect(action, &QAction::triggered, [header, index = i]() {
-                header->setSectionHidden(index, !header->isSectionHidden(index));
+            QObject::connect(action, &QAction::triggered, [headerView, index = i]() {
+                headerView->setSectionHidden(index, !headerView->isSectionHidden(index));
             });
             contextMenu.addAction(action);
         }
 
-        contextMenu.exec(tableView->mapToGlobal(pos));
-    });
-}
-
-void setSectionVisibilitySelector(QTreeView* treeView)
-{
-    auto* header = treeView->header();
-    header->setContextMenuPolicy(Qt::CustomContextMenu);
-
-    QObject::connect(header, &QHeaderView::customContextMenuRequested, [header, treeView](const QPoint& pos) {
-        QMenu contextMenu(QObject::tr("Zichtbare kolommen"), header);
-
-        for (int i = 1; i < header->count(); ++i) {
-            auto name = treeView->model()->headerData(i, Qt::Orientation::Horizontal).toString();
-
-            auto action = new QAction(name, header);
-            action->setCheckable(true);
-            action->setChecked(!header->isSectionHidden(i));
-
-            QObject::connect(action, &QAction::triggered, [header, index = i]() {
-                header->setSectionHidden(index, !header->isSectionHidden(index));
-            });
-            contextMenu.addAction(action);
-        }
-
-        contextMenu.exec(treeView->mapToGlobal(pos));
+        contextMenu.exec(headerView->mapToGlobal(pos));
     });
 }
 }
