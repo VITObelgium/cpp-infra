@@ -125,7 +125,7 @@ if (INFRA_UI_COMPONENTS)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
-    set(INFRA_UI_FILES ui/toolboxitem.ui ui/aboutdialog.ui)
+    set(INFRA_UI_FILES ui/toolboxitem.ui ui/aboutdialog.ui ui/comboxtableview.ui)
     if (INFRA_LOGGING)
         list(APPEND INFRA_UI_FILES ui/logview.ui)
     endif ()
