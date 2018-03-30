@@ -15,4 +15,12 @@ public:
 private:
     int _decimals;
 };
+
+class EmptyZeroItemDelegate : public QStyledItemDelegate
+{
+    Q_OBJECT
+public:
+    explicit EmptyZeroItemDelegate(QObject* parent = 0);
+    virtual QString displayText(const QVariant& value, const QLocale& locale) const override;
+};
 }

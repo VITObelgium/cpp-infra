@@ -143,7 +143,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/userinput.h
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
-        include/uiinfra/floatingpointitemdelegate.h ui/floatingpointitemdelegate.cpp
+        include/uiinfra/numericitemdelegates.h ui/numericitemdelegates.cpp
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
         include/uiinfra/application.h ui/application.cpp
         ui/toolboxitem.h ui/toolboxitem.cpp
