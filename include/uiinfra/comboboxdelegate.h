@@ -13,7 +13,10 @@ class ComboBoxDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    ComboBoxDelegate(QStringList items, QObject* parent = nullptr);
+    ComboBoxDelegate(QObject* parent = nullptr);
+
+    void setItems(const QStringList& items);
+    void setModel(QAbstractItemModel* model);
 
     QWidget* createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     void setEditorData(QWidget* editor, const QModelIndex& index) const override;
@@ -21,5 +24,6 @@ public:
 
 private:
     QStringList _items;
+    QAbstractItemModel* _model;
 };
 }
