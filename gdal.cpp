@@ -596,6 +596,18 @@ GDALDataType RasterDataSet::getBandDataType(int bandNr) const
     return checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index")->GetRasterDataType();
 }
 
+void RasterDataSet::readRasterData(int band, int xOff, int yOff, int xSize, int ySize, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize, int lineSize) const
+{
+    auto* bandPtr = _ptr->GetRasterBand(band);
+    checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, resolveType(type), pixelSize, lineSize), "Failed to read raster data");
+}
+
+void RasterDataSet::writeRasterData(int band, int xOff, int yOff, int xSize, int ySize, const std::type_info& type, const void* pData, int bufXSize, int bufYSize) const
+{
+    auto* bandPtr = _ptr->GetRasterBand(band);
+    checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, const_cast<void*>(pData), bufXSize, bufYSize, resolveType(type), 0, 0), "Failed to write raster data");
+}
+
 GDALDataset* RasterDataSet::get() const
 {
     return _ptr;

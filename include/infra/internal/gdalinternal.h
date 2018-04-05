@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gdal_priv.h>
+#include <typeinfo>
 
 namespace infra::gdal {
 
@@ -51,6 +52,27 @@ struct TypeResolve<double>
 {
     static constexpr GDALDataType value = GDT_Float64;
 };
+
+inline GDALDataType resolveType(const std::type_info& info)
+{
+    if (info == typeid(uint8_t)) {
+        return TypeResolve<uint8_t>::value;
+    } else if (info == typeid(uint16_t)) {
+        return TypeResolve<uint16_t>::value;
+    } else if (info == typeid(int16_t)) {
+        return TypeResolve<int16_t>::value;
+    } else if (info == typeid(uint32_t)) {
+        return TypeResolve<uint32_t>::value;
+    } else if (info == typeid(int32_t)) {
+        return TypeResolve<int32_t>::value;
+    } else if (info == typeid(float)) {
+        return TypeResolve<float>::value;
+    } else if (info == typeid(double)) {
+        return TypeResolve<double>::value;
+    }
+
+    return GDT_Unknown;
+}
 
 void throwLastError(const char* msg);
 void checkError(CPLErr err, const char* msg);
