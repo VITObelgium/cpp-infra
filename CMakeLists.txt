@@ -1,8 +1,11 @@
+include(CMakeDependentOption)
+
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 
@@ -121,6 +124,7 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
     find_package(Qt5Widgets CONFIG REQUIRED)
     find_package(Qt5Core CONFIG REQUIRED)
+    find_package(Qt5Location CONFIG REQUIRED)
     find_package(HinnantDate REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
@@ -152,6 +156,18 @@ if (INFRA_UI_COMPONENTS)
         ${FORMS_HEADERS}
     )
 
+    if (INFRA_UI_COMPONENTS_LOCATION)
+        target_sources(uiinfra PRIVATE
+            include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
+        )
+    endif ()
+
+    if (INFRA_GDAL)
+        target_sources(uiinfra PRIVATE
+            include/uiinfra/polygonio.h ui/polygonio.cpp
+        )
+    endif ()
+
     if (INFRA_LOGGING)
         target_sources(uiinfra PRIVATE
             include/uiinfra/logview.h ui/logview.cpp
@@ -169,10 +185,10 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
-    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core HinnantDate::Date)
+    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location HinnantDate::Date)
 
     if (INFRA_LOGGING)
-        target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core HinnantDate::Date)
+        target_link_libraries(uiinfra PUBLIC infra)
     endif ()
 endif ()
 
