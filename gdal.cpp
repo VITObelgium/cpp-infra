@@ -323,6 +323,29 @@ RasterDriver::RasterDriver(GDALDriver& driver)
 {
 }
 
+RasterDataSet RasterDriver::createDataSet(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType)
+{
+    return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
+}
+
+RasterDataSet RasterDriver::createDataSet(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType)
+{
+    return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
+}
+
+RasterDataSet RasterDriver::createDataSetCopy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
+{
+    auto options = createOptionsArray(driverOptions);
+    return RasterDataSet(checkPointer(_driver.CreateCopy(
+                                          filename.string().c_str(),
+                                          reference.get(),
+                                          FALSE,
+                                          options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
+                                          nullptr,
+                                          nullptr),
+        "Failed to create data set copy"));
+}
+
 RasterType RasterDriver::type() const
 {
     try {

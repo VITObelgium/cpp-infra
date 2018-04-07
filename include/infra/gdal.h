@@ -247,6 +247,8 @@ public:
         return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
+    RasterDataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType);
+
     // Use for the memory driver, when there is no path
     template <typename T>
     RasterDataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands)
@@ -254,19 +256,10 @@ public:
         return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
     }
 
-    template <typename T>
-    RasterDataSet createDataSetCopy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {})
-    {
-        auto options = createOptionsArray(driverOptions);
-        return RasterDataSet(checkPointer(_driver.CreateCopy(
-                                              filename.string().c_str(),
-                                              reference.get(),
-                                              FALSE,
-                                              options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
-                                              nullptr,
-                                              nullptr),
-            "Failed to create data set copy"));
-    }
+    // Use for the memory driver, when there is no path
+    RasterDataSet createDataSet(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType);
+
+    RasterDataSet createDataSetCopy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {});
 
     RasterType type() const;
 
