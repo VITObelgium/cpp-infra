@@ -139,7 +139,6 @@ template <typename WrappedType>
 class GeometryCollectionWrapper : public GeometryPtr<WrappedType>
 {
 public:
-    GeometryCollectionWrapper() = default;
     GeometryCollectionWrapper(WrappedType* collection);
 
     void addGeometry(const Geometry& geometry);
@@ -201,7 +200,6 @@ LineIterator end(const Line&);
 class MultiLine : public GeometryCollectionWrapper<OGRMultiLineString>
 {
 public:
-    MultiLine() = default;
     MultiLine(OGRMultiLineString* multiLine);
 
     Line lineAt(int index);
@@ -308,7 +306,7 @@ public:
     void setGeometry(const Geometry& geom);
 
     template <typename GeometryType>
-    void setGeometry(GeometryPtr<GeometryType>&& geom)
+    void setGeometry(Owner<GeometryType> geom)
     {
         get()->SetGeometryDirectly(geom.release());
     }
