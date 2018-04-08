@@ -25,6 +25,54 @@ using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 
 class Layer;
 
+template <typename GeometryType>
+class Owner : public GeometryType
+{
+public:
+    template <typename OgrType>
+    Owner(OgrType* ptr)
+    : GeometryType(ptr)
+    , _owned(true)
+    {
+    }
+
+    ~Owner()
+    {
+        if (_owned) {
+            delete GeometryType::get();
+        }
+    }
+
+    // Don't allow copying
+    Owner(const Owner<GeometryType>&) = delete;
+    Owner& operator=(const Owner<GeometryType>&) = delete;
+
+    // Allow moving
+    Owner(Owner<GeometryType>&& other)
+    : GeometryType(other)
+    {
+        _owned       = other._owned;
+        other._owned = false;
+    }
+
+    Owner& operator=(Owner<GeometryType>&& other)
+    {
+        GeometryType::operator=(other);
+
+        _owned       = other._owned;
+        other._owned = false;
+    }
+
+    auto release()
+    {
+        _owned = false;
+        return GeometryType::get();
+    }
+
+private:
+    bool _owned;
+};
+
 class Geometry
 {
 public:
@@ -40,12 +88,9 @@ public:
     };
 
     Geometry(OGRGeometry* instance);
-    Geometry(OGRGeometry& instance);
-    ~Geometry();
 
     OGRGeometry* get() noexcept;
     const OGRGeometry* get() const noexcept;
-    OGRGeometry* release();
 
     Type type() const;
     std::string_view typeName() const;
@@ -56,29 +101,16 @@ public:
     T as() const
     {
         assert(_geometry);
-        return T(dynamic_cast<typename T::WrappedType&>(*_geometry));
+        return T(dynamic_cast<typename T::WrappedType*>(_geometry));
     }
 
-    Geometry(const Geometry&) = delete;
-    Geometry& operator=(const Geometry&) = delete;
-
-    Geometry(Geometry&&) = default;
-    Geometry& operator=(Geometry&&) = default;
-
-    Geometry clone() const;
+    Owner<Geometry> clone() const;
 
     bool empty() const;
     void clear();
 
 private:
-    enum class Ownership
-    {
-        Owner,
-        Reference
-    };
-
     OGRGeometry* _geometry = nullptr;
-    Ownership _ownership   = Ownership::Reference;
 };
 
 template <typename OGRType>
@@ -97,23 +129,7 @@ public:
         return static_cast<const OGRType*>(Geometry::get());
     }
 
-    OGRType* release()
-    {
-        return static_cast<OGRType*>(Geometry::release());
-    }
-
-    GeometryPtr()
-    : Geometry(new OGRType())
-    {
-        static_assert(!std::is_same_v<OGRGeometry, OGRType>, "Call with concrete geometry type");
-    }
-
     GeometryPtr(OGRType* instance)
-    : Geometry(instance)
-    {
-    }
-
-    GeometryPtr(OGRType& instance)
     : Geometry(instance)
     {
     }
@@ -125,10 +141,9 @@ class GeometryCollectionWrapper : public GeometryPtr<WrappedType>
 public:
     GeometryCollectionWrapper() = default;
     GeometryCollectionWrapper(WrappedType* collection);
-    GeometryCollectionWrapper(WrappedType& collection);
 
     void addGeometry(const Geometry& geometry);
-    void addGeometry(Geometry&& geometry);
+    void addGeometry(Owner<Geometry> geometry);
 
     int size() const;
     Geometry geometry(int index);
@@ -140,7 +155,6 @@ class Line : public GeometryPtr<OGRSimpleCurve>
 {
 public:
     Line(OGRSimpleCurve* curve);
-    Line(OGRSimpleCurve& curve);
 
     int pointCount() const;
     Point<double> pointAt(int index) const;
@@ -153,7 +167,6 @@ class PointGeometry : public GeometryPtr<OGRPoint>
 {
 public:
     PointGeometry(OGRPoint* point);
-    PointGeometry(OGRPoint& point);
 
     Point<double> point() const;
 };
@@ -190,7 +203,6 @@ class MultiLine : public GeometryCollectionWrapper<OGRMultiLineString>
 public:
     MultiLine() = default;
     MultiLine(OGRMultiLineString* multiLine);
-    MultiLine(OGRMultiLineString& multiLine);
 
     Line lineAt(int index);
 };
@@ -205,7 +217,6 @@ class Polygon : public GeometryPtr<OGRPolygon>
 {
 public:
     Polygon(OGRPolygon* poly);
-    Polygon(OGRPolygon& poly);
 
     LinearRing exteriorRing();
     LinearRing interiorRing(int index);
@@ -217,11 +228,16 @@ public:
 class MultiPolygon : public GeometryCollectionWrapper<OGRMultiPolygon>
 {
 public:
-    MultiPolygon(OGRMultiPolygon* multiLine);
-    MultiPolygon(OGRMultiPolygon& multiLine);
+    MultiPolygon(OGRMultiPolygon* multiPoly);
 
     Polygon polygonAt(int index);
 };
+
+template <typename GeometryType>
+Owner<GeometryType> createGeometry()
+{
+    return Owner<GeometryType>(new typename GeometryType::WrappedType());
+}
 
 using Field = std::variant<int32_t, int64_t, double, std::string_view>;
 

@@ -3,7 +3,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-namespace infra {
+namespace infra::test {
 
 TEST(GdalTest, iteratePoints)
 {

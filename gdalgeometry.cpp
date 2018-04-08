@@ -9,13 +9,6 @@ namespace infra::gdal {
 
 using namespace std::string_literals;
 
-Geometry::~Geometry()
-{
-    if (_ownership == Ownership::Owner) {
-        delete _geometry;
-    }
-}
-
 OGRGeometry* Geometry::get() noexcept
 {
     return _geometry;
@@ -23,16 +16,6 @@ OGRGeometry* Geometry::get() noexcept
 
 const OGRGeometry* Geometry::get() const noexcept
 {
-    return _geometry;
-}
-
-OGRGeometry* Geometry::release()
-{
-    if (_ownership == Ownership::Reference) {
-        throw RuntimeError("Invalid release of non owning geometry");
-    }
-
-    _ownership = Ownership::Reference;
     return _geometry;
 }
 
@@ -59,9 +42,9 @@ std::string_view Geometry::typeName() const
     return _geometry->getGeometryName();
 }
 
-Geometry Geometry::clone() const
+Owner<Geometry> Geometry::clone() const
 {
-    return Geometry(_geometry->clone());
+    return Owner<Geometry>(_geometry->clone());
 }
 
 bool Geometry::empty() const
@@ -76,13 +59,6 @@ void Geometry::clear()
 
 Geometry::Geometry(OGRGeometry* instance)
 : _geometry(instance)
-, _ownership(Ownership::Owner)
-{
-}
-
-Geometry::Geometry(OGRGeometry& instance)
-: _geometry(&instance)
-, _ownership(Ownership::Reference)
 {
 }
 
@@ -93,20 +69,16 @@ GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* c
 }
 
 template <typename WrappedType>
-GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType& collection)
-: GeometryPtr<WrappedType>(collection)
-{
-}
-
-template <typename WrappedType>
 void GeometryCollectionWrapper<WrappedType>::addGeometry(const Geometry& geometry)
 {
+    // clones the geometry
     this->get()->addGeometry(geometry.get());
 }
 
 template <typename WrappedType>
-void GeometryCollectionWrapper<WrappedType>::addGeometry(Geometry&& geometry)
+void GeometryCollectionWrapper<WrappedType>::addGeometry(Owner<Geometry> geometry)
 {
+    // transfers ownership of the geometry to the collections
     this->get()->addGeometryDirectly(geometry.release());
 }
 
@@ -119,18 +91,13 @@ int GeometryCollectionWrapper<WrappedType>::size() const
 template <typename WrappedType>
 Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 {
-    return Geometry(*checkPointer(this->get()->getGeometryRef(index), "No geometry present"));
+    return Geometry(checkPointer(this->get()->getGeometryRef(index), "No geometry present"));
 }
 
 Line::Line(OGRSimpleCurve* curve)
 : GeometryPtr(curve)
 {
     assert(curve);
-}
-
-Line::Line(OGRSimpleCurve& curve)
-: GeometryPtr(curve)
-{
 }
 
 int Line::pointCount() const
@@ -247,11 +214,6 @@ PointGeometry::PointGeometry(OGRPoint* point)
 {
 }
 
-PointGeometry::PointGeometry(OGRPoint& point)
-: GeometryPtr(point)
-{
-}
-
 Point<double> PointGeometry::point() const
 {
     return Point<double>(get()->getX(), get()->getY());
@@ -261,11 +223,6 @@ MultiLine::MultiLine(OGRMultiLineString* multiLine)
 : GeometryCollectionWrapper(multiLine)
 {
     assert(multiLine);
-}
-
-MultiLine::MultiLine(OGRMultiLineString& multiLine)
-: GeometryCollectionWrapper(multiLine)
-{
 }
 
 Line MultiLine::lineAt(int index)
@@ -279,11 +236,6 @@ LinearRing::LinearRing(OGRLinearRing* ring)
 }
 
 Polygon::Polygon(OGRPolygon* poly)
-: GeometryPtr(poly)
-{
-}
-
-Polygon::Polygon(OGRPolygon& poly)
 : GeometryPtr(poly)
 {
 }
@@ -309,11 +261,6 @@ bool Polygon::hasCurveGeometry() const
 }
 
 MultiPolygon::MultiPolygon(OGRMultiPolygon* multiLine)
-: GeometryCollectionWrapper(multiLine)
-{
-}
-
-MultiPolygon::MultiPolygon(OGRMultiPolygon& multiLine)
 : GeometryCollectionWrapper(multiLine)
 {
 }
@@ -480,7 +427,7 @@ const OGRFeature* Feature::get() const
 
 Geometry Feature::geometry()
 {
-    return Geometry(*checkPointer(_feature->GetGeometryRef(), "No geometry present"));
+    return Geometry(checkPointer(_feature->GetGeometryRef(), "No geometry present"));
 }
 
 Geometry Feature::geometry() const
