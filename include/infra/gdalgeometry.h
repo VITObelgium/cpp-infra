@@ -259,6 +259,7 @@ class FieldDefinition : public FieldDefinitionRef
 public:
     FieldDefinition() = default;
     FieldDefinition(const char* name, const std::type_info& typeInfo);
+    FieldDefinition(const std::string& name, const std::type_info& typeInfo);
     FieldDefinition(OGRFieldDefn* def);
     ~FieldDefinition();
 
@@ -340,6 +341,12 @@ public:
     void setField(int index, const T& value)
     {
         _feature->SetField(index, value);
+    }
+
+    template <>
+    void setField<std::string>(int index, const std::string& value)
+    {
+        _feature->SetField(index, value.c_str());
     }
 
     bool operator==(const Feature& other) const;

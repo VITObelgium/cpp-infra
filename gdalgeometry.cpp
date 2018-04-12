@@ -337,6 +337,11 @@ FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInf
 {
 }
 
+FieldDefinition::FieldDefinition(const std::string& name, const std::type_info& typeInfo)
+: FieldDefinition(name.c_str(), typeInfo)
+{
+}
+
 FieldDefinition::FieldDefinition(OGRFieldDefn* def)
 : FieldDefinitionRef(def)
 {
