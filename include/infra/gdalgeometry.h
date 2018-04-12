@@ -218,6 +218,7 @@ public:
 
     LinearRing exteriorRing();
     LinearRing interiorRing(int index);
+    int interiorRingCount();
 
     GeometryPtr<OGRGeometry> getLinearGeometry();
     bool hasCurveGeometry() const;

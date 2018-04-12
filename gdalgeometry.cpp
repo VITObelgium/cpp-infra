@@ -250,6 +250,11 @@ LinearRing Polygon::interiorRing(int index)
     return LinearRing(get()->getInteriorRing(index));
 }
 
+int Polygon::interiorRingCount()
+{
+    return get()->getNumInteriorRings();
+}
+
 GeometryPtr<OGRGeometry> Polygon::getLinearGeometry()
 {
     return GeometryPtr<OGRGeometry>(get()->getLinearGeometry());

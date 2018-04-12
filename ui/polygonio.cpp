@@ -22,11 +22,24 @@ static void addLineToGeoPath(const gdal::CoordinateTransformer& transformer, QGe
     }
 }
 
-static void addPolyToGeoPath(const gdal::CoordinateTransformer& transformer, QGeoPath& path, gdal::Polygon& poly)
+static void addPolyToGeoPath(const gdal::CoordinateTransformer& transformer, std::vector<QGeoPath>& geoPaths, gdal::Polygon& poly)
 {
     auto ring = poly.exteriorRing();
-    for (auto& point : ring) {
-        addPointToGeoPath(transformer, path, point);
+    {
+        QGeoPath path;
+        for (auto& point : ring) {
+            addPointToGeoPath(transformer, path, point);
+        }
+        geoPaths.push_back(path);
+    }
+
+    for (int i = 0; i < poly.interiorRingCount(); ++i) {
+        QGeoPath path;
+        ring = poly.interiorRing(i);
+        for (auto& point : ring) {
+            addPointToGeoPath(transformer, path, point);
+        }
+        geoPaths.push_back(path);
     }
 }
 
@@ -53,19 +66,15 @@ static std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gda
             break;
         }
         case gdal::Geometry::Type::Polygon: {
-            QGeoPath path;
             auto poly = geometry.as<gdal::Polygon>();
-            addPolyToGeoPath(transformer, path, poly);
-            geoPaths.push_back(path);
+            addPolyToGeoPath(transformer, geoPaths, poly);
             break;
         }
         case gdal::Geometry::Type::MultiPolygon: {
             auto multiPoly = geometry.as<gdal::MultiPolygon>();
             for (int i = 0; i < multiPoly.size(); ++i) {
-                QGeoPath path;
                 auto poly = multiPoly.polygonAt(i);
-                addPolyToGeoPath(transformer, path, poly);
-                geoPaths.push_back(path);
+                addPolyToGeoPath(transformer, geoPaths, poly);
             }
             break;
         }
