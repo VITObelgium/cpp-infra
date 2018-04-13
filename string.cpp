@@ -40,6 +40,19 @@ std::optional<long> toInt(std::string_view str) noexcept
     return result;
 }
 
+std::optional<int64_t> toInt64(std::string_view str) noexcept
+{
+    std::string s(str);
+
+    char* end      = nullptr;
+    int64_t result = std::strtoll(s.c_str(), &end, 10);
+    if (end == s.c_str()) {
+        return std::optional<int64_t>();
+    }
+
+    return result;
+}
+
 std::optional<double> toFloatingPoint(std::string_view str) noexcept
 {
     std::string s(str);

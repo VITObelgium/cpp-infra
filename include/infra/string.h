@@ -16,6 +16,7 @@ bool containsValidInteger(std::string_view str);
 bool containsValidFloatingPoint(std::string_view str);
 
 std::optional<long> toInt(std::string_view str) noexcept;
+std::optional<int64_t> toInt64(std::string_view str) noexcept;
 std::optional<double> toFloatingPoint(std::string_view str) noexcept;
 
 bool iequals(std::string_view str1, std::string_view str2);
@@ -73,12 +74,14 @@ std::string join(const Container& items, std::string_view joinString)
         std::ostringstream ss;
         for (auto iter = items.cbegin(); iter != items.cend(); ++iter) {
             ss << *iter;
-            if (iter + 1 != items.cend()) {
+            if (next(iter) != items.cend()) {
                 ss << joinString;
             }
         }
 
         result = ss.str();
+    } else if constexpr (std::is_same_v<true, std::true_type::value>) {
+        static_assert(false, "invalid invocation");
     }
 
     return result;
