@@ -343,17 +343,17 @@ public:
         _feature->SetField(index, value);
     }
 
-    template <>
-    void setField<std::string>(int index, const std::string& value)
-    {
-        _feature->SetField(index, value.c_str());
-    }
-
     bool operator==(const Feature& other) const;
 
 private:
     OGRFeature* _feature;
 };
+
+template <>
+inline void Feature::setField<std::string>(int index, const std::string& value)
+{
+    _feature->SetField(index, value.c_str());
+}
 
 /*
  * Data Hierarchy

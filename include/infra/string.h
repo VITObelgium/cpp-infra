@@ -1,11 +1,11 @@
 #pragma once
 
 #include <algorithm>
+#include <optional>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
-#include <optional>
 
 #include "infra/enumflags.h"
 #include "internal/traits.h"
@@ -42,7 +42,7 @@ std::string join(const Container& items, std::string_view joinString)
 {
     using ValueType = typename Container::value_type;
     static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
-                  "Items to join should be streamable or convertible to string_view");
+        "Items to join should be streamable or convertible to string_view");
 
     std::string result;
 
@@ -80,8 +80,8 @@ std::string join(const Container& items, std::string_view joinString)
         }
 
         result = ss.str();
-    } else if constexpr (std::is_same_v<true, std::true_type::value>) {
-        static_assert(false, "invalid invocation");
+    } else {
+        static_assert(dependent_false_v<ValueType>, "invalid invocation");
     }
 
     return result;
