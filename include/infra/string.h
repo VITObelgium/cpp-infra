@@ -8,7 +8,8 @@
 #include <vector>
 
 #include "infra/enumflags.h"
-#include "internal/traits.h"
+#include "infra/internal/traits.h"
+#include "infra/typetraits.h"
 
 namespace infra::str {
 

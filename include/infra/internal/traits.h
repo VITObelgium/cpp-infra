@@ -41,12 +41,4 @@ public:
 template <typename T>
 inline constexpr bool is_streamable_v = is_streamable<T>::value;
 
-template <typename T>
-struct dependent_false : std::false_type
-{
-};
-
-template <typename T>
-inline constexpr bool dependent_false_v = dependent_false<T>::value;
-
 } // namespace utils
