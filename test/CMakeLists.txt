@@ -26,4 +26,4 @@ target_link_libraries(infratest
 
 target_compile_definitions(infratest PRIVATE -DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
-gtest_discover_tests(infratest)
+add_test(NAME infratest COMMAND infratest)
