@@ -110,7 +110,35 @@ enum class SplitOpt
 };
 
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-std::vector<std::string> split(std::string_view str, const std::string& delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+
+template <typename ResultType, typename ConversionFunc>
+std::vector<ResultType> splitTo(std::string_view str, char delimiter, ConversionFunc convFunc)
+{
+    auto splitted = splitView(str, delimiter);
+
+    std::vector<ResultType> result;
+    result.reserve(splitted.size());
+    for (auto& v : splitted) {
+        result.emplace_back(convFunc(v));
+    }
+
+    return result;
+}
+
+template <typename ResultType, typename ConversionFunc>
+std::vector<ResultType> splitTo(std::string_view str, std::string_view delimiter, ConversionFunc convFunc)
+{
+    auto splitted = splitView(str, delimiter);
+
+    std::vector<ResultType> result;
+    result.reserve(splitted.size());
+    for (auto& v : splitted) {
+        result.emplace_back(convFunc(v));
+    }
+
+    return result;
+}
 
 std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());

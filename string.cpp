@@ -280,7 +280,7 @@ std::vector<std::string> split(std::string_view str, char delimiter, Flags<Split
     return tokens;
 }
 
-std::vector<std::string> split(std::string_view str, const std::string& delimiter, Flags<SplitOpt> opt)
+std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
 {
     auto splitted = splitView(str, delimiter, opt);
 
