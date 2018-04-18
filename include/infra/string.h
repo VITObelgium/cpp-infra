@@ -112,6 +112,9 @@ enum class SplitOpt
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
+std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> splitTo(std::string_view str, char delimiter, ConversionFunc convFunc)
 {
@@ -139,9 +142,6 @@ std::vector<ResultType> splitTo(std::string_view str, std::string_view delimiter
 
     return result;
 }
-
-std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
 inline constexpr Flags<SplitOpt> operator|(SplitOpt lhs, SplitOpt rhs) noexcept
 {
