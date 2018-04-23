@@ -27,14 +27,14 @@ bool containsValidFloatingPoint(std::string_view str)
     return (end != nullptr && *end == 0);
 }
 
-std::optional<long> toInt(std::string_view str) noexcept
+std::optional<int32_t> toInt32(std::string_view str) noexcept
 {
     std::string s(str);
 
     char* end   = nullptr;
     long result = std::strtol(s.c_str(), &end, 10);
     if (end == s.c_str()) {
-        return std::optional<long>();
+        return std::optional<int32_t>();
     }
 
     return result;

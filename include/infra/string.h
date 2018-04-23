@@ -16,7 +16,7 @@ namespace infra::str {
 bool containsValidInteger(std::string_view str);
 bool containsValidFloatingPoint(std::string_view str);
 
-std::optional<long> toInt(std::string_view str) noexcept;
+std::optional<int32_t> toInt32(std::string_view str) noexcept;
 std::optional<int64_t> toInt64(std::string_view str) noexcept;
 std::optional<double> toFloatingPoint(std::string_view str) noexcept;
 
