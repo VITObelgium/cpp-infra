@@ -130,7 +130,12 @@ if (INFRA_UI_COMPONENTS)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
-    set(INFRA_UI_FILES ui/toolboxitem.ui ui/aboutdialog.ui ui/comboxtableview.ui)
+    set(INFRA_UI_FILES
+        ui/toolboxitem.ui
+        ui/aboutdialog.ui
+        ui/comboxtableview.ui
+        ui/stringinputdialog.ui
+    )
     if (INFRA_LOGGING)
         list(APPEND INFRA_UI_FILES ui/logview.ui)
     endif ()
@@ -147,7 +152,8 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/scopedcursor.h
         include/uiinfra/toolboxview.h ui/toolboxview.cpp
-        include/uiinfra/userinput.h
+        include/uiinfra/userinput.h ui/userinput.cpp
+        include/uiinfra/stringinputdialog.h ui/stringinputdialog.cpp
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
         include/uiinfra/numericitemdelegates.h ui/numericitemdelegates.cpp

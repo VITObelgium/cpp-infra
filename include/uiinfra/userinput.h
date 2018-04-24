@@ -4,20 +4,8 @@
 
 namespace uiinfra {
 
-inline bool askForConfirmation(const QString& title, const QString& message)
-{
-    QMessageBox mb(title, message,
-                   QMessageBox::Question,
-                   QMessageBox::Yes | QMessageBox::Default,
-                   QMessageBox::No | QMessageBox::Escape,
-                   QMessageBox::NoButton);
+bool askForConfirmation(const QString& title, const QString& message);
+QString askForString(QWidget* parent, const QString& title, const QString& name);
 
-    return mb.exec() == QMessageBox::Yes;
-}
-
-inline void displayError(const QString& title, const QString& message)
-{
-    QMessageBox mb(title, message, QMessageBox::Critical, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
-    mb.exec();
-}
+void displayError(const QString& title, const QString& message);
 }
