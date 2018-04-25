@@ -21,7 +21,8 @@ std::optional<int64_t> toInt64(std::string_view str) noexcept;
 std::optional<double> toFloatingPoint(std::string_view str) noexcept;
 
 bool iequals(std::string_view str1, std::string_view str2);
-void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
+void replaceInPlace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
+std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace);
 
 [[nodiscard]] std::string lowercase(std::string_view str);
 [[nodiscard]] std::string uppercase(std::string_view str);

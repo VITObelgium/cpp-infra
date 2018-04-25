@@ -81,7 +81,7 @@ bool iequals(std::string_view str1, std::string_view str2)
     return true;
 }
 
-void replace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
+void replaceInPlace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
 {
     size_t startPos = 0;
     size_t foundPos;
@@ -90,6 +90,13 @@ void replace(std::string& aString, std::string_view toSearch, std::string_view t
         aString.replace(foundPos, toSearch.length(), toReplace);
         startPos = foundPos + toReplace.size();
     }
+}
+
+std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace)
+{
+    std::string result(aString);
+    replaceInPlace(result, toSearch, toReplace);
+    return result;
 }
 
 std::string lowercase(std::string_view str)
