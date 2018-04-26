@@ -439,18 +439,10 @@ static GDALDataset* createDataSet(const fs::path& filePath,
     const char* const* drivers,
     const std::vector<std::string>& driverOpts)
 {
-    std::string path = filePath.string();
-#ifdef WIN32
-    // on windows the /vsimem/file.asc in memory path is translated to \\vsimem\\file.asc by fs::path
-    // which is not recognized by gdal, translate it back to forward slashes
-    if (path.find("\\vsimem\\") == 0) {
-        for (auto& c : path) {
-            if (c == '\\') {
-                c = '/';
-            }
-        }
-    }
-#endif
+    // use generic_string otherwise the path contains backslashes on windows
+    // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
+    // which is not recognized by gdal
+    std::string path = filePath.generic_string();
 
     auto options = createOptionsArray(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
