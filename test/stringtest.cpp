@@ -65,15 +65,24 @@ TEST(StringTest, Iequals)
     EXPECT_FALSE(str::iequals("", "TEST"));
 }
 
-TEST(StringTest, Replace)
+TEST(StringTest, ReplaceInPlace)
 {
     string testString = "abcaabbabbab";
-    str::replace(testString, "ab", "a");
+    str::replaceInPlace(testString, "ab", "a");
     EXPECT_EQ("acaababa", testString);
 
     testString = "stringstringstring";
-    str::replace(testString, "stringstring", "string");
+    str::replaceInPlace(testString, "stringstring", "string");
     EXPECT_EQ("stringstring", testString);
+}
+
+TEST(StringTest, Replace)
+{
+    string testString = "abcaabbabbab";
+    EXPECT_EQ("acaababa", str::replace(testString, "ab", "a"));
+
+    testString = "stringstringstring";
+    EXPECT_EQ("stringstring", str::replace(testString, "stringstring", "string"));
 }
 
 TEST(StringOperationsTest, Split)
