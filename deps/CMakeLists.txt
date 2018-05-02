@@ -4,6 +4,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-scripts/scripts
 
 include(ExternalProject)
 include(Autotools)
+include(CMakeArguments)
 
 option(BUILD_UI "Build the user interface" OFF)
 option(STATIC_RUNTIME "Use static msvc runtime" ON)
