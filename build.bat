@@ -16,10 +16,10 @@ cmake  ^
     -DCMAKE_GENERATOR_PLATFORM=x64 ^
     -DCMAKE_TOOLCHAIN_FILE="%projectdir%\deps\cmake-scripts\toolchain-msvc-dynamic-runtime.cmake" ^
     -DCMAKE_INSTALL_PREFIX="%prefix_dir%" ^
-    -DCMAKE_PREFIX_PATH="%prefix_dir%;C:\Qt\5.10.0\msvc2017_64" ^
+    -DCMAKE_PREFIX_PATH="%prefix_dir%;C:\Qt\5.10.1\msvc2017_64" ^
     -DBUILD_UI=ON ^
     -DSTATIC_QT=OFF ^
-    -DSTATIC_PLUGINS=OFF ^
+    -DSTATIC_PLUGINS=ON ^
     ..\..
 cmake --build . --config Debug
 pause
