@@ -61,8 +61,9 @@ add_library(stationinfoprovider STATIC
     StationInfoProvider.cpp
 )
 
-target_link_libraries(hdf5buffer opaqcore hdf5tools hdf5_cpp-static)
-target_link_libraries(riooutputbuffer opaqcore hdf5tools hdf5_cpp-static)
+target_link_libraries(hdf5tools hdf5::hdf5_cpp-static)
+target_link_libraries(hdf5buffer opaqcore hdf5tools)
+target_link_libraries(riooutputbuffer opaqcore hdf5tools)
 target_link_libraries(sqlbuffer opaqcore Sqlpp11::Sqlpp11 Sqlpp11::Sqlite3)
 target_link_libraries(rioobsprovider opaqcore)
 target_link_libraries(asciiforecastwriter opaqcore)

@@ -85,14 +85,22 @@ source_group(data FILES ${CORE_DATA_SOURCES})
 add_library(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES} ${CORE_DATA_SOURCES})
 target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(opaqcore
+PUBLIC
     fmt::fmt
+    spdlog::spdlog
+    TinyXml::TinyXml
+    Boost::disable_autolinking 
+PRIVATE
     Boost::system
     Boost::filesystem
     Boost::iostreams
-    Boost::disable_autolinking 
-    ${TINYXML_LIBRARY}
     ${EXTRA_LIBS}
     ${CMAKE_DL_LIBS}
+)
+
+# We use our own version of FMT, let spdlog use the same version
+target_compile_definitions(opaqcore PUBLIC
+    SPDLOG_FMT_EXTERNAL
 )
 
 set_target_properties(opaqcore PROPERTIES POSITION_INDEPENDENT_CODE ON)
