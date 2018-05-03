@@ -29,7 +29,6 @@ add_library(infra
     include/infra/filesystem.h filesystem.cpp
     include/infra/color.h color.cpp
     include/infra/colormap.h colormap.cpp
-    include/infra/geometadata.h geometadata.cpp
     include/infra/threadpool.h threadpool.cpp
     include/infra/typetraits.h
 
@@ -71,6 +70,7 @@ if (INFRA_GDAL)
         include/infra/gdal.h gdal.cpp
         include/infra/gdalalgo.h gdalalgo.cpp
         include/infra/gdalgeometry.h gdalgeometry.cpp
+        include/infra/geometadata.h geometadata.cpp
         include/infra/internal/gdalinternal.h
     )
 
