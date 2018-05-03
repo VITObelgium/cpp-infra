@@ -10,7 +10,7 @@ add_library(mpl_feedforward STATIC
     transfcn.h
 )
 set_target_properties(mpl_feedforward PROPERTIES POSITION_INDEPENDENT_CODE ON)
-target_link_libraries(mpl_feedforward PUBLIC Eigen3::Eigen)
+target_link_libraries(mpl_feedforward PUBLIC Eigen3::Eigen TinyXml::TinyXml)
 
 add_library(ovl_ircel_model1 STATIC
     OVL_IRCEL_model1.h
