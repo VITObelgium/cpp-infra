@@ -5,6 +5,7 @@ option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
+option(INFRA_XML "Enable xml config reader" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
@@ -69,6 +70,14 @@ if (INFRA_LOGGING)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
     # make sure spdlog does not use its internal version of fmt
     target_compile_definitions(infra PUBLIC SPDLOG_FMT_EXTERNAL)
+endif ()
+
+if (INFRA_XML)
+    find_package(pugixml REQUIRED)
+    target_sources(infra PRIVATE
+        include/infra/configreader.h configreader.cpp
+    )
+    target_link_libraries(infra PRIVATE pugixml)
 endif ()
 
 if (INFRA_GDAL)
