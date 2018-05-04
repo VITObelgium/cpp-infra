@@ -33,6 +33,7 @@ add_subdirectory(cmake-scripts/date)
 add_subdirectory(cmake-scripts/sqlpp11)
 add_subdirectory(cmake-scripts/sqlpp11-connector-sqlite3)
 add_subdirectory(cmake-scripts/tinyxml)
+add_subdirectory(cmake-scripts/pugixml)
 add_subdirectory(cmake-scripts/libressl)
 
 if (NOT CMAKE_CROSSCOMPILING OR MINGW)
