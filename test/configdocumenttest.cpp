@@ -34,4 +34,14 @@ TEST(ConfigReaderTest, readFromString)
     EXPECT_EQ("some text", xmlNode.selectChild("node3").value());
 }
 
+TEST(ConfigReaderTest, iterateChildren)
+{
+    auto doc     = ConfigDocument::loadFromString(xmlData);
+    auto xmlNode = doc.child("xml");
+
+    /*std::vector<std::string> childNames;
+    for (auto& child : xmlNode.children()) {
+    }*/
+}
+
 }
