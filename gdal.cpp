@@ -89,18 +89,7 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
 
 static std::string getExtenstion(const fs::path& filepath)
 {
-#ifdef HAVE_EXP_FILESYSTEM_H
     return filepath.extension().string();
-#else
-    std::string extension;
-    auto path                  = filepath.string();
-    std::string::size_type pos = path.find_last_of('.');
-    if (pos != std::string::npos && pos != path.size()) {
-        extension = std::string(path.substr(pos, path.size()));
-    }
-
-    return extension;
-#endif
 }
 
 template <typename Unsigned, typename Signed>
