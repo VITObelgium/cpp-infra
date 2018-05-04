@@ -18,7 +18,24 @@ bool containsValidFloatingPoint(std::string_view str);
 
 std::optional<int32_t> toInt32(std::string_view str) noexcept;
 std::optional<int64_t> toInt64(std::string_view str) noexcept;
-std::optional<double> toFloatingPoint(std::string_view str) noexcept;
+std::optional<float> toFloat(std::string_view str) noexcept;
+std::optional<double> toDouble(std::string_view str) noexcept;
+
+template <typename T>
+std::optional<T> toNumeric(std::string_view str) noexcept
+{
+    if constexpr (std::is_same_v<int32_t, T>) {
+        return toInt32(str);
+    } else if constexpr (std::is_same_v<int64_t, T>) {
+        return toInt64(str);
+    } else if constexpr (std::is_same_v<double, T>) {
+        return toFloat(str);
+    } else if constexpr (std::is_same_v<double, T>) {
+        return toDouble(str);
+    } else if constexpr (dependent_false_v<T>) {
+        static_assert(false, "Invalid type provided");
+    }
+}
 
 bool iequals(std::string_view str1, std::string_view str2);
 void replaceInPlace(std::string& aString, std::string_view toSearch, std::string_view toReplace);
@@ -148,4 +165,4 @@ inline constexpr Flags<SplitOpt> operator|(SplitOpt lhs, SplitOpt rhs) noexcept
 {
     return Flags<SplitOpt>() | lhs | rhs;
 }
-}
+} // namespace infra::str

@@ -53,7 +53,20 @@ std::optional<int64_t> toInt64(std::string_view str) noexcept
     return result;
 }
 
-std::optional<double> toFloatingPoint(std::string_view str) noexcept
+std::optional<float> toFloat(std::string_view str) noexcept
+{
+    std::string s(str);
+
+    char* end    = nullptr;
+    float result = std::strtof(s.c_str(), &end);
+    if (end == s.c_str()) {
+        return std::optional<float>();
+    }
+
+    return result;
+}
+
+std::optional<double> toDouble(std::string_view str) noexcept
 {
     std::string s(str);
 

@@ -76,7 +76,7 @@ endif ()
 if (INFRA_XML)
     find_package(pugixml REQUIRED)
     target_sources(infra PRIVATE
-        include/infra/configreader.h configreader.cpp
+        include/infra/configdocument.h configdocument.cpp
     )
     target_link_libraries(infra PRIVATE pugixml)
 endif ()
@@ -199,6 +199,8 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/logview.h ui/logview.cpp
             include/uiinfra/logsinkmodel.h ui/logsinkmodel.cpp
         )
+
+        target_compile_definitions(infratest PUBLIC HAVE_INFRA_LOG)
     endif ()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
