@@ -13,6 +13,12 @@ namespace fs = std::filesystem;
 namespace fs = std::experimental::filesystem;
 #endif
 
+#if defined HAVE_FILESYSTEM_H || defined HAVE_EXP_FILESYSTEM_H
+#define INFRA_HAS_FILESYSTEM
+#endif
+
+#ifdef INFRA_HAS_FILESYSTEM
+
 namespace infra {
 
 /*! Create the specified directory and all parent directories if it does
@@ -38,3 +44,5 @@ fs::path combinePath(const fs::path& baseDir, const fs::path& file);
 
 std::string readTextFile(const fs::path& filename);
 }
+
+#endif

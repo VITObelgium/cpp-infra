@@ -4,6 +4,8 @@
 #include <fstream>
 #include <sstream>
 
+#ifdef INFRA_HAS_FILESYSTEM
+
 namespace infra {
 
 fs::path make_preferred(const fs::path& p)
@@ -59,3 +61,5 @@ std::string readTextFile(const fs::path& filename)
     return buffer.str();
 }
 }
+
+#endif
