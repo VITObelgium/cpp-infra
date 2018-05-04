@@ -1,62 +1,52 @@
-#ifndef __POLLUTANTMANAGER_H
-#define __POLLUTANTMANAGER_H 
+#pragma once
 
 #include "Logger.h"
 #include "Pollutant.h"
 
-namespace OPAQ {
-  
-  namespace Config {
-    /**
+namespace opaq
+{
+
+namespace config
+{
+/**
      * Singleton pollutant manager class
      * Presents the available pollutants, defined in the configuration file to the OPAQ framework
      */
-    class PollutantManager {
-    public:
-      /** 
-	  Returns the instance of the singleton pollutant manager object.
-	  As this is singleton class, there is no public constructor. 
+class PollutantManager
+{
+public:
+    PollutantManager();
+    PollutantManager(const PollutantManager&) = delete;
+    void operator=(const PollutantManager&) = delete;
+
+    /**
+      Output streamer for the pollutant manager
+      Streams a list of the pollutants to the os, e.g. called via
+      \param os output streamer
+      \param s  const reference to the pollutant manager
       */
-      static PollutantManager *getInstance();
+    friend std::ostream& operator<<(std::ostream& os, const PollutantManager& s);
 
-      virtual ~PollutantManager();
-
-      /** 
-	  Output streamer for the pollutant manager
-	  Streams a list of the pollutants to the os, e.g. called via
-	  \param os output streamer
-	  \param s  const reference to the pollutant manager
-      */
-      friend std::ostream& operator<<(std::ostream& os, const PollutantManager& s );
-
-      /** Returns a reference to the list of the available pollutants
+    /** Returns a reference to the list of the available pollutants
        */
-      std::vector<OPAQ::Pollutant> &getList(){ return pollutants; }
+    const std::vector<Pollutant>& getList() { return _pollutants; }
 
-      /** Searches for a pollutant of given name and returns a pointer to the pollutant object */
-      OPAQ::Pollutant *find( std::string name );
+    /** Searches for a pollutant of given name and returns a pointer to the pollutant object */
+    Pollutant find(const std::string& name);
 
-      /** Configures the pollutant manager from the XML element
-	  \param config const pointer to the TiXmlElement
-	  This member function will push back OPAQ::Pollutants to the list for each 
-	  "<pollutant>" found in the "<pollutants>" section
+    /** Configures the pollutant manager from the XML element
+      \param config const pointer to the TiXmlElement
+      This member function will push back OPAQ::Pollutants to the list for each
+      "<pollutant>" found in the "<pollutants>" section
       */
-      void configure (TiXmlElement const * config);
+    void configure(TiXmlElement const* config);
 
-    private:
-      /** Private constructor for singleton class */
-      PollutantManager();
-      PollutantManager(PollutantManager const&); // no implementation of copy constructor for singleton
-      void operator=(PollutantManager const&);   // no implementation of copy constructor for singleton
+private:
+    // list of the available pollutants
+    std::vector<Pollutant> _pollutants; //!< list of available pollutants
+    Logger _logger;
+};
 
-      // list of the available pollutants
-      std::vector<OPAQ::Pollutant> pollutants; //!< list of available pollutants
+}
+}
 
-      LOGGER_DEC();
-    };
-
-  } /* namespace Config */
-
-} /* namespace OPAQ */
-
-#endif /* #ifndef __POLLUTANTMANAGER_H */

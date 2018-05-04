@@ -3,36 +3,45 @@
 
 #include "Pollutant.h"
 
-namespace OPAQ {
+namespace opaq
+{
 
-  Pollutant::Pollutant() :
-	  id(0) {
-  }
-   
-  Pollutant::Pollutant( TiXmlElement const *el ) {
+Pollutant::Pollutant()
+: _id(0)
+{
+}
+
+Pollutant::Pollutant(long id, std::string name, std::string unit, std::string desc)
+: _id(id)
+, _name(std::move(name))
+, _unit(std::move(unit))
+, _desc(std::move(desc))
+{
+}
+
+Pollutant::Pollutant(TiXmlElement const* el)
+{
 
     // convert id_string to long (no direct long query in tinyxml)
     std::string str;
-    el->QueryStringAttribute( "id", &str );
-    this->id = atol( str.c_str() );
+    el->QueryStringAttribute("id", &str);
+    _id = atol(str.c_str());
 
-    el->QueryStringAttribute( "name", &(this->name) );
-    el->QueryStringAttribute( "unit", &(this->unit) );
-    this->desc = el->GetText();
-  }
-  
-  Pollutant::~Pollutant(){
-  }
+    el->QueryStringAttribute("name", &(_name));
+    el->QueryStringAttribute("unit", &(_unit));
+    _desc = el->GetText();
+}
 
-  std::string Pollutant::toString() {
-	  std::stringstream ss;
-	  ss << *this;
-	  return ss.str();
-  }
+std::string Pollutant::toString() const
+{
+    std::stringstream ss;
+    ss << *this;
+    return ss.str();
+}
 
-  std::ostream& operator<<(std::ostream& os, const Pollutant& s ) {
-    os << "[pollutant]: " << s.name << " : " << s.desc;
+std::ostream& operator<<(std::ostream& os, const Pollutant& s)
+{
+    os << "[pollutant]: " << s._name << " : " << s._desc;
     return os;
-  }
-
+}
 }

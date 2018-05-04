@@ -1,65 +1,56 @@
-/*
- * Location.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys
- */
-
-#ifndef OPAQ_LOCATION_H_
-#define OPAQ_LOCATION_H_
+#pragma once
 
 #include <string>
 #include <vector>
 
-namespace OPAQ {
-    
-  /** 
+namespace opaq
+{
+
+/**
       Class for a point location.
-      Holds the x,y,z coordinates of a point location with some setters/getters. 
+      Holds the x,y,z coordinates of a point location with some setters/getters.
       Is in OPAQ the parent class for a station
    */
-  class Point {
-  public:
-    /** empty constructor */
+class Point
+{
+public:
     Point();
 
-    /** construct point from an ID for the location and x,y coordinates, no height given (z) 
-	\param ID an ID for the current point, could be e.g. station number
-	\param X x-coordinate
-	\param Y y-coordinate
+    /** construct point from an ID for the location and x,y coordinates, no height given (z)
+  \param ID an ID for the current point, could be e.g. station number
+  \param X x-coordinate
+  \param Y y-coordinate
     */
-    Point( long ID, double X, double Y );
+    Point(long ID, double X, double Y);
+
+    virtual ~Point() = default;
 
     /** construct point from an ID for the location and x,y and z coordinates
-	\param ID an ID for the current point, could be e.g. station number
-	\param X x-coordinate
-	\param Y y-coordinate
-	\param Z z-coordinage
+  \param ID an ID for the current point, could be e.g. station number
+  \param X x-coordinate
+  \param Y y-coordinate
+  \param Z z-coordinage
     */
-    Point( long ID, double X, double Y, double Z );
+    Point(long ID, double X, double Y, double Z);
 
-    virtual ~Point() = 0;
-    
     /** return the point ID */
-    long   getId() const { return id; }
+    long getId() const { return _id; }
 
     /** set the point ID to the given value */
-    void   setId(long id) { this->id = id; }
+    void setId(long id) { _id = id; }
 
-    double getX() const { return x; }
-    void   setX(double x) { this->x = x; }
-    double getY() const { return y; }
-    void   setY(double y) { this->y = y; }
-    double getZ() const { return z; }
-    void   setZ(double z) { this->z = z; }
-    
-  private:
-    long id;   //!< a unique ID for the point location
-    double x;  //!< location x coordinate (in Euclidean system)
-    double y;  //!< location y coordinate (in Euclidean system)
-    double z;  //!< location altitude above zero plane
-  };
-  
-  
-} /* namespace opaq */
-#endif /* OPAQ_Point_H_ */
+    double getX() const { return _x; }
+    void setX(double x) { _x = x; }
+    double getY() const { return _y; }
+    void setY(double y) { _y = y; }
+    double getZ() const { return _z; }
+    void setZ(double z) { _z = z; }
+
+private:
+    long _id;  //!< a unique ID for the point location
+    double _x; //!< location x coordinate (in Euclidean system)
+    double _y; //!< location y coordinate (in Euclidean system)
+    double _z; //!< location altitude above zero plane
+};
+
+}

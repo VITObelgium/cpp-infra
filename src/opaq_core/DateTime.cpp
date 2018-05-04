@@ -1,69 +1,92 @@
-/*
- * DateTime.cpp
- *
- *  Created on: 2014
- *      Author: Stijn.VanLooy@vito.be
- */
-
-#include <string.h>
-#include <time.h>
-
 #include "DateTime.h"
-#include "TimeInterval.h"
+#include "Exceptions.h"
 
-namespace OPAQ {
+#include <ctime>
+#include <iomanip>
+#include <sstream>
 
-DateTime::DateTime() {
-    _year  = 0;
-    _month = 0;
-    _day   = 0;
-    _hour  = 0;
-    _min   = 0;
-    _sec   = 0;
+#include <fmt/format.h>
+
+namespace opaq
+{
+namespace chrono
+{
+
+std::string to_dense_date_string(const date_time& dt)
+{
+    const auto ymd = date::year_month_day(date::floor<date::days>(dt));
+    return fmt::format("{}{:0=2}{:0=2}", static_cast<int>(ymd.year()), static_cast<unsigned>(ymd.month()), static_cast<unsigned>(ymd.day()));
 }
 
-
-DateTime::DateTime( const std::string& s ) {
-
-	struct tm t;
-
-	memset( &t, 0, sizeof(struct tm) );
-	strptime( s.c_str(), "%Y-%m-%d %H:%M%S", &t );
-
-	_year  = t.tm_year + 1900;
-	_month = t.tm_mon + 1;
-	_day   = t.tm_mday;
-	_hour  = t.tm_hour;
-	_min   = t.tm_min;
-	_sec   = t.tm_sec;
+std::string to_date_string(const date_time& dt)
+{
+    const auto ymd = date::year_month_day(date::floor<date::days>(dt));
+    return fmt::format("{}-{:0=2}-{:0=2}", static_cast<int>(ymd.year()), static_cast<unsigned>(ymd.month()), static_cast<unsigned>(ymd.day()));
 }
 
-const DateTime DateTime::operator+ (const TimeInterval &timeInterval) const {
-	DateTime out = *this;
-	out.addSeconds(timeInterval.getSeconds());
-	return out;
+std::string to_string(const date_time& dt)
+{
+    const auto days = date::floor<date::days>(dt);
+    const auto ymd = date::year_month_day(days);
+    const auto time = date::make_time(dt-days).make24();
+
+    return fmt::format("{}-{:0=2}-{:0=2} {:0=2}:{:0=2}:{:0=2}",
+                        static_cast<int>(ymd.year()),
+                        static_cast<unsigned>(ymd.month()),
+                        static_cast<unsigned>(ymd.day()),
+                        time.hours().count(),
+                        time.minutes().count(),
+                        time.seconds().count());
 }
 
-const DateTime DateTime::operator- (const TimeInterval &timeInterval) const {
-	DateTime out = *this;
-	out.addSeconds(- timeInterval.getSeconds());
-	return out;
+date_time from_date_string(const std::string& s)
+{
+    std::stringstream input(s);
+
+    std::tm tm{ 0 };
+    input >> std::get_time(&tm, "%Y-%m-%d");
+    if (input.fail())
+    {
+        throw InvalidArgumentsException("Could not parse date: {}", s);
+    }
+
+    return make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 }
 
-bool DateTime::isValid() const {
+date_time from_date_time_string(const std::string& s)
+{
+    std::stringstream input(s);
 
-	struct tm t;
-	memset( &t, 0, sizeof(struct tm) );
-	t.tm_year = _year - 1900;
-	t.tm_mon  = _month-1;
-	t.tm_mday = _day;
-	t.tm_hour = _hour;
-	t.tm_min  = _min;
-	t.tm_sec  = _sec;
+    std::tm tm{ 0 };
+    input >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
+    if (input.fail())
+    {
+        throw InvalidArgumentsException("Could not parse date time: {}", s);
+    }
 
-	if ( mktime( &t ) < 0 ) return false;
-	return true;
+    auto date = make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
+    date += std::chrono::hours(tm.tm_hour);
+    date += std::chrono::minutes(tm.tm_min);
+    date += std::chrono::seconds(tm.tm_sec);
+
+    return date;
 }
 
+date_time make_date_time(date::year_month_day ymd)
+{
+    return date::sys_days(ymd);
+}
 
+date_time make_date_time(int year, int month, int day)
+{
+    return make_date_time(date::year_month_day(date::year(year), date::month(month), date::day(day)));
+}
+
+bool is_weekend(const date_time& dt)
+{
+    auto weekDay = date::weekday(date::sys_days(date::floor<days>(dt)));
+    return weekDay == date::sun || weekDay == date::sat;
+}
+
+}
 }

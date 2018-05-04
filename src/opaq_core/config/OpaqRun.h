@@ -5,119 +5,89 @@
  *      Author: vlooys
  */
 
-#ifndef OPAQ_OPAQRUN_H
-#define OPAQ_OPAQRUN_H
+#pragma once
 
-#include <string>
-#include <tinyxml.h>
-#include <vector>
-
+#include "../Aggregation.h"
+#include "../DateTime.h"
+#include "../Logger.h"
+#include "../Pollutant.h"
 #include "Component.h"
 #include "ForecastStage.h"
 #include "MappingStage.h"
 #include "Plugin.h"
-#include "../Logger.h"
-#include "../Pollutant.h"
-#include "../Aggregation.h"
-#include "../DateTime.h"
 
-namespace OPAQ {
+#include <string>
+#include <tinyxml.h>
+#include <vector>
+#include <boost/optional.hpp>
 
-  namespace Config {
+namespace opaq
+{
 
-    /**
-     * Class containing the main workflow for an OPAQ run
-     * This class contains the different stages, the network providers, the grid provider
-     * and all the information needed for executing an OPAQ run. The run method of the
-     * OPAQ engine needs an object of this class to execute.
-     */
-    class OpaqRun {
-    public:
-      OpaqRun();
-      virtual ~OpaqRun();
-      
-      LOGGER_DEC();
+namespace config
+{
 
-      /** Returns a list of available plugins */
-      std::vector<OPAQ::Config::Plugin>    & getPlugins() { return plugins; }
+/**
+  * Class containing the main workflow for an OPAQ run
+  * This class contains the different stages, the network providers, the grid provider
+  * and all the information needed for executing an OPAQ run. The run method of the
+  * OPAQ engine needs an object of this class to execute.
+  */
+class OpaqRun
+{
+public:
+    OpaqRun();
 
-      /** Returns a list of available components */
-      std::vector<OPAQ::Config::Component> & getComponents() { return components; }
+    void addPlugin(const Plugin& plugin);
+    void addComponent(const Component& component);
 
-      /** Returns the pollutant name requested for this run */
-      std::string getPollutantName() const { return pollutantName; }
-      bool pollutantIsSet () { return pollutantSet; }
+    Plugin getPlugin(const std::string& pluginName);
+    const Component& getComponent(const std::string& componentName);
 
-      /** Returns the aggreagation requested for this run */
-      OPAQ::Aggregation::Type getAggregation() const { return aggregation; }
+    std::vector<Plugin> getPlugins();
+    std::vector<Component> getComponents();
 
-      /** Returns a list of basetimes */
-      std::vector<OPAQ::DateTime> & getBaseTimes() { return baseTimes; }
+    std::string getPollutantName() const;
+    bool pollutantIsSet() const noexcept;
 
-      /** Returns the nework provider */
-      OPAQ::Config::Component *getNetworkProvider() const { return networkProvider; }
-      /** Returns the grid provider */
-      OPAQ::Config::Component *getGridProvider() const { return gridProvider; }
-    
-      /** Retrieve the forecast configuration object */
-      OPAQ::Config::ForecastStage* getForecastStage() const { return forecastStage;  }
+    Aggregation::Type getAggregation() const;
 
-      /** Retrieve the mapping stage object */
-      OPAQ::Config::MappingStage* getMappingStage() const { return mappingStage; }
+    std::vector<chrono::date_time> getBaseTimes() const;
+    void addBaseTime(const chrono::date_time& dt);
+    void clearBaseTimes();
 
-      /** Set the requested pollutant & aggregation for this run */
-      void setPollutantName( const std::string& name, const std::string& aggr = "" ) {
-    	  pollutantName = name;
-    	  aggregation   = Aggregation::fromString( aggr );
-    	  pollutantSet  = true;
-      }
+    boost::optional<Component> getNetworkProvider() const;
+    boost::optional<Component> getGridProvider() const;
 
-      /**
-       * Set aggregation separately...
-       */
-      void setAggregation( const std::string& aggr ) {
-    	  aggregation = Aggregation::fromString( aggr );
-      }
+    boost::optional<ForecastStage> getForecastStage() const;
+    boost::optional<MappingStage> getMappingStage() const;
 
-      /** 
-       * Set the network provider from the component configuration 
-       * \param component a pointer to a OPAQ::Config::Component object which is defined in the 
-       *                  master XML configuration file
-       */
-      void setNetworkProvider( OPAQ::Config::Component *component ) { this->networkProvider = component; }
-      /** Set the grid provider from the component configuration
-       * \param component a pointer to a OPAQ::Config::Component object which is defined in the 
-       *                  master XML configuration file
-       */
-      void setGridProvider (OPAQ::Config::Component * component) {this->gridProvider = component; }
+    void setPollutantName(const std::string& name, const std::string& aggr = "");
+    void setAggregation(const std::string& aggr);
 
-      /** Set the forecast stage */
-      void setForecastStage(OPAQ::Config::ForecastStage* forecastStage) { this->forecastStage = forecastStage;  }
+    void setNetworkProvider(const Component& component);
+    void setGridProvider(const Component& component);
 
-      /** Set the mapping stage */
-      void setMappingStage(OPAQ::Config::MappingStage* mappingStage) { this->mappingStage = mappingStage; }
-
+    void setForecastStage(ForecastStage forecastStage);
+    void setMappingStage(MappingStage mappingStage);
 
 private:
-      std::vector<OPAQ::Config::Plugin>    plugins;    //!< list of available plugins
-      std::vector<OPAQ::Config::Component> components; //!< list of available components
+    Logger _logger;
 
-      std::string pollutantName;                  //!< requested name of the pollutant
-      bool pollutantSet;                          //!< do we have the pollutant set in the run (also checks the aggreagtion)
-      OPAQ::Aggregation::Type aggregation;        //!< the aggregation for the run
+    std::vector<Plugin> _plugins;
+    std::vector<Component> _components;
 
-      std::vector<OPAQ::DateTime> baseTimes;      //!< list of basetimes to process in this run
+    std::string _pollutantName;
+    Aggregation::Type _aggregation;
 
-      OPAQ::Config::Component *networkProvider;   //!< the network provider
-      OPAQ::Config::Component *gridProvider;	  //!< the grid provider
+    std::vector<chrono::date_time> _baseTimes;
 
-      OPAQ::Config::ForecastStage *forecastStage; //!< this defines the forecast configuration in the OPAQ run
-      OPAQ::Config::MappingStage  *mappingStage;  //!< this defines the mapping configuration in the OPAQ run
-    };
+    boost::optional<Component> _networkProvider;
+    boost::optional<Component> _gridProvider;
 
+    boost::optional<ForecastStage> _forecastStage;
+    boost::optional<MappingStage> _mappingStage;
+};
 
-  } /* namespace Config */
-
-} /* namespace OPAQ */
-
-#endif /* OPAQ_OPAQRUN_H */
+}
+}

@@ -7,67 +7,53 @@
 
 #include <tinyxml.h>
 
-namespace OPAQ {
+namespace opaq
+{
 
-
-  /**
+/**
      Class to represent a pollutant in OPAQ
      The pollutant definition is normally held in a special section in the configuration file
      which defines what pollutants are available to OPAQ. 
   */
-  class Pollutant {
-  public:
-    /** Empty constructor */
+class Pollutant
+{
+public:
     Pollutant();
+    Pollutant(long id, std::string name, std::string unit, std::string desc);
 
     /** 
-	Constructor from an XML element
-	\param el A const pointer to the TiXmlELement holding the pollutant definitoin
+    Constructor from an XML element
+    \param el A const pointer to the TiXmlELement holding the pollutant definitoin
     */
-    Pollutant( TiXmlElement const *el );
-
-    virtual ~Pollutant();
+    Pollutant(TiXmlElement const* el);
 
     /** Writes out the pollutant information to the ostream */
-    friend std::ostream& operator<<(std::ostream& os, const Pollutant& s );
-    
-    /** Converts the pollutant to a string, making use of the outputstreamer */
-    std::string toString(); 
-    
-    /** returns the ID of the pollutant */
-    long getId() const { return id; }  
+    friend std::ostream& operator<<(std::ostream& os, const Pollutant& s);
 
-    /**  sets the ID of the pollutant */
-    void setId(long id) { this->id = id; } 
+    /** Converts the pollutant to a string, making use of the outputstreamer */
+    std::string toString() const;
+
+    /** returns the ID of the pollutant */
+    long getId() const { return _id; }
 
     /** returns the name of the pollutant */
-    std::string getName() const { return name; } 
-
-    /** sets the name of the pollutant */
-    void setName(std::string name) { this->name = name; }
+    std::string getName() const { return _name; }
 
     /** 
-	returns the units of the pollutant
-	\note that this is just a string, there is no real meaning or 
-	functionality assigned to the units (yet)
+    returns the units of the pollutant
+    \note that this is just a string, there is no real meaning or 
+    functionality assigned to the units (yet)
     */
-    std::string getUnit() const { return unit; }
-
-    /** sets the units, see note under setUnit  */
-    void setUnit(std::string unit) { this->unit = unit; } 
+    std::string getUnit() const { return _unit; }
 
     /** returns the description */
-    std::string getDescription() const { return desc; }
+    std::string getDescription() const { return _desc; }
 
-    /** sets the pollutant description */
-    void setDescription(std::string desc) { this->desc = desc; }
-    
-  private:
-    long id;
-    std::string name;
-    std::string unit;
-    std::string desc;
-  };
-  
+private:
+    long _id;
+    std::string _name;
+    std::string _unit;
+    std::string _desc;
+};
 }
 #endif /* #ifndef OPAQ_POLLUTANT_H_ */

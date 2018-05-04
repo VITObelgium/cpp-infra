@@ -1,99 +1,46 @@
-/*
- * Plugin.h
- *
- *  Created on: Jan 9, 2014
- *      Author: bino.maiheu@vito.be
- */
+#pragma once
 
-#ifndef OPAQ_CONFIG_FORECAST_H
-#define OPAQ_CONFIG_FORECAST_H
-
-#include <string>
-#include <tinyxml.h>
-#include <vector>
-
+#include "../DateTime.h"
 #include "Component.h"
-#include "../Exceptions.h"
-#include "../TimeInterval.h"
 
-namespace OPAQ {
+#include <vector>
+#include <boost/optional.hpp>
 
-namespace Config {
+namespace opaq
+{
 
-  /**
-   * Forecast configuration class
-   */
-class ForecastStage {
+namespace config
+{
+
+class ForecastStage
+{
 public:
-  ForecastStage();
-  virtual ~ForecastStage(); 
+    ForecastStage(chrono::days fcHor,
+                  config::Component values,
+                  config::Component buffer,
+                  config::Component outputWriter,
+                  boost::optional<config::Component> meteo,
+                  std::vector<Component> models);
 
-  /**
-   *  Returns the dataprovider for the observed concentration values
-   */
-  OPAQ::Config::Component* getValues() const throw (OPAQ::NullPointerException) {
-    if (values == NULL) throw OPAQ::NullPointerException();
-    return values;
-  }
-  void setValues(OPAQ::Config::Component* values) {
-    this->values = values;
-  }
-  
-  OPAQ::Config::Component* getMeteo() const throw (OPAQ::NullPointerException) {
-    if (meteo == NULL) throw OPAQ::NullPointerException();
-    return meteo;
-  }
-  void setMeteo(OPAQ::Config::Component* meteo) {
-    this->meteo = meteo;
-  }
-  
-  OPAQ::Config::Component* getBuffer() const throw (OPAQ::NullPointerException) {
-    if (buffer == NULL) throw OPAQ::NullPointerException();
-    return buffer;
-  }
-  void setBuffer(OPAQ::Config::Component* buffer) {
-    this->buffer = buffer;
-  }
+    config::Component getValues() const;
+    config::Component getBuffer() const;
+    config::Component getOutputWriter() const;
+    boost::optional<config::Component> getMeteo() const;
+    const std::vector<Component>& getModels() const noexcept;
 
-  OPAQ::Config::Component* getOutputWriter() const throw (OPAQ::NullPointerException) {
-    if ( outputWriter == NULL) throw OPAQ::NullPointerException();
-    return outputWriter;
-  }
-  void setOutputWriter(OPAQ::Config::Component* ow ) {
-    this->outputWriter = ow;
-  }
-
-  // returns a list of models used in the forecast...
-  std::vector<OPAQ::Config::Component*> & getModels() { return models; }
-
-  /** Set the requested forecast horizon */
-  void setHorizon( const OPAQ::TimeInterval& f ) { fcHor = f; }
-
-  /** Returns the requested (max) forecast horizon for the forecasts */
-  OPAQ::TimeInterval& getHorizon() { return fcHor; }
-
-protected:
-
+    chrono::days getHorizon() const noexcept;
 
 private:
-  // vector of models to run in the forecast
-  std::vector<OPAQ::Config::Component *> models;
+    chrono::days _fcHor; //!< requested max forecast horizon
 
-  // input data provider components
-  OPAQ::Config::Component *values;
-  OPAQ::Config::Component *meteo;
+    Component _values;
+    Component _buffer;
+    Component _outputWriter;
 
-  // forecast buffer component
-  OPAQ::Config::Component *buffer;
-  
-  // output writer component
-  OPAQ::Config::Component *outputWriter;
-  
-  OPAQ::TimeInterval   fcHor;           //!< requested max forecast horizon
+    boost::optional<config::Component> _meteo;
+
+    std::vector<Component> _models;
 };
 
-} /* namespace Config */
-
-} /* namespace OPAQ */
-#endif /* OPAQ_STAGE_H */
-
+}
+}

@@ -5,22 +5,19 @@
  *      Author: Stijn.VanLooy@vito.be
  */
 
-#ifndef FILETOOLS_H_
-#define FILETOOLS_H_
+#pragma once
 
+#include <cstdio>
 #include <string>
-#include <stdio.h>
 
-namespace OPAQ {
-
-class FileTools {
-public:
-	FileTools();
-	virtual ~FileTools();
-
-	static bool exists (const std::string & filename);
-	static bool del (const std::string & filename);
-};
-
-} /* namespace OPAQ */
-#endif /* FILETOOLS_H_ */
+namespace opaq
+{
+namespace FileTools
+{
+    std::string readStreamContents(std::istream& stream);
+    std::string readFileContents(const std::string& filename);
+    void writeTextFile(const std::string& filename, const std::string& contents);
+    bool exists(const std::string& filename);
+    bool del(const std::string& filename);
+}
+}

@@ -1,18 +1,40 @@
 #include "MappingStage.h"
 
-namespace OPAQ {
+#include "../Exceptions.h"
+#include "../tools/ExceptionTools.h"
 
-  namespace Config {
+namespace opaq
+{
+namespace config
+{
 
-    MappingStage::MappingStage() {
-    	values = NULL;
-    	meteo = NULL;
-    };
-  
-    MappingStage::~MappingStage() {} 
-    
-  }
+MappingStage::MappingStage(GridType gridType, Component obsProvider, Component buffer, std::vector<Component> models)
+: _gridType(std::move(gridType))
+, _obsProvider(std::move(obsProvider))
+, _buffer(std::move(buffer))
+, _models(std::move(models))
+{
+}
 
-} /* namespace OPAQ */
+GridType MappingStage::getGridType() const
+{
+    return _gridType;
+}
 
+Component MappingStage::getDataProvider() const
+{
+    return _obsProvider;
+}
 
+Component MappingStage::getMappingBuffer() const
+{
+    return _buffer;
+}
+
+std::vector<Component> MappingStage::getModels() const
+{
+    return _models;
+}
+
+}
+}

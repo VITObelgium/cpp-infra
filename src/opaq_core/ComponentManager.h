@@ -1,105 +1,87 @@
-/*
- *      Created on: Dec 20, 2013
- *      Author: vlooys
- *
- */
+#pragma once
 
-#ifndef COMPONENTMANAGER_H_
-#define COMPONENTMANAGER_H_
-
+#include "config.h"
 #include "Component.h"
-#include <tinyxml.h>
+#include "Logger.h"
+#include "Exceptions.h"
+
 #include <map>
+#include <iostream>
+#include <memory>
+#include <functional>
+
+namespace opaq
+{
 
 /**
- * \brief Macro to register a class as being an OPAQ component.
- * When writing new components, a user should add this macro statement to 
- * the implementation source file. Dont forget to include a correct namespace
- * if you want to have the plugin to have it's own namespace. 
- *
- *   Example use: OPAQ_REGISTER_PLUGIN(OPAQ::ExampleComponent);
- */
-#define OPAQ_REGISTER_PLUGIN(TYPE)		\
-  extern "C" {					\
-    OPAQ::Component * factory () {		\
-      return new TYPE();			\
-    }						\
-  }
-
-/**
-   The OPAQ namespace collects all the classes and the functions which reside in the OPAQ framework.
-*/
-namespace OPAQ {
-
-  // forward declarations
-  class Component;
-  class FailedToLoadPluginException;
-  class PluginAlreadyLoadedException;
-  class ComponentAlreadyExistsException;
-  class ComponentNotFoundException;
-  class PluginNotFoundException;
-  class BadConfigurationException;
-
-  /** 
-   * \brief Singleton class for managing the components. 
+   * \brief class for managing the components.
    * \author Stijn Van Looy
    *
-   *  Class to manage the components in OPAQ. It provides functionality to discover and 
-   *  create instances of the different OPAQ plugins which derive from OPAQ::Component. 
+   *  Class to manage the components in OPAQ. It provides functionality to discover and
+   *  create instances of the different OPAQ plugins which derive from OPAQ::Component.
    *
    *  This factory class was started from and loosely inspired by:
    *  http://stackoverflow.com/questions/582331/is-there-a-way-to-instantiate-objects-from-a-string-holding-their-class-name
    *
-   *  Depends on tinyxml
-   *  	http://www.grinninglizard.com/tinyxml/
-   *  	in Ubuntu: sudo aptitude install libtinyxml-dev
    */
-  class ComponentManager {
-  public:
-    typedef std::map<std::string, Component*> instanceMapType;
-    typedef std::map<std::string, Component*(*)()> factoryMapType;
-    
-    static ComponentManager * getInstance();
-    
-    virtual ~ComponentManager();
-    
-    void loadPlugin(std::string &pluginName, std::string &filename)
-      throw (FailedToLoadPluginException, PluginAlreadyLoadedException);
-    
-    template<typename T> T * createComponent(std::string &componentName,
-					     std::string &pluginName, TiXmlElement * configuration)
-      throw (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException) {
-      Component * component = createGenericComponent(componentName, pluginName, configuration);
-      return dynamic_cast<T*>(component);
+
+using FactoryCallback = std::function<Component*(LogConfiguration*)>;
+
+class ComponentManager
+{
+public:
+    ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb);
+
+    ComponentManager(ComponentManager&&) = default;
+    ComponentManager(const ComponentManager&) = delete;
+
+    // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
+    template <typename T>
+    T& createComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration)
+    {
+        return dynamic_cast<T&>(createGenericComponent(componentName, pluginName, configuration));
     }
-    
-    template<typename T> T * getComponent(std::string &componentName)
-      throw (ComponentNotFoundException) {
-      Component * component = findComponent(componentName);
-      return dynamic_cast<T*>(component);
+
+    // throws ComponentNotFoundException
+    template <typename T>
+    T& getComponent(const std::string& componentName)
+    {
+        return dynamic_cast<T&>(findComponent(componentName));
     }
-    
-    void destroyComponent(std::string &componentName);
-    
-  private:
-    instanceMapType instanceMap;
-    factoryMapType factoryMap;
-    
-    ComponentManager();
-    ComponentManager(ComponentManager const&);	// no implementation of copy constructor for singleton
-    void operator=(ComponentManager const&);	// no implementation of assignment operator for singleton
-    
 
-    Component * createGenericComponent (std::string &componentName,
-					std::string &pluginName, TiXmlElement * configuration)
-      throw (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException);
+    template <typename T>
+    T* getOptionalComponent(const std::string& componentName)
+    {
+        try
+        {
+            return &dynamic_cast<T&>(findComponent(componentName));
+        }
+        catch (NullPointerException&)
+        {
+            return nullptr;
+        }
+    }
 
-    Component * findComponent (std::string &name) throw (ComponentNotFoundException);
+    void loadPlugin(const std::string& pluginName, const std::string& filename);
+    void destroyComponent(const std::string& componentName);
+    void destroyComponents();
 
-    Component * createComponent (std::string &pluginName, TiXmlElement * configuration)
-      throw (PluginNotFoundException, BadConfigurationException);
-  };
-  
-} /* namespace OPAQ */
+private:
+    // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
+    Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration);
 
-#endif /* COMPONENTMANAGER_H_ */
+    // throws ComponentNotFoundException
+    Component& findComponent(const std::string& name);
+
+    // throw PluginNotFoundException, BadConfigurationException
+    std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration);
+
+    std::function<FactoryCallback(const std::string&, const std::string&)> _loadPluginCb;
+    // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
+    // The instance map has to be destroyed before the dll unload
+    std::map<std::string, FactoryCallback> _factoryMap;
+    std::map<std::string, std::unique_ptr<Component>> _instanceMap;
+    IEngine& _engine;
+};
+
+}

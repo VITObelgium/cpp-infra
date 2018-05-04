@@ -6,54 +6,65 @@
  */
 
 #include "GzipReader.h"
+#include <boost/algorithm/string.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
+#include "StringTools.h"
 
-namespace OPAQ {
+namespace opaq
+{
 
-GzipReader::GzipReader() {
-	_igzstream = NULL;
+void GzipReader::open(const std::string& filename)
+{
+    close();
+
+    _file.open(filename.c_str(), std::ios::binary);
+
+    if (!_file.is_open())
+    {
+        throw IOException("File not found: {}", filename);
+    }
+
+    _filterStream = std::make_unique<boost::iostreams::filtering_istream>();
+    if (boost::algorithm::ends_with(filename, ".gz"))
+    {
+        _filterStream->push(boost::iostreams::gzip_decompressor());
+    }
+    
+    _filterStream->push(_file);
 }
 
-GzipReader::~GzipReader() {
-	close();
+std::string GzipReader::readLine()
+{
+    std::string line;
+    if (_filterStream)
+    {
+        try
+        {
+            std::getline(*_filterStream, line);
+        }
+        catch(const boost::iostreams::gzip_error& e)
+        {
+             throw RunTimeException("Failed to decompress line: {}", e.what());
+        }
+    }
+    return line;
 }
 
-void GzipReader::open(const std::string & filename) throw (IOException) {
-	close();
-	if (! FileTools::exists(filename)) {
-		std::stringstream ss;
-		ss << "File not found: " << filename;
-		throw IOException(ss.str());
-	}
-	_igzstream = new igzstream(filename.c_str());
-	if (! _igzstream->good()) {
-		std::stringstream ss;
-		ss << "Failed to open file " << filename;
-		throw IOException(ss.str());
-	}
+bool GzipReader::eof() const noexcept
+{
+    if (!_filterStream)
+    {
+        return true;
+
+    }
+
+    return _filterStream->eof();
 }
 
-std::string GzipReader::readLine() {
-	std::string line;
-	if (_igzstream != NULL)
-		std::getline(*_igzstream, line);
-	return line;
+void GzipReader::close() noexcept
+{
+    _filterStream.reset();
+    _file.close();
 }
 
-bool GzipReader::eof() {
-	if (_igzstream != NULL) {
-		return _igzstream->eof();
-	} else {
-		return true;
-	}
 }
-
-void GzipReader::close() {
-	if (_igzstream != NULL) {
-		_igzstream->close();
-		delete _igzstream;
-		_igzstream = NULL;
-	}
-}
-
-
-} /* namespace OPAQ */

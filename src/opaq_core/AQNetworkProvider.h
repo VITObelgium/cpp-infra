@@ -5,19 +5,16 @@
  *      Author: vlooys
  */
 
-#ifndef OPAQ_AQNETWORKPROVIDER_H_
-#define OPAQ_AQNETWORKPROVIDER_H_
+#pragma once
 
-#include <Component.h>
+#include "Component.h"
 
-#include "AQNetwork.h"
+namespace opaq
+{
 
-namespace OPAQ {
+class AQNetwork;
 
-  // forward declaration
-  class Component;
-
-  /**
+/**
      The Air Quality Network provider
      Abstract base class for a network provider, a derived class should 
      implement the getAQNetwork routine which returns a pointer to an 
@@ -30,15 +27,11 @@ namespace OPAQ {
      gets it's station list from there
      
   */
-  class AQNetworkProvider : virtual public OPAQ::Component {
-  public:
-    AQNetworkProvider ();
-    virtual ~AQNetworkProvider() {}
-
+class AQNetworkProvider : virtual public Component
+{
+public:
     /** Pure virtual method which returns a pointer to an Air quality network object */
-    virtual OPAQ::AQNetwork * getAQNetwork() = 0;
+    virtual AQNetwork& getAQNetwork() = 0;
+};
 
-  };
-  
-} /* namespace OPAQ */
-#endif /* OPAQ_AQNETWORKPROVIDER_H_ */
+}

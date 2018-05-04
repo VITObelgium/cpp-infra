@@ -1,39 +1,38 @@
-/*
- * Grid.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys, maiheub
- */
-
-#ifndef OPAQ_GRID_H_
-#define OPAQ_GRID_H_
+#pragma once
 
 #include <string>
 #include <vector>
 
 #include "Cell.h"
 
-namespace OPAQ {
+namespace opaq
+{
 
-  /**
+/**
      A class to contain the interpolation grid.
      Basically is a container class for a list of gridcells, which can be fetched as a 
      vector by the getCells member function. 
    */
-  class Grid {
-  public:
-    Grid();
-    virtual ~Grid();
-    
-    /** Get the gridcells
-	Returns a reference to the vector of cells (pointers) */
-    std::vector<Cell*> & getCells() { return cells; }
-    //std::vector<Pollutant*> & getPollutants() { return pollutants; }
-    
-  private:
-    std::vector<Cell*> cells;
-    //std::vector<Pollutant*> pollutants;
-  };
-  
-} /* namespace opaq */
-#endif /* OPAQ_GRID_H_ */
+class Grid
+{
+public:
+    using iterator = typename std::vector<Cell>::iterator;
+    using const_iterator = typename std::vector<Cell>::const_iterator;
+
+    void addCell(const Cell& cell);
+
+    size_t cellCount() const noexcept;
+    const Cell& cell(size_t index) const;
+
+    iterator begin();
+    const_iterator begin() const;
+    const_iterator cbegin() const;
+    iterator end();
+    const_iterator end() const;
+    const_iterator cend() const;
+
+private:
+    std::vector<Cell> _cells;
+};
+
+}

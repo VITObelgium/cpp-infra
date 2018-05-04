@@ -1,14 +1,16 @@
-/*
- *  Created on: Dec 20, 2013
- *      Author: vlooys
- */
-
 #include "Component.h"
 
-namespace OPAQ {
+namespace opaq
+{
 
-  Component::Component() {}
-  
-  Component::~Component() {}
-  
-} /* namespace opaq */
+std::string Component::getName() const noexcept
+{
+    return _name;
+}
+
+void Component::setName(const std::string& componentName)
+{ 
+    _name = componentName;
+}
+
+}

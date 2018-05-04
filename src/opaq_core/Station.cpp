@@ -1,21 +1,70 @@
 #include "Station.h"
 
-namespace OPAQ {
+#include <algorithm>
 
-  Station::Station(){
-  }
+namespace opaq
+{
 
-  Station::~Station() {
-  }
+Station::Station(std::string name, std::string desc, std::string meteoId, std::vector<Pollutant> pollutants)
+: _name(std::move(name))
+, _desc(std::move(desc))
+, _meteoId(std::move(meteoId))
+, _pollutants(std::move(pollutants))
+{
+}
 
-  std::ostream& operator<<(std::ostream& os, const Station& s ) {
+Station::Station(long id, double x, double y, double z, std::string name, std::string desc, std::string meteoId, std::vector<Pollutant> pollutants)
+: Point(id, x, y, z)
+, _name(std::move(name))
+, _desc(std::move(desc))
+, _meteoId(std::move(meteoId))
+, _pollutants(std::move(pollutants))
+{
+}
 
-    os << "[station " << s.getId() << " ]: " << s.name 
+std::ostream& operator<<(std::ostream& os, const Station& s)
+{
+    os << "[station " << s.getId() << "]: " << s._name
        << ", x=" << s.getX()
-       << ", y=" << s.getX()
-       << ", z=" << s.getX()
-       << ", meteo fc ID="<< s.getMeteoId() << std::endl;
-      return os;
-  }
+       << ", y=" << s.getY()
+       << ", z=" << s.getZ()
+       << ", meteo fc ID=" << s.getMeteoId();
 
+    return os;
+}
+
+const std::string& Station::getName() const
+{
+    return _name;
+}
+
+const std::string& Station::getDescription() const
+{
+    return _desc;
+}
+
+const std::string& Station::getMeteoId() const
+{
+    return _meteoId;
+}
+
+bool Station::measuresPollutant(const Pollutant& pol) const noexcept
+{
+    auto iter = std::find_if(_pollutants.begin(), _pollutants.end(), [&pol](const Pollutant& polIter) {
+        return polIter.getName() == pol.getName();
+    });
+
+    return iter != _pollutants.end();
+}
+
+bool Station::operator==(const Station& other) const noexcept
+{
+    return getId() == other.getId() &&
+           getX() == other.getX() &&
+           getY() == other.getY() &&
+           getZ() == other.getZ() &&
+           _name == other._name &&
+           _desc == other._desc &&
+           _meteoId == other._meteoId;
+}
 }

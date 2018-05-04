@@ -5,58 +5,67 @@
  *      Author: bino
  */
 
-#include <algorithm>
 #include "Aggregation.h"
+#include <algorithm>
 
-namespace OPAQ {
+namespace opaq
+{
+namespace Aggregation
+{
 
-Aggregation::Aggregation() {
+std::string getName(Aggregation::Type agg)
+{
+    switch (agg)
+    {
+    case Type::None:    return std::string("none");
+    case Type::DayAvg:  return std::string("dayavg");
+    case Type::Max1h:   return std::string("max1h");
+    case Type::Max8h:   return std::string("max8h");
+    }
+
+    return std::string("n/a");
 }
 
-Aggregation::~Aggregation() {
+std::string getDisplayName(Aggregation::Type agg)
+{
+    switch (agg)
+    {
+    case Type::None:    return std::string("None");
+    case Type::DayAvg:  return std::string("Dayly average");
+    case Type::Max1h:   return std::string("Maximum 1 hour");
+    case Type::Max8h:   return std::string("Maximum 8 hours");
+    }
+
+    throw std::invalid_argument("Invalid aggregation type");
 }
 
-std::string Aggregation::getName( Aggregation::Type agg ) {
+Aggregation::Type fromString(std::string s)
+{
+    if (s.empty())
+    {
+        return Aggregation::None;
+    }
 
-	switch( agg ) {
-	case Type::None:
-		return std::string( "none" );
-		break;
-	case Type::DayAvg:
-		return std::string( "dayavg" );
-		break;
-	case Type::Max1h:
-		return std::string( "max1h" );
-		break;
-	case Type::Max8h:
-		return std::string( "max8h" );
-		break;
-	}
+    // convert s to lower case
+    std::transform(s.begin(), s.end(), s.begin(), ::tolower);
 
-	return std::string( "n/a" );
+    if (s == "da" || s == "dayavg" || s == "dailyavg") {
+        return Aggregation::DayAvg;
+    }
+    else if (s == "m1" || s == "max1h" || s == "daymax" || s == "dailymax")
+    {
+        return Aggregation::Max1h;
+    }
+    else if (s == "m8" || s == "max8h")
+    {
+        return Aggregation::Max8h;
+    }
+    else if (s == "none")
+    {
+        return Aggregation::None;
+    }
+
+    throw NotAvailableException("Aggregation " + s + " is not known...");
 }
-
-
-Aggregation::Type Aggregation::fromString( std::string s )
-	throw( NotAvailableException ) {
-
-	if ( s.size() == 0 ) return Aggregation::None;
-
-	// convert s to lower case
-	std::transform( s.begin(), s.end(), s.begin(), ::tolower );
-
-	if ( !s.compare( "da" ) || !s.compare( "dayavg" ) || !s.compare( "dailyavg" ) ) {
-		return Aggregation::DayAvg;
-	} else if ( !s.compare( "m1" ) || !s.compare( "max1h" ) || !s.compare( "daymax" ) || !s.compare( "dailymax" ) ) {
-		return Aggregation::Max1h;
-	} else if ( !s.compare( "m8" ) || !s.compare( "max8h" ) ) {
-		return Aggregation::Max8h;
-	} else if ( !s.compare( "none" ) ) {
-		return Aggregation::None;
-	}
-
-	throw NotAvailableException( "Aggregation " + s + " is not known..." );
-	return Aggregation::None;
 }
-
-} /* namespace OPAQ */
+}

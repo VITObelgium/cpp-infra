@@ -1,40 +1,30 @@
-/*
- * ConfigurationHandler.h
- *
- *  Created on: Jan 15, 2014
- *      Author: vlooys
- */
+#pragma once
 
-#ifndef CONFIGURATIONHANDLER_H_
-#define CONFIGURATIONHANDLER_H_
+#include "Logger.h"
+#include "config/OpaqRun.h"
 
-#include <tinyxml.h>
 #include <string>
-#include <tools/XmlTools.h>
-#include <tools/FileTools.h>
-#include <tools/DateTimeTools.h>
-#include <config/OpaqRun.h>
-#include <config/ForecastStage.h>
-#include <config/MappingStage.h>
-#include <PollutantManager.h>
-#include <Logger.h>
 
-namespace OPAQ {
+class TiXmlElement;
 
-  /**
+namespace opaq
+{
+
+namespace config
+{
+    class PollutantManager;
+}
+
+/**
    * Parses the master configuration file and constructs the main workflow objects in OPAQ
    * This class contains methods to parse the XML configuration file and subsequently construct
-   * the main workflow objects : the plugins list, components, and the different runstages. 
+   * the main workflow objects : the plugins list, components, and the different runstages.
    */
-  class ConfigurationHandler {
-  public:
-    ConfigurationHandler() {}
-    virtual ~ConfigurationHandler() {
-      std::vector<TiXmlDocument*>::iterator it = _configDocs.begin();
-      while (it != _configDocs.end())
-	delete *it++;
-    }
-  
+class ConfigurationHandler
+{
+public:
+    ConfigurationHandler();
+
     /**
      * Parse the configuration file given by the filename and construct the main OPAQ workflow
      * Here we indicate briefly the workflow of this method
@@ -46,7 +36,7 @@ namespace OPAQ {
      *   - parsing the pollutants sections and populating the pollutant manager
      * -  Then we parse the run information, which defines how OPAQ should be run
      *    i.e. for what pollutant and what timesteps we should do ? Also this
-     *    defines the forecast/mapping stages in the OPAQ run... Here we 
+     *    defines the forecast/mapping stages in the OPAQ run... Here we
      *    - parse the pollutant elements section, indicating what pollutant to run for
      *      (can be overwritten by command line)
      *    -  Parsing network section : selects the component which will deliver the
@@ -58,29 +48,22 @@ namespace OPAQ {
      *
      * \param filename The name of the master XML configuration file
      */
-    void parseConfigurationFile (std::string& filename);
+    void parseConfigurationFile(const std::string& filename, config::PollutantManager& pollutantMgr);
 
     /** Validates whether the configuration is ok */
-    void validateConfiguration ();
-  
-    /** Returns an opaq run object, constructed from the configuration parsing */
-    OPAQ::Config::OpaqRun* getOpaqRun () { return &opaqRun; }
-  
-private:
-    OPAQ::Config::OpaqRun opaqRun;
-    TiXmlDocument doc;
-    std::vector<TiXmlDocument *> _configDocs;
-  
-    void clearConfig();
-    OPAQ::Config::Plugin*    findPlugin (std::string & pluginName);
-    OPAQ::Config::Component* findComponent (std::string & componentName);
+    void validateConfiguration(config::PollutantManager& pollutantMgr);
 
-    Config::ForecastStage * parseForecastStage(TiXmlElement * element);
-    Config::MappingStage  * parseMappingStage(TiXmlElement * element);
-    
-    LOGGER_DEC();
+    /** Returns an opaq run object, constructed from the configuration parsing */
+    config::OpaqRun& getOpaqRun() { return _opaqRun; }
+
+private:
+    config::ForecastStage parseForecastStage(TiXmlElement* element);
+    config::MappingStage parseMappingStage(TiXmlElement* element);
+
+    config::OpaqRun _opaqRun;
+    TiXmlDocument _doc;
+    std::vector<std::unique_ptr<TiXmlDocument>> _configDocs;
+    Logger _logger;
 };
 
-
-} /* namespace OPAQ */
-#endif /* CONFIGURATIONHANDLER_H_ */
+}

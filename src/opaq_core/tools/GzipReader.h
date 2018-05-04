@@ -5,41 +5,36 @@
  *      Author: Stijn.VanLooy@vito.be
  */
 
-#ifndef GZIPREADER_H_
-#define GZIPREADER_H_
+#pragma once
 
-#include <gzstream.h>
 #include "../Exceptions.h"
-#include <sstream>
 #include "FileTools.h"
+#include <fstream>
+#include <memory>
 
-namespace OPAQ {
+#include <boost/iostreams/filtering_stream.hpp>
 
-  /**
-     Filereader based upon igzstream
-     See: http://www.cs.unc.edu/Research/compgeom/gzstream/
-  */
-  class GzipReader {
-  public:
-    GzipReader();
-    virtual ~GzipReader();
+namespace opaq
+{
 
-    /** Open the gzip file */
-    void open (const std::string & filename) throw (IOException);
+class GzipReader
+{
+public:
+    /** Open the gzip file
+      * Throws IOException */
+    void open(const std::string& filename);
 
     /** Reads a line from the file and returns as a std::string */
     std::string readLine();
 
     /** filepointer is at the end of the file */
-    bool eof();
-    
+    bool eof() const noexcept;
+
     /** close the input file */
-    void close();
-    
-  private:
-    igzstream * _igzstream;
-    
-  };
-  
-} /* namespace OPAQ */
-#endif /* GZIPREADER_H_ */
+    void close() noexcept;
+
+private:
+    std::ifstream _file;
+    std::unique_ptr<boost::iostreams::filtering_istream> _filterStream;
+};
+}

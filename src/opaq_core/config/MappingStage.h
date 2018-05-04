@@ -1,57 +1,31 @@
-/*
- * Plugin.h
- *
- *  Created on: Jan 9, 2014
- *      Author: vlooys
- */
+#pragma once
 
-#ifndef OPAQ_MAPPINGSTAGE_H
-#define OPAQ_MAPPINGSTAGE_H
+#include "GridType.h"
+#include "Component.h"
 
-#include <string>
-#include <tinyxml.h>
 #include <vector>
 
-#include "Component.h"
-#include "../Exceptions.h"
+namespace opaq
+{
+namespace config
+{
 
-namespace OPAQ {
-
-namespace Config {
-
-class MappingStage {
+class MappingStage
+{
 public:
-  MappingStage();
-  virtual ~MappingStage();
+    MappingStage(GridType gridType, Component obsProvider, Component buffer, std::vector<Component> models);
 
-  OPAQ::Config::Component* getValues() const throw (OPAQ::NullPointerException) {
-    if (values == NULL) throw OPAQ::NullPointerException();
-    return values;
-  }
-  void setValues(OPAQ::Config::Component* values) {
-    this->values = values;
-  }
-
-  OPAQ::Config::Component* getMeteo() const throw (OPAQ::NullPointerException) {
-    if (meteo == NULL) throw OPAQ::NullPointerException();
-    return meteo;
-  }
-  void setMeteo(OPAQ::Config::Component* meteo) {
-    this->meteo = meteo;
-  }
-  
-protected:
-
+    GridType getGridType() const;
+    Component getDataProvider() const;
+    Component getMappingBuffer() const;
+    std::vector<Component> getModels() const;
 
 private:
-  // input data provider components
-  OPAQ::Config::Component *values;
-  OPAQ::Config::Component *meteo;
-  
+    GridType _gridType;
+    Component _obsProvider;
+    Component _buffer;
+    std::vector<Component> _models;
 };
 
-} /* namespace Config */
-
-} /* namespace OPAQ */
-#endif /* OPAQ_STAGE_H */
-
+}
+}
