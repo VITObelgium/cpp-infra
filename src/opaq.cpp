@@ -69,9 +69,10 @@ static T getOptionalArg(const po::variables_map& vm, const char* name, const T& 
 std::string readLogName(const std::string& config_file)
 {
     try {
-        auto doc = infra::ConfigDocument::loadFromString(config_file);
+        auto doc = infra::ConfigDocument::loadFromFile(config_file);
         return std::string(doc.child("opaq").child("logFile").trimmedValue());
-    } catch (...) {
+    } catch (const std::exception& e) {
+        std::cerr << e.what() << std::endl;
     }
 
     return "";

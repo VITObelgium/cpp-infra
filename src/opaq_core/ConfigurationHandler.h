@@ -2,17 +2,16 @@
 
 #include "Logger.h"
 #include "config/OpaqRun.h"
+#include "infra/configdocument.h"
 
 #include <string>
 
 class TiXmlElement;
 
-namespace opaq
-{
+namespace opaq {
 
-namespace config
-{
-    class PollutantManager;
+namespace config {
+class PollutantManager;
 }
 
 /**
@@ -54,14 +53,17 @@ public:
     void validateConfiguration(config::PollutantManager& pollutantMgr);
 
     /** Returns an opaq run object, constructed from the configuration parsing */
-    config::OpaqRun& getOpaqRun() { return _opaqRun; }
+    config::OpaqRun& getOpaqRun()
+    {
+        return _opaqRun;
+    }
 
 private:
     config::ForecastStage parseForecastStage(TiXmlElement* element);
     config::MappingStage parseMappingStage(TiXmlElement* element);
 
     config::OpaqRun _opaqRun;
-    TiXmlDocument _doc;
+    infra::ConfigDocument _doc;
     std::vector<std::unique_ptr<TiXmlDocument>> _configDocs;
     Logger _logger;
 };
