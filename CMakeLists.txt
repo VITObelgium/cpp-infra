@@ -9,6 +9,9 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui comp
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 
+CHECK_INCLUDE_FILE_CXX(filesystem HAVE_FILESYSTEM_H)
+CHECK_INCLUDE_FILE_CXX(experimental/filesystem HAVE_EXP_FILESYSTEM_H)
+
 find_package(fmt CONFIG REQUIRED)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -44,6 +47,12 @@ target_include_directories(infra
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
+if (HAVE_FILESYSTEM_H)
+    target_compile_definitions(infra PUBLIC HAVE_FILESYSTEM_H)
+elseif (HAVE_EXP_FILESYSTEM_H)
+    target_compile_definitions(infra PUBLIC HAVE_EXP_FILESYSTEM_H)
+endif ()
+
 target_link_libraries(infra PRIVATE fmt::fmt)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
@@ -59,7 +68,7 @@ if (INFRA_LOGGING)
     target_sources(infra PRIVATE include/infra/log.h log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
     # make sure spdlog does not use its internal version of fmt
-    target_compile_definitions(infra PUBLIC -DSPDLOG_FMT_EXTERNAL)
+    target_compile_definitions(infra PUBLIC SPDLOG_FMT_EXTERNAL)
 endif ()
 
 if (INFRA_GDAL)
