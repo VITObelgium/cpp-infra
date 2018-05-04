@@ -1,4 +1,5 @@
 include(CMakeDependentOption)
+include(CheckIncludeFileCXX)
 
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
