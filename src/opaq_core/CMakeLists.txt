@@ -86,6 +86,7 @@ add_library(opaqcore ${CORE_SOURCES} ${CORE_CONFIG_SOURCES} ${CORE_TOOLS_SOURCES
 target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(opaqcore
 PUBLIC
+    infra
     fmt::fmt
     spdlog::spdlog
     TinyXml::TinyXml
