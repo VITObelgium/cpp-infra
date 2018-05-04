@@ -32,8 +32,8 @@ std::optional<T> toNumeric(std::string_view str) noexcept
         return toFloat(str);
     } else if constexpr (std::is_same_v<double, T>) {
         return toDouble(str);
-    } else if constexpr (dependent_false_v<T>) {
-        static_assert(false, "Invalid type provided");
+    } else {
+        static_assert(dependent_false_v<T>, "Invalid type provided");
     }
 }
 

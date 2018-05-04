@@ -59,19 +59,17 @@ template <typename T>
 std::optional<T> ConfigNode::attribute(const char* name) const
 {
     auto attr = _pimpl->node.attribute(name);
-    if ()
-
-        if constexpr (std::is_same_v<int32_t, T>) {
-            return toInt32(str);
-        } else if constexpr (std::is_same_v<int64_t, T>) {
-            return toInt64(str);
-        } else if constexpr (std::is_same_v<double, T>) {
-            return toFloat(str);
-        } else if constexpr (std::is_same_v<double, T>) {
-            return toDouble(str);
-        } else if constexpr (dependent_false_v<T>) {
-            static_assert(false, "Invalid attribute type provided");
-        }
+    if constexpr (std::is_same_v<int32_t, T>) {
+        return str::toInt32(attr.value());
+    } else if constexpr (std::is_same_v<int64_t, T>) {
+        return str::toInt64(attr.value());
+    } else if constexpr (std::is_same_v<float, T>) {
+        return str::toFloat(attr.value());
+    } else if constexpr (std::is_same_v<double, T>) {
+        return str::toDouble(attr.value());
+    } else {
+        static_assert(dependent_false_v<T>, "Invalid attribute type provided");
+    }
 }
 
 ConfigNode ConfigNode::child(const char* name) const
