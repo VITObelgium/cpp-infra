@@ -9,30 +9,75 @@ namespace infra {
 
 class ConfigNodeIterator;
 
+template <typename Iterator>
+class ConfigObjectRange
+{
+public:
+    typedef Iterator const_iterator;
+    typedef Iterator iterator;
+
+    ConfigObjectRange(Iterator b, Iterator e)
+    : _begin(std::move(b))
+    , _end(std::move(e))
+    {
+    }
+
+    ConfigObjectRange(ConfigObjectRange&&) = default;
+    ConfigObjectRange& operator=(ConfigObjectRange&&) = default;
+
+    const_iterator begin() const
+    {
+        return _begin;
+    }
+
+    const_iterator end() const
+    {
+        return _end;
+    }
+
+    iterator begin()
+    {
+        return _begin;
+    }
+
+    iterator end()
+    {
+        return _end;
+    }
+
+private:
+    Iterator _begin, _end;
+};
+
 class ConfigNode
 {
 public:
     ConfigNode();
     ~ConfigNode();
 
+    ConfigNode(const ConfigNode&);
     ConfigNode(ConfigNode&&);
+    ConfigNode& operator=(const ConfigNode&);
     ConfigNode& operator=(ConfigNode&&);
 
     ConfigNode child(const char* name) const;
     ConfigNode child(const std::string& name) const;
 
-    ConfigNodeIterator children() const;
-
-    /*ConfigNode children(const char* name) const;
-    ConfigNode children(const std::string& name) const;*/
+    ConfigObjectRange<ConfigNodeIterator> children() const;
+    ConfigObjectRange<ConfigNodeIterator> children(const char* name) const;
+    ConfigObjectRange<ConfigNodeIterator> children(const std::string& name) const;
 
     ConfigNode selectChild(std::string_view selector) const;
 
     std::string_view attribute(const char* name) const;
     std::string_view attribute(const std::string& name) const;
 
+    std::string_view name() const;
     std::string_view value() const;
     std::string_view trimmedValue() const;
+
+    template <typename T>
+    std::optional<T> value() const;
 
     template <typename T>
     std::optional<T> attribute(const char* name) const;
@@ -42,9 +87,11 @@ public:
         return attribute<T>(name.c_str());
     }
 
-    bool operator!() const;
+    bool operator!() const noexcept;
+    operator bool() const noexcept;
 
 protected:
+    friend class ConfigDocument;
     friend class ConfigNodeIterator;
 
     struct Pimpl;
@@ -55,8 +102,7 @@ class ConfigNodeIterator
 {
 public:
     ConfigNodeIterator() = default;
-    ConfigNodeIterator(const ConfigNode& node);
-    ConfigNodeIterator(const ConfigNodeIterator&) = delete;
+    ConfigNodeIterator(const ConfigNodeIterator&);
     ConfigNodeIterator(ConfigNodeIterator&&);
     ~ConfigNodeIterator();
 
@@ -65,9 +111,12 @@ public:
     bool operator==(const ConfigNodeIterator& other) const;
     bool operator!=(const ConfigNodeIterator& other) const;
 
-    ConfigNode operator*();
+    ConfigNode& operator*();
+    const ConfigNode& operator*() const;
 
 private:
+    friend class ConfigNode;
+
     struct Pimpl;
     std::unique_ptr<Pimpl> _pimpl;
 };
@@ -89,6 +138,8 @@ public:
     ConfigDocument& operator=(ConfigDocument&&);
 
     ~ConfigDocument();
+
+    ConfigNode rootNode() const;
 
 private:
     ConfigDocument(const std::string& data, bool isPath);

@@ -1,8 +1,11 @@
 #include "infra/configdocument.h"
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace infra::test {
+
+using namespace testing;
 
 static const char* xmlData = R"("
     <xml>
@@ -13,6 +16,7 @@ static const char* xmlData = R"("
             aValue
         </node2>
         <node3>some text</node3>
+        <node3>some text 2</node3>
     </xml>
 ")";
 
@@ -39,9 +43,31 @@ TEST(ConfigReaderTest, iterateChildren)
     auto doc     = ConfigDocument::loadFromString(xmlData);
     auto xmlNode = doc.child("xml");
 
-    /*std::vector<std::string> childNames;
-    for (auto& child : xmlNode.children()) {
-    }*/
+    std::vector<std::string> childNames;
+    for (const auto& child : xmlNode.children()) {
+        childNames.push_back(std::string(child.name()));
+    }
+
+    EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node1", "node2", "node3", "node3"}));
 }
 
+TEST(ConfigReaderTest, iterateNamedChildren)
+{
+    auto doc     = ConfigDocument::loadFromString(xmlData);
+    auto xmlNode = doc.child("xml");
+
+    std::vector<std::string> childNames;
+    for (const auto& child : xmlNode.children("node1")) {
+        childNames.push_back(std::string(child.name()));
+    }
+
+    EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node1"}));
+
+    childNames.clear();
+    for (const auto& child : xmlNode.children("node3")) {
+        childNames.push_back(std::string(child.name()));
+    }
+
+    EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node3", "node3"}));
+}
 }

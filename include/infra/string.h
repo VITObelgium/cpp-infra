@@ -28,7 +28,7 @@ std::optional<T> toNumeric(std::string_view str) noexcept
         return toInt32(str);
     } else if constexpr (std::is_same_v<int64_t, T>) {
         return toInt64(str);
-    } else if constexpr (std::is_same_v<double, T>) {
+    } else if constexpr (std::is_same_v<float, T>) {
         return toFloat(str);
     } else if constexpr (std::is_same_v<double, T>) {
         return toDouble(str);

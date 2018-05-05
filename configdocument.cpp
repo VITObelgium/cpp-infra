@@ -3,6 +3,7 @@
 #include "infra/string.h"
 
 #include <pugixml.hpp>
+#include <variant>
 
 namespace infra {
 
@@ -18,7 +19,8 @@ struct ConfigDocument::Pimpl
 
 struct ConfigNodeIterator::Pimpl
 {
-    pugi::xml_node_iterator iter;
+    std::variant<pugi::xml_node_iterator, pugi::xml_named_node_iterator> iter;
+    ConfigNode node;
 };
 
 ConfigNode::ConfigNode()
@@ -26,8 +28,22 @@ ConfigNode::ConfigNode()
 {
 }
 
-ConfigNode::~ConfigNode()            = default;
+ConfigNode::~ConfigNode() = default;
+
+ConfigNode::ConfigNode(const ConfigNode& other)
+: _pimpl(std::make_unique<Pimpl>())
+{
+    _pimpl->node = other._pimpl->node;
+}
+
 ConfigNode::ConfigNode(ConfigNode&&) = default;
+
+ConfigNode& ConfigNode::operator=(const ConfigNode& other)
+{
+    _pimpl->node = other._pimpl->node;
+    return *this;
+}
+
 ConfigNode& ConfigNode::operator=(ConfigNode&&) = default;
 
 std::string_view ConfigNode::attribute(const char* name) const
@@ -40,6 +56,11 @@ std::string_view ConfigNode::attribute(const std::string& name) const
     return attribute(name.c_str());
 }
 
+std::string_view ConfigNode::name() const
+{
+    return _pimpl->node.name();
+}
+
 std::string_view ConfigNode::value() const
 {
     return _pimpl->node.child_value();
@@ -50,27 +71,37 @@ std::string_view ConfigNode::trimmedValue() const
     return str::trimmedView(value());
 }
 
-bool ConfigNode::operator!() const
+template <typename T>
+std::optional<T> ConfigNode::value() const
+{
+    return str::toNumeric<T>(_pimpl->node.child_value());
+}
+
+template std::optional<double> ConfigNode::value<double>() const;
+template std::optional<float> ConfigNode::value<float>() const;
+template std::optional<int32_t> ConfigNode::value<int32_t>() const;
+template std::optional<int64_t> ConfigNode::value<int64_t>() const;
+
+bool ConfigNode::operator!() const noexcept
 {
     return !_pimpl->node;
+}
+
+ConfigNode::operator bool() const noexcept
+{
+    return static_cast<bool>(_pimpl->node);
 }
 
 template <typename T>
 std::optional<T> ConfigNode::attribute(const char* name) const
 {
-    auto attr = _pimpl->node.attribute(name);
-    if constexpr (std::is_same_v<int32_t, T>) {
-        return str::toInt32(attr.value());
-    } else if constexpr (std::is_same_v<int64_t, T>) {
-        return str::toInt64(attr.value());
-    } else if constexpr (std::is_same_v<float, T>) {
-        return str::toFloat(attr.value());
-    } else if constexpr (std::is_same_v<double, T>) {
-        return str::toDouble(attr.value());
-    } else {
-        static_assert(dependent_false_v<T>, "Invalid attribute type provided");
-    }
+    return str::toNumeric<T>(_pimpl->node.attribute(name).value());
 }
+
+template std::optional<double> ConfigNode::attribute<double>(const char* name) const;
+template std::optional<float> ConfigNode::attribute<float>(const char* name) const;
+template std::optional<int32_t> ConfigNode::attribute<int32_t>(const char* name) const;
+template std::optional<int64_t> ConfigNode::attribute<int64_t>(const char* name) const;
 
 ConfigNode ConfigNode::child(const char* name) const
 {
@@ -84,15 +115,32 @@ ConfigNode ConfigNode::child(const std::string& name) const
     return child(name.c_str());
 }
 
-ConfigNodeIterator ConfigNode::children() const
+ConfigObjectRange<ConfigNodeIterator> ConfigNode::children() const
 {
-    return ConfigNodeIterator(*this);
+    ConfigNodeIterator begin, end;
+    begin._pimpl       = std::make_unique<ConfigNodeIterator::Pimpl>();
+    end._pimpl         = std::make_unique<ConfigNodeIterator::Pimpl>();
+    begin._pimpl->iter = _pimpl->node.begin();
+    end._pimpl->iter   = _pimpl->node.end();
+    return ConfigObjectRange<ConfigNodeIterator>(std::move(begin), std::move(end));
 }
 
-//ConfigNode ConfigNode::children(const std::string& name) const
-//{
-//    return children(name.c_str());
-//}
+ConfigObjectRange<ConfigNodeIterator> ConfigNode::children(const char* name) const
+{
+    auto range = _pimpl->node.children(name);
+
+    ConfigNodeIterator begin, end;
+    begin._pimpl       = std::make_unique<ConfigNodeIterator::Pimpl>();
+    end._pimpl         = std::make_unique<ConfigNodeIterator::Pimpl>();
+    begin._pimpl->iter = range.begin();
+    end._pimpl->iter   = range.end();
+    return ConfigObjectRange<ConfigNodeIterator>(std::move(begin), std::move(end));
+}
+
+ConfigObjectRange<ConfigNodeIterator> ConfigNode::children(const std::string& name) const
+{
+    return children(name.c_str());
+}
 
 ConfigNode ConfigNode::selectChild(std::string_view selector) const
 {
@@ -148,19 +196,26 @@ ConfigDocument::~ConfigDocument()                = default;
 ConfigDocument::ConfigDocument(ConfigDocument&&) = default;
 ConfigDocument& ConfigDocument::operator=(ConfigDocument&&) = default;
 
-ConfigNodeIterator::ConfigNodeIterator(const ConfigNode& node)
-: _pimpl(std::make_unique<Pimpl>())
+ConfigNode ConfigDocument::rootNode() const
 {
-    _pimpl->iter = node._pimpl->node.begin();
+    ConfigNode root;
+    root._pimpl->node = _pimplDoc->doc.root();
+    return root;
 }
 
 ConfigNodeIterator::ConfigNodeIterator(ConfigNodeIterator&&) = default;
-ConfigNodeIterator::~ConfigNodeIterator()                    = default;
+ConfigNodeIterator::ConfigNodeIterator(const ConfigNodeIterator& other)
+: _pimpl(std::make_unique<Pimpl>())
+{
+    _pimpl->iter = other._pimpl->iter;
+}
+
+ConfigNodeIterator::~ConfigNodeIterator()       = default;
 ConfigNodeIterator& ConfigNodeIterator::operator=(ConfigNodeIterator&& other) = default;
 
 ConfigNodeIterator& ConfigNodeIterator::operator++()
 {
-    ++_pimpl->iter;
+    std::visit([](auto& iter) { ++iter; }, _pimpl->iter);
     return *this;
 }
 
@@ -174,11 +229,22 @@ bool ConfigNodeIterator::operator!=(const ConfigNodeIterator& other) const
     return _pimpl->iter != other._pimpl->iter;
 }
 
-ConfigNode ConfigNodeIterator::operator*()
+ConfigNode& ConfigNodeIterator::operator*()
 {
-    ConfigNode node;
-    node._pimpl->node = *_pimpl->iter;
-    return node;
+    return std::visit([this](auto& iter) -> ConfigNode& {
+        _pimpl->node._pimpl->node = *iter;
+        return _pimpl->node;
+    },
+        _pimpl->iter);
+}
+
+const ConfigNode& ConfigNodeIterator::operator*() const
+{
+    return std::visit([this](auto& iter) -> const ConfigNode& {
+        _pimpl->node._pimpl->node = *iter;
+        return _pimpl->node;
+    },
+        _pimpl->iter);
 }
 
 } // namespace infra
