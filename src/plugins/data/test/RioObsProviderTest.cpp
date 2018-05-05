@@ -1,23 +1,22 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
+#include "AQNetwork.h"
+#include "AQNetworkProvider.h"
 #include "DateTime.h"
 #include "EngineMock.h"
 #include "RioObsProvider.h"
-#include "AQNetwork.h"
-#include "AQNetworkProvider.h"
 
+#include "infra/configdocument.h"
 #include "tools/FileTools.h"
 
-#include <tinyxml.h>
 #include <sstream>
 
-namespace opaq
-{
-namespace test
-{
+namespace opaq {
+namespace test {
 
 using namespace date;
+using namespace infra;
 using namespace chrono;
 using namespace testing;
 using namespace std::chrono_literals;
@@ -27,7 +26,7 @@ static const std::string s_station = "40AB01";
 class AQNetworkProviderMock : public AQNetworkProvider
 {
 public:
-    MOCK_METHOD3(configure, void(TiXmlElement*, const std::string&, IEngine&));
+    MOCK_METHOD3(configure, void(const infra::ConfigNode&, const std::string&, IEngine&));
     MOCK_METHOD0(getAQNetwork, AQNetwork&());
 };
 
@@ -36,7 +35,7 @@ class RioObsProviderTest : public Test
 protected:
     RioObsProviderTest()
     {
-        _aqNetwork.addStation(Station(s_station, "Ukkel", "123", { Pollutant(81102, "pm10", "ug/m3", "PM with diameter below 10 micron") }));
+        _aqNetwork.addStation(Station(s_station, "Ukkel", "123", {Pollutant(81102, "pm10", "ug/m3", "PM with diameter below 10 micron")}));
 
         EXPECT_CALL(_aqProviderMock, getAQNetwork()).Times(AnyNumber()).WillRepeatedly(ReturnRef(_aqNetwork));
 
@@ -50,11 +49,11 @@ protected:
             "  <config>"
             "    <resolution>{}</resolution>"
             "    <file_pattern>./%pol%_data_rio.txt</file_pattern>"
-            "</config>", resolution.count());
+            "</config>",
+            resolution.count());
 
-        TiXmlDocument doc;
-        doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
-        auto* config = doc.FirstChildElement("config");
+        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto config = doc.child("config");
 
         _obsProvider.configure(config, "obsprovider", _engineMock);
         _obsProvider.setAQNetworkProvider(_aqProviderMock);
@@ -81,29 +80,28 @@ TEST_F(RioObsProviderTest, GetValues)
 
     FileTools::writeTextFile("pm10_data_rio.txt", ss.str());
 
-    auto values = _obsProvider.getValues(make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03), s_station, "pm10", Aggregation::Max1h);
+    auto values = _obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::Max1h);
     EXPECT_EQ(2u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 129.0, 42.0 }));
-    EXPECT_THAT(values.datetimes(), ContainerEq(std::vector<date_time>{ make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03) }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{129.0, 42.0}));
+    EXPECT_THAT(values.datetimes(), ContainerEq(std::vector<date_time>{make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03)}));
 
-    values = _obsProvider.getValues(make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03), s_station, "pm10", Aggregation::Max8h);
+    values = _obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::Max8h);
     EXPECT_EQ(2u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 89.0, 38.0 }));
-    EXPECT_THAT(values.datetimes(), ContainerEq(std::vector<date_time>{ make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03) }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{89.0, 38.0}));
+    EXPECT_THAT(values.datetimes(), ContainerEq(std::vector<date_time>{make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03)}));
 
-    values = _obsProvider.getValues(make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03), s_station, "pm10", Aggregation::DayAvg);
+    values = _obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::DayAvg);
     EXPECT_EQ(2u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 80.0, 29.0 }));
-    EXPECT_THAT(values.datetimes(), ContainerEq(std::vector<date_time>{ make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03) }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{80.0, 29.0}));
+    EXPECT_THAT(values.datetimes(), ContainerEq(std::vector<date_time>{make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03)}));
 
-    values = _obsProvider.getValues(make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03) + 23h, s_station, "pm10", Aggregation::None);
+    values = _obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03) + 23h, s_station, "pm10", Aggregation::None);
     EXPECT_EQ(48u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 129, 101, 93, 87, 81, 77, 74, 72, 69, 71, 73, 70, 69, 69, 68, 66, 64, 73, 85, 85, 88, 94, 82, 80,
-                                                                   39, 41, 42, 37, 33, 34, 37, 40, 32, 35, 38, 36, 19, -9999, -9999, -9999, 13, 16, 16, 16, 17, 20, 19, 22 }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{129, 101, 93, 87, 81, 77, 74, 72, 69, 71, 73, 70, 69, 69, 68, 66, 64, 73, 85, 85, 88, 94, 82, 80,
+                                     39, 41, 42, 37, 33, 34, 37, 40, 32, 35, 38, 36, 19, -9999, -9999, -9999, 13, 16, 16, 16, 17, 20, 19, 22}));
 
-    auto date = make_date_time(2009_y/jan/02);
-    for (auto i = 0; i < 48; ++i)
-    {
+    auto date = make_date_time(2009_y / jan / 02);
+    for (auto i = 0; i < 48; ++i) {
         EXPECT_EQ(date, values.datetime(i));
         date += 1h;
     }
@@ -111,14 +109,13 @@ TEST_F(RioObsProviderTest, GetValues)
 
 TEST_F(RioObsProviderTest, GetValuesInvalidStation)
 {
-    EXPECT_TRUE(_obsProvider.getValues(make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03), "InvalidStation", "pm10", Aggregation::None).isEmpty());
+    EXPECT_TRUE(_obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), "InvalidStation", "pm10", Aggregation::None).isEmpty());
 }
 
 TEST_F(RioObsProviderTest, NoStationData)
 {
     FileTools::del("pm10_data_rio.txt");
-    EXPECT_TRUE(_obsProvider.getValues(make_date_time(2009_y/jan/02), make_date_time(2009_y/jan/03), s_station, "pm10", Aggregation::None).isEmpty());
+    EXPECT_TRUE(_obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::None).isEmpty());
 }
-
 }
 }

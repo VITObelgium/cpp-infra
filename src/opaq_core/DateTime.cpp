@@ -7,10 +7,8 @@
 
 #include <fmt/format.h>
 
-namespace opaq
-{
-namespace chrono
-{
+namespace opaq {
+namespace chrono {
 
 std::string to_dense_date_string(const date_time& dt)
 {
@@ -27,40 +25,40 @@ std::string to_date_string(const date_time& dt)
 std::string to_string(const date_time& dt)
 {
     const auto days = date::floor<date::days>(dt);
-    const auto ymd = date::year_month_day(days);
-    const auto time = date::make_time(dt-days).make24();
+    const auto ymd  = date::year_month_day(days);
+    const auto time = date::make_time(dt - days).make24();
 
     return fmt::format("{}-{:0=2}-{:0=2} {:0=2}:{:0=2}:{:0=2}",
-                        static_cast<int>(ymd.year()),
-                        static_cast<unsigned>(ymd.month()),
-                        static_cast<unsigned>(ymd.day()),
-                        time.hours().count(),
-                        time.minutes().count(),
-                        time.seconds().count());
+        static_cast<int>(ymd.year()),
+        static_cast<unsigned>(ymd.month()),
+        static_cast<unsigned>(ymd.day()),
+        time.hours().count(),
+        time.minutes().count(),
+        time.seconds().count());
 }
 
-date_time from_date_string(const std::string& s)
+date_time from_date_string(std::string_view s)
 {
-    std::stringstream input(s);
+    std::stringstream input;
+    input.write(s.data(), s.size());
 
-    std::tm tm{ 0 };
+    std::tm tm{0};
     input >> std::get_time(&tm, "%Y-%m-%d");
-    if (input.fail())
-    {
+    if (input.fail()) {
         throw InvalidArgumentsException("Could not parse date: {}", s);
     }
 
     return make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
 }
 
-date_time from_date_time_string(const std::string& s)
+date_time from_date_time_string(std::string_view s)
 {
-    std::stringstream input(s);
+    std::stringstream input;
+    input.write(s.data(), s.size());
 
-    std::tm tm{ 0 };
+    std::tm tm{0};
     input >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
-    if (input.fail())
-    {
+    if (input.fail()) {
         throw InvalidArgumentsException("Could not parse date time: {}", s);
     }
 
@@ -87,6 +85,5 @@ bool is_weekend(const date_time& dt)
     auto weekDay = date::weekday(date::sys_days(date::floor<days>(dt)));
     return weekDay == date::sun || weekDay == date::sat;
 }
-
 }
 }

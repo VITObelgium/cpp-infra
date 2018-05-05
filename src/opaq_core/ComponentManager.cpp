@@ -4,8 +4,9 @@
 
 #include "config.h"
 
-namespace opaq
-{
+namespace opaq {
+
+using namespace infra;
 
 ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb)
 : _loadPluginCb(cb)
@@ -13,13 +14,10 @@ ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallbac
 {
 }
 
-Component& ComponentManager::createGenericComponent(const std::string& componentName,
-                                                    const std::string& pluginName,
-                                                    TiXmlElement* configuration)
+Component& ComponentManager::createGenericComponent(const std::string& componentName, const std::string& pluginName, const ConfigNode& configuration)
 {
     // 1. check if the component wasn't created previously
-    if (_instanceMap.find(componentName) != _instanceMap.end())
-    {
+    if (_instanceMap.find(componentName) != _instanceMap.end()) {
         throw ComponentAlreadyExistsException("Component already exists: {}", componentName);
     }
 
@@ -35,19 +33,17 @@ Component& ComponentManager::createGenericComponent(const std::string& component
 Component& ComponentManager::findComponent(const std::string& name)
 {
     auto it = _instanceMap.find(name);
-    if (it == _instanceMap.end())
-    {
+    if (it == _instanceMap.end()) {
         throw ComponentNotFoundException("Component not found: {}", name);
     }
 
     return *it->second;
 }
 
-std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration)
+std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, const ConfigNode& configuration)
 {
     auto it = _factoryMap.find(pluginName);
-    if (it == _factoryMap.end())
-    {
+    if (it == _factoryMap.end()) {
         throw PluginNotFoundException("Plugin not found: {}", pluginName);
     }
 
@@ -61,8 +57,7 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
 {
     // 1. check if plugin was already loaded
     auto it = _factoryMap.find(pluginName);
-    if (it != _factoryMap.end())
-    {
+    if (it != _factoryMap.end()) {
         // Plugin already loaded
         return;
     }
@@ -79,5 +74,4 @@ void ComponentManager::destroyComponents()
 {
     _instanceMap.clear();
 }
-
 }

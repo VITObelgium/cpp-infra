@@ -5,10 +5,11 @@
 #include <string>
 #include <vector>
 
-#include <tinyxml.h>
+namespace infra {
+class ConfigNode;
+}
 
-namespace opaq
-{
+namespace opaq {
 
 /**
      Class to represent a pollutant in OPAQ
@@ -25,7 +26,7 @@ public:
     Constructor from an XML element
     \param el A const pointer to the TiXmlELement holding the pollutant definitoin
     */
-    Pollutant(TiXmlElement const* el);
+    Pollutant(const infra::ConfigNode& el);
 
     /** Writes out the pollutant information to the ostream */
     friend std::ostream& operator<<(std::ostream& os, const Pollutant& s);
@@ -34,20 +35,32 @@ public:
     std::string toString() const;
 
     /** returns the ID of the pollutant */
-    long getId() const { return _id; }
+    long getId() const
+    {
+        return _id;
+    }
 
     /** returns the name of the pollutant */
-    std::string getName() const { return _name; }
+    std::string getName() const
+    {
+        return _name;
+    }
 
     /** 
     returns the units of the pollutant
     \note that this is just a string, there is no real meaning or 
     functionality assigned to the units (yet)
     */
-    std::string getUnit() const { return _unit; }
+    std::string getUnit() const
+    {
+        return _unit;
+    }
 
     /** returns the description */
-    std::string getDescription() const { return _desc; }
+    std::string getDescription() const
+    {
+        return _desc;
+    }
 
 private:
     long _id;

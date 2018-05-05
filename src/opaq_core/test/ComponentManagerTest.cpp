@@ -1,19 +1,17 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
-#include "Engine.h"
 #include "ComponentManagerFactory.h"
-#include "config.h"
-#include "testconfig.h"
+#include "Engine.h"
 #include "PollutantManager.h"
+#include "config.h"
+#include "infra/configdocument.h"
+#include "testconfig.h"
 
-#include <tinyxml.h>
+namespace opaq {
+namespace test {
 
-namespace opaq
-{
-namespace test
-{
-
+using namespace infra;
 using namespace testing;
 using namespace std::string_literals;
 
@@ -32,8 +30,8 @@ protected:
     {
     }
 
-    EngineMock          _engineMock;
-    ComponentManager    _cmpMgr;
+    EngineMock _engineMock;
+    ComponentManager _cmpMgr;
 };
 
 TEST_F(ComponentManagerTest, LoadPlugin)
@@ -45,14 +43,12 @@ TEST_F(ComponentManagerTest, LoadPlugin)
         "    <fctime_resolution>24</fctime_resolution>"
         "</config>"s;
 
-    TiXmlDocument doc;
-    doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
-    auto* config = doc.FirstChildElement("config");
+    auto doc    = ConfigDocument::loadFromString(configXml);
+    auto config = doc.child("config");
 
     _cmpMgr.loadPlugin("sqlbuffer", TEST_BINARY_DIR "/" PLUGIN_PREFIX "sqlbufferplugin" PLUGIN_EXT);
     auto& comp = _cmpMgr.createComponent<Component>("sqlbuffer", "sqlbuffer", config);
     EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("sqlbuffer"));
 }
-
 }
 }

@@ -1,5 +1,3 @@
-find_path(TINYXML_INCLUDE_DIR NAMES tinyxml.h)
-
 if (UNIX)
     set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
 endif ()
@@ -20,7 +18,6 @@ endif ()
 list(APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 find_package(Eigen3 REQUIRED)
-find_package(TinyXml REQUIRED)
 
 add_definitions(-D_XOPEN_SOURCE)
 

@@ -1,11 +1,12 @@
 #include "MLP_FeedForwardModel.h"
 
-#include "Station.h"
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
+#include "Station.h"
 #include "TimeSeries.h"
-#include "feedforwardnet.h"
 #include "data/ForecastBuffer.h"
+#include "feedforwardnet.h"
+#include "infra/configdocument.h"
 #include "tools/StringTools.h"
 
 #include <limits>
@@ -17,8 +18,9 @@ static const std::string STATION_PLACEHOLDER     = "%station%"; // placeholder f
 static const std::string FCHOR_PLACEHOLDER       = "%fc_hor%";  // idem for forecast horizon
 static const std::string MODEL_PLACEHOLDER       = "%model%";   // idem for feature vector model
 
-namespace opaq
-{
+namespace opaq {
+
+using namespace infra;
 
 MLP_FeedForwardModel::MLP_FeedForwardModel(const std::string& name)
 : Model(name)
@@ -27,9 +29,8 @@ MLP_FeedForwardModel::MLP_FeedForwardModel(const std::string& name)
 }
 
 std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggregation::Type aggr,
-                                               const std::string& st_name, int fc_hor)
+    const std::string& st_name, int fc_hor)
 {
-
     // Building filename...
     std::string fname = this->pattern;
     StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol_name);
@@ -45,66 +46,63 @@ std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggr
 // run( ) method, as this will require updating the buffers, as we want OVL to be a standalone plugin,
 // we should make it independent of the output of the other models --> so run them twice !!!
 double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& station,
-                                     Aggregation::Type aggr, const chrono::date_time& baseTime,
-                                     chrono::days fc_hor)
+    Aggregation::Type aggr, const chrono::date_time& baseTime,
+    chrono::days fc_hor)
 {
-
     // Return the neural network filename, should be implemented in the daughter class
     auto fname = getFFNetFile(pol.getName(), aggr, station.getName(), fc_hor.count());
 
     // Read in the network file
-    TiXmlDocument nnet_xml(fname.c_str());
-    if (!nnet_xml.LoadFile()) {
-        _logger->error("   unable to load ffnet from: {}", fname);
+
+    try {
+        auto nnet_xml = ConfigDocument::loadFromFile(fname);
+
+        // construct the neural network object
+        std::unique_ptr<nnet::feedforwardnet> net;
+        try {
+            net = std::make_unique<nnet::feedforwardnet>(nnet_xml.rootNode());
+        } catch (const std::exception& e) {
+            _logger->error("Unable to construct ffnet in {} ({})", fname, e.what());
+            return getNoData();
+        }
+
+        if (net->inputSize() != this->sample_size) {
+            throw RunTimeException("Invalid network input size (" + std::to_string(net->inputSize()) +
+                                   ") for model sample size (" + std::to_string(this->sample_size) + ")");
+        }
+
+        auto fcTime = baseTime + fc_hor;
+
+        // construct the input feature vector, output is single pointer value
+        // not really nice, but let's leave it for the moment...
+        std::vector<double> input_sample(net->inputSize());
+        double* output;
+
+        // call abstract method to generate the sample
+        if (this->makeSample(input_sample.data(), station, pol, aggr, baseTime, fcTime, fc_hor)) {
+            _logger->error("   input sample incomplete, setting missing value");
+            return getNoData();
+        }
+
+        // for ( int ii=0; ii< net->inputSize(); ++ii )
+        //   std::cout << "input_sample["<<ii<<"] = " << input_sample[ii] << std::endl;
+
+        // simulate the network
+        net->sim(input_sample.data());
+
+        // retrieve the output & reset the logtransform
+        net->getOutput(&output);
+        double out = exp(output[0]) - 1;
+
+        if (std::isnan(out) || std::isinf(out)) {
+            out = getNoData();
+        }
+
+        return out;
+    } catch (const std::exception& e) {
+        _logger->error("   unable to load ffnet from: {} ({})", fname, e.what());
         return getNoData();
     }
-
-    // construct the neural network object
-    std::unique_ptr<nnet::feedforwardnet> net;
-    try
-    {
-        net = std::make_unique<nnet::feedforwardnet>(nnet_xml.RootElement());
-    }
-    catch (const char* msg)
-    {
-        _logger->error("Unable to construct ffnet in {} ({})", fname, msg);
-        return getNoData();
-    }
-
-    if (net->inputSize() != this->sample_size) {
-        throw RunTimeException("Invalid network input size (" + std::to_string(net->inputSize()) +
-                               ") for model sample size (" + std::to_string(this->sample_size) + ")");
-    }
-
-    auto fcTime = baseTime + fc_hor;
-
-    // construct the input feature vector, output is single pointer value
-    // not really nice, but let's leave it for the moment...
-    std::vector<double> input_sample(net->inputSize());
-    double* output;
-
-    // call abstract method to generate the sample
-    if (this->makeSample(input_sample.data(), station, pol, aggr, baseTime, fcTime, fc_hor)) {
-        _logger->error("   input sample incomplete, setting missing value");
-        return getNoData();
-    }
-
-    // for ( int ii=0; ii< net->inputSize(); ++ii )
-    //   std::cout << "input_sample["<<ii<<"] = " << input_sample[ii] << std::endl;
-
-    // simulate the network
-    net->sim(input_sample.data());
-
-    // retrieve the output & reset the logtransform
-    net->getOutput(&output);
-    double out = exp(output[0]) - 1;
-
-    if (std::isnan(out) || std::isinf(out))
-    {
-        out = getNoData();
-    }
-
-    return out;
 }
 
 /* ============================================================================
@@ -132,22 +130,19 @@ void MLP_FeedForwardModel::run()
     int fcHorMax = getForecastHorizon().count();
 
     // -- 2. loop over the stations
-    for (auto& station : stations)
-    {
+    for (auto& station : stations) {
         // check if we have a valid meteo id, otherwise skip the station
         if (station.getMeteoId().empty()) {
             _logger->trace("Skipping station {}, no meteo id given", station.getName());
             continue;
-        }
-        else
+        } else
             _logger->trace("Forecasting station {}", station.getName());
 
         // store the output in a timeseries object
         TimeSeries<double> fc;
         fc.clear();
 
-        for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor)
-        {
+        for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor) {
             chrono::days fcHor(fc_hor);
             auto fcTime = baseTime + fcHor;
             _logger->trace(" -- basetime: {}, horizon: day {}, dayN is: {}", chrono::to_date_string(baseTime), fc_hor, chrono::to_date_string(fcTime));
@@ -172,10 +167,8 @@ double MLP_FeedForwardModel::mean_missing(const std::vector<double>& list, doubl
     double out    = 0;
     int dataCount = 0;
 
-    for (auto value : list)
-    {
-        if (value != noData)
-        {
+    for (auto value : list) {
+        if (value != noData) {
             out += value;
             ++dataCount;
         }
@@ -193,9 +186,8 @@ double MLP_FeedForwardModel::max_missing(const std::vector<double>& list, double
     double out = std::numeric_limits<double>::min();
     auto it    = list.begin();
 
-    while (it != list.end())
-    {
-        double value                                = *it++;
+    while (it != list.end()) {
+        double value = *it++;
         if ((value != noData) && (value > out)) out = value;
     }
     return out > std::numeric_limits<double>::min() ? out : noData;
@@ -210,9 +202,8 @@ double MLP_FeedForwardModel::min_missing(const std::vector<double>& list, double
     double out = std::numeric_limits<double>::max();
     auto it    = list.begin();
 
-    while (it != list.end())
-    {
-        double value                                = *it++;
+    while (it != list.end()) {
+        double value = *it++;
         if ((value != noData) && (value < out)) out = value;
     }
     return out < std::numeric_limits<double>::max() ? out : noData;
@@ -225,8 +216,7 @@ void MLP_FeedForwardModel::printPar(const std::string& title, const std::vector<
 {
     std::stringstream ss;
     ss << title;
-    for (auto value : x)
-    {
+    for (auto value : x) {
         ss << " " << value;
     }
 

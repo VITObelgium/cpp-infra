@@ -4,31 +4,54 @@
 #include <functional>
 
 #include <Eigen/Dense>
-#include <tinyxml.h>
 
 #include "transfcn.h"
 
-namespace nnet
-{
+namespace infra {
+class ConfigNode;
+}
+
+namespace nnet {
 
 // base class for a neural network layer
 class layer
 {
 public:
-    layer(TiXmlElement* cnf, int ninputs);
+    layer(const infra::ConfigNode& config, int ninputs);
     virtual ~layer();
 
     friend std::ostream& operator<<(std::ostream& os, const layer& lyr);
 
-    int size() { return static_cast<int>(_a.size()); }
-    std::string name() { return _Name; }
-    double* values() { return _a.data(); } // the .data() method contains a const pointer to the scalar data
-    Eigen::VectorXd& valuesAsVector() { return _a; }
+    int size()
+    {
+        return static_cast<int>(_a.size());
+    }
+    std::string name()
+    {
+        return _Name;
+    }
+    double* values()
+    {
+        return _a.data();
+    } // the .data() method contains a const pointer to the scalar data
+    Eigen::VectorXd& valuesAsVector()
+    {
+        return _a;
+    }
 
-    int inputSize() { return static_cast<int>(_LW.cols()); }
-    int outputSize() { return static_cast<int>(_LW.rows()); }
+    int inputSize()
+    {
+        return static_cast<int>(_LW.cols());
+    }
+    int outputSize()
+    {
+        return static_cast<int>(_LW.rows());
+    }
 
-    std::string fcnName() { return _fcnName; } // transfer function
+    std::string fcnName()
+    {
+        return _fcnName;
+    } // transfer function
 
     // propagates an input vector through this layer
     void compute(const Eigen::VectorXd& input);

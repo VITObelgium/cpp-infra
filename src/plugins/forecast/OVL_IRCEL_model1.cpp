@@ -1,19 +1,17 @@
 
 #include "OVL_IRCEL_model1.h"
 
-#include "Station.h"
 #include "PluginRegistration.h"
-#include "data/MeteoProvider.h"
+#include "Station.h"
 #include "data/DataProvider.h"
-#include "tools/XmlTools.h"
-
-#include <tinyxml.h>
+#include "data/MeteoProvider.h"
+#include "infra/configdocument.h"
 
 #define epsilon 1e-6
 
-namespace opaq
-{
+namespace opaq {
 
+using namespace infra;
 using namespace std::chrono_literals;
 
 OVL_IRCEL_model1::OVL_IRCEL_model1()
@@ -36,49 +34,33 @@ std::string OVL_IRCEL_model1::name()
 /* ============================================================================
      Implementation of the configure method
      ========================================================================== */
-void OVL_IRCEL_model1::configure(TiXmlElement* cnf, const std::string& componentName, IEngine&)
+void OVL_IRCEL_model1::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 
-    try
-    {
-        // read the path to the architecture files
-        this->pattern = XmlTools::getText(cnf, "ffnetfile_pattern");
-    }
-    catch (ElementNotFoundException& e)
-    {
-        throw BadConfigurationException(e.what());
+    pattern = std::string(configuration.child("ffnetfile_pattern").value());
+    if (pattern.empty()) {
+        throw BadConfigurationException("no ffnetfile_pattern specified");
     }
 
     // read morning aggregation (optional)
-    try
-    {
-        this->mor_agg = atoi(XmlTools::getText(cnf, "mor_agg").c_str());
-    }
-    catch (const ElementNotFoundException&)
-    {
-        this->mor_agg = 24; // take all available observations for the day
-    }
+    mor_agg = configuration.child("mor_agg").value<int>().value_or(24);
 
     // read missing value for this model (optional)
-    try
-    {
-        setNoData(atoi(XmlTools::getText(cnf, "missing_value").c_str()));
+    auto missingValue = configuration.child("missing_value").value<int>();
+    if (missingValue.has_value()) {
+        setNoData(missingValue.value());
     }
-    catch (...)
-    {
-    };
 }
 
 /* ============================================================================
      Construct sample for the OVL_IRCEL_model1 configuration
      ========================================================================== */
 int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
-                                 const Pollutant& pol, Aggregation::Type aggr,
-                                 const chrono::date_time& baseTime, const chrono::date_time& fcTime,
-                                 chrono::days fc_hor)
+    const Pollutant& pol, Aggregation::Type aggr,
+    const chrono::date_time& baseTime, const chrono::date_time& fcTime,
+    chrono::days fc_hor)
 {
-
     int have_sample = 0; // return code, 0 for success
 
     // -----------------------
@@ -118,22 +100,17 @@ int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
         if (!pol.getName().compare("o3")) {
             // take the maximum BLH for O3 forecasts
             xx = max_missing(blh.values(), meteo->getNoData(p_blh));
-        }
-        else
-        {
+        } else {
             // take the minimum BLH
             xx = min_missing(blh.values(), meteo->getNoData(p_blh));
         }
-    }
-    else
-    {
+    } else {
         // also for max8h we use the daily averages
         xx = mean_missing(blh.values(), meteo->getNoData(p_blh));
     }
     if (fabs(xx - meteo->getNoData(p_blh)) > epsilon)
         sample[1] = log(1 + xx);
-    else
-    {
+    else {
         have_sample++;
         // TODO perhaps provide some kind of climatology to fill the missing sample...
     }
@@ -142,6 +119,4 @@ int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
 }
 
 OPAQ_REGISTER_STATIC_PLUGIN(OVL_IRCEL_model1)
-
 }
-

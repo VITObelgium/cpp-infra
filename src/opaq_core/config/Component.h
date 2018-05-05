@@ -1,14 +1,14 @@
 #pragma once
 
 #include "Plugin.h"
+#include "infra/configdocument.h"
+
 #include <string>
 
 class TiXmlElement;
 
-namespace opaq
-{
-namespace config
-{
+namespace opaq {
+namespace config {
 
 /**
  * Component configuration class
@@ -20,8 +20,7 @@ struct Component
 {
     std::string name;
     Plugin plugin;
-    TiXmlElement* config = nullptr;
+    infra::ConfigNode config;
 };
-
 }
 }

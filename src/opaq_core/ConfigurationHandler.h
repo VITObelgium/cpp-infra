@@ -6,8 +6,6 @@
 
 #include <string>
 
-class TiXmlElement;
-
 namespace opaq {
 
 namespace config {
@@ -59,13 +57,12 @@ public:
     }
 
 private:
-    config::ForecastStage parseForecastStage(TiXmlElement* element);
-    config::MappingStage parseMappingStage(TiXmlElement* element);
+    config::ForecastStage parseForecastStage(const infra::ConfigNode& element);
+    config::MappingStage parseMappingStage(const infra::ConfigNode& element);
 
     config::OpaqRun _opaqRun;
     infra::ConfigDocument _doc;
-    std::vector<std::unique_ptr<TiXmlDocument>> _configDocs;
+    std::vector<infra::ConfigDocument> _configDocs;
     Logger _logger;
 };
-
 }

@@ -1,41 +1,38 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <chrono>
 
-#include "../SqlBuffer.h"
 #include "../Hdf5Buffer.h"
+#include "../SqlBuffer.h"
 
+#include "EngineMock.h"
 #include "config.h"
 #include "testconfig.h"
-#include "EngineMock.h"
 
-#include "Engine.h"
-#include "TimeSeries.h"
 #include "ComponentManagerFactory.h"
-#include "tools/FileTools.h"
+#include "Engine.h"
 #include "PredictionDatabase.h"
+#include "TimeSeries.h"
+#include "infra/configdocument.h"
+#include "tools/FileTools.h"
 
-namespace std
-{
-namespace chrono
-{
+namespace std {
+namespace chrono {
 
-template<class _Clock, class _Duration = typename _Clock::duration>
-ostream& operator<< (ostream& os, const time_point<_Clock, _Duration>& dt)
+template <class _Clock, class _Duration = typename _Clock::duration>
+ostream& operator<<(ostream& os, const time_point<_Clock, _Duration>& dt)
 {
     return os << opaq::chrono::to_string(dt);
 }
-
 }
 }
 
-namespace opaq
-{
-namespace test
-{
+namespace opaq {
+namespace test {
 
 using namespace date;
+using namespace infra;
 using namespace chrono;
 using namespace testing;
 using namespace chrono_literals;
@@ -59,9 +56,8 @@ protected:
             "    <fctime_resolution>24</fctime_resolution>"
             "</config>"s;
 
-        TiXmlDocument doc;
-        doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
-        auto* config = doc.FirstChildElement("config");
+        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto config = doc.child("config");
 
         auto name = BufferType::name();
 
@@ -95,7 +91,7 @@ TYPED_TEST(ForecastBufferTest, GetModelNamesEmpty)
 
 TYPED_TEST(ForecastBufferTest, GetModelNames)
 {
-    auto basetime = make_date_time(2015_y/jan/1);
+    auto basetime = make_date_time(2015_y / jan / 1);
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime, 1.5);
     forecast2.insert(basetime + 24h, 2.5);
@@ -112,8 +108,8 @@ TYPED_TEST(ForecastBufferTest, GetModelNames)
     this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm25", Aggregation::DayAvg);
     this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm25", Aggregation::Max8h);
 
-    EXPECT_THAT(this->_buffer->getModelNames("pm10", Aggregation::DayAvg), ContainerEq(std::vector<std::string>{ "model1", "model2" }));
-    EXPECT_THAT(this->_buffer->getModelNames("pm25", Aggregation::Max8h), ContainerEq(std::vector<std::string>{ "model3" }));
+    EXPECT_THAT(this->_buffer->getModelNames("pm10", Aggregation::DayAvg), ContainerEq(std::vector<std::string>{"model1", "model2"}));
+    EXPECT_THAT(this->_buffer->getModelNames("pm25", Aggregation::Max8h), ContainerEq(std::vector<std::string>{"model3"}));
     EXPECT_THROW(this->_buffer->getModelNames("pm25", Aggregation::Max1h), NotAvailableException);
 }
 
@@ -135,16 +131,15 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValues)
     auto results = this->_buffer->getForecastValues(fcHor, basetime1 + fcHor, basetime2 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime1 + fcHor,
-        basetime2 + fcHor
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, 2.5 }));
+                                         basetime1 + fcHor,
+                                         basetime2 + fcHor}));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{1.5, 2.5}));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastSingleValue)
 {
     auto basetime1 = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor     = 1_d;
 
     TimeSeries<double> forecast1;
     forecast1.insert(basetime1 + fcHor, 1.5);
@@ -155,15 +150,15 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastSingleValue)
     auto results = this->_buffer->getForecastValues(fcHor, basetime1 + fcHor, basetime1 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime1 + fcHor,
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5 }));
+                                         basetime1 + fcHor,
+                                     }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{1.5}));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtEnd)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor    = 1_d;
 
     TimeSeries<double> forecast;
     forecast.insert(basetime + fcHor, 1.5);
@@ -175,16 +170,15 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtEnd)
     auto results = this->_buffer->getForecastValues(fcHor, basetime + fcHor + 48h, basetime + fcHor + 72h, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime + fcHor + 48h,
-        basetime + fcHor + 72h
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ this->_noData, this->_noData }));
+                                         basetime + fcHor + 48h,
+                                         basetime + fcHor + 72h}));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{this->_noData, this->_noData}));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtFront)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor    = 1_d;
 
     TimeSeries<double> forecast;
     forecast.insert(basetime + fcHor, 1.5);
@@ -196,16 +190,15 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyOutOfRangeAtFront)
     auto results = this->_buffer->getForecastValues(fcHor, basetime - 24h, basetime, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime - 24h,
-        basetime
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ this->_noData, this->_noData }));
+                                         basetime - 24h,
+                                         basetime}));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{this->_noData, this->_noData}));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRangeAtFront)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor    = 1_d;
 
     TimeSeries<double> forecast;
     forecast.insert(basetime + fcHor, 1.5);
@@ -217,16 +210,15 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRange
     auto results = this->_buffer->getForecastValues(fcHor, basetime, basetime + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime,
-        basetime + fcHor
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ this->_noData, 1.5 }));
+                                         basetime,
+                                         basetime + fcHor}));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{this->_noData, 1.5}));
 }
 
 TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRangeAtEnd)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor    = 1_d;
 
     TimeSeries<double> forecast;
     forecast.insert(basetime + fcHor, 1.5);
@@ -237,16 +229,15 @@ TYPED_TEST(ForecastBufferTest, SetGetForecastValuesCompletelyPartiallyOutOfRange
     auto results = this->_buffer->getForecastValues(fcHor, basetime + fcHor, basetime + fcHor + 24h, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime + fcHor,
-        basetime + fcHor + 24h
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, this->_noData }));
+                                         basetime + fcHor,
+                                         basetime + fcHor + 24h}));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{1.5, this->_noData}));
 }
 
 TYPED_TEST(ForecastBufferTest, OverwriteValue)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor    = 1_d;
 
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime + fcHor, 1.5);
@@ -259,9 +250,8 @@ TYPED_TEST(ForecastBufferTest, OverwriteValue)
     auto results = this->_buffer->getForecastValues(fcHor, basetime + fcHor, basetime + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
 
     EXPECT_THAT(results.datetimes(), ContainerEq(std::vector<chrono::date_time>{
-        basetime + fcHor
-    }));
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 2.5 }));
+                                         basetime + fcHor}));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{2.5}));
 }
 
 TYPED_TEST(ForecastBufferTest, SecondTimeBeforeFirstTime)
@@ -273,7 +263,7 @@ TYPED_TEST(ForecastBufferTest, SecondTimeBeforeFirstTime)
 TYPED_TEST(ForecastBufferTest, GetModelValues)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    auto fcHor = 1_d;
+    auto fcHor    = 1_d;
 
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime + fcHor, 1.5);
@@ -289,22 +279,22 @@ TYPED_TEST(ForecastBufferTest, GetModelValues)
     this->_buffer->setValues(basetime, forecast2, "Ukkel", "pm10", Aggregation::DayAvg);
 
     auto results = this->_buffer->getModelValues(basetime, fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
-    EXPECT_THAT(results, ContainerEq(std::vector<double>{ 1.5, 10.5 }));
+    EXPECT_THAT(results, ContainerEq(std::vector<double>{1.5, 10.5}));
 
     results = this->_buffer->getModelValues(basetime, fcHor * 2, "Ukkel", "pm10", Aggregation::DayAvg);
-    EXPECT_THAT(results, ContainerEq(std::vector<double>{ 2.5, 20.5 }));
+    EXPECT_THAT(results, ContainerEq(std::vector<double>{2.5, 20.5}));
 }
 
 TYPED_TEST(ForecastBufferTest, GetValuesFromSetForecastHorizon)
 {
     auto basetime1 = make_date_time(2015_y / jan / 1);
     auto basetime2 = make_date_time(2015_y / jan / 2);
-    auto fcHor = 1_d;
+    auto fcHor     = 1_d;
 
     TimeSeries<double> forecast1, forecast2;
     forecast1.insert(basetime1 + fcHor, 1.5);
     forecast1.insert(basetime1 + fcHor + 1_d, 2.5);
-    
+
     forecast2.insert(basetime2 + fcHor, 3.5);
     forecast2.insert(basetime2 + fcHor + 1_d, 4.5);
 
@@ -314,8 +304,7 @@ TYPED_TEST(ForecastBufferTest, GetValuesFromSetForecastHorizon)
 
     this->_buffer->setForecastHorizon(fcHor);
     auto results = this->_buffer->getValues(basetime1 + fcHor, basetime2 + fcHor, "Ukkel", "pm10", Aggregation::DayAvg);
-    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{ 1.5, 3.5 }));
+    EXPECT_THAT(results.values(), ContainerEq(std::vector<double>{1.5, 3.5}));
 }
-
 }
 }

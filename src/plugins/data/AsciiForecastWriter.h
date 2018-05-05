@@ -12,15 +12,13 @@
 #include <string>
 #include <vector>
 
-namespace opaq
-{
+namespace opaq {
 
 class AsciiForecastWriter : public ForecastOutputWriter
 {
-
 public:
     AsciiForecastWriter();
-    virtual ~AsciiForecastWriter();
+    virtual ~AsciiForecastWriter() override;
 
     static std::string name();
 
@@ -30,7 +28,7 @@ public:
 
     // OPAQ::Component methods
     // throws (BadConfigurationException)
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::ForecastOutputWriter methods
     void write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime) override;

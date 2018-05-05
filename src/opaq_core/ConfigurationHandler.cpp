@@ -7,8 +7,6 @@
 #include "config/MappingStage.h"
 #include "tools/XmlTools.h"
 
-#include <tinyxml.h>
-
 namespace opaq {
 
 using namespace infra;
@@ -18,86 +16,60 @@ ConfigurationHandler::ConfigurationHandler()
 {
 }
 
-config::ForecastStage ConfigurationHandler::parseForecastStage(TiXmlElement* element)
+static std::string getChildElement(const ConfigNode& node, const char* name)
 {
-    config::Component values, buffer, outputWriter;
+    auto val = node.child("name").value();
+    if (val.empty()) {
+        throw BadConfigurationException("Node '{}' not found in run configuration");
+    }
+
+    return std::string(val);
+}
+
+config::ForecastStage ConfigurationHandler::parseForecastStage(const ConfigNode& element)
+{
     boost::optional<config::Component> meteo;
     std::vector<config::Component> models;
 
-    auto* modelsElement = element->FirstChildElement("models");
+    auto modelsElement = element.child("models");
     if (!modelsElement) {
         throw RunTimeException("No models tag given in forecast stage configuration!");
     }
 
-    auto* componentElement = modelsElement->FirstChildElement("component");
-    while (componentElement) {
-        models.push_back(_opaqRun.getComponent(componentElement->GetText()));
-        componentElement = componentElement->NextSiblingElement("component");
+    for (auto& componentElement : modelsElement.children("component")) {
+        models.push_back(_opaqRun.getComponent(std::string(componentElement.value())));
     }
 
     // parse the <input> section
-    auto* inputElement = element->FirstChildElement("input");
-    try {
-        values = _opaqRun.getComponent(XmlTools::getText(inputElement, "observations"));
-    } catch (const ElementNotFoundException&) {
-        throw BadConfigurationException("No observation data provider in run configuration");
-    }
+    auto inputElement = element.child("input");
+    auto values       = _opaqRun.getComponent(getChildElement(inputElement, "observations"));
+    auto buffer       = _opaqRun.getComponent(getChildElement(inputElement, "meteo"));
+    auto outputWriter = _opaqRun.getComponent(getChildElement(inputElement, "output"));
 
-    try {
-        meteo = _opaqRun.getComponent(XmlTools::getText(inputElement, "meteo"));
-    } catch (const ElementNotFoundException&) {
-        _logger->warn("No meteo dataprovider in the run configuration");
-    }
-
-    try {
-        buffer = _opaqRun.getComponent(XmlTools::getText(element, "buffer"));
-    } catch (const ElementNotFoundException&) {
-        throw BadConfigurationException("No databuffer given in run configuration");
-    }
-
-    try {
-        outputWriter = _opaqRun.getComponent(XmlTools::getText(element, "output"));
-    } catch (const ElementNotFoundException&) {
-        throw BadConfigurationException("No outputWriter given in run configuration");
-    }
-
-    auto fcHor = chrono::days(XmlTools::getChildValue<int>(element, "horizon", 2));
-
+    auto fcHor = chrono::days(element.child("horizon").value<int>().value_or(2));
     return config::ForecastStage(fcHor, values, buffer, outputWriter, meteo, models);
 }
 
-config::MappingStage ConfigurationHandler::parseMappingStage(TiXmlElement* element)
+config::MappingStage ConfigurationHandler::parseMappingStage(const ConfigNode& element)
 {
-    config::Component observations, buffer;
     std::vector<config::Component> models;
 
-    auto gridType = gridTypeFromString(XmlTools::getChildValue<std::string>(element, "gridtype"));
+    auto gridType = gridTypeFromString(std::string(element.child("gridtype").value()));
 
-    auto* modelsElement = element->FirstChildElement("models");
+    auto modelsElement = element.child("models");
     if (!modelsElement) {
         throw RunTimeException("No models tag given in mapping stage configuration!");
     }
 
-    auto* componentElement = modelsElement->FirstChildElement("component");
-    while (componentElement) {
-        models.push_back(_opaqRun.getComponent(componentElement->GetText()));
-        componentElement = componentElement->NextSiblingElement("component");
+    for (auto& componentElement : modelsElement.children("component")) {
+        models.push_back(_opaqRun.getComponent(std::string(componentElement.value())));
     }
 
     // parse the <input> section
-    auto* inputElement = element->FirstChildElement("input");
-    try {
-        observations = _opaqRun.getComponent(XmlTools::getText(inputElement, "observations"));
-    } catch (const ElementNotFoundException&) {
-        throw BadConfigurationException("No observations data provider in run configuration");
-    }
-
-    // parse the <buffer> section
-    try {
-        buffer = _opaqRun.getComponent(XmlTools::getText(element, "buffer"));
-    } catch (const ElementNotFoundException&) {
-        _logger->warn("No databuffer given in run configuration");
-    }
+    // parse the <input> section
+    auto inputElement = element.child("input");
+    auto observations = _opaqRun.getComponent(getChildElement(inputElement, "observations"));
+    auto buffer       = _opaqRun.getComponent(getChildElement(inputElement, "buffer"));
 
     return config::MappingStage(gridType, observations, buffer, std::move(models));
 }
@@ -126,138 +98,133 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         auto pluginPath     = pluginsElement.trimmedValue();
 
         // adjusting this to make use of attributes, the config looks much cleaner this way...
-        auto pluginElement = pluginsElement.child("plugin");
-        while (pluginElement) {
-            auto fullname = fmt::format("{}/{}" PLUGIN_EXT, pluginPath, pluginElement->GetText());
+        for (auto& pluginElement : pluginsElement.children("plugin")) {
+            auto fullname = fmt::format("{}/{}" PLUGIN_EXT, pluginPath, pluginElement.value());
 
             config::Plugin plugin;
-            plugin.name    = pluginElement->Attribute("name");
+            plugin.name    = pluginElement.attribute("name");
             plugin.libPath = fullname;
             _opaqRun.addPlugin(plugin);
-            pluginElement = pluginElement->NextSiblingElement("plugin");
         }
 
         // Parsing components section
-        TiXmlDocument componentsDoc;
-        TiXmlElement* componentsElement = XmlTools::getElement(rootElement, "components", &componentsDoc);
-        TiXmlElement* componentElement  = componentsElement->FirstChildElement("component");
-        while (componentElement) {
-            _configDocs.push_back(std::make_unique<TiXmlDocument>());
+        ConfigDocument componentsDoc;
+        auto componentsElement = XmlTools::getElement(rootElement, "components", &componentsDoc);
+        for (auto& componentElement : componentsElement.children("component")) {
+            _configDocs.push_back(ConfigDocument());
 
             config::Component component;
-            component.name   = componentElement->Attribute("name");
-            component.plugin = _opaqRun.getPlugin(componentElement->Attribute("plugin"));
-            component.config = XmlTools::getElement(componentElement, "config", _configDocs.back().get());
+            component.name   = componentElement.attribute("name");
+            component.plugin = _opaqRun.getPlugin(std::string(componentElement.attribute("plugin")));
+            component.config = XmlTools::getElement(componentElement, "config", &_configDocs.back());
             _opaqRun.addComponent(component);
-
-            componentElement = componentElement->NextSiblingElement("component");
         }
 
-        // Parsing pollutants section
-        try {
-            TiXmlDocument pollutantsDoc;
-            TiXmlElement* pollutantsElement = XmlTools::getElement(rootElement, "pollutants", &pollutantsDoc);
-            pollutantMgr.configure(pollutantsElement);
-        } catch (ElementNotFoundException& e) {
-            throw BadConfigurationException("no pollutants section in configuration file: {}", e.what());
-        }
+        //        // Parsing pollutants section
+        //        try {
+        //            TiXmlDocument pollutantsDoc;
+        //            TiXmlElement* pollutantsElement = XmlTools::getElement(rootElement, "pollutants", &pollutantsDoc);
+        //            pollutantMgr.configure(pollutantsElement);
+        //        } catch (ElementNotFoundException& e) {
+        //            throw BadConfigurationException("no pollutants section in configuration file: {}", e.what());
+        //        }
 
-        if (pollutantMgr.getList().empty()) {
-            throw BadConfigurationException("pollutant list is empty: define at least 1 pollutant");
-        }
+        //        if (pollutantMgr.getList().empty()) {
+        //            throw BadConfigurationException("pollutant list is empty: define at least 1 pollutant");
+        //        }
 
-        _logger->info("Pollutant list:");
-        for (auto& pol : pollutantMgr.getList()) {
-            _logger->info(" {}", pol.toString());
-        }
+        //        _logger->info("Pollutant list:");
+        //        for (auto& pol : pollutantMgr.getList()) {
+        //            _logger->info(" {}", pol.toString());
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Now we parse the run information, which defines how OPAQ should be run
-     i.e. for what pollutant and what timesteps we should do ? Also this
-     defines the forecast/mapping stages in the OPAQ run...
+        //        /* ------------------------------------------------------------------------
+        //     Now we parse the run information, which defines how OPAQ should be run
+        //     i.e. for what pollutant and what timesteps we should do ? Also this
+        //     defines the forecast/mapping stages in the OPAQ run...
 
-     Let's us the rootElement pointer for this again...
-     --------------------------------------------------------------------- */
-        try {
-            TiXmlDocument runConfigDoc;
-            rootElement = XmlTools::getElement(rootElement, "runconfig", &runConfigDoc);
-        } catch (ElementNotFoundException& e) {
-            throw BadConfigurationException("No runconfig in configuration file: {}", e.what());
-        }
+        //     Let's us the rootElement pointer for this again...
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            TiXmlDocument runConfigDoc;
+        //            rootElement = XmlTools::getElement(rootElement, "runconfig", &runConfigDoc);
+        //        } catch (ElementNotFoundException& e) {
+        //            throw BadConfigurationException("No runconfig in configuration file: {}", e.what());
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Parsing base times section
-     --------------------------------------------------------------------- */
-        try {
-            TiXmlElement* basetimesElement = XmlTools::getElement(rootElement, "basetimes");
-            TiXmlElement* basetimeElement  = basetimesElement->FirstChildElement("basetime");
-            while (basetimeElement) {
-                _opaqRun.addBaseTime(chrono::from_date_time_string(basetimeElement->GetText()));
-                basetimeElement = basetimeElement->NextSiblingElement("basetime");
-            }
-        } catch (const ElementNotFoundException&) {
-            _logger->warn("no base times section in configuration file"); // but might be given using command line args
-        }
+        //        /* ------------------------------------------------------------------------
+        //     Parsing base times section
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            TiXmlElement* basetimesElement = XmlTools::getElement(rootElement, "basetimes");
+        //            TiXmlElement* basetimeElement  = basetimesElement->FirstChildElement("basetime");
+        //            while (basetimeElement) {
+        //                _opaqRun.addBaseTime(chrono::from_date_time_string(basetimeElement->GetText()));
+        //                basetimeElement = basetimeElement->NextSiblingElement("basetime");
+        //            }
+        //        } catch (const ElementNotFoundException&) {
+        //            _logger->warn("no base times section in configuration file"); // but might be given using command line args
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Parsing pollutant elements section
-     --------------------------------------------------------------------- */
-        try {
-            std::string name = XmlTools::getText(rootElement, "pollutant");
-            _opaqRun.setPollutantName(name); // set the pollutant name
-        } catch (const ElementNotFoundException&) {
-            _logger->warn("no pollutant set in configuration file"); // but might be given using command line args
-        }
+        //        /* ------------------------------------------------------------------------
+        //     Parsing pollutant elements section
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            std::string name = XmlTools::getText(rootElement, "pollutant");
+        //            _opaqRun.setPollutantName(name); // set the pollutant name
+        //        } catch (const ElementNotFoundException&) {
+        //            _logger->warn("no pollutant set in configuration file"); // but might be given using command line args
+        //        }
 
-        try {
-            std::string name = XmlTools::getText(rootElement, "aggregation");
-            _opaqRun.setAggregation(name); // set the aggregation
-        } catch (const ElementNotFoundException&) {
-            _logger->warn("no aggregation set in configuration file"); // but might be given using command line args
-        }
+        //        try {
+        //            std::string name = XmlTools::getText(rootElement, "aggregation");
+        //            _opaqRun.setAggregation(name); // set the aggregation
+        //        } catch (const ElementNotFoundException&) {
+        //            _logger->warn("no aggregation set in configuration file"); // but might be given using command line args
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Parsing network section : selects the component which will deliver the
-     AQ network configuration
-     --------------------------------------------------------------------- */
-        try {
-            TiXmlElement* networkElement = XmlTools::getElement(rootElement, "network");
-            std::string componentName    = XmlTools::getText(networkElement, "component");
-            _opaqRun.setNetworkProvider(_opaqRun.getComponent(componentName));
-        } catch (const ElementNotFoundException& e) {
-            _logger->critical("No air quality network defined: {}", e.what());
-            throw RunTimeException("Invalid air quality network defined");
-        }
+        //        /* ------------------------------------------------------------------------
+        //     Parsing network section : selects the component which will deliver the
+        //     AQ network configuration
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            TiXmlElement* networkElement = XmlTools::getElement(rootElement, "network");
+        //            std::string componentName    = XmlTools::getText(networkElement, "component");
+        //            _opaqRun.setNetworkProvider(_opaqRun.getComponent(componentName));
+        //        } catch (const ElementNotFoundException& e) {
+        //            _logger->critical("No air quality network defined: {}", e.what());
+        //            throw RunTimeException("Invalid air quality network defined");
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Parsing grid section : selects the component which will deliver the
-     Grid configuration
-     --------------------------------------------------------------------- */
-        try {
-            TiXmlElement* gridElement = XmlTools::getElement(rootElement, "grid");
-            std::string componentName = XmlTools::getText(gridElement, "component");
-            _opaqRun.setGridProvider(_opaqRun.getComponent(componentName));
-        } catch (const ElementNotFoundException&) {
-            _logger->warn("No grid provider defined");
-        }
+        //        /* ------------------------------------------------------------------------
+        //     Parsing grid section : selects the component which will deliver the
+        //     Grid configuration
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            TiXmlElement* gridElement = XmlTools::getElement(rootElement, "grid");
+        //            std::string componentName = XmlTools::getText(gridElement, "component");
+        //            _opaqRun.setGridProvider(_opaqRun.getComponent(componentName));
+        //        } catch (const ElementNotFoundException&) {
+        //            _logger->warn("No grid provider defined");
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Parsing forecast section
-     --------------------------------------------------------------------- */
-        try {
-            _opaqRun.setForecastStage(parseForecastStage(XmlTools::getElement(rootElement, "forecast")));
-        } catch (const ElementNotFoundException&) {
-            _logger->warn("No forecast stage defined");
-        }
+        //        /* ------------------------------------------------------------------------
+        //     Parsing forecast section
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            _opaqRun.setForecastStage(parseForecastStage(XmlTools::getElement(rootElement, "forecast")));
+        //        } catch (const ElementNotFoundException&) {
+        //            _logger->warn("No forecast stage defined");
+        //        }
 
-        /* ------------------------------------------------------------------------
-     Parsing mapping section
-     --------------------------------------------------------------------- */
-        try {
-            _opaqRun.setMappingStage(parseMappingStage(XmlTools::getElement(rootElement, "mapping")));
-        } catch (const ElementNotFoundException&) {
-            _logger->warn("no mapping stage defined");
-        }
+        //        /* ------------------------------------------------------------------------
+        //     Parsing mapping section
+        //     --------------------------------------------------------------------- */
+        //        try {
+        //            _opaqRun.setMappingStage(parseMappingStage(XmlTools::getElement(rootElement, "mapping")));
+        //        } catch (const ElementNotFoundException&) {
+        //            _logger->warn("no mapping stage defined");
+        //        }
     } catch (const std::exception& e) {
         throw BadConfigurationException("Unable to load configuration file: {}", e.what());
     }
@@ -308,5 +275,4 @@ void ConfigurationHandler::validateConfiguration(config::PollutantManager& pollu
     // throws if not found
     pollutantMgr.find(_opaqRun.getPollutantName());
 }
-
 }

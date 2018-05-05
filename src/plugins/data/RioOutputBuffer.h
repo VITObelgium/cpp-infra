@@ -5,8 +5,7 @@
 
 #include <H5Cpp.h>
 
-namespace opaq
-{
+namespace opaq {
 
 class RioOutputBuffer : public IMappingBuffer
 {
@@ -19,11 +18,11 @@ public:
      * <!-- created if it does not exist, replaced if it does -->
      * <filename>/path/to/datafile.h5</filename>
      */
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     void openResultsFile(chrono::date_time begin, chrono::date_time end,
-                         const Pollutant& pol, Aggregation::Type agg,
-                         const std::vector<Station>& stations, const Grid& grid, GridType gridType) override;
+        const Pollutant& pol, Aggregation::Type agg,
+        const std::vector<Station>& stations, const Grid& grid, GridType gridType) override;
     void addResults(const std::vector<double>& results) override;
     void closeResultsFile() override;
 
@@ -35,7 +34,5 @@ private:
     H5::StrType _stringType;
     std::string _filePattern;
     std::unique_ptr<H5::H5File> _h5File;
-
 };
-
 }

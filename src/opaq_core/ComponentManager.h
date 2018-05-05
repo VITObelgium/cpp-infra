@@ -1,17 +1,20 @@
 #pragma once
 
-#include "config.h"
 #include "Component.h"
-#include "Logger.h"
 #include "Exceptions.h"
+#include "Logger.h"
+#include "config.h"
 
-#include <map>
-#include <iostream>
-#include <memory>
 #include <functional>
+#include <iostream>
+#include <map>
+#include <memory>
 
-namespace opaq
-{
+namespace infra {
+class ConfigNode;
+}
+
+namespace opaq {
 
 /**
    * \brief class for managing the components.
@@ -32,12 +35,12 @@ class ComponentManager
 public:
     ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb);
 
-    ComponentManager(ComponentManager&&) = default;
+    ComponentManager(ComponentManager&&)      = default;
     ComponentManager(const ComponentManager&) = delete;
 
     // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
     template <typename T>
-    T& createComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration)
+    T& createComponent(const std::string& componentName, const std::string& pluginName, const infra::ConfigNode& configuration)
     {
         return dynamic_cast<T&>(createGenericComponent(componentName, pluginName, configuration));
     }
@@ -52,12 +55,9 @@ public:
     template <typename T>
     T* getOptionalComponent(const std::string& componentName)
     {
-        try
-        {
+        try {
             return &dynamic_cast<T&>(findComponent(componentName));
-        }
-        catch (NullPointerException&)
-        {
+        } catch (NullPointerException&) {
             return nullptr;
         }
     }
@@ -68,13 +68,13 @@ public:
 
 private:
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
-    Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, TiXmlElement* configuration);
+    Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, const infra::ConfigNode& configuration);
 
     // throws ComponentNotFoundException
     Component& findComponent(const std::string& name);
 
     // throw PluginNotFoundException, BadConfigurationException
-    std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, TiXmlElement* configuration);
+    std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, const infra::ConfigNode& configuration);
 
     std::function<FactoryCallback(const std::string&, const std::string&)> _loadPluginCb;
     // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
@@ -83,5 +83,4 @@ private:
     std::map<std::string, std::unique_ptr<Component>> _instanceMap;
     IEngine& _engine;
 };
-
 }

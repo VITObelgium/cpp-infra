@@ -5,8 +5,7 @@
 
 #include <map>
 
-namespace opaq
-{
+namespace opaq {
 
 class IRCELMeteoProvider : public MeteoProvider
 {
@@ -17,7 +16,7 @@ public:
 
     // OPAQ::Component methods
     // throws BadConfigurationException
-    void configure(TiXmlElement* cnf, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::MeteoProvider methods
 
@@ -35,12 +34,11 @@ public:
    * Return the values between t1 and t2 including the boundaries !
    */
     virtual TimeSeries<double> getValues(const chrono::date_time& t1,
-                                         const chrono::date_time& t2,
-                                         const std::string& meteoId,
-                                         const std::string& paramId) override;
+        const chrono::date_time& t2,
+        const std::string& meteoId,
+        const std::string& paramId) override;
 
 private:
-
     void throwIfNotConfigured();
     void readFile(const std::string& meteoId, const std::string& parameterId);
 
@@ -54,12 +52,11 @@ private:
     std::string _pattern;
 
     Logger _logger;
-    bool _configured; //! is the object completely configured
+    bool _configured;                   //! is the object completely configured
     std::chrono::hours _timeResolution; //! what is the time resolution of the meteo data ?
-    size_t _nsteps;                        //! number of steps in a line in the datafile
-    chrono::date_time _bufferStartDate;    //! requested buffer start date, if not given, then all file is stored
+    size_t _nsteps;                     //! number of steps in a line in the datafile
+    chrono::date_time _bufferStartDate; //! requested buffer start date, if not given, then all file is stored
     bool _bufferStartReq;               //! is this requested ?
     int _backsearch;                    //! how many days are we looking in the past to find data file
 };
-
 }

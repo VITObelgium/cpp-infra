@@ -6,22 +6,20 @@
  */
 
 #include "RioObsProvider.h"
+#include "AQNetworkProvider.h"
 #include "ObsParser.h"
 #include "PluginRegistration.h"
-#include "AQNetworkProvider.h"
 
+#include "infra/configdocument.h"
 #include "tools/StringTools.h"
-#include "tools/XmlTools.h"
 
-#include <tinyxml.h>
+namespace opaq {
 
-namespace opaq
-{
-
+using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
-static std::string s_pollutantPlaceholder = "%pol%";
+static const char* s_pollutantPlaceholder = "%pol%";
 
 RioObsProvider::RioObsProvider()
 : _logger("RioObsProvider")
@@ -37,14 +35,13 @@ std::string RioObsProvider::name()
     return "rioobsprovider";
 }
 
-void RioObsProvider::configure(TiXmlElement* cnf, const std::string& componentName, IEngine&)
+void RioObsProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 
-    _pattern = XmlTools::getChildValue<std::string>(cnf, "file_pattern");
-    auto res = XmlTools::getChildValue<int>(cnf, "resolution", 0);
-    if (res != 0)
-    {
+    _pattern = std::string(configuration.child("file_pattern").value());
+    auto res = configuration.child("resolution").value<int>().value_or(0);
+    if (res != 0) {
         _timeResolution = std::chrono::duration_cast<std::chrono::hours>(std::chrono::minutes(res));
         _nvalues        = (60 * 24) / res;
     }
@@ -64,8 +61,8 @@ double RioObsProvider::getNoData()
 }
 
 TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const chrono::date_time& t2,
-                                             const std::string& stationId, const std::string& pollutantId,
-                                             Aggregation::Type aggr)
+    const std::string& stationId, const std::string& pollutantId,
+    Aggregation::Type aggr)
 {
     // do some checks
     if (!_configured) throw RunTimeException("Not fully configured");
@@ -73,8 +70,7 @@ TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const 
 
     // get pointer to buffered data
     auto& data = _getTimeSeries(pollutantId, stationId, aggr);
-    if (data.isEmpty())
-    {
+    if (data.isEmpty()) {
         return data;
     }
 
@@ -91,14 +87,13 @@ TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const 
 // this returns a reference to where the full array of data is stored for this
 // particular combination of pollutant, station and aggregation
 TimeSeries<double>& RioObsProvider::_getTimeSeries(const std::string& pollutant,
-                                                   const std::string& station,
-                                                   Aggregation::Type aggr)
+    const std::string& station,
+    Aggregation::Type aggr)
 {
     // first find the pollutant in the map, if we didn't find it, read the file,
     // this should parse the whole set of stations & aggregation times, so no need
     // to re read the file afterwards, only return 0 when data is not found...
-    if (_buffer.find(pollutant) == _buffer.end())
-    {
+    if (_buffer.find(pollutant) == _buffer.end()) {
         // not found: read data file..
         readFile(pollutant);
     }
@@ -116,8 +111,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
     StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant);
 
     std::ifstream file(filename.c_str());
-    if (!file.is_open())
-    {
+    if (!file.is_open()) {
         _logger->warn("Failed to open file: {}", filename);
         return;
     }

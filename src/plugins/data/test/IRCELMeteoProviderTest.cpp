@@ -1,26 +1,25 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
+#include "AQNetwork.h"
+#include "AQNetworkProvider.h"
 #include "DateTime.h"
 #include "EngineMock.h"
 #include "IRCELMeteoProvider.h"
-#include "AQNetwork.h"
-#include "AQNetworkProvider.h"
 
+#include "infra/configdocument.h"
 #include "tools/FileTools.h"
 
-#include <tinyxml.h>
-#include <sstream>
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
 #include <boost/iostreams/filtering_stream.hpp>
+#include <sstream>
 
-namespace opaq
-{
-namespace test
-{
+namespace opaq {
+namespace test {
 
 using namespace date;
+using namespace infra;
 using namespace chrono;
 using namespace testing;
 using namespace std::chrono_literals;
@@ -57,14 +56,14 @@ protected:
             "    <parameters>"
             "      <parameter id = \"P07\" alias=\"BLH\" nodata=\"-999\"/>"
             "    </parameters>"
-            "</config>", resolution.count(), filePattern);
+            "</config>",
+            resolution.count(), filePattern);
 
-        TiXmlDocument doc;
-        doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
-        auto* config = doc.FirstChildElement("config");
+        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto config = doc.child("config");
 
         _meteoProvider.configure(config, "meteoprovider", _engineMock);
-        _meteoProvider.setBaseTime(make_date_time(2015_y/jan/01));
+        _meteoProvider.setBaseTime(make_date_time(2015_y / jan / 01));
     }
 
     EngineMock _engineMock;
@@ -81,14 +80,13 @@ TEST_F(IRCELMeteoProviderTest, GetValues)
 {
     FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
 
-    auto values = _meteoProvider.getValues(make_date_time(2015_y/jan/02), make_date_time(2015_y/jan/03) + 23h, "096_4800", "P07");
+    auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 03) + 23h, "096_4800", "P07");
     EXPECT_EQ(16u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 393.592, 566.608, 595.988,  582.382,  403.172,  498.695,   38.524,   15.083,
-                                                                   64.291, 262.974, 367.226, 1158.536, 1410.489, 1273.104, 1470.478, 1202.126}));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083,
+                                     64.291, 262.974, 367.226, 1158.536, 1410.489, 1273.104, 1470.478, 1202.126}));
 
-    auto date = make_date_time(2015_y/jan/02);
-    for (auto i = 0; i < 16; ++i)
-    {
+    auto date = make_date_time(2015_y / jan / 02);
+    for (auto i = 0; i < 16; ++i) {
         EXPECT_EQ(date, values.datetime(i));
         date += 3h;
     }
@@ -99,20 +97,19 @@ TEST_F(IRCELMeteoProviderTest, GetValuesMultiplePollutants)
     FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
     FileTools::writeTextFile("BEL_096_4800_P08.txt", referenceData());
 
-    auto values = _meteoProvider.getValues(make_date_time(2015_y/jan/02), make_date_time(2015_y/jan/02) + 23h, "096_4800", "P07");
+    auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 02) + 23h, "096_4800", "P07");
     EXPECT_EQ(8u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083 }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083}));
 
-    auto date = make_date_time(2015_y/jan/02);
-    for (auto i = 0; i < 8; ++i)
-    {
+    auto date = make_date_time(2015_y / jan / 02);
+    for (auto i = 0; i < 8; ++i) {
         EXPECT_EQ(date, values.datetime(i));
         date += 3h;
     }
 
-    values = _meteoProvider.getValues(make_date_time(2015_y/jan/02), make_date_time(2015_y/jan/02) + 23h, "096_4800", "P08");
+    values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 02) + 23h, "096_4800", "P08");
     EXPECT_EQ(8u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083 }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083}));
 }
 
 TEST_F(IRCELMeteoProviderTest, GetValuesCompressed)
@@ -130,15 +127,13 @@ TEST_F(IRCELMeteoProviderTest, GetValuesCompressed)
         boost::iostreams::copy(in, outStream);
     }
 
-
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 03) + 23h, "096_4800", "P07");
     EXPECT_EQ(16u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083,
-                                                                  64.291, 262.974, 367.226, 1158.536, 1410.489, 1273.104, 1470.478, 1202.126}));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{393.592, 566.608, 595.988, 582.382, 403.172, 498.695, 38.524, 15.083,
+                                     64.291, 262.974, 367.226, 1158.536, 1410.489, 1273.104, 1470.478, 1202.126}));
 
     auto date = make_date_time(2015_y / jan / 02);
-    for (auto i = 0; i < 16; ++i)
-    {
+    for (auto i = 0; i < 16; ++i) {
         EXPECT_EQ(date, values.datetime(i));
         date += 3h;
     }
@@ -149,13 +144,12 @@ TEST_F(IRCELMeteoProviderTest, DISABLED_GetValuesOutOfRangeUsePreviousDay)
 {
     FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
 
-    auto values = _meteoProvider.getValues(make_date_time(2015_y/jan/05), make_date_time(2015_y/jan/05) + 23h, "096_4800", "P07");
+    auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 05), make_date_time(2015_y / jan / 05) + 23h, "096_4800", "P07");
     EXPECT_EQ(8u, values.size());
-    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{ 803.952, 498.422, 241.122, 189.763, 244.497, 337.089, 312.469, 361.332 }));
+    EXPECT_THAT(values.values(), ContainerEq(std::vector<double>{803.952, 498.422, 241.122, 189.763, 244.497, 337.089, 312.469, 361.332}));
 
-    auto date = make_date_time(2015_y/jan/04);
-    for (auto i = 0; i < 8; ++i)
-    {
+    auto date = make_date_time(2015_y / jan / 04);
+    for (auto i = 0; i < 8; ++i) {
         EXPECT_EQ(date, values.datetime(i));
         date += 3h;
     }
@@ -170,6 +164,5 @@ TEST_F(IRCELMeteoProviderTest, GetValuesInvalidMeteoId)
 {
     EXPECT_TRUE(_meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 03) + 23h, "InvalidId", "P07").isEmpty());
 }
-
 }
 }

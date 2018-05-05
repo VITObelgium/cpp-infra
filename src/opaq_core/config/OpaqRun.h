@@ -16,16 +16,13 @@
 #include "MappingStage.h"
 #include "Plugin.h"
 
-#include <string>
-#include <tinyxml.h>
-#include <vector>
 #include <boost/optional.hpp>
+#include <string>
+#include <vector>
 
-namespace opaq
-{
+namespace opaq {
 
-namespace config
-{
+namespace config {
 
 /**
   * Class containing the main workflow for an OPAQ run
@@ -88,6 +85,5 @@ private:
     boost::optional<ForecastStage> _forecastStage;
     boost::optional<MappingStage> _mappingStage;
 };
-
 }
 }

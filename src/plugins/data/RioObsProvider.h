@@ -11,8 +11,7 @@
 #include "Logger.h"
 #include "data/DataProvider.h"
 
-namespace opaq
-{
+namespace opaq {
 
 class RioObsProvider : public DataProvider
 {
@@ -30,7 +29,7 @@ public:
    */
 
     // throws BadConfigurationException
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::DataProvider methods
     std::chrono::hours getTimeResolution() override;
@@ -46,8 +45,8 @@ public:
    * fills up the requested series. The timestep is set based upon the aggregation time
    */
     virtual TimeSeries<double> getValues(const chrono::date_time& t1, const chrono::date_time& t2,
-                                         const std::string& stationId, const std::string& pollutantId,
-                                         Aggregation::Type aggr = Aggregation::None) override;
+        const std::string& stationId, const std::string& pollutantId,
+        Aggregation::Type aggr = Aggregation::None) override;
 
 private:
     Logger _logger;
@@ -68,7 +67,7 @@ private:
     std::unordered_map<std::string, std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>>> _buffer; //< the data buffer for the aggregations
 
     TimeSeries<double>& _getTimeSeries(const std::string& pollutant,
-                                       const std::string& station, Aggregation::Type aggr);
+        const std::string& station, Aggregation::Type aggr);
 
     void readFile(const std::string& pollutant);
 };

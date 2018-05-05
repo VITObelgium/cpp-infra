@@ -5,8 +5,7 @@
 
 #include <map>
 
-namespace opaq
-{
+namespace opaq {
 
 class StationInfoProvider : public IStationInfoProvider
 {
@@ -15,7 +14,7 @@ public:
 
     static std::string name();
 
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     std::vector<Station> getStations(Pollutant pollutant, const std::string& gisType) override;
 
@@ -27,5 +26,4 @@ private:
     bool _configured;
     std::map<std::string, std::map<std::string, std::vector<Station>>> _stations; // key: pollutant name, gis type
 };
-
 }

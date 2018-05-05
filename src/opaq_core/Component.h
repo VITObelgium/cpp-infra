@@ -2,10 +2,11 @@
 
 #include <string>
 
-class TiXmlElement;
+namespace infra {
+class ConfigNode;
+}
 
-namespace opaq
-{
+namespace opaq {
 
 class IEngine;
 
@@ -28,7 +29,7 @@ public:
      * @param componentName the name of the component
      * @throws BadConfigurationException if the component failed to configure using the provided configuration
      */
-    virtual void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) = 0;
+    virtual void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) = 0;
 
     std::string getName() const noexcept;
 
@@ -38,5 +39,4 @@ protected:
 private:
     std::string _name; //!< the component name (from the XML)
 };
-
 }

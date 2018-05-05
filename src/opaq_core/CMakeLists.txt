@@ -89,8 +89,7 @@ PUBLIC
     infra
     fmt::fmt
     spdlog::spdlog
-    TinyXml::TinyXml
-    Boost::disable_autolinking 
+    Boost::disable_autolinking
 PRIVATE
     Boost::system
     Boost::filesystem

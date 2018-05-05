@@ -10,19 +10,16 @@
 #include <string>
 #include <vector>
 
-#include <boost/utility/string_ref.hpp>
 #include <boost/iterator/iterator_facade.hpp>
+#include <boost/utility/string_ref.hpp>
 
-namespace opaq
-{
-namespace StringTools
-{
+namespace opaq {
+namespace StringTools {
 
 bool replace(std::string& str, const std::string& from, const std::string& to);
 void replaceAll(std::string& str, const std::string& from, const std::string& to);
-std::vector<std::string> tokenize(const std::string& source, const char* delimiter = " \t\n\r\f", const int delimiterCount = 5, bool keepEmpty = false);
+std::vector<std::string> tokenize(std::string_view source, const char* delimiter = " \t\n\r\f", const int delimiterCount = 5, bool keepEmpty = false);
 int find(char* list[], unsigned int listSize, const std::string& item);
-
 
 class StringSplitter
 {
@@ -30,7 +27,7 @@ public:
     static const char* WhiteSpaceSeparator;
 
     StringSplitter(boost::string_ref src, std::string sep);
-    
+
     // avoid copying strings during construction
     StringSplitter(const std::string&& src, boost::string_ref sep) = delete;
 
@@ -42,7 +39,7 @@ public:
 
         const_iterator& operator++();
         const_iterator operator++(int);
-        
+
         reference operator*();
         pointer operator->();
 
@@ -62,9 +59,8 @@ public:
 private:
     boost::string_ref _src;
     std::string _sep;
-    mutable size_t _pos = 0;
+    mutable size_t _pos    = 0;
     mutable bool _finished = false;
 };
-
 }
 }

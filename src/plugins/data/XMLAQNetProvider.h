@@ -8,12 +8,11 @@
 
 #pragma once
 
-#include "Logger.h"
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
+#include "Logger.h"
 
-namespace opaq
-{
+namespace opaq {
 
 class XMLAQNetProvider : public AQNetworkProvider
 {
@@ -24,7 +23,7 @@ public:
 
     // component members
     // throws OPAQ::BadConfigurationException
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // AQNetowrk functions
     virtual AQNetwork& getAQNetwork() override;
