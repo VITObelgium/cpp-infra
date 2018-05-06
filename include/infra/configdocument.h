@@ -76,6 +76,9 @@ public:
     std::string_view value() const;
     std::string_view trimmedValue() const;
 
+    std::string value(std::string_view valueIfNotPresent) const;
+    std::string trimmedValue(std::string_view valueIfNotPresent) const;
+
     template <typename T>
     std::optional<T> value() const;
 
@@ -97,6 +100,16 @@ protected:
     struct Pimpl;
     std::unique_ptr<Pimpl> _pimpl;
 };
+
+extern template std::optional<double> ConfigNode::value<double>() const;
+extern template std::optional<float> ConfigNode::value<float>() const;
+extern template std::optional<int32_t> ConfigNode::value<int32_t>() const;
+extern template std::optional<int64_t> ConfigNode::value<int64_t>() const;
+
+extern template std::optional<double> ConfigNode::attribute<double>(const char* name) const;
+extern template std::optional<float> ConfigNode::attribute<float>(const char* name) const;
+extern template std::optional<int32_t> ConfigNode::attribute<int32_t>(const char* name) const;
+extern template std::optional<int64_t> ConfigNode::attribute<int64_t>(const char* name) const;
 
 class ConfigNodeIterator
 {

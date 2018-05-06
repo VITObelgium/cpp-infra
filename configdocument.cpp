@@ -71,6 +71,21 @@ std::string_view ConfigNode::trimmedValue() const
     return str::trimmedView(value());
 }
 
+std::string ConfigNode::value(std::string_view valueIfNotPresent) const
+{
+    std::string name = _pimpl->node.name();
+    if (name.empty()) {
+        name = valueIfNotPresent;
+    }
+
+    return name;
+}
+
+std::string ConfigNode::trimmedValue(std::string_view valueIfNotPresent) const
+{
+    return str::trim(value(valueIfNotPresent));
+}
+
 template <typename T>
 std::optional<T> ConfigNode::value() const
 {
