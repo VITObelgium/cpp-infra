@@ -18,6 +18,7 @@
 
 #include <boost/optional.hpp>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace opaq {
@@ -39,7 +40,7 @@ public:
     void addComponent(const Component& component);
 
     Plugin getPlugin(const std::string& pluginName);
-    const Component& getComponent(const std::string& componentName);
+    const Component& getComponent(std::string_view componentName);
 
     std::vector<Plugin> getPlugins();
     std::vector<Component> getComponents();
