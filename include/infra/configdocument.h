@@ -72,6 +72,9 @@ public:
     std::string_view attribute(const char* name) const;
     std::string_view attribute(const std::string& name) const;
 
+    std::string attribute(const char* name, std::string_view valueIfNotPresent) const;
+    std::string attribute(const std::string& name, std::string_view valueIfNotPresent) const;
+
     std::string_view name() const;
     std::string_view value() const;
     std::string_view trimmedValue() const;

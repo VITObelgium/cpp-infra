@@ -56,6 +56,21 @@ std::string_view ConfigNode::attribute(const std::string& name) const
     return attribute(name.c_str());
 }
 
+std::string ConfigNode::attribute(const char* name, std::string_view valueIfNotPresent) const
+{
+    auto value = attribute(name);
+    if (value.empty()) {
+        return std::string(valueIfNotPresent);
+    }
+
+    return std::string(value);
+}
+
+std::string ConfigNode::attribute(const std::string& name, std::string_view valueIfNotPresent) const
+{
+    return attribute(name.c_str(), valueIfNotPresent);
+}
+
 std::string_view ConfigNode::name() const
 {
     return _pimpl->node.name();
