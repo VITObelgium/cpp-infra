@@ -9,6 +9,8 @@
 
 namespace infra::str {
 
+const char* Splitter::WhiteSpaceSeparator = "\t\n\r\f";
+
 bool containsValidInteger(std::string_view str)
 {
     std::string s(str);
@@ -311,5 +313,90 @@ std::vector<std::string> split(std::string_view str, std::string_view delimiter,
         tokens.emplace_back(begin(v), end(v));
     }
     return tokens;
+}
+
+Splitter::Splitter(std::string_view src, std::string sep)
+: _src(src)
+, _sep(std::move(sep))
+{
+}
+
+Splitter::const_iterator::const_iterator(const Splitter& sp)
+: _splitter(&sp)
+{
+}
+
+Splitter::const_iterator::const_iterator()
+: _splitter(nullptr)
+{
+}
+
+Splitter::const_iterator& Splitter::const_iterator::operator++()
+{
+    if (!_splitter->finished()) {
+        _value = _splitter->next();
+    } else {
+        _splitter = nullptr;
+    }
+    return *this;
+}
+
+Splitter::const_iterator Splitter::const_iterator::operator++(int)
+{
+    Splitter::const_iterator result(*this);
+    ++(*this);
+    return result;
+}
+
+Splitter::const_iterator::reference Splitter::const_iterator::operator*()
+{
+    return _value;
+}
+
+Splitter::const_iterator::pointer Splitter::const_iterator::operator->()
+{
+    return &_value;
+}
+
+bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other) const noexcept
+{
+    return _splitter != other._splitter;
+}
+
+Splitter::const_iterator Splitter::begin() const noexcept
+{
+    return ++Splitter::const_iterator(*this);
+}
+
+Splitter::const_iterator Splitter::end() const noexcept
+{
+    return Splitter::const_iterator();
+}
+
+std::string_view Splitter::next() const noexcept
+{
+    const auto endOfCurrent = _src.substr(_pos).find_first_of(_sep);
+    if (endOfCurrent != std::string_view::npos && endOfCurrent != _src.size()) {
+        // skip all occurrences of the delimeter
+        const auto startOfNext = _src.substr(_pos + endOfCurrent).find_first_not_of(_sep);
+        const auto old_pos     = _pos;
+        _pos += endOfCurrent;
+
+        if (startOfNext != std::string_view::npos) {
+            _pos += startOfNext;
+        } else {
+            _finished = true;
+        }
+
+        return _src.substr(old_pos, endOfCurrent);
+    } else {
+        _finished = true;
+        return _src.substr(_pos);
+    }
+}
+
+bool Splitter::finished() const noexcept
+{
+    return _finished;
 }
 }

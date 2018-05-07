@@ -165,4 +165,49 @@ inline constexpr Flags<SplitOpt> operator|(SplitOpt lhs, SplitOpt rhs) noexcept
 {
     return Flags<SplitOpt>() | lhs | rhs;
 }
+
+class Splitter
+{
+public:
+    static const char* WhiteSpaceSeparator;
+
+    Splitter(std::string_view src, std::string sep);
+
+    class const_iterator
+    {
+    public:
+        using value_type        = std::string_view;
+        using pointer           = const value_type*;
+        using reference         = const value_type&;
+        using iterator_category = std::forward_iterator_tag;
+
+        explicit const_iterator(const Splitter& sp);
+        explicit const_iterator();
+
+        const_iterator& operator++();
+        const_iterator operator++(int);
+
+        reference operator*();
+        pointer operator->();
+
+        bool operator!=(const const_iterator& other) const noexcept;
+
+    private:
+        const Splitter* _splitter;
+        std::string_view _value;
+    };
+
+    const_iterator begin() const noexcept;
+    const_iterator end() const noexcept;
+
+    std::string_view next() const noexcept;
+    bool finished() const noexcept;
+
+private:
+    std::string_view _src;
+    std::string _sep;
+    mutable size_t _pos    = 0;
+    mutable bool _finished = false;
+};
+
 } // namespace infra::str

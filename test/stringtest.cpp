@@ -1,5 +1,6 @@
 #include "infra/string.h"
 
+#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace infra::test {
@@ -9,6 +10,7 @@ using std::string_view;
 using std::vector;
 using std::wstring;
 
+using namespace testing;
 using namespace std::string_literals;
 
 TEST(StringTest, LowerCase)
@@ -336,5 +338,28 @@ TEST(StringTest, EndsWith)
     EXPECT_FALSE(str::endsWith("TestOne", "TestOne."));
 
     EXPECT_FALSE(str::endsWith("", "."));
+}
+
+TEST(StringTest, SplitterTest)
+{
+    static const char* line = "Line 1:\t1\t2\t3\t4\t5\t10";
+
+    std::vector<std::string_view> result;
+    auto splitter = str::Splitter(line, "\t");
+    std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
+
+    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 1:", "1", "2", "3", "4", "5", "10"}));
+}
+
+TEST(StringTest, SplitterTestEmptyElements)
+{
+    static const char* line = "Line 2:\t\tv 1\tv 2\tv 3\tv 4\tv 5\tv 10";
+
+    std::vector<std::string_view> result;
+    for (auto& value : str::Splitter(line, "\t")) {
+        result.push_back(value);
+    }
+
+    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 2:", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
 }
 }
