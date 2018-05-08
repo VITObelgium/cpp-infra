@@ -229,7 +229,7 @@ ConfigDocument& ConfigDocument::operator=(ConfigDocument&&) = default;
 ConfigNode ConfigDocument::rootNode() const
 {
     ConfigNode root;
-    root._pimpl->node = _pimplDoc->doc.root();
+    root._pimpl->node = _pimplDoc->doc.root().first_child();
     return root;
 }
 
