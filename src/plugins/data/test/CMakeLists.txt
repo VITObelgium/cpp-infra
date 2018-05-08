@@ -30,7 +30,6 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINAR
 
 target_link_libraries(dataplugintest
     opaqcore
-    sqlbuffer
     hdf5buffer
     rioobsprovider
     ircelmeteoprovider
@@ -40,5 +39,9 @@ target_link_libraries(dataplugintest
     GTest::GTest
     GMock::GMock
 )
+
+if (ENABLE_SQL_BUFFER)
+    target_link_libraries(dataplugintest sqlbuffer)
+endif ()
 
 add_test(NAME dataplugintest COMMAND dataplugintest)

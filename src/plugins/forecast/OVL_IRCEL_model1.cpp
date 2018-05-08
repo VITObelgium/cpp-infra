@@ -38,7 +38,7 @@ void OVL_IRCEL_model1::configure(const ConfigNode& configuration, const std::str
 {
     setName(componentName);
 
-    pattern = std::string(configuration.child("ffnetfile_pattern").value());
+    pattern = std::string(configuration.child("ffnetfile_pattern").trimmedValue());
     if (pattern.empty()) {
         throw BadConfigurationException("no ffnetfile_pattern specified");
     }

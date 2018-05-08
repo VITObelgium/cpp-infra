@@ -18,9 +18,9 @@ ConfigurationHandler::ConfigurationHandler()
 
 static std::string getChildElement(const ConfigNode& node, const char* name)
 {
-    auto val = node.child("name").value();
+    auto val = node.child(name).value();
     if (val.empty()) {
-        throw BadConfigurationException("Node '{}' not found in run configuration");
+        throw BadConfigurationException("Node '{}' not found in run configuration", name);
     }
 
     return std::string(val);
@@ -43,8 +43,11 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(const ConfigNode&
     // parse the <input> section
     auto inputElement = element.child("input");
     auto values       = _opaqRun.getComponent(getChildElement(inputElement, "observations"));
-    auto buffer       = _opaqRun.getComponent(getChildElement(inputElement, "meteo"));
-    auto outputWriter = _opaqRun.getComponent(getChildElement(inputElement, "output"));
+    if (auto meteoElement = getChildElement(inputElement, "meteo"); !meteoElement.empty()) {
+        meteo = _opaqRun.getComponent(meteoElement);
+    }
+    auto buffer       = _opaqRun.getComponent(getChildElement(element, "buffer"));
+    auto outputWriter = _opaqRun.getComponent(getChildElement(element, "output"));
 
     auto fcHor = chrono::days(element.child("horizon").value<int>().value_or(2));
     return config::ForecastStage(fcHor, values, buffer, outputWriter, meteo, models);

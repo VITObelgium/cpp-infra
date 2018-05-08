@@ -49,7 +49,7 @@ feedforwardnet::feedforwardnet(const infra::ConfigNode& config)
         return;
     }
 
-    if (config.value() != "feedforwardnet") {
+    if (config.name() != "feedforwardnet") {
         throw std::runtime_error("wrong root element, expecting feedforwardnet");
     }
 
@@ -61,7 +61,7 @@ feedforwardnet::feedforwardnet(const infra::ConfigNode& config)
         throw std::runtime_error("cannot find input specification");
     }
 
-    auto sz = config.attribute<int>("size");
+    auto sz = pLyr.attribute<int>("size");
     if (!sz.has_value()) {
         throw std::runtime_error("cannot retrieve input size");
     }

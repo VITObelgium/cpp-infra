@@ -6,7 +6,7 @@
 #include "PollutantManager.h"
 #include "Station.h"
 #include "infra/configdocument.h"
-#include "tools/StringTools.h"
+#include "infra/string.h"
 
 namespace opaq {
 
@@ -35,7 +35,7 @@ void XMLAQNetProvider::configure(const ConfigNode& configuration, const std::str
 
     // loop over station elements
     long stID = 1; // here we assign a unique ID to each station
-    for (auto& stEl : configuration.children("station")) {
+    for (auto& stEl : netEl.children("station")) {
         auto name    = std::string(stEl.attribute("name"));
         auto meteoId = std::string(stEl.attribute("meteo"));
         auto desc    = std::string(stEl.attribute("desc"));
@@ -49,7 +49,7 @@ void XMLAQNetProvider::configure(const ConfigNode& configuration, const std::str
 
         // get pollutant list from stEl->GetText(); via string tokenizer
         auto val      = stEl.value();
-        auto pol_list = StringTools::tokenize(val, ",:;| \t", 6);
+        auto pol_list = str::split(val, ",:;| \t", str::SplitOpt::DelimiterIsCharacterArray);
         for (auto& pol : pol_list) {
             // add to the pollutants list for this station
             pollutants.push_back(engine.pollutantManager().find(pol));

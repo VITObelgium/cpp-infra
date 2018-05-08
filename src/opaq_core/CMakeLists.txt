@@ -70,8 +70,6 @@ set (CORE_TOOLS_SOURCES
     tools/FileTools.cpp
     tools/GzipReader.h
     tools/GzipReader.cpp
-    tools/StringTools.h
-    tools/StringTools.cpp
     tools/XmlTools.h
     tools/XmlTools.cpp
     tools/CalcTools.h

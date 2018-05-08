@@ -48,7 +48,7 @@ void AsciiForecastWriter::configure(const ConfigNode& configuration, const std::
     _filename = fileEl.value();
 
     auto model_list = configuration.child("models").value();
-    _models         = str::split(model_list,  StringTools::tokenize(model_list, ",;:|/ \t", 7);
+    _models         = str::split(model_list, ",;:|/ \t", str::SplitOpt::DelimiterIsCharacterArray);
 
     _title = configuration.child("title").value();
     _title = configuration.child("header").value();
