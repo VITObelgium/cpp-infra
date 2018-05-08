@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<opaq>
+  <network>
+    <station name="40AB01" type="4" x="147285" y="219017" lon="4.32984796481247" lat="51.2810136905197" meteo="431_5136" desc="Antwerpen">pm10,bc</station>
+    <station name="40AB02" type="4" x="146729" y="225661" lon="4.32182021518486" lat="51.3407274941436" meteo="431_5136" desc="Berendrecht">pm10</station>
+    <station name="40AL01" type="2" x="151150" y="214030" lon="4.38522368489264" lat="51.2361942021347" meteo="431_5120" desc="Linkeroever">pm10,bc</station>
+    <station name="40AL02" type="4" x="140660" y="221640" lon="4.23483275356762" lat="51.3045207925805" meteo="416_5136" desc="Doel (Engelsesteenweg)">pm25,pm10</station>
+    <station name="40AL03" type="4" x="138320" y="216020" lon="4.20146039554634" lat="51.2539648829037" meteo="416_5120" desc="Beveren">pm25</station>
+    <station name="40AL04" type="4" x="144738" y="220093" lon="4.29332947736965" lat="51.2906675289821" meteo="431_5136" desc="Verrebroek">pm25</station>
+    <station name="40AL05" type="4" x="143727" y="217029" lon="4.2788898220954"  lat="51.2631177191077" meteo="431_5120" desc="Kallo (sluis Kallo)">pm25,pm10</station>
+    <station name="40BE06" type="4" x="181383" y="224413" lon="4.81899637704008" lat="51.3286616671425" meteo="479_5136" desc="Beerse">so2</station>
+    <station name="40GK06" type="4" x="227463" y="180307" lon="5.47062003803001" lat="50.9278918454776" meteo="544_5088" desc="Diepenbeek (Zinniastraat)">pm10,bc</station>
+    <station name="40GK09" type="4" x="229010" y="181080" lon="5.49278843014049" lat="50.9346312213256" meteo="544_5088" desc="Genk (Sluis Langerlo)">pm10,no2,so2</station>
+    <station name="40HB23" type="4" x="148059" y="206699" lon="4.34100506499573" lat="51.1702980406645" meteo="431_5120" desc="Hoboken">pm10,no2,so2</station>
+    <station name="40LD01" type="4" x="194547" y="200179" lon="5.00486439408605" lat="51.1099761226903" meteo="496_5104" desc="Laakdal">no2</station>
+    <station name="40LD02" type="4" x="195718" y="201462" lon="5.0217461030164"  lat="51.1214167739899" meteo="496_5120" desc="Geel">no2</station>
+    <station name="40ML01" type="2" x="156569" y="189536" lon="4.46236731494087" lat="51.015988397501"  meteo="448_5104" desc="Mechelen (Hombeeksestwg)">pm25,pm10,no2</station>
+    <station name="40MN01" type="4" x="61230"  y="165530" lon="3.10964187480641" lat="50.7934690465271" meteo="304_5072" desc="Menen">pm10</station>
+    <station name="40OB01" type="4" x="75367"  y="179078" lon="3.30738579966392" lat="50.9172284432463" meteo="336_5088" desc="Oostrozebeke">pm10,no2,so2</station>
+    <station name="40OB02" type="0" x="80203"  y="178758" lon="3.37621163142098" lat="50.9149529631003" meteo="336_5088" desc="Wielsbeke">pm10</station>		
+    <station name="40R833" type="0" x="149548" y="224206" lon="4.3622749397639"  lat="51.3276588744333" meteo="431_5136" desc="Stabroek">pm25,pm10,no2,bc</station>
+    <station name="40RL01" type="2" x="62340"  y="183280" lon="3.12115559921118" lat="50.9531772824604" meteo="320_5088" desc="Roeselare">pm10</station>
+    <station name="40SA04" type="0" x="152448" y="222679" lon="4.40386814019013" lat="51.313928896381"  meteo="448_5136" desc="Hoevenen">pm25,pm10,bc</station>
+    <station name="40SZ01" type="2" x="159524" y="178259" lon="4.50418332375898" lat="50.9145761393822" meteo="448_5088" desc="Steenokkerzeel">pm25,no2,bc</station>
+    <station name="40SZ02" type="2" x="160087" y="178087" lon="4.51218434663773" lat="50.9130204252401" meteo="448_5088" desc="Steenokkerzeel">pm10,no2</station>
+    <station name="40TS07" type="4" x="201911" y="195706" lon="5.10937436000329" lat="51.0691565595918" meteo="512_5104" desc="Tessenderlo">so2</station>
+    <station name="40TS21" type="0" x="201786" y="195321" lon="5.1075363904703"  lat="51.065707211357"  meteo="512_5104" desc="Tessenderlo">so2</station>
+    <station name="40WZ01" type="4" x="211133" y="211068" lon="5.24351820593095" lat="51.2063298765516" meteo="528_5120" desc="Lommel">pm10,so2</station>
+    <station name="40WZ02" type="4" x="209614" y="209545" lon="5.22153407961382" lat="51.1928003354233" meteo="528_5120" desc="Wezel">so2</station>
+    <station name="41B003" type="5" x="149995" y="170590" lon="4.36868122389411" lat="50.8457151031408" meteo="431_5088" desc="Brussel (Kunst-Wet)">no2,so2</station>
+    <station name="41B004" type="3" x="148580" y="171157" lon="4.34858747470456" lat="50.8508105390075" meteo="431_5088" desc="Brussel (Sint-Katelijne)">no2,o3</station>
+    <station name="41B005" type="3" x="150703" y="169968" lon="4.37873287319623" lat="50.8401231370445" meteo="431_5088" desc="Brussel (Belliard)">no2,so2</station>
+    <station name="41B006" type="3" x="150397" y="169802" lon="4.37438828378585" lat="50.8386311898461" meteo="431_5088" desc="Brussel (EU Parlement)">no2,o3</station>
+    <station name="41B008" type="0" x="150521" y="170042" lon="4.37614907018234" lat="50.8407885687122" meteo="431_5088" desc="Kapellen">no2,so2</station>
+    <station name="41B011" type="3" x="144338" y="171963" lon="4.28833636673069" lat="50.8580305954902" meteo="431_5088" desc="Sint-Agatha-Berchem">pm25,pm10,no2,o3</station>
+    <station name="41MEU1" type="3" x="151686" y="176084" lon="4.39271769800161" lat="50.8951005642471" meteo="431_5088" desc="Neder-Over-Heembeek">pm10,no2,so2</station>
+    <station name="41N043" type="5" x="151000" y="174800" lon="4.38296325223672" lat="50.8835598135965" meteo="431_5088" desc="Haren">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="41R001" type="3" x="147540" y="171030" lon="4.33381970814122" lat="50.8496654902807" meteo="431_5088" desc="Sint-Jans-Molenbeek">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="41R002" type="5" x="151125" y="168300" lon="4.38471884213359" lat="50.8251278751684" meteo="431_5088" desc="Elsene">no2,so2,bc</station>
+    <station name="41R012" type="2" x="149280" y="165130" lon="4.35853885678284" lat="50.7966316407078" meteo="431_5072" desc="Ukkel">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="41WOL1" type="5" x="154010" y="171800" lon="4.42570368468258" lat="50.8565782396291" meteo="448_5088" desc="Sint-Lambrechts-Woluwe">pm10,no2,o3,so2,bc</station>
+    <station name="42M802" type="4" x="153884" y="216790" lon="4.42439900737739" lat="51.2609897097004" meteo="448_5120" desc="Antwerpen (Luchtbal)">pm10,no2,so2,bc</station>
+    <station name="42N015" type="1" x="165538" y="216667" lon="4.59134359536238" lat="51.2596869177603" meteo="464_5120" desc="Schilde">no2</station>
+    <station name="42N016" type="1" x="205542" y="214045" lon="5.16397884684722" lat="51.2336522083913" meteo="512_5120" desc="Dessel">pm10,no2,o3,so2,bc</station>
+    <station name="42N027" type="1" x="236644" y="203352" lon="5.60665922026277" lat="51.1337166982348" meteo="560_5120" desc="Bree">no2,o3,so2</station>
+    <station name="42N035" type="1" x="182928" y="185359" lon="4.83761801617892" lat="50.9775413803315" meteo="479_5104" desc="Aarschot">pm10,no2,o3,so2</station>
+    <station name="42N040" type="1" x="139873" y="161970" lon="4.22519424716445" lat="50.7681375154642" meteo="416_5072" desc="Sint-Pieters-Leeuw">no2,o3</station>
+    <station name="42N045" type="2" x="220258" y="181520" lon="5.36837853282668" lat="50.9397118672803" meteo="544_5088" desc="Hasselt">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="42N046" type="1" x="237950" y="175401" lon="5.61858982421675" lat="50.8823018561903" meteo="560_5088" desc="Gellik">no2,o3</station>
+    <station name="42N054" type="1" x="201869" y="155940" lon="5.10315860995768" lat="50.7117060959361" meteo="512_5072" desc="Walshoutem">pm10,no2,o3,so2</station>
+    <station name="42R010" type="4" x="154201" y="172749" lon="4.42842728399991" lat="50.8651078856578" meteo="448_5088" desc="Sint-Stevens-Woluwe">no2</station>
+    <station name="42R020" type="3" x="154777" y="181235" lon="4.43672076397431" lat="50.9413871168109" meteo="448_5088" desc="Vilvoorde">pm10,no2,so2</station>
+    <station name="42R801" type="3" x="154407" y="211080" lon="4.43182104741115" lat="51.2096625331407" meteo="448_5120" desc="Borgerhout">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="42R802" type="3" x="154390" y="211050" lon="4.43157741313105" lat="51.2093930114249" meteo="448_5120" desc="Borgerhout (Straatkant)">pm25,pm10,no2,bc</station>
+    <station name="42R811" type="2" x="158560" y="215807" lon="4.49136202838409" lat="51.2521034140774" meteo="448_5120" desc="Schoten">pm10,no2,o3,so2</station>
+    <station name="42R815" type="4" x="147446" y="211639" lon="4.33220643274275" lat="51.2146988186069" meteo="431_5120" desc="Zwijndrecht">pm10,no2,so2,bc</station>
+    <station name="42R820" type="2" x="155302" y="223403" lon="4.44481061942472" lat="51.3204167875486" meteo="448_5136" desc="Kapellen">no2,so2</station>
+    <station name="42R821" type="2" x="141724" y="211734" lon="4.2503146663416"  lat="51.2154995214774" meteo="431_5120" desc="Beveren Waas">no2,so2</station>
+    <station name="42R822" type="4" x="148082" y="217156" lon="4.34127999289847" lat="51.2642897864825" meteo="431_5120" desc="Antwerpen">no2,so2</station>
+    <station name="42R830" type="4" x="142601" y="223162" lon="4.26263373000902" lat="51.3182286325189" meteo="431_5136" desc="Doel">no2,so2</station>
+    <station name="42R831" type="4" x="147976" y="226558" lon="4.33970994755431" lat="51.3487952941703" meteo="431_5136" desc="Berendrecht">pm10,no2,o3,so2</station>
+    <station name="42R832" type="4" x="148937" y="196707" lon="4.35358634847101" lat="51.0804850676987" meteo="431_5104" desc="Ruisbroek">pm10,no2,so2</station>
+    <station name="42R833" type="0" x="149547" y="224206" lon="4.36226059363687" lat="51.3276588737325" meteo="431_5136" desc="Stabroek">pm25,pm10</station>
+    <station name="42R834" type="0" x="150795" y="197988" lon="4.38010354531854" lat="51.0920000397293" meteo="431_5104" desc="Boom">pm10,no2</station>
+    <station name="42R841" type="2" x="157059" y="188039" lon="4.46932103699185" lat="51.0025259706054" meteo="448_5104" desc="N/A">pm25,pm10,no2,o3</station>
+    <station name="42R891" type="4" x="151159" y="216212" lon="4.3853598264875"  lat="51.2558066465478" meteo="431_5120" desc="Antwerpen">no2,so2</station>
+    <station name="42R892" type="4" x="143727" y="217020" lon="4.27888997693349" lat="51.2630368250489" meteo="431_5120" desc="Kallo">no2,so2</station>
+    <station name="42R893" type="4" x="151187" y="219057" lon="4.38577061994941" lat="51.2813780579874" meteo="431_5136" desc="Antwerpen">no2,so2</station>
+    <station name="42R894" type="4" x="148656" y="219293" lon="4.34949581408109" lat="51.2834991347521" meteo="431_5136" desc="Antwerpen">no2,so2</station>
+    <station name="42R897" type="4" x="148139" y="215578" lon="4.34210451175589" lat="51.2501065005402" meteo="431_5120" desc="Antwerpen">no2,so2</station>
+    <station name="43H201" type="3" x="233400" y="146700" lon="5.54746418311726" lat="50.6249915710942" meteo="560_5056" desc="Saint-Nicolas">pm25,pm10,so2</station>
+    <station name="43M204" type="0" x="237930" y="145320" lon="5.61114976337198" lat="50.6119227087484" meteo="560_5056" desc="Stabroek">pm25,pm10</station>
+    <station name="43N060" type="1" x="85521"  y="145512" lon="3.45762442752259" lat="50.6167184039975" meteo="352_5056" desc="Havinnes">pm25,pm10,no2,o3,so2</station>
+    <station name="43N063" type="1" x="171200" y="149460" lon="4.66855597462472" lat="50.6553754856048" meteo="464_5072" desc="Corroy-Le-Grand">pm25,pm10,no2,o3,so2</station>
+    <station name="43N066" type="1" x="265570" y="147740" lon="6.0023286875281"  lat="50.6288602620119" meteo="608_5056" desc="Eupen">pm25,pm10,no2,o3,so2</station>
+    <station name="43N067" type="1" x="264933" y="145881" lon="5.99275271977705" lat="50.6122775303272" meteo="592_5056" desc="Membach">pm25,pm10</station>
+    <station name="43N070" type="3" x="119540" y="128350" lon="3.93971432591091" lat="50.4651921586212" meteo="400_5040" desc="Mons">pm25,pm10,no2,o3,so2</station>
+    <station name="43N073" type="1" x="193960" y="132620" lon="4.98842295458277" lat="50.5027163432349" meteo="496_5056" desc="Vezin">pm25,pm10,no2,o3</station>
+    <station name="43N085" type="1" x="266325" y="111525" lon="6.00173628912486" lat="50.3032078303659" meteo="608_5024" desc="Vielsalm">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="43N093" type="1" x="211760" y="107410" lon="5.23516865528608" lat="50.2744775131291" meteo="528_5024" desc="Sinsin">pm25,pm10,no2,o3,so2</station>
+    <station name="43N100" type="1" x="166170" y="87160"  lon="4.59473365868866" lat="50.0954407457384" meteo="464_5008" desc="Dourbes">pm25,pm10,no2,o3,so2</station>
+    <station name="43N113" type="1" x="237720" y="80250"  lon="5.59301691461049" lat="50.0270290195129" meteo="560_5008" desc="Saint-Ode">pm25,pm10,no2,o3</station>
+    <station name="43N121" type="1" x="209920" y="63190"  lon="5.20238746730465" lat="49.8771284934884" meteo="528_4992" desc="Offagne">pm25,pm10,no2,o3</station>
+    <station name="43N132" type="1" x="240980" y="46070"  lon="5.63039774115334" lat="49.71928119003"   meteo="560_4976" desc="Habay-La-Neuve">pm25,pm10,no2,o3,so2</station>
+    <station name="43R201" type="3" x="235350" y="147130" lon="5.57511805409316" lat="50.6285750658241" meteo="560_5056" desc="Liege">pm25,pm10,no2,o3</station>
+    <station name="43R221" type="3" x="239030" y="150490" lon="5.62792851712437" lat="50.6582276240019" meteo="560_5072" desc="Liege">pm25,pm10,so2,bc</station>
+    <station name="43R222" type="4" x="235031" y="145438" lon="5.57022281466112" lat="50.6134125036773" meteo="560_5056" desc="Liege (ISSeP)">pm25,pm10,no2,o3,so2</station>
+    <station name="43R223" type="3" x="231130" y="146160" lon="5.51526892152043" lat="50.6204572746176" meteo="544_5056" desc="Jemeppe">pm25,pm10,no2,so2</station>
+    <station name="43R240" type="4" x="222850" y="141940" lon="5.39744605065857" lat="50.5836143495633" meteo="544_5056" desc="Engis">pm25,pm10,no2,o3,so2</station>
+    <station name="44M702" type="4" x="107569" y="206396" lon="3.76213735947586" lat="51.1660232233808" meteo="384_5120" desc="Ertvelde">no2,so2</station>
+    <station name="44M705" type="4" x="64521"  y="182374" lon="3.152401590783"   lat="50.9453592435718" meteo="320_5088" desc="Roeselare">pm10,no2,o3,bc</station>
+    <station name="44N002" type="4" x="69993"  y="225436" lon="3.2207873683533"  lat="51.3331620640764" meteo="320_5136" desc="Zeebrugge">so2</station>
+    <station name="44N012" type="1" x="79753"  y="216550" lon="3.36253588903766" lat="51.254573624673"  meteo="336_5120" desc="Moerkerke">pm10,no2,o3</station>
+    <station name="44N029" type="1" x="24655"  y="191071" lon="2.58232278174656" lat="51.0162801133643" meteo="256_5104" desc="Houtem">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="44N051" type="1" x="119090" y="165475" lon="3.93029323799065" lat="50.7989156059006" meteo="400_5072" desc="Idegem">no2,o3,so2</station>
+    <station name="44N052" type="1" x="76269"  y="167678" lon="3.32249431936621" lat="50.814873872134"  meteo="336_5088" desc="Zwevegem">pm10,no2,o3,so2</station>
+    <station name="44R701" type="3" x="105169" y="194435" lon="3.72929817206168" lat="51.0583317184903" meteo="368_5104" desc="Gent">pm25,pm10,no2,o3,so2,bc</station>
+    <station name="44R702" type="5" x="105550" y="192469" lon="3.73497148005682" lat="51.040689421652"  meteo="368_5104" desc="Gent G. Callierlaan">bc</station>
+    <station name="44R710" type="2" x="108394" y="194736" lon="3.77526239002104" lat="51.0612776998801" meteo="384_5104" desc="Destelbergen">pm10,no2,o3,so2</station>
+    <station name="44R721" type="4" x="104275" y="197850" lon="3.71611937106604" lat="51.0889577258914" meteo="368_5104" desc="Wondelgem">no2,so2</station>
+    <station name="44R731" type="4" x="105947" y="201811" lon="3.73950422081456" lat="51.1246905141287" meteo="368_5120" desc="Evergem">pm25,pm10,no2,so2</station>
+    <station name="44R740" type="4" x="110815" y="204603" lon="3.80873543079248" lat="51.1501360922306" meteo="384_5120" desc="Sint-Kruiswinkel">pm10,no2,o3,so2</station>
+    <station name="44R750" type="4" x="111845" y="209705" lon="3.82292004718586" lat="51.1960632707315" meteo="384_5120" desc="Zelzate">pm10,no2,so2,bc</station>
+    <station name="45R501" type="3" x="155930" y="122050" lon="4.45217178148666" lat="50.4093114542045" meteo="448_5040" desc="Charleroi">pm25,pm10,no2,so2</station>
+    <station name="45R502" type="3" x="156390" y="124240" lon="4.45868085845934" lat="50.4289953950868" meteo="448_5040" desc="Lodelinsart">pm25,pm10,no2,o3,so2</station>
+    <station name="45R510" type="3" x="160830" y="122850" lon="4.52113020857407" lat="50.4164333617277" meteo="448_5040" desc="Chatelineau">pm25,pm10,so2</station>
+    <station name="45R511" type="3" x="153980" y="118520" lon="4.42470045083629" lat="50.3775921043162" meteo="448_5040" desc="Marcinelle">pm25,pm10</station>
+    <station name="45R512" type="4" x="151930" y="121880" lon="4.39589711747052" lat="50.4078102016064" meteo="431_5040" desc="Marchienne-Au-Pont">pm25,pm10,no2,so2,bc</station>
+  </network>
+</opaq>
