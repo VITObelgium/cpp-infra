@@ -349,7 +349,13 @@ TEST(StringTest, SplitterTest)
 
     std::vector<std::string_view> result;
     auto splitter = str::Splitter(line, "\t");
-    std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
+
+    for (auto& value : str::Splitter(line, "\t")) {
+        result.push_back(value);
+    }
+
+    // TODO: does not compile under msvc
+    //std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
 
     EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 1:", "1", "2", "3", "4", "5", "10"}));
 }
