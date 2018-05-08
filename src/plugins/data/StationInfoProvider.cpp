@@ -2,7 +2,7 @@
 #include "PluginRegistration.h"
 
 #include "infra/configdocument.h"
-#include "tools/StringTools.h"
+#include "infra/string.h"
 
 #include <boost/lexical_cast.hpp>
 #include <fstream>
@@ -48,12 +48,12 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
 {
     // create file name & open file stream
     std::string filename = _pattern;
-    StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant.getName());
-    StringTools::replaceAll(filename, s_gisTypePlaceholder, gisType);
+    str::replaceInPlace(filename, s_pollutantPlaceholder, pollutant.getName());
+    str::replaceInPlace(filename, s_gisTypePlaceholder, gisType);
 
     try {
         auto contents = FileTools::readFileContents(filename);
-        StringTools::StringSplitter lineSplitter(contents, "\r\n");
+        str::Splitter lineSplitter(contents, "\r\n");
 
         auto& stations = _stations[pollutant.getName()][gisType];
 
@@ -66,7 +66,7 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
             }
 
             // line format: ID STATIONCODE XLAMB YLAMB ALTITUDE TYPE BETA
-            StringTools::StringSplitter stationSplitter(line, " \t\r\n\f");
+            str::Splitter stationSplitter(line, " \t\r\n\f");
             auto iter = stationSplitter.begin();
 
             auto id          = boost::lexical_cast<long>(*iter++);

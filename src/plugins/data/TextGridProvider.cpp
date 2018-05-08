@@ -2,11 +2,13 @@
 #include "Exceptions.h"
 #include "PluginRegistration.h"
 #include "infra/configdocument.h"
-#include "tools/StringTools.h"
+#include "infra/string.h"
 
 #include <boost/lexical_cast.hpp>
 
 namespace opaq {
+
+using namespace infra;
 
 static const char* s_gridTypePlaceholder  = "%grid%";
 static const char* s_pollutantPlaceholder = "%pol%";
@@ -40,15 +42,15 @@ const Grid& TextGridProvider::getGrid(const std::string& pollutant, GridType typ
 void TextGridProvider::readFile(const std::string& pollutant, GridType type)
 {
     std::string filename = _pattern;
-    StringTools::replaceAll(filename, s_gridTypePlaceholder, gridTypeToString(type));
-    StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant);
+    str::replaceInPlace(filename, s_gridTypePlaceholder, gridTypeToString(type));
+    str::replaceInPlace(filename, s_pollutantPlaceholder, pollutant);
 
     try {
         auto& grid    = _grid[pollutant][type];
         auto cellSize = gridTypeToCellSize(type);
 
         auto contents = FileTools::readFileContents(filename);
-        StringTools::StringSplitter lineSplitter(contents, "\r\n");
+        str::Splitter lineSplitter(contents, "\r\n");
 
         bool first = true;
         for (auto& line : lineSplitter) {
@@ -59,7 +61,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
             }
 
             // line format: ID XLAMB YLAMB BETA
-            StringTools::StringSplitter cellSplitter(line, " \t\r\n\f");
+            str::Splitter cellSplitter(line, " \t\r\n\f");
             auto iter = cellSplitter.begin();
 
             auto id = boost::lexical_cast<long>(*iter++);

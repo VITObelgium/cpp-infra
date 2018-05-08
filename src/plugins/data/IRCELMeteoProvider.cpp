@@ -8,8 +8,8 @@
 #include "IRCELMeteoProvider.h"
 #include "PluginRegistration.h"
 #include "infra/configdocument.h"
+#include "infra/string.h"
 #include "tools/GzipReader.h"
-#include "tools/StringTools.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -139,9 +139,9 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
     bool have_file = false;
     while ((checkDate >= (_baseTime - chrono::days(_backsearch))) && (!have_file)) {
         filename = _pattern;
-        StringTools::replaceAll(filename, s_meteo_placeholder, meteoId);
-        StringTools::replaceAll(filename, s_parameter_placeholder, parameterId);
-        StringTools::replaceAll(filename, s_basetime_placeholder, chrono::to_date_string(checkDate));
+        str::replaceInPlace(filename, s_meteo_placeholder, meteoId);
+        str::replaceInPlace(filename, s_parameter_placeholder, parameterId);
+        str::replaceInPlace(filename, s_basetime_placeholder, chrono::to_date_string(checkDate));
 
         // -- Read & parse file
         try {
@@ -168,7 +168,7 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
          * YYYYMMDD hour0 hour3 hour6 hour9 ...   // new ECMWF data : every 3 hours
          */
 
-        StringTools::StringSplitter meteoSplitter(line, " \t\r\n\f");
+        str::Splitter meteoSplitter(line, " \t\r\n\f");
 
         auto iter = meteoSplitter.begin();
 

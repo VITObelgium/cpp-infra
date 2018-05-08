@@ -5,7 +5,6 @@
 
 #include "infra/configdocument.h"
 #include "infra/string.h"
-#include "tools/StringTools.h"
 
 #include <iterator>
 #include <vector>
@@ -49,7 +48,7 @@ void AsciiForecastWriter::configure(const ConfigNode& configuration, const std::
     _filename = fileEl.value();
 
     auto model_list = configuration.child("models").value();
-    _models         = StringTools::tokenize(model_list, ",;:|/ \t", 7);
+    _models         = str::split(model_list,  StringTools::tokenize(model_list, ",;:|/ \t", 7);
 
     _title = configuration.child("title").value();
     _title = configuration.child("header").value();
@@ -92,14 +91,14 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
     int fcHorMax   = getForecastHorizon().count();
 
     // -- translate the filename
-    StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol.getName());
-    StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    StringTools::replaceAll(fname, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
+    str::replaceInPlace(fname, POLLUTANT_PLACEHOLDER, pol.getName());
+    str::replaceInPlace(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    str::replaceInPlace(fname, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // -- translate the header
-    StringTools::replaceAll(head, POLLUTANT_PLACEHOLDER, pol.getName());
-    StringTools::replaceAll(head, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    StringTools::replaceAll(head, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
+    str::replaceInPlace(head, POLLUTANT_PLACEHOLDER, pol.getName());
+    str::replaceInPlace(head, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    str::replaceInPlace(head, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // ========================================================================
     // initialization

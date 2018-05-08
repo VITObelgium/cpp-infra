@@ -11,7 +11,7 @@
 #include "PluginRegistration.h"
 
 #include "infra/configdocument.h"
-#include "tools/StringTools.h"
+#include "infra/string.h"
 
 namespace opaq {
 
@@ -108,7 +108,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
 {
     // create file name & open file stream
     std::string filename = _pattern;
-    StringTools::replaceAll(filename, s_pollutantPlaceholder, pollutant);
+    str::replaceInPlace(filename, s_pollutantPlaceholder, pollutant);
 
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {

@@ -7,7 +7,7 @@
 #include "data/ForecastBuffer.h"
 #include "feedforwardnet.h"
 #include "infra/configdocument.h"
-#include "tools/StringTools.h"
+#include "infra/string.h"
 
 #include <limits>
 
@@ -33,11 +33,11 @@ std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggr
 {
     // Building filename...
     std::string fname = this->pattern;
-    StringTools::replaceAll(fname, POLLUTANT_PLACEHOLDER, pol_name);
-    StringTools::replaceAll(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    StringTools::replaceAll(fname, STATION_PLACEHOLDER, st_name);
-    StringTools::replaceAll(fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor));
-    StringTools::replaceAll(fname, MODEL_PLACEHOLDER, this->getName());
+    str::replaceInPlace(fname, POLLUTANT_PLACEHOLDER, pol_name);
+    str::replaceInPlace(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    str::replaceInPlace(fname, STATION_PLACEHOLDER, st_name);
+    str::replaceInPlace(fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor));
+    str::replaceInPlace(fname, MODEL_PLACEHOLDER, this->getName());
 
     return fname;
 }
