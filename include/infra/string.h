@@ -187,15 +187,16 @@ public:
         using pointer           = const value_type*;
         using reference         = const value_type&;
         using iterator_category = std::forward_iterator_tag;
+        using difference_type   = int;
 
         explicit const_iterator(const Splitter& sp);
         explicit const_iterator();
 
-        const_iterator& operator++();
-        const_iterator operator++(int);
+        const_iterator& operator++() noexcept;
+        const_iterator operator++(int) noexcept;
 
-        reference operator*();
-        pointer operator->();
+        reference operator*() const noexcept;
+        pointer operator->() const noexcept;
 
         bool operator!=(const const_iterator& other) const noexcept;
 

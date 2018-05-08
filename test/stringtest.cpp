@@ -246,6 +246,13 @@ TEST(StringOperationsTest, SplittedView)
     EXPECT_EQ("", tokenized[0]);
 }
 
+TEST(StringOperationsTest, SplittedViewDelimiterString)
+{
+    string testString = "A-B.C|D+E++";
+    auto tokenized    = str::splitView(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray);
+    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E"}));
+}
+
 TEST(StringTest, Trim)
 {
     EXPECT_EQ("astring"s, str::trim("astring"));

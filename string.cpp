@@ -242,6 +242,17 @@ std::vector<std::string_view> splitView(std::string_view str, char delimiter, Fl
     return tokens;
 }
 
+static bool isDelimiter(char character, std::string_view delimiter)
+{
+    for (auto& del : delimiter) {
+        if (del == character) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
 {
     std::vector<std::string_view> tokens;
@@ -250,36 +261,59 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
     size_t matchLength = 0;
     const char* start  = str.data();
 
-    for (size_t i = 0; i < str.size(); ++i) {
-        if (str[i] == delimiter[matchLength]) {
-            ++matchLength;
-
-            if (matchLength == delimiter.size()) {
-                applySplitOptions(std::string_view(start, length), opt, tokens);
-                length      = 0;
-                matchLength = 0;
-
-                if (i + 1 < str.size()) {
-                    start = &str[i + 1];
+    if (opt.is_set(SplitOpt::DelimiterIsCharacterArray)) {
+        for (size_t i = 0; i < str.size(); ++i) {
+            if (isDelimiter(str[i], delimiter)) {
+                ++matchLength;
+            } else {
+                if (matchLength > 0) {
+                    applySplitOptions(std::string_view(start, length), opt, tokens);
+                    length      = 1;
+                    matchLength = 0;
+                    start       = &str[i];
+                    continue;
                 }
 
-                continue;
+                ++length;
+                matchLength = 0;
             }
-        } else {
-            length += matchLength;
-            ++length;
-            matchLength = 0;
         }
-    }
 
-    if (matchLength == delimiter.size()) {
-        applySplitOptions(std::string_view(), opt, tokens);
-    } else if (length + matchLength > 0) {
-        applySplitOptions(std::string_view(start, length), opt, tokens);
-    }
+        if (length > 0) {
+            applySplitOptions(std::string_view(start, length), opt, tokens);
+        }
+    } else {
+        for (size_t i = 0; i < str.size(); ++i) {
+            if (str[i] == delimiter[matchLength]) {
+                ++matchLength;
 
-    if (length == 0 && matchLength == 0) {
-        applySplitOptions(std::string_view(), opt, tokens);
+                if (matchLength == delimiter.size()) {
+                    applySplitOptions(std::string_view(start, length), opt, tokens);
+                    length      = 0;
+                    matchLength = 0;
+
+                    if (i + 1 < str.size()) {
+                        start = &str[i + 1];
+                    }
+
+                    continue;
+                }
+            } else {
+                length += matchLength;
+                ++length;
+                matchLength = 0;
+            }
+        }
+
+        if (matchLength == delimiter.size()) {
+            applySplitOptions(std::string_view(), opt, tokens);
+        } else if (length + matchLength > 0) {
+            applySplitOptions(std::string_view(start, length), opt, tokens);
+        }
+
+        if (length == 0 && matchLength == 0) {
+            applySplitOptions(std::string_view(), opt, tokens);
+        }
     }
 
     if (tokens.empty()) {
@@ -331,7 +365,7 @@ Splitter::const_iterator::const_iterator()
 {
 }
 
-Splitter::const_iterator& Splitter::const_iterator::operator++()
+Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
 {
     if (!_splitter->finished()) {
         _value = _splitter->next();
@@ -341,19 +375,19 @@ Splitter::const_iterator& Splitter::const_iterator::operator++()
     return *this;
 }
 
-Splitter::const_iterator Splitter::const_iterator::operator++(int)
+Splitter::const_iterator Splitter::const_iterator::operator++(int) noexcept
 {
     Splitter::const_iterator result(*this);
     ++(*this);
     return result;
 }
 
-Splitter::const_iterator::reference Splitter::const_iterator::operator*()
+Splitter::const_iterator::reference Splitter::const_iterator::operator*() const noexcept
 {
     return _value;
 }
 
-Splitter::const_iterator::pointer Splitter::const_iterator::operator->()
+Splitter::const_iterator::pointer Splitter::const_iterator::operator->() const noexcept
 {
     return &_value;
 }
