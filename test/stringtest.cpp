@@ -72,6 +72,8 @@ TEST(StringTest, ReplaceInPlace)
     string testString = "abcaabbabbab";
     str::replaceInPlace(testString, "ab", "a");
     EXPECT_EQ("acaababa", testString);
+    str::replaceInPlace(testString, "a", "z");
+    EXPECT_EQ("zczzbzbz", testString);
 
     testString = "stringstringstring";
     str::replaceInPlace(testString, "stringstring", "string");
@@ -82,6 +84,7 @@ TEST(StringTest, Replace)
 {
     string testString = "abcaabbabbab";
     EXPECT_EQ("acaababa", str::replace(testString, "ab", "a"));
+    EXPECT_EQ("zcazbzbz", str::replace(testString, "ab", "z"));
 
     testString = "stringstringstring";
     EXPECT_EQ("stringstring", str::replace(testString, "stringstring", "string"));

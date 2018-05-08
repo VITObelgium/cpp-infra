@@ -121,13 +121,19 @@ std::string join(const Container& items, const std::string& joinString, ToString
     return ss.str();
 }
 
+/*! Split options that can be passed to splitting functions */
 enum class SplitOpt
 {
-    NoEmpty = 1 << 0,
-    Trim    = 1 << 1
+    NoEmpty                   = 1 << 0, //! Don't include empty substrings in the results
+    Trim                      = 1 << 1, //! Trim the substrings
+    DelimiterIsCharacterArray = 1 << 2, //! Treat the delimiter as an array of characters, any occurence is used to split
 };
 
+/*! Splits the passed strings into substrings using the delimeter character
+ * When splitting on a single character, use this overload as it is slightly more efficient then using a string delimiter
+ */
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+/*! Splits the passed strings into substrings using the delimeter character */
 std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
 std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
