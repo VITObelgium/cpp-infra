@@ -115,10 +115,6 @@ if (NOT STATIC_PLUGINS)
     endif ()
 endif ()
 
-set (PLUGINS ${PLUGINS} hdf5buffer riooutputbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider textgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
-
-if (ENABLE_SQL_BUFFER)
-    set (PLUGINS ${PLUGINS} sqlbuffer PARENT_SCOPE)
-endif ()
+set (PLUGINS ${PLUGINS} sqlbuffer hdf5buffer riooutputbuffer asciiforecastwriter ircelmeteoprovider rioobsprovider xmlgridprovider textgridprovider xmlaqnetprovider stationinfoprovider PARENT_SCOPE)
 
 add_subdirectory(test)

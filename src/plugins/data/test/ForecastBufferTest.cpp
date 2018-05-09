@@ -4,7 +4,7 @@
 #include <chrono>
 
 #include "../Hdf5Buffer.h"
-//#include "../SqlBuffer.h"
+#include "../SqlBuffer.h"
 
 #include "EngineMock.h"
 #include "config.h"
@@ -70,8 +70,7 @@ protected:
     double _noData;
 };
 
-//using BufferTypes = testing::Types<Hdf5Buffer, SqlBuffer>;
-using BufferTypes = testing::Types<Hdf5Buffer>;
+using BufferTypes = testing::Types<Hdf5Buffer, SqlBuffer>;
 TYPED_TEST_CASE(ForecastBufferTest, BufferTypes);
 
 TYPED_TEST(ForecastBufferTest, GetTimeResolution)

@@ -31,7 +31,7 @@ inline std::vector<std::string> getPluginNames()
     return {
         AsciiForecastWriter::name(),
         RioObsProvider::name(),
-        //SqlBuffer::name(),
+        SqlBuffer::name(),
         XMLAQNetProvider::name(),
         XmlGridProvider::name(),
         TextGridProvider::name(),
