@@ -44,7 +44,7 @@ option(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory acc
 option(BUILD_UI "Build the user interface" OFF)
 option(STATIC_PLUGINS "Do not use shared library for plugins" OFF)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
-option(ENABLE_SQL_BUFFER "Enable sql buffer plugin" OFF)
+option(ENABLE_SQL_BUFFER "Enable sql buffer plugin" ON)
 
 if (SANITIZE_ADDRESS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
