@@ -1,5 +1,5 @@
 include(CMakeDependentOption)
-include(CheckIncludeFileCXX)
+include(CheckCXXSourceCompiles)
 
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
@@ -11,8 +11,25 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui comp
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 
-CHECK_INCLUDE_FILE_CXX(filesystem HAVE_FILESYSTEM_H)
-CHECK_INCLUDE_FILE_CXX(experimental/filesystem HAVE_EXP_FILESYSTEM_H)
+check_cxx_source_compiles("
+#include <filesystem>
+namespace fs = std::filesystem;
+int main() { return 0; }
+" HAVE_FILESYSTEM_H)
+
+check_cxx_source_compiles("
+#include <experimental/filesystem>
+namespace fs = std::experimental::filesystem;
+int main() { return 0; }
+" HAVE_EXP_FILESYSTEM_H)
+
+if (HAVE_FILESYSTEM_H)
+    message(STATUS "Found std::filesystem")
+elseif (HAVE_EXP_FILESYSTEM_H)
+    message(STATUS "Found std::experimental::filesystem")
+else ()
+    message(WARNING "no filesystem implementation found")
+endif ()
 
 find_package(fmt CONFIG REQUIRED)
 # make sure we use release versions of fmt lib when building relwithdebinfo
