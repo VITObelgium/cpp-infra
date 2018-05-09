@@ -8,7 +8,7 @@ namespace opaq {
 
 using namespace infra;
 
-ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&, const std::string&)> cb)
+ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&)> cb)
 : _loadPluginCb(cb)
 , _engine(engine)
 {
@@ -53,7 +53,7 @@ std::unique_ptr<Component> ComponentManager::createComponent(const std::string& 
     return component;
 }
 
-void ComponentManager::loadPlugin(const std::string& pluginName, const std::string& filename)
+void ComponentManager::loadPlugin(const std::string& pluginName)
 {
     // 1. check if plugin was already loaded
     auto it = _factoryMap.find(pluginName);
@@ -62,7 +62,7 @@ void ComponentManager::loadPlugin(const std::string& pluginName, const std::stri
         return;
     }
 
-    _factoryMap.emplace(pluginName, _loadPluginCb(pluginName, filename));
+    _factoryMap.emplace(pluginName, _loadPluginCb(pluginName));
 }
 
 void ComponentManager::destroyComponent(const std::string& componentName)

@@ -5,12 +5,4 @@ add_library(idwmodel STATIC
 
 target_link_libraries(idwmodel opaqcore)
 
-if (NOT STATIC_PLUGINS)
-    set_target_properties(idwmodel PROPERTIES POSITION_INDEPENDENT_CODE ON)
-
-    add_library(idwmodelplugin MODULE InverseDistanceWeightingModelPlugin.cpp)
-
-    target_link_libraries(idwmodelplugin idwmodel)
-endif ()
-
 set (PLUGINS ${PLUGINS} idwmodel PARENT_SCOPE)

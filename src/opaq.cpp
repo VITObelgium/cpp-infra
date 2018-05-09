@@ -25,12 +25,10 @@ namespace po = boost::program_options;
 
 static void printPlugins()
 {
-#ifdef STATIC_PLUGINS
     std::cout << "Available Plugins:" << std::endl;
     for (auto& plugin : opaq::getPluginNames()) {
         std::cout << " - " << plugin << std::endl;
     }
-#endif
 }
 
 static void printVersion()

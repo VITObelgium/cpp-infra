@@ -1,9 +1,9 @@
 #include "Engine.h"
-#include "data/IGridProvider.h"
-#include "data/MeteoProvider.h"
-#include "data/IMappingBuffer.h"
 #include "ComponentManagerFactory.h"
+#include "data/IGridProvider.h"
+#include "data/IMappingBuffer.h"
 #include "data/IStationInfoProvider.h"
+#include "data/MeteoProvider.h"
 
 #include "config/ForecastStage.h"
 #include "config/MappingStage.h"
@@ -19,8 +19,7 @@
 #include "PollutantManager.h"
 #include "tools/ScopeGuard.h"
 
-namespace opaq
-{
+namespace opaq {
 
 using namespace chrono_literals;
 
@@ -32,10 +31,10 @@ Engine::Engine(config::PollutantManager& pollutantMgr)
 }
 
 void Engine::runForecastStage(const config::ForecastStage& cnf,
-                              AQNetworkProvider& net,
-                              const Pollutant& pol,
-                              Aggregation::Type aggr,
-                              const chrono::date_time& baseTime)
+    AQNetworkProvider& net,
+    const Pollutant& pol,
+    Aggregation::Type aggr,
+    const chrono::date_time& baseTime)
 {
     // Get max forecast horizon...
     auto forecastHorizon = cnf.getHorizon();
@@ -46,8 +45,7 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
 
     // Get meteo data provider (can be missing)
     MeteoProvider* meteo = nullptr;
-    if (cnf.getMeteo())
-    {
+    if (cnf.getMeteo()) {
         meteo = &_compMgr.getComponent<MeteoProvider>(cnf.getMeteo()->name);
         meteo->setBaseTime(baseTime);
     }
@@ -57,8 +55,7 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
     buffer.setAQNetworkProvider(net);
 
     // Get the forecast models to run
-    for (auto& modelConfig : cnf.getModels())
-    {
+    for (auto& modelConfig : cnf.getModels()) {
         auto& model = _compMgr.getComponent<Model>(modelConfig.name);
 
         // set ins and outs for the model
@@ -86,20 +83,19 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
 }
 
 void Engine::runMappingStage(const config::MappingStage& cnf,
-                             AQNetworkProvider& aqNetworkProvider,
-                             IGridProvider& gridProvider,
-                             const Pollutant& pollutant,
-                             Aggregation::Type aggr,
-                             const chrono::date_time& baseTime)
+    AQNetworkProvider& aqNetworkProvider,
+    IGridProvider& gridProvider,
+    const Pollutant& pollutant,
+    Aggregation::Type aggr,
+    const chrono::date_time& baseTime)
 {
     _logger->info("Mapping");
 
     auto& buffer = _compMgr.getComponent<IMappingBuffer>(cnf.getMappingBuffer().name);
-    auto& obs = _compMgr.getComponent<DataProvider>(cnf.getDataProvider().name);
+    auto& obs    = _compMgr.getComponent<DataProvider>(cnf.getDataProvider().name);
     obs.setAQNetworkProvider(aqNetworkProvider);
 
-    for (auto& modelConfig : cnf.getModels())
-    {
+    for (auto& modelConfig : cnf.getModels()) {
         auto& model = _compMgr.getComponent<Model>(modelConfig.name);
 
         // set ins and outs for the model
@@ -135,9 +131,8 @@ void Engine::run(config::OpaqRun& config)
 
     // Get grid provider
     IGridProvider* gridProvider = nullptr;
-    auto gridProviderConfig = config.getGridProvider();
-    if (gridProviderConfig)
-    {
+    auto gridProviderConfig     = config.getGridProvider();
+    if (gridProviderConfig) {
         gridProvider = &_compMgr.getComponent<IGridProvider>(gridProviderConfig->name);
         _logger->info("Using grid provider {}", gridProviderConfig->name);
     }
@@ -146,39 +141,33 @@ void Engine::run(config::OpaqRun& config)
     auto baseTimes = config.getBaseTimes();
 
     IMappingBuffer* mappingBuffer = nullptr;
-    if (mappingStage)
-    {
+    if (mappingStage) {
         mappingBuffer = &_compMgr.getComponent<IMappingBuffer>(mappingStage->getMappingBuffer().name);
-        auto& grid = gridProvider->getGrid(pollutant.getName(), mappingStage->getGridType());
+        auto& grid    = gridProvider->getGrid(pollutant.getName(), mappingStage->getGridType());
         mappingBuffer->openResultsFile(baseTimes.front(), baseTimes.back() + 1_d, pollutant, config.getAggregation(), aqNetworkProvider.getAQNetwork().getStations(), grid, mappingStage->getGridType());
     }
 
-    auto closeBuffer = make_scope_guard([mappingBuffer] () {
-        if (mappingBuffer)
-        {
+    auto closeBuffer = make_scope_guard([mappingBuffer]() {
+        if (mappingBuffer) {
             mappingBuffer->closeResultsFile();
         }
     });
 
     _logger->info("Starting OPAQ workflow...");
-    if (forecastStage)
-    {
+    if (forecastStage) {
         // Get data buffer
         auto& buffer = _compMgr.getComponent<ForecastBuffer>(forecastStage->getBuffer().name);
 
-        for (auto& baseTime : baseTimes)
-        {
+        for (auto& baseTime : baseTimes) {
             _logger->info("Forecast stage for {}", chrono::to_date_string(baseTime));
             runForecastStage(*forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
-            if (mappingStage)
-            {
+            if (mappingStage) {
                 _logger->info(">> Mapping forecast {}", chrono::to_date_string(baseTime));
                 assert(gridProvider);
 
                 // loop over the forecast horizons and call the mapping stage for each horizon
-                for (auto fcHor = 0_d; fcHor <= forecastStage->getHorizon(); fcHor += 1_d)
-                {
+                for (auto fcHor = 0_d; fcHor <= forecastStage->getHorizon(); fcHor += 1_d) {
                     // Buffer is input provider for the mapping models
                     // set the forecast horizon on the hdf5 dataprovider, then run the mapping stage
                     buffer.setForecastHorizon(fcHor);
@@ -186,27 +175,23 @@ void Engine::run(config::OpaqRun& config)
                 }
             }
         }
-    }
-    else if (mappingStage)
-    {
+    } else if (mappingStage) {
         assert(gridProvider);
-        
-        for (auto& baseTime : baseTimes)
-        {
+
+        for (auto& baseTime : baseTimes) {
             runMappingStage(*config.getMappingStage(), aqNetworkProvider, *gridProvider, pollutant, config.getAggregation(), baseTime);
         }
     }
 }
 
 std::vector<PredictionResult> Engine::validate(config::OpaqRun& config,
-                                               chrono::days forecastHorizon,
-                                               const std::string& station,
-                                               chrono::date_time startTime,
-                                               chrono::date_time endTime,
-                                               const std::string& model)
+    chrono::days forecastHorizon,
+    const std::string& station,
+    chrono::date_time startTime,
+    chrono::date_time endTime,
+    const std::string& model)
 {
-    if (startTime > endTime)
-    {
+    if (startTime > endTime) {
         throw RunTimeException("Validation start time must be before the end time");
     }
 
@@ -234,8 +219,7 @@ std::vector<PredictionResult> Engine::validate(config::OpaqRun& config,
         throw RunTimeException("Inconsistent measured and predicted values");
     }*/
 
-    for (size_t i = 0; i < predictedValues.size(); ++i)
-    {
+    for (size_t i = 0; i < predictedValues.size(); ++i) {
         results.emplace_back(predictedValues.datetime(i), measuredValues.value(i), predictedValues.value(i));
     }
 
@@ -254,14 +238,10 @@ ComponentManager& Engine::componentManager()
 
 void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
 {
-    for (auto& plugin : plugins)
-    {
-        try
-        {
-            _compMgr.loadPlugin(plugin.name, plugin.libPath);
-        }
-        catch (std::exception& e)
-        {
+    for (auto& plugin : plugins) {
+        try {
+            _compMgr.loadPlugin(plugin.name);
+        } catch (std::exception& e) {
             throw RunTimeException("Failed to load plugins {} ({})", plugin.name, e.what());
         }
     }
@@ -270,15 +250,11 @@ void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
 void Engine::initComponents(const std::vector<config::Component>& components)
 {
     _compMgr.destroyComponents();
-    for (auto& component : components)
-    {
-        try
-        {
+    for (auto& component : components) {
+        try {
             _logger->info("Creating component {} from plugin {}", component.name, component.plugin.name);
             _compMgr.createComponent<Component>(component.name, component.plugin.name, component.config);
-        }
-        catch (const std::exception& e)
-        {
+        } catch (const std::exception& e) {
             _logger->critical("Error while creating & configuring component {} ({})", component.name, e.what());
             throw std::runtime_error("Failed to initialize components");
         }

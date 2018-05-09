@@ -98,15 +98,11 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         // Parsing plugins section
         ConfigDocument pluginsDoc;
         auto pluginsElement = XmlTools::getElement(rootElement, "plugins", &pluginsDoc);
-        auto pluginPath     = pluginsElement.trimmedValue();
 
         // adjusting this to make use of attributes, the config looks much cleaner this way...
         for (auto& pluginElement : pluginsElement.children("plugin")) {
-            auto fullname = fmt::format("{}/{}" PLUGIN_EXT, pluginPath, pluginElement.value());
-
             config::Plugin plugin;
-            plugin.name    = pluginElement.attribute("name");
-            plugin.libPath = fullname;
+            plugin.name = pluginElement.attribute("name");
             _opaqRun.addPlugin(plugin);
         }
 
@@ -236,13 +232,6 @@ void ConfigurationHandler::validateConfiguration(config::PollutantManager& pollu
                 throw BadConfigurationException("Found 2 plugins with the same name: {}", name);
             }
         }
-
-#ifndef STATIC_PLUGINS
-        // check if plugin lib file exists
-        if (!FileTools::exists(it1->libPath)) {
-            throw BadConfigurationException("Library file not found: {}", it1->libPath);
-        }
-#endif
     }
 
     // check for components with the same name

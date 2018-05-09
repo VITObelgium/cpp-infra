@@ -46,7 +46,7 @@ TEST_F(ComponentManagerTest, LoadPlugin)
     auto doc    = ConfigDocument::loadFromString(configXml);
     auto config = doc.child("config");
 
-    _cmpMgr.loadPlugin("sqlbuffer", TEST_BINARY_DIR "/" PLUGIN_PREFIX "sqlbufferplugin" PLUGIN_EXT);
+    _cmpMgr.loadPlugin("sqlbuffer");
     auto& comp = _cmpMgr.createComponent<Component>("sqlbuffer", "sqlbuffer", config);
     EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("sqlbuffer"));
 }

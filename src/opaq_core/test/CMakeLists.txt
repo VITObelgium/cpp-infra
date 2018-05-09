@@ -15,9 +15,7 @@ add_executable(opaqcoretest
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINARY_DIR}/testconfig.h)
 
 target_link_libraries(opaqcoretest opaqcore GTest::GTest GMock::GMock)
-if (STATIC_PLUGINS)
-    target_link_libraries(opaqcoretest ${PLUGINS})
-endif ()
+target_link_libraries(opaqcoretest ${PLUGINS})
 
 add_test(NAME opaqcore COMMAND opaqcoretest)
 

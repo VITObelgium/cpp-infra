@@ -27,7 +27,6 @@ namespace opaq {
 // the static libraries because noone seems to use them
 inline std::vector<std::string> getPluginNames()
 {
-#ifdef STATIC_PLUGINS
     return {
         AsciiForecastWriter::name(),
         RioObsProvider::name(),
@@ -46,9 +45,6 @@ inline std::vector<std::string> getPluginNames()
         OVL_IRCEL_model3::name(),
 
         InverseDistanceWeighting::name()};
-#else
-    return {};
-#endif
 }
 
 }

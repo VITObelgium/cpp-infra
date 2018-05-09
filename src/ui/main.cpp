@@ -7,7 +7,7 @@
 
 #ifdef STATIC_QT
 #if defined WIN32
-    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 #endif
 
@@ -22,13 +22,10 @@ int main(int argc, char* argv[])
     Log::initLogger("");
     Logger logger("main");
 
-#ifdef STATIC_PLUGINS
     logger->debug("Available Plugins:");
-    for (auto& plugin : opaq::getPluginNames())
-    {
+    for (auto& plugin : opaq::getPluginNames()) {
         logger->debug(" - {}", plugin);
     }
-#endif
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");

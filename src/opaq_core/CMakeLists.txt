@@ -24,7 +24,6 @@ set (CORE_SOURCES
     GridType.h
     Grid.h
     Grid.cpp
-    OpaqDllExports.h
     OpaqMath.h
     OpaqMath.cpp
     Model.cpp
@@ -93,7 +92,6 @@ PRIVATE
     Boost::filesystem
     Boost::iostreams
     ${EXTRA_LIBS}
-    ${CMAKE_DL_LIBS}
 )
 
 # We use our own version of FMT, let spdlog use the same version
