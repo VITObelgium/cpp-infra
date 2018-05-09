@@ -1,5 +1,8 @@
 #pragma once
 
+#include <iosfwd>
+#include <string_view>
+
 #include <cassert>
 #ifdef HAVE_FILESYSTEM_H
 #include <filesystem>
@@ -17,10 +20,8 @@ namespace fs = std::experimental::filesystem;
 #define INFRA_HAS_FILESYSTEM
 #endif
 
+namespace infra::file {
 #ifdef INFRA_HAS_FILESYSTEM
-
-namespace infra {
-
 /*! Create the specified directory and all parent directories if it does
  *  not exist.
  * /param path should specify a directory, not a file path
@@ -42,7 +43,11 @@ fs::path combineAbsoluteWithRelativePath(const fs::path& baseFile, const fs::pat
  */
 fs::path combinePath(const fs::path& baseDir, const fs::path& file);
 
-std::string readTextFile(const fs::path& filename);
-}
+std::string readAsText(const fs::path& filename);
 
 #endif
+
+std::string readAsText(const std::string& filename);
+std::string readAsText(const std::istream& filestream);
+void writeAsText(const std::string& filename, std::string_view contents);
+}

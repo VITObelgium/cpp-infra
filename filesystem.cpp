@@ -2,13 +2,13 @@
 #include "infra/exception.h"
 
 #include <fstream>
+#include <istream>
 #include <sstream>
 
+namespace infra::file {
 #ifdef INFRA_HAS_FILESYSTEM
 
-namespace infra {
-
-fs::path make_preferred(const fs::path& p)
+static fs::path make_preferred(const fs::path& p)
 {
     auto pStr = p.string();
     for (auto& c : pStr) {
@@ -48,18 +48,37 @@ fs::path combinePath(const fs::path& base, const fs::path& file)
 #endif
 }
 
-std::string readTextFile(const fs::path& filename)
+std::string readAsText(const fs::path& filename)
+{
+    return readAsText(filename.string());
+}
+
+#endif
+
+std::string readAsText(const std::string& filename)
 {
     std::ifstream fileStream(filename.c_str(), std::ifstream::binary);
-
     if (!fileStream.is_open()) {
-        throw RuntimeError("Failed to open file for reading: {}", filename.string());
+        throw RuntimeError("Failed to open file for reading: {}", filename);
     }
 
+    return readAsText(fileStream);
+}
+
+std::string readAsText(const std::istream& fileStream)
+{
     std::stringstream buffer;
     buffer << fileStream.rdbuf();
     return buffer.str();
 }
-}
 
-#endif
+void writeAsText(const std::string& filename, std::string_view contents)
+{
+    std::ofstream fs(filename.c_str(), std::ios::trunc);
+    if (!fs.is_open()) {
+        throw RuntimeError("Failed to open file for writing: {}", filename);
+    }
+
+    fs << contents;
+}
+}
