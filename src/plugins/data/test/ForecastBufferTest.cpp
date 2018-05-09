@@ -47,7 +47,7 @@ protected:
     : _buffer(&_concreteBuffer)
     , _noData(_buffer->getNoData())
     {
-        FileTools::del("test.db");
+        FileTools::remove("test.db");
 
         auto configXml =
             "<config>"

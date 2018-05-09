@@ -8,7 +8,7 @@
 #include "IRCELMeteoProvider.h"
 
 #include "infra/configdocument.h"
-#include "tools/FileTools.h"
+#include "infra/filesystem.h"
 
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
@@ -31,9 +31,9 @@ class IRCELMeteoProviderTest : public Test
 protected:
     IRCELMeteoProviderTest()
     {
-        FileTools::del("BEL_096_4800_P07.txt");
-        FileTools::del("BEL_096_4800_P08.txt");
-        FileTools::del("BEL_096_4800_P07.txt.gz");
+        FileTools::remove("BEL_096_4800_P07.txt");
+        FileTools::remove("BEL_096_4800_P08.txt");
+        FileTools::remove("BEL_096_4800_P07.txt.gz");
 
         configure(3h, "./BEL_%meteo%_%param%.txt");
     }
@@ -78,7 +78,7 @@ TEST_F(IRCELMeteoProviderTest, GetTimeResolution)
 
 TEST_F(IRCELMeteoProviderTest, GetValues)
 {
-    FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
+    file::writeAsText("BEL_096_4800_P07.txt", referenceData());
 
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 03) + 23h, "096_4800", "P07");
     EXPECT_EQ(16u, values.size());
@@ -94,8 +94,8 @@ TEST_F(IRCELMeteoProviderTest, GetValues)
 
 TEST_F(IRCELMeteoProviderTest, GetValuesMultiplePollutants)
 {
-    FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
-    FileTools::writeTextFile("BEL_096_4800_P08.txt", referenceData());
+    file::writeAsText("BEL_096_4800_P07.txt", referenceData());
+    file::writeAsText("BEL_096_4800_P08.txt", referenceData());
 
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 02) + 23h, "096_4800", "P07");
     EXPECT_EQ(8u, values.size());
@@ -142,7 +142,7 @@ TEST_F(IRCELMeteoProviderTest, GetValuesCompressed)
 // Check with Bino, this seems to be incorrectly implemented
 TEST_F(IRCELMeteoProviderTest, DISABLED_GetValuesOutOfRangeUsePreviousDay)
 {
-    FileTools::writeTextFile("BEL_096_4800_P07.txt", referenceData());
+    file::writeAsText("BEL_096_4800_P07.txt", referenceData());
 
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 05), make_date_time(2015_y / jan / 05) + 23h, "096_4800", "P07");
     EXPECT_EQ(8u, values.size());

@@ -6,7 +6,7 @@
 #include "TextGridProvider.h"
 
 #include "infra/configdocument.h"
-#include "tools/FileTools.h"
+#include "infra/filesystem.h"
 
 #include <sstream>
 
@@ -25,8 +25,8 @@ class TextGridProviderTest : public Test
 protected:
     TextGridProviderTest()
     {
-        FileTools::del("pm10_clc06d_grid_4x4.txt");
-        FileTools::del("pm10_clc06d_grid_1x1.txt");
+        FileTools::remove("pm10_clc06d_grid_4x4.txt");
+        FileTools::remove("pm10_clc06d_grid_1x1.txt");
         configure();
     }
 
@@ -57,7 +57,7 @@ TEST_F(TextGridProviderTest, GetGridCells)
        << "3	24000	182000	0.2162\r\n"
        << "4	24000	190000	0.2101\r\n";
 
-    FileTools::writeTextFile("pm10_clc06d_grid_4x4.txt", ss.str());
+    file::writeAsText("pm10_clc06d_grid_4x4.txt", ss.str());
 
     auto grid = _gridProvider.getGrid("pm10", GridType::Grid4x4);
     EXPECT_EQ(4u, grid.cellCount());
@@ -73,7 +73,7 @@ TEST_F(TextGridProviderTest, GetGridInvalidGridSize)
     ss << "ID	XLAMB	YLAMB	BETA\r\n"
        << "1	24000	174000	0.22\r\n";
 
-    FileTools::writeTextFile("pm10_clc06d_grid_1x1.txt", ss.str());
+    file::writeAsText("pm10_clc06d_grid_1x1.txt", ss.str());
 
     EXPECT_EQ(0, _gridProvider.getGrid("pm10", GridType::Grid4x4).cellCount());
 }

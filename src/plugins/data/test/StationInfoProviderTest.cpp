@@ -6,7 +6,7 @@
 #include "StationInfoProvider.h"
 
 #include "infra/configdocument.h"
-#include "tools/FileTools.h"
+#include "infra/filesystem.h"
 
 #include <sstream>
 
@@ -27,7 +27,7 @@ class StationInfoProviderTest : public Test
 protected:
     StationInfoProviderTest()
     {
-        FileTools::del("pm10_stations_info_GIS_clc06d.txt");
+        FileTools::remove("pm10_stations_info_GIS_clc06d.txt");
 
         configure();
     }
@@ -60,7 +60,7 @@ TEST_F(StationInfoProviderTest, GetStations)
        << "4	41N043	151000	174800	14.6	5	1.035592\r\n"
        << "5	41R001	147540	171030	23.2	3	0.754189\r\n";
 
-    FileTools::writeTextFile("pm10_stations_info_GIS_clc06d.txt", ss.str());
+    file::writeAsText("pm10_stations_info_GIS_clc06d.txt", ss.str());
 
     auto stations = _stationsProvider.getStations(Pollutant(1, "pm10", "unit", "desc"), "clc06d");
     EXPECT_THAT(stations, ContainerEq(std::vector<Station>{

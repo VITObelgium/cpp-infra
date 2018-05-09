@@ -8,7 +8,7 @@
 #include "RioObsProvider.h"
 
 #include "infra/configdocument.h"
-#include "tools/FileTools.h"
+#include "infra/filesystem.h"
 
 #include <sstream>
 
@@ -78,7 +78,7 @@ TEST_F(RioObsProviderTest, GetValues)
        << "40AB01 20090102    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\n"
        << "40AB01 20090103     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\n";
 
-    FileTools::writeTextFile("pm10_data_rio.txt", ss.str());
+    file::writeAsText("pm10_data_rio.txt", ss.str());
 
     auto values = _obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::Max1h);
     EXPECT_EQ(2u, values.size());
@@ -114,7 +114,7 @@ TEST_F(RioObsProviderTest, GetValuesInvalidStation)
 
 TEST_F(RioObsProviderTest, NoStationData)
 {
-    FileTools::del("pm10_data_rio.txt");
+    fs::remove("pm10_data_rio.txt");
     EXPECT_TRUE(_obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::None).isEmpty());
 }
 }

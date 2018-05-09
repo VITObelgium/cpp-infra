@@ -2,6 +2,7 @@
 #include "Exceptions.h"
 #include "PluginRegistration.h"
 #include "infra/configdocument.h"
+#include "infra/filesystem.h"
 #include "infra/string.h"
 
 #include <boost/lexical_cast.hpp>
@@ -49,7 +50,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
         auto& grid    = _grid[pollutant][type];
         auto cellSize = gridTypeToCellSize(type);
 
-        auto contents = FileTools::readFileContents(filename);
+        auto contents = file::readAsText(filename);
         str::Splitter lineSplitter(contents, "\r\n");
 
         bool first = true;
@@ -71,7 +72,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
 
             grid.addCell(Cell(id, x, x + cellSize, y, y + cellSize));
         }
-    } catch (const RunTimeException& e) {
+    } catch (const std::exception& e) {
         _logger->warn(e.what());
     }
 }

@@ -9,7 +9,7 @@
 #include "Hdf5Tools.h"
 #include "PluginRegistration.h"
 #include "infra/configdocument.h"
-#include "infra/filesystem.h"
+#include "tools/FileTools.h"
 
 #include <algorithm>
 
@@ -64,7 +64,7 @@ void Hdf5Buffer::configure(const ConfigNode& configuration, const std::string& c
     _fcTimeResolution   = std::chrono::hours(configuration.child("fctime_resolution").value<int>().value_or(24));
 
     auto filename = std::string(configuration.child("filename").value());
-    if (fs::exists(filename)) {
+    if (FileTools::exists(filename)) {
         openFile(filename);
     } else {
         createFile(filename);

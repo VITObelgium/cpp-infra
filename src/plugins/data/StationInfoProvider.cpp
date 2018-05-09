@@ -2,6 +2,7 @@
 #include "PluginRegistration.h"
 
 #include "infra/configdocument.h"
+#include "infra/filesystem.h"
 #include "infra/string.h"
 
 #include <boost/lexical_cast.hpp>
@@ -52,7 +53,7 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
     str::replaceInPlace(filename, s_gisTypePlaceholder, gisType);
 
     try {
-        auto contents = FileTools::readFileContents(filename);
+        auto contents = file::readAsText(filename);
         str::Splitter lineSplitter(contents, "\r\n");
 
         auto& stations = _stations[pollutant.getName()][gisType];

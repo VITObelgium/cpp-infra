@@ -1,8 +1,8 @@
 #include "ObsParser.h"
 
 #include "AQNetwork.h"
+#include "infra/filesystem.h"
 #include "infra/string.h"
-#include "tools/FileTools.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -22,7 +22,7 @@ std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries
 {
     std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>> result;
 
-    auto contents = FileTools::readStreamContents(file);
+    auto contents = file::readAsText(file);
     str::Splitter lineSplitter(contents, "\r\n");
 
     for (auto& line : lineSplitter) {

@@ -1,6 +1,6 @@
 #include "XmlTools.h"
 #include "infra/configdocument.h"
-#include "infra/filesystem.h"
+#include "tools/FileTools.h"
 
 namespace opaq {
 namespace XmlTools {
@@ -23,7 +23,7 @@ infra::ConfigNode getElement(const infra::ConfigNode& parent, const std::string&
             return element;
         }
 
-        if (!fs::exists(ref)) {
+        if (!FileTools::exists(ref)) {
             throw ElementNotFoundException("File in ref attribute '{}' not found.", ref);
         }
 

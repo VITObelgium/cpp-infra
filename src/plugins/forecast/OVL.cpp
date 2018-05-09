@@ -12,8 +12,8 @@
 #include "TimeSeries.h"
 #include "data/ForecastBuffer.h"
 #include "infra/configdocument.h"
-#include "infra/filesystem.h"
 #include "infra/string.h"
+#include "tools/FileTools.h"
 
 #include <cmath>
 #include <fstream>
@@ -146,7 +146,7 @@ void OVL::parseTuneList(const ConfigNode& lst)
             parseTuneElement(tuneEl);
         } else {
             // ref attribute found
-            if (fs::exists(ref)) {
+            if (FileTools::exists(ref)) {
                 // file found
                 auto refDoc      = ConfigDocument::loadFromFile(ref);
                 auto fileElement = refDoc.child("tune");
