@@ -1,5 +1,7 @@
 #include "Hdf5Tools.h"
 
+#include <algorithm>
+
 namespace opaq {
 namespace Hdf5Tools {
 
