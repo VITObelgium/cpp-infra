@@ -114,7 +114,7 @@ TEST_F(RioObsProviderTest, GetValuesInvalidStation)
 
 TEST_F(RioObsProviderTest, NoStationData)
 {
-    fs::remove("pm10_data_rio.txt");
+    FileTools::remove("pm10_data_rio.txt");
     EXPECT_TRUE(_obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::None).isEmpty());
 }
 }
