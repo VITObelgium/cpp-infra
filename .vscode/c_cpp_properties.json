@@ -3,7 +3,10 @@
         {
             "name": "Mac",
             "compileCommands": "${workspaceRoot}/build/opaq-clang/compile_commands.json",
-            "cppStandard": "c++17"
+            "cppStandard": "c++17",
+            "includePath": [
+                "${workspaceRoot}/build/local-toolchain-clang/include"
+            ]
         },
         {
             "name": "Linux",

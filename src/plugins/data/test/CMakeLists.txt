@@ -30,12 +30,7 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/testconfig.h.in ${CMAKE_CURRENT_BINAR
 
 target_link_libraries(dataplugintest
     opaqcore
-    hdf5buffer
-    sqlbuffer
-    rioobsprovider
-    ircelmeteoprovider
-    stationinfoprovider
-    textgridprovider
+    opaqplugins
     Boost::iostreams
     GTest::GTest
     GMock::GMock

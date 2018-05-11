@@ -34,8 +34,7 @@ if (BUILD_UI)
 endif ()
 
 add_executable(opaq opaq.cpp)
-target_link_libraries(opaq opaqcore Eigen3::Eigen Boost::program_options)
-target_link_libraries(opaq ${PLUGINS})
+target_link_libraries(opaq opaqcore Eigen3::Eigen Boost::program_options opaqplugins)
 
 install(TARGETS opaq
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

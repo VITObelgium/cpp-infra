@@ -37,7 +37,6 @@ public:
 
 // Throws FailedToLoadPluginException PluginAlreadyLoadedException
 FactoryCallback loadStaticPlugin(const std::string& pluginName);
-
 }
 
 #define OPAQ_REGISTER_STATIC_PLUGIN(TYPE) \
