@@ -7,7 +7,7 @@ namespace infra::test {
 
 using namespace testing;
 
-static const char* xmlData = R"("
+static const char* s_xmlData = R"("
     <xml>
         <node1 attr1="5">
             <subnode1 attr1="6"/>
@@ -20,9 +20,19 @@ static const char* xmlData = R"("
     </xml>
 ")";
 
-TEST(ConfigReaderTest, readFromString)
+class ConfigReaderTest : public Test
 {
-    auto doc = ConfigDocument::loadFromString(xmlData);
+protected:
+    ConfigReaderTest()
+    {
+        doc = ConfigDocument::loadFromString(s_xmlData);
+    }
+
+    ConfigDocument doc;
+};
+
+TEST_F(ConfigReaderTest, readFromString)
+{
     EXPECT_EQ("5", doc.child("xml").child("node1").attribute("attr1"));
     EXPECT_EQ("6", doc.child("xml").child("node1").child("subnode1").attribute("attr1"));
 
@@ -38,9 +48,8 @@ TEST(ConfigReaderTest, readFromString)
     EXPECT_EQ("some text", xmlNode.selectChild("node3").value());
 }
 
-TEST(ConfigReaderTest, iterateChildren)
+TEST_F(ConfigReaderTest, iterateChildren)
 {
-    auto doc     = ConfigDocument::loadFromString(xmlData);
     auto xmlNode = doc.child("xml");
 
     std::vector<std::string> childNames;
@@ -51,9 +60,8 @@ TEST(ConfigReaderTest, iterateChildren)
     EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node1", "node2", "node3", "node3"}));
 }
 
-TEST(ConfigReaderTest, iterateNamedChildren)
+TEST_F(ConfigReaderTest, iterateNamedChildren)
 {
-    auto doc     = ConfigDocument::loadFromString(xmlData);
     auto xmlNode = doc.child("xml");
 
     std::vector<std::string> childNames;
@@ -69,5 +77,23 @@ TEST(ConfigReaderTest, iterateNamedChildren)
     }
 
     EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node3", "node3"}));
+}
+
+TEST_F(ConfigReaderTest, rootNode)
+{
+    EXPECT_EQ("xml", doc.rootNode().name());
+}
+
+TEST_F(ConfigReaderTest, nonExistingNodes)
+{
+    auto child = doc.child("lmx");
+    EXPECT_FALSE(child);
+    EXPECT_TRUE(child.name().empty());
+    EXPECT_TRUE(child.attribute("").empty());
+
+    child = doc.child("lmx").child("notpresent").child("nope");
+    EXPECT_FALSE(child);
+    EXPECT_TRUE(child.name().empty());
+    EXPECT_TRUE(child.attribute("").empty());
 }
 }
