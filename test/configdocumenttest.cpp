@@ -84,6 +84,16 @@ TEST_F(ConfigReaderTest, rootNode)
     EXPECT_EQ("xml", doc.rootNode().name());
 }
 
+TEST_F(ConfigReaderTest, rootChildren)
+{
+    std::vector<std::string> names;
+    for (auto& child : doc.children()) {
+        names.emplace_back(child.name());
+    }
+
+    EXPECT_THAT(names, ContainerEq(std::vector<std::string>{"xml"}));
+}
+
 TEST_F(ConfigReaderTest, nonExistingNodes)
 {
     auto child = doc.child("lmx");
