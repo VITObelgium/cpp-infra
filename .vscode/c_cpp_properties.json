@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "Mac",
+            "compileCommands": "${workspaceRoot}/build/opaq-clang/compile_commands.json",
+            "cppStandard": "c++17"
+        },
+        {
+            "name": "Linux",
+            "compileCommands": "${workspaceRoot}/build/opaq-gcc/compile_commands.json",
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

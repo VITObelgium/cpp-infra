@@ -1,0 +1,14 @@
+{
+    "cmake.buildDirectory": "${workspaceRoot}/build/opaq-clang",
+    "cmake.configureSettings": {
+        "CMAKE_PREFIX_PATH": "${workspaceRoot}/build/local-toolchain-clang"
+    },
+    "cmake.installPrefix": "${workspaceRoot}/build/local-toolchain-clang",
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/build/deps-toolchain-*": true
+    },
+    "C_Cpp.intelliSenseEngine": "Default",
+    "C_Cpp.intelliSenseEngineFallback": "Disabled"
+}
