@@ -5,6 +5,8 @@
 
 namespace infra {
 
+#ifdef INFRA_HAS_FILESYSTEM
+
 TEST(FilesystemTest, getFullPath)
 {
     auto pwd = fs::current_path();
@@ -46,4 +48,7 @@ TEST(FilesystemTest, getFullPathBackslash)
     EXPECT_EQ(expected.string(), file::combineAbsoluteWithRelativePath(base, rel).string());
     fs::remove_all("./test1/test");
 }
+
+#endif
+
 }
