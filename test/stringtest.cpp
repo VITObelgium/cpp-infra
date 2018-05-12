@@ -384,6 +384,7 @@ TEST(StringTest, SplitterTest)
     auto splitter = str::Splitter(line, "\t");
     EXPECT_EQ("Line 1:", *splitter.begin());
     EXPECT_EQ("Line 1:", *splitter.begin());
+    EXPECT_NE(splitter.begin(), ++splitter.begin());
     EXPECT_EQ(7, std::distance(splitter.begin(), splitter.end()));
 }
 

@@ -369,6 +369,7 @@ Splitter::const_iterator::const_iterator(const Splitter& sp) noexcept
 
 Splitter::const_iterator::const_iterator() noexcept
 : _splitter(nullptr)
+, _pos(std::string_view::npos)
 {
 }
 
@@ -401,7 +402,7 @@ Splitter::const_iterator::pointer Splitter::const_iterator::operator->() const n
 
 bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other) const noexcept
 {
-    return _splitter != other._splitter;
+    return _splitter != other._splitter || _pos != other._pos;
 }
 
 Splitter::const_iterator Splitter::begin() const noexcept
