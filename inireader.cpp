@@ -131,7 +131,7 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
 #endif
 
     /* Scan through stream line by line */
-    while (reader(line, INI_MAX_LINE, stream) != NULL) {
+    while (reader(line, INI_MAX_LINE, stream) != nullptr) {
         lineno++;
 
         start = line;

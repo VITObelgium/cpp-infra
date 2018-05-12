@@ -358,7 +358,7 @@ Splitter::Splitter(std::string_view src, std::string sep)
 {
 }
 
-Splitter::const_iterator::const_iterator(const Splitter& sp)
+Splitter::const_iterator::const_iterator(const Splitter& sp) noexcept
 : _splitter(&sp)
 , _pos(0)
 {
@@ -367,7 +367,7 @@ Splitter::const_iterator::const_iterator(const Splitter& sp)
     ++*this;
 }
 
-Splitter::const_iterator::const_iterator()
+Splitter::const_iterator::const_iterator() noexcept
 : _splitter(nullptr)
 {
 }
@@ -414,31 +414,25 @@ Splitter::const_iterator Splitter::end() const noexcept
     return Splitter::const_iterator();
 }
 
-void Splitter::skipDelimiters(size_t& pos) const noexcept
+void Splitter::skipDelimiters(std::string_view::size_type& pos) const noexcept
 {
     pos = _src.find_first_not_of(_sep, pos);
 }
 
-std::string_view Splitter::next(size_t& pos) const noexcept
+std::string_view Splitter::next(std::string_view::size_type& pos) const noexcept
 {
-    const auto endOfCurrent = _src.substr(pos).find_first_of(_sep);
-    if (endOfCurrent != std::string_view::npos && endOfCurrent != _src.size()) {
-        // skip all occurrences of the delimeter
-        const auto startOfNext = _src.substr(pos + endOfCurrent).find_first_not_of(_sep);
-        const auto old_pos     = pos;
-        pos += endOfCurrent;
+    std::string_view result;
 
-        if (startOfNext != std::string_view::npos) {
-            pos += startOfNext;
-        } else {
-            pos = std::string_view::npos;
-        }
-
-        return _src.substr(old_pos, endOfCurrent);
+    const auto endOfCurrent = _src.find_first_of(_sep, pos + 1);
+    if (endOfCurrent != std::string_view::npos) {
+        result = _src.substr(pos, endOfCurrent - pos);
+        // skip all occurrences of the delimeter, so  pos points to the start of the next substring
+        pos = _src.find_first_not_of(_sep, endOfCurrent);
     } else {
-        auto result = _src.substr(pos);
-        pos         = std::string_view::npos;
-        return result;
+        result = _src.substr(pos);
+        pos    = std::string_view::npos;
     }
+
+    return result;
 }
 }

@@ -189,8 +189,8 @@ public:
         using iterator_category = std::forward_iterator_tag;
         using difference_type   = int;
 
-        explicit const_iterator(const Splitter& sp);
-        explicit const_iterator();
+        explicit const_iterator(const Splitter& sp) noexcept;
+        explicit const_iterator() noexcept;
 
         const_iterator& operator++() noexcept;
         const_iterator operator++(int) noexcept;
@@ -202,7 +202,7 @@ public:
 
     private:
         const Splitter* _splitter;
-        size_t _pos;
+        std::string_view::size_type _pos;
         std::string_view _value;
     };
 
@@ -210,8 +210,8 @@ public:
     const_iterator end() const noexcept;
 
 private:
-    void skipDelimiters(size_t& pos) const noexcept;
-    std::string_view next(size_t& pos) const noexcept;
+    void skipDelimiters(std::string_view::size_type& pos) const noexcept;
+    std::string_view next(std::string_view::size_type& pos) const noexcept;
 
     std::string_view _src;
     std::string _sep;
