@@ -387,6 +387,13 @@ TEST(StringTest, SplitterTest)
     EXPECT_EQ(7, std::distance(splitter.begin(), splitter.end()));
 }
 
+TEST(StringTest, SplitterTestOnlyDelimiters)
+{
+    static const char* line = "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-";
+    auto splitter           = str::Splitter(line, ".-");
+    EXPECT_EQ(0, std::distance(splitter.begin(), splitter.end()));
+}
+
 TEST(StringTest, SplitterTestStartsWithDelimeters)
 {
     static const char* line = "- This, a sample string.";

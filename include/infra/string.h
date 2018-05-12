@@ -203,7 +203,6 @@ public:
     private:
         const Splitter* _splitter;
         size_t _pos;
-        bool _finished;
         std::string_view _value;
     };
 
@@ -211,8 +210,8 @@ public:
     const_iterator end() const noexcept;
 
 private:
-    void skipDelimiters(size_t& pos, bool& finished) const noexcept;
-    std::string_view next(size_t& pos, bool& finished) const noexcept;
+    void skipDelimiters(size_t& pos) const noexcept;
+    std::string_view next(size_t& pos) const noexcept;
 
     std::string_view _src;
     std::string _sep;

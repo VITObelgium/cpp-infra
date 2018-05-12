@@ -361,10 +361,10 @@ Splitter::Splitter(std::string_view src, std::string sep)
 Splitter::const_iterator::const_iterator(const Splitter& sp)
 : _splitter(&sp)
 , _pos(0)
-, _finished(false)
 {
-    _splitter->skipDelimiters(_pos, _finished);
-    _value = _splitter->next(_pos, _finished);
+    // skip initial delimiters
+    _splitter->skipDelimiters(_pos);
+    ++*this;
 }
 
 Splitter::const_iterator::const_iterator()
@@ -374,8 +374,8 @@ Splitter::const_iterator::const_iterator()
 
 Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
 {
-    if (!_finished) {
-        _value = _splitter->next(_pos, _finished);
+    if (_pos != std::string_view::npos) {
+        _value = _splitter->next(_pos);
     } else {
         _splitter = nullptr;
     }
@@ -414,13 +414,12 @@ Splitter::const_iterator Splitter::end() const noexcept
     return Splitter::const_iterator();
 }
 
-void Splitter::skipDelimiters(size_t& pos, bool& finished) const noexcept
+void Splitter::skipDelimiters(size_t& pos) const noexcept
 {
-    pos      = _src.find_first_not_of(_sep, pos);
-    finished = pos == std::string_view::npos;
+    pos = _src.find_first_not_of(_sep, pos);
 }
 
-std::string_view Splitter::next(size_t& pos, bool& finished) const noexcept
+std::string_view Splitter::next(size_t& pos) const noexcept
 {
     const auto endOfCurrent = _src.substr(pos).find_first_of(_sep);
     if (endOfCurrent != std::string_view::npos && endOfCurrent != _src.size()) {
@@ -431,15 +430,15 @@ std::string_view Splitter::next(size_t& pos, bool& finished) const noexcept
 
         if (startOfNext != std::string_view::npos) {
             pos += startOfNext;
-            finished = false;
         } else {
-            finished = true;
+            pos = std::string_view::npos;
         }
 
         return _src.substr(old_pos, endOfCurrent);
     } else {
-        finished = true;
-        return _src.substr(pos);
+        auto result = _src.substr(pos);
+        pos         = std::string_view::npos;
+        return result;
     }
 }
 }
