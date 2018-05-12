@@ -267,7 +267,10 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
                 ++matchLength;
             } else {
                 if (matchLength > 0) {
-                    applySplitOptions(std::string_view(start, length), opt, tokens);
+                    if (matchLength != i) {
+                        // if matchlength == i, we have only had delimeter data
+                        applySplitOptions(std::string_view(start, length), opt, tokens);
+                    }
                     length      = 1;
                     matchLength = 0;
                     start       = &str[i];
@@ -357,7 +360,11 @@ Splitter::Splitter(std::string_view src, std::string sep)
 
 Splitter::const_iterator::const_iterator(const Splitter& sp)
 : _splitter(&sp)
+, _pos(0)
+, _finished(false)
 {
+    _splitter->skipDelimiters(_pos, _finished);
+    _value = _splitter->next(_pos, _finished);
 }
 
 Splitter::const_iterator::const_iterator()
@@ -367,8 +374,8 @@ Splitter::const_iterator::const_iterator()
 
 Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
 {
-    if (!_splitter->finished()) {
-        _value = _splitter->next();
+    if (!_finished) {
+        _value = _splitter->next(_pos, _finished);
     } else {
         _splitter = nullptr;
     }
@@ -399,7 +406,7 @@ bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other)
 
 Splitter::const_iterator Splitter::begin() const noexcept
 {
-    return ++Splitter::const_iterator(*this);
+    return Splitter::const_iterator(*this);
 }
 
 Splitter::const_iterator Splitter::end() const noexcept
@@ -407,30 +414,32 @@ Splitter::const_iterator Splitter::end() const noexcept
     return Splitter::const_iterator();
 }
 
-std::string_view Splitter::next() const noexcept
+void Splitter::skipDelimiters(size_t& pos, bool& finished) const noexcept
 {
-    const auto endOfCurrent = _src.substr(_pos).find_first_of(_sep);
+    pos      = _src.find_first_not_of(_sep, pos);
+    finished = pos == std::string_view::npos;
+}
+
+std::string_view Splitter::next(size_t& pos, bool& finished) const noexcept
+{
+    const auto endOfCurrent = _src.substr(pos).find_first_of(_sep);
     if (endOfCurrent != std::string_view::npos && endOfCurrent != _src.size()) {
         // skip all occurrences of the delimeter
-        const auto startOfNext = _src.substr(_pos + endOfCurrent).find_first_not_of(_sep);
-        const auto old_pos     = _pos;
-        _pos += endOfCurrent;
+        const auto startOfNext = _src.substr(pos + endOfCurrent).find_first_not_of(_sep);
+        const auto old_pos     = pos;
+        pos += endOfCurrent;
 
         if (startOfNext != std::string_view::npos) {
-            _pos += startOfNext;
+            pos += startOfNext;
+            finished = false;
         } else {
-            _finished = true;
+            finished = true;
         }
 
         return _src.substr(old_pos, endOfCurrent);
     } else {
-        _finished = true;
-        return _src.substr(_pos);
+        finished = true;
+        return _src.substr(pos);
     }
-}
-
-bool Splitter::finished() const noexcept
-{
-    return _finished;
 }
 }

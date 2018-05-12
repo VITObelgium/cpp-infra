@@ -3,6 +3,17 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+namespace std {
+
+void PrintTo(const std::string_view& sv, ::std::ostream* os)
+{
+    *os << "'";
+    os->write(sv.data(), sv.size());
+    *os << "'";
+}
+
+} // namespace foo
+
 namespace infra::test {
 
 using std::string;
@@ -251,6 +262,10 @@ TEST(StringOperationsTest, SplittedViewDelimiterString)
     string testString = "A-B.C|D+E++";
     auto tokenized    = str::splitView(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray);
     EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E"}));
+
+    testString = "- This, a sample string.";
+    tokenized  = str::splitView(testString, " ,.-", str::SplitOpt::DelimiterIsCharacterArray);
+    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"This", "a", "sample", "string"}));
 }
 
 TEST(StringTest, Trim)
@@ -355,16 +370,33 @@ TEST(StringTest, SplitterTest)
     static const char* line = "Line 1:\t1\t2\t3\t4\t5\t10";
 
     std::vector<std::string_view> result;
-    auto splitter = str::Splitter(line, "\t");
 
     for (auto& value : str::Splitter(line, "\t")) {
         result.push_back(value);
     }
 
     // TODO: does not compile under msvc
+    //auto splitter = str::Splitter(line, "\t");
     //std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
 
     EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 1:", "1", "2", "3", "4", "5", "10"}));
+
+    auto splitter = str::Splitter(line, "\t");
+    EXPECT_EQ("Line 1:", *splitter.begin());
+    EXPECT_EQ("Line 1:", *splitter.begin());
+    EXPECT_EQ(7, std::distance(splitter.begin(), splitter.end()));
+}
+
+TEST(StringTest, SplitterTestStartsWithDelimeters)
+{
+    static const char* line = "- This, a sample string.";
+
+    std::vector<std::string_view> result;
+    for (auto& value : str::Splitter(line, " ,.-")) {
+        result.push_back(value);
+    }
+
+    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"This", "a", "sample", "string"}));
 }
 
 TEST(StringTest, SplitterTestEmptyElements)

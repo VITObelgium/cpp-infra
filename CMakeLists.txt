@@ -10,6 +10,7 @@ option(INFRA_XML "Enable xml config reader" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
+option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -248,4 +249,8 @@ if (INFRA_ENABLE_TESTS)
     if (INFRA_UI_COMPONENTS)
         add_subdirectory(ui/test)
     endif ()
+endif ()
+
+if (INFRA_ENABLE_BENCHMARKS)
+    add_subdirectory(benchmarks)
 endif ()

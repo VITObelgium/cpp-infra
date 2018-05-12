@@ -202,20 +202,20 @@ public:
 
     private:
         const Splitter* _splitter;
+        size_t _pos;
+        bool _finished;
         std::string_view _value;
     };
 
     const_iterator begin() const noexcept;
     const_iterator end() const noexcept;
 
-    std::string_view next() const noexcept;
-    bool finished() const noexcept;
-
 private:
+    void skipDelimiters(size_t& pos, bool& finished) const noexcept;
+    std::string_view next(size_t& pos, bool& finished) const noexcept;
+
     std::string_view _src;
     std::string _sep;
-    mutable size_t _pos    = 0;
-    mutable bool _finished = false;
 };
 
 } // namespace infra::str
