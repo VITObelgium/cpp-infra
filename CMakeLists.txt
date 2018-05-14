@@ -224,7 +224,7 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/logsinkmodel.h ui/logsinkmodel.cpp
         )
 
-        target_compile_definitions(infratest PUBLIC HAVE_INFRA_LOG)
+        target_compile_definitions(infra PUBLIC HAVE_INFRA_LOG)
     endif ()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
