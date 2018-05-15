@@ -141,9 +141,9 @@ std::vector<std::string_view> splitView(std::string_view str, char delimiter, Fl
 std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
 template <typename ResultType, typename ConversionFunc>
-std::vector<ResultType> splitTo(std::string_view str, char delimiter, ConversionFunc convFunc)
+std::vector<ResultType> splitTo(std::string_view str, char delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    auto splitted = splitView(str, delimiter);
+    auto splitted = splitView(str, delimiter, opt);
 
     std::vector<ResultType> result;
     result.reserve(splitted.size());
@@ -155,9 +155,9 @@ std::vector<ResultType> splitTo(std::string_view str, char delimiter, Conversion
 }
 
 template <typename ResultType, typename ConversionFunc>
-std::vector<ResultType> splitTo(std::string_view str, std::string_view delimiter, ConversionFunc convFunc)
+std::vector<ResultType> splitTo(std::string_view str, std::string_view delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    auto splitted = splitView(str, delimiter);
+    auto splitted = splitView(str, delimiter, opt);
 
     std::vector<ResultType> result;
     result.reserve(splitted.size());
