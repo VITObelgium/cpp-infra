@@ -24,6 +24,13 @@ config=""
 toolchain=""
 generator="Ninja"
 emscripten=0
+buildui="OFF"
+
+if [[ $@ == **--build-ui** ]]
+then
+    echo "Building qt"
+    buildui="OFF"
+fi
 
 printf "Select configuration: [1:Debug 2:Release]: "
 read yno
@@ -73,7 +80,7 @@ checkresult cmake -G "${generator}" \
     -DCMAKE_TOOLCHAIN_FILE=${pwd}/deps/cmake-scripts/${toolchain}.cmake \
     -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain} \
     -DCMAKE_BUILD_TYPE=${config} \
-    -BUILD_UI=OFF \
+    -BUILD_UI=${buildui} \
     ../../deps
 else
 checkresult emcmake cmake -G "${generator}" \
