@@ -92,5 +92,5 @@ checkresult emcmake cmake -G "${generator}" \
     ../../deps
 fi
 
-checkresult cmake --build . -- "$@"
+checkresult cmake --build .
 cd ..
