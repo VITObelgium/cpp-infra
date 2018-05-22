@@ -221,12 +221,16 @@ Registration::~Registration()
 
 EmbeddedDataRegistration::EmbeddedDataRegistration()
 {
+#ifdef EMBED_GDAL_DATA
     createEmbeddedData();
+#endif
 }
 
 EmbeddedDataRegistration::~EmbeddedDataRegistration()
 {
+#ifdef EMBED_GDAL_DATA
     destroyEmbeddedData();
+#endif
 }
 
 void registerGdal()
