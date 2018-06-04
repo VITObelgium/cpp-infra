@@ -4,6 +4,7 @@
 #include "data/IGridProvider.h"
 
 #include <algorithm>
+#include <map>
 
 namespace opaq {
 

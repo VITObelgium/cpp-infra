@@ -36,7 +36,7 @@ elseif (MINGW)
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(opaqui opaqcore Qt5::Gui Qt5::Charts Qt5::Widgets Qt5::Core ${PLUGINS} ${EXTRA_LIBS})
+target_link_libraries(opaqui opaqcore opaqplugins Qt5::Gui Qt5::Charts Qt5::Widgets Qt5::Core ${EXTRA_LIBS})
 
 install(TARGETS opaqui
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
