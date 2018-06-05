@@ -19,7 +19,7 @@ using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
-static const LogSource s_logSrc           = "RioObsProvider";
+static const LogSource s_logSrc("RioObsProvider");
 static const char* s_pollutantPlaceholder = "%pol%";
 
 RioObsProvider::RioObsProvider()
@@ -119,5 +119,4 @@ void RioObsProvider::readFile(const std::string& pollutant)
     assert(_aqNetworkProvider);
     _buffer[pollutant] = readObservationsFile(file, _aqNetworkProvider->getAQNetwork(), _nvalues, _timeResolution);
 }
-
 }

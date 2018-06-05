@@ -17,7 +17,7 @@ namespace nnet {
 
 using namespace infra;
 
-static const LogSource s_logSrc = "feedforwardnet";
+static const LogSource s_logSrc("feedforwardnet");
 
 namespace {
 

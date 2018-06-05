@@ -12,7 +12,7 @@ namespace opaq {
 
 using namespace infra;
 
-static const LogSource s_logSrc = "ConfigurationHandler";
+static const LogSource s_logSrc("ConfigurationHandler");
 
 static std::string getChildElement(const ConfigNode& node, const char* name)
 {

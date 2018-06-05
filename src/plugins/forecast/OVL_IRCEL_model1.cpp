@@ -14,7 +14,7 @@ namespace opaq {
 using namespace infra;
 using namespace std::chrono_literals;
 
-static const LogSource s_logSrc = "OVL_IRCEL_model1";
+static const LogSource s_logSrc("OVL_IRCEL_model1");
 
 OVL_IRCEL_model1::OVL_IRCEL_model1()
 : p_t2m("P01")     // t2m in IRCEL meteo provider
@@ -118,5 +118,4 @@ int OVL_IRCEL_model1::makeSample(double* sample, const Station& st,
 
     return have_sample;
 }
-
 }

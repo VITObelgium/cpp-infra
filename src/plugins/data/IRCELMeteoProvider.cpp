@@ -18,7 +18,7 @@ namespace opaq {
 using namespace infra;
 using namespace std::chrono_literals;
 
-static const LogSource s_logSrc            = "IRCELMeteoProvider";
+static const LogSource s_logSrc("IRCELMeteoProvider");
 static const char* s_meteo_placeholder     = "%meteo%";
 static const char* s_parameter_placeholder = "%param%";
 static const char* s_basetime_placeholder  = "%basetime%";
@@ -200,5 +200,4 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
         line = reader.readLine();
     }
 }
-
 }

@@ -19,7 +19,7 @@ using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
-static const LogSource s_logSrc = "Hdf5Buffer";
+static const LogSource s_logSrc("Hdf5Buffer");
 static const std::string BASETIME_DATASET_NAME("basetime");
 static const std::string START_DATE_NAME("start_date");
 static const std::string FORECAST_DATASET_NAME("fc_value");
@@ -546,5 +546,4 @@ std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()
 {
     return chrono::to_seconds(getBaseTimeResolution());
 }
-
 }

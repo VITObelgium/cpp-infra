@@ -11,7 +11,7 @@ namespace opaq {
 
 using namespace infra;
 
-static const LogSource s_logSrc           = "TextGridProvider";
+static const LogSource s_logSrc("TextGridProvider");
 static const char* s_gridTypePlaceholder  = "%grid%";
 static const char* s_pollutantPlaceholder = "%pol%";
 
@@ -72,5 +72,4 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
         Log::warn(s_logSrc, e.what());
     }
 }
-
 }

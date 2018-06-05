@@ -12,7 +12,7 @@ namespace opaq {
 
 using namespace infra;
 
-static const LogSource s_logSrc = "XMLAQNetProvider";
+static const LogSource s_logSrc("XMLAQNetProvider");
 
 std::string XMLAQNetProvider::name()
 {
@@ -64,5 +64,4 @@ AQNetwork& XMLAQNetProvider::getAQNetwork()
 {
     return _net;
 }
-
 }

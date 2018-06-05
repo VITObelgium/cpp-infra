@@ -23,7 +23,7 @@ namespace opaq {
 
 using namespace infra;
 
-static const LogSource s_logSrc = "MLP_FeedForwardModel";
+static const LogSource s_logSrc("MLP_FeedForwardModel");
 
 MLP_FeedForwardModel::MLP_FeedForwardModel()
 : sample_size(0)

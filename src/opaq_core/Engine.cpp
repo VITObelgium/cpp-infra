@@ -24,7 +24,7 @@ namespace opaq {
 using namespace infra;
 using namespace chrono_literals;
 
-static const LogSource s_logSrc = "Engine";
+static const LogSource s_logSrc("Engine");
 
 Engine::Engine(config::PollutantManager& pollutantMgr, const IPluginFactory& pluginFactory)
 : _pollutantMgr(pollutantMgr)
@@ -250,5 +250,4 @@ void Engine::initComponents(const std::vector<config::Component>& components)
         }
     }
 }
-
 }

@@ -15,7 +15,7 @@ using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
-static const LogSource s_logSrc = "IDWModel";
+static const LogSource s_logSrc("IDWModel");
 
 InverseDistanceWeighting::InverseDistanceWeighting()
 : _powerParam(0.0)
@@ -93,5 +93,4 @@ void InverseDistanceWeighting::run()
 
     getMappingBuffer().addResults(results);
 }
-
 }

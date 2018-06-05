@@ -13,7 +13,7 @@ namespace opaq {
 using namespace infra;
 using namespace std::chrono_literals;
 
-static const LogSource s_logSrc = "StationInfoProvider";
+static const LogSource s_logSrc("StationInfoProvider");
 
 static const char* s_pollutantPlaceholder = "%pol%";
 static const char* s_gisTypePlaceholder   = "%gis%";
@@ -83,5 +83,4 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
         Log::warn(s_logSrc, e.what());
     }
 }
-
 }

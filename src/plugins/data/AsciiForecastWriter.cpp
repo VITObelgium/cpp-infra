@@ -13,7 +13,7 @@ namespace opaq {
 
 using namespace infra;
 
-static const LogSource s_logSrc                                = "AsciiForecastWriter";
+static const LogSource s_logSrc("AsciiForecastWriter");
 const std::string AsciiForecastWriter::BASETIME_PLACEHOLDER    = "%basetime%";
 const std::string AsciiForecastWriter::POLLUTANT_PLACEHOLDER   = "%pol%";
 const std::string AsciiForecastWriter::AGGREGATION_PLACEHOLDER = "%aggr%";
@@ -188,5 +188,4 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
 
     fclose(fp);
 }
-
 }

@@ -23,7 +23,7 @@ namespace opaq {
 using namespace infra;
 using namespace chrono_literals;
 
-static const LogSource s_logSrc = "OVL";
+static const LogSource s_logSrc("OVL");
 
 OVL::OVL()
 : _componentMgr(nullptr)
