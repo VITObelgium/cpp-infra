@@ -20,7 +20,7 @@ message (STATUS "Target: ${CMAKE_SYSTEM_NAME}")
 message (STATUS "Cross compiling: ${CMAKE_CROSSCOMPILING}")
 message (STATUS "User Host: ${HOST}")
 
-set(BOOST_COMPONENTS filesystem system program_options iostreams)
+set(BOOST_COMPONENTS random thread chrono atomic date_time regex filesystem system program_options iostreams)
 
 if (NOT (CMAKE_CROSSCOMPILING AND MINGW))
     add_subdirectory(cmake-scripts/benchmark)
@@ -37,9 +37,7 @@ add_subdirectory(cmake-scripts/sqlpp11)
 add_subdirectory(cmake-scripts/sqlpp11-connector-sqlite3)
 add_subdirectory(cmake-scripts/pugixml)
 add_subdirectory(cmake-scripts/libressl)
-add_subdirectory(cmake-scripts/c-ares)
-add_subdirectory(cmake-scripts/protobuf)
-add_subdirectory(cmake-scripts/grpc)
+add_subdirectory(cmake-scripts/cpprestsdk)
 
 if (NOT CMAKE_CROSSCOMPILING OR MINGW)
     # hdf5 build system does not support cross compiling, but we created patches in case of mingw
