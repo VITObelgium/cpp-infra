@@ -7,6 +7,22 @@ namespace infra {
 std::shared_ptr<spdlog::logger> Log::_log;
 std::vector<spdlog::sink_ptr> Log::_sinks;
 
+#ifdef _WIN32
+
+class OutputDebugSink : public spdlog::sinks::sink
+{
+    void log(const spdlog::details::log_msg& msg) override
+    {
+        OutputDebugString(msg.formatted.c_str());
+    }
+
+    void flush()
+    {
+    }
+};
+
+#endif
+
 void Log::addFileSink(const std::string& filePath)
 {
     if (_log) {
@@ -31,6 +47,10 @@ void Log::addConsoleSink(Colored colored)
     } else {
         _sinks.push_back(std::make_shared<spdlog::sinks::stdout_sink_mt>());
     }
+
+#ifdef _WIN32
+    _sinks.push_back(std::make_shared<OutputDebugSink>());
+#endif
 }
 
 void Log::addCustomSink(const spdlog::sink_ptr& sink)

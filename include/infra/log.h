@@ -5,6 +5,30 @@
 
 namespace infra {
 
+/*!
+ * class for strongly typed log source name
+ */
+class LogSource
+{
+public:
+    /*!
+    * The logsource assumes the name of the log source is defined in static storage
+    * that outlives the log source instance so we use a string_view
+    */
+    LogSource(std::string_view src) noexcept
+    : _src(src)
+    {
+    }
+
+    operator std::string_view() const noexcept
+    {
+        return _src;
+    }
+
+private:
+    std::string_view _src;
+};
+
 class Log
 {
 public:
@@ -34,42 +58,152 @@ public:
     static void setLevel(Level level);
 
     template <class... T>
-    static void debug(T&&... arg)
+    static void debug(const char* format, T&&... arg)
     {
         if (_log) {
-            _log->debug(std::forward<T>(arg)...);
+            _log->debug(format, std::forward<T>(arg)...);
+        }
+    }
+
+    static void debug(const std::string& msg)
+    {
+        if (_log) {
+            _log->debug(msg);
+        }
+    }
+
+    static void debug(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->debug("[{}] {}", static_cast<std::string_view>(src), message);
         }
     }
 
     template <class... T>
-    static void info(T&&... arg)
+    static void debug(const LogSource& src, const char* format, T&&... arg)
     {
         if (_log) {
-            _log->info(std::forward<T>(arg)...);
+            _log->debug("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(arg)...));
         }
     }
 
     template <class... T>
-    static void warn(T&&... arg)
+    static void info(const char* format, T&&... arg)
     {
         if (_log) {
-            _log->warn(std::forward<T>(arg)...);
+            _log->info(format, std::forward<T>(arg)...);
+        }
+    }
+
+    static void info(const std::string& msg)
+    {
+        if (_log) {
+            _log->info(msg);
+        }
+    }
+
+    static void info(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->info("[{}] {}", static_cast<std::string_view>(src), message);
         }
     }
 
     template <class... T>
-    static void error(T&&... arg)
+    static void info(const LogSource& src, const char* format, T&&... arg)
     {
         if (_log) {
-            _log->error(std::forward<T>(arg)...);
+            _log->info("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(arg)...));
         }
     }
 
     template <class... T>
-    static void critical(T&&... arg)
+    static void warn(const char* format, T&&... arg)
     {
         if (_log) {
-            _log->critical(std::forward<T>(arg)...);
+            _log->warn(format, std::forward<T>(arg)...);
+        }
+    }
+
+    static void warn(const std::string& msg)
+    {
+        if (_log) {
+            _log->warn(msg);
+        }
+    }
+
+    static void warn(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->warn("[{}] {}", static_cast<std::string_view>(src), message);
+        }
+    }
+
+    template <class... T>
+    static void warn(const LogSource& src, const char* format, T&&... arg)
+    {
+        if (_log) {
+            _log->warn("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(arg)...));
+        }
+    }
+
+    template <class... T>
+    static void error(const char* format, T&&... arg)
+    {
+        if (_log) {
+            _log->error(format, std::forward<T>(arg)...);
+        }
+    }
+
+    static void error(const std::string& msg)
+    {
+        if (_log) {
+            _log->error(msg);
+        }
+    }
+
+    static void error(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->error("[{}] {}", static_cast<std::string_view>(src), message);
+        }
+    }
+
+    template <class... T>
+    static void error(const LogSource& src, const char* format, T&&... arg)
+    {
+        if (_log) {
+            _log->error("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(arg)...));
+        }
+    }
+
+    template <class... T>
+    static void critical(const char* format, T&&... arg)
+    {
+        if (_log) {
+            _log->critical(format, std::forward<T>(arg)...);
+        }
+    }
+
+    static void critical(const std::string& msg)
+    {
+        if (_log) {
+            _log->critical(msg);
+        }
+    }
+
+    static void critical(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->critical("[{}] {}", static_cast<std::string_view>(src), message);
+        }
+    }
+
+    template <class... T>
+    static void critical(const LogSource& src, const char* format, T&&... arg)
+    {
+        if (_log) {
+            _log->critical("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(arg)...));
         }
     }
 
