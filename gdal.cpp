@@ -167,8 +167,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 std::string projectionToFriendlyName(const std::string& projection)
 {
     OGRSpatialReference spatialRef;
-    auto projectionPtr = projection.c_str();
-    checkError(spatialRef.importFromWkt(const_cast<char**>(&projectionPtr)), "Failed to import projection WKT");
+    checkError(spatialRef.importFromWkt(projection.c_str()), "Failed to import projection WKT");
     CplPointer<char> friendlyWkt;
     checkError(spatialRef.exportToPrettyWkt(friendlyWkt.ptrAddress(), TRUE), "Failed to export projection to pretty WKT");
 
@@ -188,8 +187,7 @@ std::string projectionFromEpsg(int32_t epsg)
 int32_t projectionToGeoEpsg(const std::string& projection)
 {
     OGRSpatialReference spatialRef;
-    auto projectionPtr = projection.c_str();
-    checkError(spatialRef.importFromWkt(const_cast<char**>(&projectionPtr)), "Failed to import projection WKT");
+    checkError(spatialRef.importFromWkt(projection.c_str()), "Failed to import projection WKT");
 
     auto epsg = spatialRef.GetEPSGGeogCS();
     if (epsg < 0) {
@@ -202,8 +200,7 @@ int32_t projectionToGeoEpsg(const std::string& projection)
 int32_t projectionToEpsg(const std::string& projection)
 {
     OGRSpatialReference spatialRef;
-    auto projectionPtr = projection.c_str();
-    checkError(spatialRef.importFromWkt(const_cast<char**>(&projectionPtr)), "Failed to import projection WKT");
+    checkError(spatialRef.importFromWkt(projection.c_str()), "Failed to import projection WKT");
 
     std::string epsgCode;
     return std::atoi(checkPointer(spatialRef.GetAuthorityCode("PROJCS"), "Failed to get projection authority code"));
