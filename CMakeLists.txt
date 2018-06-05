@@ -59,7 +59,7 @@ endif ()
 
 if (MSVC)
     # avoid windows specific warnings
-    add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS")
+    add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /w34100 /w34101 /w35038 /w34127")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -fdiagnostics-color")
@@ -78,7 +78,6 @@ set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(INFRA_XML ON CACHE BOOL "" FORCE)
 set(INFRA_GDAL OFF CACHE BOOL "" FORCE)
-set(INFRA_LOGGING OFF CACHE BOOL "" FORCE)
 add_subdirectory(deps/infra)
 add_subdirectory(src)
 
