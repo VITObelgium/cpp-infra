@@ -168,7 +168,7 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
          * YYYYMMDD hour0 hour3 hour6 hour9 ...   // new ECMWF data : every 3 hours
          */
 
-        str::Splitter meteoSplitter(line, " \t\r\n\f");
+        str::Splitter meteoSplitter(line, " \t\r\n\f", str::StrTokFlags);
 
         auto iter = meteoSplitter.begin();
 

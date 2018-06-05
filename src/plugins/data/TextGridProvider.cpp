@@ -47,7 +47,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
         auto cellSize = gridTypeToCellSize(type);
 
         auto contents = file::readAsText(filename);
-        str::Splitter lineSplitter(contents, "\r\n");
+        str::Splitter lineSplitter(contents, "\r\n", str::StrTokFlags);
 
         bool first = true;
         for (auto& line : lineSplitter) {
@@ -58,7 +58,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
             }
 
             // line format: ID XLAMB YLAMB BETA
-            str::Splitter cellSplitter(line, " \t\r\n\f");
+            str::Splitter cellSplitter(line, " \t\r\n\f", str::StrTokFlags);
             auto iter = cellSplitter.begin();
 
             auto id = boost::lexical_cast<long>(*iter++);

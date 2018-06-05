@@ -22,7 +22,9 @@ message (STATUS "User Host: ${HOST}")
 
 set(BOOST_COMPONENTS filesystem system program_options iostreams)
 
-add_subdirectory(cmake-scripts/benchmark)
+if (NOT (CMAKE_CROSSCOMPILING AND MINGW))
+    add_subdirectory(cmake-scripts/benchmark)
+endif ()
 add_subdirectory(cmake-scripts/googletest)
 add_subdirectory(cmake-scripts/zlib)
 add_subdirectory(cmake-scripts/fmt)

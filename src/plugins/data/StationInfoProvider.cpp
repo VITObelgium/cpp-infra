@@ -55,7 +55,7 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
 
     try {
         auto contents = file::readAsText(filename);
-        str::Splitter lineSplitter(contents, "\r\n");
+        str::Splitter lineSplitter(contents, "\r\n", str::StrTokFlags);
 
         auto& stations = _stations[pollutant.getName()][gisType];
 
@@ -68,7 +68,7 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
             }
 
             // line format: ID STATIONCODE XLAMB YLAMB ALTITUDE TYPE BETA
-            str::Splitter stationSplitter(line, " \t\r\n\f");
+            str::Splitter stationSplitter(line, " \t\r\n\f", str::StrTokFlags);
             auto iter = stationSplitter.begin();
 
             auto id          = boost::lexical_cast<long>(*iter++);

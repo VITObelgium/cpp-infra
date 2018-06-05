@@ -23,12 +23,12 @@ std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries
     std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>> result;
 
     auto contents = file::readAsText(file);
-    str::Splitter lineSplitter(contents, "\r\n");
+    str::Splitter lineSplitter(contents, "\r\n", str::StrTokFlags);
 
     for (auto& line : lineSplitter) {
         // line format: stationCode YYYYMMDD m1 m8 da hour0 hour1, ..., hour23
 
-        str::Splitter observationSplitter(line, " \t\r\n\f");
+        str::Splitter observationSplitter(line, " \t\r\n\f", str::StrTokFlags);
 
         auto iter          = observationSplitter.begin();
         const auto station = std::string(iter->begin(), iter->end());
