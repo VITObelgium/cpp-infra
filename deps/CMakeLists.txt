@@ -35,6 +35,9 @@ add_subdirectory(cmake-scripts/sqlpp11)
 add_subdirectory(cmake-scripts/sqlpp11-connector-sqlite3)
 add_subdirectory(cmake-scripts/pugixml)
 add_subdirectory(cmake-scripts/libressl)
+add_subdirectory(cmake-scripts/c-ares)
+add_subdirectory(cmake-scripts/protobuf)
+add_subdirectory(cmake-scripts/grpc)
 
 if (NOT CMAKE_CROSSCOMPILING OR MINGW)
     # hdf5 build system does not support cross compiling, but we created patches in case of mingw
