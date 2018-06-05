@@ -4,12 +4,11 @@
 #include <algorithm>
 #include <cassert>
 #include <cctype>
+#include <iostream>
 #include <string>
 #include <string_view>
 
 namespace infra::str {
-
-const char* Splitter::WhiteSpaceSeparator = "\t\n\r\f";
 
 bool containsValidInteger(std::string_view str)
 {
@@ -20,7 +19,16 @@ bool containsValidInteger(std::string_view str)
     return (end != nullptr && *end == 0);
 }
 
-bool containsValidFloatingPoint(std::string_view str)
+bool containsValidFloat(std::string_view str)
+{
+    std::string s(str);
+
+    char* end = nullptr;
+    std::strtof(s.c_str(), &end);
+    return (end != nullptr && *end == 0);
+}
+
+bool containsValidDouble(std::string_view str)
 {
     std::string s(str);
 
@@ -42,6 +50,16 @@ std::optional<int32_t> toInt32(std::string_view str) noexcept
     return result;
 }
 
+int32_t toInt32Value(std::string_view str)
+{
+    auto optval = toInt32(str);
+    if (!optval.has_value()) {
+        throw InvalidArgument("Failed to convert '{}' to int32", str);
+    }
+
+    return *optval;
+}
+
 std::optional<int64_t> toInt64(std::string_view str) noexcept
 {
     std::string s(str);
@@ -53,6 +71,16 @@ std::optional<int64_t> toInt64(std::string_view str) noexcept
     }
 
     return result;
+}
+
+int64_t toInt64Value(std::string_view str)
+{
+    auto optval = toInt64(str);
+    if (!optval.has_value()) {
+        throw InvalidArgument("Failed to convert '{}' to int64", str);
+    }
+
+    return *optval;
 }
 
 std::optional<float> toFloat(std::string_view str) noexcept
@@ -68,6 +96,16 @@ std::optional<float> toFloat(std::string_view str) noexcept
     return result;
 }
 
+float toFloatValue(std::string_view str)
+{
+    auto optval = toFloat(str);
+    if (!optval.has_value()) {
+        throw InvalidArgument("Failed to convert '{}' to float", str);
+    }
+
+    return *optval;
+}
+
 std::optional<double> toDouble(std::string_view str) noexcept
 {
     std::string s(str);
@@ -79,6 +117,16 @@ std::optional<double> toDouble(std::string_view str) noexcept
     }
 
     return result;
+}
+
+double toDoubleValue(std::string_view str)
+{
+    auto optval = toDouble(str);
+    if (!optval.has_value()) {
+        throw InvalidArgument("Failed to convert '{}' to double", str);
+    }
+
+    return *optval;
 }
 
 bool iequals(std::string_view str1, std::string_view str2)
@@ -203,9 +251,20 @@ static void applySplitOptions(std::string_view sv, Flags<SplitOpt> opt, std::vec
         sv = trimmedView(sv);
     }
 
-    if (!opt.is_set(SplitOpt::NoEmpty) || !sv.empty()) {
-        tokens.emplace_back(sv);
+    if (sv.empty() && opt.is_set(SplitOpt::NoEmpty)) {
+        return;
     }
+
+    tokens.emplace_back(sv);
+}
+
+static std::string_view applySplitOptions(std::string_view sv, Flags<SplitOpt> opt)
+{
+    if (opt.is_set(SplitOpt::Trim)) {
+        return trimmedView(sv);
+    }
+
+    return sv;
 }
 
 std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt)
@@ -263,26 +322,38 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
 
     if (opt.is_set(SplitOpt::DelimiterIsCharacterArray)) {
         for (size_t i = 0; i < str.size(); ++i) {
+            if (length == 0) {
+                start = &str[i];
+            }
+
+            matchLength = 0;
             if (isDelimiter(str[i], delimiter)) {
                 ++matchLength;
-            } else {
-                if (matchLength > 0) {
-                    if (matchLength != i) {
-                        // if matchlength == i, we have only had delimeter data
-                        applySplitOptions(std::string_view(start, length), opt, tokens);
-                    }
-                    length      = 1;
-                    matchLength = 0;
-                    start       = &str[i];
-                    continue;
-                }
 
+                if (opt.is_set(SplitOpt::JoinAdjacentCharDelimeters)) {
+                    while (i + 1 < str.size() && isDelimiter(str[i + 1], delimiter)) {
+                        ++matchLength;
+                        ++i;
+                    }
+                }
+            }
+
+            if (matchLength > 0) {
+                //if (matchLength != str.size()) {
+                // if matchlength == str size, we have only had delimeter data
+                applySplitOptions(std::string_view(start, length), opt, tokens);
+                length = 0;
+                //}
+            } else {
                 ++length;
-                matchLength = 0;
             }
         }
 
         if (length > 0) {
+            applySplitOptions(std::string_view(start, length), opt, tokens);
+        }
+
+        if (matchLength > 0) {
             applySplitOptions(std::string_view(start, length), opt, tokens);
         }
     } else {
@@ -352,88 +423,143 @@ std::vector<std::string> split(std::string_view str, std::string_view delimiter,
     return tokens;
 }
 
-Splitter::Splitter(std::string_view src, std::string sep)
-: _src(src)
-, _sep(std::move(sep))
-{
-}
+//Splitter::Splitter(std::string_view src, std::string_view delimiter, Flags<SplitOpt> opt)
+//: _src(src)
+//, _delimiter(delimiter)
+//, _splitopts(opt)
+//{
+//}
 
-Splitter::const_iterator::const_iterator(const Splitter& sp) noexcept
-: _splitter(&sp)
-, _pos(0)
-{
-    // skip initial delimiters
-    _splitter->skipDelimiters(_pos);
-    ++*this;
-}
+//Splitter::const_iterator::const_iterator(const Splitter& sp) noexcept
+//: _splitter(&sp)
+//, _pos(0)
+//{
+//    ++*this;
+//}
 
-Splitter::const_iterator::const_iterator() noexcept
-: _splitter(nullptr)
-, _pos(std::string_view::npos)
-{
-}
+//Splitter::const_iterator::const_iterator() noexcept
+//: _splitter(nullptr)
+//, _pos(std::string_view::npos)
+//{
+//}
 
-Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
-{
-    if (_pos != std::string_view::npos) {
-        _value = _splitter->next(_pos);
-    } else {
-        _splitter = nullptr;
-    }
-    return *this;
-}
+//Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
+//{
+//    if (_pos != std::string_view::npos) {
+//        _value = _splitter->next(_pos);
+//    }
 
-Splitter::const_iterator Splitter::const_iterator::operator++(int) noexcept
-{
-    Splitter::const_iterator result(*this);
-    ++(*this);
-    return result;
-}
+//    if (_pos == std::string_view::npos) {
+//        _splitter = nullptr;
+//    }
 
-Splitter::const_iterator::reference Splitter::const_iterator::operator*() const noexcept
-{
-    return _value;
-}
+//    return *this;
+//}
 
-Splitter::const_iterator::pointer Splitter::const_iterator::operator->() const noexcept
-{
-    return &_value;
-}
+//Splitter::const_iterator Splitter::const_iterator::operator++(int) noexcept
+//{
+//    Splitter::const_iterator result(*this);
+//    ++(*this);
+//    return result;
+//}
 
-bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other) const noexcept
-{
-    return _splitter != other._splitter || _pos != other._pos;
-}
+//Splitter::const_iterator::reference Splitter::const_iterator::operator*() const noexcept
+//{
+//    return _value;
+//}
 
-Splitter::const_iterator Splitter::begin() const noexcept
-{
-    return Splitter::const_iterator(*this);
-}
+//Splitter::const_iterator::pointer Splitter::const_iterator::operator->() const noexcept
+//{
+//    return &_value;
+//}
 
-Splitter::const_iterator Splitter::end() const noexcept
-{
-    return Splitter::const_iterator();
-}
+//bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other) const noexcept
+//{
+//    std::cout << _splitter << " - " << other._splitter << " - " << _pos << " - " << other._pos << " - " << std::endl;
+//    return _splitter != other._splitter || _pos != other._pos;
+//}
 
-void Splitter::skipDelimiters(std::string_view::size_type& pos) const noexcept
-{
-    pos = _src.find_first_not_of(_sep, pos);
-}
+//Splitter::const_iterator Splitter::begin() const noexcept
+//{
+//    return Splitter::const_iterator(*this);
+//}
 
-std::string_view Splitter::next(std::string_view::size_type& pos) const noexcept
-{
-    std::string_view result;
+//Splitter::const_iterator Splitter::end() const noexcept
+//{
+//    return Splitter::const_iterator();
+//}
 
-    const auto endOfCurrent = _src.find_first_of(_sep, pos + 1);
-    if (endOfCurrent != std::string_view::npos) {
-        result = _src.substr(pos, endOfCurrent - pos);
-        // skip all occurrences of the delimeter, so  pos points to the start of the next substring
-        pos = _src.find_first_not_of(_sep, endOfCurrent);
-    } else {
-        result = _src.substr(pos);
-        pos    = std::string_view::npos;
-    }
+//std::string_view Splitter::next(std::string_view::size_type& pos) const noexcept
+//{
+//    std::cout << "Next: " << pos << std::endl;
 
-    return result;
-}
+//    size_t length      = 0;
+//    size_t matchLength = 0;
+//    const char* start  = &_src[pos];
+//    if (_splitopts.is_set(SplitOpt::DelimiterIsCharacterArray)) {
+//        for (; pos < _src.size(); ++pos) {
+//            if (isDelimiter(_src[pos], _delimiter)) {
+//                ++matchLength;
+
+//                if (_splitopts.is_set(SplitOpt::JoinAdjacentCharDelimeters)) {
+//                    while (pos + 1 < _src.size() && isDelimiter(_src[pos + 1], _delimiter)) {
+//                        ++matchLength;
+//                        ++pos;
+//                    }
+//                }
+//            }
+
+//            if (matchLength > 0) {
+//                if (_splitopts.is_set(SplitOpt::NoEmpty) && length == 0) {
+//                    continue;
+//                }
+
+//                ++pos;
+//                std::cout << "Next 1: " << length << std::endl;
+//                return applySplitOptions(std::string_view(start, length), _splitopts);
+//            } else {
+//                ++length;
+//            }
+//        }
+
+//        if (length > 0) {
+//            return applySplitOptions(std::string_view(start, length), _splitopts);
+//        } else if (matchLength > 0) {
+//            return applySplitOptions(std::string_view(start, length), _splitopts);
+//        } else if (pos != _src.size()) {
+//            return applySplitOptions(std::string_view(start, length), _splitopts);
+//        }
+
+//        std::cout << "Next 2: npos " << std::endl;
+//        pos = std::string_view::npos;
+//        return std::string_view();
+//    } else {
+//        for (; pos < _src.size(); ++pos) {
+//            if (_src[pos] == _delimiter[matchLength]) {
+//                ++matchLength;
+
+//                if (matchLength == _delimiter.size()) {
+//                    ++pos;
+//                    return applySplitOptions(std::string_view(start, length), _splitopts);
+//                }
+//            } else {
+//                length += matchLength;
+//                ++length;
+//                matchLength = 0;
+//            }
+//        }
+
+//        if (matchLength == _delimiter.size()) {
+//            return applySplitOptions(std::string_view(), _splitopts);
+//        } else if (length + matchLength > 0) {
+//            return applySplitOptions(std::string_view(start, length), _splitopts);
+//        }
+
+//        //        if (length == 0 && matchLength == 0) {
+//        //            applySplitOptions(std::string_view(), opt, tokens);
+//        //        }
+//        pos = std::string_view::npos;
+//        return std::string_view();
+//    }
+//}
 }

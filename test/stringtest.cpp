@@ -255,17 +255,25 @@ TEST(StringOperationsTest, SplittedView)
     tokenized  = str::splitView(testString, ",");
     EXPECT_EQ(1u, tokenized.size());
     EXPECT_EQ("", tokenized[0]);
+
+    testString = "Line1\nLine2";
+    tokenized  = str::splitView(testString, "\r\n", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
+    EXPECT_EQ(2u, tokenized.size());
+    EXPECT_EQ("Line1", tokenized[0]);
+    EXPECT_EQ("Line2", tokenized[1]);
 }
 
 TEST(StringOperationsTest, SplittedViewDelimiterString)
 {
     string testString = "A-B.C|D+E++";
-    auto tokenized    = str::splitView(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray);
-    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E"}));
+    auto tokenized    = str::splitView(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
+    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E", ""}));
+    tokenized = str::splitView(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray);
+    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E", "", ""}));
 
     testString = "- This, a sample string.";
-    tokenized  = str::splitView(testString, " ,.-", str::SplitOpt::DelimiterIsCharacterArray);
-    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"This", "a", "sample", "string"}));
+    tokenized  = str::splitView(testString, " ,.-", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
+    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"", "This", "a", "sample", "string", ""}));
 }
 
 TEST(StringTest, Trim)
@@ -390,15 +398,15 @@ TEST(StringTest, SplitterTest)
 
 TEST(StringTest, SplitterTestOnlyDelimiters)
 {
-    static const char* line = "-.-.-.-.-.-.-.-.-.-.-.-.-.-.-";
-    auto splitter           = str::Splitter(line, ".-");
-    EXPECT_EQ(0, std::distance(splitter.begin(), splitter.end()));
+    static const char* line = "-.-.-";
+    auto splitter           = str::Splitter(line, ".-", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
+    EXPECT_EQ(2, std::distance(splitter.begin(), splitter.end()));
 }
 
 TEST(StringTest, SplitterTestNoDelimiters)
 {
     static const char* line = "Blablablablablabla";
-    auto splitter           = str::Splitter(line, ".-");
+    auto splitter           = str::Splitter(line, ".-", str::SplitOpt::DelimiterIsCharacterArray);
     EXPECT_EQ(1, std::distance(splitter.begin(), splitter.end()));
     EXPECT_EQ(line, *splitter.begin());
 }
@@ -408,7 +416,7 @@ TEST(StringTest, SplitterTestStartsWithDelimeters)
     static const char* line = "- This, a sample string.";
 
     std::vector<std::string_view> result;
-    for (auto& value : str::Splitter(line, " ,.-")) {
+    for (auto& value : str::Splitter(line, " ,.-", str::StrTokFlags)) {
         result.push_back(value);
     }
 
@@ -424,6 +432,23 @@ TEST(StringTest, SplitterTestEmptyElements)
         result.push_back(value);
     }
 
-    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 2:", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
+    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 2:", "", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
+}
+
+std::vector<std::string_view> splitterVector(std::string_view input, std::string_view delimiter)
+{
+    std::vector<std::string_view> result;
+    for (auto& value : str::Splitter(input, delimiter)) {
+        result.push_back(value);
+    }
+
+    return result;
+}
+
+TEST(StringTest, SplitterVsSplitBehavior)
+{
+    static const char* line = "Line 2:\t\tv 1\tv 2\tv 3\tv 4\tv 5\tv 10";
+
+    EXPECT_THAT(str::splitView(line, "\t"), ContainerEq(splitterVector(line, "\t")));
 }
 }

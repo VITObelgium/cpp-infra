@@ -11,6 +11,7 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui comp
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
+option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 
 #check_cxx_source_compiles("
 ##include <filesystem>
@@ -253,4 +254,8 @@ endif ()
 
 if (INFRA_ENABLE_BENCHMARKS)
     add_subdirectory(benchmarks)
+endif ()
+
+if (INFRA_ENABLE_DOCUMENTATION)
+    add_subdirectory(docs)
 endif ()
