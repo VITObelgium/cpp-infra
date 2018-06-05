@@ -5,6 +5,7 @@
 #include "data/DataProvider.h"
 #include "data/MeteoProvider.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 
 #define epsilon 1e-6
 
@@ -13,9 +14,10 @@ namespace opaq {
 using namespace infra;
 using namespace std::chrono_literals;
 
+static const LogSource s_logSrc = "OVL_IRCEL_model1";
+
 OVL_IRCEL_model1::OVL_IRCEL_model1()
-: MLP_FeedForwardModel("OVL_IRCEL_model1")
-, p_t2m("P01")     // t2m in IRCEL meteo provider
+: p_t2m("P01")     // t2m in IRCEL meteo provider
 , p_wsp10m("P03")  // wind speed 10 m in IRCEL meteo provider
 , p_wdir10m("P04") // wind direction 10 m
 , p_blh("P07")     // boundary layer height

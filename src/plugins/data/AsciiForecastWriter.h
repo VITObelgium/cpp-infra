@@ -6,7 +6,6 @@
 #ifndef AsciiForecastWriter_H_
 #define AsciiForecastWriter_H_
 
-#include "Logger.h"
 #include "data/ForecastOutputWriter.h"
 
 #include <string>
@@ -34,7 +33,6 @@ public:
     void write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime) override;
 
 private:
-    Logger _logger;
     std::string _filename;
     std::vector<std::string> _models; //! a list of models to output
     std::string _title;

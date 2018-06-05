@@ -10,6 +10,7 @@
 #include "ObsParser.h"
 
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 namespace opaq {
@@ -18,11 +19,11 @@ using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
+static const LogSource s_logSrc           = "RioObsProvider";
 static const char* s_pollutantPlaceholder = "%pol%";
 
 RioObsProvider::RioObsProvider()
-: _logger("RioObsProvider")
-, _noData(-9999)      // RIO observations use -9999 as nodata placeholder
+: _noData(-9999)      // RIO observations use -9999 as nodata placeholder
 , _timeResolution(1h) // RIO observations have hourly resolution, per default, can be overwritten !
 , _configured(false)
 , _nvalues(24)
@@ -111,7 +112,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
 
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {
-        _logger->warn("Failed to open file: {}", filename);
+        Log::warn(s_logSrc, "Failed to open file: {}", filename);
         return;
     }
 

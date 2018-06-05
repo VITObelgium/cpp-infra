@@ -7,6 +7,7 @@
 #include "data/IMappingBuffer.h"
 #include "data/IStationInfoProvider.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 
 namespace opaq {
 
@@ -14,9 +15,10 @@ using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
+static const LogSource s_logSrc = "IDWModel";
+
 InverseDistanceWeighting::InverseDistanceWeighting()
-: Model("IDWModel")
-, _powerParam(0.0)
+: _powerParam(0.0)
 {
 }
 
@@ -86,7 +88,7 @@ void InverseDistanceWeighting::run()
 
         results.push_back(idw);
 
-        _logger->info("Cell: {} idw: {}", cell.getId(), idw);
+        Log::info(s_logSrc, "Cell: {} idw: {}", cell.getId(), idw);
     }
 
     getMappingBuffer().addResults(results);

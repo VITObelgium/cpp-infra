@@ -39,11 +39,11 @@ mapdummy::mapdummy()
 mapdummy::~mapdummy()
 {
 }
-int mapdummy::apply(Eigen::Ref<Eigen::VectorXd> x)
+int mapdummy::apply(Eigen::Ref<Eigen::VectorXd> /*x*/)
 {
     return 0;
 }
-int mapdummy::reverse(Eigen::Ref<Eigen::VectorXd> y)
+int mapdummy::reverse(Eigen::Ref<Eigen::VectorXd> /*y*/)
 {
     return 0;
 }

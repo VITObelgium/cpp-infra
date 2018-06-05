@@ -3,6 +3,7 @@
 #include "AQNetwork.h"
 
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 #include <iterator>
@@ -12,13 +13,13 @@ namespace opaq {
 
 using namespace infra;
 
+static const LogSource s_logSrc                                = "AsciiForecastWriter";
 const std::string AsciiForecastWriter::BASETIME_PLACEHOLDER    = "%basetime%";
 const std::string AsciiForecastWriter::POLLUTANT_PLACEHOLDER   = "%pol%";
 const std::string AsciiForecastWriter::AGGREGATION_PLACEHOLDER = "%aggr%";
 
 AsciiForecastWriter::AsciiForecastWriter()
-: _logger("AsciiForecastWriter")
-, _enable_fields(false)
+: _enable_fields(false)
 , _sepchar('\t')
 , _fctime_full(true)
 , _full_output(true)
@@ -102,7 +103,7 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
     // ========================================================================
     // initialization
     // ========================================================================
-    _logger->info("Writing output file " + fname);
+    Log::info(s_logSrc, "Writing output file {}", fname);
 
     FILE* fp = fopen(fname.c_str(), "w");
     if (!fp) {

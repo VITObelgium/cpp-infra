@@ -9,7 +9,6 @@
 
 #include "../Aggregation.h"
 #include "../DateTime.h"
-#include "../Logger.h"
 #include "../Pollutant.h"
 #include "Component.h"
 #include "ForecastStage.h"
@@ -70,8 +69,6 @@ public:
     void setMappingStage(MappingStage mappingStage);
 
 private:
-    Logger _logger;
-
     std::vector<Plugin> _plugins;
     std::vector<Component> _components;
 

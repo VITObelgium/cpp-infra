@@ -2,6 +2,7 @@
 #include <QtPlugin>
 
 #include "config.h"
+#include "infra/log.h"
 #include "mainwindow.h"
 
 #ifdef STATIC_QT
@@ -9,6 +10,8 @@
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 #endif
+
+using namespace infra;
 
 int main(int argc, char* argv[])
 {
@@ -18,8 +21,8 @@ int main(int argc, char* argv[])
     QCoreApplication::addLibraryPath("./plugins");
 #endif
 
-    Log::initLogger("");
-    Logger logger("main");
+    Log::addConsoleSink(Log::Colored::On);
+    LogRegistration logging("opaq");
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");

@@ -5,6 +5,7 @@
 #include "Pollutant.h"
 #include "Station.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -83,8 +84,7 @@ static void writeStations(const std::vector<Station>& stations, H5::Group& group
 }
 
 RioOutputBuffer::RioOutputBuffer()
-: _logger("RioOutputBuffer")
-, _index(0)
+: _index(0)
 , _stringType(H5::StrType(0, H5T_VARIABLE))
 {
     // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves

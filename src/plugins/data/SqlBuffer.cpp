@@ -9,8 +9,7 @@ using namespace infra;
 using namespace chrono_literals;
 
 SqlBuffer::SqlBuffer()
-: _logger("SqlBuffer")
-, _noData(-9999)
+: _noData(-9999)
 , _fcHor(0)
 {
 }

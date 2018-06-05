@@ -25,7 +25,7 @@ Pollutant::Pollutant(long id, std::string name, std::string unit, std::string de
 
 Pollutant::Pollutant(const ConfigNode& el)
 {
-    _id   = el.attribute<int64_t>("id").value();
+    _id   = el.attribute<int32_t>("id").value();
     _name = std::string(el.attribute("name"));
     _unit = std::string(el.attribute("unit"));
 

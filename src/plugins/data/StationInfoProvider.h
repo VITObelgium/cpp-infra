@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Logger.h"
 #include "data/IStationInfoProvider.h"
 
 #include <map>
@@ -21,7 +20,6 @@ public:
 private:
     void readFile(Pollutant pollutant, const std::string& gisType);
 
-    Logger _logger;
     std::string _pattern;
     bool _configured;
     std::map<std::string, std::map<std::string, std::vector<Station>>> _stations; // key: pollutant name, gis type

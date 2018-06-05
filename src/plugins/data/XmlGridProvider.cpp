@@ -13,11 +13,6 @@ namespace opaq {
 
 using namespace infra;
 
-XmlGridProvider::XmlGridProvider()
-: _logger("XmlGridProvider")
-{
-}
-
 std::string XmlGridProvider::name()
 {
     return "xmlgridprovider";
@@ -37,7 +32,6 @@ void XmlGridProvider::configure(const ConfigNode& configuration, const std::stri
 
     auto gridEl = configuration.child("grid");
     if (!gridEl) {
-        _logger->error("grid element not found in configuration");
         throw BadConfigurationException("grid element not found in configuration");
     }
 

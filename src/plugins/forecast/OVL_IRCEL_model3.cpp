@@ -14,8 +14,7 @@ using namespace chrono_literals;
 using namespace std::chrono_literals;
 
 OVL_IRCEL_model3::OVL_IRCEL_model3()
-: MLP_FeedForwardModel("OVL_IRCEL_model3")
-, p_t2m("P01")     // t2m in IRCEL meteo provider
+: p_t2m("P01")     // t2m in IRCEL meteo provider
 , p_wsp10m("P03")  // wind speed 10 m in IRCEL meteo provider
 , p_wdir10m("P04") // wind direction 10 m
 , p_blh("P07")     // boundary layer height

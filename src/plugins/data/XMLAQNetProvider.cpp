@@ -5,16 +5,14 @@
 #include "PollutantManager.h"
 #include "Station.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 namespace opaq {
 
 using namespace infra;
 
-XMLAQNetProvider::XMLAQNetProvider()
-: _logger("OPAQ::XMLAQNetProvider")
-{
-}
+static const LogSource s_logSrc = "XMLAQNetProvider";
 
 std::string XMLAQNetProvider::name()
 {
@@ -28,7 +26,7 @@ void XMLAQNetProvider::configure(const ConfigNode& configuration, const std::str
     // Here we assume we recieve the <config> element which should define the AQNetwork...
     auto netEl = configuration.child("network");
     if (!netEl) {
-        _logger->error("network element not found in configuration");
+        Log::error(s_logSrc, "network element not found in configuration");
         throw BadConfigurationException("network element not found in configuration");
     }
 

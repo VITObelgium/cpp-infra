@@ -7,6 +7,7 @@
 
 #include "IRCELMeteoProvider.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 #include "tools/GzipReader.h"
 
@@ -14,16 +15,16 @@
 
 namespace opaq {
 
+using namespace infra;
+using namespace std::chrono_literals;
+
+static const LogSource s_logSrc            = "IRCELMeteoProvider";
 static const char* s_meteo_placeholder     = "%meteo%";
 static const char* s_parameter_placeholder = "%param%";
 static const char* s_basetime_placeholder  = "%basetime%";
 
-using namespace infra;
-using namespace std::chrono_literals;
-
 IRCELMeteoProvider::IRCELMeteoProvider()
-: _logger("IRCELMeteoProvider")
-, _configured(false)
+: _configured(false)
 , _nsteps(0)
 , _bufferStartReq(false)
 , _backsearch(3)
@@ -148,12 +149,12 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
             have_file = true;
         } catch (const IOException&) {
             checkDate -= chrono::days(1);
-            _logger->warn("{} not found, checking previous day : {}", filename, chrono::to_date_string(checkDate));
+            Log::warn(s_logSrc, "{} not found, checking previous day : {}", filename, chrono::to_date_string(checkDate));
         }
     }
 
     if (!have_file) {
-        _logger->error("giving up : no meteo file found for {}, {}", meteoId, parameterId);
+        Log::error(s_logSrc, "giving up : no meteo file found for {}, {}", meteoId, parameterId);
         return;
     }
 

@@ -2,6 +2,7 @@
 #include "Exceptions.h"
 #include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 #include <boost/lexical_cast.hpp>
@@ -10,13 +11,9 @@ namespace opaq {
 
 using namespace infra;
 
+static const LogSource s_logSrc           = "TextGridProvider";
 static const char* s_gridTypePlaceholder  = "%grid%";
 static const char* s_pollutantPlaceholder = "%pol%";
-
-TextGridProvider::TextGridProvider()
-: _logger("TextGridProvider")
-{
-}
 
 std::string TextGridProvider::name()
 {
@@ -72,7 +69,7 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
             grid.addCell(Cell(id, x, x + cellSize, y, y + cellSize));
         }
     } catch (const std::exception& e) {
-        _logger->warn(e.what());
+        Log::warn(s_logSrc, e.what());
     }
 }
 

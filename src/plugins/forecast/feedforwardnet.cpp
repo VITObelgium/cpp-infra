@@ -10,11 +10,14 @@
 
 #include "feedforwardnet.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 namespace nnet {
 
 using namespace infra;
+
+static const LogSource s_logSrc = "feedforwardnet";
 
 namespace {
 
@@ -43,7 +46,6 @@ std::unique_ptr<nnet::scaler> createScaler(const infra::ConfigNode& config, int 
 }
 
 feedforwardnet::feedforwardnet(const infra::ConfigNode& config)
-: _logger("feedforwardnet")
 {
     if (!config) {
         return;
@@ -122,11 +124,11 @@ int feedforwardnet::sim(const double* inp)
     for (unsigned int i = 0; i < this->inputSize(); i++)
         _input(i) = inp[i];
 
-    _logger->trace("sim: network input: {}", _input);
+    Log::debug(s_logSrc, "sim: network input: {}", _input);
 
     // apply the input scaler
     _inputScaler->apply(_input);
-    _logger->trace("sim: scaled input: {}", _input);
+    Log::debug(s_logSrc, "sim: scaled input: {}", _input);
 
     nnet::layer* prev_layer = nullptr;
     for (auto it = _layers.begin(); it != _layers.end(); ++it) {
@@ -136,17 +138,17 @@ int feedforwardnet::sim(const double* inp)
             (*it)->compute(prev_layer->valuesAsVector());
         }
 
-        _logger->trace("sim: layer values: {}", (*it)->valuesAsVector());
+        Log::debug(s_logSrc, "sim: layer values: {}", (*it)->valuesAsVector());
         prev_layer = it->get();
     }
 
     // set output to output of last layer
     _output = _layers.back()->valuesAsVector();
-    _logger->trace("sim: scaled output: {}", _output);
+    Log::debug(s_logSrc, "sim: scaled output: {}", _output);
 
     // apply the reverse output scaler
     _outputScaler->reverse(_output); // --> need to make this public
-    _logger->trace("sim: output: {}", _output);
+    Log::debug(s_logSrc, "sim: output: {}", _output);
 
     return 0;
 }

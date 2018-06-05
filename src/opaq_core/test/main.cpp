@@ -1,26 +1,21 @@
 #include <gmock/gmock.h>
 
-#include "Logger.h"
-#include "PluginRegistration.h"
+#include "infra/log.h"
 
+using namespace infra;
 using namespace testing;
 
-int main(int argc, char **argv)
+int main(int argc, char** argv)
 {
     FLAGS_gmock_verbose = "error";
 
-    Log::initConsoleLogger();
-    Logger log("opaqcoretest");
-
-    for (auto& plugin : opaq::PluginRegistry::instance().getPluginNames())
-    {
-        log->debug("Plugin: {}", plugin);
-    }
+    Log::addConsoleSink(Log::Colored::On);
+    Log::initialize("opaqcoretest");
 
     InitGoogleMock(&argc, argv);
     auto rc = RUN_ALL_TESTS();
 
-    Log::destroyLogger();
+    Log::uninitialize();
 
     return rc;
 }

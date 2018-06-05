@@ -11,17 +11,18 @@
 #include "DateTime.h"
 #include "Engine.h"
 #include "Exceptions.h"
-#include "Logger.h"
 
 #include "PollutantManager.h"
 #include "config.h"
 #include "plugins/PluginFactory.h"
 
 #include "infra/configdocument.h"
+#include "infra/log.h"
 
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
+using Log    = infra::Log;
 
 static void printVersion()
 {
@@ -115,8 +116,8 @@ int main(int argc, char* argv[])
 
     printWelcome();
 
-    Log::initLogger(logFile);
-    auto logger = Log::createLogger("main");
+    Log::addConsoleSink(Log::Colored::On);
+    infra::LogRegistration logging("opaq");
 
     // -- Parse configuration, after init of the log, otherwise we get errors
     opaq::config::PollutantManager pollutantMgr;
@@ -129,8 +130,8 @@ int main(int argc, char* argv[])
         exit(EXIT_FAILURE);
     }
 
-    logger->info("Starting OPAQ run...");
-    logger->info("Using OPAQ configuration in .... : {}", configFile);
+    Log::info("Starting OPAQ run...");
+    Log::info("Using OPAQ configuration in .... : {}", configFile);
 
     /* -----------------------------------------------------------------------------------
      Starting initialization
@@ -144,8 +145,8 @@ int main(int argc, char* argv[])
         ch.getOpaqRun().setPollutantName(pol, aggr);
     else
         pol = ch.getOpaqRun().getPollutantName();
-    logger->info("Requested pollutant ....... : " + pol);
-    logger->info("Requested aggregation ..... : " + opaq::Aggregation::getName(ch.getOpaqRun().getAggregation()));
+    Log::info("Requested pollutant ....... : {}", pol);
+    Log::info("Requested aggregation ..... : {}", opaq::Aggregation::getName(ch.getOpaqRun().getAggregation()));
 
     // 2. base times
     if (!basetime.empty()) {
@@ -158,15 +159,15 @@ int main(int argc, char* argv[])
                 baseTime += opaq::chrono::days(1);
             }
         } catch (const opaq::ParseException&) {
-            logger->error("Failed to parse base time: {}", basetime);
+            Log::error("Failed to parse base time: {}", basetime);
             exit(EXIT_FAILURE);
         }
     }
 
-#ifdef DEBUG
-    logger->info("Requested base times:");
+#ifndef NDEBUG
+    Log::info("Requested base times:");
     for (auto& basetime : ch.getOpaqRun().getBaseTimes())
-        logger->info(opaq::chrono::to_string(basetime));
+        Log::info(opaq::chrono::to_string(basetime));
 #endif
 
     opaq::PluginFactory pluginFactory;
@@ -179,12 +180,11 @@ int main(int argc, char* argv[])
         engine.prepareRun(ch.getOpaqRun());
         engine.run(ch.getOpaqRun());
     } catch (const std::exception& e) {
-        logger->error("Error during run: {}", e.what());
-        std::cerr << "Error during run: " << e.what() << std::endl;
+        Log::error("Error during run: {}", e.what());
         return EXIT_FAILURE;
     }
 
     // some friendliness
-    logger->info("All done, have a nice day !");
+    Log::info("All done, have a nice day !");
     return EXIT_SUCCESS;
 }

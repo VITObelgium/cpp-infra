@@ -3,15 +3,12 @@
 #include "Exceptions.h"
 #include "infra/configdocument.h"
 
+#include <algorithm>
+
 namespace opaq {
 namespace config {
 
 using namespace infra;
-
-PollutantManager::PollutantManager()
-: _logger("OPAQ::config::PollutantManager")
-{
-}
 
 Pollutant PollutantManager::find(const std::string& name)
 {

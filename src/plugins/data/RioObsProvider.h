@@ -8,8 +8,9 @@
 #ifndef RIOOBSPROVIDER_H_
 #define RIOOBSPROVIDER_H_
 
-#include "Logger.h"
 #include "data/DataProvider.h"
+
+#include <unordered_map>
 
 namespace opaq {
 
@@ -49,7 +50,6 @@ public:
         Aggregation::Type aggr = Aggregation::None) override;
 
 private:
-    Logger _logger;
     double _noData;
     std::chrono::hours _timeResolution;
     std::string _pattern;

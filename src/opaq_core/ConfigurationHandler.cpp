@@ -5,16 +5,14 @@
 
 #include "config/ForecastStage.h"
 #include "config/MappingStage.h"
+#include "infra/log.h"
 #include "tools/XmlTools.h"
 
 namespace opaq {
 
 using namespace infra;
 
-ConfigurationHandler::ConfigurationHandler()
-: _logger("ConfigurationHandler")
-{
-}
+static const LogSource s_logSrc = "ConfigurationHandler";
 
 static std::string getChildElement(const ConfigNode& node, const char* name)
 {
@@ -132,9 +130,9 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
             throw BadConfigurationException("pollutant list is empty: define at least 1 pollutant");
         }
 
-        _logger->info("Pollutant list:");
+        Log::info(s_logSrc, "Pollutant list:");
         for (auto& pol : pollutantMgr.getList()) {
-            _logger->info(" {}", pol.toString());
+            Log::info(s_logSrc, " {}", pol.toString());
         }
 
         /* ------------------------------------------------------------------------
@@ -157,7 +155,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
                 _opaqRun.addBaseTime(chrono::from_date_time_string(basetimeElement.value()));
             }
         } else {
-            _logger->warn("no base times section in configuration file"); // but might be given using command line args
+            Log::warn(s_logSrc, "no base times section in configuration file"); // but might be given using command line args
         }
 
         /* ------------------------------------------------------------------------
@@ -165,14 +163,14 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
            --------------------------------------------------------------------- */
         auto name = std::string(runConfigElement.child("pollutant").value());
         if (name.empty()) {
-            _logger->warn("no pollutant set in configuration file"); // but might be given using command line args
+            Log::warn(s_logSrc, "no pollutant set in configuration file"); // but might be given using command line args
         } else {
             _opaqRun.setPollutantName(name); // set the pollutant name
         }
 
         name = std::string(runConfigElement.child("aggregation").value());
         if (name.empty()) {
-            _logger->warn("no aggregation set in configuration file"); // but might be given using command line args
+            Log::warn(s_logSrc, "no aggregation set in configuration file"); // but might be given using command line args
         } else {
             _opaqRun.setAggregation(name); // set the aggregation
         }
@@ -184,7 +182,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         if (auto networkElement = runConfigElement.child("network"); networkElement) {
             _opaqRun.setNetworkProvider(_opaqRun.getComponent(networkElement.child("component").value()));
         } else {
-            _logger->critical("No air quality network defined");
+            Log::critical(s_logSrc, "No air quality network defined");
             throw RunTimeException("Invalid air quality network defined");
         }
 
@@ -195,7 +193,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         if (auto gridElement = runConfigElement.child("grid"); gridElement) {
             _opaqRun.setGridProvider(_opaqRun.getComponent(gridElement.child("component").value()));
         } else {
-            _logger->warn("No grid provider defined");
+            Log::warn(s_logSrc, "No grid provider defined");
         }
 
         /* ------------------------------------------------------------------------
@@ -204,7 +202,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         if (auto forecastEl = runConfigElement.child("forecast"); forecastEl) {
             _opaqRun.setForecastStage(parseForecastStage(forecastEl));
         } else {
-            _logger->warn("no forecast stage defined");
+            Log::warn(s_logSrc, "no forecast stage defined");
         }
 
         /* ------------------------------------------------------------------------
@@ -213,7 +211,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         if (auto mappingEl = runConfigElement.child("mapping"); mappingEl) {
             _opaqRun.setMappingStage(parseMappingStage(mappingEl));
         } else {
-            _logger->warn("no mapping stage defined");
+            Log::warn(s_logSrc, "no mapping stage defined");
         }
     } catch (const std::exception& e) {
         throw BadConfigurationException("Unable to load configuration file: {}", e.what());

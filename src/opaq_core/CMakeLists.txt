@@ -25,8 +25,6 @@ set (CORE_SOURCES
     OpaqMath.h
     OpaqMath.cpp
     Model.cpp
-    Logger.h
-    Logger.cpp
     Point.h
     Point.cpp
     Pollutant.h

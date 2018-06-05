@@ -9,6 +9,7 @@
 
 #include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "tools/FileTools.h"
 
 #include <sstream>
 

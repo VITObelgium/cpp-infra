@@ -10,15 +10,12 @@
 
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
-#include "Logger.h"
 
 namespace opaq {
 
 class XMLAQNetProvider : public AQNetworkProvider
 {
 public:
-    XMLAQNetProvider();
-
     static std::string name();
 
     // component members
@@ -30,7 +27,6 @@ public:
 
 private:
     AQNetwork _net;
-    Logger _logger;
 };
 
 } /* namespace IRCEL */

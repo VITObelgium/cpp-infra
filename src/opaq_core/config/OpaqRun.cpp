@@ -4,9 +4,10 @@
 namespace opaq {
 namespace config {
 
+using namespace infra;
+
 OpaqRun::OpaqRun()
-: _logger("OPAQ::config::OpaqRun")
-, _aggregation(Aggregation::None)
+: _aggregation(Aggregation::None)
 {
 }
 

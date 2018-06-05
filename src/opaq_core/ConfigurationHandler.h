@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Logger.h"
 #include "config/OpaqRun.h"
 #include "infra/configdocument.h"
 
@@ -20,8 +19,6 @@ class PollutantManager;
 class ConfigurationHandler
 {
 public:
-    ConfigurationHandler();
-
     /**
      * Parse the configuration file given by the filename and construct the main OPAQ workflow
      * Here we indicate briefly the workflow of this method
@@ -63,6 +60,5 @@ private:
     config::OpaqRun _opaqRun;
     infra::ConfigDocument _doc;
     std::vector<infra::ConfigDocument> _configDocs;
-    Logger _logger;
 };
 }

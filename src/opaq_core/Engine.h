@@ -3,7 +3,6 @@
 #include "Aggregation.h"
 #include "ComponentManager.h"
 #include "DateTime.h"
-#include "Logger.h"
 
 namespace opaq {
 
@@ -108,7 +107,6 @@ public:
     ComponentManager& componentManager() override;
 
 private:
-    Logger _logger;
     config::PollutantManager& _pollutantMgr;
     ComponentManager _compMgr;
 

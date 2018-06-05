@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Logger.h"
 #include "data/IMappingBuffer.h"
 
 #include <H5Cpp.h>
@@ -29,7 +28,6 @@ public:
 private:
     void throwIfNotConfigured() const;
 
-    Logger _logger;
     size_t _index;
     H5::StrType _stringType;
     std::string _filePattern;

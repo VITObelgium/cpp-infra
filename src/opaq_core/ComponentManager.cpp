@@ -1,6 +1,5 @@
 #include "ComponentManager.h"
 #include "Exceptions.h"
-#include "Logger.h"
 #include "PluginFactoryInterface.h"
 
 #include "config.h"

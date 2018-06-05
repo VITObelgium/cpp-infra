@@ -2,7 +2,6 @@
 
 #include "Component.h"
 #include "Exceptions.h"
-#include "Logger.h"
 #include "config.h"
 
 #include <functional>

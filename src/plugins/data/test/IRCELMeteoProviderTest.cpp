@@ -9,6 +9,7 @@
 
 #include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "tools/FileTools.h"
 
 #include <boost/iostreams/copy.hpp>
 #include <boost/iostreams/filter/gzip.hpp>

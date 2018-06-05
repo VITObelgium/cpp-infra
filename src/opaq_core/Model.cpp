@@ -2,12 +2,10 @@
 
 #include "tools/ExceptionTools.h"
 
-namespace opaq
-{
+namespace opaq {
 
-Model::Model(const std::string& name)
-: _logger(name)
-, _aggregation(Aggregation::None)
+Model::Model()
+: _aggregation(Aggregation::None)
 , _gridType(GridType::Grid4x4)
 , _aqNetworkProvider(nullptr)
 , _gridProvider(nullptr)

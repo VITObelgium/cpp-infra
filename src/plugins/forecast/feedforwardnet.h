@@ -7,7 +7,6 @@
 
 #include <Eigen/Dense>
 
-#include "Logger.h"
 #include "layer.h"
 #include "scaler.h"
 
@@ -47,7 +46,6 @@ public:
     }
 
 private:
-    Logger _logger;
     Eigen::VectorXd _input;                            // the input sample
     Eigen::VectorXd _output;                           // the output sample
     std::vector<std::unique_ptr<nnet::layer>> _layers; // the hidden/output layers

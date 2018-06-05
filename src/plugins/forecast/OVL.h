@@ -12,7 +12,6 @@
 #pragma once
 
 #include "ComponentManager.h"
-#include "Logger.h"
 #include "Model.h"
 
 #include <map>
@@ -21,7 +20,7 @@
 
 namespace opaq {
 
-class OVL : virtual public Model
+class OVL : public Model
 {
 public:
     OVL();

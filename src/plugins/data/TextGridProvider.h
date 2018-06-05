@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Logger.h"
 #include "data/IGridProvider.h"
 
 #include <algorithm>
@@ -11,8 +10,6 @@ namespace opaq {
 class TextGridProvider : public IGridProvider
 {
 public:
-    TextGridProvider();
-
     static std::string name();
 
     // throws BadConfigurationException
@@ -23,7 +20,6 @@ public:
 private:
     void readFile(const std::string& pollutant, GridType type);
 
-    Logger _logger;
     std::string _pattern;
     std::map<std::string, std::map<GridType, Grid>> _grid;
 };

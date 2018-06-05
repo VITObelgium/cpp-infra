@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Logger.h"
 #include "data/IGridProvider.h"
 
 #include <algorithm>
@@ -10,8 +9,6 @@ namespace opaq {
 class XmlGridProvider : public IGridProvider
 {
 public:
-    XmlGridProvider();
-
     static std::string name();
 
     // throws BadConfigurationException
@@ -21,6 +18,5 @@ public:
 
 private:
     Grid _grid;
-    Logger _logger;
 };
 }

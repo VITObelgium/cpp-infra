@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Logger.h"
 #include "Pollutant.h"
 
 namespace opaq {
@@ -13,7 +12,7 @@ namespace config {
 class PollutantManager
 {
 public:
-    PollutantManager();
+    PollutantManager()                        = default;
     PollutantManager(const PollutantManager&) = delete;
     void operator=(const PollutantManager&) = delete;
 
@@ -45,7 +44,6 @@ public:
 private:
     // list of the available pollutants
     std::vector<Pollutant> _pollutants; //!< list of available pollutants
-    Logger _logger;
 };
 }
 }

@@ -8,6 +8,7 @@
 #include "Hdf5Buffer.h"
 #include "Hdf5Tools.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "tools/FileTools.h"
 
 #include <algorithm>
@@ -18,6 +19,7 @@ using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
+static const LogSource s_logSrc = "Hdf5Buffer";
 static const std::string BASETIME_DATASET_NAME("basetime");
 static const std::string START_DATE_NAME("start_date");
 static const std::string FORECAST_DATASET_NAME("fc_value");
@@ -34,8 +36,7 @@ const std::string Hdf5BufferVersion("0.1");
 static const char* s_noData = "n/a";
 
 Hdf5Buffer::Hdf5Buffer()
-: _logger("Hdf5Buffer")
-, _stringType(0, H5T_VARIABLE)
+: _stringType(0, H5T_VARIABLE)
 , _noData(-9999)
 , _fcHor(0)
 {
@@ -199,7 +200,7 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
             dsModels   = grpAggr.createDataSet(MODELS_DATASET_NAME, _stringType, dataSpace2, cparms2);
             dsStations = grpAggr.createDataSet(STATION_DATASET_NAME, _stringType, dataSpace2, cparms2);
         } catch (const H5::Exception& e) {
-            _logger->error("Failed to write values to HDF5 buffer: {} {}", e.getDetailMsg());
+            Log::error(s_logSrc, "Failed to write values to HDF5 buffer: {} {}", e.getDetailMsg());
             throw RunTimeException("Failed to write values to HDF5 buffer");
         }
     }
@@ -374,7 +375,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
         dsStations = grpAggr.openDataSet(STATION_DATASET_NAME);
         dsModels   = grpAggr.openDataSet(MODELS_DATASET_NAME);
     } catch (const H5::Exception&) {
-        _logger->error("cannot retrieve hindcast values in forecast buffer...");
+        Log::error(s_logSrc, "cannot retrieve hindcast values in forecast buffer...");
         throw NotAvailableException("forecast is not available");
     }
 
@@ -479,7 +480,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
         // open datasets for models & stations
         dsStations = grpAggr.openDataSet(STATION_DATASET_NAME);
     } catch (const H5::Exception&) {
-        _logger->error("cannot retrieve model values in forecast buffer...");
+        Log::error(s_logSrc, "cannot retrieve model values in forecast buffer...");
         throw NotAvailableException("forecast is not available");
     }
 

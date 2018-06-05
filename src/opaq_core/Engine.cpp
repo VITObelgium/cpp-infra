@@ -16,15 +16,18 @@
 #include "AQNetworkProvider.h"
 #include "Model.h"
 #include "PollutantManager.h"
+#include "infra/log.h"
 #include "tools/ScopeGuard.h"
 
 namespace opaq {
 
+using namespace infra;
 using namespace chrono_literals;
 
+static const LogSource s_logSrc = "Engine";
+
 Engine::Engine(config::PollutantManager& pollutantMgr, const IPluginFactory& pluginFactory)
-: _logger("Engine")
-, _pollutantMgr(pollutantMgr)
+: _pollutantMgr(pollutantMgr)
 , _compMgr(*this, pluginFactory)
 {
 }
@@ -69,7 +72,7 @@ void Engine::runForecastStage(const config::ForecastStage& cnf,
 
         // Run the model up till the requested forecast horizon, the loop over the forecast horizons has to be
         // in the model as probably some models (AR) use info of previous days...
-        _logger->info("Running {}", model.getName());
+        Log::info(s_logSrc, "Running {}", model.getName());
         model.run();
     }
 
@@ -88,7 +91,7 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
     Aggregation::Type /*aggr*/,
     const chrono::date_time& baseTime)
 {
-    _logger->info("Mapping");
+    Log::info(s_logSrc, "Mapping");
 
     auto& buffer = _compMgr.getComponent<IMappingBuffer>(cnf.getMappingBuffer().name);
     auto& obs    = _compMgr.getComponent<DataProvider>(cnf.getDataProvider().name);
@@ -106,7 +109,7 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
         model.setMappingBuffer(buffer);
         model.setGridType(cnf.getGridType());
 
-        _logger->info("Running {}", model.getName());
+        Log::info(s_logSrc, "Running {}", model.getName());
         model.run();
     }
 }
@@ -118,21 +121,21 @@ void Engine::prepareRun(config::OpaqRun& config)
 
 void Engine::run(config::OpaqRun& config)
 {
-    _logger->info("Fetching workflow configuration");
+    Log::info(s_logSrc, "Fetching workflow configuration");
     auto pollutant = _pollutantMgr.find(config.getPollutantName());
 
     auto forecastStage = config.getForecastStage();
     auto mappingStage  = config.getMappingStage();
 
     auto& aqNetworkProvider = _compMgr.getComponent<AQNetworkProvider>(config.getNetworkProvider()->name);
-    _logger->info("Using AQ network provider {}", aqNetworkProvider.getName());
+    Log::info(s_logSrc, "Using AQ network provider {}", aqNetworkProvider.getName());
 
     // Get grid provider
     IGridProvider* gridProvider = nullptr;
     auto gridProviderConfig     = config.getGridProvider();
     if (gridProviderConfig) {
         gridProvider = &_compMgr.getComponent<IGridProvider>(gridProviderConfig->name);
-        _logger->info("Using grid provider {}", gridProviderConfig->name);
+        Log::info(s_logSrc, "Using grid provider {}", gridProviderConfig->name);
     }
 
     // Get the base times
@@ -151,17 +154,17 @@ void Engine::run(config::OpaqRun& config)
         }
     });
 
-    _logger->info("Starting OPAQ workflow...");
+    Log::info(s_logSrc, "Starting OPAQ workflow...");
     if (forecastStage) {
         // Get data buffer
         auto& buffer = _compMgr.getComponent<ForecastBuffer>(forecastStage->getBuffer().name);
 
         for (auto& baseTime : baseTimes) {
-            _logger->info("Forecast stage for {}", chrono::to_date_string(baseTime));
+            Log::info(s_logSrc, "Forecast stage for {}", chrono::to_date_string(baseTime));
             runForecastStage(*forecastStage, aqNetworkProvider, pollutant, config.getAggregation(), baseTime);
 
             if (mappingStage) {
-                _logger->info(">> Mapping forecast {}", chrono::to_date_string(baseTime));
+                Log::info(s_logSrc, ">> Mapping forecast {}", chrono::to_date_string(baseTime));
                 assert(gridProvider);
 
                 // loop over the forecast horizons and call the mapping stage for each horizon
@@ -239,10 +242,10 @@ void Engine::initComponents(const std::vector<config::Component>& components)
     _compMgr.destroyComponents();
     for (auto& component : components) {
         try {
-            _logger->info("Creating component {} from plugin {}", component.name, component.plugin.name);
+            Log::info(s_logSrc, "Creating component {} from plugin {}", component.name, component.plugin.name);
             _compMgr.createComponent<Component>(component.name, component.plugin.name, component.config);
         } catch (const std::exception& e) {
-            _logger->critical("Error while creating & configuring component {} ({})", component.name, e.what());
+            Log::critical(s_logSrc, "Error while creating & configuring component {} ({})", component.name, e.what());
             throw std::runtime_error("Failed to initialize components");
         }
     }

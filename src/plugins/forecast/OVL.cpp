@@ -11,6 +11,7 @@
 #include "TimeSeries.h"
 #include "data/ForecastBuffer.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 #include "tools/FileTools.h"
 
@@ -22,9 +23,10 @@ namespace opaq {
 using namespace infra;
 using namespace chrono_literals;
 
+static const LogSource s_logSrc = "OVL";
+
 OVL::OVL()
-: Model("OVL")
-, _componentMgr(nullptr)
+: _componentMgr(nullptr)
 , _output_raw(false)
 , _debug_output(false)
 {
@@ -166,7 +168,7 @@ void OVL::parseTuneList(const ConfigNode& lst)
 void OVL::run()
 {
     // -- 1. initialization
-    _logger->debug("OVL " + getName() + " run() method called");
+    Log::debug(s_logSrc, "{} run() method called", getName());
 
     auto baseTime          = getBaseTime();
     Pollutant pol          = getPollutant();
@@ -191,10 +193,10 @@ void OVL::run()
     for (auto& station : stations) {
         // check if we have a valid meteo id, otherwise skip the station
         if (station.getMeteoId().length() == 0) {
-            _logger->trace("Skipping station " + station.getName() + ", no meteo id given");
+            Log::debug(s_logSrc, "Skipping station " + station.getName() + ", no meteo id given");
             continue;
         } else
-            _logger->trace("Forecasting station " + station.getName());
+            Log::debug(s_logSrc, "Forecasting station " + station.getName());
 
         if (_debug_output) fs << "[STATION] " << station.getName() << " - " << chrono::to_date_string(baseTime) << std::endl;
 
@@ -211,7 +213,7 @@ void OVL::run()
             auto stIt = _conf.find(std::make_tuple(pol.getName(), aggr, _tune_mode, station.getName(), fc_hor));
             if (stIt == _conf.end()) {
                 // no configuration for this station, returning -9999 or something
-                _logger->warn("Model configuration not found for " + pol.getName() + ", st = " + station.getName() + ", skipping...");
+                Log::warn(s_logSrc, "Model configuration not found for " + pol.getName() + ", st = " + station.getName() + ", skipping...");
                 fc.insert(fcTime, getNoData());
                 continue;
             }

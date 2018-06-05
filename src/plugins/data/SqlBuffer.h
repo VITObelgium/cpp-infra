@@ -100,7 +100,6 @@ public:
 private:
     void throwIfNotConfigured() const;
 
-    Logger _logger;
     std::unique_ptr<PredictionDatabase> _db;
 
     double _noData;

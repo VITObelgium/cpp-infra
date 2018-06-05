@@ -2,6 +2,7 @@
 
 #include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 #include <boost/lexical_cast.hpp>
@@ -12,12 +13,13 @@ namespace opaq {
 using namespace infra;
 using namespace std::chrono_literals;
 
+static const LogSource s_logSrc = "StationInfoProvider";
+
 static const char* s_pollutantPlaceholder = "%pol%";
 static const char* s_gisTypePlaceholder   = "%gis%";
 
 StationInfoProvider::StationInfoProvider()
-: _logger("StationInfoProvider")
-, _configured(false)
+: _configured(false)
 {
 }
 
@@ -78,7 +80,7 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
             stations.push_back(Station(id, x, y, z, std::move(stationCode), "", "", {}));
         }
     } catch (const std::exception& e) {
-        _logger->warn(e.what());
+        Log::warn(s_logSrc, e.what());
     }
 }
 

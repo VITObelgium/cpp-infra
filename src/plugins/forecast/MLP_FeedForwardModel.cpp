@@ -7,6 +7,7 @@
 #include "data/ForecastBuffer.h"
 #include "feedforwardnet.h"
 #include "infra/configdocument.h"
+#include "infra/log.h"
 #include "infra/string.h"
 
 #include <limits>
@@ -22,9 +23,10 @@ namespace opaq {
 
 using namespace infra;
 
-MLP_FeedForwardModel::MLP_FeedForwardModel(const std::string& name)
-: Model(name)
-, sample_size(0)
+static const LogSource s_logSrc = "MLP_FeedForwardModel";
+
+MLP_FeedForwardModel::MLP_FeedForwardModel()
+: sample_size(0)
 {
 }
 
@@ -62,13 +64,12 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
         try {
             net = std::make_unique<nnet::feedforwardnet>(nnet_xml.rootNode());
         } catch (const std::exception& e) {
-            _logger->error("Unable to construct ffnet in {} ({})", fname, e.what());
+            Log::error(s_logSrc, "Unable to construct ffnet in {} ({})", fname, e.what());
             return getNoData();
         }
 
         if (net->inputSize() != this->sample_size) {
-            throw RunTimeException("Invalid network input size (" + std::to_string(net->inputSize()) +
-                                   ") for model sample size (" + std::to_string(this->sample_size) + ")");
+            throw RunTimeException("Invalid network input size ({}) for model sample size ({})", net->inputSize(), sample_size);
         }
 
         auto fcTime = baseTime + fc_hor;
@@ -80,7 +81,7 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
 
         // call abstract method to generate the sample
         if (this->makeSample(input_sample.data(), station, pol, aggr, baseTime, fcTime, fc_hor)) {
-            _logger->error("   input sample incomplete, setting missing value");
+            Log::error(s_logSrc, "   input sample incomplete, setting missing value");
             return getNoData();
         }
 
@@ -100,7 +101,7 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
 
         return out;
     } catch (const std::exception& e) {
-        _logger->error("   unable to load ffnet from: {} ({})", fname, e.what());
+        Log::error(s_logSrc, "   unable to load ffnet from: {} ({})", fname, e.what());
         return getNoData();
     }
 }
@@ -113,7 +114,7 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
 void MLP_FeedForwardModel::run()
 {
     // -- 1. initialization
-    _logger->debug("MLP_FeedForwardModel " + this->getName() + " run() method called");
+    Log::debug(s_logSrc, "MLP_FeedForwardModel {} run() method called", getName());
 
     auto baseTime          = getBaseTime();
     Pollutant pol          = getPollutant();
@@ -133,10 +134,10 @@ void MLP_FeedForwardModel::run()
     for (auto& station : stations) {
         // check if we have a valid meteo id, otherwise skip the station
         if (station.getMeteoId().empty()) {
-            _logger->trace("Skipping station {}, no meteo id given", station.getName());
+            Log::debug(s_logSrc, "Skipping station {}, no meteo id given", station.getName());
             continue;
         } else
-            _logger->trace("Forecasting station {}", station.getName());
+            Log::debug(s_logSrc, "Forecasting station {}", station.getName());
 
         // store the output in a timeseries object
         TimeSeries<double> fc;
@@ -145,7 +146,7 @@ void MLP_FeedForwardModel::run()
         for (int fc_hor = 0; fc_hor <= fcHorMax; ++fc_hor) {
             chrono::days fcHor(fc_hor);
             auto fcTime = baseTime + fcHor;
-            _logger->trace(" -- basetime: {}, horizon: day {}, dayN is: {}", chrono::to_date_string(baseTime), fc_hor, chrono::to_date_string(fcTime));
+            Log::debug(s_logSrc, " -- basetime: {}, horizon: day {}, dayN is: {}", chrono::to_date_string(baseTime), fc_hor, chrono::to_date_string(fcTime));
 
             fc.insert(fcTime, fcValue(pol, station, aggr, baseTime, fcHor));
         }
@@ -220,7 +221,7 @@ void MLP_FeedForwardModel::printPar(const std::string& title, const std::vector<
         ss << " " << value;
     }
 
-    _logger->trace(ss.str());
+    Log::debug(s_logSrc, ss.str());
 }
 
 } /* namespace OPAQ */

@@ -6,7 +6,6 @@
 #ifndef Hdf5Buffer_H_
 #define Hdf5Buffer_H_
 
-#include "Logger.h"
 #include "data/ForecastOutputWriter.h"
 
 #include <H5Cpp.h>
@@ -169,7 +168,6 @@ private:
     //  unsigned int _getStringDataSetSize (H5::DataSet & dataSet);
     //  void _addToStringDataSet (H5::DataSet & dataSet, const std::string & value);
 
-    Logger _logger;
     std::unique_ptr<H5::H5File> _h5file; //!< HDF5 file handle for the buffer file
 
     H5::DataSet _parametersSet, _stationsSet;
