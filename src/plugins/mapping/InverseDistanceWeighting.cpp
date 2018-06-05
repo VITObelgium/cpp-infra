@@ -2,7 +2,6 @@
 #include "InverseDistanceWeighting.h"
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
-#include "PluginRegistration.h"
 #include "data/DataProvider.h"
 #include "data/IGridProvider.h"
 #include "data/IMappingBuffer.h"
@@ -93,5 +92,4 @@ void InverseDistanceWeighting::run()
     getMappingBuffer().addResults(results);
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(InverseDistanceWeighting)
 }

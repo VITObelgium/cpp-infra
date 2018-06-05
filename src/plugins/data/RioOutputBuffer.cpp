@@ -2,7 +2,6 @@
 #include "DateTime.h"
 #include "Grid.h"
 #include "Hdf5Tools.h"
-#include "PluginRegistration.h"
 #include "Pollutant.h"
 #include "Station.h"
 #include "infra/configdocument.h"
@@ -185,5 +184,4 @@ void RioOutputBuffer::throwIfNotConfigured() const
     }
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(RioOutputBuffer)
 }

@@ -15,7 +15,7 @@
 
 #include "PollutantManager.h"
 #include "config.h"
-#include "plugins/ForcePluginLink.h"
+#include "plugins/PluginFactory.h"
 
 #include "infra/configdocument.h"
 
@@ -23,18 +23,9 @@
 
 namespace po = boost::program_options;
 
-static void printPlugins()
-{
-    std::cout << "Available Plugins:" << std::endl;
-    for (auto& plugin : opaq::getPluginNames()) {
-        std::cout << " - " << plugin << std::endl;
-    }
-}
-
 static void printVersion()
 {
     std::cout << "OPAQ Version: " << OPAQ_VERSION << std::endl;
-    printPlugins();
 }
 
 static void printWelcome()
@@ -178,7 +169,8 @@ int main(int argc, char* argv[])
         logger->info(opaq::chrono::to_string(basetime));
 #endif
 
-    opaq::Engine engine(pollutantMgr);
+    opaq::PluginFactory pluginFactory;
+    opaq::Engine engine(pollutantMgr, pluginFactory);
 
     try {
         // validate configuration

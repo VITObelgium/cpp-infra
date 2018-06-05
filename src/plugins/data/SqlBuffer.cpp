@@ -1,6 +1,5 @@
 #include "SqlBuffer.h"
 
-#include "PluginRegistration.h"
 #include "PredictionDatabase.h"
 #include "infra/configdocument.h"
 
@@ -93,9 +92,9 @@ TimeSeries<double> SqlBuffer::getValues(const chrono::date_time& t1,
     return getForecastValues(_fcHor, t1, t2, stationId, pollutantId, aggr);
 }
 
-TimeSeries<double> SqlBuffer::getForecastValues(const chrono::date_time& baseTime,
-    const std::vector<chrono::days>& fc_hor, const std::string& stationId,
-    const std::string& pollutantId, Aggregation::Type aggr)
+TimeSeries<double> SqlBuffer::getForecastValues(const chrono::date_time& /*baseTime*/,
+    const std::vector<chrono::days>& /*fc_hor*/, const std::string& /*stationId*/,
+    const std::string& /*pollutantId*/, Aggregation::Type /*aggr*/)
 {
     throw RunTimeException("IMPLEMENT ME !!");
 }
@@ -171,5 +170,4 @@ void SqlBuffer::setForecastHorizon(chrono::days fcHor)
     _fcHor = fcHor;
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(SqlBuffer)
 }

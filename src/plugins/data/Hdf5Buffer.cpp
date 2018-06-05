@@ -7,7 +7,6 @@
 
 #include "Hdf5Buffer.h"
 #include "Hdf5Tools.h"
-#include "PluginRegistration.h"
 #include "infra/configdocument.h"
 #include "tools/FileTools.h"
 
@@ -337,11 +336,11 @@ TimeSeries<double> Hdf5Buffer::getValues(const chrono::date_time& t1,
     return getForecastValues(_fcHor, t1, t2, stationId, pollutantId, aggr);
 }
 
-TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& baseTime,
-    const std::vector<chrono::days>& fc_hor,
-    const std::string& stationId,
-    const std::string& pollutantId,
-    Aggregation::Type aggr)
+TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& /*baseTime*/,
+    const std::vector<chrono::days>& /*fc_hor*/,
+    const std::string& /*stationId*/,
+    const std::string& /*pollutantId*/,
+    Aggregation::Type /*aggr*/)
 {
     throw RunTimeException("IMPLEMENT ME !!");
 }
@@ -547,5 +546,4 @@ std::chrono::seconds Hdf5Buffer::getBaseTimeResolutionInSeconds()
     return chrono::to_seconds(getBaseTimeResolution());
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(Hdf5Buffer)
 }

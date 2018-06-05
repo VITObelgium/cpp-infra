@@ -1,5 +1,4 @@
 #include "Engine.h"
-#include "ComponentManagerFactory.h"
 #include "data/IGridProvider.h"
 #include "data/IMappingBuffer.h"
 #include "data/IStationInfoProvider.h"
@@ -23,10 +22,10 @@ namespace opaq {
 
 using namespace chrono_literals;
 
-Engine::Engine(config::PollutantManager& pollutantMgr)
+Engine::Engine(config::PollutantManager& pollutantMgr, const IPluginFactory& pluginFactory)
 : _logger("Engine")
 , _pollutantMgr(pollutantMgr)
-, _compMgr(factory::createComponentManager(*this))
+, _compMgr(*this, pluginFactory)
 {
 }
 
@@ -86,7 +85,7 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
     AQNetworkProvider& aqNetworkProvider,
     IGridProvider& gridProvider,
     const Pollutant& pollutant,
-    Aggregation::Type aggr,
+    Aggregation::Type /*aggr*/,
     const chrono::date_time& baseTime)
 {
     _logger->info("Mapping");
@@ -114,7 +113,6 @@ void Engine::runMappingStage(const config::MappingStage& cnf,
 
 void Engine::prepareRun(config::OpaqRun& config)
 {
-    loadPlugins(config.getPlugins());
     initComponents(config.getComponents());
 }
 
@@ -234,17 +232,6 @@ config::PollutantManager& Engine::pollutantManager()
 ComponentManager& Engine::componentManager()
 {
     return _compMgr;
-}
-
-void Engine::loadPlugins(const std::vector<config::Plugin>& plugins)
-{
-    for (auto& plugin : plugins) {
-        try {
-            _compMgr.loadPlugin(plugin.name);
-        } catch (std::exception& e) {
-            throw RunTimeException("Failed to load plugins {} ({})", plugin.name, e.what());
-        }
-    }
 }
 
 void Engine::initComponents(const std::vector<config::Component>& components)

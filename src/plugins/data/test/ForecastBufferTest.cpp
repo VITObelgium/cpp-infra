@@ -10,7 +10,6 @@
 #include "config.h"
 #include "testconfig.h"
 
-#include "ComponentManagerFactory.h"
 #include "Engine.h"
 #include "PredictionDatabase.h"
 #include "TimeSeries.h"

@@ -1,6 +1,5 @@
 #include "TextGridProvider.h"
 #include "Exceptions.h"
-#include "PluginRegistration.h"
 #include "infra/configdocument.h"
 #include "infra/filesystem.h"
 #include "infra/string.h"
@@ -77,5 +76,4 @@ void TextGridProvider::readFile(const std::string& pollutant, GridType type)
     }
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(TextGridProvider)
 }

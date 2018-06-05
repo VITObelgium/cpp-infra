@@ -1,7 +1,6 @@
 #include "AsciiForecastWriter.h"
 
 #include "AQNetwork.h"
-#include "PluginRegistration.h"
 
 #include "infra/configdocument.h"
 #include "infra/string.h"
@@ -189,5 +188,4 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
     fclose(fp);
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(AsciiForecastWriter)
 }

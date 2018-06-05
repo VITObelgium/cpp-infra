@@ -6,7 +6,6 @@
  */
 
 #include "IRCELMeteoProvider.h"
-#include "PluginRegistration.h"
 #include "infra/configdocument.h"
 #include "infra/string.h"
 #include "tools/GzipReader.h"
@@ -201,5 +200,4 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
     }
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(IRCELMeteoProvider)
 }

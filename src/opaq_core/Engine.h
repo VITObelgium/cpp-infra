@@ -1,24 +1,23 @@
 #pragma once
 
-#include "Logger.h"
-#include "DateTime.h"
 #include "Aggregation.h"
 #include "ComponentManager.h"
+#include "DateTime.h"
+#include "Logger.h"
 
-namespace opaq
-{
+namespace opaq {
 
-namespace config
-{
-    struct Plugin;
-    struct Component;
-    class OpaqRun;
-    class ForecastStage;
-    class MappingStage;
-    class PollutantManager;
+namespace config {
+struct Plugin;
+struct Component;
+class OpaqRun;
+class ForecastStage;
+class MappingStage;
+class PollutantManager;
 }
 
 class Pollutant;
+class IPluginFactory;
 class IGridProvider;
 class AQNetworkProvider;
 
@@ -28,7 +27,7 @@ public:
     virtual ~IEngine() = default;
 
     virtual config::PollutantManager& pollutantManager() = 0;
-    virtual ComponentManager&         componentManager() = 0;
+    virtual ComponentManager& componentManager()         = 0;
 };
 
 struct PredictionResult
@@ -40,8 +39,14 @@ struct PredictionResult
     {
     }
 
-    double x() const noexcept { return measuredValue; }
-    double y() const noexcept { return predictedValue; }
+    double x() const noexcept
+    {
+        return measuredValue;
+    }
+    double y() const noexcept
+    {
+        return predictedValue;
+    }
 
     chrono::date_time time;
     double measuredValue  = 0.0;
@@ -59,7 +64,7 @@ struct PredictionResult
 class Engine : public IEngine
 {
 public:
-    Engine(config::PollutantManager& pollutantMgr);
+    Engine(config::PollutantManager& pollutantMgr, const IPluginFactory& pluginFactory);
 
     /**
     * Prepare an opaq run
@@ -93,19 +98,19 @@ public:
      * Validate the measured values agains the predicted values for the given station
      */
     std::vector<PredictionResult> validate(config::OpaqRun& config,
-                                           chrono::days forecastHorizon,
-                                           const std::string& station,
-                                           chrono::date_time startTime,
-                                           chrono::date_time endTime,
-                                           const std::string& model);
+        chrono::days forecastHorizon,
+        const std::string& station,
+        chrono::date_time startTime,
+        chrono::date_time endTime,
+        const std::string& model);
 
     config::PollutantManager& pollutantManager() override;
-    ComponentManager&         componentManager() override;
+    ComponentManager& componentManager() override;
 
 private:
-    Logger                              _logger;
-    config::PollutantManager&           _pollutantMgr;
-    ComponentManager                    _compMgr;
+    Logger _logger;
+    config::PollutantManager& _pollutantMgr;
+    ComponentManager _compMgr;
 
     /**
    * This runs the forecast stage with the given configuration, network,
@@ -115,13 +120,12 @@ private:
    */
     void runForecastStage(const config::ForecastStage& cnf, AQNetworkProvider& net, const Pollutant& pol, Aggregation::Type agg, const chrono::date_time& baseTime);
     void runMappingStage(const config::MappingStage& cnf,
-                         AQNetworkProvider& net,
-                         IGridProvider& gridProvider,
-                         const Pollutant& pollutant,
-                         Aggregation::Type aggr,
-                         const chrono::date_time& baseTime);
+        AQNetworkProvider& net,
+        IGridProvider& gridProvider,
+        const Pollutant& pollutant,
+        Aggregation::Type aggr,
+        const chrono::date_time& baseTime);
 
-    void loadPlugins(const std::vector<config::Plugin>& plugins);
     void initComponents(const std::vector<config::Component>& components);
 };
 

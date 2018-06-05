@@ -1,8 +1,8 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include "ComponentManagerFactory.h"
 #include "Engine.h"
+#include "PluginFactoryInterface.h"
 #include "PollutantManager.h"
 #include "config.h"
 #include "infra/configdocument.h"
@@ -22,14 +22,29 @@ public:
     MOCK_METHOD0(componentManager, ComponentManager&());
 };
 
+class PluginFactoryMock : public IPluginFactory
+{
+public:
+    MOCK_CONST_METHOD1(createPlugin, std::unique_ptr<Component>(std::string_view));
+};
+
+class DummyComponent : public Component
+{
+public:
+    void configure(const infra::ConfigNode& /*configuration*/, const std::string& /*componentName*/, IEngine& /*engine*/) override
+    {
+    }
+};
+
 class ComponentManagerTest : public Test
 {
 protected:
     ComponentManagerTest()
-    : _cmpMgr(factory::createComponentManager(_engineMock))
+    : _cmpMgr(_engineMock, _pluginFactoryMock)
     {
     }
 
+    PluginFactoryMock _pluginFactoryMock;
     EngineMock _engineMock;
     ComponentManager _cmpMgr;
 };
@@ -46,9 +61,10 @@ TEST_F(ComponentManagerTest, LoadPlugin)
     auto doc    = ConfigDocument::loadFromString(configXml);
     auto config = doc.child("config");
 
-    _cmpMgr.loadPlugin("sqlbuffer");
-    auto& comp = _cmpMgr.createComponent<Component>("sqlbuffer", "sqlbuffer", config);
-    EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("sqlbuffer"));
+    EXPECT_CALL(_pluginFactoryMock, createPlugin(std::string_view("dummy"))).WillOnce(Return(ByMove(std::make_unique<DummyComponent>())));
+
+    auto& comp = _cmpMgr.createComponent<Component>("dummy", "dummy", config);
+    EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("dummy"));
 }
 }
 }

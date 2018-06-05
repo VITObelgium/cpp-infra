@@ -7,14 +7,16 @@
 
 #include <functional>
 #include <iostream>
-#include <map>
 #include <memory>
+#include <unordered_map>
 
 namespace infra {
 class ConfigNode;
 }
 
 namespace opaq {
+
+class IPluginFactory;
 
 /**
    * \brief class for managing the components.
@@ -28,12 +30,10 @@ namespace opaq {
    *
    */
 
-using FactoryCallback = std::function<Component*(LogConfiguration*)>;
-
 class ComponentManager
 {
 public:
-    ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&)> cb);
+    ComponentManager(IEngine& engine, const IPluginFactory& pluginFactory);
 
     ComponentManager(ComponentManager&&)      = default;
     ComponentManager(const ComponentManager&) = delete;
@@ -62,7 +62,7 @@ public:
         }
     }
 
-    void loadPlugin(const std::string& pluginName);
+    //void loadPlugin(const std::string& pluginName);
     void destroyComponent(const std::string& componentName);
     void destroyComponents();
 
@@ -75,12 +75,9 @@ private:
 
     // throw PluginNotFoundException, BadConfigurationException
     std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, const infra::ConfigNode& configuration);
+    std::unordered_map<std::string, std::unique_ptr<Component>> _instanceMap;
 
-    std::function<FactoryCallback(const std::string&)> _loadPluginCb;
-    // Factory map must occur before instance map, destroying the factory function causes the dll to be unloaded
-    // The instance map has to be destroyed before the dll unload
-    std::map<std::string, FactoryCallback> _factoryMap;
-    std::map<std::string, std::unique_ptr<Component>> _instanceMap;
     IEngine& _engine;
+    const IPluginFactory& _pluginFactory;
 };
 }

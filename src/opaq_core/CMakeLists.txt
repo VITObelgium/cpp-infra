@@ -10,8 +10,6 @@ set (CORE_SOURCES
     Cell.cpp
     Component.h
     Component.cpp
-    ComponentManagerFactory.h
-    ComponentManagerFactory.cpp
     ComponentManager.h
     ComponentManager.cpp
     ConfigurationHandler.h
@@ -35,8 +33,7 @@ set (CORE_SOURCES
     Pollutant.cpp
     PollutantManager.h
     PollutantManager.cpp
-    PluginRegistration.h
-    PluginRegistration.cpp
+    PluginFactoryInterface.h
     Station.h
     Station.cpp
     TimeSeries.h

@@ -1,6 +1,7 @@
 #include "ComponentManager.h"
 #include "Exceptions.h"
 #include "Logger.h"
+#include "PluginFactoryInterface.h"
 
 #include "config.h"
 
@@ -8,9 +9,9 @@ namespace opaq {
 
 using namespace infra;
 
-ComponentManager::ComponentManager(IEngine& engine, std::function<FactoryCallback(const std::string&)> cb)
-: _loadPluginCb(cb)
-, _engine(engine)
+ComponentManager::ComponentManager(IEngine& engine, const IPluginFactory& pluginFactory)
+: _engine(engine)
+, _pluginFactory(pluginFactory)
 {
 }
 
@@ -42,27 +43,9 @@ Component& ComponentManager::findComponent(const std::string& name)
 
 std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, const ConfigNode& configuration)
 {
-    auto it = _factoryMap.find(pluginName);
-    if (it == _factoryMap.end()) {
-        throw PluginNotFoundException("Plugin not found: {}", pluginName);
-    }
-
-    auto& sink = Log::getConfiguration();
-    std::unique_ptr<Component> component((it->second)(&sink));
+    auto component = _pluginFactory.createPlugin(pluginName);
     component->configure(configuration, componentName, _engine);
     return component;
-}
-
-void ComponentManager::loadPlugin(const std::string& pluginName)
-{
-    // 1. check if plugin was already loaded
-    auto it = _factoryMap.find(pluginName);
-    if (it != _factoryMap.end()) {
-        // Plugin already loaded
-        return;
-    }
-
-    _factoryMap.emplace(pluginName, _loadPluginCb(pluginName));
 }
 
 void ComponentManager::destroyComponent(const std::string& componentName)

@@ -7,7 +7,6 @@
 
 #include "XmlGridProvider.h"
 #include "Exceptions.h"
-#include "PluginRegistration.h"
 #include "infra/configdocument.h"
 
 namespace opaq {
@@ -77,5 +76,4 @@ const Grid& XmlGridProvider::getGrid(const std::string&, GridType)
     return _grid;
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(XmlGridProvider)
 }

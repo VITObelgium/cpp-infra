@@ -3,7 +3,6 @@
 
 #include "config.h"
 #include "mainwindow.h"
-#include "plugins/ForcePluginLink.h"
 
 #ifdef STATIC_QT
 #if defined WIN32
@@ -21,11 +20,6 @@ int main(int argc, char* argv[])
 
     Log::initLogger("");
     Logger logger("main");
-
-    logger->debug("Available Plugins:");
-    for (auto& plugin : opaq::getPluginNames()) {
-        logger->debug(" - {}", plugin);
-    }
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");

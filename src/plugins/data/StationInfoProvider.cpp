@@ -1,5 +1,4 @@
 #include "StationInfoProvider.h"
-#include "PluginRegistration.h"
 
 #include "infra/configdocument.h"
 #include "infra/filesystem.h"
@@ -83,5 +82,4 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
     }
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(StationInfoProvider)
 }

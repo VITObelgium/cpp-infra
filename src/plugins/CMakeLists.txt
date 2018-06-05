@@ -2,6 +2,9 @@ find_package(hdf5 CONFIG REQUIRED)
 find_package(Sqlpp11 REQUIRED)
 
 add_library(opaqplugins
+    PluginFactory.h
+    PluginFactory.cpp
+
     data/Hdf5Tools.h
     data/Hdf5Tools.cpp
     data/Hdf5Buffer.h

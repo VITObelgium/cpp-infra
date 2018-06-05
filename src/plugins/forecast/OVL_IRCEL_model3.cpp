@@ -1,6 +1,5 @@
 #include "OVL_IRCEL_model3.h"
 #include "OpaqMath.h"
-#include "PluginRegistration.h"
 #include "Station.h"
 #include "data/DataProvider.h"
 #include "data/MeteoProvider.h"
@@ -63,7 +62,7 @@ void OVL_IRCEL_model3::configure(const ConfigNode& configuration, const std::str
 int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     const Pollutant& pol, Aggregation::Type aggr,
     const chrono::date_time& baseTime, const chrono::date_time& fcTime,
-    chrono::days fc_hor)
+    chrono::days /*fc_hor*/)
 {
     int have_sample = 0; // return code, 0 for success
 
@@ -240,5 +239,4 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     return have_sample;
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(OVL_IRCEL_model3)
 }

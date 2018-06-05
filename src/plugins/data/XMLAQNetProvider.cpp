@@ -2,7 +2,6 @@
 
 #include "Engine.h"
 #include "Exceptions.h"
-#include "PluginRegistration.h"
 #include "PollutantManager.h"
 #include "Station.h"
 #include "infra/configdocument.h"
@@ -68,5 +67,4 @@ AQNetwork& XMLAQNetProvider::getAQNetwork()
     return _net;
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(XMLAQNetProvider)
 }

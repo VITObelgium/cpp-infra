@@ -6,7 +6,6 @@
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
 #include "Engine.h"
-#include "PluginRegistration.h"
 #include "PollutantManager.h"
 #include "Station.h"
 #include "TimeSeries.h"
@@ -361,7 +360,5 @@ void OVL::run()
 
     } // loop over the stations
 }
-
-OPAQ_REGISTER_STATIC_PLUGIN(OVL)
 
 } /* namespace OPAQ */
