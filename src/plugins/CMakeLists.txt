@@ -72,11 +72,11 @@ target_link_libraries(opaqplugins PRIVATE
 )
 
 if (OPAQ_ENABLE_POSTGRESQL)
-    if (NOT Sqlpp11::Postgresql)
+    if (NOT TARGET Sqlpp11::Postgresql)
         message(FATAL_ERROR "Postgresql enabled but the library could not be found")
     endif ()
 
-    target_link_libraries(opaqplugins PRIVATE NOT Sqlpp11::Postgresql)
+    target_link_libraries(opaqplugins PRIVATE Sqlpp11::Postgresql)
 endif ()
 
 add_subdirectory(data/test)

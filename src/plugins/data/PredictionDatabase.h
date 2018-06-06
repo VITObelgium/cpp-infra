@@ -209,7 +209,7 @@ public:
         return result;
     }
 
-    std::vector<std::string> getModelNames(const std::string& pollutantId, const std::string& aggr)
+    std::vector<std::string> getModelNames(const std::string& pollutantId, const std::string& aggr) override
     {
         std::vector<std::string> names;
         auto result = _db(select(predictions.Model).flags(sqlpp::distinct).from(predictions).where(predictions.Aggregation == aggr and predictions.Pollutant == pollutantId).order_by(predictions.Model.asc()));
@@ -301,5 +301,4 @@ inline std::shared_ptr<sqlpp::postgresql::connection_config> createPostgresConfi
 
 using PostgresPredictionDatabase = PredictionDatabase<sqlpp::postgresql::connection>;
 #endif
-
 }

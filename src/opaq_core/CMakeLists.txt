@@ -85,7 +85,6 @@ PUBLIC
     Boost::disable_autolinking
 PRIVATE
     Boost::system
-    Boost::filesystem
     Boost::iostreams
     ${EXTRA_LIBS}
 )

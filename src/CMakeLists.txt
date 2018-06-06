@@ -9,7 +9,7 @@ find_package(OpenSSL REQUIRED)
 
 set (Boost_USE_STATIC_LIBS ON)
 set (Boost_USE_STATIC_RUNTIME OFF)
-find_package(Boost REQUIRED COMPONENTS system filesystem iostreams program_options)
+find_package(Boost REQUIRED COMPONENTS system iostreams program_options)
 
 if (MSVC)
     set(EXTRA_LIBS Psapi Ws2_32)
