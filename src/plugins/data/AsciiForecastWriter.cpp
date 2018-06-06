@@ -83,8 +83,8 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
     std::string fname = _filename;
     std::string head  = _header;
 
-    if (!getBuffer()) throw RunTimeException("No databuffer set");
-    if (!getAQNetworkProvider()) throw RunTimeException("No AQ network set");
+    if (!getBuffer()) throw RuntimeError("No databuffer set");
+    if (!getAQNetworkProvider()) throw RuntimeError("No AQ network set");
 
     // -- get network & stations & maximum forecast horizon
     auto& stations = getAQNetworkProvider()->getAQNetwork().getStations();
@@ -107,7 +107,7 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
 
     FILE* fp = fopen(fname.c_str(), "w");
     if (!fp) {
-        throw RunTimeException("Unable to open output file " + fname);
+        throw RuntimeError("Unable to open output file " + fname);
     }
 
     // -- print header
@@ -171,7 +171,7 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
             try {
                 auto modelVals = getBuffer()->getModelValues(baseTime, fcHor, station.getName(), pol.getName(), aggr);
                 if (modelVals.size() != modelNames.size())
-                    throw RunTimeException("data size doesn't match the number of models...");
+                    throw RuntimeError("data size doesn't match the number of models...");
 
                 for (auto ii : idx)
                     fprintf(fp, "%c%.6f", _sepchar, modelVals[ii]);

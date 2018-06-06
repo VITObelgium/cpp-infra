@@ -17,7 +17,9 @@ add_library(opaqplugins
     data/SqlBuffer.cpp
     data/PredictionScheme.h
     data/PredictionDatabase.h
-    data/PredictionDatabase.cpp
+    data/PredictionDatabaseInterface.h
+    data/PredictionDatabaseFactory.h
+    data/PredictionDatabaseFactory.cpp
     data/IRCELMeteoProvider.h
     data/IRCELMeteoProvider.cpp
     data/ObsParser.h
@@ -65,6 +67,7 @@ target_link_libraries(opaqplugins PRIVATE
     hdf5::hdf5_cpp-static
     Sqlpp11::Sqlpp11
     Sqlpp11::Sqlite3
+    Sqlpp11::Postgresql
     Eigen3::Eigen
     infra
 )

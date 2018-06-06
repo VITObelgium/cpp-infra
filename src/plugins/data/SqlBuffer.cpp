@@ -1,6 +1,7 @@
 #include "SqlBuffer.h"
 
-#include "PredictionDatabase.h"
+#include "PredictionDatabaseFactory.h"
+#include "PredictionDatabaseInterface.h"
 #include "infra/configdocument.h"
 
 namespace opaq {
@@ -26,7 +27,7 @@ void SqlBuffer::configure(const infra::ConfigNode& configuration, const std::str
     setName(componentName);
 
     if (!configuration) {
-        throw NullPointerException("No configuration element given for SqlBuffer...");
+        throw InvalidArgument("No configuration element given for SqlBuffer...");
     }
 
     // need to specify the time interval for which to store these values...
@@ -36,8 +37,11 @@ void SqlBuffer::configure(const infra::ConfigNode& configuration, const std::str
     _fcTimeResolution   = std::chrono::hours(configuration.child("fctime_resolution").value<int>().value_or(24));
 
     // parse filename
-    auto filename = std::string(configuration.child("filename").value());
-    _db           = std::make_unique<PredictionDatabase>(filename);
+    auto type     = std::string(configuration.child("dbtype").value());
+    auto location = std::string(configuration.child("location").value());
+    auto user     = std::string(configuration.child("dbuser").value());
+    auto pass     = std::string(configuration.child("dbpass").value());
+    _db           = factory::createPredictionDatabase(type, location, user, pass);
 }
 
 void SqlBuffer::setNoData(double noData)
@@ -48,7 +52,7 @@ void SqlBuffer::setNoData(double noData)
 void SqlBuffer::throwIfNotConfigured() const
 {
     if (!_db) {
-        throw RunTimeException("SqlBuffer Not fully configured");
+        throw RuntimeError("SqlBuffer Not fully configured");
     }
 }
 
@@ -95,7 +99,7 @@ TimeSeries<double> SqlBuffer::getForecastValues(const chrono::date_time& /*baseT
     const std::vector<chrono::days>& /*fc_hor*/, const std::string& /*stationId*/,
     const std::string& /*pollutantId*/, Aggregation::Type /*aggr*/)
 {
-    throw RunTimeException("IMPLEMENT ME !!");
+    throw RuntimeError("IMPLEMENT ME !!");
 }
 
 // return hindcast vector of model values for a fixed forecast horizon
@@ -108,7 +112,7 @@ TimeSeries<double> SqlBuffer::getForecastValues(chrono::days fcHor,
     throwIfNotConfigured();
 
     if (fcTime1 > fcTime2) {
-        throw RunTimeException("requested fcTime1 is > fcTime2...");
+        throw RuntimeError("requested fcTime1 is > fcTime2...");
     }
 
     auto aggStr = Aggregation::getName(aggr);

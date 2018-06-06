@@ -107,11 +107,11 @@ TimeSeries<double> IRCELMeteoProvider::getValues(const chrono::date_time& t1,
     throwIfNotConfigured();
 
     if (t2 < t1) {
-        throw RunTimeException("End date has to be after start date");
+        throw RuntimeError("End date has to be after start date");
     }
 
     if (_baseTime == chrono::date_time()) {
-        throw RunTimeException("No basetime set");
+        throw RuntimeError("No basetime set");
     }
 
     if (_buffer[meteoId].find(paramId) == _buffer[meteoId].end()) {
@@ -124,7 +124,7 @@ TimeSeries<double> IRCELMeteoProvider::getValues(const chrono::date_time& t1,
 void IRCELMeteoProvider::throwIfNotConfigured()
 {
     if (!_configured) {
-        throw RunTimeException("IRCELMeteoProvider Not fully configured");
+        throw RuntimeError("IRCELMeteoProvider Not fully configured");
     }
 }
 
@@ -194,7 +194,7 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
         }
 
         if (parsedValues != _nsteps) {
-            throw RunTimeException("Meteo format does not match the configuration");
+            throw RuntimeError("Meteo format does not match the configuration");
         }
 
         line = reader.readLine();

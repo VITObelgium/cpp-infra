@@ -45,7 +45,7 @@ date_time from_date_string(std::string_view s)
     std::tm tm{0};
     input >> std::get_time(&tm, "%Y-%m-%d");
     if (input.fail()) {
-        throw InvalidArgumentsException("Could not parse date: {}", s);
+        throw InvalidArgument("Could not parse date: {}", s);
     }
 
     return make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);
@@ -59,7 +59,7 @@ date_time from_date_time_string(std::string_view s)
     std::tm tm{0};
     input >> std::get_time(&tm, "%Y-%m-%d %H:%M:%S");
     if (input.fail()) {
-        throw InvalidArgumentsException("Could not parse date time: {}", s);
+        throw InvalidArgument("Could not parse date time: {}", s);
     }
 
     auto date = make_date_time(tm.tm_year + 1900, tm.tm_mon + 1, tm.tm_mday);

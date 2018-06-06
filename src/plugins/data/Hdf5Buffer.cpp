@@ -63,7 +63,12 @@ void Hdf5Buffer::configure(const ConfigNode& configuration, const std::string& c
     _baseTimeResolution = std::chrono::hours(configuration.child("basetime_resolution").value<int>().value_or(24));
     _fcTimeResolution   = std::chrono::hours(configuration.child("fctime_resolution").value<int>().value_or(24));
 
-    auto filename = std::string(configuration.child("filename").value());
+    auto filename = std::string(configuration.child("location").value());
+    if (filename.empty()) {
+        // try to read the filename tag for backwards compatibility
+        filename = std::string(configuration.child("filename").value());
+    }
+
     if (FileTools::exists(filename)) {
         openFile(filename);
     } else {
@@ -96,14 +101,14 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
     // -- check whether the forecast array is sequential
     for (size_t i = 0; i < forecast.size(); ++i) {
         if (forecast.datetime(i) < baseTime) {
-            throw RunTimeException("Expecting forecasts in the future");
+            throw RuntimeError("Expecting forecasts in the future");
         }
 
         auto secs = chrono::to_seconds(forecast.datetime(i) - baseTime);
 
         // this allows for setting forecast values one by one...
         if ((secs.count() % std::chrono::seconds(_fcTimeResolution).count()) != 0) {
-            throw RunTimeException("Provided values should be ordered & spaced by time resolution");
+            throw RuntimeError("Provided values should be ordered & spaced by time resolution");
         }
     }
 
@@ -121,7 +126,7 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
         try {
             grpPol = _h5file->createGroup(pollutantId);
         } catch (const H5::Exception&) {
-            throw RunTimeException("Unable to create " + pollutantId + " group in H5 forecast store");
+            throw RuntimeError("Unable to create " + pollutantId + " group in H5 forecast store");
         }
     }
 
@@ -132,7 +137,7 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
         try {
             grpAggr = grpPol.createGroup(Aggregation::getName(aggr));
         } catch (const H5::Exception&) {
-            throw RunTimeException("Unable to create " + Aggregation::getName(aggr) + " group for " + pollutantId + " in H5 forecast store");
+            throw RuntimeError("Unable to create " + Aggregation::getName(aggr) + " group for " + pollutantId + " in H5 forecast store");
         }
     }
 
@@ -201,7 +206,7 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
             dsStations = grpAggr.createDataSet(STATION_DATASET_NAME, _stringType, dataSpace2, cparms2);
         } catch (const H5::Exception& e) {
             Log::error(s_logSrc, "Failed to write values to HDF5 buffer: {} {}", e.getDetailMsg());
-            throw RunTimeException("Failed to write values to HDF5 buffer");
+            throw RuntimeError("Failed to write values to HDF5 buffer");
         }
     }
 
@@ -281,7 +286,7 @@ void Hdf5Buffer::setValues(const chrono::date_time& baseTime,
 void Hdf5Buffer::throwIfNotConfigured() const
 {
     if (!_h5file) {
-        throw RunTimeException("Hdf5Buffer Not fully configured");
+        throw RuntimeError("Hdf5Buffer Not fully configured");
     }
 }
 
@@ -343,7 +348,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(const chrono::date_time& /*base
     const std::string& /*pollutantId*/,
     Aggregation::Type /*aggr*/)
 {
-    throw RunTimeException("IMPLEMENT ME !!");
+    throw RuntimeError("IMPLEMENT ME !!");
 }
 
 // return hindcast vector of model values for a fixed forecast horizon
@@ -356,7 +361,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
     Aggregation::Type aggr)
 {
     if (fcTime1 > fcTime2) {
-        throw RunTimeException("requested fcTime1 is > fcTime2...");
+        throw RuntimeError("requested fcTime1 is > fcTime2...");
     }
 
     H5::DataSet dsVals, dsStations, dsModels;
@@ -398,7 +403,7 @@ TimeSeries<double> Hdf5Buffer::getForecastValues(chrono::days fc_hor,
     hsize_t fhSize    = Hdf5Tools::getDataSetSize(dsVals, 3);
 
     if (fhIndex >= fhSize || modelIndex >= modelSize || stIndex >= stSize) {
-        throw RunTimeException("Could not find requested forecast horizon/model/station in HDF5 buffer");
+        throw RuntimeError("Could not find requested forecast horizon/model/station in HDF5 buffer");
     }
 
     try {
@@ -500,7 +505,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
 
     // is the station/forecast/base time in the datafile ?
     if (fhIndex >= fhSize || btIndex >= btSize) {
-        throw RunTimeException("Requested forecast horizon index not in HDF5 buffer");
+        throw RuntimeError("Requested forecast horizon index not in HDF5 buffer");
     }
 
     try {
@@ -521,7 +526,7 @@ std::vector<double> Hdf5Buffer::getModelValues(const chrono::date_time& baseTime
         dsVals.read(out.data(), H5::PredType::NATIVE_DOUBLE, memSpace, space);
         return out;
     } catch (const H5::DataSetIException& e) {
-        throw RunTimeException("Failed to read value from HDF5 buffer ({})", e.getDetailMsg());
+        throw RuntimeError("Failed to read value from HDF5 buffer ({})", e.getDetailMsg());
     }
 }
 

@@ -19,6 +19,7 @@ set (CORE_SOURCES
     Engine.h
     Engine.cpp
     Exceptions.h
+    Exceptions.cpp
     GridType.h
     Grid.h
     Grid.cpp

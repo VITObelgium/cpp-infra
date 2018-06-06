@@ -50,7 +50,8 @@ protected:
 
         auto configXml =
             "<config>"
-            "    <filename>test.db</filename>"
+            "    <location>test.db</location>"
+            "    <dbtype>sqlite</dbtype>"
             "    <basetime_resolution>24</basetime_resolution>"
             "    <fctime_resolution>24</fctime_resolution>"
             "</config>"s;
@@ -256,7 +257,7 @@ TYPED_TEST(ForecastBufferTest, OverwriteValue)
 TYPED_TEST(ForecastBufferTest, SecondTimeBeforeFirstTime)
 {
     auto basetime = make_date_time(2015_y / jan / 1);
-    EXPECT_THROW(this->_buffer->getForecastValues(1_d, basetime + 24h, basetime, "Ukkel", "pm10", Aggregation::DayAvg), RunTimeException);
+    EXPECT_THROW(this->_buffer->getForecastValues(1_d, basetime + 24h, basetime, "Ukkel", "pm10", Aggregation::DayAvg), RuntimeError);
 }
 
 TYPED_TEST(ForecastBufferTest, GetModelValues)

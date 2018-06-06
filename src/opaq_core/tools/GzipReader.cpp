@@ -36,7 +36,7 @@ std::string GzipReader::readLine()
         try {
             std::getline(*_filterStream, line);
         } catch (const boost::iostreams::gzip_error& e) {
-            throw RunTimeException("Failed to decompress line: {}", e.what());
+            throw RuntimeError("Failed to decompress line: {}", e.what());
         }
     }
     return line;

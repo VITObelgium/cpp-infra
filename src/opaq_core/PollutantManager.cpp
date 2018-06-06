@@ -17,7 +17,7 @@ Pollutant PollutantManager::find(const std::string& name)
     });
 
     if (iter == _pollutants.end()) {
-        throw InvalidArgumentsException("No pollutant with name: {}", name);
+        throw InvalidArgument("No pollutant with name: {}", name);
     }
 
     return *iter;

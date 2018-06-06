@@ -69,7 +69,7 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
         }
 
         if (net->inputSize() != this->sample_size) {
-            throw RunTimeException("Invalid network input size ({}) for model sample size ({})", net->inputSize(), sample_size);
+            throw RuntimeError("Invalid network input size ({}) for model sample size ({})", net->inputSize(), sample_size);
         }
 
         auto fcTime = baseTime + fc_hor;

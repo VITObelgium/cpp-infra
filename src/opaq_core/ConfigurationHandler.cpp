@@ -31,7 +31,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(const ConfigNode&
 
     auto modelsElement = element.child("models");
     if (!modelsElement) {
-        throw RunTimeException("No models tag given in forecast stage configuration!");
+        throw RuntimeError("No models tag given in forecast stage configuration!");
     }
 
     for (auto& componentElement : modelsElement.children("component")) {
@@ -59,7 +59,7 @@ config::MappingStage ConfigurationHandler::parseMappingStage(const ConfigNode& e
 
     auto modelsElement = element.child("models");
     if (!modelsElement) {
-        throw RunTimeException("No models tag given in mapping stage configuration!");
+        throw RuntimeError("No models tag given in mapping stage configuration!");
     }
 
     for (auto& componentElement : modelsElement.children("component")) {
@@ -183,7 +183,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
             _opaqRun.setNetworkProvider(_opaqRun.getComponent(networkElement.child("component").value()));
         } else {
             Log::critical(s_logSrc, "No air quality network defined");
-            throw RunTimeException("Invalid air quality network defined");
+            throw RuntimeError("Invalid air quality network defined");
         }
 
         /* ------------------------------------------------------------------------

@@ -139,9 +139,9 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
         auto stationsGroup = rootGroup.createGroup(s_stationsGroupName);
         writeStations(stations, stationsGroup);
     } catch (const H5::FileIException& e) {
-        throw RunTimeException("Failed to create file {} ({}::{})", filename, e.getCFuncName(), e.getCDetailMsg());
+        throw RuntimeError("Failed to create file {} ({}::{})", filename, e.getCFuncName(), e.getCDetailMsg());
     } catch (const H5::Exception& e) {
-        throw RunTimeException("Failed to create Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
+        throw RuntimeError("Failed to create Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
     }
 }
 
@@ -168,7 +168,7 @@ void RioOutputBuffer::addResults(const std::vector<double>& results)
 
         ++_index;
     } catch (const H5::Exception& e) {
-        throw RunTimeException("Failed to add results to Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
+        throw RuntimeError("Failed to add results to Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
     }
 }
 
@@ -180,7 +180,7 @@ void RioOutputBuffer::closeResultsFile()
 void RioOutputBuffer::throwIfNotConfigured() const
 {
     if (_filePattern.empty()) {
-        throw RunTimeException("Hdf5Buffer Not fully configured");
+        throw RuntimeError("Hdf5Buffer Not fully configured");
     }
 }
 

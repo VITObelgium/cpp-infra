@@ -82,7 +82,7 @@ TEST_F(RioObsProviderParserTest, ParseInvalidFile)
     ss << "40AB01 20090101    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\n"
        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    \n"; // one value too little
 
-    EXPECT_THROW(readObservationsFile(ss, network, 24, 1h), RunTimeException);
+    EXPECT_THROW(readObservationsFile(ss, network, 24, 1h), RuntimeError);
 }
 
 // Used to check performance

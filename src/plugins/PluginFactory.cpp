@@ -49,6 +49,6 @@ std::unique_ptr<Component> PluginFactory::createPlugin(std::string_view name) co
         return std::make_unique<OVL_IRCEL_model3>();
     }
 
-    throw InvalidArgumentsException("Unknown plugin name: {}", name);
+    throw InvalidArgument("Unknown plugin name: {}", name);
 }
 }

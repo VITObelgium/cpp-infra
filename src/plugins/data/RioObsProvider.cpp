@@ -65,8 +65,8 @@ TimeSeries<double> RioObsProvider::getValues(const chrono::date_time& t1, const 
     Aggregation::Type aggr)
 {
     // do some checks
-    if (!_configured) throw RunTimeException("Not fully configured");
-    if (t1 >= t2) throw InvalidArgumentsException("First date is after the second... hmmm");
+    if (!_configured) throw RuntimeError("Not fully configured");
+    if (t1 >= t2) throw InvalidArgument("First date is after the second... hmmm");
 
     // get pointer to buffered data
     auto& data = _getTimeSeries(pollutantId, stationId, aggr);

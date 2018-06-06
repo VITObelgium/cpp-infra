@@ -1,19 +1,12 @@
 #pragma once
 
-#include "PredictionDatabase.h"
 #include "data/ForecastBuffer.h"
 
 #include <memory>
 
-namespace sqlpp {
-namespace sqlite3 {
-class connection;
-}
-}
-
 namespace opaq {
 
-class PredictionDatabase;
+class IPredictionDatabase;
 
 class SqlBuffer : public ForecastBuffer
 {
@@ -100,7 +93,7 @@ public:
 private:
     void throwIfNotConfigured() const;
 
-    std::unique_ptr<PredictionDatabase> _db;
+    std::unique_ptr<IPredictionDatabase> _db;
 
     double _noData;
 

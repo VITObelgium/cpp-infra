@@ -193,7 +193,7 @@ std::vector<PredictionResult> Engine::validate(config::OpaqRun& config,
     const std::string& model)
 {
     if (startTime > endTime) {
-        throw RunTimeException("Validation start time must be before the end time");
+        throw RuntimeError("Validation start time must be before the end time");
     }
 
     auto days = chrono::to_days(endTime - startTime);
@@ -217,7 +217,7 @@ std::vector<PredictionResult> Engine::validate(config::OpaqRun& config,
 
     /*if (!measuredValues.isConsistent(predictedValues))
     {
-        throw RunTimeException("Inconsistent measured and predicted values");
+        throw RuntimeError("Inconsistent measured and predicted values");
     }*/
 
     for (size_t i = 0; i < predictedValues.size(); ++i) {

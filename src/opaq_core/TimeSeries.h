@@ -133,21 +133,21 @@ public:
     // throws OutOfBoundsException
     chrono::date_time datetime(size_t i) const
     {
-        if (i >= size()) throw RunTimeException("index out of range");
+        if (i >= size()) throw RuntimeError("index out of range");
         return _datetimes.at(i);
     }
 
     // throws OutOfBoundsException
     T value(size_t i) const
     {
-        if (i >= size()) throw RunTimeException("index out of range");
+        if (i >= size()) throw RuntimeError("index out of range");
         return _values.at(i);
     }
 
     // throws OutOfBoundsException
     T value(const chrono::date_time& dt) const
     {
-        if (!contains(dt)) throw RunTimeException("datetime not found in timeseries");
+        if (!contains(dt)) throw RuntimeError("datetime not found in timeseries");
         return _values[index(dt)];
     }
     // this one returns either the value at dt if present, or the last value before the
@@ -196,7 +196,7 @@ template <class T>
 void TimeSeries<T>::insert(const chrono::date_time& dt, const T& val)
 {
 
-    if (dt == chrono::date_time()) throw RunTimeException("invalid datetime given");
+    if (dt == chrono::date_time()) throw RuntimeError("invalid datetime given");
     // if the timeseries is empty or the date is after the last date, push it back...
     if (isEmpty() || dt > lastDateTime()) {
         _datetimes.push_back(dt);
@@ -312,8 +312,8 @@ template <class T>
 T TimeSeries<T>::valueAt(const chrono::date_time& dt) const
 {
 
-    if (isEmpty()) throw RunTimeException("empty timeseries");
-    if (dt < firstDateTime()) throw RunTimeException("datetime before first requested");
+    if (isEmpty()) throw RuntimeError("empty timeseries");
+    if (dt < firstDateTime()) throw RuntimeError("datetime before first requested");
     if (contains(dt)) return value(dt);
     return _values[indexOfLastBefore(dt)];
 }

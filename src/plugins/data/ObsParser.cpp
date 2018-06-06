@@ -59,7 +59,7 @@ std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries
             }
 
             if (parsedValues != numberOfValues) {
-                throw RunTimeException("format does not match the configuration");
+                throw RuntimeError("format does not match the configuration");
             }
         }
     }

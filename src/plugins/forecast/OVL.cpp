@@ -293,7 +293,7 @@ void OVL::run()
 
                 // check if the timeseries are consistent !
                 if (!fc_hindcast.isConsistent(obs_hindcast))
-                    throw RunTimeException("forecast & hindcast timeseries are not consistent...");
+                    throw RuntimeError("forecast & hindcast timeseries are not consistent...");
 
                 double fc_err = 0.;
                 // run the real time correction scheme, let's do it this way for the moment,
