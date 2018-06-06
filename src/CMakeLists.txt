@@ -19,8 +19,6 @@ list(APPEND EXTRA_LIBS ${CMAKE_THREAD_LIBS_INIT})
 
 find_package(Eigen3 REQUIRED)
 
-add_definitions(-D_XOPEN_SOURCE)
-
 if (MSVC)
     # suppress decorated name length exceeded warning
     add_definitions(/wd4503)
@@ -29,8 +27,12 @@ endif ()
 add_subdirectory(plugins)
 add_subdirectory(opaq_core)
 
-if (BUILD_UI)
+if (OPAQ_ENABLE_UI)
     add_subdirectory(ui)
+endif ()
+
+if (OPAQ_ENABLE_PREDICTION_SERVICE)
+    add_subdirectory(predictionservice)
 endif ()
 
 add_executable(opaq opaq.cpp)

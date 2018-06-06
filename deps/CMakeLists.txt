@@ -39,6 +39,7 @@ add_subdirectory(cmake-scripts/sqlpp11-connector-sqlite3)
 add_subdirectory(cmake-scripts/sqlpp11-connector-postgresql)
 add_subdirectory(cmake-scripts/pugixml)
 add_subdirectory(cmake-scripts/libressl)
+add_subdirectory(cmake-scripts/http-parser)
 add_subdirectory(cmake-scripts/restinio)
 
 if (NOT CMAKE_CROSSCOMPILING OR MINGW)
