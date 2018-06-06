@@ -8,7 +8,7 @@
     class NAME : public BASE                                 \
     {                                                        \
     public:                                                  \
-        NAME() = default;                                    \
+        NAME();                                              \
         NAME(std::string_view message);                      \
                                                              \
         template <typename... Args>                          \
@@ -17,6 +17,17 @@
         {                                                    \
         }                                                    \
     };
+
+#define EXCEPTION_IMPL(NAME, BASE)       \
+    NAME::NAME()                         \
+    : BASE("")                           \
+    {                                    \
+    }                                    \
+                                         \
+    NAME::NAME(std::string_view message) \
+    : BASE(std::string(message))         \
+    {                                    \
+    }
 
 namespace infra {
 
