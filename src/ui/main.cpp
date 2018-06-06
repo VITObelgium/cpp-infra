@@ -1,9 +1,9 @@
 #include <QApplication>
 #include <QtPlugin>
 
-#include "config.h"
 #include "infra/log.h"
 #include "mainwindow.h"
+#include "opaqconfig.h"
 
 #ifdef STATIC_QT
 #if defined WIN32

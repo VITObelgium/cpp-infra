@@ -1,7 +1,7 @@
 #include <gmock/gmock.h>
 
-#include "config.h"
 #include "infra/log.h"
+#include "opaqconfig.h"
 
 using namespace infra;
 using namespace testing;

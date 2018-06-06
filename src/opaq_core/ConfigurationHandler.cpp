@@ -1,7 +1,7 @@
 #include "ConfigurationHandler.h"
 #include "GridType.h"
 #include "PollutantManager.h"
-#include "config.h"
+#include "opaqconfig.h"
 
 #include "config/ForecastStage.h"
 #include "config/MappingStage.h"
