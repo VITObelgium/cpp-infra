@@ -67,9 +67,16 @@ target_link_libraries(opaqplugins PRIVATE
     hdf5::hdf5_cpp-static
     Sqlpp11::Sqlpp11
     Sqlpp11::Sqlite3
-    Sqlpp11::Postgresql
     Eigen3::Eigen
     infra
 )
+
+if (OPAQ_ENABLE_POSTGRESQL)
+    if (NOT Sqlpp11::Postgresql)
+        message(FATAL_ERROR "Postgresql enabled but the library could not be found")
+    endif ()
+
+    target_link_libraries(opaqplugins PRIVATE NOT Sqlpp11::Postgresql)
+endif ()
 
 add_subdirectory(data/test)

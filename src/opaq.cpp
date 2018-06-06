@@ -13,7 +13,7 @@
 #include "Exceptions.h"
 
 #include "PollutantManager.h"
-#include "config.h"
+#include "opaqconfig.h"
 #include "plugins/PluginFactory.h"
 
 #include "infra/configdocument.h"

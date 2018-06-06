@@ -4,8 +4,8 @@
 #include "Engine.h"
 #include "PluginFactoryInterface.h"
 #include "PollutantManager.h"
-#include "config.h"
 #include "infra/configdocument.h"
+#include "opaqconfig.h"
 #include "testconfig.h"
 
 namespace opaq {

@@ -43,6 +43,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 option(SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
 option(BUILD_UI "Build the user interface" OFF)
 option(ENABLE_WERROR "Treat warnings as errors" OFF)
+option(OPAQ_ENABLE_POSTGRESQL "Support postgresql in the sql plugin" OFF)
 
 if (SANITIZE_ADDRESS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
@@ -81,4 +82,4 @@ set(INFRA_GDAL OFF CACHE BOOL "" FORCE)
 add_subdirectory(deps/infra)
 add_subdirectory(src)
 
-configure_file(${CMAKE_SOURCE_DIR}/config.h.in ${CMAKE_BINARY_DIR}/config.h)
+configure_file(${CMAKE_SOURCE_DIR}/opaqconfig.h.in ${CMAKE_BINARY_DIR}/opaqconfig.h)

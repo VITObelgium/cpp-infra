@@ -2,7 +2,7 @@
 
 #include "Component.h"
 #include "Exceptions.h"
-#include "config.h"
+#include "opaqconfig.h"
 
 #include <functional>
 #include <iostream>

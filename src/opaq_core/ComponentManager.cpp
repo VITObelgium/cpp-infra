@@ -2,7 +2,7 @@
 #include "Exceptions.h"
 #include "PluginFactoryInterface.h"
 
-#include "config.h"
+#include "opaqconfig.h"
 
 namespace opaq {
 

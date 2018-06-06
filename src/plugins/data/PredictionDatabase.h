@@ -4,8 +4,12 @@
 #include "PredictionDatabaseInterface.h"
 #include "PredictionScheme.h"
 #include "TimeSeries.h"
+#include "opaqconfig.h"
 
+#ifdef OPAQ_ENABLE_POSTGRESQL
 #include <sqlpp11/postgresql/postgresql.h>
+#endif
+
 #include <sqlpp11/sqlite3/sqlite3.h>
 #include <sqlpp11/sqlpp11.h>
 
@@ -277,6 +281,9 @@ inline sqlpp::sqlite3::connection_config createSqliteConfig(std::string_view fil
     return config;
 }
 
+using SqlitePredictionDatabase = PredictionDatabase<sqlpp::sqlite3::connection>;
+
+#ifdef OPAQ_ENABLE_POSTGRESQL
 inline std::shared_ptr<sqlpp::postgresql::connection_config> createPostgresConfig(std::string_view host, std::string_view user, std::string_view pass)
 {
     auto config      = std::make_shared<sqlpp::postgresql::connection_config>();
@@ -292,7 +299,7 @@ inline std::shared_ptr<sqlpp::postgresql::connection_config> createPostgresConfi
     return config;
 }
 
-using SqlitePredictionDatabase   = PredictionDatabase<sqlpp::sqlite3::connection>;
 using PostgresPredictionDatabase = PredictionDatabase<sqlpp::postgresql::connection>;
+#endif
 
 }

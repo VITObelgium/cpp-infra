@@ -7,7 +7,7 @@
 #include "../SqlBuffer.h"
 
 #include "EngineMock.h"
-#include "config.h"
+#include "opaqconfig.h"
 #include "testconfig.h"
 
 #include "Engine.h"
