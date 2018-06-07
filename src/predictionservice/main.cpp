@@ -2,15 +2,17 @@
 
 #include <restinio/all.hpp>
 
+namespace rest = restinio;
+
 // Create request handler.
-restinio::request_handling_status_t handler(restinio::request_handle_t req)
+rest::request_handling_status_t handler(rest::request_handle_t req)
 {
-    if (restinio::http_method_get() == req->header().method()) {
+    if (rest::http_method_get() == req->header().method()) {
         std::ostringstream sout;
         sout << "GET request to '" << req->header().request_target() << "'\n";
 
         // Query params.
-        const auto qp = restinio::parse_query(req->header().query());
+        const auto qp = rest::parse_query(req->header().query());
 
         if (0 == qp.size()) {
             sout << "No query parameters.";
@@ -27,23 +29,23 @@ restinio::request_handling_status_t handler(restinio::request_handle_t req)
         }
 
         req->create_response()
-            .append_header(restinio::http_field::server, "RESTinio query string params server")
+            .append_header(rest::http_field::server, "OPAQ prediction server")
             .append_header_date_field()
-            .append_header(restinio::http_field::content_type, "text/plain; charset=utf-8")
+            .append_header(rest::http_field::content_type, "text/plain; charset=utf-8")
             .set_body(sout.str())
             .done();
 
-        return restinio::request_accepted();
+        return rest::request_accepted();
     }
 
-    return restinio::request_rejected();
+    return rest::request_rejected();
 }
 
 int main()
 {
     try {
-        restinio::run(
-            restinio::on_thread_pool(std::thread::hardware_concurrency())
+        rest::run(
+            rest::on_thread_pool(std::thread::hardware_concurrency())
                 .port(8080)
                 .address("localhost")
                 .request_handler(handler));

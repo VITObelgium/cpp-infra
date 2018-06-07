@@ -20,6 +20,8 @@ cmake  ^
     -DBUILD_UI=ON ^
     -DSTATIC_QT=OFF ^
     -DSTATIC_PLUGINS=ON ^
+    -DOPAQ_ENABLE_POSTGRESQL=ON ^
+    -DOPAQ_ENABLE_PREDICTION_SERVICE=ON ^
     ..\..
 cmake --build . --config Debug
 pause
