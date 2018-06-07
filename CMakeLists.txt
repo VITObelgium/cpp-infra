@@ -62,6 +62,8 @@ endif ()
 if (MSVC)
     # avoid windows specific warnings
     add_definitions("-D_CRT_SECURE_NO_WARNINGS -D_SCL_SECURE_NO_WARNINGS -D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS")
+    # require windows7 service pack1
+    add_definitions("-D_WIN32_WINNT=0x0601")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /bigobj /w34100 /w34101 /w35038")
 else ()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wfatal-errors -fdiagnostics-color")
@@ -77,6 +79,9 @@ include_directories(
 
 set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
+set (Boost_USE_STATIC_LIBS ON)
+set (Boost_USE_STATIC_RUNTIME OFF)
 
 set(INFRA_XML ON CACHE BOOL "" FORCE)
 set(INFRA_GDAL OFF CACHE BOOL "" FORCE)
