@@ -5,6 +5,7 @@ find_package(restinio CONFIG REQUIRED)
 add_executable(opaqpredictionservice main.cpp)
 target_link_libraries(opaqpredictionservice PRIVATE
     restinio::restinio
+    infra
     Boost::disable_autolinking
 )
 
