@@ -57,7 +57,12 @@ std::string readAsText(const fs::path& filename)
 
 std::string readAsText(const std::string& filename)
 {
-    std::ifstream fileStream(filename.c_str(), std::ifstream::binary);
+    return readAsText(filename.c_str());
+}
+
+std::string readAsText(const char* filename)
+{
+    std::ifstream fileStream(filename, std::ifstream::binary);
     if (!fileStream.is_open()) {
         throw RuntimeError("Failed to open file for reading: {}", filename);
     }

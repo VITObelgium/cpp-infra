@@ -47,6 +47,7 @@ std::string readAsText(const fs::path& filename);
 
 #endif
 
+std::string readAsText(const char* filename);
 std::string readAsText(const std::string& filename);
 std::string readAsText(const std::istream& filestream);
 void writeAsText(const std::string& filename, std::string_view contents);
