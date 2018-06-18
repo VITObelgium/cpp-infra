@@ -1,7 +1,3 @@
-if (UNIX)
-    set(hdf5_DIR ${CMAKE_PREFIX_PATH}/share/cmake)
-endif ()
-
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Threads)
