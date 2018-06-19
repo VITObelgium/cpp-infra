@@ -34,11 +34,12 @@ projectdir="opaq-${triplet}"
 mkdir -p ${builddir}/${projectdir}
 cd ${builddir}/${projectdir}
 
-cmake ../.. -G ${generator} \
+cmake -G ${generator} \
+    -C ${pwd}/deps/vcpkg/triplets/${triplet}.cmake \
     -DCMAKE_TOOLCHAIN_FILE=${pwd}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DVCPKG_TARGET_TRIPLET=${triplet} \
-    -DVCPKG_LINKER_FLAGS="-stdlib=libc++" \
     -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${toolchain} \
-    -DCMAKE_BUILD_TYPE=${config}
+    -DCMAKE_BUILD_TYPE=${config} \
+    ../..
 
 cmake --build .
