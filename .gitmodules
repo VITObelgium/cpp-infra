@@ -4,3 +4,6 @@
 [submodule "deps/infra"]
 	path = deps/infra
 	url = https://git.vito.be/scm/marvin-geodynamix/infra.git
+[submodule "deps/vcpkg"]
+	path = deps/vcpkg
+	url = https://git.vito.be/scm/marvin/vcpkg-ports.git
