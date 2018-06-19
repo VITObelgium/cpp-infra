@@ -39,6 +39,7 @@ cmake -G ${generator} \
     -DCMAKE_TOOLCHAIN_FILE=${pwd}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake \
     -DVCPKG_TARGET_TRIPLET=${triplet} \
     -DVCPKG_CHAINLOAD_TOOLCHAIN_FILE=${toolchain} \
+    -DCMAKE_MODULE_PATH=${pwd}/deps/vcpkg/installed/${triplet}/lib/cmake-modules \
     -DCMAKE_BUILD_TYPE=${config} \
     ../..
 
