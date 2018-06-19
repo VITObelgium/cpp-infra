@@ -1,4 +1,5 @@
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(ZLIB REQUIRED)
 
 set (CORE_SOURCES
     Aggregation.h
@@ -86,7 +87,7 @@ PUBLIC
 PRIVATE
     Boost::system
     Boost::iostreams
-    ${EXTRA_LIBS}
+    ZLIB::ZLIB
 )
 
 # We use our own version of FMT, let spdlog use the same version
