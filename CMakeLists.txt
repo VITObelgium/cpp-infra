@@ -170,7 +170,7 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Widgets CONFIG REQUIRED)
     find_package(Qt5Core CONFIG REQUIRED)
     find_package(Qt5Location CONFIG REQUIRED)
-    find_package(HinnantDate REQUIRED)
+    find_package(date CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -238,7 +238,7 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
-    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location HinnantDate::Date)
+    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location date_interface)
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
