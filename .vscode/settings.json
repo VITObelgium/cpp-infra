@@ -7,7 +7,9 @@
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
-        "**/build/deps-toolchain-*": true
+        "**/build/deps-toolchain-*": true,
+        "**/vcpkg/buildtrees": true,
+        "**/vcpkg/packages": true
     },
     "C_Cpp.intelliSenseEngine": "Default",
     "C_Cpp.intelliSenseEngineFallback": "Disabled"
