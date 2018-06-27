@@ -67,8 +67,8 @@ TEST(GdalTest, convertPointProjected)
 
     // Bottom left coordinate
     auto point = gdal::convertPointProjected(31370, 4326, Point<double>(22000.000, 153000.000));
-    EXPECT_NEAR(2.55772472781224, point.x, 1e-10);
-    EXPECT_NEAR(50.6735631138308, point.y, 1e-10);
+    EXPECT_NEAR(2.55772472781224, point.x, 1e-8);
+    EXPECT_NEAR(50.6735631138308, point.y, 1e-8);
 }
 
 TEST(GdalTest, createExcelFile)
