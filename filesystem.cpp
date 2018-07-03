@@ -35,6 +35,26 @@ fs::path combineAbsoluteWithRelativePath(const fs::path& base, const fs::path& f
     return combinePath(make_preferred(base).parent_path(), file);
 }
 
+fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
+{
+#ifdef HAVE_FILESYSTEM_H
+    return fs::relative(absPath, root);
+#else
+    throw RuntimeError("absoluteToRelativePath not implemented");
+#endif
+}
+
+fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base)
+{
+#ifdef HAVE_FILESYSTEM_H
+    return fs::absolute(fs::canonical(base / relPath));
+#elif defined HAVE_EXP_FILESYSTEM_H
+    return fs::absolute(relPath, base);
+#else
+    throw RuntimeError("relativeToAbsolutePath not implemented");
+#endif
+}
+
 fs::path combinePath(const fs::path& base, const fs::path& file)
 {
 #ifndef WIN32
@@ -43,8 +63,12 @@ fs::path combinePath(const fs::path& base, const fs::path& file)
 
     //return fs::canonical(fs::absolute(file, base.parent_path()));
     return fs::absolute(make_preferred(file), make_preferred(basePref));
-#else
+#elif defined HAVE_EXP_FILESYSTEM_H        
     return fs::canonical(fs::absolute(file, base)).make_preferred();
+#elif defined HAVE_FILESYSTEM_H
+    return fs::canonical(fs::absolute(base) / file).make_preferred();
+#else 
+    throw RuntimeError("combinePath not supported");
 #endif
 }
 

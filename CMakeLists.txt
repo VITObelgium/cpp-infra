@@ -13,11 +13,11 @@ option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 
-#check_cxx_source_compiles("
-##include <filesystem>
-#namespace fs = std::filesystem;
-#int main() { return 0; }
-#" HAVE_FILESYSTEM_H)
+check_cxx_source_compiles("
+#include <filesystem>
+namespace fs = std::filesystem;
+int main() { return 0; }
+" HAVE_FILESYSTEM_H)
 
 check_cxx_source_compiles("
 #include <experimental/filesystem>
