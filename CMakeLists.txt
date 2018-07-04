@@ -109,6 +109,7 @@ endif ()
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
     find_package(Gsl REQUIRED)
+    find_package(date CONFIG REQUIRED)
 
     target_sources(infra PRIVATE
         include/infra/gdal.h gdal.cpp
@@ -146,7 +147,7 @@ if (INFRA_GDAL)
         )
     endif ()
 
-    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl)
+    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl date_interface)
 endif ()
 
 if (INFRA_NUMERIC)
