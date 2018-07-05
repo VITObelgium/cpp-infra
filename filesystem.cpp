@@ -8,18 +8,6 @@
 namespace infra::file {
 #ifdef INFRA_HAS_FILESYSTEM
 
-static fs::path make_preferred(const fs::path& p)
-{
-    auto pStr = p.string();
-    for (auto& c : pStr) {
-        if (c == '\\') {
-            c = '/';
-        }
-    }
-
-    return fs::path(pStr);
-}
-
 bool createDirectoryIfNotExists(const fs::path& path)
 {
     if (path.empty() || fs::exists(path)) {
@@ -32,7 +20,7 @@ bool createDirectoryIfNotExists(const fs::path& path)
 fs::path combineAbsoluteWithRelativePath(const fs::path& base, const fs::path& file)
 {
     assert(base.has_parent_path());
-    return combinePath(make_preferred(base).parent_path(), file);
+    return combinePath(base.parent_path(), file);
 }
 
 fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
@@ -47,7 +35,7 @@ fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
 fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base)
 {
 #ifdef HAVE_FILESYSTEM_H
-    return fs::absolute(fs::canonical(base / relPath));
+    return fs::absolute(base / relPath);
 #elif defined HAVE_EXP_FILESYSTEM_H
     return fs::absolute(relPath, base);
 #else
@@ -63,11 +51,11 @@ fs::path combinePath(const fs::path& base, const fs::path& file)
 
     //return fs::canonical(fs::absolute(file, base.parent_path()));
     return fs::absolute(make_preferred(file), make_preferred(basePref));
-#elif defined HAVE_EXP_FILESYSTEM_H        
-    return fs::canonical(fs::absolute(file, base)).make_preferred();
+#elif defined HAVE_EXP_FILESYSTEM_H
+    return fs::absolute(file, base).make_preferred();
 #elif defined HAVE_FILESYSTEM_H
-    return fs::canonical(fs::absolute(base) / file).make_preferred();
-#else 
+    return (fs::absolute(base) / file).make_preferred();
+#else
     throw RuntimeError("combinePath not supported");
 #endif
 }
@@ -103,11 +91,11 @@ std::string readAsText(const std::istream& fileStream)
 
 void writeAsText(const std::string& filename, std::string_view contents)
 {
-    std::ofstream fs(filename.c_str(), std::ios::trunc);
+    std::ofstream fs(filename.c_str(), std::ios::trunc | std::ios::binary);
     if (!fs.is_open()) {
         throw RuntimeError("Failed to open file for writing: {}", filename);
     }
 
-    fs << contents;
+    fs.write(contents.data(), contents.size());
 }
 }
