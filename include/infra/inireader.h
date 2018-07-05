@@ -15,8 +15,10 @@ class IniReader
 {
 public:
     IniReader(const std::string& filename);
-    IniReader(const IniReader&) = delete;
-    IniReader& operator=(const IniReader&) = delete;
+    IniReader(const IniReader&) = default;
+    IniReader(IniReader&&)      = default;
+    IniReader& operator=(const IniReader&) = default;
+    IniReader& operator=(IniReader&&) = default;
 
     // Return the list of sections found in ini file
     std::vector<std::string> sections() const;
