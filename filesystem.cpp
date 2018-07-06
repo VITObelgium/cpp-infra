@@ -45,16 +45,10 @@ fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base)
 
 fs::path combinePath(const fs::path& base, const fs::path& file)
 {
-#ifndef WIN32
-    auto basePref = base;
-    auto filePref = file;
-
-    //return fs::canonical(fs::absolute(file, base.parent_path()));
-    return fs::absolute(make_preferred(file), make_preferred(basePref));
+#ifdef HAVE_FILESYSTEM_H
+    return (fs::absolute(base) / file).make_preferred();
 #elif defined HAVE_EXP_FILESYSTEM_H
     return fs::absolute(file, base).make_preferred();
-#elif defined HAVE_FILESYSTEM_H
-    return (fs::absolute(base) / file).make_preferred();
 #else
     throw RuntimeError("combinePath not supported");
 #endif
