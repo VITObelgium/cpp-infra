@@ -197,7 +197,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/scopedcursor.h
         include/uiinfra/toolboxview.h ui/toolboxview.cpp
-        include/uiinfra/userinput.h ui/userinput.cpp
+        include/uiinfra/userinteraction.h ui/userinteraction.cpp
         include/uiinfra/stringinputdialog.h ui/stringinputdialog.cpp
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp

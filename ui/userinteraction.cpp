@@ -1,4 +1,4 @@
-#include "uiinfra/userinput.h"
+#include "uiinfra/userinteraction.h"
 #include "uiinfra/stringinputdialog.h"
 
 #include <qlocale.h>
@@ -9,10 +9,10 @@ namespace uiinfra {
 bool askForConfirmation(const QString& title, const QString& message)
 {
     QMessageBox mb(title, message,
-        QMessageBox::Question,
-        QMessageBox::Yes | QMessageBox::Default,
-        QMessageBox::No | QMessageBox::Escape,
-        QMessageBox::NoButton);
+                   QMessageBox::Question,
+                   QMessageBox::Yes | QMessageBox::Default,
+                   QMessageBox::No | QMessageBox::Escape,
+                   QMessageBox::NoButton);
 
     // TODO: should not be necessary ig the proper qt localization files are loaded
     if (QLocale::system().language() == QLocale(QLocale::Dutch).language()) {
