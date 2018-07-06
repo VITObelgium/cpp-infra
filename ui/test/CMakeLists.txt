@@ -16,4 +16,7 @@ target_link_libraries(uiinfratest
 
 set_target_properties(uiinfratest PROPERTIES AUTOMOC ON)
 
-gtest_add_tests(TARGET uiinfratest)
+add_test(NAME uiinfra COMMAND uiinfratest)
+if (WIN32)
+    set_tests_properties(uiinfra PROPERTIES ENVIRONMENT "PATH=${Qt5_DIR}/../../../bin")
+endif ()
