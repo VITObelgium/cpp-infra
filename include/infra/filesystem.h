@@ -14,9 +14,12 @@ namespace fs = std::filesystem;
 #elif defined HAVE_EXP_FILESYSTEM_H
 #include <experimental/filesystem>
 namespace fs = std::experimental::filesystem;
+#elif defined HAVE_BOOST_FILESYSTEM
+#include <boost/filesystem.hpp>
+namespace fs = boost::filesystem;
 #endif
 
-#if defined HAVE_FILESYSTEM_H || defined HAVE_EXP_FILESYSTEM_H
+#if defined HAVE_FILESYSTEM_H || defined HAVE_EXP_FILESYSTEM_H || defined HAVE_BOOST_FILESYSTEM
 #define INFRA_HAS_FILESYSTEM
 #endif
 
