@@ -8,6 +8,23 @@
 namespace infra::file {
 #ifdef INFRA_HAS_FILESYSTEM
 
+static fs::path& forcePreferred(fs::path& p)
+{
+#ifndef _MSC_VER
+    auto pStr = p.string();
+    for (auto& c : pStr) {
+        if (c == '\\') {
+            c = '/';
+        }
+    }
+
+    p = pStr;
+    return p;
+#else
+    return p.make_preferred();
+#endif
+}
+
 bool createDirectoryIfNotExists(const fs::path& path)
 {
     if (path.empty() || fs::exists(path)) {
@@ -20,7 +37,8 @@ bool createDirectoryIfNotExists(const fs::path& path)
 fs::path combineAbsoluteWithRelativePath(const fs::path& base, const fs::path& file)
 {
     assert(base.has_parent_path());
-    return combinePath(base.parent_path(), file);
+    auto preferredBase = base;
+    return combinePath(forcePreferred(preferredBase).parent_path(), file);
 }
 
 fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
@@ -28,6 +46,8 @@ fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
 #ifdef HAVE_FILESYSTEM_H
     return fs::relative(absPath, root);
 #else
+    (void) absPath;
+    (void) root;
     throw RuntimeError("absoluteToRelativePath not implemented");
 #endif
 }
