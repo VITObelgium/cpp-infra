@@ -25,16 +25,16 @@ namespace fs = std::experimental::filesystem;
 int main() { return 0; }
 " HAVE_EXP_FILESYSTEM_H)
 
+if (EMSCRIPTEN)
+    # emscripten installs the headers but does not support the lib
+    set (HAVE_EXP_FILESYSTEM_H OFF)
+endif ()
+
 if (NOT HAVE_FILESYSTEM_H AND NOT HAVE_EXP_FILESYSTEM_H)
     find_package(Boost COMPONENTS filesystem)
     if (TARGET Boost::filesystem)
         set (HAVE_BOOST_FILESYSTEM ON)
     endif ()
-endif ()
-
-if (EMSCRIPTEN)
-    # emscripten installs the headers but does not support the lib
-    set (HAVE_EXP_FILESYSTEM_H OFF)
 endif ()
 
 if (HAVE_FILESYSTEM_H)
