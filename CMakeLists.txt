@@ -222,6 +222,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/numericitemdelegates.h ui/numericitemdelegates.cpp
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
         include/uiinfra/application.h ui/application.cpp
+        include/uiinfra/qstringhash.h
         ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
     )

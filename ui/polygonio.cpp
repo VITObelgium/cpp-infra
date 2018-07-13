@@ -5,6 +5,8 @@
 #include "infra/gdalalgo.h"
 #include "infra/log.h"
 
+#include <qvector.h>
+
 namespace uiinfra {
 
 using namespace infra;
@@ -30,7 +32,7 @@ static void addPolyToGeoPath(const gdal::CoordinateTransformer& transformer, std
         for (auto& point : ring) {
             addPointToGeoPath(transformer, path, point);
         }
-        geoPaths.push_back(path);
+        geoPaths.emplace_back(std::move(path));
     }
 
     for (int i = 0; i < poly.interiorRingCount(); ++i) {
@@ -39,11 +41,11 @@ static void addPolyToGeoPath(const gdal::CoordinateTransformer& transformer, std
         for (auto& point : ring) {
             addPointToGeoPath(transformer, path, point);
         }
-        geoPaths.push_back(path);
+        geoPaths.emplace_back(std::move(path));
     }
 }
 
-static std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::CoordinateTransformer& transformer)
+std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::CoordinateTransformer& transformer)
 {
     std::vector<QGeoPath> geoPaths;
 
@@ -100,7 +102,7 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
         }
 
         try {
-            data.emplace(shpName, dataSetToGeoPath(ds, transformer1));
+            data.emplace(QString::fromUtf8(shpName.c_str()), dataSetToGeoPath(ds, transformer1));
         } catch (const std::exception& e) {
             Log::warn("Failed to add overlay {} ({})", shpPath.string(), e.what());
         }

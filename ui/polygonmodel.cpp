@@ -1,5 +1,6 @@
 #include "uiinfra/polygonmodel.h"
 #include "infra/algo.h"
+#include "infra/cast.h"
 
 #include <qcolor.h>
 #include <qgeolocation.h>
@@ -35,32 +36,28 @@ int PolygonModel::columnCount(const QModelIndex& /*parent*/) const
 
 QVariant PolygonModel::data(const QModelIndex& index, int role) const
 {
-    if (role == PathRole) {
-        return QVariant::fromValue(*_visibleData.at(index.row()));
+    if (index.row() < truncate<int>(_visibleData.size())) {
+        if (role == PathRole) {
+            return QVariant::fromValue(*_visibleData.at(index.row()));
+        }
     }
 
     return QVariant();
 }
 
-void PolygonModel::addGeoData(const std::string& name, std::vector<QGeoPath> data)
+void PolygonModel::setGeoData(std::shared_ptr<OverlayMap> data)
 {
-    _data[name] = std::move(data);
+    _data = data;
     updateVisibleData();
 }
 
-void PolygonModel::setGeoData(std::unordered_map<std::string, std::vector<QGeoPath>> data)
-{
-    _data = std::move(data);
-    updateVisibleData();
-}
-
-void PolygonModel::setVisibleData(std::vector<std::string> names)
+void PolygonModel::setVisibleData(std::vector<QString> names)
 {
     _visibleNames = std::move(names);
     updateVisibleData();
 }
 
-std::vector<std::string> PolygonModel::visibleData() const
+std::vector<QString> PolygonModel::visibleData() const
 {
     return _visibleNames;
 }
@@ -68,7 +65,6 @@ std::vector<std::string> PolygonModel::visibleData() const
 void PolygonModel::clear()
 {
     beginResetModel();
-    _data.clear();
     _visibleData.clear();
     endResetModel();
 }
@@ -78,10 +74,12 @@ void PolygonModel::updateVisibleData()
     beginResetModel();
     _visibleData.clear();
 
-    for (auto& [name, data] : _data) {
-        if (infra::containerContains(_visibleNames, name)) {
-            for (auto& geoPath : data) {
-                _visibleData.push_back(&geoPath);
+    if (_data) {
+        for (auto& [name, value] : *_data) {
+            if (infra::containerContains(_visibleNames, name)) {
+                for (auto& geoPath : value) {
+                    _visibleData.push_back(&geoPath);
+                }
             }
         }
     }
