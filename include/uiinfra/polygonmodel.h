@@ -3,11 +3,20 @@
 #include "uiinfra/polygonio.h"
 
 #include <qabstractitemmodel.h>
+#include <qcolor.h>
 #include <qgeopath.h>
 #include <unordered_map>
 #include <vector>
 
 namespace uiinfra {
+
+struct PolygonData
+{
+    QString name;
+    double lineWidth = 2.0;
+    QColor color     = Qt::black;
+    std::vector<QGeoPath> geometry;
+};
 
 class PolygonModel : public QAbstractListModel
 {
@@ -18,8 +27,8 @@ public:
     {
         PathRole = Qt::UserRole + 1,
         NameRole,
-        ColorRole,
-        LineStyleRole
+        LineColorRole,
+        LineWidthRole
     };
 
     PolygonModel(QObject* parent = nullptr);
@@ -29,7 +38,7 @@ public:
     int columnCount(const QModelIndex& parent = QModelIndex()) const override;
     QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
 
-    void setGeoData(std::shared_ptr<OverlayMap> data);
+    void setPolygonData(std::shared_ptr<std::vector<PolygonData>> data);
     void setVisibleData(std::vector<QString> names);
     std::vector<QString> visibleData() const;
 
@@ -40,8 +49,8 @@ private:
 
     int _rowCount;
     int _colCount;
-    std::shared_ptr<OverlayMap> _data;
-    std::vector<const QGeoPath*> _visibleData;
+    std::shared_ptr<std::vector<PolygonData>> _data;
+    std::vector<std::pair<const PolygonData*, const QGeoPath*>> _visibleData;
     std::vector<QString> _visibleNames;
 };
 }
