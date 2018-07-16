@@ -45,6 +45,35 @@ fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
 {
 #ifdef HAVE_FILESYSTEM_H
     return fs::relative(absPath, root);
+#elif defined HAVE_EXP_FILESYSTEM_H
+    // Start at the root path and while they are the same then do nothing then when they first
+    // diverge take the entire from path, swap it with '..' segments, and then append the remainder of the to path.
+    auto fromIter = root.begin();
+    auto toIter = absPath.begin();
+
+    // Loop through both while they are the same to find nearest common directory
+    while (fromIter != root.end() && toIter != absPath.end() && (*toIter) == (*fromIter))
+    {
+        ++toIter;
+        ++fromIter;
+    }
+
+    // Replace from path segments with '..' (from => nearest common directory)
+    fs::path finalPath;
+    while (fromIter != root.end())
+    {
+        finalPath /= "..";
+        ++fromIter;
+    }
+
+    // Append the remainder of the to path (nearest common directory => to)
+    while (toIter != absPath.end())
+    {
+        finalPath /= *toIter;
+        ++toIter;
+    }
+
+    return finalPath;
 #else
     (void) absPath;
     (void) root;
