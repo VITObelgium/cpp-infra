@@ -13,6 +13,7 @@ namespace uiinfra {
 struct PolygonData
 {
     QString name;
+    QString displayName;
     double lineWidth = 2.0;
     QColor color     = Qt::black;
     std::vector<QGeoPath> geometry;
@@ -26,6 +27,7 @@ public:
     enum Roles
     {
         PathRole = Qt::UserRole + 1,
+        DisplayNameRole,
         NameRole,
         LineColorRole,
         LineWidthRole

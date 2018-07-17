@@ -20,10 +20,11 @@ PolygonModel::PolygonModel(QObject* parent)
 QHash<int, QByteArray> PolygonModel::roleNames() const
 {
     QHash<int, QByteArray> roles;
-    roles[PathRole]      = "PathData";
-    roles[NameRole]      = "Name";
-    roles[LineColorRole] = "LineColor";
-    roles[LineWidthRole] = "LineWidth";
+    roles[PathRole]        = "PathData";
+    roles[NameRole]        = "Name";
+    roles[DisplayNameRole] = "DisplayName";
+    roles[LineColorRole]   = "LineColor";
+    roles[LineWidthRole]   = "LineWidth";
     return roles;
 }
 
@@ -46,6 +47,10 @@ QVariant PolygonModel::data(const QModelIndex& index, int role) const
             return _visibleData.at(index.row()).first->color;
         } else if (role == LineWidthRole) {
             return _visibleData.at(index.row()).first->lineWidth;
+        } else if (role == NameRole) {
+            return _visibleData.at(index.row()).first->name;
+        } else if (role == DisplayNameRole) {
+            return _visibleData.at(index.row()).first->displayName;
         }
     }
 
