@@ -73,6 +73,10 @@ TEST(GdalTest, convertPointProjected)
 
 TEST(GdalTest, createExcelFile)
 {
+    if (!gdal::VectorDriver::isSupported(gdal::VectorType::Xlsx)) {
+        return;
+    }
+
     auto shapeDriver = gdal::VectorDriver::create(gdal::VectorType::Xlsx);
     auto ds          = shapeDriver.createDataSet("sheet.xlsx");
 
