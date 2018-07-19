@@ -6,7 +6,7 @@
 #include <cassert>
 #ifdef HAVE_FILESYSTEM_H
 #include <filesystem>
-#if _MSC_VER < 1914
+#if defined(_MSC_VER) && _MSC_VER < 1914
 namespace fs = std::experimental::filesystem;
 #else
 namespace fs = std::filesystem;
