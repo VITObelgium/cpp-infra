@@ -1,27 +1,19 @@
 #include "infra/log.h"
 
 #include <spdlog/details/log_msg.h>
+#include <spdlog/sinks/ansicolor_sink.h>
+#include <spdlog/sinks/basic_file_sink.h>
+#include <spdlog/sinks/msvc_sink.h>
+#include <spdlog/sinks/stdout_sinks.h>
+
+#ifdef _WIN32
+#include <spdlog/sinks/wincolor_sink.h>
+#endif
 
 namespace infra {
 
 std::shared_ptr<spdlog::logger> Log::_log;
 std::vector<spdlog::sink_ptr> Log::_sinks;
-
-#ifdef _WIN32
-
-class OutputDebugSink : public spdlog::sinks::sink
-{
-    void log(const spdlog::details::log_msg& msg) override
-    {
-        OutputDebugString(msg.formatted.c_str());
-    }
-
-    void flush()
-    {
-    }
-};
-
-#endif
 
 void Log::addFileSink(const std::string& filePath)
 {
@@ -29,7 +21,7 @@ void Log::addFileSink(const std::string& filePath)
         throw std::runtime_error("Sinks need to be added before initialising the logging system");
     }
 
-    _sinks.push_back(std::make_shared<spdlog::sinks::simple_file_sink_mt>(filePath, true));
+    _sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath, true));
 }
 
 void Log::addConsoleSink(Colored colored)
@@ -49,7 +41,7 @@ void Log::addConsoleSink(Colored colored)
     }
 
 #ifdef _WIN32
-    _sinks.push_back(std::make_shared<OutputDebugSink>());
+    _sinks.push_back(std::make_shared<spdlog::sinks::msvc_sink_mt>());
 #endif
 }
 
