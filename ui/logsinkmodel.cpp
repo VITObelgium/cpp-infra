@@ -5,28 +5,39 @@
 
 namespace uiinfra {
 
-LogSinkModel::LogSinkModel(QObject* parent)
+template <typename Mutex>
+LogSinkModel<Mutex>::LogSinkModel(QObject* parent)
 : QAbstractListModel(parent)
 {
 }
 
-void LogSinkModel::log(const spdlog::details::log_msg& msg)
+template <typename Mutex>
+void LogSinkModel<Mutex>::sink_it_(const spdlog::details::log_msg& msg)
 {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
-    auto rows = rowCount();
+    fmt::memory_buffer formatted;
+    spdlog::sinks::sink::formatter_->format(msg, formatted);
+
+    std::lock_guard<Mutex> lock(_mutex);
+    auto rows = size();
     beginInsertRows(QModelIndex(), rows, rows);
-    _messages.push_back({msg.level, QString::fromUtf8(msg.raw.c_str())});
+    _messages.push_back({msg.level, QString::fromUtf8(fmt::to_string(formatted).c_str())});
     endInsertRows();
 }
 
-void LogSinkModel::flush()
+template <typename Mutex>
+void LogSinkModel<Mutex>::flush_()
 {
 }
 
-QVariant LogSinkModel::data(const QModelIndex& index, int role) const
+template <typename Mutex>
+QVariant LogSinkModel<Mutex>::data(const QModelIndex& index, int role) const
 {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
     if (!index.isValid()) {
+        return QVariant();
+    }
+
+    std::lock_guard<Mutex> lock(_mutex);
+    if (index.row() >= size()) {
         return QVariant();
     }
 
@@ -53,9 +64,20 @@ QVariant LogSinkModel::data(const QModelIndex& index, int role) const
     return QVariant();
 }
 
-int LogSinkModel::rowCount(const QModelIndex& /*parent*/) const
+template <typename Mutex>
+int LogSinkModel<Mutex>::rowCount(const QModelIndex& /*parent*/) const
 {
-    std::lock_guard<std::recursive_mutex> lock(_mutex);
+    std::lock_guard<Mutex> lock(_mutex);
+    return size();
+}
+
+template <typename Mutex>
+int LogSinkModel<Mutex>::size() const
+{
     return static_cast<int>(_messages.size());
 }
+
+template class LogSinkModel<std::recursive_mutex>;
+template class LogSinkModel<spdlog::details::null_mutex>;
+
 }

@@ -3,18 +3,20 @@
 #include <deque>
 #include <mutex>
 #include <qabstractitemmodel.h>
-#include <spdlog/sinks/sink.h>
-#include <spdlog/spdlog.h>
+#include <spdlog/details/null_mutex.h>
+#include <spdlog/sinks/base_sink.h>
 
 namespace uiinfra {
 
-class LogSinkModel : public spdlog::sinks::sink, public QAbstractListModel
+template <typename Mutex>
+class LogSinkModel : public spdlog::sinks::base_sink<Mutex>, public QAbstractListModel
 {
 public:
     LogSinkModel(QObject* parent = nullptr);
 
-    void log(const spdlog::details::log_msg& msg) override;
-    void flush() override;
+protected:
+    void sink_it_(const spdlog::details::log_msg& msg) override;
+    void flush_() override;
 
     QVariant data(const QModelIndex& index, int role) const override;
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
@@ -26,7 +28,12 @@ private:
         QString message;
     };
 
-    mutable std::recursive_mutex _mutex;
+    int size() const;
+
+    mutable Mutex _mutex;
     std::deque<LogMessage> _messages;
 };
+
+using LogSinkModelMt = LogSinkModel<std::recursive_mutex>;
+using LogSinkModelSt = LogSinkModel<spdlog::details::null_mutex>;
 }
