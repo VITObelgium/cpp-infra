@@ -1,7 +1,6 @@
 #include "infra/gdalgeometry.h"
 #include "infra/exception.h"
 #include "infra/internal/gdalinternal.h"
-#include "infra/log.h"
 
 #include <ogrsf_frmts.h>
 

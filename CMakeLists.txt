@@ -90,7 +90,7 @@ elseif (HAVE_BOOST_FILESYSTEM)
     target_compile_definitions(infra PUBLIC HAVE_BOOST_FILESYSTEM)    
 endif ()
 
-target_link_libraries(infra PRIVATE fmt::fmt)
+target_link_libraries(infra PUBLIC fmt::fmt)
 
 if (CMAKE_COMPILER_IS_GNUCXX)
     if (HAVE_FILESYSTEM_H OR HAVE_EXP_FILESYSTEM_H)
