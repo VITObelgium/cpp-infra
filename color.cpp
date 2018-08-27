@@ -1,6 +1,6 @@
 #include "infra/color.h"
 
-namespace infra {
+namespace inf {
 
 Color::Color(uint8_t r_, uint8_t g_, uint8_t b_) noexcept
 : Color(r_, g_, b_, 255)

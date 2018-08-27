@@ -4,7 +4,7 @@
 #include <string_view>
 #include <type_traits>
 
-namespace infra {
+namespace inf {
 
 // trait indicating that type T is castable to an std::string_view
 template <typename T>

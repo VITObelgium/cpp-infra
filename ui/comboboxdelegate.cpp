@@ -46,7 +46,7 @@ void ComboBoxDelegate::setEditorData(QWidget* editor, const QModelIndex& index) 
 void ComboBoxDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
     auto* comboBox = static_cast<QComboBox*>(editor);
-    infra::Log::info("Data: {} {}", comboBox->currentData(Qt::UserRole).toLongLong(), comboBox->currentText().toStdString());
+    inf::Log::info("Data: {} {}", comboBox->currentData(Qt::UserRole).toLongLong(), comboBox->currentText().toStdString());
     model->setData(index, comboBox->currentText(), Qt::DisplayRole);
     model->setData(index, comboBox->currentData(Qt::UserRole), Qt::UserRole);
 }

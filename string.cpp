@@ -8,7 +8,7 @@
 #include <string>
 #include <string_view>
 
-namespace infra::str {
+namespace inf::str {
 
 bool containsValidInteger(std::string_view str)
 {

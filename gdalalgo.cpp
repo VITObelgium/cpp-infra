@@ -4,7 +4,7 @@
 #include <gdal_alg.h>
 #include <gdal_utils.h>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 VectorDataSet polygonize(const RasterDataSet& ds)
 {
@@ -52,7 +52,7 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
     gdal::RasterDataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
     memDataSet.addBand(data.data());
-    memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
+    memDataSet.setGeoTransform(inf::metadataToGeoTransform(meta));
     memDataSet.setNoDataValue(1, meta.nodata);
     memDataSet.setProjection(meta.projection);
 
@@ -140,7 +140,7 @@ std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
     gdal::RasterDataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
     memDataSet.addBand(data.data());
-    memDataSet.setGeoTransform(infra::metadataToGeoTransform(meta));
+    memDataSet.setGeoTransform(inf::metadataToGeoTransform(meta));
     memDataSet.setNoDataValue(1, meta.nodata);
     memDataSet.setProjection(meta.projection);
 

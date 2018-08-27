@@ -5,7 +5,7 @@
 #include <istream>
 #include <sstream>
 
-namespace infra::file {
+namespace inf::file {
 #ifdef INFRA_HAS_FILESYSTEM
 
 static fs::path& forcePreferred(fs::path& p)

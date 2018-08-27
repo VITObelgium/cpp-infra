@@ -18,7 +18,7 @@ class OGRGeometryCollection;
 class OGRMultiLineString;
 class OGRLinearRing;
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
@@ -428,7 +428,7 @@ inline LayerIterator begin(Layer&& layer)
     return LayerIterator(layer);
 }
 
-inline LayerIterator end(const infra::gdal::Layer& /*layer*/)
+inline LayerIterator end(const inf::gdal::Layer& /*layer*/)
 {
     return LayerIterator();
 }

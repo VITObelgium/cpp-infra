@@ -4,7 +4,7 @@
 
 #include <cpl_conv.h>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 using namespace std::string_literals;
 

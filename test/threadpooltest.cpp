@@ -6,7 +6,7 @@
 #include <gtest/gtest.h>
 #include <thread>
 
-namespace infra::test {
+namespace inf::test {
 
 using namespace std;
 using namespace testing;

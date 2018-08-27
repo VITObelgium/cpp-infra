@@ -2,7 +2,7 @@
 
 #include "infra/point.h"
 
-namespace infra {
+namespace inf {
 
 template <typename T>
 struct Line

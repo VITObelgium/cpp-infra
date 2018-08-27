@@ -19,7 +19,7 @@
 #include <optional>
 #include <variant>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 using namespace std::string_literals;
 
@@ -301,5 +301,5 @@ private:
     VSILFILE* _ptr;
 };
 
-infra::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet);
+inf::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet);
 }

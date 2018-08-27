@@ -17,7 +17,7 @@
 #include <unordered_map>
 #include <utility>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 using namespace std::string_literals;
 
@@ -839,7 +839,7 @@ VectorType guessVectorTypeFromFileName(const fs::path& filePath)
     return VectorType::Unknown;
 }
 
-static void fillMetadataFromGeoTransform(infra::GeoMetadata& meta, const std::array<double, 6>& geoTrans)
+static void fillMetadataFromGeoTransform(inf::GeoMetadata& meta, const std::array<double, 6>& geoTrans)
 {
     if (geoTrans[2] == 0.0 && geoTrans[4] == 0.0) {
         meta.cellSize = geoTrans[1];
@@ -850,9 +850,9 @@ static void fillMetadataFromGeoTransform(infra::GeoMetadata& meta, const std::ar
     meta.yll = geoTrans[3] + geoTrans[4] * 0.0 + geoTrans[5] * meta.rows;
 }
 
-infra::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet)
+inf::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet)
 {
-    infra::GeoMetadata meta;
+    inf::GeoMetadata meta;
 
     if (dataSet.rasterCount() != 1) {
         throw RuntimeError("Only rasters with a single band are currently supported");

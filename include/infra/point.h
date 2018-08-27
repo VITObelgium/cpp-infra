@@ -4,7 +4,7 @@
 #include <limits>
 #include <ostream>
 
-namespace infra {
+namespace inf {
 
 // Represents a point in the raster using x,y coordinates
 template <typename T>

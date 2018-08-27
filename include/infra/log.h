@@ -3,7 +3,7 @@
 #include <memory>
 #include <spdlog/spdlog.h>
 
-namespace infra {
+namespace inf {
 
 /*!
  * class for strongly typed log source name

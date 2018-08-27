@@ -29,7 +29,7 @@
     {                                    \
     }
 
-namespace infra {
+namespace inf {
 
 EXCEPTION(RuntimeError, std::runtime_error)
 EXCEPTION(InvalidArgument, std::invalid_argument)

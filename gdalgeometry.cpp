@@ -4,7 +4,7 @@
 
 #include <ogrsf_frmts.h>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 using namespace std::string_literals;
 

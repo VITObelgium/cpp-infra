@@ -8,7 +8,7 @@
 
 namespace uiinfra {
 
-using namespace infra;
+using namespace inf;
 
 PolygonModel::PolygonModel(QObject* parent)
 : QAbstractListModel(parent)
@@ -89,7 +89,7 @@ void PolygonModel::updateVisibleData()
 
     if (_data) {
         for (auto& polyData : *_data) {
-            if (infra::containerContains(_visibleNames, polyData.name)) {
+            if (inf::containerContains(_visibleNames, polyData.name)) {
                 for (auto& geoPath : polyData.geometry) {
                     _visibleData.emplace_back(&polyData, &geoPath);
                 }

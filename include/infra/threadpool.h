@@ -8,7 +8,7 @@
 
 #include "infra/signal.h"
 
-namespace infra {
+namespace inf {
 
 class ThreadPool
 {

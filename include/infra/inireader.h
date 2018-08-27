@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace infra {
+namespace inf {
 
 class IniReader
 {

@@ -4,7 +4,7 @@
 #include <cpl_error.h>
 #include <cpl_port.h>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 static void gdalErrorHandler(CPLErr errClass, int /*err_no*/, const char* msg)
 {

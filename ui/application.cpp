@@ -24,9 +24,9 @@ static const char* levelString(QtMsgType type)
 static void loggedMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     if (context.file && context.line && context.function) {
-        infra::Log::debug("[Qt {}] {} ({}:{}.{})", levelString(type), msg.toStdString(), context.file, context.line, context.function);
+        inf::Log::debug("[Qt {}] {} ({}:{}.{})", levelString(type), msg.toStdString(), context.file, context.line, context.function);
     } else {
-        infra::Log::debug("[Qt {}] {}", levelString(type), msg.toStdString());
+        inf::Log::debug("[Qt {}] {}", levelString(type), msg.toStdString());
     }
 }
 
@@ -41,7 +41,7 @@ bool Application::notify(QObject* receiver, QEvent* event)
     try {
         return QApplication::notify(receiver, event);
     } catch (std::exception& e) {
-        infra::Log::critical("Uncaught exception: {}", e.what());
+        inf::Log::critical("Uncaught exception: {}", e.what());
     }
 
     return false;

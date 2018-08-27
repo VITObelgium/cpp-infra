@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace infra::gdal {
+namespace inf::gdal {
 class VectorDataSet;
 class CoordinateTransformer;
 }
@@ -17,6 +17,6 @@ namespace uiinfra {
 using OverlayMap = std::unordered_map<QString, std::vector<QGeoPath>>;
 
 OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes);
-std::vector<QGeoPath> dataSetToGeoPath(infra::gdal::VectorDataSet& ds, const infra::gdal::CoordinateTransformer& transformer);
+std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, const inf::gdal::CoordinateTransformer& transformer);
 
 }

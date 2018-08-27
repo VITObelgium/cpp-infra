@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace infra {
+namespace inf {
 
 template <typename T>
 struct dependent_false : std::false_type

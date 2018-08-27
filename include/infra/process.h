@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace infra {
+namespace inf {
 
 int runProcess(std::string_view cmdLine);
 }

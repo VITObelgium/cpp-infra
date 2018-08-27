@@ -3,7 +3,7 @@
 
 #include "infra/colormap.h"
 
-namespace infra::test
+namespace inf::test
 {
 
 using namespace testing;

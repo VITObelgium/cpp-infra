@@ -13,7 +13,7 @@
 #include "infra/internal/traits.h"
 #include "infra/typetraits.h"
 
-namespace infra::str {
+namespace inf::str {
 
 /*!
  * \brief check if a string contains a valid integer value
@@ -240,7 +240,7 @@ std::string join(const Container& items, std::string_view joinString)
 {
     using ValueType = typename Container::value_type;
     static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
-        "Items to join should be streamable or convertible to string_view");
+                  "Items to join should be streamable or convertible to string_view");
 
     std::string result;
 
@@ -300,7 +300,7 @@ std::string join(const Container& items, std::string_view joinString)
  * \endcode
  */
 template <typename Container, typename ToStringCb>
-std::string join(const Container& items, const std::string& joinString, ToStringCb&& cb)
+std::string join(const Container& items, std::string_view joinString, ToStringCb&& cb)
 {
     std::ostringstream ss;
     for (auto iter = begin(items); iter != end(items); ++iter) {
@@ -448,4 +448,4 @@ private:
 //    Flags<SplitOpt> _splitopts;
 //};
 
-} // namespace infra::str
+} // namespace inf::str

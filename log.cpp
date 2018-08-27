@@ -10,7 +10,7 @@
 #include <spdlog/sinks/wincolor_sink.h>
 #endif
 
-namespace infra {
+namespace inf {
 
 std::shared_ptr<spdlog::logger> Log::_log;
 std::vector<spdlog::sink_ptr> Log::_sinks;

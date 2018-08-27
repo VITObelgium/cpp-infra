@@ -6,7 +6,7 @@
 #include <ostream>
 #include <vector>
 
-namespace infra {
+namespace inf {
 
 struct ColorDict
 {

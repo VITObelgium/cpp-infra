@@ -3,7 +3,7 @@
 #include <optional>
 #include <type_traits>
 
-namespace infra {
+namespace inf {
 
 template <typename TDest, typename TSrc>
 TDest truncate(TSrc value)

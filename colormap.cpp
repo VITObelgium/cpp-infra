@@ -7,7 +7,7 @@
 
 #include <unordered_map>
 
-namespace infra {
+namespace inf {
 
 const ColorDict Cmap::bone{
     {{0.0f, 0.0f, 0.0f},

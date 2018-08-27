@@ -3,7 +3,7 @@
 #include <gdal_priv.h>
 #include <typeinfo>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 template <typename T>
 struct TypeResolve

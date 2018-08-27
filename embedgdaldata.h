@@ -1,6 +1,6 @@
 #pragma once
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 // Create the in memory gdal data files (call this ones in the application)
 void createEmbeddedData();

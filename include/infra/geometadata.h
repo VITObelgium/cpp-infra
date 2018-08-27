@@ -7,7 +7,7 @@
 #include <optional>
 #include <sstream>
 
-namespace infra {
+namespace inf {
 
 struct GeoMetadata
 {

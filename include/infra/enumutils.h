@@ -2,7 +2,7 @@
 
 #include <type_traits>
 
-namespace infra {
+namespace inf {
 
 template <typename EnumType>
 constexpr auto enum_value(EnumType e)

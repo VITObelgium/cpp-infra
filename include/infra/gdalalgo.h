@@ -3,7 +3,7 @@
 #include "infra/gdal.h"
 #include "infra/geometadata.h"
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 // Create a vector dataset from a raster dataset
 VectorDataSet polygonize(const RasterDataSet& ds);

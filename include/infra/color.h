@@ -2,7 +2,7 @@
 
 #include <cinttypes>
 
-namespace infra {
+namespace inf {
 
 struct Color
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 void setLogHandler();
 }

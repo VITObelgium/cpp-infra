@@ -9,9 +9,9 @@
 
 namespace uiinfra {
 
-using namespace infra;
+using namespace inf;
 
-static void addPointToGeoPath(const gdal::CoordinateTransformer& transformer, QGeoPath& path, const infra::Point<double>& point)
+static void addPointToGeoPath(const gdal::CoordinateTransformer& transformer, QGeoPath& path, const inf::Point<double>& point)
 {
     auto converted = transformer.transform(point);
     path.addCoordinate(QGeoCoordinate(converted.y, converted.x));

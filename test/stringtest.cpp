@@ -14,7 +14,7 @@ void PrintTo(const std::string_view& sv, ::std::ostream* os)
 
 } // namespace foo
 
-namespace infra::test {
+namespace inf::test {
 
 using std::string;
 using std::string_view;

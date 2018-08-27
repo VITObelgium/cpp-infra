@@ -12,8 +12,8 @@ set(INPUT_FILES
 set(HEADER "${OUTPUT_FILE}.h")
 set(SOURCE "${OUTPUT_FILE}.cpp")
 
-file(WRITE ${HEADER} "#include <array>\n#include <cinttypes>\nnamespace infra::data { \n")
-file(WRITE ${SOURCE} "#include <array>\n#include <cinttypes>\nnamespace infra::data { \n")
+file(WRITE ${HEADER} "#include <array>\n#include <cinttypes>\nnamespace inf::data { \n")
+file(WRITE ${SOURCE} "#include <array>\n#include <cinttypes>\nnamespace inf::data { \n")
 
 foreach(INPUT_FILE ${INPUT_FILES})
     message(STATUS "Generate embedded data ${INPUT_FILE}")

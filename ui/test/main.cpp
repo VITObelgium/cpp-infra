@@ -8,8 +8,8 @@ using namespace testing;
 
 int main(int argc, char** argv)
 {
-    infra::Log::addConsoleSink(infra::Log::Colored::On);
-    infra::LogRegistration logReg("UiInfraTest");
+    inf::Log::addConsoleSink(inf::Log::Colored::On);
+    inf::LogRegistration logReg("UiInfraTest");
 
     InitGoogleTest(&argc, argv);
     return RUN_ALL_TESTS();

@@ -5,7 +5,7 @@
 #include <mutex>
 #include <vector>
 
-namespace infra {
+namespace inf {
 
 template <typename... Args>
 class Signal

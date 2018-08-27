@@ -14,12 +14,12 @@ using namespace testing;
 int main(int argc, char** argv)
 {
 #ifdef HAVE_INFRA_LOG
-    infra::Log::addConsoleSink(infra::Log::Colored::On);
-    infra::LogRegistration logReg("InfraTest");
+    inf::Log::addConsoleSink(inf::Log::Colored::On);
+    inf::LogRegistration logReg("InfraTest");
 #endif
 
 #ifdef HAVE_GDAL
-    infra::gdal::Registration reg;
+    inf::gdal::Registration reg;
 #endif
 
     InitGoogleTest(&argc, argv);

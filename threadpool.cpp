@@ -3,7 +3,7 @@
 #include <cassert>
 #include <thread>
 
-namespace infra {
+namespace inf {
 
 class ThreadPool::Task
 {

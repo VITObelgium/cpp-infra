@@ -1,7 +1,7 @@
 #include "infra/exception.h"
 #include <string>
 
-namespace infra {
+namespace inf {
 
 EXCEPTION_IMPL(RuntimeError, std::runtime_error)
 EXCEPTION_IMPL(InvalidArgument, std::invalid_argument)

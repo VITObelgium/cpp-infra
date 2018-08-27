@@ -16,7 +16,7 @@ void setSectionVisibilitySelector(QHeaderView* headerView, const std::vector<int
         QMenu contextMenu(QObject::tr("Zichtbare kolommen"), headerView);
 
         for (int i = 0; i < headerView->count(); ++i) {
-            if (infra::containerContains(fixedSections, i)) {
+            if (inf::containerContains(fixedSections, i)) {
                 continue;
             }
 

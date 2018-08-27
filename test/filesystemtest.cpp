@@ -3,7 +3,7 @@
 #include <fstream>
 #include <gtest/gtest.h>
 
-namespace infra {
+namespace inf {
 
 #ifdef INFRA_HAS_FILESYSTEM
 

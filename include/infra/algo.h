@@ -6,7 +6,7 @@
 #include <optional>
 #include <stdexcept>
 
-namespace infra {
+namespace inf {
 
 template <typename T>
 std::optional<T> asOptional(const T* ptr)

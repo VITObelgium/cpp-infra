@@ -23,7 +23,7 @@ namespace fs = boost::filesystem;
 #define INFRA_HAS_FILESYSTEM
 #endif
 
-namespace infra::file {
+namespace inf::file {
 #ifdef INFRA_HAS_FILESYSTEM
 /*! Create the specified directory and all parent directories if it does
  *  not exist.

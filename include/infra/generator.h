@@ -5,7 +5,7 @@
 #include <utility>
 #include <vector>
 
-namespace infra {
+namespace inf {
 template <typename T>
 class generator;
 

@@ -4,7 +4,7 @@
 #include <gtest/gtest.h>
 #include <type_traits>
 
-namespace infra::gdal {
+namespace inf::gdal {
 
 TEST(GdalGeometryTest, fieldDefinition)
 {

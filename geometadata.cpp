@@ -5,7 +5,7 @@
 #include <limits>
 #include <sstream>
 
-namespace infra {
+namespace inf {
 
 GeoMetadata::GeoMetadata(int32_t _rows, int32_t _cols)
 : GeoMetadata(_rows, _cols, 0.0, 0.0, 0.0, std::optional<double>())
@@ -166,7 +166,7 @@ std::optional<int32_t> GeoMetadata::projectionGeoEpsg() const
 {
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
-        epsg = infra::gdal::projectionToGeoEpsg(projection);
+        epsg = inf::gdal::projectionToGeoEpsg(projection);
     }
 
     return epsg;
@@ -177,7 +177,7 @@ std::optional<int32_t> GeoMetadata::projectionEpsg() const
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
         try {
-            epsg = infra::gdal::projectionToEpsg(projection);
+            epsg = inf::gdal::projectionToEpsg(projection);
         } catch (const std::exception&) {
         }
     }
@@ -192,7 +192,7 @@ std::string GeoMetadata::projectionFrienlyName() const
 
 void GeoMetadata::setProjectionFromEpsg(int32_t epsg)
 {
-    projection = infra::gdal::projectionFromEpsg(epsg);
+    projection = inf::gdal::projectionFromEpsg(epsg);
 }
 
 std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta)

@@ -8,7 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 
-namespace infra {
+namespace inf {
 
 /* Typedef for prototype of handler function. */
 typedef int (*ini_handler)(void* user, const char* section,
