@@ -23,11 +23,12 @@ class FloatingPointItemDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
 public:
-    explicit FloatingPointItemDelegate(int decimals, QObject* parent = nullptr);
+    explicit FloatingPointItemDelegate(char format, int decimals, QObject* parent = nullptr);
     virtual QString displayText(const QVariant& value, const QLocale& locale) const override;
     virtual void setEditorData(QWidget* editor, const QModelIndex& index) const override;
 
 private:
+    char _format;
     int _decimals;
 };
 

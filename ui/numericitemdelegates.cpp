@@ -36,15 +36,16 @@ void IntegerItemDelegate::setEditorData(QWidget* editor, const QModelIndex& inde
     spinBox->setValue(value);
 }
 
-FloatingPointItemDelegate::FloatingPointItemDelegate(int decimals, QObject* parent)
+FloatingPointItemDelegate::FloatingPointItemDelegate(char format, int decimals, QObject* parent)
 : QStyledItemDelegate(parent)
+, _format(format)
 , _decimals(decimals)
 {
 }
 
 QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    QString formattedNum = locale.toString(value.toDouble(), 'g', 15);
+    QString formattedNum = locale.toString(value.toDouble(), _format, _decimals);
     return formattedNum;
 }
 
