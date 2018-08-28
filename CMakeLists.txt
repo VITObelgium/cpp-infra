@@ -5,13 +5,14 @@ option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
 option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
-option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
-cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
+option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS" OFF)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -231,6 +232,14 @@ if (INFRA_UI_COMPONENTS)
         target_sources(uiinfra PRIVATE
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
         )
+    endif ()
+
+    if (INFRA_UI_COMPONENTS_XLSX_EXPORT)
+        find_package(XlsxWriter REQUIRED)
+        target_sources(uiinfra PRIVATE
+            include/uiinfra/modelexport.h ui/modelexport.cpp
+        )
+        target_link_libraries(uiinfra PRIVATE XslxWriter::XslxWriter)
     endif ()
 
     if (INFRA_GDAL)
