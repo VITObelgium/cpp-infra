@@ -16,7 +16,9 @@ void FixedItemProxyModel::setFixedItems(const QStringList& items)
 
 void FixedItemProxyModel::setRootModelIndex(const QModelIndex& root)
 {
+    beginResetModel();
     _rootIndex = root;
+    endResetModel();
 }
 
 int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
@@ -32,11 +34,7 @@ int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
 
 int FixedItemProxyModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    if (!sourceModel()) {
-        return 1;
-    }
-
-    return sourceModel()->columnCount();
+    return 1;
 }
 
 QModelIndex FixedItemProxyModel::parent(const QModelIndex& /*index*/) const
@@ -93,11 +91,11 @@ QModelIndex FixedItemProxyModel::mapFromSource(const QModelIndex& sourceIndex) c
 
 QModelIndex FixedItemProxyModel::mapToSource(const QModelIndex& proxyIndex) const
 {
-    if (!sourceModel() || proxyIndex.row() < _items.size()) {
+    if (!sourceModel() || proxyIndex.row() < _items.size() || proxyIndex.column() != 0) {
         // Fixed items do not appear in the source model
         return QModelIndex();
     }
 
-    return sourceModel()->index(proxyIndex.row() - _items.size(), proxyIndex.column(), _rootIndex);
+    return sourceModel()->index(proxyIndex.row() - _items.size(), _rootIndex.column(), _rootIndex);
 }
 }
