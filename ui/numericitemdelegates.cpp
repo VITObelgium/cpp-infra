@@ -24,9 +24,9 @@ QWidget* IntegerItemDelegate::createEditor(QWidget* parent, const QStyleOptionVi
     return sb;
 }
 
-QString IntegerItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
+QString IntegerItemDelegate::displayText(const QVariant& value, const QLocale& /*locale*/) const
 {
-    return locale.toString(value.toInt());
+    return QLocale().toString(value.toInt());
 }
 
 void IntegerItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
@@ -43,10 +43,9 @@ FloatingPointItemDelegate::FloatingPointItemDelegate(char format, int decimals, 
 {
 }
 
-QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
+QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& /*locale*/) const
 {
-    QString formattedNum = locale.toString(value.toDouble(), _format, _decimals);
-    return formattedNum;
+    return QLocale().toString(value.toDouble(), _format, _decimals);
 }
 
 void FloatingPointItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
