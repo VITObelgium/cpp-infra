@@ -208,6 +208,7 @@ if (INFRA_UI_COMPONENTS)
 
     add_library(uiinfra
         include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
+        include/uiinfra/clearableabstractitemmodel.h
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
@@ -216,6 +217,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/scopedcursor.h
         include/uiinfra/toolboxview.h ui/toolboxview.cpp
+        include/uiinfra/treemodel.h ui/treemodel.cpp
         include/uiinfra/userinteraction.h ui/userinteraction.cpp
         include/uiinfra/stringinputdialog.h ui/stringinputdialog.cpp
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
