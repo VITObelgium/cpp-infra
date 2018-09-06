@@ -3,7 +3,10 @@
 #include "infra/cast.h"
 #include "uiinfra/clearableabstractitemmodel.h"
 
+#include <memory>
+#include <qstring.h>
 #include <qvariant.h>
+#include <vector>
 
 namespace uiinfra {
 
@@ -35,7 +38,7 @@ public:
 
     TreeNode* child(int index)
     {
-        return index < _children.size() ? _children[index].get() : nullptr;
+        return index < inf::truncate<int>(_children.size()) ? _children[index].get() : nullptr;
     }
 
     int indexOf(const TreeNode* node) const
