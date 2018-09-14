@@ -32,13 +32,13 @@ int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
     return sourceModel()->rowCount(_rootIndex) + _items.size();
 }
 
-int FixedItemProxyModel::columnCount(const QModelIndex& /*parent*/) const
+int FixedItemProxyModel::columnCount(const QModelIndex& parent) const
 {
     if (!sourceModel()) {
         return 1;
     }
 
-    return sourceModel()->columnCount();
+    return sourceModel()->columnCount(parent);
 }
 
 QModelIndex FixedItemProxyModel::parent(const QModelIndex& /*index*/) const
@@ -90,7 +90,7 @@ QModelIndex FixedItemProxyModel::mapFromSource(const QModelIndex& sourceIndex) c
         return QModelIndex();
     }
 
-    return createIndex(sourceIndex.row() + _items.size(), sourceIndex.column());
+    return createIndex(sourceIndex.row() + _items.size(), 0);
 }
 
 QModelIndex FixedItemProxyModel::mapToSource(const QModelIndex& proxyIndex) const
@@ -100,6 +100,8 @@ QModelIndex FixedItemProxyModel::mapToSource(const QModelIndex& proxyIndex) cons
         return QModelIndex();
     }
 
-    return sourceModel()->index(proxyIndex.row() - _items.size(), proxyIndex.column(), _rootIndex);
+    auto column = _rootIndex.isValid() ? _rootIndex.column() : 0;
+    column += proxyIndex.column();
+    return sourceModel()->index(proxyIndex.row() - _items.size(), column, _rootIndex);
 }
 }
