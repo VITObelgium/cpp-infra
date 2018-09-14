@@ -1,8 +1,8 @@
 #pragma once
 
 #include <cinttypes>
+#include <fmt/core.h>
 #include <limits>
-#include <ostream>
 
 namespace inf {
 
@@ -30,9 +30,26 @@ struct Point
     T y = std::numeric_limits<T>::max();
 };
 
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const Point<T>& point)
-{
-    return os << point.x << "x" << point.y;
 }
+
+namespace fmt {
+template <typename T>
+struct formatter<inf::Point<T>>
+{
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx)
+    {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const inf::Point<T>& p, FormatContext& ctx)
+    {
+        if constexpr (std::is_floating_point_v<T>) {
+            return format_to(ctx.begin(), "({:.1f}, {:.1f})", p.x, p.y);
+        } else {
+            return format_to(ctx.begin(), "({}, {})", p.x, p.y);
+        }
+    }
+};
 }

@@ -94,9 +94,9 @@ double GeoMetadata::convertRowLLToY(const int32_t row) const
     return (rows - 1 - row) * cellSize + yll;
 }
 
-Cell<int32_t> GeoMetadata::convertXYtoCell(const double x, const double y) const
+Cell GeoMetadata::convertXYtoCell(const double x, const double y) const
 {
-    return Cell<int32_t>(convertYtoRow(y), convertXtoCol(x));
+    return Cell(convertYtoRow(y), convertXtoCol(x));
 }
 
 bool GeoMetadata::isXY(const double x, const double y, const int32_t row, const int32_t col) const
@@ -104,7 +104,7 @@ bool GeoMetadata::isXY(const double x, const double y, const int32_t row, const 
     return (row == convertYtoRow(y) && col == convertXtoCol(x));
 }
 
-bool GeoMetadata::isOnMap(const Cell<int32_t>& cell) const
+bool GeoMetadata::isOnMap(const Cell& cell) const
 {
     return isOnMap(cell.r, cell.c);
 }

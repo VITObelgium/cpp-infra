@@ -34,7 +34,11 @@ int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
 
 int FixedItemProxyModel::columnCount(const QModelIndex& /*parent*/) const
 {
-    return 1;
+    if (!sourceModel()) {
+        return 1;
+    }
+
+    return sourceModel()->columnCount();
 }
 
 QModelIndex FixedItemProxyModel::parent(const QModelIndex& /*index*/) const
@@ -91,11 +95,11 @@ QModelIndex FixedItemProxyModel::mapFromSource(const QModelIndex& sourceIndex) c
 
 QModelIndex FixedItemProxyModel::mapToSource(const QModelIndex& proxyIndex) const
 {
-    if (!sourceModel() || proxyIndex.row() < _items.size() || proxyIndex.column() != 0) {
+    if (!sourceModel() || proxyIndex.row() < _items.size()) {
         // Fixed items do not appear in the source model
         return QModelIndex();
     }
 
-    return sourceModel()->index(proxyIndex.row() - _items.size(), _rootIndex.column(), _rootIndex);
+    return sourceModel()->index(proxyIndex.row() - _items.size(), proxyIndex.column(), _rootIndex);
 }
 }

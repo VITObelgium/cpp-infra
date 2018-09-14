@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fmt/core.h>
 #include <iosfwd>
 #include <string_view>
 
@@ -68,4 +69,22 @@ std::string readAsText(const char* filename);
 std::string readAsText(const std::string& filename);
 std::string readAsText(const std::istream& filestream);
 void writeAsText(const std::string& filename, std::string_view contents);
+}
+
+namespace fmt {
+template <>
+struct formatter<fs::path>
+{
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx)
+    {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const fs::path& p, FormatContext& ctx)
+    {
+        return format_to(ctx.begin(), "{}", p.string());
+    }
+};
 }

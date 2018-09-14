@@ -5,6 +5,17 @@
 
 namespace inf {
 
+template <typename T>
+bool fitsInType(double value)
+{
+    if (value >= static_cast<double>(std::numeric_limits<T>::lowest()) &&
+        value <= static_cast<double>(std::numeric_limits<T>::max())) {
+        return true;
+    }
+
+    return false;
+}
+
 template <typename TDest, typename TSrc>
 TDest truncate(TSrc value)
 {

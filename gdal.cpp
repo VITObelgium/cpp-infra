@@ -154,7 +154,7 @@ Point<double> projectedToGeoGraphic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-        "Failed to create transformation");
+                              "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -313,7 +313,7 @@ RasterDriver RasterDriver::create(const fs::path& filename)
         return create(rasterType);
     }
 
-    throw RuntimeError("Failed to determine raster type from filename: {}", filename.string());
+    throw RuntimeError("Failed to determine raster type from filename: {}", filename);
 }
 
 RasterDriver::RasterDriver(GDALDriver& driver)
@@ -341,7 +341,7 @@ RasterDataSet RasterDriver::createDataSetCopy(const RasterDataSet& reference, co
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-        "Failed to create data set copy"));
+                                      "Failed to create data set copy"));
 }
 
 RasterType RasterDriver::type() const
@@ -369,7 +369,7 @@ VectorDriver VectorDriver::create(const fs::path& filename)
         return create(vectorType);
     }
 
-    throw RuntimeError("Failed to determine vector type from filename: {}", filename.string());
+    throw RuntimeError("Failed to determine vector type from filename: {}", filename);
 }
 
 VectorDriver VectorDriver::create(VectorType type)
@@ -414,7 +414,7 @@ VectorDataSet VectorDriver::createDataSetCopy(const VectorDataSet& reference, co
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-        "Failed to create data set copy"));
+                                      "Failed to create data set copy"));
 }
 
 VectorType VectorDriver::type() const
@@ -442,9 +442,9 @@ const GDALRasterBand* RasterBand::get() const
 }
 
 static GDALDataset* createDataSet(const fs::path& filePath,
-    unsigned int openFlags,
-    const char* const* drivers,
-    const std::vector<std::string>& driverOpts)
+                                  unsigned int openFlags,
+                                  const char* const* drivers,
+                                  const std::vector<std::string>& driverOpts)
 {
     // use generic_string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
@@ -464,7 +464,7 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, const std::vector<
 {
     auto* dataSet = createDataSet(filePath, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, driverOpts);
     if (!dataSet) {
-        throw RuntimeError("Failed to open raster file '{}'", filePath.string());
+        throw RuntimeError("Failed to open raster file '{}'", filePath);
     }
 
     return RasterDataSet(dataSet);
@@ -475,15 +475,15 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
     if (type == RasterType::Unknown) {
         type = guessRasterTypeFromFileName(filePath);
         if (type == RasterType::Unknown) {
-            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath.string());
+            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath);
         }
     }
 
     return RasterDataSet(checkPointer(createDataSet(filePath,
-                                          GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                          nullptr,
-                                          driverOpts),
-        "Failed to open raster file"));
+                                                    GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                                    nullptr,
+                                                    driverOpts),
+                                      "Failed to open raster file"));
 }
 
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
@@ -644,7 +644,7 @@ VectorDataSet VectorDataSet::create(const fs::path& filePath, const std::vector<
 {
     auto* dsPtr = createDataSet(filePath, GDAL_OF_READONLY | GDAL_OF_VECTOR, nullptr, driverOptions);
     if (!dsPtr) {
-        throw RuntimeError("Failed to open vector file '{}'", filePath.string());
+        throw RuntimeError("Failed to open vector file '{}'", filePath);
     }
 
     return VectorDataSet(dsPtr);
@@ -655,7 +655,7 @@ VectorDataSet VectorDataSet::create(const fs::path& filePath, VectorType type, c
     if (type == VectorType::Unknown) {
         type = guessVectorTypeFromFileName(filePath);
         if (type == VectorType::Unknown) {
-            throw RuntimeError("Failed to determine vector type for file ('{}')", filePath.string());
+            throw RuntimeError("Failed to determine vector type for file ('{}')", filePath);
         }
     }
 
@@ -663,7 +663,7 @@ VectorDataSet VectorDataSet::create(const fs::path& filePath, VectorType type, c
 
     auto* dsPtr = createDataSet(filePath, GDAL_OF_READONLY | GDAL_OF_VECTOR, drivers.data(), driverOptions);
     if (!dsPtr) {
-        throw RuntimeError("Failed to open vector file '{}'", filePath.string());
+        throw RuntimeError("Failed to open vector file '{}'", filePath);
     }
 
     return VectorDataSet(dsPtr);
@@ -869,8 +869,8 @@ inf::GeoMetadata readMetadataFromDataset(const gdal::RasterDataSet& dataSet)
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-      dataBuffer.size(), FALSE /*no ownership*/))
+                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+                            dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

@@ -26,9 +26,9 @@ struct GeoMetadata
     double convertRowCentreToY(int32_t row) const;
     double convertColLLToX(int32_t col) const;
     double convertRowLLToY(int32_t row) const;
-    Cell<int32_t> convertXYtoCell(double x, double y) const;
+    Cell convertXYtoCell(double x, double y) const;
     bool isXY(double x, double y, int32_t row, int32_t col) const;
-    bool isOnMap(const Cell<int32_t>& cell) const;
+    bool isOnMap(const Cell& cell) const;
     bool isOnMap(int32_t r, int32_t c) const;
     void computeRectOnMapAround(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
 

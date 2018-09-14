@@ -1,32 +1,32 @@
 #pragma once
 
 #include <cinttypes>
+#include <fmt/core.h>
 #include <limits>
-#include <ostream>
 
 namespace inf {
 
 // Represents a point in the raster using r,c coordinates
-template <typename T>
 struct Cell
 {
     Cell() = default;
-    Cell(T row, T col)
-    : r(row), c(col)
+    Cell(int32_t row, int32_t col)
+    : r(row)
+    , c(col)
     {
     }
 
-    bool operator==(const Cell<T>& other) const noexcept
+    bool operator==(const Cell& other) const noexcept
     {
         return r == other.r && c == other.c;
     }
 
-    bool operator!=(const Cell<T>& other) const noexcept
+    bool operator!=(const Cell& other) const noexcept
     {
         return !(*this == other);
     }
 
-    bool operator<(const Cell<T>& other) const noexcept
+    bool operator<(const Cell& other) const noexcept
     {
         if (r != other.r) {
             return r < other.r;
@@ -35,61 +35,65 @@ struct Cell
         }
     }
 
-    T r = std::numeric_limits<T>::max();
-    T c = std::numeric_limits<T>::max();
+    int32_t r = std::numeric_limits<int32_t>::max();
+    int32_t c = std::numeric_limits<int32_t>::max();
 };
 
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const Cell<T>& cell)
+inline Cell leftCell(const Cell& cell) noexcept
 {
-    return os << cell.r << "x" << cell.c;
+    return Cell(cell.r, cell.c - 1);
 }
 
-template <typename T>
-Cell<T> leftCell(const Cell<T>& cell) noexcept
+inline Cell rightCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r, cell.c - 1);
+    return Cell(cell.r, cell.c + 1);
 }
 
-template <typename T>
-Cell<T> rightCell(const Cell<T>& cell) noexcept
+inline Cell topCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r, cell.c + 1);
+    return Cell(cell.r - 1, cell.c);
 }
 
-template <typename T>
-Cell<T> topCell(const Cell<T>& cell) noexcept
+inline Cell bottomCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r - 1, cell.c);
+    return Cell(cell.r + 1, cell.c);
 }
 
-template <typename T>
-Cell<T> bottomCell(const Cell<T>& cell) noexcept
+inline Cell topLeftCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r + 1, cell.c);
+    return Cell(cell.r - 1, cell.c - 1);
 }
 
-template <typename T>
-Cell<T> topLeftCell(const Cell<T>& cell) noexcept
+inline Cell topRightCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r - 1, cell.c - 1);
+    return Cell(cell.r - 1, cell.c + 1);
 }
 
-template <typename T>
-Cell<T> topRightCell(const Cell<T>& cell) noexcept
+inline Cell bottomLeftCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r - 1, cell.c + 1);
+    return Cell(cell.r + 1, cell.c - 1);
 }
 
-template <typename T>
-Cell<T> bottomLeftCell(const Cell<T>& cell) noexcept
+inline Cell bottomRightCell(const Cell& cell) noexcept
 {
-    return Cell<T>(cell.r + 1, cell.c - 1);
+    return Cell(cell.r + 1, cell.c + 1);
+}
 }
 
-template <typename T>
-Cell<T> bottomRightCell(const Cell<T>& cell) noexcept
+namespace fmt {
+template <>
+struct formatter<inf::Cell>
 {
-    return Cell<T>(cell.r + 1, cell.c + 1);
-}
+    template <typename ParseContext>
+    constexpr auto parse(ParseContext& ctx)
+    {
+        return ctx.begin();
+    }
+
+    template <typename FormatContext>
+    auto format(const inf::Cell& cell, FormatContext& ctx)
+    {
+        return format_to(ctx.begin(), "[{}, {}]", cell.r, cell.c);
+    }
+};
 }
