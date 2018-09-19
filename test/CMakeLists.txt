@@ -2,6 +2,7 @@ find_package(GTest REQUIRED)
 find_package(GMock REQUIRED)
 
 add_executable(infratest
+    casttest.cpp
     colormaptest.cpp
     inireadertest.cpp
     filesystemtest.cpp
