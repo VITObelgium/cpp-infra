@@ -258,14 +258,14 @@ static void applySplitOptions(std::string_view sv, Flags<SplitOpt> opt, std::vec
     tokens.emplace_back(sv);
 }
 
-static std::string_view applySplitOptions(std::string_view sv, Flags<SplitOpt> opt)
-{
-    if (opt.is_set(SplitOpt::Trim)) {
-        return trimmedView(sv);
-    }
-
-    return sv;
-}
+//static std::string_view applySplitOptions(std::string_view sv, Flags<SplitOpt> opt)
+//{
+//    if (opt.is_set(SplitOpt::Trim)) {
+//        return trimmedView(sv);
+//    }
+//
+//    return sv;
+//}
 
 std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt)
 {

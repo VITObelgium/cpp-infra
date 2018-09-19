@@ -43,7 +43,7 @@ fs::path combineAbsoluteWithRelativePath(const fs::path& base, const fs::path& f
 
 fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
 {
-#ifdef HAVE_FILESYSTEM_H
+#if defined(HAVE_FILESYSTEM_H) || defined(HAVE_BOOST_FILESYSTEM)
     return fs::relative(absPath, root);
 #elif defined HAVE_EXP_FILESYSTEM_H
     // Start at the root path and while they are the same then do nothing then when they first
@@ -74,10 +74,6 @@ fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
     }
 
     return finalPath;
-#else
-    (void) absPath;
-    (void) root;
-    throw RuntimeError("absoluteToRelativePath not implemented");
 #endif
 }
 
@@ -85,10 +81,8 @@ fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base)
 {
 #ifdef HAVE_FILESYSTEM_H
     return fs::absolute(base / relPath);
-#elif defined HAVE_EXP_FILESYSTEM_H
+#elif defined(HAVE_EXP_FILESYSTEM_H) || defined(HAVE_BOOST_FILESYSTEM)
     return fs::absolute(relPath, base);
-#else
-    throw RuntimeError("relativeToAbsolutePath not implemented");
 #endif
 }
 
@@ -96,10 +90,8 @@ fs::path combinePath(const fs::path& base, const fs::path& file)
 {
 #ifdef HAVE_FILESYSTEM_H
     return (fs::absolute(base) / file).make_preferred();
-#elif defined HAVE_EXP_FILESYSTEM_H
+#elif defined(HAVE_EXP_FILESYSTEM_H) || defined(HAVE_BOOST_FILESYSTEM)
     return fs::absolute(file, base).make_preferred();
-#else
-    throw RuntimeError("combinePath not supported");
 #endif
 }
 
