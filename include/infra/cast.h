@@ -34,6 +34,7 @@ constexpr bool fitsInType(TInput value)
 {
     if constexpr (std::is_same_v<TInput, TCheck>) {
         // same type, always fits
+        (void)value;
         return true;
     } else if constexpr ((std::is_unsigned_v<TInput> && std::is_unsigned_v<TCheck>) ||
                          (std::is_signed_v<TInput> && std::is_signed_v<TCheck>) ||
