@@ -209,6 +209,7 @@ if (INFRA_UI_COMPONENTS)
     add_library(uiinfra
         include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
         include/uiinfra/clearableabstractitemmodel.h
+        include/uiinfra/colorconversion.h
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp

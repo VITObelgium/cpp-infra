@@ -1156,8 +1156,4 @@ uint8_t ColorMap::processBand(float value, const std::vector<ColorDict::Entry>& 
     return 0;
 }
 
-std::ostream& operator<<(std::ostream& os, const Color& c)
-{
-    return os << '(' << int(c.r) << ", " << int(c.g) << ", " << int(c.b) << ')';
-}
 }

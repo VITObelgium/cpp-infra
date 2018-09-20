@@ -3,7 +3,6 @@
 #include "infra/color.h"
 
 #include <array>
-#include <ostream>
 #include <vector>
 
 namespace inf {
@@ -33,8 +32,6 @@ struct ColorInfo
     float start;
     Color color;
 };
-
-std::ostream& operator<<(std::ostream& os, const Color& c);
 
 class ColorMap
 {
