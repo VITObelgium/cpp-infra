@@ -41,7 +41,10 @@ TEST(CastTest, fitsInType)
     static_assert(fitsInType<int64_t>(std::numeric_limits<int64_t>::max()));
 
     EXPECT_FALSE(fitsInType<float>(std::nextafter(maxFloat, maxDouble)));
-    EXPECT_FALSE(fitsInType<double>(std::nextafter(maxDouble, std::numeric_limits<long double>::max())));
+
+    if constexpr (sizeof(long double) != sizeof(double)) {
+        EXPECT_FALSE(fitsInType<double>(std::nextafter(maxDouble, std::numeric_limits<long double>::max())));
+    }
 
     // maximum values + 1
     static_assert(!fitsInType<uint8_t>(std::numeric_limits<uint8_t>::max() + 1));
@@ -53,7 +56,9 @@ TEST(CastTest, fitsInType)
     static_assert(!fitsInType<int32_t>(std::numeric_limits<int32_t>::max() + 1ll));
 
     EXPECT_FALSE(fitsInType<float>(std::nextafter(maxFloat, maxDouble)));
-    EXPECT_FALSE(fitsInType<double>(std::nextafter(maxDouble, std::numeric_limits<long double>::max())));
+    if constexpr (sizeof(long double) != sizeof(double)) {
+        EXPECT_FALSE(fitsInType<double>(std::nextafter(maxDouble, std::numeric_limits<long double>::max())));
+    }
 
     // minimum values
     static_assert(fitsInType<int8_t>(int64_t(std::numeric_limits<int8_t>::lowest())));
@@ -70,7 +75,9 @@ TEST(CastTest, fitsInType)
     static_assert(!fitsInType<int32_t>(int64_t(std::numeric_limits<int32_t>::lowest() - 1ll)));
 
     EXPECT_FALSE(fitsInType<float>(std::nextafter(minFloat, minDouble)));
-    EXPECT_FALSE(fitsInType<double>(std::nextafter(minDouble, std::numeric_limits<long double>::lowest())));
+    if constexpr (sizeof(long double) != sizeof(double)) {
+        EXPECT_FALSE(fitsInType<double>(std::nextafter(minDouble, std::numeric_limits<long double>::lowest())));
+    }
 
     // negative values in unsigned types
     static_assert(!fitsInType<uint8_t>(-1));

@@ -199,6 +199,21 @@ bool startsWith(std::string_view aString, std::string_view search)
     return aString.compare(0, search.size(), search) == 0;
 }
 
+bool startsWithIgnoreCase(std::string_view aString, std::string_view search)
+{
+    if (search.size() > aString.size()) {
+        return false;
+    }
+
+    for (int i = 0; i < search.size(); ++i) {
+        if (std::tolower(aString[i]) != std::tolower(search[i])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 bool endsWith(std::string_view aString, std::string_view search)
 {
     if (search.size() > aString.size()) {

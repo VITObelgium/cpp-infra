@@ -358,6 +358,21 @@ TEST(StringTest, StartsWith)
     EXPECT_FALSE(str::startsWith("", "."));
 }
 
+TEST(StringTest, StartsWithIgnoreCase)
+{
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", ""));
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", "t"));
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", "TE"));
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", "TeStOn"));
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", "tEsToNe"));
+
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", std::string("teston")));
+    EXPECT_TRUE(str::startsWithIgnoreCase("TestOne", std::string("TESTONE")));
+
+    EXPECT_FALSE(str::startsWithIgnoreCase("TestOne", "es"));
+    EXPECT_FALSE(str::startsWithIgnoreCase("", "."));
+}
+
 TEST(StringTest, EndsWith)
 {
     EXPECT_TRUE(str::endsWith("TestOne", ""));

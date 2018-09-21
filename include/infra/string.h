@@ -201,6 +201,14 @@ void uppercaseInPlace(std::string& str);
 bool startsWith(std::string_view str, std::string_view search);
 
 /*!
+ * \brief check if a string starts with the provided string ignoring casing
+ * \param str input string
+ * \param search string
+ * \return true is the input string starts with the search string
+ */
+bool startsWithIgnoreCase(std::string_view str, std::string_view search);
+
+/*!
  * \brief check if a string ends with the provided string
  * \param str input string
  * \param search string
