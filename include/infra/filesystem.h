@@ -69,6 +69,40 @@ std::string readAsText(const char* filename);
 std::string readAsText(const std::string& filename);
 std::string readAsText(const std::istream& filestream);
 void writeAsText(const std::string& filename, std::string_view contents);
+
+class Handle
+{
+public:
+    Handle() = default;
+    Handle(const fs::path& p, const char* mode)
+    {
+        ptr = std::fopen(p.string().c_str(), mode);
+    }
+
+    ~Handle()
+    {
+        std::fclose(ptr);
+    }
+
+    bool isOpen() const
+    {
+        return ptr != nullptr;
+    }
+
+    std::FILE* get()
+    {
+        return ptr;
+    }
+
+    operator std::FILE*()
+    {
+        return ptr;
+    }
+
+private:
+    std::FILE* ptr = nullptr;
+};
+
 }
 
 namespace fmt {
