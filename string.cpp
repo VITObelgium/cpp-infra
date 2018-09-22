@@ -205,7 +205,7 @@ bool startsWithIgnoreCase(std::string_view aString, std::string_view search)
         return false;
     }
 
-    for (int i = 0; i < search.size(); ++i) {
+    for (size_t i = 0; i < search.size(); ++i) {
         if (std::tolower(aString[i]) != std::tolower(search[i])) {
             return false;
         }
