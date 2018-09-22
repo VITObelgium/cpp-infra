@@ -31,44 +31,44 @@ namespace inf::file {
  * /param path should specify a directory, not a file path
  * /return true if the directory was created, false otherwise
  */
-bool createDirectoryIfNotExists(const fs::path& path);
+bool create_directory_if_not_exists(const fs::path& path);
 
 /*!Create a full absolute path based on the base path and a relative file path
  * /param base the full path of a file on disk (not a directory)
  * /param file relative filepath that will be combined with the base
  * /return the full absolute path of the relative file argument
  */
-fs::path combineAbsoluteWithRelativePath(const fs::path& baseFile, const fs::path& file);
+fs::path combine_absolute_with_relative_path(const fs::path& baseFile, const fs::path& file);
 
 /*!Create a relative path from an absolute path given a root dir
  * /param absPath the absolute path that will be converted to a relative path
  * /param root absolute path of the root directory
  * /return the relative path relative to the root path
  */
-fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root);
+fs::path absolute_to_relative_path(const fs::path& absPath, const fs::path& root);
 
 /*!Create an absolute path from a relative path
  * /param relPath the relative path that will be converted to an absolute path
  * /param base base directory for the relative reference
  * /return the absolute path
  */
-fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base);
+fs::path relative_to_absolute_path(const fs::path& relPath, const fs::path& base);
 
 /*!Create a full absolute path based on the base path and a relative file path
  * /param base the full path of a directory on disk (not a file)
  * /param file relative filepath that will be combined with the base
  * /return the full absolute path of the relative file argument
  */
-fs::path combinePath(const fs::path& baseDir, const fs::path& file);
+fs::path combine_path(const fs::path& baseDir, const fs::path& file);
 
-std::string readAsText(const fs::path& filename);
+std::string read_as_text(const fs::path& filename);
 
 #endif
 
-std::string readAsText(const char* filename);
-std::string readAsText(const std::string& filename);
-std::string readAsText(const std::istream& filestream);
-void writeAsText(const std::string& filename, std::string_view contents);
+std::string read_as_text(const char* filename);
+std::string read_as_text(const std::string& filename);
+std::string read_as_text(const std::istream& filestream);
+void write_as_text(const std::string& filename, std::string_view contents);
 
 class Handle
 {

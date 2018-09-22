@@ -1201,7 +1201,7 @@ static uint8_t remap(float start, float end, float mapStart, float mapEnd, float
     return static_cast<uint8_t>(std::round((mapStart + (mapWidth * pos)) * 255.f));
 }
 
-static ColorDict colorListToDict(const std::vector<Color>& clist)
+static ColorDict colorlist_to_dict(const std::vector<Color>& clist)
 {
     assert(clist.size() > 1);
 
@@ -1222,7 +1222,7 @@ static ColorDict colorListToDict(const std::vector<Color>& clist)
     return cdict;
 }
 
-static ColorDict colorListToDict(const std::vector<ColorInfo>& clist)
+static ColorDict colorlist_to_dict(const std::vector<ColorInfo>& clist)
 {
     assert(clist.size() > 1);
 
@@ -1259,12 +1259,12 @@ ColorMap::ColorMap(const ColorDict& cdict, bool reverse)
 }
 
 ColorMap::ColorMap(const std::vector<Color>& clist, bool reverse)
-: ColorMap(colorListToDict(clist), reverse)
+: ColorMap(colorlist_to_dict(clist), reverse)
 {
 }
 
 ColorMap::ColorMap(const std::vector<ColorInfo>& clist, bool reverse)
-: ColorMap(colorListToDict(clist), reverse)
+: ColorMap(colorlist_to_dict(clist), reverse)
 {
 }
 

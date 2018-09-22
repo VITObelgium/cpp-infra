@@ -19,7 +19,7 @@ struct MemoryFiles
 
 static std::unique_ptr<MemoryFiles> s_memFiles;
 
-static const char* findFile(const char* /*className*/, const char* fileName)
+static const char* find_file(const char* /*className*/, const char* fileName)
 {
     if (!s_memFiles) {
         return nullptr;
@@ -40,22 +40,22 @@ static const char* findFile(const char* /*className*/, const char* fileName)
     return nullptr;
 }
 
-void createEmbeddedData()
+void create_embedded_data()
 {
     s_memFiles = std::make_unique<MemoryFiles>();
 }
 
-void destroyEmbeddedData()
+void destroy_embedded_data()
 {
     s_memFiles.reset();
 }
 
-void registerEmbeddedDataFileFinder()
+void register_embedded_data_file_finder()
 {
-    CPLPushFileFinder(findFile);
+    CPLPushFileFinder(find_file);
 }
 
-void unregisterEmbeddedDataFileFinder()
+void unregister_embedded_data_file_finder()
 {
     CPLPopFileFinder();
 }

@@ -218,21 +218,21 @@ Registration::~Registration()
 EmbeddedDataRegistration::EmbeddedDataRegistration()
 {
 #ifdef EMBED_GDAL_DATA
-    createEmbeddedData();
+    create_embedded_data();
 #endif
 }
 
 EmbeddedDataRegistration::~EmbeddedDataRegistration()
 {
 #ifdef EMBED_GDAL_DATA
-    destroyEmbeddedData();
+    destroy_embedded_data();
 #endif
 }
 
 void registerGdal()
 {
 #ifdef EMBED_GDAL_DATA
-    createEmbeddedData();
+    create_embedded_data();
     registerEmbeddedData();
 #endif
 
@@ -252,7 +252,7 @@ void unregisterGdal()
 {
 #ifdef EMBED_GDAL_DATA
     unregisterEmbeddedData();
-    destroyEmbeddedData();
+    destroy_embedded_data();
 #endif
 
     GDALDestroy();
@@ -261,14 +261,14 @@ void unregisterGdal()
 void registerEmbeddedData()
 {
 #ifdef EMBED_GDAL_DATA
-    registerEmbeddedDataFileFinder();
+    register_embedded_data_file_finder();
 #endif
 }
 
 void unregisterEmbeddedData()
 {
 #ifdef EMBED_GDAL_DATA
-    unregisterEmbeddedDataFileFinder();
+    unregister_embedded_data_file_finder();
 #endif
 }
 

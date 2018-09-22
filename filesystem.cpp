@@ -25,7 +25,7 @@ static fs::path& forcePreferred(fs::path& p)
 #endif
 }
 
-bool createDirectoryIfNotExists(const fs::path& path)
+bool create_directory_if_not_exists(const fs::path& path)
 {
     if (path.empty() || fs::exists(path)) {
         return true;
@@ -34,14 +34,14 @@ bool createDirectoryIfNotExists(const fs::path& path)
     return fs::create_directories(path);
 }
 
-fs::path combineAbsoluteWithRelativePath(const fs::path& base, const fs::path& file)
+fs::path combine_absolute_with_relative_path(const fs::path& base, const fs::path& file)
 {
     assert(base.has_parent_path());
     auto preferredBase = base;
-    return combinePath(forcePreferred(preferredBase).parent_path(), file);
+    return combine_path(forcePreferred(preferredBase).parent_path(), file);
 }
 
-fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
+fs::path absolute_to_relative_path(const fs::path& absPath, const fs::path& root)
 {
 #if defined(HAVE_FILESYSTEM_H) || defined(HAVE_BOOST_FILESYSTEM)
     return fs::relative(absPath, root);
@@ -77,7 +77,7 @@ fs::path absoluteToRelativePath(const fs::path& absPath, const fs::path& root)
 #endif
 }
 
-fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base)
+fs::path relative_to_absolute_path(const fs::path& relPath, const fs::path& base)
 {
 #ifdef HAVE_FILESYSTEM_H
     return fs::absolute(base / relPath);
@@ -86,7 +86,7 @@ fs::path relativeToAbsolutePath(const fs::path& relPath, const fs::path& base)
 #endif
 }
 
-fs::path combinePath(const fs::path& base, const fs::path& file)
+fs::path combine_path(const fs::path& base, const fs::path& file)
 {
 #ifdef HAVE_FILESYSTEM_H
     return (fs::absolute(base) / file).make_preferred();
@@ -95,36 +95,36 @@ fs::path combinePath(const fs::path& base, const fs::path& file)
 #endif
 }
 
-std::string readAsText(const fs::path& filename)
+std::string read_as_text(const fs::path& filename)
 {
-    return readAsText(filename.string());
+    return read_as_text(filename.string());
 }
 
 #endif
 
-std::string readAsText(const std::string& filename)
+std::string read_as_text(const std::string& filename)
 {
-    return readAsText(filename.c_str());
+    return read_as_text(filename.c_str());
 }
 
-std::string readAsText(const char* filename)
+std::string read_as_text(const char* filename)
 {
     std::ifstream fileStream(filename, std::ifstream::binary);
     if (!fileStream.is_open()) {
         throw RuntimeError("Failed to open file for reading: {}", filename);
     }
 
-    return readAsText(fileStream);
+    return read_as_text(fileStream);
 }
 
-std::string readAsText(const std::istream& fileStream)
+std::string read_as_text(const std::istream& fileStream)
 {
     std::stringstream buffer;
     buffer << fileStream.rdbuf();
     return buffer.str();
 }
 
-void writeAsText(const std::string& filename, std::string_view contents)
+void write_as_text(const std::string& filename, std::string_view contents)
 {
     std::ofstream fs(filename.c_str(), std::ios::trunc | std::ios::binary);
     if (!fs.is_open()) {

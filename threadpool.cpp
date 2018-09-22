@@ -27,7 +27,7 @@ public:
         _stop = true;
     }
 
-    void stopFinishJobs()
+    void stop_finish_jobs()
     {
         _stopFinish = true;
     }
@@ -130,7 +130,7 @@ void ThreadPool::stop_finish_jobs()
     {
         std::lock_guard<std::mutex> lock(_poolMutex);
         for (auto& t : _threads) {
-            t->stopFinishJobs();
+            t->stop_finish_jobs();
         }
         _condition.notify_all();
     }

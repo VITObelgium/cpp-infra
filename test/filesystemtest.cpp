@@ -23,7 +23,7 @@ TEST(FilesystemTest, getFullPath)
     fs::path rel("file.db");
 
     auto expected = (pwd / "test1/test/file.db").make_preferred();
-    EXPECT_EQ(expected.string(), file::combineAbsoluteWithRelativePath(base, rel).string());
+    EXPECT_EQ(expected.string(), file::combine_absolute_with_relative_path(base, rel).string());
     fs::remove_all("./test1/test");
 }
 
@@ -45,7 +45,7 @@ TEST(FilesystemTest, getFullPathBackslash)
     rel.make_preferred();
 
     auto expected = (pwd / "test1/test/file.db").make_preferred();
-    EXPECT_EQ(expected.string(), file::combineAbsoluteWithRelativePath(base, rel).string()) << base << " " <<  base.make_preferred();
+    EXPECT_EQ(expected.string(), file::combine_absolute_with_relative_path(base, rel).string()) << base << " " <<  base.make_preferred();
     fs::remove_all("./test1/test");
 }
 
