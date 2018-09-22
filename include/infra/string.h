@@ -20,28 +20,28 @@ namespace inf::str {
  * \param str string to parse
  * \return the parsing result
  */
-bool containsValidInteger(std::string_view str);
+bool contains_valid_integer(std::string_view str);
 
 /*!
  * \brief check if a string contains a valid float value
  * \param str string to parse
  * \return the parsing result
  */
-bool containsValidFloat(std::string_view str);
+bool contains_valid_float(std::string_view str);
 
 /*!
  * \brief check if a string contains a valid double value
  * \param str string to parse
  * \return the parsing result
  */
-bool containsValidDouble(std::string_view str);
+bool contains_valid_double(std::string_view str);
 
 /*!
  * \brief string conversion to signed 32bit integer
  * \param str string to parse
  * \return optional int32_t that contains a value if the string contained a valid integer
  */
-std::optional<int32_t> toInt32(std::string_view str) noexcept;
+std::optional<int32_t> to_int32(std::string_view str) noexcept;
 
 /*!
  * \brief string conversion to signed 32bit integer
@@ -49,14 +49,14 @@ std::optional<int32_t> toInt32(std::string_view str) noexcept;
  * \return that int32 value
  * \throw InvalidArgument if the input string does not contain a valid integer
  */
-int32_t toInt32Value(std::string_view str);
+int32_t to_int32_value(std::string_view str);
 
 /*!
  * \brief string conversion to signed 64bit integer
  * \param str string to parse
  * \return optional int64_t that contains a value if the string contained a valid integer
  */
-std::optional<int64_t> toInt64(std::string_view str) noexcept;
+std::optional<int64_t> to_int64(std::string_view str) noexcept;
 
 /*!
  * \brief string conversion to signed 64bit integer
@@ -64,14 +64,14 @@ std::optional<int64_t> toInt64(std::string_view str) noexcept;
  * \return the int64 value
  * \throw InvalidArgument if the input string does not contain a valid integer
  */
-int64_t toInt64Value(std::string_view str);
+int64_t to_int64_value(std::string_view str);
 
 /*!
  * \brief string conversion to float
  * \param str string to parse
  * \return optional float that contains a value if the string contained a valid integer
  */
-std::optional<float> toFloat(std::string_view str) noexcept;
+std::optional<float> to_float(std::string_view str) noexcept;
 
 /*!
  * \brief string conversion to float
@@ -79,14 +79,14 @@ std::optional<float> toFloat(std::string_view str) noexcept;
  * \return the foat value
  * \throw InvalidArgument if the input string does not contain a valid float
  */
-float toFloatValue(std::string_view str);
+float to_float_value(std::string_view str);
 
 /*!
  * \brief string conversion to double
  * \param str string to parse
  * \return optional double that contains a value if the string contained a valid integer
  */
-std::optional<double> toDouble(std::string_view str) noexcept;
+std::optional<double> to_double(std::string_view str) noexcept;
 
 /*!
  * \brief string conversion to double
@@ -94,7 +94,7 @@ std::optional<double> toDouble(std::string_view str) noexcept;
  * \return the double value
  * \throw InvalidArgument if the input string does not contain a valid double
  */
-double toDoubleValue(std::string_view str);
+double to_double_value(std::string_view str);
 
 /*!
  * \brief templated version of the string to numeric functions
@@ -103,16 +103,16 @@ double toDoubleValue(std::string_view str);
  * \return optional<T> that contains a value if the string contained a valid number
  */
 template <typename T>
-std::optional<T> toNumeric(std::string_view str) noexcept
+std::optional<T> to_numeric(std::string_view str) noexcept
 {
     if constexpr (std::is_same_v<int32_t, T>) {
-        return toInt32(str);
+        return to_int32(str);
     } else if constexpr (std::is_same_v<int64_t, T>) {
-        return toInt64(str);
+        return to_int64(str);
     } else if constexpr (std::is_same_v<float, T>) {
-        return toFloat(str);
+        return to_float(str);
     } else if constexpr (std::is_same_v<double, T>) {
-        return toDouble(str);
+        return to_double(str);
     } else {
         static_assert(dependent_false_v<T>, "Invalid type provided");
     }
@@ -126,16 +126,16 @@ std::optional<T> toNumeric(std::string_view str) noexcept
  * \throw InvalidArgument if the input string does not contain a valid number
  */
 template <typename T>
-T toNumericValue(std::string_view str)
+T to_numeric_value(std::string_view str)
 {
     if constexpr (std::is_same_v<int32_t, T>) {
-        return toInt32Value(str);
+        return to_int32_value(str);
     } else if constexpr (std::is_same_v<int64_t, T>) {
-        return toInt64Value(str);
+        return to_int64_value(str);
     } else if constexpr (std::is_same_v<float, T>) {
-        return toFloatValue(str);
+        return to_float_value(str);
     } else if constexpr (std::is_same_v<double, T>) {
-        return toDoubleValue(str);
+        return to_double_value(str);
     } else {
         static_assert(dependent_false_v<T>, "Invalid type provided");
     }
@@ -155,7 +155,7 @@ bool iequals(std::string_view str1, std::string_view str2);
  * \param toSearch the search string
  * \param toReplace the replacement string
  */
-void replaceInPlace(std::string& str, std::string_view toSearch, std::string_view toReplace);
+void replace_in_place(std::string& str, std::string_view toSearch, std::string_view toReplace);
 
 /*!
  * \brief replace all occurences of the toSearch string with toReplace
@@ -184,13 +184,13 @@ void replaceInPlace(std::string& str, std::string_view toSearch, std::string_vie
  * \brief transform string to lowercase (in place version)
  * \param str input string that will be lowercased
  */
-void lowercaseInPlace(std::string& str);
+void lowercase_in_place(std::string& str);
 
 /*!
  * \brief transform string to uppercase (in place version)
  * \param str input string that will be uppercased
  */
-void uppercaseInPlace(std::string& str);
+void uppercase_in_place(std::string& str);
 
 /*!
  * \brief check if a string starts with the provided string
@@ -198,7 +198,7 @@ void uppercaseInPlace(std::string& str);
  * \param search string
  * \return true is the input string starts with the search string
  */
-bool startsWith(std::string_view str, std::string_view search);
+bool starts_with(std::string_view str, std::string_view search);
 
 /*!
  * \brief check if a string starts with the provided string ignoring casing
@@ -206,7 +206,7 @@ bool startsWith(std::string_view str, std::string_view search);
  * \param search string
  * \return true is the input string starts with the search string
  */
-bool startsWithIgnoreCase(std::string_view str, std::string_view search);
+bool starts_with_ignore_case(std::string_view str, std::string_view search);
 
 /*!
  * \brief check if a string ends with the provided string
@@ -214,7 +214,7 @@ bool startsWithIgnoreCase(std::string_view str, std::string_view search);
  * \param search string
  * \return true is the input string ends with the search string
  */
-bool endsWith(std::string_view str, std::string_view search);
+bool ends_with(std::string_view str, std::string_view search);
 
 /*!
  * \brief create a trimmed view to a astring
@@ -222,7 +222,7 @@ bool endsWith(std::string_view str, std::string_view search);
  * \return trimmed view of the input string
  * \note it is important that the lifetime of the returned view is shorter than that of the input string
  */
-[[nodiscard]] std::string_view trimmedView(std::string_view str);
+[[nodiscard]] std::string_view trimmed_view(std::string_view str);
 
 /*!
  * \brief create a trimmed copy of a astring
@@ -230,7 +230,7 @@ bool endsWith(std::string_view str, std::string_view search);
  * \return trimmed copy of the input string
  */
 [[nodiscard]] std::string trim(std::string_view str);
-void trimInPlace(std::string& str);
+void trim_in_place(std::string& str);
 
 /*!
  * \brief Join items in the container with the provided join string
@@ -248,7 +248,7 @@ std::string join(const Container& items, std::string_view joinString)
 {
     using ValueType = typename Container::value_type;
     static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
-                  "Items to join should be streamable or convertible to string_view");
+        "Items to join should be streamable or convertible to string_view");
 
     std::string result;
 
@@ -348,13 +348,13 @@ std::vector<std::string> split(std::string_view str, char delimiter, Flags<Split
 /*! Splits the passed strings into substrings using the delimeter character */
 std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
-std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
 template <typename ResultType, typename ConversionFunc>
-std::vector<ResultType> splitTo(std::string_view str, char delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
+std::vector<ResultType> split_to(std::string_view str, char delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    auto splitted = splitView(str, delimiter, opt);
+    auto splitted = split_view(str, delimiter, opt);
 
     std::vector<ResultType> result;
     result.reserve(splitted.size());
@@ -366,9 +366,9 @@ std::vector<ResultType> splitTo(std::string_view str, char delimiter, Conversion
 }
 
 template <typename ResultType, typename ConversionFunc>
-std::vector<ResultType> splitTo(std::string_view str, std::string_view delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
+std::vector<ResultType> split_to(std::string_view str, std::string_view delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    auto splitted = splitView(str, delimiter, opt);
+    auto splitted = split_view(str, delimiter, opt);
 
     std::vector<ResultType> result;
     result.reserve(splitted.size());
@@ -389,12 +389,12 @@ public:
     using difference_type = std::vector<std::string_view>::difference_type;
 
     Splitter(std::string_view src, std::string_view sep, Flags<SplitOpt> opt = Flags<SplitOpt>()) noexcept
-    : _result(str::splitView(src, sep, opt))
+    : _result(str::split_view(src, sep, opt))
     {
     }
 
     Splitter(std::string_view src, char sep, Flags<SplitOpt> opt = Flags<SplitOpt>()) noexcept
-    : _result(str::splitView(src, sep, opt))
+    : _result(str::split_view(src, sep, opt))
     {
     }
 

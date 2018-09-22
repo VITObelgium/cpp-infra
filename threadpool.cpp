@@ -40,17 +40,17 @@ public:
 
         for (;;) {
             std::unique_lock<std::mutex> lock(_pool._poolMutex);
-            if (!_pool.hasJobs() || !_stop) {
-                _pool._condition.wait(lock, [this]() { return _pool.hasJobs() || _stop || _stopFinish; });
+            if (!_pool.has_jobs() || !_stop) {
+                _pool._condition.wait(lock, [this]() { return _pool.has_jobs() || _stop || _stopFinish; });
             }
 
-            if (_stop || (_stopFinish && !_pool.hasJobs())) {
+            if (_stop || (_stopFinish && !_pool.has_jobs())) {
                 break;
             }
 
             lock.unlock();
 
-            auto job = _pool.getJob();
+            auto job = _pool.get_job();
             while (job && !_stop) {
                 try {
                     job();
@@ -58,7 +58,7 @@ public:
                     _pool.UncaughtException(std::current_exception());
                 }
 
-                job = _pool.getJob();
+                job = _pool.get_job();
             }
         }
 
@@ -78,17 +78,17 @@ private:
 ThreadPool::ThreadPool()  = default;
 ThreadPool::~ThreadPool() = default;
 
-size_t ThreadPool::threadCount() const
+size_t ThreadPool::thread_count() const
 {
     return _threads.size();
 }
 
-void ThreadPool::setThreadCreationCb(std::function<void()> cb)
+void ThreadPool::set_thread_creation_cb(std::function<void()> cb)
 {
     _threadCreateCb = cb;
 }
 
-void ThreadPool::setThreadDestructionCb(std::function<void()> cb)
+void ThreadPool::set_thread_destruction_cb(std::function<void()> cb)
 {
     _threadDestroyCb = cb;
 }
@@ -125,7 +125,7 @@ void ThreadPool::stop()
     _threads.clear();
 }
 
-void ThreadPool::stopFinishJobs()
+void ThreadPool::stop_finish_jobs()
 {
     {
         std::lock_guard<std::mutex> lock(_poolMutex);
@@ -139,13 +139,13 @@ void ThreadPool::stopFinishJobs()
     _threads.clear();
 }
 
-bool ThreadPool::hasJobs()
+bool ThreadPool::has_jobs()
 {
     std::lock_guard<std::mutex> lock(_jobsMutex);
     return !_queuedJobs.empty();
 }
 
-void ThreadPool::addJob(std::function<void()> job)
+void ThreadPool::add_job(std::function<void()> job)
 {
     {
         std::lock_guard<std::mutex> lock(_jobsMutex);
@@ -158,7 +158,7 @@ void ThreadPool::addJob(std::function<void()> job)
     }
 }
 
-std::function<void()> ThreadPool::getJob()
+std::function<void()> ThreadPool::get_job()
 {
     std::function<void()> job;
 

@@ -18,30 +18,30 @@ struct GeoMetadata
 
     bool operator==(const GeoMetadata& other) const noexcept;
     bool operator!=(const GeoMetadata& other) const noexcept;
-    double convertXtoColFraction(double x) const;
-    double convertYtoRowFraction(double y) const;
-    int32_t convertXtoCol(double x) const;
-    int32_t convertYtoRow(double y) const;
-    double convertColCentreToX(int32_t col) const;
-    double convertRowCentreToY(int32_t row) const;
-    double convertColLLToX(int32_t col) const;
-    double convertRowLLToY(int32_t row) const;
-    Cell convertXYtoCell(double x, double y) const;
-    bool isXY(double x, double y, int32_t row, int32_t col) const;
-    bool isOnMap(const Cell& cell) const;
-    bool isOnMap(int32_t r, int32_t c) const;
-    void computeRectOnMapAround(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
+    double convert_x_to_col_fraction(double x) const;
+    double convert_y_to_row_fraction(double y) const;
+    int32_t convert_x_to_col(double x) const;
+    int32_t convert_y_to_row(double y) const;
+    double convert_col_centre_to_x(int32_t col) const;
+    double convert_row_centre_to_y(int32_t row) const;
+    double convert_col_ll_to_x(int32_t col) const;
+    double convert_row_ll_to_y(int32_t row) const;
+    Cell convert_xy_to_cell(double x, double y) const;
+    bool is_xy(double x, double y, int32_t row, int32_t col) const;
+    bool is_on_map(const Cell& cell) const;
+    bool is_on_map(int32_t r, int32_t c) const;
+    void compute_rect_on_map_around(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
 
     Point<double> center() const;
-    Point<double> topLeft() const;
-    Point<double> bottomRight() const;
+    Point<double> top_left() const;
+    Point<double> bottom_right() const;
 
-    std::string toString() const;
+    std::string to_string() const;
 
-    std::optional<int32_t> projectionGeoEpsg() const;
-    std::optional<int32_t> projectionEpsg() const;
-    std::string projectionFrienlyName() const;
-    void setProjectionFromEpsg(int32_t epsg);
+    std::optional<int32_t> projection_geo_epsg() const;
+    std::optional<int32_t> projection_epsg() const;
+    std::string projection_frienly_name() const;
+    void set_projection_from_epsg(int32_t epsg);
 
     int32_t rows    = 0;
     int32_t cols    = 0;
@@ -52,6 +52,6 @@ struct GeoMetadata
     std::string projection;
 };
 
-std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta);
+std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta);
 std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta);
 }

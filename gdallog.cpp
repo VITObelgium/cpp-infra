@@ -26,7 +26,7 @@ static void gdalErrorHandler(CPLErr errClass, int /*err_no*/, const char* msg)
     }
 }
 
-void setLogHandler()
+void set_log_handler()
 {
     CPLSetErrorHandler(&gdalErrorHandler);
 }

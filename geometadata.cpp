@@ -54,67 +54,67 @@ bool GeoMetadata::operator!=(const GeoMetadata& other) const noexcept
     return !(*this == other);
 }
 
-double GeoMetadata::convertXtoColFraction(const double x) const
+double GeoMetadata::convert_x_to_col_fraction(const double x) const
 {
     return (x - xll) / cellSize;
 }
 
-double GeoMetadata::convertYtoRowFraction(const double y) const
+double GeoMetadata::convert_y_to_row_fraction(const double y) const
 {
     return rows - (y - yll) / cellSize;
 }
 
-int32_t GeoMetadata::convertXtoCol(const double x) const
+int32_t GeoMetadata::convert_x_to_col(const double x) const
 {
-    return int32_t(std::floor(convertXtoColFraction(x)));
+    return int32_t(std::floor(convert_x_to_col_fraction(x)));
 }
 
-int32_t GeoMetadata::convertYtoRow(const double y) const
+int32_t GeoMetadata::convert_y_to_row(const double y) const
 {
-    return int32_t(std::floor(convertYtoRowFraction(y)));
+    return int32_t(std::floor(convert_y_to_row_fraction(y)));
 }
 
-double GeoMetadata::convertColCentreToX(const int32_t col) const
+double GeoMetadata::convert_col_centre_to_x(const int32_t col) const
 {
     return (col + 0.5) * cellSize + xll;
 }
 
-double GeoMetadata::convertRowCentreToY(const int32_t row) const
+double GeoMetadata::convert_row_centre_to_y(const int32_t row) const
 {
     return (rows - row - 0.5) * cellSize + yll;
 }
 
-double GeoMetadata::convertColLLToX(const int32_t col) const
+double GeoMetadata::convert_col_ll_to_x(const int32_t col) const
 {
     return (col * cellSize) + xll;
 }
 
-double GeoMetadata::convertRowLLToY(const int32_t row) const
+double GeoMetadata::convert_row_ll_to_y(const int32_t row) const
 {
     return (rows - 1 - row) * cellSize + yll;
 }
 
-Cell GeoMetadata::convertXYtoCell(const double x, const double y) const
+Cell GeoMetadata::convert_xy_to_cell(const double x, const double y) const
 {
-    return Cell(convertYtoRow(y), convertXtoCol(x));
+    return Cell(convert_y_to_row(y), convert_x_to_col(x));
 }
 
-bool GeoMetadata::isXY(const double x, const double y, const int32_t row, const int32_t col) const
+bool GeoMetadata::is_xy(const double x, const double y, const int32_t row, const int32_t col) const
 {
-    return (row == convertYtoRow(y) && col == convertXtoCol(x));
+    return (row == convert_y_to_row(y) && col == convert_x_to_col(x));
 }
 
-bool GeoMetadata::isOnMap(const Cell& cell) const
+bool GeoMetadata::is_on_map(const Cell& cell) const
 {
-    return isOnMap(cell.r, cell.c);
+    return is_on_map(cell.r, cell.c);
 }
 
-bool GeoMetadata::isOnMap(const int32_t r, const int32_t c) const
+bool GeoMetadata::is_on_map(const int32_t r, const int32_t c) const
 {
     return r < rows && c < cols && r >= 0 && c >= 0;
 }
 
-void GeoMetadata::computeRectOnMapAround(const int32_t row, const int32_t col, const int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const
+void GeoMetadata::compute_rect_on_map_around(const int32_t row, const int32_t col, const int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const
 {
     r0 = row - radius;
     r1 = row + radius;
@@ -134,17 +134,17 @@ Point<double> GeoMetadata::center() const
     return Point<double>(xll + ((rows * cellSize) / 2), yll + ((rows * cellSize) / 2));
 }
 
-Point<double> GeoMetadata::topLeft() const
+Point<double> GeoMetadata::top_left() const
 {
     return Point<double>(xll, yll + (rows * cellSize));
 }
 
-Point<double> GeoMetadata::bottomRight() const
+Point<double> GeoMetadata::bottom_right() const
 {
     return Point<double>(xll + (cols * cellSize), yll);
 }
 
-std::string GeoMetadata::toString() const
+std::string GeoMetadata::to_string() const
 {
     std::ostringstream os;
     os << "Rows: " << rows << " Cols: " << cols
@@ -162,22 +162,22 @@ std::string GeoMetadata::toString() const
     return os.str();
 }
 
-std::optional<int32_t> GeoMetadata::projectionGeoEpsg() const
+std::optional<int32_t> GeoMetadata::projection_geo_epsg() const
 {
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
-        epsg = inf::gdal::projectionToGeoEpsg(projection);
+        epsg = inf::gdal::projection_to_geo_epsg(projection);
     }
 
     return epsg;
 }
 
-std::optional<int32_t> GeoMetadata::projectionEpsg() const
+std::optional<int32_t> GeoMetadata::projection_epsg() const
 {
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
         try {
-            epsg = inf::gdal::projectionToEpsg(projection);
+            epsg = inf::gdal::projection_to_epsg(projection);
         } catch (const std::exception&) {
         }
     }
@@ -185,23 +185,23 @@ std::optional<int32_t> GeoMetadata::projectionEpsg() const
     return epsg;
 }
 
-std::string GeoMetadata::projectionFrienlyName() const
+std::string GeoMetadata::projection_frienly_name() const
 {
-    return fmt::format("EPSG:{}", projectionEpsg().value());
+    return fmt::format("EPSG:{}", projection_epsg().value());
 }
 
-void GeoMetadata::setProjectionFromEpsg(int32_t epsg)
+void GeoMetadata::set_projection_from_epsg(int32_t epsg)
 {
-    projection = inf::gdal::projectionFromEpsg(epsg);
+    projection = inf::gdal::projection_from_epsg(epsg);
 }
 
-std::array<double, 6> metadataToGeoTransform(const GeoMetadata& meta)
+std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta)
 {
     return {{meta.xll, meta.cellSize, 0.0, meta.yll + (meta.cellSize * meta.rows), 0.0, -meta.cellSize}};
 }
 
 std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta)
 {
-    return os << meta.toString();
+    return os << meta.to_string();
 }
 }

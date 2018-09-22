@@ -36,7 +36,7 @@ Geometry::Type Geometry::type() const
     }
 }
 
-std::string_view Geometry::typeName() const
+std::string_view Geometry::type_name() const
 {
     return _geometry->getGeometryName();
 }
@@ -68,14 +68,14 @@ GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* c
 }
 
 template <typename WrappedType>
-void GeometryCollectionWrapper<WrappedType>::addGeometry(const Geometry& geometry)
+void GeometryCollectionWrapper<WrappedType>::add_geometry(const Geometry& geometry)
 {
     // clones the geometry
     this->get()->addGeometry(geometry.get());
 }
 
 template <typename WrappedType>
-void GeometryCollectionWrapper<WrappedType>::addGeometry(Owner<Geometry> geometry)
+void GeometryCollectionWrapper<WrappedType>::add_geometry(Owner<Geometry> geometry)
 {
     // transfers ownership of the geometry to the collections
     this->get()->addGeometryDirectly(geometry.release());
@@ -99,26 +99,26 @@ Line::Line(OGRSimpleCurve* curve)
     assert(curve);
 }
 
-int Line::pointCount() const
+int Line::point_count() const
 {
     return get()->getNumPoints();
 }
 
-Point<double> Line::pointAt(int index) const
+Point<double> Line::point_at(int index) const
 {
     OGRPoint p;
     get()->getPoint(index, &p);
     return Point<double>(p.getX(), p.getY());
 }
 
-Point<double> Line::startPoint()
+Point<double> Line::startpoint()
 {
     OGRPoint point;
     get()->StartPoint(&point);
     return Point<double>(point.getX(), point.getY());
 }
 
-Point<double> Line::endPoint()
+Point<double> Line::endpoint()
 {
     OGRPoint point;
     get()->EndPoint(&point);
@@ -224,7 +224,7 @@ MultiLine::MultiLine(OGRMultiLineString* multiLine)
     assert(multiLine);
 }
 
-Line MultiLine::lineAt(int index)
+Line MultiLine::line_at(int index)
 {
     return geometry(index).as<Line>();
 }
@@ -239,27 +239,27 @@ Polygon::Polygon(OGRPolygon* poly)
 {
 }
 
-LinearRing Polygon::exteriorRing()
+LinearRing Polygon::exteriorring()
 {
     return LinearRing(get()->getExteriorRing());
 }
 
-LinearRing Polygon::interiorRing(int index)
+LinearRing Polygon::interiorring(int index)
 {
     return LinearRing(get()->getInteriorRing(index));
 }
 
-int Polygon::interiorRingCount()
+int Polygon::interiorring_count()
 {
     return get()->getNumInteriorRings();
 }
 
-GeometryPtr<OGRGeometry> Polygon::getLinearGeometry()
+GeometryPtr<OGRGeometry> Polygon::linear_geometry()
 {
     return GeometryPtr<OGRGeometry>(get()->getLinearGeometry());
 }
 
-bool Polygon::hasCurveGeometry() const
+bool Polygon::has_curve_geometry() const
 {
     return get()->hasCurveGeometry();
 }
@@ -269,12 +269,12 @@ MultiPolygon::MultiPolygon(OGRMultiPolygon* multiLine)
 {
 }
 
-Polygon MultiPolygon::polygonAt(int index)
+Polygon MultiPolygon::polygon_at(int index)
 {
     return geometry(index).as<Polygon>();
 }
 
-static OGRFieldType fieldTypeFromTypeInfo(const std::type_info& typeInfo)
+static OGRFieldType field_type_from_type_info(const std::type_info& typeInfo)
 {
     if (typeInfo == typeid(int32_t)) {
         return OFTInteger;
@@ -332,7 +332,7 @@ OGRFieldDefn* FieldDefinitionRef::get() noexcept
 }
 
 FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInfo)
-: FieldDefinitionRef(new OGRFieldDefn(name, fieldTypeFromTypeInfo(typeInfo)))
+: FieldDefinitionRef(new OGRFieldDefn(name, field_type_from_type_info(typeInfo)))
 {
 }
 
@@ -375,17 +375,17 @@ std::string_view FeatureDefinitionRef::name() const
     return std::string_view(_def->GetName());
 }
 
-int FeatureDefinitionRef::fieldCount() const
+int FeatureDefinitionRef::field_count() const
 {
     return _def->GetFieldCount();
 }
 
-int FeatureDefinitionRef::fieldIndex(std::string_view name) const
+int FeatureDefinitionRef::field_index(std::string_view name) const
 {
     return _def->GetFieldIndex(name.data());
 }
 
-FieldDefinitionRef FeatureDefinitionRef::fieldDefinition(int index) const
+FieldDefinitionRef FeatureDefinitionRef::field_definition(int index) const
 {
     return FieldDefinitionRef(checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
 }
@@ -444,44 +444,44 @@ Geometry Feature::geometry() const
     return const_cast<Feature*>(this)->geometry();
 }
 
-void Feature::setGeometry(const Geometry& geom)
+void Feature::set_geometry(const Geometry& geom)
 {
     checkError(_feature->SetGeometry(geom.get()), "Failed to set geometry");
 }
 
-int Feature::fieldCount() const
+int Feature::field_count() const
 {
     return _feature->GetFieldCount();
 }
 
-int Feature::fieldIndex(std::string_view name) const
+int Feature::field_index(std::string_view name) const
 {
     return _feature->GetFieldIndex(name.data());
 }
 
-FieldDefinitionRef Feature::fieldDefinition(int index) const
+FieldDefinitionRef Feature::field_definition(int index) const
 {
     return FieldDefinitionRef(checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
 }
 
-Field Feature::getField(int index) const noexcept
+Field Feature::field(int index) const noexcept
 {
-    auto& type = fieldDefinition(index).type();
+    auto& type = field_definition(index).type();
     if (type == typeid(double)) {
-        return Field(getFieldAs<double>(index));
+        return Field(field_as<double>(index));
     } else if (type == typeid(int32_t)) {
-        return Field(getFieldAs<int32_t>(index));
+        return Field(field_as<int32_t>(index));
     } else if (type == typeid(int64_t)) {
-        return Field(getFieldAs<int64_t>(index));
+        return Field(field_as<int64_t>(index));
     } else if (type == typeid(std::string_view)) {
-        return Field(getFieldAs<std::string_view>(index));
+        return Field(field_as<std::string_view>(index));
     }
 
     return Field();
 }
 
 template <typename T>
-T Feature::getFieldAs(int index) const
+T Feature::field_as(int index) const
 {
     if constexpr (std::is_same_v<double, T>) {
         return _feature->GetFieldAsDouble(index);
@@ -499,7 +499,7 @@ T Feature::getFieldAs(int index) const
 }
 
 template <typename T>
-T Feature::getFieldAs(std::string_view name) const
+T Feature::field_as(std::string_view name) const
 {
     if constexpr (std::is_same_v<double, T>) {
         return _feature->GetFieldAsDouble(name.data());
@@ -517,17 +517,17 @@ T Feature::getFieldAs(std::string_view name) const
 }
 
 // template instantiations to avoid linker errors
-template double Feature::getFieldAs<double>(int index) const;
-template float Feature::getFieldAs<float>(int index) const;
-template int32_t Feature::getFieldAs<int32_t>(int index) const;
-template int64_t Feature::getFieldAs<int64_t>(int index) const;
-template std::string_view Feature::getFieldAs<std::string_view>(int index) const;
+template double Feature::field_as<double>(int index) const;
+template float Feature::field_as<float>(int index) const;
+template int32_t Feature::field_as<int32_t>(int index) const;
+template int64_t Feature::field_as<int64_t>(int index) const;
+template std::string_view Feature::field_as<std::string_view>(int index) const;
 
-template double Feature::getFieldAs<double>(std::string_view index) const;
-template float Feature::getFieldAs<float>(std::string_view index) const;
-template int32_t Feature::getFieldAs<int32_t>(std::string_view index) const;
-template int64_t Feature::getFieldAs<int64_t>(std::string_view index) const;
-template std::string_view Feature::getFieldAs<std::string_view>(std::string_view index) const;
+template double Feature::field_as<double>(std::string_view index) const;
+template float Feature::field_as<float>(std::string_view index) const;
+template int32_t Feature::field_as<int32_t>(std::string_view index) const;
+template int64_t Feature::field_as<int64_t>(std::string_view index) const;
+template std::string_view Feature::field_as<std::string_view>(std::string_view index) const;
 
 bool Feature::operator==(const Feature& other) const
 {
@@ -567,7 +567,7 @@ Layer::~Layer()
     }
 }
 
-int64_t Layer::featureCount() const
+int64_t Layer::feature_count() const
 {
     return _layer->GetFeatureCount();
 }
@@ -578,28 +578,28 @@ Feature Layer::feature(int64_t index) const
     return Feature(checkPointer(_layer->GetFeature(index), "Failed to get feature from layer"));
 }
 
-int Layer::fieldIndex(std::string_view name) const
+int Layer::field_index(std::string_view name) const
 {
     return _layer->FindFieldIndex(name.data(), 1 /*exact match*/);
 }
 
-void Layer::setSpatialFilter(Point<double> point)
+void Layer::set_spatial_filter(Point<double> point)
 {
     OGRPoint p(point.x, point.y);
     _layer->SetSpatialFilter(&p);
 }
 
-void Layer::createField(FieldDefinition& field)
+void Layer::create_field(FieldDefinition& field)
 {
     checkError(_layer->CreateField(field.get()), "Failed to create layer field");
 }
 
-void Layer::createFeature(Feature& feature)
+void Layer::create_feature(Feature& feature)
 {
     checkError(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
 }
 
-FeatureDefinitionRef Layer::layerDefinition() const
+FeatureDefinitionRef Layer::layer_definition() const
 {
     return FeatureDefinitionRef(checkPointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
 }
@@ -681,7 +681,7 @@ FeatureIterator::FeatureIterator(int fieldCount)
 
 FeatureIterator::FeatureIterator(const Feature& feature)
 : _feature(&feature)
-, _fieldCount(feature.fieldCount())
+, _fieldCount(feature.field_count())
 {
     next();
 }
@@ -689,7 +689,7 @@ FeatureIterator::FeatureIterator(const Feature& feature)
 void FeatureIterator::next()
 {
     if (_currentFieldIndex < _fieldCount) {
-        _currentField = _feature->getField(_currentFieldIndex);
+        _currentField = _feature->field(_currentFieldIndex);
     }
 }
 
@@ -727,7 +727,7 @@ FeatureDefinitionIterator::FeatureDefinitionIterator(int fieldCount)
 
 FeatureDefinitionIterator::FeatureDefinitionIterator(FeatureDefinitionRef featureDef)
 : _featureDef(featureDef)
-, _fieldCount(featureDef.fieldCount())
+, _fieldCount(featureDef.field_count())
 {
     next();
 }
@@ -735,7 +735,7 @@ FeatureDefinitionIterator::FeatureDefinitionIterator(FeatureDefinitionRef featur
 void FeatureDefinitionIterator::next()
 {
     if (_currentFieldIndex < _fieldCount) {
-        _currentField = _featureDef.fieldDefinition(_currentFieldIndex);
+        _currentField = _featureDef.field_definition(_currentFieldIndex);
     }
 }
 

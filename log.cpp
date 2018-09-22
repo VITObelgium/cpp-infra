@@ -15,7 +15,7 @@ namespace inf {
 std::shared_ptr<spdlog::logger> Log::_log;
 std::vector<spdlog::sink_ptr> Log::_sinks;
 
-void Log::addFileSink(const std::string& filePath)
+void Log::add_file_sink(const std::string& filePath)
 {
     if (_log) {
         throw std::runtime_error("Sinks need to be added before initialising the logging system");
@@ -24,7 +24,7 @@ void Log::addFileSink(const std::string& filePath)
     _sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath, true));
 }
 
-void Log::addConsoleSink(Colored colored)
+void Log::add_console_sink(Colored colored)
 {
     if (_log) {
         throw std::runtime_error("Sinks need to be added before initialising the logging system");
@@ -45,7 +45,7 @@ void Log::addConsoleSink(Colored colored)
 #endif
 }
 
-void Log::addCustomSink(const spdlog::sink_ptr& sink)
+void Log::add_custom_sink(const spdlog::sink_ptr& sink)
 {
     if (_log) {
         throw std::runtime_error("Sinks need to be added before initialising the logging system");
@@ -54,9 +54,9 @@ void Log::addCustomSink(const spdlog::sink_ptr& sink)
     _sinks.push_back(sink);
 }
 
-void Log::initializeConsoleOnly(const std::string& name, Colored colored)
+void Log::initialize_console_only(const std::string& name, Colored colored)
 {
-    addConsoleSink(colored);
+    add_console_sink(colored);
     initialize(name);
 }
 

@@ -18,23 +18,23 @@ public:
     ThreadPool(const ThreadPool&) = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
 
-    size_t threadCount() const;
+    size_t thread_count() const;
 
     /* Set a callback that will get exectuded at the start of each thread in the pool */
-    void setThreadCreationCb(std::function<void()> cb);
+    void set_thread_creation_cb(std::function<void()> cb);
     /* Set a callback that will get exectuded at the end of each thread in the pool */
-    void setThreadDestructionCb(std::function<void()> cb);
+    void set_thread_destruction_cb(std::function<void()> cb);
 
     void start(int numThreads);
     void stop();
-    void stopFinishJobs();
-    void addJob(std::function<void()> job);
+    void stop_finish_jobs();
+    void add_job(std::function<void()> job);
 
     Signal<std::exception_ptr> UncaughtException;
 
 private:
-    bool hasJobs();
-    std::function<void()> getJob();
+    bool has_jobs();
+    std::function<void()> get_job();
 
     class Task;
     friend class Task;

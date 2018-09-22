@@ -30,7 +30,7 @@ template <typename T>
 using larger_type_t = typename larger_type<T>::type;
 
 template <typename TCheck, typename TInput>
-constexpr bool fitsInType(TInput value)
+constexpr bool fits_in_type(TInput value)
 {
     if constexpr (std::is_same_v<TInput, TCheck>) {
         // same type, always fits

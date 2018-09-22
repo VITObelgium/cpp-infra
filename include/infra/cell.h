@@ -39,42 +39,42 @@ struct Cell
     int32_t c = std::numeric_limits<int32_t>::max();
 };
 
-inline Cell leftCell(const Cell& cell) noexcept
+inline Cell left_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r, cell.c - 1);
 }
 
-inline Cell rightCell(const Cell& cell) noexcept
+inline Cell right_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r, cell.c + 1);
 }
 
-inline Cell topCell(const Cell& cell) noexcept
+inline Cell top_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r - 1, cell.c);
 }
 
-inline Cell bottomCell(const Cell& cell) noexcept
+inline Cell bottom_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r + 1, cell.c);
 }
 
-inline Cell topLeftCell(const Cell& cell) noexcept
+inline Cell top_left_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r - 1, cell.c - 1);
 }
 
-inline Cell topRightCell(const Cell& cell) noexcept
+inline Cell top_right_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r - 1, cell.c + 1);
 }
 
-inline Cell bottomLeftCell(const Cell& cell) noexcept
+inline Cell bottom_left_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r + 1, cell.c - 1);
 }
 
-inline Cell bottomRightCell(const Cell& cell) noexcept
+inline Cell bottom_right_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r + 1, cell.c + 1);
 }

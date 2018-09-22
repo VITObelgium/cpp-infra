@@ -47,13 +47,13 @@ public:
         Off
     };
 
-    static void initializeConsoleOnly(const std::string& name, Colored colored);
+    static void initialize_console_only(const std::string& name, Colored colored);
     static void initialize(const std::string& name);
     static void uninitialize();
 
-    static void addFileSink(const std::string& filePath);
-    static void addConsoleSink(Colored option);
-    static void addCustomSink(const spdlog::sink_ptr& sink);
+    static void add_file_sink(const std::string& filePath);
+    static void add_console_sink(Colored option);
+    static void add_custom_sink(const spdlog::sink_ptr& sink);
 
     static void setLevel(Level level);
 

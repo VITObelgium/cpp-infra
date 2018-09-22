@@ -54,7 +54,7 @@ TEST_F(ThreadPoolTest, RunJobs)
     std::set<std::thread::id> threadIds;
 
     for (auto i = 0u; i < jobCount; ++i) {
-        tp.addJob([&]() {
+        tp.add_job([&]() {
             std::unique_lock<std::mutex> lock(mutex);
             threadIds.insert(std::this_thread::get_id());
 
@@ -83,13 +83,13 @@ TEST_F(ThreadPoolTest, StopFinishJobs)
 
     long count = 0;
     for (auto i = 0; i < jobCount; ++i) {
-        tp.addJob([&]() {
+        tp.add_job([&]() {
             std::unique_lock<std::mutex> lock(mutex);
             ++count;
         });
     }
 
-    tp.stopFinishJobs();
+    tp.stop_finish_jobs();
     EXPECT_EQ(jobCount, count);
 }
 
@@ -101,7 +101,7 @@ TEST_F(ThreadPoolTest, ErrorInjob)
         prom.set_exception(ex);
     });
 
-    tp.addJob([]() {
+    tp.add_job([]() {
         throw std::runtime_error("Oops");
     });
 
@@ -109,31 +109,31 @@ TEST_F(ThreadPoolTest, ErrorInjob)
     EXPECT_EQ(std::future_status::ready, fut.wait_for(std::chrono::seconds(3)));
     EXPECT_THROW(fut.get(), std::runtime_error);
 
-    tp.stopFinishJobs();
+    tp.stop_finish_jobs();
 }
 
 TEST_F(ThreadPoolTest, StartStopFinishJobs)
 {
-    EXPECT_NO_THROW(tp.stopFinishJobs());
+    EXPECT_NO_THROW(tp.stop_finish_jobs());
 }
 
 TEST_F(ThreadPoolTest, CallInitDestroyFunctions)
 {
-    tp.stopFinishJobs();
+    tp.stop_finish_jobs();
 
     std::atomic<int> startThreadCounter = 0;
     std::atomic<int> stopThreadCounter  = 0;
 
-    tp.setThreadCreationCb([&]() {
+    tp.set_thread_creation_cb([&]() {
         ++startThreadCounter;
     });
 
-    tp.setThreadDestructionCb([&]() {
+    tp.set_thread_destruction_cb([&]() {
         ++stopThreadCounter;
     });
 
     tp.start(g_poolSize);
-    tp.stopFinishJobs();
+    tp.stop_finish_jobs();
     EXPECT_EQ(g_poolSize, startThreadCounter);
     EXPECT_EQ(g_poolSize, stopThreadCounter);
 }

@@ -84,7 +84,7 @@ public:
         std::fclose(ptr);
     }
 
-    bool isOpen() const
+    bool is_open() const
     {
         return ptr != nullptr;
     }

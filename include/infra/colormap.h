@@ -46,11 +46,11 @@ public:
     static ColorMap create(std::string_view name);
 
     // float value in range [0.0-1.0]
-    const Color& getColor(float value) const noexcept;
-    const Color& getColor(uint8_t value) const noexcept;
+    const Color& get_color(float value) const noexcept;
+    const Color& get_color(uint8_t value) const noexcept;
 
 private:
-    uint8_t processBand(float value, const std::vector<ColorDict::Entry>& dict) const noexcept;
+    uint8_t process_band(float value, const std::vector<ColorDict::Entry>& dict) const noexcept;
 
     std::array<Color, 256> _cmap;
 };

@@ -93,7 +93,7 @@ public:
     const OGRGeometry* get() const noexcept;
 
     Type type() const;
-    std::string_view typeName() const;
+    std::string_view type_name() const;
 
     // The returned type does not have ownership of the geometry
     // the geometry instance has to stay alive
@@ -141,8 +141,8 @@ class GeometryCollectionWrapper : public GeometryPtr<WrappedType>
 public:
     GeometryCollectionWrapper(WrappedType* collection);
 
-    void addGeometry(const Geometry& geometry);
-    void addGeometry(Owner<Geometry> geometry);
+    void add_geometry(const Geometry& geometry);
+    void add_geometry(Owner<Geometry> geometry);
 
     int size() const;
     Geometry geometry(int index);
@@ -155,11 +155,11 @@ class Line : public GeometryPtr<OGRSimpleCurve>
 public:
     Line(OGRSimpleCurve* curve);
 
-    int pointCount() const;
-    Point<double> pointAt(int index) const;
+    int point_count() const;
+    Point<double> point_at(int index) const;
 
-    Point<double> startPoint();
-    Point<double> endPoint();
+    Point<double> startpoint();
+    Point<double> endpoint();
 };
 
 class PointGeometry : public GeometryPtr<OGRPoint>
@@ -202,7 +202,7 @@ class MultiLine : public GeometryCollectionWrapper<OGRMultiLineString>
 public:
     MultiLine(OGRMultiLineString* multiLine);
 
-    Line lineAt(int index);
+    Line line_at(int index);
 };
 
 class LinearRing : public Line
@@ -216,12 +216,12 @@ class Polygon : public GeometryPtr<OGRPolygon>
 public:
     Polygon(OGRPolygon* poly);
 
-    LinearRing exteriorRing();
-    LinearRing interiorRing(int index);
-    int interiorRingCount();
+    LinearRing exteriorring();
+    LinearRing interiorring(int index);
+    int interiorring_count();
 
-    GeometryPtr<OGRGeometry> getLinearGeometry();
-    bool hasCurveGeometry() const;
+    GeometryPtr<OGRGeometry> linear_geometry();
+    bool has_curve_geometry() const;
 };
 
 class MultiPolygon : public GeometryCollectionWrapper<OGRMultiPolygon>
@@ -229,7 +229,7 @@ class MultiPolygon : public GeometryCollectionWrapper<OGRMultiPolygon>
 public:
     MultiPolygon(OGRMultiPolygon* multiPoly);
 
-    Polygon polygonAt(int index);
+    Polygon polygon_at(int index);
 };
 
 template <typename GeometryType>
@@ -277,9 +277,9 @@ public:
     FeatureDefinitionRef(OGRFeatureDefn* def);
     std::string_view name() const;
 
-    int fieldCount() const;
-    int fieldIndex(std::string_view name) const;
-    FieldDefinitionRef fieldDefinition(int index) const;
+    int field_count() const;
+    int field_index(std::string_view name) const;
+    FieldDefinitionRef field_definition(int index) const;
 
     OGRFeatureDefn* get() noexcept;
 
@@ -305,40 +305,40 @@ public:
     Geometry geometry();
     Geometry geometry() const;
 
-    void setGeometry(const Geometry& geom);
+    void set_geometry(const Geometry& geom);
 
     template <typename GeometryType>
-    void setGeometry(Owner<GeometryType> geom)
+    void set_geometry(Owner<GeometryType> geom)
     {
         get()->SetGeometryDirectly(geom.release());
     }
 
-    int fieldCount() const;
-    int fieldIndex(std::string_view name) const;
-    FieldDefinitionRef fieldDefinition(int index) const;
+    int field_count() const;
+    int field_index(std::string_view name) const;
+    FieldDefinitionRef field_definition(int index) const;
 
-    Field getField(int index) const noexcept;
-
-    template <typename T>
-    T getFieldAs(int index) const;
+    Field field(int index) const noexcept;
 
     template <typename T>
-    T getFieldAs(std::string_view name) const;
+    T field_as(int index) const;
 
     template <typename T>
-    void setField(const std::string& name, const T& value)
+    T field_as(std::string_view name) const;
+
+    template <typename T>
+    void set_field(const std::string& name, const T& value)
     {
         _feature->SetField(name.c_str(), value);
     }
 
     template <typename T>
-    void setField(const char* name, const T& value)
+    void set_field(const char* name, const T& value)
     {
         _feature->SetField(name, value);
     }
 
     template <typename T>
-    void setField(int index, const T& value)
+    void set_field(int index, const T& value)
     {
         _feature->SetField(index, value);
     }
@@ -350,7 +350,7 @@ private:
 };
 
 template <>
-inline void Feature::setField<std::string>(int index, const std::string& value)
+inline void Feature::set_field<std::string>(int index, const std::string& value)
 {
     _feature->SetField(index, value.c_str());
 }
@@ -374,16 +374,16 @@ public:
 
     Layer& operator=(Layer&&) = default;
 
-    int64_t featureCount() const;
+    int64_t feature_count() const;
     Feature feature(int64_t index) const;
 
-    int fieldIndex(std::string_view name) const;
-    void setSpatialFilter(Point<double> point);
+    int field_index(std::string_view name) const;
+    void set_spatial_filter(Point<double> point);
 
-    void createField(FieldDefinition& field);
-    void createFeature(Feature& feature);
+    void create_field(FieldDefinition& field);
+    void create_feature(Feature& feature);
 
-    FeatureDefinitionRef layerDefinition() const;
+    FeatureDefinitionRef layer_definition() const;
 
     const char* name() const;
     OGRLayer* get();
@@ -470,7 +470,7 @@ inline FeatureIterator begin(Feature&& feat)
 
 inline FeatureIterator end(const Feature& feat)
 {
-    return FeatureIterator(feat.fieldCount());
+    return FeatureIterator(feat.field_count());
 }
 
 class FeatureDefinitionIterator
@@ -505,7 +505,7 @@ inline FeatureDefinitionIterator begin(FeatureDefinitionRef featDef)
 
 inline FeatureDefinitionIterator end(FeatureDefinitionRef featDef)
 {
-    return FeatureDefinitionIterator(featDef.fieldCount());
+    return FeatureDefinitionIterator(featDef.field_count());
 }
 
 MultiLine forceToMultiLine(Geometry& geom);

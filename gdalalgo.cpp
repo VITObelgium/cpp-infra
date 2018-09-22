@@ -9,12 +9,12 @@ namespace inf::gdal {
 VectorDataSet polygonize(const RasterDataSet& ds)
 {
     auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
-    gdal::VectorDataSet memDataSet(memDriver.createDataSet("dummy"));
-    auto layer = memDataSet.createLayer("Polygons");
+    gdal::VectorDataSet memDataSet(memDriver.create_dataset("dummy"));
+    auto layer = memDataSet.create_layer("Polygons");
     FieldDefinition def("Value", typeid(int32_t));
-    layer.createField(def);
+    layer.create_field(def);
 
-    checkError(GDALPolygonize(ds.rasterBand(1).get(), ds.rasterBand(1).get(), layer.get(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
+    checkError(GDALPolygonize(ds.rasterband(1).get(), ds.rasterband(1).get(), layer.get(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
     return memDataSet;
 }
 
@@ -24,7 +24,7 @@ public:
     RasterizeOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        auto optionValues = createOptionsArray(opts);
+        auto optionValues = create_options_array(opts);
         _options          = GDALRasterizeOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
     }
 
@@ -50,11 +50,11 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
     std::vector<T> data(meta.rows * meta.cols);
 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
-    memDataSet.addBand(data.data());
-    memDataSet.setGeoTransform(inf::metadataToGeoTransform(meta));
-    memDataSet.setNoDataValue(1, meta.nodata);
-    memDataSet.setProjection(meta.projection);
+    gdal::RasterDataSet memDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
+    memDataSet.add_band(data.data());
+    memDataSet.set_geotransform(inf::metadata_to_geo_transform(meta));
+    memDataSet.set_nodata_value(1, meta.nodata);
+    memDataSet.set_projection(meta.projection);
 
     int errorCode = CE_None;
     GDALRasterize(nullptr, memDataSet.get(), ds.get(), gdalOptions.get(), &errorCode);
@@ -62,7 +62,7 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
         throw RuntimeError("Failed to rasterize dataset {}", errorCode);
     }
 
-    return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
+    return std::make_pair(read_metadata_from_dataset(memDataSet), std::move(data));
 }
 
 class VectorTranslateOptionsWrapper
@@ -71,7 +71,7 @@ public:
     VectorTranslateOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        auto optionValues = createOptionsArray(opts);
+        auto optionValues = create_options_array(opts);
         _options          = GDALVectorTranslateOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
     }
 
@@ -89,12 +89,12 @@ private:
     GDALVectorTranslateOptions* _options;
 };
 
-VectorDataSet translateVector(const VectorDataSet& ds, const std::vector<std::string>& options)
+VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::string>& options)
 {
     VectorTranslateOptionsWrapper gdalOptions(options);
 
     auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
-    gdal::VectorDataSet memDataSet(memDriver.createDataSet("dummy"));
+    gdal::VectorDataSet memDataSet(memDriver.create_dataset("dummy"));
 
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
@@ -112,7 +112,7 @@ public:
     WarpOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        auto optionValues = createOptionsArray(opts);
+        auto optionValues = create_options_array(opts);
         _options          = GDALWarpAppOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
     }
 
@@ -138,11 +138,11 @@ std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const 
     std::vector<T> data(meta.rows * meta.cols);
 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet memDataSet(memDriver.createDataSet<T>(meta.rows, meta.cols, 0));
-    memDataSet.addBand(data.data());
-    memDataSet.setGeoTransform(inf::metadataToGeoTransform(meta));
-    memDataSet.setNoDataValue(1, meta.nodata);
-    memDataSet.setProjection(meta.projection);
+    gdal::RasterDataSet memDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
+    memDataSet.add_band(data.data());
+    memDataSet.set_geotransform(inf::metadata_to_geo_transform(meta));
+    memDataSet.set_nodata_value(1, meta.nodata);
+    memDataSet.set_projection(meta.projection);
 
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
@@ -151,7 +151,7 @@ std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const 
         throw RuntimeError("Failed to translate dataset {}", errorCode);
     }
 
-    return std::make_pair(readMetadataFromDataset(memDataSet), std::move(data));
+    return std::make_pair(read_metadata_from_dataset(memDataSet), std::move(data));
 }
 
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);

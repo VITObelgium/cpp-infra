@@ -2,5 +2,5 @@
 
 namespace inf::gdal {
 
-void setLogHandler();
+void set_log_handler();
 }

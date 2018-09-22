@@ -10,7 +10,7 @@
 
 namespace inf::str {
 
-bool containsValidInteger(std::string_view str)
+bool contains_valid_integer(std::string_view str)
 {
     std::string s(str);
 
@@ -19,7 +19,7 @@ bool containsValidInteger(std::string_view str)
     return (end != nullptr && *end == 0);
 }
 
-bool containsValidFloat(std::string_view str)
+bool contains_valid_float(std::string_view str)
 {
     std::string s(str);
 
@@ -28,7 +28,7 @@ bool containsValidFloat(std::string_view str)
     return (end != nullptr && *end == 0);
 }
 
-bool containsValidDouble(std::string_view str)
+bool contains_valid_double(std::string_view str)
 {
     std::string s(str);
 
@@ -37,7 +37,7 @@ bool containsValidDouble(std::string_view str)
     return (end != nullptr && *end == 0);
 }
 
-std::optional<int32_t> toInt32(std::string_view str) noexcept
+std::optional<int32_t> to_int32(std::string_view str) noexcept
 {
     std::string s(str);
 
@@ -50,9 +50,9 @@ std::optional<int32_t> toInt32(std::string_view str) noexcept
     return result;
 }
 
-int32_t toInt32Value(std::string_view str)
+int32_t to_int32_value(std::string_view str)
 {
-    auto optval = toInt32(str);
+    auto optval = to_int32(str);
     if (!optval.has_value()) {
         throw InvalidArgument("Failed to convert '{}' to int32", str);
     }
@@ -60,7 +60,7 @@ int32_t toInt32Value(std::string_view str)
     return *optval;
 }
 
-std::optional<int64_t> toInt64(std::string_view str) noexcept
+std::optional<int64_t> to_int64(std::string_view str) noexcept
 {
     std::string s(str);
 
@@ -73,9 +73,9 @@ std::optional<int64_t> toInt64(std::string_view str) noexcept
     return result;
 }
 
-int64_t toInt64Value(std::string_view str)
+int64_t to_int64_value(std::string_view str)
 {
-    auto optval = toInt64(str);
+    auto optval = to_int64(str);
     if (!optval.has_value()) {
         throw InvalidArgument("Failed to convert '{}' to int64", str);
     }
@@ -83,7 +83,7 @@ int64_t toInt64Value(std::string_view str)
     return *optval;
 }
 
-std::optional<float> toFloat(std::string_view str) noexcept
+std::optional<float> to_float(std::string_view str) noexcept
 {
     std::string s(str);
 
@@ -96,9 +96,9 @@ std::optional<float> toFloat(std::string_view str) noexcept
     return result;
 }
 
-float toFloatValue(std::string_view str)
+float to_float_value(std::string_view str)
 {
-    auto optval = toFloat(str);
+    auto optval = to_float(str);
     if (!optval.has_value()) {
         throw InvalidArgument("Failed to convert '{}' to float", str);
     }
@@ -106,7 +106,7 @@ float toFloatValue(std::string_view str)
     return *optval;
 }
 
-std::optional<double> toDouble(std::string_view str) noexcept
+std::optional<double> to_double(std::string_view str) noexcept
 {
     std::string s(str);
 
@@ -119,9 +119,9 @@ std::optional<double> toDouble(std::string_view str) noexcept
     return result;
 }
 
-double toDoubleValue(std::string_view str)
+double to_double_value(std::string_view str)
 {
-    auto optval = toDouble(str);
+    auto optval = to_double(str);
     if (!optval.has_value()) {
         throw InvalidArgument("Failed to convert '{}' to double", str);
     }
@@ -144,7 +144,7 @@ bool iequals(std::string_view str1, std::string_view str2)
     return true;
 }
 
-void replaceInPlace(std::string& aString, std::string_view toSearch, std::string_view toReplace)
+void replace_in_place(std::string& aString, std::string_view toSearch, std::string_view toReplace)
 {
     size_t startPos = 0;
     size_t foundPos;
@@ -158,7 +158,7 @@ void replaceInPlace(std::string& aString, std::string_view toSearch, std::string
 std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace)
 {
     std::string result(aString);
-    replaceInPlace(result, toSearch, toReplace);
+    replace_in_place(result, toSearch, toReplace);
     return result;
 }
 
@@ -180,26 +180,26 @@ std::string uppercase(std::string_view str)
     return result;
 }
 
-void lowercaseInPlace(std::string& str)
+void lowercase_in_place(std::string& str)
 {
     std::transform(str.begin(), str.end(), str.begin(), [](char c) {
         return static_cast<char>(::tolower(c));
     });
 }
 
-void uppercaseInPlace(std::string& str)
+void uppercase_in_place(std::string& str)
 {
     std::transform(str.begin(), str.end(), str.begin(), [](char c) {
         return static_cast<char>(::toupper(c));
     });
 }
 
-bool startsWith(std::string_view aString, std::string_view search)
+bool starts_with(std::string_view aString, std::string_view search)
 {
     return aString.compare(0, search.size(), search) == 0;
 }
 
-bool startsWithIgnoreCase(std::string_view aString, std::string_view search)
+bool starts_with_ignore_case(std::string_view aString, std::string_view search)
 {
     if (search.size() > aString.size()) {
         return false;
@@ -214,7 +214,7 @@ bool startsWithIgnoreCase(std::string_view aString, std::string_view search)
     return true;
 }
 
-bool endsWith(std::string_view aString, std::string_view search)
+bool ends_with(std::string_view aString, std::string_view search)
 {
     if (search.size() > aString.size()) {
         return false;
@@ -223,7 +223,7 @@ bool endsWith(std::string_view aString, std::string_view search)
     return aString.rfind(search) == (aString.size() - search.size());
 }
 
-std::string_view trimmedView(std::string_view str)
+std::string_view trimmed_view(std::string_view str)
 {
     if (str.empty()) {
         return str;
@@ -245,13 +245,13 @@ std::string_view trimmedView(std::string_view str)
 
 std::string trim(std::string_view str)
 {
-    auto trimmed = trimmedView(str);
+    auto trimmed = trimmed_view(str);
     return std::string(trimmed.begin(), trimmed.end());
 }
 
-void trimInPlace(std::string& str)
+void trim_in_place(std::string& str)
 {
-    auto trimmed = trimmedView(str);
+    auto trimmed = trimmed_view(str);
     if (trimmed.data() == str.data() && trimmed.size() == str.size()) {
         // no trimming was needed
         return;
@@ -260,10 +260,10 @@ void trimInPlace(std::string& str)
     str.assign(trimmed.begin(), trimmed.end());
 }
 
-static void applySplitOptions(std::string_view sv, Flags<SplitOpt> opt, std::vector<std::string_view>& tokens)
+static void apply_split_options(std::string_view sv, Flags<SplitOpt> opt, std::vector<std::string_view>& tokens)
 {
     if (opt.is_set(SplitOpt::Trim)) {
-        sv = trimmedView(sv);
+        sv = trimmed_view(sv);
     }
 
     if (sv.empty() && opt.is_set(SplitOpt::NoEmpty)) {
@@ -276,13 +276,13 @@ static void applySplitOptions(std::string_view sv, Flags<SplitOpt> opt, std::vec
 //static std::string_view applySplitOptions(std::string_view sv, Flags<SplitOpt> opt)
 //{
 //    if (opt.is_set(SplitOpt::Trim)) {
-//        return trimmedView(sv);
+//        return trimmed_view(sv);
 //    }
 //
 //    return sv;
 //}
 
-std::vector<std::string_view> splitView(std::string_view str, char delimiter, Flags<SplitOpt> opt)
+std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt)
 {
     std::vector<std::string_view> tokens;
 
@@ -290,7 +290,7 @@ std::vector<std::string_view> splitView(std::string_view str, char delimiter, Fl
     const char* start = str.data();
     for (size_t i = 0; i < str.size(); ++i) {
         if (str[i] == delimiter) {
-            applySplitOptions(std::string_view(start, length), opt, tokens);
+            apply_split_options(std::string_view(start, length), opt, tokens);
             length = 0;
 
             if (i + 1 < str.size()) {
@@ -302,21 +302,21 @@ std::vector<std::string_view> splitView(std::string_view str, char delimiter, Fl
     }
 
     if (length > 0) {
-        applySplitOptions(std::string_view(start, length), opt, tokens);
+        apply_split_options(std::string_view(start, length), opt, tokens);
     }
 
     if (*start == delimiter) {
-        applySplitOptions(std::string_view(), opt, tokens);
+        apply_split_options(std::string_view(), opt, tokens);
     }
 
     if (tokens.empty()) {
-        applySplitOptions(str, opt, tokens);
+        apply_split_options(str, opt, tokens);
     }
 
     return tokens;
 }
 
-static bool isDelimiter(char character, std::string_view delimiter)
+static bool is_delimiter(char character, std::string_view delimiter)
 {
     for (auto& del : delimiter) {
         if (del == character) {
@@ -327,7 +327,7 @@ static bool isDelimiter(char character, std::string_view delimiter)
     return false;
 }
 
-std::vector<std::string_view> splitView(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
+std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
 {
     std::vector<std::string_view> tokens;
 
@@ -342,11 +342,11 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
             }
 
             matchLength = 0;
-            if (isDelimiter(str[i], delimiter)) {
+            if (is_delimiter(str[i], delimiter)) {
                 ++matchLength;
 
                 if (opt.is_set(SplitOpt::JoinAdjacentCharDelimeters)) {
-                    while (i + 1 < str.size() && isDelimiter(str[i + 1], delimiter)) {
+                    while (i + 1 < str.size() && is_delimiter(str[i + 1], delimiter)) {
                         ++matchLength;
                         ++i;
                     }
@@ -356,7 +356,7 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
             if (matchLength > 0) {
                 //if (matchLength != str.size()) {
                 // if matchlength == str size, we have only had delimeter data
-                applySplitOptions(std::string_view(start, length), opt, tokens);
+                apply_split_options(std::string_view(start, length), opt, tokens);
                 length = 0;
                 //}
             } else {
@@ -365,11 +365,11 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
         }
 
         if (length > 0) {
-            applySplitOptions(std::string_view(start, length), opt, tokens);
+            apply_split_options(std::string_view(start, length), opt, tokens);
         }
 
         if (matchLength > 0) {
-            applySplitOptions(std::string_view(start, length), opt, tokens);
+            apply_split_options(std::string_view(start, length), opt, tokens);
         }
     } else {
         for (size_t i = 0; i < str.size(); ++i) {
@@ -377,7 +377,7 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
                 ++matchLength;
 
                 if (matchLength == delimiter.size()) {
-                    applySplitOptions(std::string_view(start, length), opt, tokens);
+                    apply_split_options(std::string_view(start, length), opt, tokens);
                     length      = 0;
                     matchLength = 0;
 
@@ -395,18 +395,18 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
         }
 
         if (matchLength == delimiter.size()) {
-            applySplitOptions(std::string_view(), opt, tokens);
+            apply_split_options(std::string_view(), opt, tokens);
         } else if (length + matchLength > 0) {
-            applySplitOptions(std::string_view(start, length), opt, tokens);
+            apply_split_options(std::string_view(start, length), opt, tokens);
         }
 
         if (length == 0 && matchLength == 0) {
-            applySplitOptions(std::string_view(), opt, tokens);
+            apply_split_options(std::string_view(), opt, tokens);
         }
     }
 
     if (tokens.empty()) {
-        applySplitOptions(std::string_view(start, length), opt, tokens);
+        apply_split_options(std::string_view(start, length), opt, tokens);
     }
 
     return tokens;
@@ -414,7 +414,7 @@ std::vector<std::string_view> splitView(std::string_view str, std::string_view d
 
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt)
 {
-    auto splitted = splitView(str, delimiter, opt);
+    auto splitted = split_view(str, delimiter, opt);
 
     std::vector<std::string> tokens;
     tokens.reserve(splitted.size());
@@ -427,7 +427,7 @@ std::vector<std::string> split(std::string_view str, char delimiter, Flags<Split
 
 std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
 {
-    auto splitted = splitView(str, delimiter, opt);
+    auto splitted = split_view(str, delimiter, opt);
 
     std::vector<std::string> tokens;
     tokens.reserve(splitted.size());

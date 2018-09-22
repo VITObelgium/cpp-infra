@@ -4,5 +4,5 @@
 
 namespace inf {
 
-int runProcess(std::string_view cmdLine);
+int run_process(std::string_view cmdLine);
 }

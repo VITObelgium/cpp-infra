@@ -13,7 +13,7 @@ template <typename T>
 std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options = {});
 
 // convert a vector dataset
-VectorDataSet translateVector(const VectorDataSet& ds, const std::vector<std::string>& options = {});
+VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::string>& options = {});
 
 // convert a raster dataset
 template <typename T>
