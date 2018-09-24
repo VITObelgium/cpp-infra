@@ -26,7 +26,7 @@ static void addLineToGeoPath(const gdal::CoordinateTransformer& transformer, QGe
 
 static void addPolyToGeoPath(const gdal::CoordinateTransformer& transformer, std::vector<QGeoPath>& geoPaths, gdal::Polygon& poly)
 {
-    auto ring = poly.exteriorRing();
+    auto ring = poly.exteriorring();
     {
         QGeoPath path;
         for (auto& point : ring) {
@@ -35,9 +35,9 @@ static void addPolyToGeoPath(const gdal::CoordinateTransformer& transformer, std
         geoPaths.emplace_back(std::move(path));
     }
 
-    for (int i = 0; i < poly.interiorRingCount(); ++i) {
+    for (int i = 0; i < poly.interiorring_count(); ++i) {
         QGeoPath path;
-        ring = poly.interiorRing(i);
+        ring = poly.interiorring(i);
         for (auto& point : ring) {
             addPointToGeoPath(transformer, path, point);
         }
@@ -49,7 +49,7 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::Coor
 {
     std::vector<QGeoPath> geoPaths;
 
-    for (auto& feature : ds.getLayer(0)) {
+    for (auto& feature : ds.layer(0)) {
         auto geometry = feature.geometry();
         switch (geometry.type()) {
         case gdal::Geometry::Type::Line: {
@@ -62,7 +62,7 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::Coor
             QGeoPath path;
             auto multiLine = geometry.as<gdal::MultiLine>();
             for (int i = 0; i < multiLine.size(); ++i) {
-                addLineToGeoPath(transformer, path, multiLine.lineAt(i));
+                addLineToGeoPath(transformer, path, multiLine.line_at(i));
             }
             geoPaths.push_back(path);
             break;
@@ -75,13 +75,13 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::Coor
         case gdal::Geometry::Type::MultiPolygon: {
             auto multiPoly = geometry.as<gdal::MultiPolygon>();
             for (int i = 0; i < multiPoly.size(); ++i) {
-                auto poly = multiPoly.polygonAt(i);
+                auto poly = multiPoly.polygon_at(i);
                 addPolyToGeoPath(transformer, geoPaths, poly);
             }
             break;
         }
         default:
-            Log::warn("Unhandled type: {}", geometry.typeName());
+            Log::warn("Unhandled type: {}", geometry.type_name());
         }
     }
 
@@ -97,7 +97,7 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
     gdal::CoordinateTransformer transformer1(31370, 4326);
     for (auto& [shpName, shpPath] : shapes) {
         auto ds = gdal::VectorDataSet::create(shpPath, gdal::VectorType::Unknown);
-        if (ds.layerCount() == 0) {
+        if (ds.layer_count() == 0) {
             continue;
         }
 

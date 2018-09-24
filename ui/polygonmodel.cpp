@@ -89,7 +89,7 @@ void PolygonModel::updateVisibleData()
 
     if (_data) {
         for (auto& polyData : *_data) {
-            if (inf::containerContains(_visibleNames, polyData.name)) {
+            if (inf::container_contains(_visibleNames, polyData.name)) {
                 for (auto& geoPath : polyData.geometry) {
                     _visibleData.emplace_back(&polyData, &geoPath);
                 }
