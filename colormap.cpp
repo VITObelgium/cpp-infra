@@ -1301,7 +1301,7 @@ ColorMap ColorMap::create(std::string_view name)
         {"bone", Cmap::bone},
         {"cool", Cmap::cool},
         {"copper", Cmap::copper},
-        {"gray", Cmap::copper},
+        {"gray", Cmap::gray},
         {"hot", Cmap::hot},
         {"hsv", Cmap::hsv},
         {"pink", Cmap::pink},

@@ -223,6 +223,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
         include/uiinfra/comboboxdelegate.h ui/comboboxdelegate.cpp
+        include/uiinfra/delegatecombobox.h ui/delegatecombobox.cpp
         include/uiinfra/readonlyproxy.h
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/scopedcursor.h

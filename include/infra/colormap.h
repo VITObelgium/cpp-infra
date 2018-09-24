@@ -49,6 +49,11 @@ public:
     const Color& get_color(float value) const noexcept;
     const Color& get_color(uint8_t value) const noexcept;
 
+    constexpr size_t size()
+    {
+        return _cmap.size();
+    }
+
 private:
     uint8_t process_band(float value, const std::vector<ColorDict::Entry>& dict) const noexcept;
 
