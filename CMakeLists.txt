@@ -1,5 +1,21 @@
 include(CMakeDependentOption)
+include(CMakePackageConfigHelpers)
 include(CheckCXXSourceCompiles)
+include(GNUInstallDirs)
+
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set (INFRA_IS_TOPLEVEL ON)
+endif ()
+
+if (INFRA_IS_TOPLEVEL)
+    cmake_minimum_required(VERSION 3.10)
+    project(Infra
+        VERSION 0.9.1
+        LANGUAGES CXX
+    )
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+endif ()
 
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
@@ -52,7 +68,7 @@ find_package(fmt CONFIG REQUIRED)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 
-add_library(infra
+set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
@@ -61,19 +77,31 @@ add_library(infra
     include/infra/generator.h
     include/infra/line.h
     include/infra/point.h
-    include/infra/process.h process.cpp
+    include/infra/process.h
     include/infra/signal.h
-    include/infra/string.h string.cpp
-    include/infra/exception.h exception.cpp
-    include/infra/filesystem.h filesystem.cpp
-    include/infra/color.h color.cpp
-    include/infra/colormap.h colormap.cpp
-    include/infra/threadpool.h threadpool.cpp
+    include/infra/string.h
+    include/infra/exception.h
+    include/infra/filesystem.h
+    include/infra/color.h
+    include/infra/colormap.h
+    include/infra/threadpool.h
     include/infra/typetraits.h
-
     include/infra/internal/traits.h
-    include/infra/inireader.h inireader.cpp
+    include/infra/inireader.h
 )
+
+add_library(infra
+    process.cpp
+    string.cpp
+    exception.cpp
+    filesystem.cpp
+    color.cpp
+    colormap.cpp
+    threadpool.cpp
+    inireader.cpp
+)
+
+add_library(Infra::Infra ALIAS infra)
 
 target_include_directories(infra
     PUBLIC
@@ -119,8 +147,8 @@ endif ()
 
 if (INFRA_LOGGING)
     find_package(spdlog CONFIG REQUIRED)
-
-    target_sources(infra PRIVATE include/infra/log.h log.cpp)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
+    target_sources(infra PRIVATE log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
     # make sure spdlog does not use its internal version of fmt
     target_compile_definitions(infra PUBLIC SPDLOG_FMT_EXTERNAL)
@@ -128,9 +156,8 @@ endif ()
 
 if (INFRA_XML)
     find_package(pugixml REQUIRED)
-    target_sources(infra PRIVATE
-        include/infra/configdocument.h configdocument.cpp
-    )
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/configdocument.h)
+    target_sources(infra PRIVATE configdocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
 endif ()
 
@@ -139,12 +166,19 @@ if (INFRA_GDAL)
     find_package(Gsl REQUIRED)
     find_package(date CONFIG REQUIRED)
 
-    target_sources(infra PRIVATE
-        include/infra/gdal.h gdal.cpp
-        include/infra/gdalalgo.h gdalalgo.cpp
-        include/infra/gdalgeometry.h gdalgeometry.cpp
-        include/infra/geometadata.h geometadata.cpp
+    list (APPEND INFRA_PUBLIC_HEADERS
+        include/infra/gdal.h
+        include/infra/gdalalgo.h
+        include/infra/gdalgeometry.h
+        include/infra/geometadata.h
         include/infra/internal/gdalinternal.h
+    )
+
+    target_sources(infra PRIVATE
+        gdal.cpp
+        gdalalgo.cpp
+        gdalgeometry.cpp
+        geometadata.cpp
     )
 
     if (INFRA_EMBED_GDAL_DATA)
@@ -170,29 +204,59 @@ if (INFRA_GDAL)
     endif ()
 
     if (INFRA_LOGGING)
-        target_sources(infra PRIVATE
-            include/infra/gdallog.h gdallog.cpp
-        )
+        list (APPEND INFRA_PUBLIC_HEADERS include/infra/gdallog.h)
+        target_sources(infra PRIVATE gdallog.cpp)
     endif ()
-
     target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl date_interface)
 endif ()
 
 if (INFRA_NUMERIC)
     find_package(Eigen3 CONFIG REQUIRED)
-
-    target_sources(infra PRIVATE include/infra/polyfit.h)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/polyfit.h)
     target_link_libraries(infra PUBLIC Eigen3::Eigen)
 endif ()
 
 if (INFRA_LICENSE_MANAGER)
     find_package(Rlm CONFIG REQUIRED)
-
-    target_sources(infra PRIVATE
-        include/infra/licensemanager.h licensemanager.cpp
-    )
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/licensemanager.h)
+    target_sources(infra PRIVATE licensemanager.cpp)
     target_link_libraries(infra PRIVATE Rlm::Rlm)
 endif ()
+
+target_sources(infra PRIVATE ${INFRA_PUBLIC_HEADERS})
+set_target_properties(infra PROPERTIES
+    PUBLIC_HEADER "${INFRA_PUBLIC_HEADERS}"
+)
+
+set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
+
+install(TARGETS infra EXPORT infra-targets
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
+)
+
+install(EXPORT infra-targets
+    FILE InfraTargets.cmake
+    NAMESPACE Infra::
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+write_basic_package_version_file("InfraConfigVersion.cmake"
+    VERSION ${Infra_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/InfraConfig.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
+    DESTINATION ${INSTALL_CONFIGDIR}
+)
 
 if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
