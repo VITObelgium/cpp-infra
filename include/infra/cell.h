@@ -78,6 +78,16 @@ inline Cell bottom_right_cell(const Cell& cell) noexcept
 {
     return Cell(cell.r + 1, cell.c + 1);
 }
+
+inline void increment_cell(Cell& cell, int32_t cols)
+{
+    ++cell.c;
+    if (cell.c >= cols) {
+        cell.c = 0;
+        ++cell.r;
+    }
+}
+
 }
 
 namespace fmt {
