@@ -223,6 +223,22 @@ bool ends_with(std::string_view aString, std::string_view search)
     return aString.rfind(search) == (aString.size() - search.size());
 }
 
+bool ends_with_ignore_case(std::string_view aString, std::string_view search)
+{
+    if (search.size() > aString.size()) {
+        return false;
+    }
+
+    size_t searchIndex = 0;
+    for (size_t i = aString.size() - search.size(); i < aString.size(); ++i) {
+        if (std::tolower(aString[i]) != std::tolower(search[searchIndex++])) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::string_view trimmed_view(std::string_view str)
 {
     if (str.empty()) {

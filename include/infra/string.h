@@ -217,6 +217,14 @@ bool starts_with_ignore_case(std::string_view str, std::string_view search);
 bool ends_with(std::string_view str, std::string_view search);
 
 /*!
+ * \brief check if a string ends with the provided string ignoring casing
+ * \param str input string
+ * \param search string
+ * \return true is the input string ends with the search string
+ */
+bool ends_with_ignore_case(std::string_view aString, std::string_view search);
+
+/*!
  * \brief create a trimmed view to a astring
  * \param str input string
  * \return trimmed view of the input string
@@ -248,7 +256,7 @@ std::string join(const Container& items, std::string_view joinString)
 {
     using ValueType = typename Container::value_type;
     static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
-        "Items to join should be streamable or convertible to string_view");
+                  "Items to join should be streamable or convertible to string_view");
 
     std::string result;
 

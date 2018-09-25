@@ -388,6 +388,26 @@ TEST(StringTest, ends_with)
     EXPECT_FALSE(str::ends_with("", "."));
 }
 
+TEST(StringTest, ends_with_ignore_case)
+{
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", ""));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "e"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "E"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "ne"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "NE"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "One"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "oNe"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "TestOne"));
+    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "testone"));
+
+    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "On"));
+    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "oN"));
+    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "TESTON"));
+    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "TestOne."));
+
+    EXPECT_FALSE(str::ends_with_ignore_case("", "."));
+}
+
 TEST(StringTest, SplitterTest)
 {
     static const char* line = "Line 1:\t1\t2\t3\t4\t5\t10";
