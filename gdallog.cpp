@@ -32,9 +32,11 @@ void set_log_handler()
 {
     CPLSetErrorHandler(&gdalErrorHandler);
 }
+}
 #else
+namespace inf::gdal {
 void set_log_handler()
 {
 }
-#endif
 }
+#endif
