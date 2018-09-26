@@ -10,7 +10,7 @@
 #include <vector>
 
 #include "infra/enumflags.h"
-#include "infra/internal/traits.h"
+#include "infra/typetraits-private.h"
 #include "infra/typetraits.h"
 
 namespace inf::str {

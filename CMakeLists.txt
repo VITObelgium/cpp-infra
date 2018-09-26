@@ -17,9 +17,9 @@ if (INFRA_IS_TOPLEVEL)
     set(CMAKE_CXX_EXTENSIONS OFF)
 endif ()
 
-option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
 option(INFRA_LOGGING "Enable logging functionality" ON)
-option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" ON)
+option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
+cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
@@ -86,7 +86,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/colormap.h
     include/infra/threadpool.h
     include/infra/typetraits.h
-    include/infra/internal/traits.h
+    include/infra/typetraits-private.h
     include/infra/inireader.h
 )
 
@@ -171,7 +171,7 @@ if (INFRA_GDAL)
         include/infra/gdalalgo.h
         include/infra/gdalgeometry.h
         include/infra/geometadata.h
-        include/infra/internal/gdalinternal.h
+        include/infra/gdal-private.h
     )
 
     target_sources(infra PRIVATE
@@ -194,7 +194,7 @@ if (INFRA_GDAL)
             embedgdaldata.cmake
         )
 
-        target_compile_definitions(infra PRIVATE -DEMBED_GDAL_DATA)
+        target_compile_definitions(infra PRIVATE EMBED_GDAL_DATA)
 
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.h ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.cpp
                            COMMAND ${CMAKE_COMMAND} ARGS -DGDAL_DATA_PATH=${Gdal_DATA_PATH} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/gdal_data -P ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
