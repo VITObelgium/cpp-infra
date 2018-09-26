@@ -1,4 +1,6 @@
 #include "infra/gdallog.h"
+
+#ifdef INFRA_LOG_ENABLED
 #include "infra/log.h"
 
 #include <cpl_error.h>
@@ -30,4 +32,9 @@ void set_log_handler()
 {
     CPLSetErrorHandler(&gdalErrorHandler);
 }
+#else
+void set_log_handler()
+{
+}
+#endif
 }

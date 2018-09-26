@@ -15,6 +15,15 @@ if (INFRA_IS_TOPLEVEL)
     )
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_EXTENSIONS OFF)
+
+    # avoid windows specific warnings
+    add_definitions(
+        -D_CRT_SECURE_NO_WARNINGS
+        -D_SCL_SECURE_NO_WARNINGS
+        -D_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING
+        -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+        -D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
+    )
 endif ()
 
 option(INFRA_LOGGING "Enable logging functionality" ON)
@@ -151,7 +160,7 @@ if (INFRA_LOGGING)
     target_sources(infra PRIVATE log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
     # make sure spdlog does not use its internal version of fmt
-    target_compile_definitions(infra PUBLIC SPDLOG_FMT_EXTERNAL)
+    target_compile_definitions(infra PUBLIC SPDLOG_FMT_EXTERNAL PRIVATE INFRA_LOG_ENABLED)
 endif ()
 
 if (INFRA_XML)
