@@ -88,13 +88,13 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::Coor
     return geoPaths;
 }
 
-OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes)
+OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg)
 {
     Log::debug("Load overlays");
 
     OverlayMap data;
 
-    gdal::CoordinateTransformer transformer1(31370, 4326);
+    gdal::CoordinateTransformer transformer(epsg, 4326);
     for (auto& [shpName, shpPath] : shapes) {
         auto ds = gdal::VectorDataSet::create(shpPath, gdal::VectorType::Unknown);
         if (ds.layer_count() == 0) {
@@ -102,7 +102,7 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
         }
 
         try {
-            data.emplace(QString::fromUtf8(shpName.c_str()), dataSetToGeoPath(ds, transformer1));
+            data.emplace(QString::fromUtf8(shpName.c_str()), dataSetToGeoPath(ds, transformer));
         } catch (const std::exception& e) {
             Log::warn("Failed to add overlay {} ({})", shpPath.string(), e.what());
         }
