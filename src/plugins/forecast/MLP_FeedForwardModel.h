@@ -8,13 +8,11 @@
 #ifndef MLP_FEEDFORWARDFORECASTMODEL_H_
 #define MLP_FEEDFORWARDFORECASTMODEL_H_
 
-#include "Logger.h"
 #include "Model.h"
 
 #include <string>
 
-namespace opaq
-{
+namespace opaq {
 
 class Station;
 
@@ -27,7 +25,7 @@ class Station;
 class MLP_FeedForwardModel : public Model
 {
 public:
-    MLP_FeedForwardModel(const std::string& name);
+    MLP_FeedForwardModel();
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
@@ -38,8 +36,8 @@ public:
      *  value
      */
     double fcValue(const Pollutant& pol, const Station& station,
-                   Aggregation::Type aggr, const chrono::date_time& baseTime,
-                   chrono::days fc_hor);
+        Aggregation::Type aggr, const chrono::date_time& baseTime,
+        chrono::days fc_hor);
 
     // Some helper routines, make them public
     static double mean_missing(const std::vector<double>& list, double noData);
@@ -51,14 +49,14 @@ protected:
     // derived models are the actual plugins and they need to implement this particular
     // method...
     virtual int makeSample(double* sample, const Station& st, const Pollutant& pol,
-                           Aggregation::Type aggr, const chrono::date_time& baseTime,
-                           const chrono::date_time& fcTime, chrono::days fc_hor) = 0;
+        Aggregation::Type aggr, const chrono::date_time& baseTime,
+        const chrono::date_time& fcTime, chrono::days fc_hor) = 0;
 
     /**
      * virtual method which returns the name of the ffnet file from a given pattern
      */
     virtual std::string getFFNetFile(const std::string& pol_name, Aggregation::Type aggr,
-                                     const std::string& st_name, int fc_hor);
+        const std::string& st_name, int fc_hor);
 
     void printPar(const std::string&, const std::vector<double>& x);
 

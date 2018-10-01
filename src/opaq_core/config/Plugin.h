@@ -9,15 +9,12 @@
 
 #include <string>
 
-namespace opaq
-{
-namespace config
-{
+namespace opaq {
+namespace config {
 
 struct Plugin
 {
     std::string name;
-    std::string libPath;
 };
 
 }

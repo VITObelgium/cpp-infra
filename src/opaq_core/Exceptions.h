@@ -1,59 +1,23 @@
-/*
- * Exceptions.h
- *
- *  Created on: Dec 20, 2013
- *      Author: vlooys
- */
-
 #pragma once
 
-#include <fmt/format.h>
-#include <string>
+#include "infra/exception.h"
 
-#define EXCEPTION(NAME)                                 \
-class NAME : public std::exception                      \
-                                                        \
-{                                                       \
-public:                                                 \
-    NAME() = default;                                   \
-                                                        \
-    template<typename... T>                             \
-    NAME(T&&... args)                                   \
-    : _message(fmt::format(std::forward<T>(args)...))   \
-    {                                                   \
-    }                                                   \
-                                                        \
-    NAME(std::string message)                           \
-    : _message(std::move(message))                      \
-    {                                                   \
-    }                                                   \
-                                                        \
-    const char* what() const throw()                    \
-    {                                                   \
-        return _message.c_str();                        \
-    }                                                   \
-                                                        \
-    private : std::string _message;                     \
-};
+namespace opaq {
 
-namespace opaq
-{
+EXCEPTION(BadConfigurationException, std::runtime_error);
+EXCEPTION(ComponentAlreadyExistsException, std::runtime_error);
+EXCEPTION(ComponentNotFoundException, std::runtime_error);
+EXCEPTION(FailedToLoadPluginException, std::runtime_error);
+EXCEPTION(PluginNotFoundException, std::runtime_error);
 
-EXCEPTION(BadConfigurationException);
-EXCEPTION(ComponentAlreadyExistsException);
-EXCEPTION(ComponentNotFoundException);
-EXCEPTION(FailedToLoadPluginException);
-EXCEPTION(PluginNotFoundException);
+EXCEPTION(IOException, std::runtime_error)
+EXCEPTION(NullPointerException, std::runtime_error);
+EXCEPTION(ParseException, std::runtime_error)
 
-EXCEPTION(IOException)
-EXCEPTION(NullPointerException);
-EXCEPTION(ParseException)
+EXCEPTION(NotAvailableException, std::runtime_error);
+EXCEPTION(ElementNotFoundException, std::runtime_error);
 
-EXCEPTION(InvalidArgumentsException)
-EXCEPTION(NotAvailableException);
-EXCEPTION(ElementNotFoundException);
-
-EXCEPTION(RunTimeException)
+using RuntimeError    = infra::RuntimeError;
+using InvalidArgument = infra::InvalidArgument;
 
 }
-

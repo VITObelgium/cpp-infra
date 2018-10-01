@@ -1,10 +1,9 @@
 #include "Hdf5Tools.h"
-#include "tools/StringTools.h"
 
-namespace opaq
-{
-namespace Hdf5Tools
-{
+#include <algorithm>
+
+namespace opaq {
+namespace Hdf5Tools {
 
 unsigned int getDataSetSize(const H5::DataSet& dataSet, const unsigned int dimIndex)
 {
@@ -18,7 +17,6 @@ unsigned int getDataSetSize(const H5::DataSet& dataSet, const unsigned int dimIn
 
 void createStringAttribute(const H5::DataSet& dataSet, const std::string& attname, const std::string& attvalue)
 {
-
     static H5::StrType stringType = H5::StrType(0, H5T_VARIABLE);
 
     H5::DataSpace att_space(H5S_SCALAR);
@@ -44,8 +42,7 @@ int getIndexInStringDataSet(H5::DataSet& dataSet, const std::string& str, bool c
 
     // 2. check if given parameter is already in the set
     auto iter = std::find(buffer.begin(), buffer.end(), str);
-    if (iter == buffer.end() && create)
-    {
+    if (iter == buffer.end() && create) {
         // if not found; add to list and update index value
         addToStringDataSet(dataSet, str);
         return static_cast<int>(buffer.size());
@@ -76,8 +73,7 @@ std::vector<std::string> readStringData(const H5::DataSet& dataSet)
     dataSet.read(strData.data(), stringType, memSpace, space);
 
     result.reserve(size);
-    for (auto* str : strData)
-    {
+    for (auto* str : strData) {
         result.push_back(str);
         free(str);
     }
@@ -164,6 +160,5 @@ void addToLongDataSet(H5::DataSet& dataSet, const long& value)
     space.close();
     dataSet.flush(H5F_SCOPE_GLOBAL);
 }
-
 }
 }

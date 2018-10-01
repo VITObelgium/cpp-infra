@@ -1,13 +1,10 @@
 #pragma once
 
-#include "Logger.h"
 #include "Pollutant.h"
 
-namespace opaq
-{
+namespace opaq {
 
-namespace config
-{
+namespace config {
 /**
      * Singleton pollutant manager class
      * Presents the available pollutants, defined in the configuration file to the OPAQ framework
@@ -15,7 +12,7 @@ namespace config
 class PollutantManager
 {
 public:
-    PollutantManager();
+    PollutantManager()                        = default;
     PollutantManager(const PollutantManager&) = delete;
     void operator=(const PollutantManager&) = delete;
 
@@ -29,7 +26,10 @@ public:
 
     /** Returns a reference to the list of the available pollutants
        */
-    const std::vector<Pollutant>& getList() { return _pollutants; }
+    const std::vector<Pollutant>& getList()
+    {
+        return _pollutants;
+    }
 
     /** Searches for a pollutant of given name and returns a pointer to the pollutant object */
     Pollutant find(const std::string& name);
@@ -39,14 +39,11 @@ public:
       This member function will push back OPAQ::Pollutants to the list for each
       "<pollutant>" found in the "<pollutants>" section
       */
-    void configure(TiXmlElement const* config);
+    void configure(const infra::ConfigNode& config);
 
 private:
     // list of the available pollutants
     std::vector<Pollutant> _pollutants; //!< list of available pollutants
-    Logger _logger;
 };
-
 }
 }
-

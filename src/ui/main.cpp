@@ -1,15 +1,17 @@
 #include <QApplication>
 #include <QtPlugin>
 
-#include "config.h"
+#include "infra/log.h"
 #include "mainwindow.h"
-#include "plugins/ForcePluginLink.h"
+#include "opaqconfig.h"
 
 #ifdef STATIC_QT
 #if defined WIN32
-    Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 #endif
+
+using namespace infra;
 
 int main(int argc, char* argv[])
 {
@@ -19,16 +21,8 @@ int main(int argc, char* argv[])
     QCoreApplication::addLibraryPath("./plugins");
 #endif
 
-    Log::initLogger("");
-    Logger logger("main");
-
-#ifdef STATIC_PLUGINS
-    logger->debug("Available Plugins:");
-    for (auto& plugin : opaq::getPluginNames())
-    {
-        logger->debug(" - {}", plugin);
-    }
-#endif
+    Log::addConsoleSink(Log::Colored::On);
+    LogRegistration logging("opaq");
 
     QApplication app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");

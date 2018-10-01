@@ -1,14 +1,13 @@
 #include "OpaqRun.h"
 #include "../PollutantManager.h"
 
-namespace opaq
-{
-namespace config
-{
+namespace opaq {
+namespace config {
+
+using namespace infra;
 
 OpaqRun::OpaqRun()
-: _logger("OPAQ::config::OpaqRun")
-, _aggregation(Aggregation::None)
+: _aggregation(Aggregation::None)
 {
 }
 
@@ -28,22 +27,20 @@ Plugin OpaqRun::getPlugin(const std::string& pluginName)
         return plugin.name == pluginName;
     });
 
-    if (iter == _plugins.end())
-    {
+    if (iter == _plugins.end()) {
         throw BadConfigurationException("Plugin with name '{}' not found.", pluginName);
     }
 
     return *iter;
 }
 
-const Component& OpaqRun::getComponent(const std::string& componentName)
+const Component& OpaqRun::getComponent(std::string_view componentName)
 {
     auto iter = std::find_if(_components.begin(), _components.end(), [&](config::Component& comp) {
         return comp.name == componentName;
     });
 
-    if (iter == _components.end())
-    {
+    if (iter == _components.end()) {
         throw BadConfigurationException("Component with name '{}' not found.", componentName);
     }
 
@@ -140,6 +137,5 @@ void OpaqRun::setMappingStage(MappingStage mappingStage)
 {
     _mappingStage = mappingStage;
 }
-
 }
 }

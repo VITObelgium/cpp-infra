@@ -1,4 +1,0 @@
-Source: python3
-Version: 3.5.2
-Description: The Python programming language as an embeddable library
-Build-Depends: zlib

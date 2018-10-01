@@ -2,18 +2,17 @@
 #include "DateTime.h"
 #include "Grid.h"
 #include "Hdf5Tools.h"
-#include "PluginRegistration.h"
 #include "Pollutant.h"
 #include "Station.h"
-#include "tools/XmlTools.h"
+#include "infra/configdocument.h"
+#include "infra/log.h"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
-#include <tinyxml.h>
 
-namespace opaq
-{
+namespace opaq {
 
+using namespace infra;
 using namespace chrono_literals;
 
 static const std::string s_gridGroupName("grid");
@@ -35,11 +34,11 @@ static void writeGrid(chrono::date_time start, chrono::date_time end, const Grid
     hsize_t dimension = grid.cellCount();
     H5::DataSpace dataSpace(1, &dimension);
 
-    auto xDataSet      = group.createDataSet("x", H5::PredType::NATIVE_DOUBLE, dataSpace);
-    auto yDataSet      = group.createDataSet("y", H5::PredType::NATIVE_DOUBLE, dataSpace);
-    
-    hsize_t valuesDimension[2] { grid.cellCount(), hsize_t(date::floor<chrono::days>(end - start).count()) };
-    auto valueDataSet  = group.createDataSet("value", H5::PredType::NATIVE_DOUBLE, H5::DataSpace(2, valuesDimension));
+    auto xDataSet = group.createDataSet("x", H5::PredType::NATIVE_DOUBLE, dataSpace);
+    auto yDataSet = group.createDataSet("y", H5::PredType::NATIVE_DOUBLE, dataSpace);
+
+    hsize_t valuesDimension[2]{grid.cellCount(), hsize_t(date::floor<chrono::days>(end - start).count())};
+    auto valueDataSet = group.createDataSet("value", H5::PredType::NATIVE_DOUBLE, H5::DataSpace(2, valuesDimension));
 
     H5::StrType stringType(0, H5T_VARIABLE);
     hsize_t attrDimension = 1;
@@ -85,8 +84,7 @@ static void writeStations(const std::vector<Station>& stations, H5::Group& group
 }
 
 RioOutputBuffer::RioOutputBuffer()
-: _logger("RioOutputBuffer")
-, _index(0)
+: _index(0)
 , _stringType(H5::StrType(0, H5T_VARIABLE))
 {
     // Tell the hdf5 lib not to print error messages: we will handle them properly ourselves
@@ -98,21 +96,20 @@ std::string RioOutputBuffer::name()
     return "riooutputbuffer";
 }
 
-void RioOutputBuffer::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
+void RioOutputBuffer::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 
-    if (!configuration)
-    {
+    if (!configuration) {
         throw NullPointerException("No configuration element given for RioOutputBuffer...");
     }
 
-    _filePattern = XmlTools::getChildValue<std::string>(configuration, "filename");
+    _filePattern = std::string(configuration.child("filename").value());
 }
 
 void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time end,
-                                      const Pollutant& pol, Aggregation::Type agg,
-                                      const std::vector<Station>& stations, const Grid& grid, GridType gridType)
+    const Pollutant& pol, Aggregation::Type agg,
+    const std::vector<Station>& stations, const Grid& grid, GridType gridType)
 {
     throwIfNotConfigured();
 
@@ -125,9 +122,8 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
     boost::algorithm::replace_all(filename, s_gridPlaceholder, gridTypeToString(gridType));
     boost::algorithm::replace_all(filename, s_startDatePlaceholder, chrono::to_dense_date_string(start));
     boost::algorithm::replace_all(filename, s_endDatePlaceholder, chrono::to_dense_date_string(end));
-    
-    try
-    {
+
+    try {
         _h5File = std::make_unique<H5::H5File>(filename, H5F_ACC_TRUNC);
 
         auto rootGroup = _h5File->openGroup("/");
@@ -142,14 +138,10 @@ void RioOutputBuffer::openResultsFile(chrono::date_time start, chrono::date_time
 
         auto stationsGroup = rootGroup.createGroup(s_stationsGroupName);
         writeStations(stations, stationsGroup);
-    }
-    catch (const H5::FileIException& e)
-    {
-        throw RunTimeException("Failed to create file {} ({}::{})", filename, e.getCFuncName(), e.getCDetailMsg());
-    }
-    catch (const H5::Exception& e)
-    {
-        throw RunTimeException("Failed to create Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
+    } catch (const H5::FileIException& e) {
+        throw RuntimeError("Failed to create file {} ({}::{})", filename, e.getCFuncName(), e.getCDetailMsg());
+    } catch (const H5::Exception& e) {
+        throw RuntimeError("Failed to create Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
     }
 }
 
@@ -157,29 +149,26 @@ void RioOutputBuffer::addResults(const std::vector<double>& results)
 {
     assert(_h5File);
 
-    try
-    {
+    try {
         auto gridGroup = _h5File->openGroup("/" + s_gridGroupName);
-        auto ds = gridGroup.openDataSet("value");
+        auto ds        = gridGroup.openDataSet("value");
 
-        hsize_t size[4] {0};
+        hsize_t size[4]{0};
         auto space = ds.getSpace();
         space.getSimpleExtentDims(size);
 
         assert(_index <= size[1]);
 
-        hsize_t count[4] = { size[0], 1, 1, 1 };
-        hsize_t offset[4] = { 0, _index, 0, 0 };
+        hsize_t count[4]  = {size[0], 1, 1, 1};
+        hsize_t offset[4] = {0, _index, 0, 0};
         space.selectHyperslab(H5S_SELECT_SET, count, offset);
 
         H5::DataSpace writeMemSpace(4, count);
         ds.write(results.data(), H5::PredType::NATIVE_DOUBLE, writeMemSpace, space);
 
         ++_index;
-    }
-    catch (const H5::Exception& e)
-    {
-        throw RunTimeException("Failed to add results to Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
+    } catch (const H5::Exception& e) {
+        throw RuntimeError("Failed to add results to Rio output buffer ({}::{})", e.getCFuncName(), e.getCDetailMsg());
     }
 }
 
@@ -190,11 +179,9 @@ void RioOutputBuffer::closeResultsFile()
 
 void RioOutputBuffer::throwIfNotConfigured() const
 {
-    if (_filePattern.empty())
-    {
-        throw RunTimeException("Hdf5Buffer Not fully configured");
+    if (_filePattern.empty()) {
+        throw RuntimeError("Hdf5Buffer Not fully configured");
     }
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(RioOutputBuffer)
 }

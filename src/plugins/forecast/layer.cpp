@@ -1,15 +1,14 @@
 #include <string>
 
+#include "infra/configdocument.h"
 #include "layer.h"
 
 int _parseMatrix(Eigen::MatrixXd& m, const std::string& str)
 {
     std::stringstream ss(str);
     int n = 0;
-    for (int i = 0; i < m.rows(); i++)
-    {
-        for (int j = 0; j < m.cols(); j++)
-        {
+    for (int i = 0; i < m.rows(); i++) {
+        for (int j = 0; j < m.cols(); j++) {
             if ((ss >> m(i, j)).fail()) break;
             n++;
         }
@@ -21,88 +20,83 @@ int _parseMatrix(Eigen::VectorXd& m, const std::string& str)
 {
     std::stringstream ss(str);
     int n = 0;
-    for (int i = 0; i < m.size(); i++)
-    {
+    for (int i = 0; i < m.size(); i++) {
         if ((ss >> m(i)).fail()) break;
         n++;
     }
     return n;
 }
 
-namespace nnet
-{
+namespace nnet {
 
-layer::layer(TiXmlElement* cnf, int ninput)
+using namespace infra;
+
+layer::layer(const ConfigNode& config, int ninput)
 : _fcn(nullptr)
 {
+    if (!config) {
+        throw std::runtime_error("invalid layer config");
+    }
 
-    int size;
-    std::string mat_str;
+    auto size = config.attribute<int>("size");
+    if (!size.has_value()) {
+        throw std::runtime_error("cannot find layer size");
+    }
 
-    if (!cnf) throw "invalid pointer to cnf";
-    if (cnf->QueryIntAttribute("size", &size) != TIXML_SUCCESS) throw "cannot find layer size";
-    if (cnf->QueryStringAttribute("transfcn", &_fcnName) != TIXML_SUCCESS)
-        throw "cannot find transfer function";
+    _fcnName = std::string(config.attribute("transfcn"));
+    if (_fcnName.empty()) {
+        throw std::runtime_error("cannot find transfer function");
+    }
 
-    cnf->QueryStringAttribute("name", &_Name);
+    _Name = config.attribute("name");
 
     // allocate vectors
-    _LW = Eigen::MatrixXd::Zero(size, ninput); // layer weights
-    _B  = Eigen::VectorXd::Zero(size);         // layer biasses
-    _a  = Eigen::VectorXd::Zero(size);         // layer values
+    _LW = Eigen::MatrixXd::Zero(*size, ninput); // layer weights
+    _B  = Eigen::VectorXd::Zero(*size);         // layer biasses
+    _a  = Eigen::VectorXd::Zero(*size);         // layer values
 
     // set the transfer function, a bit heavy here but what the hell
-    if (this->fcnName() == "purelin")
-    {
+    if (this->fcnName() == "purelin") {
         _fcn = nnet::purelin;
-    }
-    else if (this->fcnName() == "logsig")
-    {
+    } else if (this->fcnName() == "logsig") {
         _fcn = nnet::logsig;
-    }
-    else if (this->fcnName() == "tansig")
-    {
+    } else if (this->fcnName() == "tansig") {
         _fcn = nnet::tansig;
-    }
-    else if (this->fcnName() == "hardlim")
-    {
+    } else if (this->fcnName() == "hardlim") {
         _fcn = nnet::hardlim;
-    }
-    else if (this->fcnName() == "hardlims")
-    {
+    } else if (this->fcnName() == "hardlims") {
         _fcn = nnet::hardlims;
-    }
-    else if (this->fcnName() == "poslin")
-    {
+    } else if (this->fcnName() == "poslin") {
         _fcn = nnet::poslin;
-    }
-    else if (this->fcnName() == "radbas")
-    {
+    } else if (this->fcnName() == "radbas") {
         _fcn = nnet::radbas;
-    }
-    else if (this->fcnName() == "satlin")
-    {
+    } else if (this->fcnName() == "satlin") {
         _fcn = nnet::satlin;
-    }
-    else if (this->fcnName() == "satlins")
-    {
+    } else if (this->fcnName() == "satlins") {
         _fcn = nnet::satlins;
-    }
-    else if (this->fcnName() == "tribas")
-    {
+    } else if (this->fcnName() == "tribas") {
         _fcn = nnet::tribas;
-    }
-    else
-        throw "unknown transfer function requested";
+    } else
+        throw std::runtime_error("unknown transfer function requested");
 
     // read the layer weights and biases
     // this assumes we are reading the layer weight matrix row-wise from the text element
-    if (!cnf->FirstChildElement("weights")) throw "no weights defined in layer";
-    mat_str = cnf->FirstChildElement("weights")->GetText();
-    if (_parseMatrix(_LW, mat_str) != _LW.rows() * _LW.cols()) throw "error reading layer weights";
+    auto weightsNode = config.child("weights");
+    if (!weightsNode) {
+        throw std::runtime_error("no weights defined in layer");
+    }
 
-    if (!cnf->FirstChildElement("bias")) throw "no biasses defined in layer";
-    mat_str = cnf->FirstChildElement("bias")->GetText();
+    auto mat_str = std::string(weightsNode.value());
+    if (_parseMatrix(_LW, mat_str) != _LW.rows() * _LW.cols()) {
+        throw std::runtime_error("error reading layer weights");
+    }
+
+    auto biasNode = config.child("bias");
+    if (!biasNode) {
+        throw std::runtime_error("no biasses defined in layer");
+    }
+
+    mat_str = std::string(biasNode.value());
     _parseMatrix(_B, mat_str);
 }
 
@@ -116,7 +110,6 @@ layer::~layer()
 
 void layer::compute(const Eigen::VectorXd& input)
 {
-
     if (input.size() != this->inputSize())
         throw "invalid input size in layer::compute";
 

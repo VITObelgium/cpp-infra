@@ -1,32 +1,28 @@
 #include "OVL_IRCEL_model3.h"
-#include "Station.h"
-#include "PluginRegistration.h"
 #include "OpaqMath.h"
-#include "data/MeteoProvider.h"
+#include "Station.h"
 #include "data/DataProvider.h"
-#include "tools/XmlTools.h"
-
-#include <tinyxml.h>
+#include "data/MeteoProvider.h"
+#include "infra/configdocument.h"
 
 #define epsilon 1e-6
 
-namespace opaq
-{
+namespace opaq {
 
+using namespace infra;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
 OVL_IRCEL_model3::OVL_IRCEL_model3()
-: MLP_FeedForwardModel("OVL_IRCEL_model3")
-, p_t2m("P01") // t2m in IRCEL meteo provider
-, p_wsp10m("P03") // wind speed 10 m in IRCEL meteo provider
+: p_t2m("P01")     // t2m in IRCEL meteo provider
+, p_wsp10m("P03")  // wind speed 10 m in IRCEL meteo provider
 , p_wdir10m("P04") // wind direction 10 m
-, p_blh("P07") // boundary layer height
-, p_cc("P13") // low cloud cover
-, p_rh("P24") // relative humidity
-, p_S("P21") // buyltinck-malet S parameter
-, p_Transp("P16") // horizontal transport in BL (BLH x mean wind in BLH)
-, mor_agg(-1) // default is all
+, p_blh("P07")     // boundary layer height
+, p_cc("P13")      // low cloud cover
+, p_rh("P24")      // relative humidity
+, p_S("P21")       // buyltinck-malet S parameter
+, p_Transp("P16")  // horizontal transport in BL (BLH x mean wind in BLH)
+, mor_agg(-1)      // default is all
 {
     sample_size = 11;
 }
@@ -39,48 +35,34 @@ std::string OVL_IRCEL_model3::name()
 /* ============================================================================
      Implementation of the configure method
      ========================================================================== */
-void OVL_IRCEL_model3::configure(TiXmlElement* cnf, const std::string& componentName, IEngine&)
+void OVL_IRCEL_model3::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
-    try
-    {
-        // read the path to the architecture files
-        this->pattern = XmlTools::getText(cnf, "ffnetfile_pattern");
-    }
-    catch (ElementNotFoundException& e)
-    {
-        throw BadConfigurationException(e.what());
+
+    // read the path to the architecture files
+    pattern = std::string(configuration.child("ffnetfile_pattern").trimmedValue());
+    if (pattern.empty()) {
+        throw BadConfigurationException("missing ffnetfile_pattern value");
     }
 
     // read morning aggregation (optional)
-    try
-    {
-        this->mor_agg = atoi(XmlTools::getText(cnf, "mor_agg").c_str());
-    }
-    catch (const ElementNotFoundException&)
-    {
-        this->mor_agg = 24; // take all available observations for the day
-    }
+    mor_agg = configuration.child("mor_agg").value<int>().value_or(24);
 
     // read missing value for this model (optional)
-    try
-    {
-        setNoData(atoi(XmlTools::getText(cnf, "missing_value").c_str()));
+    auto missingValue = configuration.child("missing_value").value<int>();
+    if (missingValue.has_value()) {
+        setNoData(missingValue.value());
     }
-    catch (...)
-    {
-    };
 }
 
 /* ============================================================================
      Construct sample for the OVL_IRCEL_model3 configuration
      ========================================================================== */
 int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
-                                 const Pollutant& pol, Aggregation::Type aggr,
-                                 const chrono::date_time& baseTime, const chrono::date_time& fcTime,
-                                 chrono::days fc_hor)
+    const Pollutant& pol, Aggregation::Type aggr,
+    const chrono::date_time& baseTime, const chrono::date_time& fcTime,
+    chrono::days /*fc_hor*/)
 {
-
     int have_sample = 0; // return code, 0 for success
 
     // -----------------------
@@ -144,22 +126,17 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
         if (!pol.getName().compare("o3")) {
             // take the maximum BLH for O3 forecasts
             xx = max_missing(blh.values(), meteo->getNoData(p_blh));
-        }
-        else
-        {
+        } else {
             // take the minimum BLH
             xx = min_missing(blh.values(), meteo->getNoData(p_blh));
         }
-    }
-    else
-    {
+    } else {
         // also for max8h we use the daily averages
         xx = mean_missing(blh.values(), meteo->getNoData(p_blh));
     }
     if (fabs(xx - meteo->getNoData(p_blh)) > epsilon)
         sample[2] = log(1 + xx);
-    else
-    {
+    else {
         have_sample++;
         // TODO perhaps provide some kind of climatology to fill the missing sample...
     }
@@ -177,14 +154,10 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     if (aggr == Aggregation::Max1h) {
         if (!pol.getName().compare("o3")) {
             xx = max_missing(t2m.values(), meteo->getNoData(p_t2m));
-        }
-        else
-        {
+        } else {
             xx = min_missing(t2m.values(), meteo->getNoData(p_t2m));
         }
-    }
-    else
-    {
+    } else {
         xx = mean_missing(t2m.values(), meteo->getNoData(p_t2m));
     }
     if (fabs(xx - meteo->getNoData(p_t2m)) > epsilon)
@@ -197,14 +170,10 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     if (aggr == Aggregation::Max1h) {
         if (!pol.getName().compare("o3")) {
             xx = min_missing(rh.values(), meteo->getNoData(p_rh)); // take the min here !!!
-        }
-        else
-        {
+        } else {
             xx = max_missing(rh.values(), meteo->getNoData(p_rh));
         }
-    }
-    else
-    {
+    } else {
         xx = mean_missing(rh.values(), meteo->getNoData(p_rh));
     }
     if (fabs(xx - meteo->getNoData(p_rh)) > epsilon)
@@ -217,14 +186,10 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     if (aggr == Aggregation::Max1h) {
         if (!pol.getName().compare("o3")) {
             xx = min_missing(S.values(), meteo->getNoData(p_S)); // take the min here !!!
-        }
-        else
-        {
+        } else {
             xx = max_missing(S.values(), meteo->getNoData(p_S));
         }
-    }
-    else
-    {
+    } else {
         xx = mean_missing(S.values(), meteo->getNoData(p_S));
     }
     if (fabs(xx - meteo->getNoData(p_S)) > epsilon)
@@ -237,14 +202,10 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     if (aggr == Aggregation::Max1h) {
         if (!pol.getName().compare("o3")) {
             xx = max_missing(tra.values(), meteo->getNoData(p_Transp));
-        }
-        else
-        {
+        } else {
             xx = min_missing(tra.values(), meteo->getNoData(p_Transp));
         }
-    }
-    else
-    {
+    } else {
         xx = mean_missing(tra.values(), meteo->getNoData(p_Transp));
     }
     if (fabs(xx - meteo->getNoData(p_Transp)) > epsilon)
@@ -260,14 +221,11 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
     Math::winddir(&x_vec, &y_vec, wdir.values(), meteo->getNoData(p_wdir10m), &ok);
     if (!ok) {
         have_sample++;
-    }
-    else
-    {
+    } else {
         xx = mean_missing(wsp.values(), meteo->getNoData(p_wsp10m)); // average wind speed
         if (fabs(xx - meteo->getNoData(p_wsp10m)) < epsilon)
             have_sample++;
-        else
-        {
+        else {
             sample[8] = x_vec * xx;
             sample[9] = y_vec * xx;
         }
@@ -279,7 +237,5 @@ int OVL_IRCEL_model3::makeSample(double* sample, const Station& st,
 
     return have_sample;
 }
-
-OPAQ_REGISTER_STATIC_PLUGIN(OVL_IRCEL_model3)
 
 }

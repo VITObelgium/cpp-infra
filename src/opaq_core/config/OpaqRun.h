@@ -9,23 +9,20 @@
 
 #include "../Aggregation.h"
 #include "../DateTime.h"
-#include "../Logger.h"
 #include "../Pollutant.h"
 #include "Component.h"
 #include "ForecastStage.h"
 #include "MappingStage.h"
 #include "Plugin.h"
 
-#include <string>
-#include <tinyxml.h>
-#include <vector>
 #include <boost/optional.hpp>
+#include <string>
+#include <string_view>
+#include <vector>
 
-namespace opaq
-{
+namespace opaq {
 
-namespace config
-{
+namespace config {
 
 /**
   * Class containing the main workflow for an OPAQ run
@@ -42,7 +39,7 @@ public:
     void addComponent(const Component& component);
 
     Plugin getPlugin(const std::string& pluginName);
-    const Component& getComponent(const std::string& componentName);
+    const Component& getComponent(std::string_view componentName);
 
     std::vector<Plugin> getPlugins();
     std::vector<Component> getComponents();
@@ -72,8 +69,6 @@ public:
     void setMappingStage(MappingStage mappingStage);
 
 private:
-    Logger _logger;
-
     std::vector<Plugin> _plugins;
     std::vector<Component> _components;
 
@@ -88,6 +83,5 @@ private:
     boost::optional<ForecastStage> _forecastStage;
     boost::optional<MappingStage> _mappingStage;
 };
-
 }
 }

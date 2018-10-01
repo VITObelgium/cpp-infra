@@ -7,17 +7,11 @@
 
 #include "XmlGridProvider.h"
 #include "Exceptions.h"
-#include "PluginRegistration.h"
+#include "infra/configdocument.h"
 
-#include <tinyxml.h>
+namespace opaq {
 
-namespace opaq
-{
-
-XmlGridProvider::XmlGridProvider()
-: _logger("XmlGridProvider")
-{
-}
+using namespace infra;
 
 std::string XmlGridProvider::name()
 {
@@ -32,51 +26,43 @@ std::string XmlGridProvider::name()
  * 	<cell id="1" xmin="12.1" xmax="14.1" ymin="11.1" ymax="12.1"/>
  * </grid>
  */
-void XmlGridProvider::configure(TiXmlElement* configuration, const std::string& componentName, IEngine&)
+void XmlGridProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 
-    TiXmlElement* gridEl = configuration->FirstChildElement("grid");
+    auto gridEl = configuration.child("grid");
     if (!gridEl) {
-        _logger->error("grid element not found in configuration");
         throw BadConfigurationException("grid element not found in configuration");
     }
 
     std::vector<int> cellIds;
+    for (auto& cellEl : gridEl.children("cell")) {
+        auto id   = cellEl.attribute<int>("id");
+        auto xmin = cellEl.attribute<double>("xmin");
+        auto xmax = cellEl.attribute<double>("xmax");
+        auto ymin = cellEl.attribute<double>("ymin");
+        auto ymax = cellEl.attribute<double>("ymax");
+        auto zmin = cellEl.attribute<double>("zmin");
+        auto zmax = cellEl.attribute<double>("zmax");
 
-    TiXmlElement* cellEl = gridEl->FirstChildElement("cell");
-    while (cellEl)
-    {
-        int id;
-        double xmin, xmax, ymin, ymax, zmin, zmax;
-
-        if (cellEl->QueryIntAttribute("id", &id) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("xmin", &xmin) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("xmax", &xmax) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("ymin", &ymin) != TIXML_SUCCESS || cellEl->QueryDoubleAttribute("ymax", &ymax) != TIXML_SUCCESS)
-        {
+        if (!id || !xmin || !xmax || !ymin || !ymax) {
             throw BadConfigurationException("cell should at least have id, xmin, xmax, ymin, and ymax defined");
         }
 
-        // zmin and zmax are optional, default is 0
-        if (cellEl->QueryDoubleAttribute("zmin", &zmin) != TIXML_SUCCESS)
-            zmin = 0;
-        if (cellEl->QueryDoubleAttribute("zmax", &zmax) != TIXML_SUCCESS)
-            zmax = 0;
-
         // check if id is unique
-        if (std::find(cellIds.begin(), cellIds.end(), id) != cellIds.end())
-        {
-            throw BadConfigurationException("Duplicate cell id: {}", id);
+        if (std::find(cellIds.begin(), cellIds.end(), id) != cellIds.end()) {
+            throw BadConfigurationException("Duplicate cell id: {}", *id);
         }
 
-        cellIds.push_back(id);
+        cellIds.push_back(id.value());
 
         // create cell and push into the grid
-        _grid.addCell(Cell(id, xmin, xmax, ymin, ymax, zmin, zmax));
-
-        cellEl = cellEl->NextSiblingElement("cell");
+        _grid.addCell(Cell(*id, *xmin, *xmax, *ymin, *ymax, zmin.value_or(0), zmax.value_or(0)));
     }
 
-    if (_grid.cellCount() == 0)
+    if (_grid.cellCount() == 0) {
         throw BadConfigurationException("no cells defined in grid");
+    }
 }
 
 const Grid& XmlGridProvider::getGrid(const std::string&, GridType)
@@ -84,5 +70,4 @@ const Grid& XmlGridProvider::getGrid(const std::string&, GridType)
     return _grid;
 }
 
-OPAQ_REGISTER_STATIC_PLUGIN(XmlGridProvider)
 }

@@ -1,4 +1,5 @@
 set (CMAKE_INCLUDE_CURRENT_DIR ON)
+find_package(ZLIB REQUIRED)
 
 set (CORE_SOURCES
     Aggregation.h
@@ -10,8 +11,6 @@ set (CORE_SOURCES
     Cell.cpp
     Component.h
     Component.cpp
-    ComponentManagerFactory.h
-    ComponentManagerFactory.cpp
     ComponentManager.h
     ComponentManager.cpp
     ConfigurationHandler.h
@@ -21,23 +20,20 @@ set (CORE_SOURCES
     Engine.h
     Engine.cpp
     Exceptions.h
+    Exceptions.cpp
     GridType.h
     Grid.h
     Grid.cpp
-    OpaqDllExports.h
     OpaqMath.h
     OpaqMath.cpp
     Model.cpp
-    Logger.h
-    Logger.cpp
     Point.h
     Point.cpp
     Pollutant.h
     Pollutant.cpp
     PollutantManager.h
     PollutantManager.cpp
-    PluginRegistration.h
-    PluginRegistration.cpp
+    PluginFactoryInterface.h
     Station.h
     Station.cpp
     TimeSeries.h
@@ -70,8 +66,6 @@ set (CORE_TOOLS_SOURCES
     tools/FileTools.cpp
     tools/GzipReader.h
     tools/GzipReader.cpp
-    tools/StringTools.h
-    tools/StringTools.cpp
     tools/XmlTools.h
     tools/XmlTools.cpp
     tools/CalcTools.h
@@ -89,14 +83,11 @@ PUBLIC
     infra
     fmt::fmt
     spdlog::spdlog
-    TinyXml::TinyXml
-    Boost::disable_autolinking 
+    Boost::disable_autolinking
 PRIVATE
     Boost::system
-    Boost::filesystem
     Boost::iostreams
-    ${EXTRA_LIBS}
-    ${CMAKE_DL_LIBS}
+    ZLIB::ZLIB
 )
 
 # We use our own version of FMT, let spdlog use the same version

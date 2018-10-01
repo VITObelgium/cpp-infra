@@ -1,4 +1,0 @@
-Source: qt5
-Version: 5.11.2
-Description: Complete software development framework
-Build-Depends: zlib, freetype, harfbuzz, libjpeg-turbo, libpng, sqlite3, pcre2

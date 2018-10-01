@@ -2,9 +2,13 @@
 #include <string>
 
 #include "Pollutant.h"
+#include "infra/configdocument.h"
 
-namespace opaq
-{
+#include <sstream>
+
+namespace opaq {
+
+using namespace infra;
 
 Pollutant::Pollutant()
 : _id(0)
@@ -19,17 +23,13 @@ Pollutant::Pollutant(long id, std::string name, std::string unit, std::string de
 {
 }
 
-Pollutant::Pollutant(TiXmlElement const* el)
+Pollutant::Pollutant(const ConfigNode& el)
 {
+    _id   = el.attribute<int32_t>("id").value();
+    _name = std::string(el.attribute("name"));
+    _unit = std::string(el.attribute("unit"));
 
-    // convert id_string to long (no direct long query in tinyxml)
-    std::string str;
-    el->QueryStringAttribute("id", &str);
-    _id = atol(str.c_str());
-
-    el->QueryStringAttribute("name", &(_name));
-    el->QueryStringAttribute("unit", &(_unit));
-    _desc = el->GetText();
+    _desc = el.value();
 }
 
 std::string Pollutant::toString() const

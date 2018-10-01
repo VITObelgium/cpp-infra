@@ -1,15 +1,13 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include <sstream>
 
-#include "ObsParser.h"
 #include "AQNetwork.h"
+#include "ObsParser.h"
 
-namespace opaq
-{
-namespace test
-{
+namespace opaq {
+namespace test {
 
 using namespace testing;
 using namespace std::chrono_literals;
@@ -27,16 +25,6 @@ protected:
     AQNetwork network;
 };
 
-//TEST_F(ObserverVationParser, StringSplitter)
-//{
-//    std::string test = "1 2 ";
-//    string_splitter s(test, " ");
-//    std::vector<std::string> result(s.begin(), s.end());
-//
-//    //EXPECT_THAT(result, ContainerEq(std::vector<std::string>{"1", "2", "3", "4"}));
-//    EXPECT_THAT(result, ContainerEq(std::vector<std::string>{"1", "2"}));
-//}
-
 TEST_F(RioObsProviderParserTest, ParseFile)
 {
     using namespace date;
@@ -47,29 +35,28 @@ TEST_F(RioObsProviderParserTest, ParseFile)
        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\n";
 
     auto result = readObservationsFile(ss, network, 24, 1h);
-    EXPECT_EQ(4u, result.size()); // one result for each aggregation
-    EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size()); // one value for each basetime
-    EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size()); // one value for each basetime
+    EXPECT_EQ(4u, result.size());                                 // one result for each aggregation
+    EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size());  // one value for each basetime
+    EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size());  // one value for each basetime
     EXPECT_EQ(2u, result[Aggregation::DayAvg][s_station].size()); // one value for each basetime
-    EXPECT_EQ(48u, result[Aggregation::None][s_station].size()); // 24 values for each basetime
+    EXPECT_EQ(48u, result[Aggregation::None][s_station].size());  // 24 values for each basetime
 
-    EXPECT_THAT(result[Aggregation::Max1h][s_station].valueAt(make_date_time(2009_y/jan/01)), DoubleEq(129));
-    EXPECT_THAT(result[Aggregation::Max1h][s_station].valueAt(make_date_time(2009_y/jan/02)), DoubleEq(42));
+    EXPECT_THAT(result[Aggregation::Max1h][s_station].valueAt(make_date_time(2009_y / jan / 01)), DoubleEq(129));
+    EXPECT_THAT(result[Aggregation::Max1h][s_station].valueAt(make_date_time(2009_y / jan / 02)), DoubleEq(42));
 
-    EXPECT_THAT(result[Aggregation::Max8h][s_station].valueAt(make_date_time(2009_y/jan/01)), DoubleEq(89));
-    EXPECT_THAT(result[Aggregation::Max8h][s_station].valueAt(make_date_time(2009_y/jan/02)), DoubleEq(38));
+    EXPECT_THAT(result[Aggregation::Max8h][s_station].valueAt(make_date_time(2009_y / jan / 01)), DoubleEq(89));
+    EXPECT_THAT(result[Aggregation::Max8h][s_station].valueAt(make_date_time(2009_y / jan / 02)), DoubleEq(38));
 
-    EXPECT_THAT(result[Aggregation::DayAvg][s_station].valueAt(make_date_time(2009_y/jan/01)), DoubleEq(80));
-    EXPECT_THAT(result[Aggregation::DayAvg][s_station].valueAt(make_date_time(2009_y/jan/02)), DoubleEq(29));
+    EXPECT_THAT(result[Aggregation::DayAvg][s_station].valueAt(make_date_time(2009_y / jan / 01)), DoubleEq(80));
+    EXPECT_THAT(result[Aggregation::DayAvg][s_station].valueAt(make_date_time(2009_y / jan / 02)), DoubleEq(29));
 
-    std::vector<double> values = { 129, 101, 93, 87, 81, 77, 74, 72, 69, 71, 73, 70, 69, 69, 68, 66, 64, 73, 85, 85, 88, 94, 82, 80,
-                                   39, 41, 42, 37, 33, 34, 37, 40, 32, 35, 38, 36, 19, -9999, -9999, -9999, 13, 16, 16, 16, 17, 20, 19, 22 };
+    std::vector<double> values = {129, 101, 93, 87, 81, 77, 74, 72, 69, 71, 73, 70, 69, 69, 68, 66, 64, 73, 85, 85, 88, 94, 82, 80,
+        39, 41, 42, 37, 33, 34, 37, 40, 32, 35, 38, 36, 19, -9999, -9999, -9999, 13, 16, 16, 16, 17, 20, 19, 22};
 
     EXPECT_THAT(result[Aggregation::None][s_station].values(), ContainerEq(values));
 
-    auto date = make_date_time(2009_y/jan/01);
-    for (auto i = 0; i < 48; ++i)
-    {
+    auto date = make_date_time(2009_y / jan / 01);
+    for (auto i = 0; i < 48; ++i) {
         EXPECT_EQ(date, result[Aggregation::None][s_station].datetime(i));
         date += 1h;
     }
@@ -82,11 +69,11 @@ TEST_F(RioObsProviderParserTest, ParseFileCarriageReturnLineFeed)
        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\r\n";
 
     auto result = readObservationsFile(ss, network, 24, 1h);
-    EXPECT_EQ(4u, result.size()); // one result for each aggregation
-    EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size()); // one value for each basetime
-    EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size()); // one value for each basetime
+    EXPECT_EQ(4u, result.size());                                 // one result for each aggregation
+    EXPECT_EQ(2u, result[Aggregation::Max1h][s_station].size());  // one value for each basetime
+    EXPECT_EQ(2u, result[Aggregation::Max8h][s_station].size());  // one value for each basetime
     EXPECT_EQ(2u, result[Aggregation::DayAvg][s_station].size()); // one value for each basetime
-    EXPECT_EQ(48u, result[Aggregation::None][s_station].size()); // 24 values for each basetime
+    EXPECT_EQ(48u, result[Aggregation::None][s_station].size());  // 24 values for each basetime
 }
 
 TEST_F(RioObsProviderParserTest, ParseInvalidFile)
@@ -95,7 +82,7 @@ TEST_F(RioObsProviderParserTest, ParseInvalidFile)
     ss << "40AB01 20090101    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\n"
        << "40AB01 20090102     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    \n"; // one value too little
 
-    EXPECT_THROW(readObservationsFile(ss, network, 24, 1h), RunTimeException);
+    EXPECT_THROW(readObservationsFile(ss, network, 24, 1h), RuntimeError);
 }
 
 // Used to check performance
@@ -110,6 +97,5 @@ TEST_F(RioObsProviderParserTest, DISABLED_ParseFile1)
     auto result = readObservationsFile(fs, network, 24, 1h);
     EXPECT_EQ(4u, result.size()); // one result for each aggregation
 }
-
 }
 }

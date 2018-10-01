@@ -3,12 +3,10 @@
 
 #include "MLP_FeedForwardModel.h"
 
-namespace opaq
-{
+namespace opaq {
 
 class OVL_IRCEL_model2 : public MLP_FeedForwardModel
 {
-
 public:
     OVL_IRCEL_model2();
 
@@ -16,11 +14,11 @@ public:
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     int makeSample(double* sample, const Station& st, const Pollutant& pol,
-                   Aggregation::Type aggr, const chrono::date_time& baseTime,
-                   const chrono::date_time& fcTime, chrono::days fc_hor) override;
+        Aggregation::Type aggr, const chrono::date_time& baseTime,
+        const chrono::date_time& fcTime, chrono::days fc_hor) override;
 
 private:
     const std::string p_t2m;     // t2m

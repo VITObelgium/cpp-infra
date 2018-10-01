@@ -1,19 +1,17 @@
-#include <gtest/gtest.h>
 #include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 #include "Engine.h"
-#include "ComponentManagerFactory.h"
-#include "config.h"
-#include "testconfig.h"
+#include "PluginFactoryInterface.h"
 #include "PollutantManager.h"
+#include "infra/configdocument.h"
+#include "opaqconfig.h"
+#include "testconfig.h"
 
-#include <tinyxml.h>
+namespace opaq {
+namespace test {
 
-namespace opaq
-{
-namespace test
-{
-
+using namespace infra;
 using namespace testing;
 using namespace std::string_literals;
 
@@ -24,16 +22,31 @@ public:
     MOCK_METHOD0(componentManager, ComponentManager&());
 };
 
+class PluginFactoryMock : public IPluginFactory
+{
+public:
+    MOCK_CONST_METHOD1(createPlugin, std::unique_ptr<Component>(std::string_view));
+};
+
+class DummyComponent : public Component
+{
+public:
+    void configure(const infra::ConfigNode& /*configuration*/, const std::string& /*componentName*/, IEngine& /*engine*/) override
+    {
+    }
+};
+
 class ComponentManagerTest : public Test
 {
 protected:
     ComponentManagerTest()
-    : _cmpMgr(factory::createComponentManager(_engineMock))
+    : _cmpMgr(_engineMock, _pluginFactoryMock)
     {
     }
 
-    EngineMock          _engineMock;
-    ComponentManager    _cmpMgr;
+    PluginFactoryMock _pluginFactoryMock;
+    EngineMock _engineMock;
+    ComponentManager _cmpMgr;
 };
 
 TEST_F(ComponentManagerTest, LoadPlugin)
@@ -45,14 +58,13 @@ TEST_F(ComponentManagerTest, LoadPlugin)
         "    <fctime_resolution>24</fctime_resolution>"
         "</config>"s;
 
-    TiXmlDocument doc;
-    doc.Parse(configXml.c_str(), 0, TIXML_ENCODING_UTF8);
-    auto* config = doc.FirstChildElement("config");
+    auto doc    = ConfigDocument::loadFromString(configXml);
+    auto config = doc.child("config");
 
-    _cmpMgr.loadPlugin("sqlbuffer", TEST_BINARY_DIR "/" PLUGIN_PREFIX "sqlbufferplugin" PLUGIN_EXT);
-    auto& comp = _cmpMgr.createComponent<Component>("sqlbuffer", "sqlbuffer", config);
-    EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("sqlbuffer"));
+    EXPECT_CALL(_pluginFactoryMock, createPlugin(std::string_view("dummy"))).WillOnce(Return(ByMove(std::make_unique<DummyComponent>())));
+
+    auto& comp = _cmpMgr.createComponent<Component>("dummy", "dummy", config);
+    EXPECT_EQ(&comp, &_cmpMgr.getComponent<Component>("dummy"));
 }
-
 }
 }

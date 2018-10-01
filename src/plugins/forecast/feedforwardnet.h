@@ -5,37 +5,49 @@
 #include <math.h>
 #include <vector>
 
-#include <tinyxml.h>
-
 #include <Eigen/Dense>
 
 #include "layer.h"
 #include "scaler.h"
-#include "Logger.h"
 
-namespace nnet
-{
+namespace infra {
+class ConfigNode;
+}
+
+namespace nnet {
 
 class feedforwardnet
 {
 public:
-    feedforwardnet(TiXmlElement* cnf);
+    feedforwardnet(const infra::ConfigNode& config);
 
     int sim(const double* input);
     int sim(const Eigen::VectorXd& in);
 
     friend std::ostream& operator<<(std::ostream& os, const feedforwardnet& net);
 
-    unsigned int inputSize(void) { return static_cast<unsigned int>(_input.size()); }
-    unsigned int outputSize(void) { return static_cast<int>(_output.size()); }
+    unsigned int inputSize(void)
+    {
+        return static_cast<unsigned int>(_input.size());
+    }
 
-    void getOutput(double** x) { *x = _output.data(); }
-    void getOutput(Eigen::VectorXd& out) { out = _output; }
+    unsigned int outputSize(void)
+    {
+        return static_cast<int>(_output.size());
+    }
+
+    void getOutput(double** x)
+    {
+        *x = _output.data();
+    }
+    void getOutput(Eigen::VectorXd& out)
+    {
+        out = _output;
+    }
 
 private:
-    Logger _logger;
-    Eigen::VectorXd _input;            // the input sample
-    Eigen::VectorXd _output;           // the output sample
+    Eigen::VectorXd _input;                            // the input sample
+    Eigen::VectorXd _output;                           // the output sample
     std::vector<std::unique_ptr<nnet::layer>> _layers; // the hidden/output layers
 
     std::unique_ptr<nnet::scaler> _inputScaler;

@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Logger.h"
-#include "DateTime.h"
-#include "Component.h"
-#include "Pollutant.h"
 #include "Aggregation.h"
+#include "Component.h"
+#include "DateTime.h"
 #include "GridType.h"
+#include "Pollutant.h"
 
-namespace opaq
-{
+namespace opaq {
 
 // forward declaration
 class Component;
@@ -23,7 +21,7 @@ class AQNetworkProvider;
 class Model : public Component
 {
 public:
-    Model(const std::string& name);
+    Model();
 
     void setBaseTime(const chrono::date_time& baseTime);
     void setPollutant(const Pollutant& pollutant);
@@ -55,8 +53,6 @@ protected:
     MeteoProvider* getMeteoProvider();
     ForecastBuffer* getBuffer();
     IMappingBuffer& getMappingBuffer();
-
-    Logger _logger;
 
 private:
     chrono::date_time _baseTime;    //< run for this basetime

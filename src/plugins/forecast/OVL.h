@@ -9,21 +9,18 @@
  *  model selection
  */
 
-#ifndef OVL_H_
-#define OVL_H_
+#pragma once
 
 #include "ComponentManager.h"
-#include "Logger.h"
 #include "Model.h"
 
 #include <map>
 #include <string>
 #include <tuple>
 
-namespace opaq
-{
+namespace opaq {
 
-class OVL : virtual public Model
+class OVL : public Model
 {
 public:
     OVL();
@@ -32,7 +29,7 @@ public:
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    void configure(TiXmlElement* configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
@@ -48,8 +45,8 @@ public:
     };
 
 private:
-    void parseTuneList(TiXmlElement* lst);
-    void parseTuneElement(TiXmlElement* el);
+    void parseTuneList(const infra::ConfigNode& list);
+    void parseTuneElement(const infra::ConfigNode& tuneEl);
 
     ComponentManager* _componentMgr;
 
@@ -72,4 +69,3 @@ private:
 };
 
 } /* namespace OPAQ */
-#endif /* OVL_H_ */

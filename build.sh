@@ -29,7 +29,7 @@ case $yno in
     * ) echo "Invalid selection" exit;;
 esac
 
-printf "Select toolchain to use:\n1:Default\n2:Musl (static linking)\n3:Mingw\n4:Gcc6\n5:Gcc7\n6:Clang\n7:emscripten\n"
+printf "Select toolchain to use:\n1:Default\n2:Musl (static linking)\n3:Mingw\n4:Gcc6\n5:Gcc7\n6:Gcc8\n7:Clang\n8:emscripten\n"
 read yno
 case $yno in
     [1] ) toolchain="toolchain-cluster";;
@@ -43,7 +43,8 @@ case $yno in
         ;;
     [4] ) toolchain="toolchain-gcc6";;
     [5] ) toolchain="toolchain-gcc7";;
-    [6] )
+    [6] ) toolchain="toolchain-gcc8";;
+    [7] )
         if [[ "$platform" == "linux" ]]; then
             toolchain="toolchain-cluster-clang"
         elif [[ $platform == MINGW64* ]]; then
@@ -52,7 +53,7 @@ case $yno in
             toolchain="toolchain-clang"
         fi
         ;;
-    [7] ) toolchain="toolchain-wasm"; emscripten=1;;
+    [8] ) toolchain="toolchain-wasm"; emscripten=1;;
     * ) echo "Invalid selection" exit;;
 esac
 
@@ -70,8 +71,7 @@ then
 checkresult cmake ../.. -G ${generator} \
     -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain}/ \
     -DCMAKE_TOOLCHAIN_FILE=${pwd}/deps/cmake-scripts/${toolchain}.cmake \
-    -DCMAKE_BUILD_TYPE=${config} \
-    -DSTATIC_PLUGINS=ON
+    -DCMAKE_BUILD_TYPE=${config}
 else
 checkresult emcmake cmake ../.. -G ${generator} \
     -DCMAKE_PREFIX_PATH=${pwd}/build/local-${toolchain}/ \

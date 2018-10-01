@@ -1,85 +1,61 @@
 #include "XMLAQNetProvider.h"
 
-
-#include "Station.h"
 #include "Engine.h"
 #include "Exceptions.h"
 #include "PollutantManager.h"
-#include "PluginRegistration.h"
-#include "tools/StringTools.h"
+#include "Station.h"
+#include "infra/configdocument.h"
+#include "infra/log.h"
+#include "infra/string.h"
 
-#include <tinyxml.h>
+namespace opaq {
 
-namespace opaq
-{
+using namespace infra;
 
-XMLAQNetProvider::XMLAQNetProvider()
-: _logger("OPAQ::XMLAQNetProvider")
-{
-}
+static const LogSource s_logSrc("XMLAQNetProvider");
 
 std::string XMLAQNetProvider::name()
 {
     return "xmlaqnetprovider";
 }
 
-void XMLAQNetProvider::configure(TiXmlElement* cnf, const std::string& componentName, IEngine& engine)
+void XMLAQNetProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine& engine)
 {
     setName(componentName);
 
     // Here we assume we recieve the <config> element which should define the AQNetwork...
-    TiXmlElement* netEl = cnf->FirstChildElement("network");
+    auto netEl = configuration.child("network");
     if (!netEl) {
-        _logger->error("network element not found in configuration");
+        Log::error(s_logSrc, "network element not found in configuration");
         throw BadConfigurationException("network element not found in configuration");
     }
 
     // loop over station elements
-    long stID          = 1; // here we assign a unique ID to each station
-    TiXmlElement* stEl = netEl->FirstChildElement("station");
-    while (stEl)
-    {
-        std::string name, meteoId, desc;
-        double x, y, z;
+    long stID = 1; // here we assign a unique ID to each station
+    for (auto& stEl : netEl.children("station")) {
+        auto name    = std::string(stEl.attribute("name"));
+        auto meteoId = std::string(stEl.attribute("meteo"));
+        auto desc    = std::string(stEl.attribute("desc"));
 
-        // get station attributes
-        if ((stEl->QueryStringAttribute("name", &name) != TIXML_SUCCESS) || (stEl->QueryDoubleAttribute("x", &x) != TIXML_SUCCESS) || (stEl->QueryDoubleAttribute("y", &y) != TIXML_SUCCESS))
-            throw BadConfigurationException("station " + name + " should at least have name, x and y defined");
-
-        // z is optional, default is 0.
-        if (stEl->QueryDoubleAttribute("z", &z) != TIXML_SUCCESS) z = 0;
-
-        // meteo is optional, default is ""
-        if (stEl->QueryStringAttribute("meteo", &meteoId) != TIXML_SUCCESS)
-            meteoId = "";
-
-        // meteo is optional, default is ""
-        if (stEl->QueryStringAttribute("desc", &desc) != TIXML_SUCCESS)
-            meteoId = "";
+        auto x = stEl.attribute<double>("x");
+        auto y = stEl.attribute<double>("y");
+        auto z = stEl.attribute<double>("z");
 
         // create station and push back to network
         std::vector<Pollutant> pollutants;
 
         // get pollutant list from stEl->GetText(); via string tokenizer
-        if (stEl->GetText())
-        {
-            std::string str = stEl->GetText();
-
-            auto pol_list = StringTools::tokenize(str, ",:;| \t", 6);
-            for (auto& pol : pol_list)
-            {
-                // add to the pollutants list for this station
-                pollutants.push_back(engine.pollutantManager().find(pol));
-            }
+        auto val      = stEl.value();
+        auto pol_list = str::split(val, ",:;| \t", str::SplitOpt::DelimiterIsCharacterArray);
+        for (auto& pol : pol_list) {
+            // add to the pollutants list for this station
+            pollutants.push_back(engine.pollutantManager().find(pol));
         }
 
-        _net.addStation(Station(stID++, x, y, z, name, desc, meteoId, std::move(pollutants)));
-
-        stEl = stEl->NextSiblingElement("station");
+        _net.addStation(Station(stID++, *x, *y, z.value_or(0), name, desc, meteoId, std::move(pollutants)));
     } /* end while loop over station elements */
 
-    if (_net.getStations().empty())
-    {
+    if (_net.getStations().empty()) {
         throw BadConfigurationException("no stations defined in network");
     }
 }
@@ -88,7 +64,4 @@ AQNetwork& XMLAQNetProvider::getAQNetwork()
 {
     return _net;
 }
-
-OPAQ_REGISTER_STATIC_PLUGIN(XMLAQNetProvider)
-
 }

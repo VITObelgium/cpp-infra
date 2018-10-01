@@ -1,18 +1,14 @@
 #pragma once
 
-#include "Logger.h"
 #include "config/OpaqRun.h"
+#include "infra/configdocument.h"
 
 #include <string>
 
-class TiXmlElement;
+namespace opaq {
 
-namespace opaq
-{
-
-namespace config
-{
-    class PollutantManager;
+namespace config {
+class PollutantManager;
 }
 
 /**
@@ -23,8 +19,6 @@ namespace config
 class ConfigurationHandler
 {
 public:
-    ConfigurationHandler();
-
     /**
      * Parse the configuration file given by the filename and construct the main OPAQ workflow
      * Here we indicate briefly the workflow of this method
@@ -54,16 +48,17 @@ public:
     void validateConfiguration(config::PollutantManager& pollutantMgr);
 
     /** Returns an opaq run object, constructed from the configuration parsing */
-    config::OpaqRun& getOpaqRun() { return _opaqRun; }
+    config::OpaqRun& getOpaqRun()
+    {
+        return _opaqRun;
+    }
 
 private:
-    config::ForecastStage parseForecastStage(TiXmlElement* element);
-    config::MappingStage parseMappingStage(TiXmlElement* element);
+    config::ForecastStage parseForecastStage(const infra::ConfigNode& element);
+    config::MappingStage parseMappingStage(const infra::ConfigNode& element);
 
     config::OpaqRun _opaqRun;
-    TiXmlDocument _doc;
-    std::vector<std::unique_ptr<TiXmlDocument>> _configDocs;
-    Logger _logger;
+    infra::ConfigDocument _doc;
+    std::vector<infra::ConfigDocument> _configDocs;
 };
-
 }

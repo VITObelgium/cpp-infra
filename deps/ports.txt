@@ -1,0 +1,15 @@
+gtest
+benchmark
+boost-filesystem
+boost-regex
+boost-program-options
+boost-iostreams
+hdf5[cpp]
+zlib
+fmt
+spdlog
+eigen3
+sqlpp11-connector-sqlite3
+sqlpp11-connector-postgresql
+pugixml
+restinio[boost]

@@ -1,0 +1,119 @@
+###############################################################################
+# nc_table variable definitions for wgrib2
+#
+# See : http://www.cpc.ncep.noaa.gov/products/wesley/wgrib2/netcdf.html
+#
+# Bino Maiheu, (c) VITO 2014
+###############################################################################
+
+###############################################################################
+# Put the wgrib2 match statement here to select the corresponding variables
+# this is not used by wgrib2 itself, but by the scripts that call it in order
+# to specify the -match command line option of wgrib2. We put it here to keep
+# the information on the netcdf and the variables consistent, so we only have
+# to define it in one place, the scripts look for the "#!" line in this file
+#
+# So put there the wgrib2 -match statement that selects the variables from
+# the grb2 file in order to fill the netcfd file with only the selected variables
+#
+#!:(HPBL|TCDC|TMP|RH|UGRD|VGRD|HGT):((1000|975|950|925|900|850|800|750|700) mb|2 m above ground|10 m above ground|surface|low cloud layer|middle cloud layer|high cloud layer|convective cloud layer|entire atmosphere \(considered as a single layer\))
+#
+###############################################################################
+
+###############################################################################
+# define the vertical level information
+#
+# $lev_type 100:pressure:pressure level:mb:0.01
+#
+# This directive explicitly defines the type of vertical level in the grib2 
+# file that becomes eligible for treating data at these levels as 4D data and 
+# some it attributes for netcdf file. Default, first found level type listed 
+# in the wgrib2 build-in table of eligible levels is selected if no $lev_type 
+# directive found.
+# 
+# Fields here include:
+#
+# 100      - the grib2 level type code number for treating data as 4D. 
+#            In this example it is the code number for pressure levels, integer
+# pressure - short_name for the vertical axis in the netcdf file, string
+# pressure level - long_name for the vertical axis in the netcdf file, string, 
+#                  could include spaces
+# mb   - vertical axis units as written in the netcdf file, string
+# 0.01 - decimal scale to convert grib2 level values to the netcdf-stored 
+#        values, float. In this example we convert Pa to mb (hPa). It is 
+#        default conversion scale for the pressure levels when exporting to 
+#        the netcdf file
+#
+#
+# $nlev X
+#
+# This directive is an equivalent of the -nc_nlev command line option but 
+# value in the -nc_table file has precedence over the command line option if
+# both are found. It is required if next $levs directive is specified.
+#
+# $levs lev(1) lev(2) lev(3)...
+#  ...lev(I-1) lev(I) lev(I+1)...
+# ...lev(X-1) lev(X)
+# This directive explicitly specifies the vertical level values to be exported 
+# to the netcdf file, in the netcdf units. If this directive exists in the 
+# -nc_table file and there is found the grib2 data eligible for the 4D 
+# presentation but defined on other then listed level - these data are skipped 
+# from export and work is silently continued. All data conversion parameters 
+# are checked before the $levs is checked. List of level values could consist 
+# of multiple lines; max line length in the -nc_table file is limited by 
+# _MAX_PATH symbols (about 255 symbols); use space, ',', ';' or ':' as lev(i) 
+# fields separator.
+#
+# Impact of $nlev and $levs directives is different depending on does the 
+# netcdf file is first created or it is updated. When the netcdf file is first 
+# created these values are written to the netcdf file fixing 4D data vertical 
+# structure. When updating an existing netcdf file in the -append mode these 
+# parameters will work like filter limiting possible updates of 4D data by 
+# these that satisfy to the given $levs only and ignoring other. 3D (TIME,LAT,
+# LON) data are not affected by these directives.
+# 
+# The $nlev and $levs directives could be necessary if records in the grib2 
+# file have randomly changing vertical level values that makes it impossible 
+# sequentionally define valid order of vertical levels.
+###############################################################################
+$lev_type 100:pressure:pressure level:mb:0.01
+$nlev 9
+$levs 1000 975 950 925 900 850 800 750 700
+
+###############################################################################
+# Define variables to export
+#
+# In the next example two lines from the -nc_table file instruct the wgrib2 
+# utility export to the netcdf file the geopotential height changing name from 
+# HGT (wgrib2) to geopotential in the netcdf file, at all levels except at 
+# 975 mb if these data would be found in the grib2 decoded input data stream:
+#
+# HGT:*:geopotential
+# HGT:975 mb:ignore
+#
+###############################################################################
+UGRD:10 m above ground:u10m
+VGRD:10 m above ground:v10m
+TMP:2 m above ground:t2m
+RH:2 m above ground:rh2m
+
+TMP:*:t
+HGT:*:hgtprs
+RH:*:rh
+UGRD:*:u
+VGRD:*:v
+
+HGT:surface:hgtprs0
+TMP:surface:lst
+
+HPBL:surface:blh
+
+TCDC:low cloud layer:low_cloud_cover
+TCDC:middle cloud layer:middle_cloud_cover
+TCDC:high cloud layer:high_cloud_cover
+
+TCDC:entire atmosphere (considered as a single layer):cloud_cover
+TCDC:convective cloud layer:conv_cloud_clover
+
+RH:entire atmosphere (considered as a single layer):rhtot:ignore
+# End of file

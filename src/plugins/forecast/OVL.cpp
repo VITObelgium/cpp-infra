@@ -3,27 +3,30 @@
 #include "MLP_FeedForwardModel.h"
 #include "feedforwardnet.h"
 
-#include "Engine.h"
-#include "Station.h"
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
+#include "Engine.h"
 #include "PollutantManager.h"
-#include "PluginRegistration.h"
+#include "Station.h"
 #include "TimeSeries.h"
 #include "data/ForecastBuffer.h"
-#include "tools/XmlTools.h"
+#include "infra/configdocument.h"
+#include "infra/log.h"
+#include "infra/string.h"
+#include "tools/FileTools.h"
 
 #include <cmath>
 #include <fstream>
 
-namespace opaq
-{
+namespace opaq {
 
+using namespace infra;
 using namespace chrono_literals;
 
+static const LogSource s_logSrc("OVL");
+
 OVL::OVL()
-: Model("OVL")
-, _componentMgr(nullptr)
+: _componentMgr(nullptr)
 , _output_raw(false)
 , _debug_output(false)
 {
@@ -67,7 +70,7 @@ double _wexp(int i, int n, int p)
     return (1. - lambda) * std::pow(lambda, i) / (1. - std::pow(lambda, n));
 }
 
-void OVL::configure(TiXmlElement* cnf, const std::string& componentName, IEngine& engine)
+void OVL::configure(const ConfigNode& configuration, const std::string& componentName, IEngine& engine)
 {
     setName(componentName);
 
@@ -76,133 +79,96 @@ void OVL::configure(TiXmlElement* cnf, const std::string& componentName, IEngine
     _conf.clear();
     _componentMgr = &engine.componentManager();
 
-    try
-    {
-
+    try {
         // read the mode for which the corresponding tune should be taken
-        _tune_mode = XmlTools::getText(cnf, "tune_mode");
+        _tune_mode = std::string(configuration.child("tune_mode").value());
 
         // read missing value for this model
-        setNoData(atoi(XmlTools::getText(cnf, "missing_value").c_str()));
+        setNoData(configuration.child("missing_value").value<int>().value_or(0));
 
         // read hind cast period
-        _hindcast = chrono::days(atoi(XmlTools::getText(cnf, "hindcast").c_str()));
+        _hindcast = chrono::days(configuration.child("hindcast").value<int>().value_or(0));
 
         // parse the tunes database & run configuration for OVL
-        parseTuneList(cnf->FirstChildElement("tunes"));
-    }
-    catch (BadConfigurationException& err)
-    {
+        parseTuneList(configuration.child("tunes"));
+    } catch (BadConfigurationException& err) {
         throw BadConfigurationException(err.what());
     }
 
     // get output mode
-    try
-    {
-        std::string s = XmlTools::getText(cnf, "output_raw");
-        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-        if (!s.compare("enable") || !s.compare("true") || !s.compare("yes")) _output_raw = true;
-    }
-    catch (...)
-    {
-        _output_raw = false;
-    }
+    auto outputRaw = str::lowercase(configuration.child("output_raw").value());
+    _output_raw    = outputRaw.empty() || outputRaw == "enable" || outputRaw == "true" || outputRaw == "yes";
 
     // activate debugging output, hard coded for now
     // get output mode
-    try
-    {
-        std::string s = XmlTools::getText(cnf, "_debug_output");
-        std::transform(s.begin(), s.end(), s.begin(), ::tolower);
-        if (!s.compare("enable") || !s.compare("true") || !s.compare("yes")) _debug_output = true;
-    }
-    catch (...)
-    {
-        _debug_output = false;
-    }
+    auto debugOutput = str::lowercase(configuration.child("debug_output").value());
+    _debug_output    = debugOutput.empty() || debugOutput == "enable" || debugOutput == "true" || debugOutput == "yes";
 }
 
-void OVL::parseTuneElement(TiXmlElement* tuneEl)
+void OVL::parseTuneElement(const ConfigNode& tuneEl)
 {
+    auto tunePol  = std::string(tuneEl.attribute("pollutant"));
+    auto tuneAggr = std::string(tuneEl.attribute("aggr"));
+    auto tuneMode = std::string(tuneEl.attribute("mode"));
 
-    std::string tunePol, tuneAggr, tuneMode;
-    if (tuneEl->QueryStringAttribute("pollutant", &tunePol) != TIXML_SUCCESS) throw BadConfigurationException("pollutant not found in tune");
-    if (tuneEl->QueryStringAttribute("aggr", &tuneAggr) != TIXML_SUCCESS) throw BadConfigurationException("aggr not found in tune");
-    if (tuneEl->QueryStringAttribute("mode", &tuneMode) != TIXML_SUCCESS) throw BadConfigurationException("mode not found in tune");
+    if (tunePol.empty()) {
+        throw BadConfigurationException("pollutant not found in tune");
+    }
 
-    TiXmlElement* stEl = tuneEl->FirstChildElement("station");
-    while (stEl)
-    {
-        std::string stName = stEl->Attribute("name");
+    if (tuneAggr.empty()) {
+        throw BadConfigurationException("aggr not found in tune");
+    }
 
-        TiXmlElement* modelEl = stEl->FirstChildElement("model");
-        while (modelEl)
-        {
+    if (tuneMode.empty()) {
+        throw BadConfigurationException("mode not found in tune");
+    }
+
+    for (auto& stEl : tuneEl.children("station")) {
+        auto stName = std::string(stEl.attribute("name"));
+
+        for (auto& modelEl : stEl.children("model")) {
             OVL::StationConfig c;
-            int fc_hor;
-
-            modelEl->QueryIntAttribute("fc_hor", &fc_hor);
-            modelEl->QueryIntAttribute("rtc_mode", &(c.rtc_mode));
-            modelEl->QueryIntAttribute("rtc_param", &(c.rtc_param));
-            c.model_name = modelEl->GetText();
+            auto fc_hor  = modelEl.attribute<int>("fc_hor");
+            c.rtc_mode   = modelEl.attribute<int>("rtc_mode").value();
+            c.rtc_param  = modelEl.attribute<int>("rtc_param").value();
+            c.model_name = modelEl.value();
 
             // inserting using list initializer instead of std::pair()... doesnt work for replacing the std::make_tuple command though
-            _conf.insert({std::make_tuple(tunePol, Aggregation::fromString(tuneAggr), tuneMode, stName, fc_hor), c});
-
-            modelEl = modelEl->NextSiblingElement("model");
+            _conf.insert({std::make_tuple(tunePol, Aggregation::fromString(tuneAggr), tuneMode, stName, fc_hor.value()), c});
         }
-
-        stEl = stEl->NextSiblingElement("station");
-    } // loop over the stations
+    }
 }
 
-void OVL::parseTuneList(TiXmlElement* lst)
+void OVL::parseTuneList(const ConfigNode& lst)
 {
-
-    TiXmlDocument refDoc;
-    TiXmlElement* tuneEl = lst->FirstChildElement("tune");
-    while (tuneEl)
-    {
-        std::string ref;
-        if (tuneEl->QueryStringAttribute("ref", &ref) == TIXML_SUCCESS) {
+    for (auto& tuneEl : lst.children("tune")) {
+        auto ref = std::string(tuneEl.attribute("ref"));
+        if (ref.empty()) {
+            parseTuneElement(tuneEl);
+        } else {
             // ref attribute found
             if (FileTools::exists(ref)) {
                 // file found
-                if (!refDoc.LoadFile(ref)) {
-                    throw ElementNotFoundException("Failed to load file in ref attribute: {}", ref);
-                }
-                TiXmlElement* fileElement = refDoc.FirstChildElement("tune");
+                auto refDoc      = ConfigDocument::loadFromFile(ref);
+                auto fileElement = refDoc.child("tune");
                 if (!fileElement) {
                     throw ElementNotFoundException("File in ref attribute ({}) does not have 'tune' as root element", ref);
                 }
                 parseTuneElement(fileElement);
-            }
-            else
-            {
+            } else {
                 throw ElementNotFoundException("File in ref attribute '{}' not found.", ref);
             }
         }
-        else
-        {
-            parseTuneElement(tuneEl);
-        }
-
-        tuneEl = tuneEl->NextSiblingElement("tune");
-    } // loop over the pollutants
-
-    return;
+    }
 }
 
 /* ============================================================================
-
-     Implementation of the model run method
-
-     ========================================================================== */
+ Implementation of the model run method
+ ========================================================================== */
 void OVL::run()
 {
-
     // -- 1. initialization
-    _logger->debug("OVL " + getName() + " run() method called");
+    Log::debug(s_logSrc, "{} run() method called", getName());
 
     auto baseTime          = getBaseTime();
     Pollutant pol          = getPollutant();
@@ -224,25 +190,20 @@ void OVL::run()
     }
 
     // -- 2. loop over the stations, the C++ 11 way :)
-    for (auto& station : stations)
-    {
-
+    for (auto& station : stations) {
         // check if we have a valid meteo id, otherwise skip the station
         if (station.getMeteoId().length() == 0) {
-            _logger->trace("Skipping station " + station.getName() + ", no meteo id given");
+            Log::debug(s_logSrc, "Skipping station " + station.getName() + ", no meteo id given");
             continue;
-        }
-        else
-            _logger->trace("Forecasting station " + station.getName());
+        } else
+            Log::debug(s_logSrc, "Forecasting station " + station.getName());
 
         if (_debug_output) fs << "[STATION] " << station.getName() << " - " << chrono::to_date_string(baseTime) << std::endl;
 
         // store the output in a time series object
         TimeSeries<double> fc;
 
-        for (int fc_hor = 0; fc_hor <= fcHorMax; fc_hor++)
-        {
-
+        for (int fc_hor = 0; fc_hor <= fcHorMax; fc_hor++) {
             auto fcHor  = chrono::days(fc_hor);
             auto fcTime = baseTime + fcHor;
 
@@ -252,7 +213,7 @@ void OVL::run()
             auto stIt = _conf.find(std::make_tuple(pol.getName(), aggr, _tune_mode, station.getName(), fc_hor));
             if (stIt == _conf.end()) {
                 // no configuration for this station, returning -9999 or something
-                _logger->warn("Model configuration not found for " + pol.getName() + ", st = " + station.getName() + ", skipping...");
+                Log::warn(s_logSrc, "Model configuration not found for " + pol.getName() + ", st = " + station.getName() + ", skipping...");
                 fc.insert(fcTime, getNoData());
                 continue;
             }
@@ -298,7 +259,6 @@ void OVL::run()
             // now handle the RTC, if the mode is larger than 0, otherwise we already have out output !!!
             // only to this if the output value of the model is not missing...
             if (cf->rtc_mode > 0 && fabs(out - model.getNoData()) > 1.e-6) {
-
                 if (_debug_output) {
                     fs << "\t\tRTC PARAM   : " << cf->rtc_param << std::endl;
                 }
@@ -333,21 +293,17 @@ void OVL::run()
 
                 // check if the timeseries are consistent !
                 if (!fc_hindcast.isConsistent(obs_hindcast))
-                    throw RunTimeException("forecast & hindcast timeseries are not consistent...");
+                    throw RuntimeError("forecast & hindcast timeseries are not consistent...");
 
                 double fc_err = 0.;
                 // run the real time correction scheme, let's do it this way for the moment,
                 // later on we can add a separate class or even plugin for this...
-                switch (cf->rtc_mode)
-                {
-                case 1:
-                { // compute the average error in the hind cast period
+                switch (cf->rtc_mode) {
+                case 1: { // compute the average error in the hind cast period
                     int n = 0;
-                    for (unsigned int i = 0; i < fc_hindcast.size(); i++)
-                    {
+                    for (unsigned int i = 0; i < fc_hindcast.size(); i++) {
                         if (fabs(fc_hindcast.value(i) - buffer->getNoData()) > 1.e-6 &&
                             fabs(obs_hindcast.value(i) - getInputProvider().getNoData()) > 1.e-6) {
-
                             if (_debug_output) {
                                 fs << "\t\tERROR : " << chrono::to_date_string(fc_hindcast.datetime(i)) << "\t" << fc_hindcast.value(i) - obs_hindcast.value(i) << std::endl;
                             }
@@ -360,21 +316,17 @@ void OVL::run()
                     if (n > 0) fc_err /= n;
 
                     if (_debug_output) fs << "\t\tFINAL ERROR (mode 1) : " << fc_err << std::endl;
-                }
-                break;
+                } break;
 
-                case 2:
-                { // compute a weighted error in the hindcast period
+                case 2: { // compute a weighted error in the hindcast period
                     // TODO here we don't take the weights of the missing values in either
                     //      obs / fc arrays into account... maybe a fix for later (was never so in OVL)
-                    for (unsigned int i = 0; i < fc_hindcast.size(); i++)
-                    {
+                    for (unsigned int i = 0; i < fc_hindcast.size(); i++) {
                         if (fabs(fc_hindcast.value(i) - buffer->getNoData()) > 1.e-6 &&
                             fabs(obs_hindcast.value(i) - getInputProvider().getNoData()) > 1.e-6) {
-
                             // BUGFIX : have to turn the order of i around... !!
                             const auto fc_hindcast_size = static_cast<int>(fc_hindcast.size());
-                            double w = _wexp(fc_hindcast_size - i - 1, fc_hindcast_size, cf->rtc_param);
+                            double w                    = _wexp(fc_hindcast_size - i - 1, fc_hindcast_size, cf->rtc_param);
 
                             if (_debug_output) {
                                 fs << "\t\tERROR : " << chrono::to_date_string(fc_hindcast.datetime(i)) << "\t"
@@ -387,8 +339,7 @@ void OVL::run()
                     }
 
                     if (_debug_output) fs << "\t\tFINAL ERROR (mode 2) : " << fc_err << std::endl;
-                }
-                break;
+                } break;
 
                 default:
                     throw BadConfigurationException("Invalid real time correction mode : " + std::to_string(cf->rtc_mode));
@@ -411,7 +362,5 @@ void OVL::run()
 
     } // loop over the stations
 }
-
-OPAQ_REGISTER_STATIC_PLUGIN(OVL)
 
 } /* namespace OPAQ */

@@ -8,10 +8,8 @@
 #include "GzipReader.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/iostreams/filter/gzip.hpp>
-#include "StringTools.h"
 
-namespace opaq
-{
+namespace opaq {
 
 void GzipReader::open(const std::string& filename)
 {
@@ -19,32 +17,26 @@ void GzipReader::open(const std::string& filename)
 
     _file.open(filename.c_str(), std::ios::binary);
 
-    if (!_file.is_open())
-    {
+    if (!_file.is_open()) {
         throw IOException("File not found: {}", filename);
     }
 
     _filterStream = std::make_unique<boost::iostreams::filtering_istream>();
-    if (boost::algorithm::ends_with(filename, ".gz"))
-    {
+    if (boost::algorithm::ends_with(filename, ".gz")) {
         _filterStream->push(boost::iostreams::gzip_decompressor());
     }
-    
+
     _filterStream->push(_file);
 }
 
 std::string GzipReader::readLine()
 {
     std::string line;
-    if (_filterStream)
-    {
-        try
-        {
+    if (_filterStream) {
+        try {
             std::getline(*_filterStream, line);
-        }
-        catch(const boost::iostreams::gzip_error& e)
-        {
-             throw RunTimeException("Failed to decompress line: {}", e.what());
+        } catch (const boost::iostreams::gzip_error& e) {
+            throw RuntimeError("Failed to decompress line: {}", e.what());
         }
     }
     return line;
@@ -52,10 +44,8 @@ std::string GzipReader::readLine()
 
 bool GzipReader::eof() const noexcept
 {
-    if (!_filterStream)
-    {
+    if (!_filterStream) {
         return true;
-
     }
 
     return _filterStream->eof();

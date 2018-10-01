@@ -1,0 +1,14 @@
+[
+    {
+        "name": "Clang",
+        "toolchainFile": "${workspaceRoot}/deps/cmake-scripts/toolchain-clang.cmake"
+    },
+    {
+        "name": "Gcc 7",
+        "toolchainFile": "${workspaceRoot}/deps/cmake-scripts/toolchain-gcc7.cmake"
+    },
+    {
+        "name": "Gcc 8",
+        "toolchainFile": "${workspaceRoot}/deps/cmake-scripts/toolchain-gcc8.cmake"
+    }
+]
