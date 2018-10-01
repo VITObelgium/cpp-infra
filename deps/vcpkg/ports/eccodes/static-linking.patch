@@ -1,0 +1,34 @@
+diff -Naur a/cmake/FindNetCDF.cmake b/cmake/FindNetCDF.cmake
+--- a/cmake/FindNetCDF.cmake	2018-08-06 11:45:31.000000000 +0200
++++ b/cmake/FindNetCDF.cmake	2018-08-14 09:54:45.634183703 +0200
+@@ -78,7 +78,7 @@
+ 
+   # Note: Only the HDF5 C-library is required for NetCDF
+   #       ( even for Fortan and CXX bindings)
+-  find_package( HDF5 COMPONENTS C QUIET )
++  find_package( HDF5 CONFIG COMPONENTS C HL QUIET )
+ 
+   ## netcdf4
+ 
+@@ -111,8 +111,7 @@
+ 
+   if( NETCDF_FOUND AND HDF5_FOUND )
+     # list( APPEND NETCDF_DEFINITIONS  ${HDF5_DEFINITIONS} )
+-    list( APPEND NETCDF_LIBRARIES    ${HDF5_HL_LIBRARIES} ${HDF5_LIBRARIES}  )
+-    list( APPEND NETCDF_INCLUDE_DIRS ${HDF5_INCLUDE_DIRS} )
++    list( APPEND NETCDF_LIBRARIES    hdf5::hdf5_hl-static hdf5::hdf5-static)
+   endif()
+ 
+   #ecbuild_debug_var( NETCDF_FOUND )
+diff -Naur a/src/CMakeLists.txt b/src/CMakeLists.txt
+--- a/src/CMakeLists.txt	2018-08-06 11:45:33.000000000 +0200
++++ b/src/CMakeLists.txt	2018-08-08 11:01:17.859638659 +0200
+@@ -434,7 +434,7 @@
+                               # griby.c gribl.c
+                              ${grib_api_srcs}
+                     GENERATED grib_api_version.c
+-                    LIBS      ${ECCODES_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMATH_LIBRARIES}
++                    LIBS      ${ECCODES_EXTRA_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT} ${CMATH_LIBRARIES} ${CMAKE_DL_LIBS}
+                     TEMPLATES ${grib_api_extra_srcs})
+ 
+ 
