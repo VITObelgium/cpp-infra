@@ -1,6 +1,0 @@
-[submodule "deps/cmake-scripts"]
-	path = deps/cmake-scripts
-	url = https://git.vito.be/scm/marvin-geodynamix/cmake-scripts.git
-[submodule "deps/infra"]
-	path = deps/infra
-	url = https://git.vito.be/scm/marvin-geodynamix/infra.git
