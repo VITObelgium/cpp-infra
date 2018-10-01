@@ -15,13 +15,13 @@
 
 namespace nnet {
 
-using namespace infra;
+using namespace inf;
 
 static const LogSource s_logSrc("feedforwardnet");
 
 namespace {
 
-std::unique_ptr<nnet::scaler> createScaler(const infra::ConfigNode& config, int size)
+std::unique_ptr<nnet::scaler> createScaler(const inf::ConfigNode& config, int size)
 {
     // get scaler type
     if (!config) {
@@ -45,7 +45,7 @@ std::unique_ptr<nnet::scaler> createScaler(const infra::ConfigNode& config, int 
 }
 }
 
-feedforwardnet::feedforwardnet(const infra::ConfigNode& config)
+feedforwardnet::feedforwardnet(const inf::ConfigNode& config)
 {
     if (!config) {
         return;

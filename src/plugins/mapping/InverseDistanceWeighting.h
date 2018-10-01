@@ -11,7 +11,7 @@ public:
 
     static std::string name();
 
-    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
     void run() override;
 
 private:

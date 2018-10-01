@@ -15,7 +15,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
@@ -108,7 +108,7 @@ void RioObsProvider::readFile(const std::string& pollutant)
 {
     // create file name & open file stream
     std::string filename = _pattern;
-    str::replaceInPlace(filename, s_pollutantPlaceholder, pollutant);
+    str::replace_in_place(filename, s_pollutantPlaceholder, pollutant);
 
     std::ifstream file(filename.c_str());
     if (!file.is_open()) {

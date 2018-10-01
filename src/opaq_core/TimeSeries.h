@@ -9,11 +9,11 @@
 
 #include "DateTime.h"
 #include "Exceptions.h"
-#include <fstream>
 #include <algorithm>
+#include <fstream>
+#include <vector>
 
-namespace opaq
-{
+namespace opaq {
 
 /**
  * Basic template class for OPAQ timeseries
@@ -22,10 +22,22 @@ template <class T>
 class TimeSeries
 {
 public:
-    size_t size() const { return _datetimes.size(); }
-    void setNoData(const T& missing_value) { _missing_value = missing_value; }
-    const T& getNoData() const { return _missing_value; }
-    bool isEmpty() const { return _datetimes.empty(); }
+    size_t size() const
+    {
+        return _datetimes.size();
+    }
+    void setNoData(const T& missing_value)
+    {
+        _missing_value = missing_value;
+    }
+    const T& getNoData() const
+    {
+        return _missing_value;
+    }
+    bool isEmpty() const
+    {
+        return _datetimes.empty();
+    }
 
     bool isConsistent(const TimeSeries<T>& t) const
     {
@@ -195,7 +207,6 @@ protected:
 template <class T>
 void TimeSeries<T>::insert(const chrono::date_time& dt, const T& val)
 {
-
     if (dt == chrono::date_time()) throw RuntimeError("invalid datetime given");
     // if the timeseries is empty or the date is after the last date, push it back...
     if (isEmpty() || dt > lastDateTime()) {
@@ -227,15 +238,10 @@ void TimeSeries<T>::insert(const chrono::date_time& dt, const T& val)
 template <class T>
 void TimeSeries<T>::merge(const TimeSeries<T>& ts, bool overwrite)
 {
-
-    for (unsigned int i = 0; i < ts.size(); i++)
-    {
-        if (!contains(ts.datetime(i)))
-        {
+    for (unsigned int i = 0; i < ts.size(); i++) {
+        if (!contains(ts.datetime(i))) {
             insert(ts.datetime(i), ts.value(i));
-        }
-        else if (overwrite)
-        {
+        } else if (overwrite) {
             insert(ts.datetime(i), ts.value(i));
         }
     }
@@ -311,7 +317,6 @@ void TimeSeries<T>::removeAfter(const chrono::date_time& t)
 template <class T>
 T TimeSeries<T>::valueAt(const chrono::date_time& dt) const
 {
-
     if (isEmpty()) throw RuntimeError("empty timeseries");
     if (dt < firstDateTime()) throw RuntimeError("datetime before first requested");
     if (contains(dt)) return value(dt);
@@ -322,8 +327,7 @@ template <class T>
 TimeSeries<T> TimeSeries<T>::select(const chrono::date_time& t1, const chrono::date_time& t2) const
 {
     TimeSeries<T> ts;
-    for (unsigned int i = 0; i < size(); i++)
-    {
+    for (unsigned int i = 0; i < size(); i++) {
         if ((_datetimes[i] >= t1) && (_datetimes[i] <= t2)) ts.insert(_datetimes[i], _values[i]);
         if (_datetimes[i] > t2) break;
     }
@@ -336,8 +340,7 @@ TimeSeries<T> TimeSeries<T>::select(const chrono::date_time& t1, const chrono::d
 {
     TimeSeries<T> ts;
 
-    for (chrono::date_time t = t1; t <= t2; t += step)
-    {
+    for (chrono::date_time t = t1; t <= t2; t += step) {
         int i = index(t);
         if (i < 0)
             ts.insert(t, _missing_value);
@@ -352,8 +355,7 @@ template <class T>
 std::ostream& operator<<(std::ostream& os, const TimeSeries<T>& ts)
 {
     if (ts.isEmpty()) return os;
-    for (unsigned int i = 0; i < ts.size(); i++)
-    {
+    for (unsigned int i = 0; i < ts.size(); i++) {
         os << "[" << ts.datetime(i) << "] " << ts.value(i) << std::endl;
     };
     return os;

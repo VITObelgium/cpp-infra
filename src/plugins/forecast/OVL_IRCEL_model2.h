@@ -14,7 +14,7 @@ public:
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     int makeSample(double* sample, const Station& st, const Pollutant& pol,
         Aggregation::Type aggr, const chrono::date_time& baseTime,

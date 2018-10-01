@@ -10,7 +10,7 @@
 #include "layer.h"
 #include "scaler.h"
 
-namespace infra {
+namespace inf {
 class ConfigNode;
 }
 
@@ -19,7 +19,7 @@ namespace nnet {
 class feedforwardnet
 {
 public:
-    feedforwardnet(const infra::ConfigNode& config);
+    feedforwardnet(const inf::ConfigNode& config);
 
     int sim(const double* input);
     int sim(const Eigen::VectorXd& in);

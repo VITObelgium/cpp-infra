@@ -2,14 +2,14 @@
 
 #include "infra/log.h"
 
-using namespace infra;
+using namespace inf;
 using namespace testing;
 
 int main(int argc, char** argv)
 {
     FLAGS_gmock_verbose = "error";
 
-    Log::addConsoleSink(Log::Colored::On);
+    Log::add_console_sink(Log::Colored::On);
     Log::initialize("opaqcoretest");
 
     InitGoogleMock(&argc, argv);

@@ -17,7 +17,7 @@ namespace opaq {
 namespace test {
 
 using namespace date;
-using namespace infra;
+using namespace inf;
 using namespace chrono;
 using namespace testing;
 using namespace std::chrono_literals;
@@ -27,7 +27,7 @@ static const std::string s_station = "40AB01";
 class AQNetworkProviderMock : public AQNetworkProvider
 {
 public:
-    MOCK_METHOD3(configure, void(const infra::ConfigNode&, const std::string&, IEngine&));
+    MOCK_METHOD3(configure, void(const inf::ConfigNode&, const std::string&, IEngine&));
     MOCK_METHOD0(getAQNetwork, AQNetwork&());
 };
 
@@ -79,7 +79,7 @@ TEST_F(RioObsProviderTest, GetValues)
        << "40AB01 20090102    129    89    80   129   101    93    87    81    77    74    72    69    71    73    70    69    69    68    66    64    73    85    85    88    94    82    80\n"
        << "40AB01 20090103     42    38    29    39    41    42    37    33    34    37    40    32    35    38    36    19 -9999 -9999 -9999    13    16    16    16    17    20    19    22\n";
 
-    file::writeAsText("pm10_data_rio.txt", ss.str());
+    file::write_as_text("pm10_data_rio.txt", ss.str());
 
     auto values = _obsProvider.getValues(make_date_time(2009_y / jan / 02), make_date_time(2009_y / jan / 03), s_station, "pm10", Aggregation::Max1h);
     EXPECT_EQ(2u, values.size());

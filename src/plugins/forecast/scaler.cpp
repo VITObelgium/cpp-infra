@@ -20,7 +20,7 @@ int _parseArray(Eigen::VectorXd& v, std::string_view str)
 
 namespace nnet {
 
-using namespace infra;
+using namespace inf;
 
 scaler::scaler()
 {
@@ -49,7 +49,7 @@ int mapdummy::reverse(Eigen::Ref<Eigen::VectorXd> /*y*/)
 }
 
 // MAP STD IMPLEMENTATION
-mapstd::mapstd(const infra::ConfigNode& config, int size, double ymean, double ystd)
+mapstd::mapstd(const inf::ConfigNode& config, int size, double ymean, double ystd)
 : scaler(), _ymean(ymean), _ystd(ystd)
 {
     _name          = "mapstd";
@@ -101,7 +101,7 @@ int mapstd::reverse(Eigen::Ref<Eigen::VectorXd> y)
 }
 
 // MAP MINMAX IMPLEMENTATION
-mapminmax::mapminmax(const infra::ConfigNode& config, int size, double ymin, double ymax)
+mapminmax::mapminmax(const inf::ConfigNode& config, int size, double ymin, double ymax)
 : scaler(), _ymin(ymin), _ymax(ymax)
 {
     _name = "mapminmax";

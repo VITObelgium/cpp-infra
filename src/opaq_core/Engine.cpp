@@ -21,7 +21,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace chrono_literals;
 
 static const LogSource s_logSrc("Engine");

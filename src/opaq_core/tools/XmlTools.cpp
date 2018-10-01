@@ -5,9 +5,9 @@
 namespace opaq {
 namespace XmlTools {
 
-using namespace infra;
+using namespace inf;
 
-infra::ConfigNode getElement(const infra::ConfigNode& parent, const std::string& childName, infra::ConfigDocument* refDoc)
+inf::ConfigNode getElement(const inf::ConfigNode& parent, const std::string& childName, inf::ConfigDocument* refDoc)
 {
     auto element = parent.child(childName);
     if (!element) {

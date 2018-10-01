@@ -251,21 +251,23 @@ install(EXPORT infra-targets
     DESTINATION ${INSTALL_CONFIGDIR}
 )
 
-write_basic_package_version_file("InfraConfigVersion.cmake"
-    VERSION ${Infra_VERSION}
-    COMPATIBILITY SameMajorVersion
-)
+if (INFRA_IS_TOPLEVEL)
+    write_basic_package_version_file("InfraConfigVersion.cmake"
+        VERSION ${Infra_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
 
-configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/InfraConfig.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
-    INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-)
+    configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/InfraConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+    )
 
-install(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
-    ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
-    DESTINATION ${INSTALL_CONFIGDIR}
-)
+    install(FILES
+        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
+endif ()
 
 if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)

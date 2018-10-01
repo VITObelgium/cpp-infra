@@ -241,11 +241,11 @@ private:
 
     void prepareStatements()
     {
-        _statements.addPrediction         = _db.prepare(addPredictionQuery());
+        /*_statements.addPrediction         = _db.prepare(addPredictionQuery());
         _statements.getPrediction         = _db.prepare(getPredictionQuery());
         _statements.getPredictions        = _db.prepare(getPredictionsQuery());
         _statements.getPredictionValues   = _db.prepare(getPredictionValuesQuery());
-        _statements.getPredictionsInRange = _db.prepare(getPredictionsInRangeQuery());
+        _statements.getPredictionsInRange = _db.prepare(getPredictionsInRangeQuery());*/
     }
 
     ConnectionType _db;

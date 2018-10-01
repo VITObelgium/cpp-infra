@@ -6,7 +6,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace chrono_literals;
 
 SqlBuffer::SqlBuffer()
@@ -22,7 +22,7 @@ std::string SqlBuffer::name()
     return "sqlbuffer";
 }
 
-void SqlBuffer::configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine&)
+void SqlBuffer::configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

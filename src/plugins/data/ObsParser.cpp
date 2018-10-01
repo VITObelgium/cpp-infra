@@ -10,7 +10,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 // parse the file and read in the pollutant //
 // no need to specify the aggregation time since we load the whole file in memory and build the
@@ -22,7 +22,7 @@ std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries
 {
     std::unordered_map<Aggregation::Type, std::unordered_map<std::string, TimeSeries<double>>> result;
 
-    auto contents = file::readAsText(file);
+    auto contents = file::read_as_text(file);
     str::Splitter lineSplitter(contents, "\r\n", str::StrTokFlags);
 
     for (auto& line : lineSplitter) {

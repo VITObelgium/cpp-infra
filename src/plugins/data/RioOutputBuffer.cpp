@@ -12,7 +12,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace chrono_literals;
 
 static const std::string s_gridGroupName("grid");

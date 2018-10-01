@@ -4,7 +4,7 @@
 namespace opaq {
 namespace config {
 
-using namespace infra;
+using namespace inf;
 
 OpaqRun::OpaqRun()
 : _aggregation(Aggregation::None)

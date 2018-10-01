@@ -20,7 +20,7 @@ struct Component
 {
     std::string name;
     Plugin plugin;
-    infra::ConfigNode config;
+    inf::ConfigNode config;
 };
 }
 }

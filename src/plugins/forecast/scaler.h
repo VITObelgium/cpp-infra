@@ -3,7 +3,7 @@
 
 #include <Eigen/Dense>
 
-namespace infra {
+namespace inf {
 class ConfigNode;
 }
 
@@ -45,7 +45,7 @@ public:
 class mapstd : public scaler
 {
 public:
-    mapstd(const infra::ConfigNode& config, int size, double ymean = 0, double ystd = 1);
+    mapstd(const inf::ConfigNode& config, int size, double ymean = 0, double ystd = 1);
     ~mapstd();
 
     int apply(Eigen::Ref<Eigen::VectorXd> x);
@@ -62,7 +62,7 @@ private:
 class mapminmax : public scaler
 {
 public:
-    mapminmax(const infra::ConfigNode& config, int size, double ymin = -1, double ymax = 1);
+    mapminmax(const inf::ConfigNode& config, int size, double ymin = -1, double ymax = 1);
     ~mapminmax();
 
     int apply(Eigen::Ref<Eigen::VectorXd> x);

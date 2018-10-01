@@ -11,7 +11,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 static const LogSource s_logSrc("AsciiForecastWriter");
 const std::string AsciiForecastWriter::BASETIME_PLACEHOLDER    = "%basetime%";
@@ -91,14 +91,14 @@ void AsciiForecastWriter::write(const Pollutant& pol, Aggregation::Type aggr, co
     int fcHorMax   = getForecastHorizon().count();
 
     // -- translate the filename
-    str::replaceInPlace(fname, POLLUTANT_PLACEHOLDER, pol.getName());
-    str::replaceInPlace(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    str::replaceInPlace(fname, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
+    str::replace_in_place(fname, POLLUTANT_PLACEHOLDER, pol.getName());
+    str::replace_in_place(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    str::replace_in_place(fname, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // -- translate the header
-    str::replaceInPlace(head, POLLUTANT_PLACEHOLDER, pol.getName());
-    str::replaceInPlace(head, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    str::replaceInPlace(head, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
+    str::replace_in_place(head, POLLUTANT_PLACEHOLDER, pol.getName());
+    str::replace_in_place(head, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    str::replace_in_place(head, BASETIME_PLACEHOLDER, chrono::to_date_string(baseTime));
 
     // ========================================================================
     // initialization

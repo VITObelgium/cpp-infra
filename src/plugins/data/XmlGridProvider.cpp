@@ -11,7 +11,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 std::string XmlGridProvider::name()
 {

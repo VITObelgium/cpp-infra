@@ -39,7 +39,7 @@ public:
       This member function will push back OPAQ::Pollutants to the list for each
       "<pollutant>" found in the "<pollutants>" section
       */
-    void configure(const infra::ConfigNode& config);
+    void configure(const inf::ConfigNode& config);
 
 private:
     // list of the available pollutants

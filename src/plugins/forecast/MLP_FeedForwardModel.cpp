@@ -21,7 +21,7 @@ static const std::string MODEL_PLACEHOLDER       = "%model%";   // idem for feat
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 static const LogSource s_logSrc("MLP_FeedForwardModel");
 
@@ -35,11 +35,11 @@ std::string MLP_FeedForwardModel::getFFNetFile(const std::string& pol_name, Aggr
 {
     // Building filename...
     std::string fname = this->pattern;
-    str::replaceInPlace(fname, POLLUTANT_PLACEHOLDER, pol_name);
-    str::replaceInPlace(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
-    str::replaceInPlace(fname, STATION_PLACEHOLDER, st_name);
-    str::replaceInPlace(fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor));
-    str::replaceInPlace(fname, MODEL_PLACEHOLDER, this->getName());
+    str::replace_in_place(fname, POLLUTANT_PLACEHOLDER, pol_name);
+    str::replace_in_place(fname, AGGREGATION_PLACEHOLDER, Aggregation::getName(aggr));
+    str::replace_in_place(fname, STATION_PLACEHOLDER, st_name);
+    str::replace_in_place(fname, FCHOR_PLACEHOLDER, std::to_string(fc_hor));
+    str::replace_in_place(fname, MODEL_PLACEHOLDER, this->getName());
 
     return fname;
 }

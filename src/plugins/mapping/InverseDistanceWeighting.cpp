@@ -11,7 +11,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 
@@ -27,7 +27,7 @@ std::string InverseDistanceWeighting::name()
     return "idwmodel";
 }
 
-void InverseDistanceWeighting::configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine&)
+void InverseDistanceWeighting::configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

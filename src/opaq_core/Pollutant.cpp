@@ -8,7 +8,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 Pollutant::Pollutant()
 : _id(0)

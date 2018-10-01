@@ -31,7 +31,7 @@ namespace opaq {
 namespace test {
 
 using namespace date;
-using namespace infra;
+using namespace inf;
 using namespace chrono;
 using namespace testing;
 using namespace chrono_literals;

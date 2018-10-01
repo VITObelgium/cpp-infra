@@ -29,7 +29,7 @@ int _parseMatrix(Eigen::VectorXd& m, const std::string& str)
 
 namespace nnet {
 
-using namespace infra;
+using namespace inf;
 
 layer::layer(const ConfigNode& config, int ninput)
 : _fcn(nullptr)

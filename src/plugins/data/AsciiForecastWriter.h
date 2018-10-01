@@ -27,7 +27,7 @@ public:
 
     // OPAQ::Component methods
     // throws (BadConfigurationException)
-    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::ForecastOutputWriter methods
     void write(const Pollutant& pol, Aggregation::Type aggr, const chrono::date_time& baseTime) override;

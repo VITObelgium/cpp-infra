@@ -10,7 +10,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 static const LogSource s_logSrc("XMLAQNetProvider");
 

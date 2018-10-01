@@ -17,7 +17,7 @@ EXCEPTION(ParseException, std::runtime_error)
 EXCEPTION(NotAvailableException, std::runtime_error);
 EXCEPTION(ElementNotFoundException, std::runtime_error);
 
-using RuntimeError    = infra::RuntimeError;
-using InvalidArgument = infra::InvalidArgument;
+using RuntimeError    = inf::RuntimeError;
+using InvalidArgument = inf::InvalidArgument;
 
 }

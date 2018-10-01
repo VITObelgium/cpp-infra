@@ -54,11 +54,11 @@ public:
     }
 
 private:
-    config::ForecastStage parseForecastStage(const infra::ConfigNode& element);
-    config::MappingStage parseMappingStage(const infra::ConfigNode& element);
+    config::ForecastStage parseForecastStage(const inf::ConfigNode& element);
+    config::MappingStage parseMappingStage(const inf::ConfigNode& element);
 
     config::OpaqRun _opaqRun;
-    infra::ConfigDocument _doc;
-    std::vector<infra::ConfigDocument> _configDocs;
+    inf::ConfigDocument _doc;
+    std::vector<inf::ConfigDocument> _configDocs;
 };
 }

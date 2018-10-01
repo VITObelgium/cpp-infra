@@ -9,7 +9,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 static const LogSource s_logSrc("TextGridProvider");
 static const char* s_gridTypePlaceholder  = "%grid%";
@@ -20,7 +20,7 @@ std::string TextGridProvider::name()
     return "textgridprovider";
 }
 
-void TextGridProvider::configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine&)
+void TextGridProvider::configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
     _grid.clear();
@@ -39,14 +39,14 @@ const Grid& TextGridProvider::getGrid(const std::string& pollutant, GridType typ
 void TextGridProvider::readFile(const std::string& pollutant, GridType type)
 {
     std::string filename = _pattern;
-    str::replaceInPlace(filename, s_gridTypePlaceholder, gridTypeToString(type));
-    str::replaceInPlace(filename, s_pollutantPlaceholder, pollutant);
+    str::replace_in_place(filename, s_gridTypePlaceholder, gridTypeToString(type));
+    str::replace_in_place(filename, s_pollutantPlaceholder, pollutant);
 
     try {
         auto& grid    = _grid[pollutant][type];
         auto cellSize = gridTypeToCellSize(type);
 
-        auto contents = file::readAsText(filename);
+        auto contents = file::read_as_text(filename);
         str::Splitter lineSplitter(contents, "\r\n", str::StrTokFlags);
 
         bool first = true;

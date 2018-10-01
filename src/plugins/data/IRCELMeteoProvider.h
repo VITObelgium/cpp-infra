@@ -15,7 +15,7 @@ public:
 
     // OPAQ::Component methods
     // throws BadConfigurationException
-    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // OPAQ::MeteoProvider methods
 

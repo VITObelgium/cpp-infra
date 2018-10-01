@@ -3,15 +3,15 @@
 #include "infra/log.h"
 #include "opaqconfig.h"
 
-using namespace infra;
+using namespace inf;
 using namespace testing;
 
 int main(int argc, char** argv)
 {
     FLAGS_gmock_verbose = "error";
 
-    Log::addConsoleSink(Log::Colored::On);
-    infra::LogRegistration logging("opaq");
+    Log::add_console_sink(Log::Colored::On);
+    inf::LogRegistration logging("opaq");
 
     InitGoogleMock(&argc, argv);
     return RUN_ALL_TESTS();

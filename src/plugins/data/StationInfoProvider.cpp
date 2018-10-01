@@ -10,7 +10,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace std::chrono_literals;
 
 static const LogSource s_logSrc("StationInfoProvider");
@@ -50,11 +50,11 @@ void StationInfoProvider::readFile(Pollutant pollutant, const std::string& gisTy
 {
     // create file name & open file stream
     std::string filename = _pattern;
-    str::replaceInPlace(filename, s_pollutantPlaceholder, pollutant.getName());
-    str::replaceInPlace(filename, s_gisTypePlaceholder, gisType);
+    str::replace_in_place(filename, s_pollutantPlaceholder, pollutant.getName());
+    str::replace_in_place(filename, s_gisTypePlaceholder, gisType);
 
     try {
-        auto contents = file::readAsText(filename);
+        auto contents = file::read_as_text(filename);
         str::Splitter lineSplitter(contents, "\r\n", str::StrTokFlags);
 
         auto& stations = _stations[pollutant.getName()][gisType];

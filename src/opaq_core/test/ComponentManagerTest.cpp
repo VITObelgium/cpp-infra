@@ -11,7 +11,7 @@
 namespace opaq {
 namespace test {
 
-using namespace infra;
+using namespace inf;
 using namespace testing;
 using namespace std::string_literals;
 
@@ -31,7 +31,7 @@ public:
 class DummyComponent : public Component
 {
 public:
-    void configure(const infra::ConfigNode& /*configuration*/, const std::string& /*componentName*/, IEngine& /*engine*/) override
+    void configure(const inf::ConfigNode& /*configuration*/, const std::string& /*componentName*/, IEngine& /*engine*/) override
     {
     }
 };

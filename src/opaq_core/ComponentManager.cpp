@@ -6,7 +6,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 
 ComponentManager::ComponentManager(IEngine& engine, const IPluginFactory& pluginFactory)
 : _engine(engine)

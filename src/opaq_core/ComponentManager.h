@@ -9,7 +9,7 @@
 #include <memory>
 #include <unordered_map>
 
-namespace infra {
+namespace inf {
 class ConfigNode;
 }
 
@@ -39,7 +39,7 @@ public:
 
     // throws (ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException)
     template <typename T>
-    T& createComponent(const std::string& componentName, const std::string& pluginName, const infra::ConfigNode& configuration)
+    T& createComponent(const std::string& componentName, const std::string& pluginName, const inf::ConfigNode& configuration)
     {
         return dynamic_cast<T&>(createGenericComponent(componentName, pluginName, configuration));
     }
@@ -67,13 +67,13 @@ public:
 
 private:
     // throws ComponentAlreadyExistsException, PluginNotFoundException, BadConfigurationException
-    Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, const infra::ConfigNode& configuration);
+    Component& createGenericComponent(const std::string& componentName, const std::string& pluginName, const inf::ConfigNode& configuration);
 
     // throws ComponentNotFoundException
     Component& findComponent(const std::string& name);
 
     // throw PluginNotFoundException, BadConfigurationException
-    std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, const infra::ConfigNode& configuration);
+    std::unique_ptr<Component> createComponent(const std::string& pluginName, const std::string& componentName, const inf::ConfigNode& configuration);
     std::unordered_map<std::string, std::unique_ptr<Component>> _instanceMap;
 
     IEngine& _engine;

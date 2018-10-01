@@ -1,9 +1,6 @@
 gtest
 benchmark
-boost-filesystem
-boost-regex
-boost-program-options
-boost-iostreams
+boost[filesystem,regex,program-options,iostreams,zlib]
 hdf5[cpp]
 zlib
 fmt

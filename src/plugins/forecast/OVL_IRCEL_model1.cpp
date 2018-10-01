@@ -11,7 +11,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace std::chrono_literals;
 
 static const LogSource s_logSrc("OVL_IRCEL_model1");

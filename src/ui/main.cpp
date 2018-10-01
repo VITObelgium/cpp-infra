@@ -11,7 +11,7 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 #endif
 
-using namespace infra;
+using namespace inf;
 
 int main(int argc, char* argv[])
 {
@@ -21,7 +21,7 @@ int main(int argc, char* argv[])
     QCoreApplication::addLibraryPath("./plugins");
 #endif
 
-    Log::addConsoleSink(Log::Colored::On);
+    Log::add_console_sink(Log::Colored::On);
     LogRegistration logging("opaq");
 
     QApplication app(argc, argv);

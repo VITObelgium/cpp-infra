@@ -20,7 +20,7 @@ public:
 
     // component members
     // throws OPAQ::BadConfigurationException
-    void configure(const infra::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // AQNetowrk functions
     virtual AQNetwork& getAQNetwork() override;

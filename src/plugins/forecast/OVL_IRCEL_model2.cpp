@@ -10,7 +10,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace chrono_literals;
 using namespace std::chrono_literals;
 

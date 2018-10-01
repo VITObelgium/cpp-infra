@@ -7,7 +7,7 @@
 
 namespace opaq::factory {
 
-using namespace infra;
+using namespace inf;
 
 std::unique_ptr<IPredictionDatabase> createPredictionDatabase(std::string_view type, std::string_view location, std::string_view user, std::string_view pass)
 {

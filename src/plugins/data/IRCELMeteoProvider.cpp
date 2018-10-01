@@ -15,7 +15,7 @@
 
 namespace opaq {
 
-using namespace infra;
+using namespace inf;
 using namespace std::chrono_literals;
 
 static const LogSource s_logSrc("IRCELMeteoProvider");
@@ -139,9 +139,9 @@ void IRCELMeteoProvider::readFile(const std::string& meteoId, const std::string&
     bool have_file = false;
     while ((checkDate >= (_baseTime - chrono::days(_backsearch))) && (!have_file)) {
         filename = _pattern;
-        str::replaceInPlace(filename, s_meteo_placeholder, meteoId);
-        str::replaceInPlace(filename, s_parameter_placeholder, parameterId);
-        str::replaceInPlace(filename, s_basetime_placeholder, chrono::to_date_string(checkDate));
+        str::replace_in_place(filename, s_meteo_placeholder, meteoId);
+        str::replace_in_place(filename, s_parameter_placeholder, parameterId);
+        str::replace_in_place(filename, s_basetime_placeholder, chrono::to_date_string(checkDate));
 
         // -- Read & parse file
         try {

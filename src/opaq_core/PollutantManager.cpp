@@ -8,7 +8,7 @@
 namespace opaq {
 namespace config {
 
-using namespace infra;
+using namespace inf;
 
 Pollutant PollutantManager::find(const std::string& name)
 {

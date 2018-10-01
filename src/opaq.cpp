@@ -22,7 +22,7 @@
 #include <boost/program_options.hpp>
 
 namespace po = boost::program_options;
-using Log    = infra::Log;
+using Log    = inf::Log;
 
 static void printVersion()
 {
@@ -59,7 +59,7 @@ static T getOptionalArg(const po::variables_map& vm, const char* name, const T& 
 std::string readLogName(const std::string& config_file)
 {
     try {
-        auto doc = infra::ConfigDocument::loadFromFile(config_file);
+        auto doc = inf::ConfigDocument::loadFromFile(config_file);
         return std::string(doc.child("opaq").child("logFile").trimmedValue());
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
@@ -116,8 +116,8 @@ int main(int argc, char* argv[])
 
     printWelcome();
 
-    Log::addConsoleSink(Log::Colored::On);
-    infra::LogRegistration logging("opaq");
+    Log::add_console_sink(Log::Colored::On);
+    inf::LogRegistration logging("opaq");
 
     // -- Parse configuration, after init of the log, otherwise we get errors
     opaq::config::PollutantManager pollutantMgr;

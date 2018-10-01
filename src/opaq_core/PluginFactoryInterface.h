@@ -4,7 +4,7 @@
 
 #include <string_view>
 
-namespace infra {
+namespace inf {
 class ConfigNode;
 }
 

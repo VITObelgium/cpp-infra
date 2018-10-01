@@ -20,7 +20,7 @@ namespace opaq {
 namespace test {
 
 using namespace date;
-using namespace infra;
+using namespace inf;
 using namespace chrono;
 using namespace testing;
 using namespace std::chrono_literals;
@@ -79,7 +79,7 @@ TEST_F(IRCELMeteoProviderTest, GetTimeResolution)
 
 TEST_F(IRCELMeteoProviderTest, GetValues)
 {
-    file::writeAsText("BEL_096_4800_P07.txt", referenceData());
+    file::write_as_text("BEL_096_4800_P07.txt", referenceData());
 
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 03) + 23h, "096_4800", "P07");
     EXPECT_EQ(16u, values.size());
@@ -95,8 +95,8 @@ TEST_F(IRCELMeteoProviderTest, GetValues)
 
 TEST_F(IRCELMeteoProviderTest, GetValuesMultiplePollutants)
 {
-    file::writeAsText("BEL_096_4800_P07.txt", referenceData());
-    file::writeAsText("BEL_096_4800_P08.txt", referenceData());
+    file::write_as_text("BEL_096_4800_P07.txt", referenceData());
+    file::write_as_text("BEL_096_4800_P08.txt", referenceData());
 
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 02), make_date_time(2015_y / jan / 02) + 23h, "096_4800", "P07");
     EXPECT_EQ(8u, values.size());
@@ -143,7 +143,7 @@ TEST_F(IRCELMeteoProviderTest, GetValuesCompressed)
 // Check with Bino, this seems to be incorrectly implemented
 TEST_F(IRCELMeteoProviderTest, DISABLED_GetValuesOutOfRangeUsePreviousDay)
 {
-    file::writeAsText("BEL_096_4800_P07.txt", referenceData());
+    file::write_as_text("BEL_096_4800_P07.txt", referenceData());
 
     auto values = _meteoProvider.getValues(make_date_time(2015_y / jan / 05), make_date_time(2015_y / jan / 05) + 23h, "096_4800", "P07");
     EXPECT_EQ(8u, values.size());
