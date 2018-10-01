@@ -1,0 +1,12 @@
+Source: tiff
+Version: 4.0.9
+Build-Depends: zlib
+Description: A library that supports the manipulation of TIFF image files
+
+Feature: jpeg
+Description: JPEG compression support
+Build-Depends: libjpeg-turbo
+
+Feature: lzw
+Description: LZW compression support
+Build-Depends: liblzma

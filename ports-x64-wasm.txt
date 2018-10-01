@@ -1,0 +1,10 @@
+zlib
+libjpeg-turbo
+libpng
+tiff
+date
+eigen3
+fmt
+spdlog
+gdal
+gsl

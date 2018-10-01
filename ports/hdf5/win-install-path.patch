@@ -1,0 +1,46 @@
+diff -Naur -x '.*' a/fortran/src/CMakeLists.txt b/fortran/src/CMakeLists.txt
+--- a/fortran/src/CMakeLists.txt	2017-04-13 12:26:10.000000000 +0200
++++ b/fortran/src/CMakeLists.txt	2018-07-03 21:13:40.000000000 +0200
+@@ -66,17 +66,9 @@
+ 
+ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
+   file (MAKE_DIRECTORY "${HDF5_F90_BINARY_DIR}/shared")
+-  if (WIN32)
+-    set (MODSH_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/shared/${CMAKE_BUILD_TYPE})
+-  else ()
+-    set (MODSH_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
+-  endif ()
+-endif ()
+-if (WIN32)
+-  set (MOD_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/static/${CMAKE_BUILD_TYPE})
+-else ()
+-  set (MOD_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
++  set (MODSH_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
+ endif ()
++set (MOD_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
+ 
+ INCLUDE_DIRECTORIES (${HDF5_F90_BINARY_DIR} ${CMAKE_Fortran_MODULE_DIRECTORY})
+ 
+diff -Naur -x '.*' a/hl/fortran/src/CMakeLists.txt b/hl/fortran/src/CMakeLists.txt
+--- a/hl/fortran/src/CMakeLists.txt	2017-04-13 12:26:10.000000000 +0200
++++ b/hl/fortran/src/CMakeLists.txt	2018-07-03 21:14:56.000000000 +0200
+@@ -38,17 +38,9 @@
+ 
+ if (BUILD_SHARED_LIBS AND NOT SKIP_HDF5_FORTRAN_SHARED)
+   file (MAKE_DIRECTORY "${HDF5_HL_F90_SRC_BINARY_DIR}/shared")
+-  if (WIN32)
+-    set (MODSH_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/shared/${CMAKE_BUILD_TYPE})
+-  else ()
+-    set (MODSH_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
+-  endif ()
+-endif ()
+-if (WIN32)
+-  set (MOD_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/static/${CMAKE_BUILD_TYPE})
+-else ()
+-  set (MOD_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
++  set (MODSH_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/shared)
+ endif ()
++set (MOD_BUILD_DIR ${CMAKE_Fortran_MODULE_DIRECTORY}/static)
+ 
+ #-----------------------------------------------------------------------------
+ # Setup include Directories
