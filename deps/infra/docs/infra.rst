@@ -1,0 +1,5 @@
+.. doxygenindex::
+
+=============
+Test Document
+=============
