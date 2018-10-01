@@ -1,0 +1,37 @@
+get_filename_component(Infra_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include(CMakeFindDependencyMacro)
+
+list(APPEND CMAKE_MODULE_PATH ${Infra_CMAKE_DIR})
+
+find_dependency(fmt CONFIG REQUIRED)
+
+if (@HAVE_BOOST_FILESYSTEM@)
+    find_dependency(Boost COMPONENTS filesystem)
+endif ()
+
+if (@INFRA_GDAL@)
+    find_dependency(Gdal::Gdal REQUIRED)
+    find_dependency(Gdal REQUIRED)
+    find_dependency(Gsl REQUIRED)
+    find_dependency(date CONFIG REQUIRED)
+endif ()
+
+if (@INFRA_LOGGING@)
+    find_dependency(spdlog CONFIG REQUIRED)
+endif ()
+
+if (@INFRA_XML@)
+    find_dependency(pugixml REQUIRED)
+endif ()
+
+if (@INFRA_NUMERIC@)
+    find_dependency(Eigen3 CONFIG REQUIRED)
+endif ()
+
+list(REMOVE_AT CMAKE_MODULE_PATH -1)
+
+if(NOT TARGET Infra::Infra)
+    include("${Infra_CMAKE_DIR}/InfraTargets.cmake")
+endif()
+
+set(Infra_LIBRARIES Infra::Infra)
