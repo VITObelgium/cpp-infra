@@ -36,9 +36,9 @@ QString askForString(QWidget* parent, const QString& title, const QString& name)
     return QString();
 }
 
-void displayMessage(const QString& title, const QString& message)
+void displayMessage(const QString& title, const QString& message, QWidget* parent)
 {
-    QMessageBox mb(title, message, QMessageBox::Information, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+    QMessageBox mb(title, message, QMessageBox::Information, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton, parent);
     mb.exec();
 }
 
