@@ -3,7 +3,7 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-namespace infra::test {
+namespace inf::test {
 
 using namespace testing;
 

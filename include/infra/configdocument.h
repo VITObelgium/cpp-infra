@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace infra {
+namespace inf {
 
 class ConfigNodeIterator;
 
@@ -164,4 +164,4 @@ private:
     std::unique_ptr<Pimpl> _pimplDoc;
 };
 
-} // namespace infra
+} // namespace inf
