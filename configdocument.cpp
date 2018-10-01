@@ -5,7 +5,7 @@
 #include <pugixml.hpp>
 #include <variant>
 
-namespace infra {
+namespace inf {
 
 struct ConfigNode::Pimpl
 {
@@ -83,7 +83,7 @@ std::string_view ConfigNode::value() const
 
 std::string_view ConfigNode::trimmedValue() const
 {
-    return str::trimmedView(value());
+    return str::trimmed_view(value());
 }
 
 std::string ConfigNode::value(std::string_view valueIfNotPresent) const
@@ -104,7 +104,7 @@ std::string ConfigNode::trimmedValue(std::string_view valueIfNotPresent) const
 template <typename T>
 std::optional<T> ConfigNode::value() const
 {
-    return str::toNumeric<T>(_pimpl->node.child_value());
+    return str::to_numeric<T>(_pimpl->node.child_value());
 }
 
 template std::optional<double> ConfigNode::value<double>() const;
@@ -125,7 +125,7 @@ ConfigNode::operator bool() const noexcept
 template <typename T>
 std::optional<T> ConfigNode::attribute(const char* name) const
 {
-    return str::toNumeric<T>(_pimpl->node.attribute(name).value());
+    return str::to_numeric<T>(_pimpl->node.attribute(name).value());
 }
 
 template std::optional<double> ConfigNode::attribute<double>(const char* name) const;
@@ -277,4 +277,4 @@ const ConfigNode& ConfigNodeIterator::operator*() const
         _pimpl->iter);
 }
 
-} // namespace infra
+} // namespace inf
