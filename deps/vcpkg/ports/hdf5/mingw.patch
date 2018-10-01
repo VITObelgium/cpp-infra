@@ -1,0 +1,16 @@
+diff -Naur -x '.*' a/src/H5win32defs.h b/src/H5win32defs.h
+--- a/src/H5win32defs.h	2017-04-25 16:45:02.000000000 +0200
++++ b/src/H5win32defs.h	2018-07-03 21:22:22.000000000 +0200
+@@ -78,10 +78,12 @@
+  */
+ #define HDmemset(X,C,Z)     memset((void*)(X),C,Z)
+ 
++#ifndef H5_HAVE_MINGW
+ struct timezone {
+     int tz_minuteswest;
+     int tz_dsttime;
+ };
++#endif
+ 
+ /* time.h before VS2015 does not include timespec */
+ #if (_MSC_VER < 1900)
