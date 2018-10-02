@@ -60,6 +60,29 @@ int32_t to_int32_value(std::string_view str)
     return *optval;
 }
 
+std::optional<uint32_t> to_uint32(std::string_view str) noexcept
+{
+    std::string s(str);
+
+    char* end   = nullptr;
+    long result = std::strtoul(s.c_str(), &end, 10);
+    if (end == s.c_str()) {
+        return std::optional<uint32_t>();
+    }
+
+    return result;
+}
+
+uint32_t to_uint32_value(std::string_view str)
+{
+    auto optval = to_uint32(str);
+    if (!optval.has_value()) {
+        throw InvalidArgument("Failed to convert '{}' to uint32", str);
+    }
+
+    return *optval;
+}
+
 std::optional<int64_t> to_int64(std::string_view str) noexcept
 {
     std::string s(str);
@@ -76,6 +99,29 @@ std::optional<int64_t> to_int64(std::string_view str) noexcept
 int64_t to_int64_value(std::string_view str)
 {
     auto optval = to_int64(str);
+    if (!optval.has_value()) {
+        throw InvalidArgument("Failed to convert '{}' to int64", str);
+    }
+
+    return *optval;
+}
+
+std::optional<uint64_t> to_uint64(std::string_view str) noexcept
+{
+    std::string s(str);
+
+    char* end      = nullptr;
+    int64_t result = std::strtoull(s.c_str(), &end, 10);
+    if (end == s.c_str()) {
+        return std::optional<uint64_t>();
+    }
+
+    return result;
+}
+
+uint64_t to_uint64_value(std::string_view str)
+{
+    auto optval = to_uint64(str);
     if (!optval.has_value()) {
         throw InvalidArgument("Failed to convert '{}' to int64", str);
     }
