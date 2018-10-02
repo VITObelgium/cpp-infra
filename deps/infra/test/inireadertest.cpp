@@ -18,50 +18,50 @@ public:
     IniReader reader;
 };
 
-TEST_F(IniReaderTest, getInteger)
+TEST_F(IniReaderTest, get_int32)
 {
-    EXPECT_EQ(6, reader.getInteger("protocol", "version"));
-    EXPECT_EQ(6, reader.getInteger("protocol", "VERSION"));
-    EXPECT_EQ(6, reader.getInteger("PROTOCOL", "VERsiON"));
-    EXPECT_FALSE(reader.getInteger("PROTOCOL", "value").has_value());
+    EXPECT_EQ(6, reader.get_int32("protocol", "version"));
+    EXPECT_EQ(6, reader.get_int32("protocol", "VERSION"));
+    EXPECT_EQ(6, reader.get_int32("PROTOCOL", "VERsiON"));
+    EXPECT_FALSE(reader.get_int32("PROTOCOL", "value").has_value());
 
-    EXPECT_FALSE(reader.getInteger("types", "doesnotexist").has_value());
-    EXPECT_FALSE(reader.getInteger("doesnotexist", "doesnotexist").has_value());
+    EXPECT_FALSE(reader.get_int32("types", "doesnotexist").has_value());
+    EXPECT_FALSE(reader.get_int32("doesnotexist", "doesnotexist").has_value());
 }
 
-TEST_F(IniReaderTest, getString)
+TEST_F(IniReaderTest, get_string)
 {
-    EXPECT_EQ("Bob Smith", reader.getString("user", "name"));
-    EXPECT_EQ("bob@smith.com", reader.getString("user", "email"));
-    EXPECT_EQ("true", reader.getString("user", "active"));
+    EXPECT_EQ("Bob Smith", reader.get_string("user", "name"));
+    EXPECT_EQ("bob@smith.com", reader.get_string("user", "email"));
+    EXPECT_EQ("true", reader.get_string("user", "active"));
 }
 
-TEST_F(IniReaderTest, getBool)
+TEST_F(IniReaderTest, get_bool)
 {
-    EXPECT_EQ(true, reader.getBool("user", "active"));
-    EXPECT_EQ(false, reader.getBool("user", "inactive"));
+    EXPECT_EQ(true, reader.get_bool("user", "active"));
+    EXPECT_EQ(false, reader.get_bool("user", "inactive"));
 
-    EXPECT_EQ(true, reader.getBool("types", "onbool"));
-    EXPECT_EQ(false, reader.getBool("types", "offbool"));
+    EXPECT_EQ(true, reader.get_bool("types", "onbool"));
+    EXPECT_EQ(false, reader.get_bool("types", "offbool"));
 
-    EXPECT_EQ(true, reader.getBool("types", "yesbool"));
-    EXPECT_EQ(false, reader.getBool("types", "nobool"));
+    EXPECT_EQ(true, reader.get_bool("types", "yesbool"));
+    EXPECT_EQ(false, reader.get_bool("types", "nobool"));
 
-    EXPECT_EQ(true, reader.getBool("types", "onebool"));
-    EXPECT_EQ(false, reader.getBool("types", "zerobool"));
+    EXPECT_EQ(true, reader.get_bool("types", "onebool"));
+    EXPECT_EQ(false, reader.get_bool("types", "zerobool"));
 
-    EXPECT_FALSE(reader.getBool("types", "doesnotexist").has_value());
-    EXPECT_FALSE(reader.getBool("doesnotexist", "doesnotexist").has_value());
-    EXPECT_FALSE(reader.getBool("user", "name").has_value());
-    EXPECT_FALSE(reader.getBool("types", "integer").has_value());
+    EXPECT_FALSE(reader.get_bool("types", "doesnotexist").has_value());
+    EXPECT_FALSE(reader.get_bool("doesnotexist", "doesnotexist").has_value());
+    EXPECT_FALSE(reader.get_bool("user", "name").has_value());
+    EXPECT_FALSE(reader.get_bool("types", "integer").has_value());
 }
 
-TEST_F(IniReaderTest, getReal)
+TEST_F(IniReaderTest, get_double)
 {
-    EXPECT_DOUBLE_EQ(3.14159, reader.getReal("types", "pi").value());
+    EXPECT_DOUBLE_EQ(3.14159, reader.get_double("types", "pi").value());
 
-    EXPECT_FALSE(reader.getReal("types", "doesnotexist").has_value());
-    EXPECT_FALSE(reader.getReal("doesnotexist", "doesnotexist").has_value());
-    EXPECT_FALSE(reader.getReal("user", "name").has_value());
+    EXPECT_FALSE(reader.get_double("types", "doesnotexist").has_value());
+    EXPECT_FALSE(reader.get_double("doesnotexist", "doesnotexist").has_value());
+    EXPECT_FALSE(reader.get_double("user", "name").has_value());
 }
 }
