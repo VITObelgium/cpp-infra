@@ -67,7 +67,7 @@ public:
     ConfigObjectRange<ConfigNodeIterator> children(const char* name) const;
     ConfigObjectRange<ConfigNodeIterator> children(const std::string& name) const;
 
-    ConfigNode selectChild(std::string_view selector) const;
+    ConfigNode select_child(std::string_view selector) const;
 
     std::string_view attribute(const char* name) const;
     std::string_view attribute(const std::string& name) const;
@@ -77,10 +77,10 @@ public:
 
     std::string_view name() const;
     std::string_view value() const;
-    std::string_view trimmedValue() const;
+    std::string_view trimmed_value() const;
 
     std::string value(std::string_view valueIfNotPresent) const;
-    std::string trimmedValue(std::string_view valueIfNotPresent) const;
+    std::string trimmed_value(std::string_view valueIfNotPresent) const;
 
     template <typename T>
     std::optional<T> value() const;

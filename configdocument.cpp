@@ -81,7 +81,7 @@ std::string_view ConfigNode::value() const
     return _pimpl->node.child_value();
 }
 
-std::string_view ConfigNode::trimmedValue() const
+std::string_view ConfigNode::trimmed_value() const
 {
     return str::trimmed_view(value());
 }
@@ -96,7 +96,7 @@ std::string ConfigNode::value(std::string_view valueIfNotPresent) const
     return name;
 }
 
-std::string ConfigNode::trimmedValue(std::string_view valueIfNotPresent) const
+std::string ConfigNode::trimmed_value(std::string_view valueIfNotPresent) const
 {
     return str::trim(value(valueIfNotPresent));
 }
@@ -172,7 +172,7 @@ ConfigObjectRange<ConfigNodeIterator> ConfigNode::children(const std::string& na
     return children(name.c_str());
 }
 
-ConfigNode ConfigNode::selectChild(std::string_view selector) const
+ConfigNode ConfigNode::select_child(std::string_view selector) const
 {
     ConfigNode node;
     auto children = str::split(selector, '.', str::SplitOpt::Trim);
