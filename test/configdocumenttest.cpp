@@ -1,4 +1,4 @@
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -25,10 +25,10 @@ class ConfigReaderTest : public Test
 protected:
     ConfigReaderTest()
     {
-        doc = ConfigDocument::loadFromString(s_xmlData);
+        doc = XmlDocument::load_from_string(s_xmlData);
     }
 
-    ConfigDocument doc;
+    XmlDocument doc;
 };
 
 TEST_F(ConfigReaderTest, readFromString)
