@@ -5,7 +5,7 @@
 
 namespace rio {
 
-ircelwriter::ircelwriter(TiXmlElement* cnf)
+ircelwriter::ircelwriter(const inf::XmlNode& cnf)
 : outputhandler(cnf)
 , _saroad_codes{{"o3", "44201"}, {"no2", "42602"}, {"pm10", "88102"},
       {"pm25", "81104"}, {"so2", "42401"}, {"co", "42101"},

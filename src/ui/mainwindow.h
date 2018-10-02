@@ -1,14 +1,13 @@
 #pragma once
 
-#include "opaqview.h"
+#include "ui_mainwindow.h"
 
 #include <QMainWindow>
 
 class ToolBar;
 QT_FORWARD_DECLARE_CLASS(QMenu)
 
-namespace opaq
-{
+namespace opaq {
 
 class MainWindow : public QMainWindow
 {
@@ -20,9 +19,7 @@ public:
     MainWindow();
 
 private:
-    void setupMenuBar();
-
-    OpaqView _opaqView;
+    Ui::MainWindow _ui;
 };
 
 }

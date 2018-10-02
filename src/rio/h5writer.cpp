@@ -17,7 +17,9 @@ TODO
 
 namespace rio {
 
-h5writer::h5writer(TiXmlElement* cnf)
+using namespace inf;
+
+h5writer::h5writer(const XmlNode& cnf)
 : outputhandler(cnf)
 , _h5FileName("rio_output.h5")
 , _h5File(nullptr)

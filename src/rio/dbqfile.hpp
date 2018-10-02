@@ -4,12 +4,16 @@
 #include "parser.hpp"
 #include "timeseries.hpp"
 
+namespace inf {
+class XmlNode;
+}
+
 namespace rio {
 
 class dbqfile : public obshandler
 {
 public:
-    dbqfile(TiXmlElement* cnf);
+    dbqfile(const inf::XmlNode& cnf);
     dbqfile(std::string filename, std::string type, double scale = 1.);
     virtual ~dbqfile();
 

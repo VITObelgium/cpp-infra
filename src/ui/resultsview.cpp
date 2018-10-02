@@ -4,16 +4,15 @@
 #include "stationresultsmodel.h"
 
 #include <QtCharts/QChartView>
-#include <QtCharts/QLineSeries>
 #include <QtCharts/QHXYModelMapper>
 #include <QtCharts/QLegendMarker>
+#include <QtCharts/QLineSeries>
 
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTableView>
 
-namespace opaq
-{
+namespace opaq {
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -48,6 +47,7 @@ ResultsView::ResultsView(QWidget* parent)
 
     // create main layout
     auto* mainLayout = new QHBoxLayout;
+    mainLayout->setMargin(0);
     mainLayout->addWidget(chartView);
     setLayout(mainLayout);
 }
@@ -62,8 +62,7 @@ void ResultsView::setModels(StationResultsModel& model, const std::vector<config
     _chart->removeAllSeries();
 
     int row = 1;
-    for (auto& comp : modelComponents)
-    {
+    for (auto& comp : modelComponents) {
         QLineSeries* series = new QLineSeries();
         series->setName(comp.name.c_str());
         auto* mapper = new QHXYModelMapper(this);
@@ -81,8 +80,7 @@ void ResultsView::setModels(StationResultsModel& model, const std::vector<config
         model.addMapping(seriesColorHex, QRect(0, row++, _rows, 1));
     }
 
-    for (auto* marker : _chart->legend()->markers())
-    {
+    for (auto* marker : _chart->legend()->markers()) {
         // Disconnect possible existing connection to avoid multiple connections
         disconnect(marker, &QLegendMarker::clicked, this, &ResultsView::handleMarkerClicked);
         connect(marker, &QLegendMarker::clicked, this, &ResultsView::handleMarkerClicked);
@@ -94,10 +92,8 @@ void ResultsView::handleMarkerClicked()
     QLegendMarker* marker = qobject_cast<QLegendMarker*>(sender());
     Q_ASSERT(marker);
 
-    switch (marker->type())
-    {
-    case QLegendMarker::LegendMarkerTypeXY:
-    {
+    switch (marker->type()) {
+    case QLegendMarker::LegendMarkerTypeXY: {
         // Toggle visibility of series
         marker->series()->setVisible(!marker->series()->isVisible());
 
@@ -108,14 +104,13 @@ void ResultsView::handleMarkerClicked()
         // Dim the marker, if series is not visible
         qreal alpha = 1.0;
 
-        if (!marker->series()->isVisible())
-        {
+        if (!marker->series()->isVisible()) {
             alpha = 0.5;
         }
 
         QColor color;
         QBrush brush = marker->labelBrush();
-        color = brush.color();
+        color        = brush.color();
         color.setAlphaF(alpha);
         brush.setColor(color);
         marker->setLabelBrush(brush);
@@ -127,7 +122,7 @@ void ResultsView::handleMarkerClicked()
         marker->setBrush(brush);
 
         QPen pen = marker->pen();
-        color = pen.color();
+        color    = pen.color();
         color.setAlphaF(alpha);
         pen.setColor(color);
         marker->setPen(pen);
@@ -137,6 +132,5 @@ void ResultsView::handleMarkerClicked()
         break;
     }
 }
-
 
 }

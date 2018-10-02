@@ -6,14 +6,16 @@
 
 #include "cell.hpp"
 
-class TiXmlElement;
+namespace inf {
+class XmlNode;
+}
 
 namespace rio {
 
 class grid
 {
 public:
-    grid(const std::string& name, TiXmlElement* cnf);
+    grid(const std::string& name, const inf::XmlNode& cnf);
     virtual ~grid();
 
     const std::vector<cell>& cells() const

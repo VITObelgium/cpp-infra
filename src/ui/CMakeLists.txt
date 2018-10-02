@@ -1,32 +1,52 @@
 cmake_policy(SET CMP0020 NEW)
 set(CMAKE_AUTOMOC ON)
-find_package(Qt5Gui)
-find_package(Qt5Charts)
-find_package(Qt5Widgets)
+find_package(Qt5Gui CONFIG REQUIRED)
+find_package(Qt5Charts CONFIG REQUIRED)
+find_package(Qt5Widgets CONFIG REQUIRED)
+find_package(Qt5QuickWidgets CONFIG REQUIRED)
+find_package(Qt5QuickControls2 CONFIG REQUIRED)
+find_package(Qt5Positioning CONFIG REQUIRED)
+find_package(Qt5QuickCompiler REQUIRED)
 
 option(STATIC_QT "Statically link qt" OFF)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-qt5_wrap_ui(OPAQ_FORMS_HEADERS runsimulationdialog.ui opaqview.ui opaqviewer.ui opaqvalidation.ui)
+qtquick_compiler_add_resources(UI_RESOURCES resources.qrc)
+
+set(QT_UI_FILES
+    runsimulationdialog.ui
+    mappingview.ui
+    mainwindow.ui
+    mapview.ui
+    opaqview.ui
+    opaqviewer.ui
+    opaqvalidation.ui
+)
+qt5_wrap_ui(OPAQ_FORMS_HEADERS ${QT_UI_FILES})
 
 add_executable(opaqui
+    mapview.qml
     main.cpp
     uiutils.h
     mainwindow.h mainwindow.cpp
     runsimulationdialog.h runsimulationdialog.cpp
     stationresultsmodel.h stationresultsmodel.cpp
     validationresultsmodel.h validationresultsmodel.cpp
+    mappingview.h mappingview.cpp
+    mapview.h mapview.cpp
     opaqview.h opaqview.cpp
     opaqviewer.h opaqviewer.cpp
     opaqvalidation.h opaqvalidation.cpp
     resultsview.h resultsview.cpp
     validationlineview.h validationlineview.cpp
     validationscatterview.h validationscatterview.cpp
+    ${UI_RESOURCES}
     ${OPAQ_FORMS_HEADERS}
 )
 
-source_group(ui FILES ${OPAQ_FORMS_HEADERS} opaqui_automoc.cpp)
+source_group("Qt ui files" FILES ${QT_UI_FILES})
+source_group("Qt generated" FILES ${UI_RESOURCES} ${OPAQ_FORMS_HEADERS})
 set_target_properties(opaqui PROPERTIES AUTOMOC ON)
 
 if (MSVC)
@@ -36,7 +56,18 @@ elseif (MINGW)
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
-target_link_libraries(opaqui opaqcore opaqplugins Qt5::Gui Qt5::Charts Qt5::Widgets Qt5::Core ${EXTRA_LIBS})
+target_link_libraries(opaqui
+    opaqcore
+    opaqplugins
+    Qt5::Gui
+    Qt5::Charts
+    Qt5::Widgets
+    Qt5::Core
+    Qt5::QuickControls2
+    Qt5::QuickWidgets
+    Qt5::Positioning
+    ${EXTRA_LIBS}
+)
 
 install(TARGETS opaqui
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

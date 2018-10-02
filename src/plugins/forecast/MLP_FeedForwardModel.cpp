@@ -62,7 +62,7 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
         // construct the neural network object
         std::unique_ptr<nnet::feedforwardnet> net;
         try {
-            net = std::make_unique<nnet::feedforwardnet>(nnet_xml.rootNode());
+            net = std::make_unique<nnet::feedforwardnet>(nnet_xml.root_node());
         } catch (const std::exception& e) {
             Log::error(s_logSrc, "Unable to construct ffnet in {} ({})", fname, e.what());
             return getNoData();

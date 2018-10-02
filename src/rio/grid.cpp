@@ -1,29 +1,39 @@
-#include <cstring>
-#include <tinyxml.h>
-
 #include "grid.hpp"
+#include "infra/exception.h"
+#include "infra/string.h"
+#include "infra/xmldocument.h"
 #include "parser.hpp"
 #include "strfun.hpp"
 #include "xmltools.hpp"
 
+#include <cstring>
+
 namespace rio {
 
-grid::grid(const std::string& name, TiXmlElement* cnf)
+using namespace inf;
+
+grid::grid(const std::string& name, const XmlNode& cnf)
 : _cellsize(0.)
 {
-    if (!cnf) throw std::runtime_error("Invalid TiXmlElement pointer in grid()...");
+    if (!cnf) {
+        throw std::runtime_error("Invalid TiXmlElement pointer in grid()...");
+    }
 
     // lookup the grid name
-    TiXmlElement* g = rio::xml::getElementByAttribute(cnf, "grid", "name", name);
-    if (!g) throw std::runtime_error("Cannot find requested grid " + name);
+    auto g = rio::xml::getElementByAttribute(cnf, "grid", "name", name);
+    if (!g) {
+        throw RuntimeError("Cannot find requested grid {}", name);
+    }
 
-    if (g->QueryDoubleAttribute("cellsize", &_cellsize) != TIXML_SUCCESS)
+    auto cellSizeAttr = str::to_numeric<double>(g.attribute("cellsize"));
+    if (!cellSizeAttr.has_value()) {
         throw std::runtime_error("no/error in cellsize attribute for grid...");
+    }
 
-    std::string gridfile;
-    try {
-        gridfile = g->GetText();
-    } catch (...) {
+    _cellsize = cellSizeAttr.value();
+
+    std::string gridfile(g.value());
+    if (gridfile.empty()) {
         throw std::runtime_error("unable to get grid file name from <grid> tag");
     }
     rio::parser::get()->process(gridfile);

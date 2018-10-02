@@ -6,7 +6,9 @@
 
 namespace rio {
 
-apswriter::apswriter(TiXmlElement* cnf)
+using namespace inf;
+
+apswriter::apswriter(const XmlNode& cnf)
 : outputhandler(cnf)
 , _pattern_values("rio_%timestamp%.aps")
 , _pattern_uncert("rio_%timestamp%.err.aps")

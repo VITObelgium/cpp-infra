@@ -5,7 +5,6 @@ add_definitions("-DBOOST_ALL_NO_LIB")
 find_package(Boost REQUIRED COMPONENTS date_time system filesystem program_options)
 
 find_package(Eigen3 REQUIRED)
-find_package(TinyXml REQUIRED)
 find_package(hdf5 CONFIG REQUIRED)
 find_package(ZLIB REQUIRED)
 find_package(fmt CONFIG REQUIRED)
@@ -57,8 +56,8 @@ if(MINGW)
 endif()
 
 target_link_libraries(rio
+    infra
     Eigen3::Eigen
-    TinyXml::TinyXml
     Boost::boost
     Boost::date_time
     Boost::program_options

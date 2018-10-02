@@ -9,5 +9,4 @@ eigen3
 sqlpp11-connector-sqlite3
 sqlpp11-connector-postgresql
 pugixml
-tinyxml
 restinio[boost]

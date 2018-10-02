@@ -4,24 +4,14 @@
 
 #include <QMenuBar>
 
-namespace opaq
-{
+namespace opaq {
 
 MainWindow::MainWindow()
 : QMainWindow()
-, _opaqView(this)
 {
-    setObjectName("Opaq");
-    setWindowTitle("Opaq");
-    setCentralWidget(&_opaqView);
+    _ui.setupUi(this);
 
-    setupMenuBar();
-}
-
-void MainWindow::setupMenuBar()
-{
-    QMenu *menu = menuBar()->addMenu(tr("&File"));
-    menu->addAction(tr("&Quit"), this, &QWidget::close);
+    connect(_ui.actionQuit, &QAction::triggered, this, &QMainWindow::close);
 }
 
 }

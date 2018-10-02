@@ -2,70 +2,70 @@
 
 #include "outputhandler.hpp"
 
-namespace rio
-{
+namespace rio {
 
 class apswriter : public outputhandler
 {
 public:
-  apswriter( TiXmlElement *cnf );
-  ~apswriter();
-  
-  void init( const rio::config& cnf,
-	     const std::shared_ptr<rio::network> net,
-	     const std::shared_ptr<rio::grid> grid );
+    apswriter(const inf::XmlNode& cnf);
+    ~apswriter();
 
-  void write( const boost::posix_time::ptime& curr_time,
-              const std::map<std::string, double>& obs, 
-              const Eigen::VectorXd& values, 
-              const Eigen::VectorXd& uncert );
+    void init(const rio::config& cnf,
+        const std::shared_ptr<rio::network> net,
+        const std::shared_ptr<rio::grid> grid);
 
-  
-  void close( void );
-  
+    void write(const boost::posix_time::ptime& curr_time,
+        const std::map<std::string, double>& obs,
+        const Eigen::VectorXd& values,
+        const Eigen::VectorXd& uncert);
+
+    void close(void);
+
 public:
-  typedef struct {
-    std::string aggr;
-    std::string pol;
-    std::string units;
-    std::string origin;
-    std::string comments;
-    std::string fmt;
-    std::string c_fmt;
-  
-    int srs;       //! spatial reference system code (1)
-    double xull;
-    double yull;
-    double dx;
-    double dy;
-    double missing;
+    typedef struct
+    {
+        std::string aggr;
+        std::string pol;
+        std::string units;
+        std::string origin;
+        std::string comments;
+        std::string fmt;
+        std::string c_fmt;
 
-    int    nx;
-    int    ny;
+        int srs; //! spatial reference system code (1)
+        double xull;
+        double yull;
+        double dx;
+        double dy;
+        double missing;
 
-    std::string mapfile_pattern; 
-  } apsconf_t;
+        int nx;
+        int ny;
 
-  typedef struct {
-    int I;
-    int J;
-  } apsidx_t;
+        std::string mapfile_pattern;
+    } apsconf_t;
 
-private:
-  // some configuration settings
-  std::string _pattern_values;    //! output filename pattern
-  std::string _pattern_uncert;    //! uncertainties filename pattern
-  apsconf_t   _apscf;             //! aps header config
-  std::vector<apsidx_t> _apsmap;  //! vector, assuming same size as grid with aps I,J values
-
-  std::shared_ptr<rio::network> _net;
-  std::shared_ptr<rio::grid>    _grid;  
-
-  std::vector<double> _buffer;
+    typedef struct
+    {
+        int I;
+        int J;
+    } apsidx_t;
 
 private:
-  void write_header( FILE* fp, const boost::posix_time::ptime& curr_time, const std::string& comments );
-  void write_buffer( FILE* fp );
+    // some configuration settings
+    std::string _pattern_values;   //! output filename pattern
+    std::string _pattern_uncert;   //! uncertainties filename pattern
+    apsconf_t _apscf;              //! aps header config
+    std::vector<apsidx_t> _apsmap; //! vector, assuming same size as grid with aps I,J values
+
+    std::shared_ptr<rio::network> _net;
+    std::shared_ptr<rio::grid> _grid;
+
+    std::vector<double> _buffer;
+
+private:
+    void write_header(FILE* fp, const boost::posix_time::ptime& curr_time, const std::string& comments);
+    void write_buffer(FILE* fp);
 };
 
 }

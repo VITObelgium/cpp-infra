@@ -3,7 +3,9 @@
 
 namespace rio {
 
-jsonwriter::jsonwriter(TiXmlElement* cnf)
+using namespace inf;
+
+jsonwriter::jsonwriter(const XmlNode& cnf)
 : outputhandler(cnf)
 , _pattern("rio_%timestamp%.json")
 {

@@ -3,7 +3,9 @@
 
 namespace rio {
 
-asciiwriter::asciiwriter(TiXmlElement* cnf)
+using namespace inf;
+
+asciiwriter::asciiwriter(const XmlNode& cnf)
 : outputhandler(cnf)
 , _pattern("rio_%timestamp%.txt")
 , _fs('\t')
