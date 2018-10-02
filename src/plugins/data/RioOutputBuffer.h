@@ -17,7 +17,7 @@ public:
      * <!-- created if it does not exist, replaced if it does -->
      * <filename>/path/to/datafile.h5</filename>
      */
-    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     void openResultsFile(chrono::date_time begin, chrono::date_time end,
         const Pollutant& pol, Aggregation::Type agg,

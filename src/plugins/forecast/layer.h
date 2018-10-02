@@ -8,7 +8,7 @@
 #include "transfcn.h"
 
 namespace inf {
-class ConfigNode;
+class XmlNode;
 }
 
 namespace nnet {
@@ -17,7 +17,7 @@ namespace nnet {
 class layer
 {
 public:
-    layer(const inf::ConfigNode& config, int ninputs);
+    layer(const inf::XmlNode& config, int ninputs);
     virtual ~layer();
 
     friend std::ostream& operator<<(std::ostream& os, const layer& lyr);

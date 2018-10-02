@@ -14,7 +14,7 @@ ComponentManager::ComponentManager(IEngine& engine, const IPluginFactory& plugin
 {
 }
 
-Component& ComponentManager::createGenericComponent(const std::string& componentName, const std::string& pluginName, const ConfigNode& configuration)
+Component& ComponentManager::createGenericComponent(const std::string& componentName, const std::string& pluginName, const XmlNode& configuration)
 {
     // 1. check if the component wasn't created previously
     if (_instanceMap.find(componentName) != _instanceMap.end()) {
@@ -40,7 +40,7 @@ Component& ComponentManager::findComponent(const std::string& name)
     return *it->second;
 }
 
-std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, const ConfigNode& configuration)
+std::unique_ptr<Component> ComponentManager::createComponent(const std::string& pluginName, const std::string& componentName, const XmlNode& configuration)
 {
     auto component = _pluginFactory.createPlugin(pluginName);
     component->configure(configuration, componentName, _engine);

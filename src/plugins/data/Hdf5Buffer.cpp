@@ -7,8 +7,8 @@
 
 #include "Hdf5Buffer.h"
 #include "Hdf5Tools.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 #include <algorithm>
@@ -49,7 +49,7 @@ std::string Hdf5Buffer::name()
     return "hdf5buffer";
 }
 
-void Hdf5Buffer::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void Hdf5Buffer::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

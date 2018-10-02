@@ -1,5 +1,5 @@
 #include "XmlTools.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 namespace opaq {
@@ -7,7 +7,7 @@ namespace XmlTools {
 
 using namespace inf;
 
-inf::ConfigNode getElement(const inf::ConfigNode& parent, const std::string& childName, inf::ConfigDocument* refDoc)
+inf::XmlNode getElement(const inf::XmlNode& parent, const std::string& childName, inf::XmlDocument* refDoc)
 {
     auto element = parent.child(childName);
     if (!element) {
@@ -27,7 +27,7 @@ inf::ConfigNode getElement(const inf::ConfigNode& parent, const std::string& chi
             throw ElementNotFoundException("File in ref attribute '{}' not found.", ref);
         }
 
-        *refDoc          = ConfigDocument::loadFromFile(ref);
+        *refDoc          = XmlDocument::load_from_file(ref);
         auto fileElement = refDoc->child(childName);
         if (!fileElement) {
             throw ElementNotFoundException("File in ref attribute ({}) does not have '{}' as root element", ref, childName);

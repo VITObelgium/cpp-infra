@@ -4,9 +4,9 @@
 #include "Exceptions.h"
 #include "PollutantManager.h"
 #include "Station.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 namespace opaq {
 
@@ -19,7 +19,7 @@ std::string XMLAQNetProvider::name()
     return "xmlaqnetprovider";
 }
 
-void XMLAQNetProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine& engine)
+void XMLAQNetProvider::configure(const XmlNode& configuration, const std::string& componentName, IEngine& engine)
 {
     setName(componentName);
 

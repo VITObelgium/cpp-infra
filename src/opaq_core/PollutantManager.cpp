@@ -1,7 +1,7 @@
 #include "PollutantManager.h"
 
 #include "Exceptions.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 #include <algorithm>
 
@@ -23,7 +23,7 @@ Pollutant PollutantManager::find(const std::string& name)
     return *iter;
 }
 
-void PollutantManager::configure(const ConfigNode& config)
+void PollutantManager::configure(const XmlNode& config)
 {
     _pollutants.clear();
     for (auto& pollutantElement : config.children("pollutant")) {

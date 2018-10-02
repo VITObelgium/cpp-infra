@@ -14,7 +14,7 @@ using namespace inf;
 
 static const LogSource s_logSrc("ConfigurationHandler");
 
-static std::string getChildElement(const ConfigNode& node, const char* name)
+static std::string getChildElement(const XmlNode& node, const char* name)
 {
     auto val = node.child(name).value();
     if (val.empty()) {
@@ -24,7 +24,7 @@ static std::string getChildElement(const ConfigNode& node, const char* name)
     return std::string(val);
 }
 
-config::ForecastStage ConfigurationHandler::parseForecastStage(const ConfigNode& element)
+config::ForecastStage ConfigurationHandler::parseForecastStage(const XmlNode& element)
 {
     boost::optional<config::Component> meteo;
     std::vector<config::Component> models;
@@ -51,7 +51,7 @@ config::ForecastStage ConfigurationHandler::parseForecastStage(const ConfigNode&
     return config::ForecastStage(fcHor, values, buffer, outputWriter, meteo, models);
 }
 
-config::MappingStage ConfigurationHandler::parseMappingStage(const ConfigNode& element)
+config::MappingStage ConfigurationHandler::parseMappingStage(const XmlNode& element)
 {
     std::vector<config::Component> models;
 
@@ -80,7 +80,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
     _opaqRun = config::OpaqRun();
 
     try {
-        _doc = ConfigDocument::loadFromFile(filename);
+        _doc = XmlDocument::load_from_file(filename);
 
         auto rootElement = _doc.child("opaq");
         if (!rootElement) {
@@ -94,7 +94,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
          --------------------------------------------------------------------- */
 
         // Parsing plugins section
-        ConfigDocument pluginsDoc;
+        XmlDocument pluginsDoc;
         auto pluginsElement = XmlTools::getElement(rootElement, "plugins", &pluginsDoc);
 
         // adjusting this to make use of attributes, the config looks much cleaner this way...
@@ -105,10 +105,10 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         }
 
         // Parsing components section
-        ConfigDocument componentsDoc;
+        XmlDocument componentsDoc;
         auto componentsElement = XmlTools::getElement(rootElement, "components", &componentsDoc);
         for (auto& componentElement : componentsElement.children("component")) {
-            _configDocs.push_back(ConfigDocument());
+            _configDocs.push_back(XmlDocument());
 
             config::Component component;
             component.name   = componentElement.attribute("name");
@@ -118,7 +118,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
         }
 
         // Parsing pollutants section
-        ConfigDocument pollutantsDoc;
+        XmlDocument pollutantsDoc;
         auto pollutantsElement = XmlTools::getElement(rootElement, "pollutants", &pollutantsDoc);
         if (pollutantsElement) {
             pollutantMgr.configure(pollutantsElement);
@@ -140,7 +140,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
          i.e. for what pollutant and what timesteps we should do ? Also this
          defines the forecast/mapping stages in the OPAQ run...
          --------------------------------------------------------------------- */
-        ConfigDocument runConfigDoc;
+        XmlDocument runConfigDoc;
         auto runConfigElement = XmlTools::getElement(rootElement, "runconfig", &runConfigDoc);
         if (!runConfigElement) {
             throw BadConfigurationException("No runconfig in configuration file");

@@ -9,9 +9,9 @@
 #include <spdlog/fmt/ostr.h>
 
 #include "feedforwardnet.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 namespace nnet {
 
@@ -21,7 +21,7 @@ static const LogSource s_logSrc("feedforwardnet");
 
 namespace {
 
-std::unique_ptr<nnet::scaler> createScaler(const inf::ConfigNode& config, int size)
+std::unique_ptr<nnet::scaler> createScaler(const inf::XmlNode& config, int size)
 {
     // get scaler type
     if (!config) {
@@ -45,7 +45,7 @@ std::unique_ptr<nnet::scaler> createScaler(const inf::ConfigNode& config, int si
 }
 }
 
-feedforwardnet::feedforwardnet(const inf::ConfigNode& config)
+feedforwardnet::feedforwardnet(const inf::XmlNode& config)
 {
     if (!config) {
         return;

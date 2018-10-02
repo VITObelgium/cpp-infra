@@ -3,7 +3,7 @@
 #include <string>
 
 namespace inf {
-class ConfigNode;
+class XmlNode;
 }
 
 namespace opaq {
@@ -29,7 +29,7 @@ public:
      * @param componentName the name of the component
      * @throws BadConfigurationException if the component failed to configure using the provided configuration
      */
-    virtual void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) = 0;
+    virtual void configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine& engine) = 0;
 
     std::string getName() const noexcept;
 

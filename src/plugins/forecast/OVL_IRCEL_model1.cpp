@@ -4,8 +4,8 @@
 #include "Station.h"
 #include "data/DataProvider.h"
 #include "data/MeteoProvider.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
+#include "infra/xmldocument.h"
 
 #define epsilon 1e-6
 
@@ -35,7 +35,7 @@ std::string OVL_IRCEL_model1::name()
 /* ============================================================================
      Implementation of the configure method
      ========================================================================== */
-void OVL_IRCEL_model1::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void OVL_IRCEL_model1::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

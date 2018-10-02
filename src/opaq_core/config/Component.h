@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Plugin.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 #include <string>
 
@@ -20,7 +20,7 @@ struct Component
 {
     std::string name;
     Plugin plugin;
-    inf::ConfigNode config;
+    inf::XmlNode config;
 };
 }
 }

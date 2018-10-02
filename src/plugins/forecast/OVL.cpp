@@ -10,9 +10,9 @@
 #include "Station.h"
 #include "TimeSeries.h"
 #include "data/ForecastBuffer.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 #include <cmath>
@@ -70,7 +70,7 @@ double _wexp(int i, int n, int p)
     return (1. - lambda) * std::pow(lambda, i) / (1. - std::pow(lambda, n));
 }
 
-void OVL::configure(const ConfigNode& configuration, const std::string& componentName, IEngine& engine)
+void OVL::configure(const XmlNode& configuration, const std::string& componentName, IEngine& engine)
 {
     setName(componentName);
 
@@ -105,7 +105,7 @@ void OVL::configure(const ConfigNode& configuration, const std::string& componen
     _debug_output    = debugOutput.empty() || debugOutput == "enable" || debugOutput == "true" || debugOutput == "yes";
 }
 
-void OVL::parseTuneElement(const ConfigNode& tuneEl)
+void OVL::parseTuneElement(const XmlNode& tuneEl)
 {
     auto tunePol  = std::string(tuneEl.attribute("pollutant"));
     auto tuneAggr = std::string(tuneEl.attribute("aggr"));
@@ -139,7 +139,7 @@ void OVL::parseTuneElement(const ConfigNode& tuneEl)
     }
 }
 
-void OVL::parseTuneList(const ConfigNode& lst)
+void OVL::parseTuneList(const XmlNode& lst)
 {
     for (auto& tuneEl : lst.children("tune")) {
         auto ref = std::string(tuneEl.attribute("ref"));
@@ -149,7 +149,7 @@ void OVL::parseTuneList(const ConfigNode& lst)
             // ref attribute found
             if (FileTools::exists(ref)) {
                 // file found
-                auto refDoc      = ConfigDocument::loadFromFile(ref);
+                auto refDoc      = XmlDocument::load_from_file(ref);
                 auto fileElement = refDoc.child("tune");
                 if (!fileElement) {
                     throw ElementNotFoundException("File in ref attribute ({}) does not have 'tune' as root element", ref);

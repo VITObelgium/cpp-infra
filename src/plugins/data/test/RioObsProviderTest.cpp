@@ -7,8 +7,8 @@
 #include "EngineMock.h"
 #include "RioObsProvider.h"
 
-#include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 #include <sstream>
@@ -27,7 +27,7 @@ static const std::string s_station = "40AB01";
 class AQNetworkProviderMock : public AQNetworkProvider
 {
 public:
-    MOCK_METHOD3(configure, void(const inf::ConfigNode&, const std::string&, IEngine&));
+    MOCK_METHOD3(configure, void(const inf::XmlNode&, const std::string&, IEngine&));
     MOCK_METHOD0(getAQNetwork, AQNetwork&());
 };
 
@@ -53,7 +53,7 @@ protected:
             "</config>",
             resolution.count());
 
-        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto doc    = XmlDocument::load_from_string(configXml.c_str());
         auto config = doc.child("config");
 
         _obsProvider.configure(config, "obsprovider", _engineMock);

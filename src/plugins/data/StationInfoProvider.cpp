@@ -1,9 +1,9 @@
 #include "StationInfoProvider.h"
 
-#include "infra/configdocument.h"
 #include "infra/filesystem.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 #include <boost/lexical_cast.hpp>
 #include <fstream>
@@ -28,7 +28,7 @@ std::string StationInfoProvider::name()
     return "stationinfoprovider";
 }
 
-void StationInfoProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void StationInfoProvider::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

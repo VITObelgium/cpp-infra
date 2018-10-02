@@ -11,7 +11,7 @@
 #include "scaler.h"
 
 namespace inf {
-class ConfigNode;
+class XmlNode;
 }
 
 namespace nnet {
@@ -19,7 +19,7 @@ namespace nnet {
 class feedforwardnet
 {
 public:
-    feedforwardnet(const inf::ConfigNode& config);
+    feedforwardnet(const inf::XmlNode& config);
 
     int sim(const double* input);
     int sim(const Eigen::VectorXd& in);

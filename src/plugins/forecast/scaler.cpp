@@ -2,7 +2,7 @@
 #include <sstream>
 #include <string>
 
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 #include "scaler.h"
 
 // little helper routine
@@ -49,7 +49,7 @@ int mapdummy::reverse(Eigen::Ref<Eigen::VectorXd> /*y*/)
 }
 
 // MAP STD IMPLEMENTATION
-mapstd::mapstd(const inf::ConfigNode& config, int size, double ymean, double ystd)
+mapstd::mapstd(const inf::XmlNode& config, int size, double ymean, double ystd)
 : scaler(), _ymean(ymean), _ystd(ystd)
 {
     _name          = "mapstd";
@@ -101,7 +101,7 @@ int mapstd::reverse(Eigen::Ref<Eigen::VectorXd> y)
 }
 
 // MAP MINMAX IMPLEMENTATION
-mapminmax::mapminmax(const inf::ConfigNode& config, int size, double ymin, double ymax)
+mapminmax::mapminmax(const inf::XmlNode& config, int size, double ymin, double ymax)
 : scaler(), _ymin(ymin), _ymax(ymax)
 {
     _name = "mapminmax";

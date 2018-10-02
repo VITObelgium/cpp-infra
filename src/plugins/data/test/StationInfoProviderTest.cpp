@@ -5,8 +5,8 @@
 #include "EngineMock.h"
 #include "StationInfoProvider.h"
 
-#include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 #include <sstream>
@@ -39,9 +39,9 @@ protected:
             "<?xml version=\"1.0\"?>"
             "  <config>"
             "    <file_pattern>./%pol%_stations_info_GIS_%gis%.txt</file_pattern>"
-            "</config>"s;
+            "</config>";
 
-        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto doc    = XmlDocument::load_from_string(configXml);
         auto config = doc.child("config");
 
         _stationsProvider.configure(config, "stationinfoprovider", _engineMock);

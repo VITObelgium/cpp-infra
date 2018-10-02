@@ -29,7 +29,7 @@ public:
 
     // OPAQ::Component methods
     // throws OPAQ::BadConfigurationException
-    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // the configure method should also be implemented in the derived class...
     // OPAQ::Model methods --> run for this particular fcTime...
@@ -45,8 +45,8 @@ public:
     };
 
 private:
-    void parseTuneList(const inf::ConfigNode& list);
-    void parseTuneElement(const inf::ConfigNode& tuneEl);
+    void parseTuneList(const inf::XmlNode& list);
+    void parseTuneElement(const inf::XmlNode& tuneEl);
 
     ComponentManager* _componentMgr;
 

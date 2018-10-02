@@ -2,9 +2,9 @@
 
 #include "AQNetwork.h"
 
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 #include <iterator>
 #include <vector>
@@ -35,7 +35,7 @@ std::string AsciiForecastWriter::name()
     return "asciiforecastwriter";
 }
 
-void AsciiForecastWriter::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void AsciiForecastWriter::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

@@ -35,7 +35,7 @@ public:
    * <offset>-10</offset>
    * throws BadConfigurationException
    */
-    void configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine& engine) override;
+    void configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine& engine) override;
 
     // ==================================================
     // OPAQ::DataProvider methods

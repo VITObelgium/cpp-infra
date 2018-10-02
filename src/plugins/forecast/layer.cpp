@@ -1,6 +1,6 @@
 #include <string>
 
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 #include "layer.h"
 
 int _parseMatrix(Eigen::MatrixXd& m, const std::string& str)
@@ -31,7 +31,7 @@ namespace nnet {
 
 using namespace inf;
 
-layer::layer(const ConfigNode& config, int ninput)
+layer::layer(const XmlNode& config, int ninput)
 : _fcn(nullptr)
 {
     if (!config) {

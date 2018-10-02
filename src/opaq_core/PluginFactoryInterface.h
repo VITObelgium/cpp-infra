@@ -5,7 +5,7 @@
 #include <string_view>
 
 namespace inf {
-class ConfigNode;
+class XmlNode;
 }
 
 namespace opaq {

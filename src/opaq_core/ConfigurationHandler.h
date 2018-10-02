@@ -1,7 +1,7 @@
 #pragma once
 
 #include "config/OpaqRun.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 #include <string>
 
@@ -54,11 +54,11 @@ public:
     }
 
 private:
-    config::ForecastStage parseForecastStage(const inf::ConfigNode& element);
-    config::MappingStage parseMappingStage(const inf::ConfigNode& element);
+    config::ForecastStage parseForecastStage(const inf::XmlNode& element);
+    config::MappingStage parseMappingStage(const inf::XmlNode& element);
 
     config::OpaqRun _opaqRun;
-    inf::ConfigDocument _doc;
-    std::vector<inf::ConfigDocument> _configDocs;
+    inf::XmlDocument _doc;
+    std::vector<inf::XmlDocument> _configDocs;
 };
 }

@@ -6,9 +6,9 @@
 #include "TimeSeries.h"
 #include "data/ForecastBuffer.h"
 #include "feedforwardnet.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 #include <limits>
 
@@ -57,7 +57,7 @@ double MLP_FeedForwardModel::fcValue(const Pollutant& pol, const Station& statio
     // Read in the network file
 
     try {
-        auto nnet_xml = ConfigDocument::loadFromFile(fname);
+        auto nnet_xml = XmlDocument::load_from_file(fname);
 
         // construct the neural network object
         std::unique_ptr<nnet::feedforwardnet> net;

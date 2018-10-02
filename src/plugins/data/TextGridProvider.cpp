@@ -1,9 +1,9 @@
 #include "TextGridProvider.h"
 #include "Exceptions.h"
-#include "infra/configdocument.h"
 #include "infra/filesystem.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -20,7 +20,7 @@ std::string TextGridProvider::name()
     return "textgridprovider";
 }
 
-void TextGridProvider::configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine&)
+void TextGridProvider::configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
     _grid.clear();

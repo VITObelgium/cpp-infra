@@ -2,7 +2,7 @@
 
 #include "PredictionDatabaseFactory.h"
 #include "PredictionDatabaseInterface.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 namespace opaq {
 
@@ -22,7 +22,7 @@ std::string SqlBuffer::name()
     return "sqlbuffer";
 }
 
-void SqlBuffer::configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine&)
+void SqlBuffer::configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

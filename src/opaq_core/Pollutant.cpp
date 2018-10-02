@@ -2,7 +2,7 @@
 #include <string>
 
 #include "Pollutant.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 #include <sstream>
 
@@ -23,7 +23,7 @@ Pollutant::Pollutant(long id, std::string name, std::string unit, std::string de
 {
 }
 
-Pollutant::Pollutant(const ConfigNode& el)
+Pollutant::Pollutant(const XmlNode& el)
 {
     _id   = el.attribute<int32_t>("id").value();
     _name = std::string(el.attribute("name"));

@@ -7,8 +7,8 @@
 #include "EngineMock.h"
 #include "IRCELMeteoProvider.h"
 
-#include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 #include <boost/iostreams/copy.hpp>
@@ -60,7 +60,7 @@ protected:
             "</config>",
             resolution.count(), filePattern);
 
-        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto doc    = XmlDocument::load_from_string(configXml.c_str());
         auto config = doc.child("config");
 
         _meteoProvider.configure(config, "meteoprovider", _engineMock);

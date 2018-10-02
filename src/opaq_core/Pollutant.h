@@ -6,7 +6,7 @@
 #include <vector>
 
 namespace inf {
-class ConfigNode;
+class XmlNode;
 }
 
 namespace opaq {
@@ -26,7 +26,7 @@ public:
     Constructor from an XML element
     \param el A const pointer to the TiXmlELement holding the pollutant definitoin
     */
-    Pollutant(const inf::ConfigNode& el);
+    Pollutant(const inf::XmlNode& el);
 
     /** Writes out the pollutant information to the ostream */
     friend std::ostream& operator<<(std::ostream& os, const Pollutant& s);

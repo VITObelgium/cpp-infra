@@ -6,8 +6,8 @@
 #include "data/IGridProvider.h"
 #include "data/IMappingBuffer.h"
 #include "data/IStationInfoProvider.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
+#include "infra/xmldocument.h"
 
 namespace opaq {
 
@@ -27,12 +27,12 @@ std::string InverseDistanceWeighting::name()
     return "idwmodel";
 }
 
-void InverseDistanceWeighting::configure(const inf::ConfigNode& configuration, const std::string& componentName, IEngine&)
+void InverseDistanceWeighting::configure(const inf::XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 
     _powerParam = configuration.child("power_parameter").value<double>().value_or(1.0);
-    _gisType    = configuration.child("gis_type").value("clc06d");
+    _gisType    = configuration.child("gis_type").optional_value().value_or("clc06d");
 }
 
 static double calculateDistance(double x1, double y1, double x2, double y2)

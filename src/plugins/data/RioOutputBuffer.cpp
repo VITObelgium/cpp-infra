@@ -4,8 +4,8 @@
 #include "Hdf5Tools.h"
 #include "Pollutant.h"
 #include "Station.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
+#include "infra/xmldocument.h"
 
 #include <algorithm>
 #include <boost/algorithm/string.hpp>
@@ -96,7 +96,7 @@ std::string RioOutputBuffer::name()
     return "riooutputbuffer";
 }
 
-void RioOutputBuffer::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void RioOutputBuffer::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

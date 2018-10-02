@@ -4,7 +4,7 @@
 #include "Engine.h"
 #include "PluginFactoryInterface.h"
 #include "PollutantManager.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 #include "opaqconfig.h"
 #include "testconfig.h"
 
@@ -31,7 +31,7 @@ public:
 class DummyComponent : public Component
 {
 public:
-    void configure(const inf::ConfigNode& /*configuration*/, const std::string& /*componentName*/, IEngine& /*engine*/) override
+    void configure(const inf::XmlNode& /*configuration*/, const std::string& /*componentName*/, IEngine& /*engine*/) override
     {
     }
 };
@@ -58,7 +58,7 @@ TEST_F(ComponentManagerTest, LoadPlugin)
         "    <fctime_resolution>24</fctime_resolution>"
         "</config>"s;
 
-    auto doc    = ConfigDocument::loadFromString(configXml);
+    auto doc    = XmlDocument::load_from_string(configXml.c_str());
     auto config = doc.child("config");
 
     EXPECT_CALL(_pluginFactoryMock, createPlugin(std::string_view("dummy"))).WillOnce(Return(ByMove(std::make_unique<DummyComponent>())));

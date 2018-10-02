@@ -16,8 +16,8 @@
 #include "opaqconfig.h"
 #include "plugins/PluginFactory.h"
 
-#include "infra/configdocument.h"
 #include "infra/log.h"
+#include "infra/xmldocument.h"
 
 #include <boost/program_options.hpp>
 
@@ -59,7 +59,7 @@ static T getOptionalArg(const po::variables_map& vm, const char* name, const T& 
 std::string readLogName(const std::string& config_file)
 {
     try {
-        auto doc = inf::ConfigDocument::loadFromFile(config_file);
+        auto doc = inf::XmlDocument::load_from_file(config_file);
         return std::string(doc.child("opaq").child("logFile").trimmed_value());
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;

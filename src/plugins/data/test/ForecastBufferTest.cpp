@@ -13,7 +13,7 @@
 #include "Engine.h"
 #include "PredictionDatabase.h"
 #include "TimeSeries.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 namespace std {
@@ -54,9 +54,9 @@ protected:
             "    <dbtype>sqlite</dbtype>"
             "    <basetime_resolution>24</basetime_resolution>"
             "    <fctime_resolution>24</fctime_resolution>"
-            "</config>"s;
+            "</config>";
 
-        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto doc    = XmlDocument::load_from_string(configXml);
         auto config = doc.child("config");
 
         auto name = BufferType::name();
@@ -86,7 +86,7 @@ TYPED_TEST(ForecastBufferTest, GetBaseTimeResolution)
 TYPED_TEST(ForecastBufferTest, GetModelNamesEmpty)
 {
     // no data in the buffer
-    EXPECT_THROW(this->_buffer->getModelNames("pm10", Aggregation::DayAvg).empty(), NotAvailableException);
+    EXPECT_THROW(auto empty = this->_buffer->getModelNames("pm10", Aggregation::DayAvg).empty(), NotAvailableException);
 }
 
 TYPED_TEST(ForecastBufferTest, GetModelNames)

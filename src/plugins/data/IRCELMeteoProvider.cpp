@@ -6,9 +6,9 @@
  */
 
 #include "IRCELMeteoProvider.h"
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 #include "tools/GzipReader.h"
 
 #include <boost/lexical_cast.hpp>
@@ -37,7 +37,7 @@ std::string IRCELMeteoProvider::name()
 }
 
 // OPAQ::Component methods
-void IRCELMeteoProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void IRCELMeteoProvider::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

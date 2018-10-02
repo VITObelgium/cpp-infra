@@ -5,8 +5,8 @@
 #include "EngineMock.h"
 #include "TextGridProvider.h"
 
-#include "infra/configdocument.h"
 #include "infra/filesystem.h"
+#include "infra/xmldocument.h"
 #include "tools/FileTools.h"
 
 #include <sstream>
@@ -37,9 +37,9 @@ protected:
             "<?xml version=\"1.0\"?>"
             "  <config>"
             "    <file_pattern>./%pol%_clc06d_grid_%grid%.txt</file_pattern>"
-            "</config>"s;
+            "</config>";
 
-        auto doc    = ConfigDocument::loadFromString(configXml);
+        auto doc    = XmlDocument::load_from_string(configXml);
         auto config = doc.child("config");
 
         _gridProvider.configure(config, "stationinfoprovider", _engineMock);

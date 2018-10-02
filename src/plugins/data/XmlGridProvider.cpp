@@ -7,7 +7,7 @@
 
 #include "XmlGridProvider.h"
 #include "Exceptions.h"
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 namespace opaq {
 
@@ -26,7 +26,7 @@ std::string XmlGridProvider::name()
  * 	<cell id="1" xmin="12.1" xmax="14.1" ymin="11.1" ymax="12.1"/>
  * </grid>
  */
-void XmlGridProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void XmlGridProvider::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 

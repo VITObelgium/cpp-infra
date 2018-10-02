@@ -4,7 +4,7 @@
 #include <Eigen/Dense>
 
 namespace inf {
-class ConfigNode;
+class XmlNode;
 }
 
 namespace nnet {
@@ -45,7 +45,7 @@ public:
 class mapstd : public scaler
 {
 public:
-    mapstd(const inf::ConfigNode& config, int size, double ymean = 0, double ystd = 1);
+    mapstd(const inf::XmlNode& config, int size, double ymean = 0, double ystd = 1);
     ~mapstd();
 
     int apply(Eigen::Ref<Eigen::VectorXd> x);
@@ -62,7 +62,7 @@ private:
 class mapminmax : public scaler
 {
 public:
-    mapminmax(const inf::ConfigNode& config, int size, double ymin = -1, double ymax = 1);
+    mapminmax(const inf::XmlNode& config, int size, double ymin = -1, double ymax = 1);
     ~mapminmax();
 
     int apply(Eigen::Ref<Eigen::VectorXd> x);

@@ -9,9 +9,9 @@
 #include "AQNetworkProvider.h"
 #include "ObsParser.h"
 
-#include "infra/configdocument.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "infra/xmldocument.h"
 
 namespace opaq {
 
@@ -35,7 +35,7 @@ std::string RioObsProvider::name()
     return "rioobsprovider";
 }
 
-void RioObsProvider::configure(const ConfigNode& configuration, const std::string& componentName, IEngine&)
+void RioObsProvider::configure(const XmlNode& configuration, const std::string& componentName, IEngine&)
 {
     setName(componentName);
 
