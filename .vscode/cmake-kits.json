@@ -1,14 +1,37 @@
 [
     {
-        "name": "Clang",
-        "toolchainFile": "${workspaceRoot}/deps/cmake-scripts/toolchain-clang.cmake"
+        "name": "x64-osx",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-osx"
+        }
     },
     {
-        "name": "Gcc 7",
-        "toolchainFile": "${workspaceRoot}/deps/cmake-scripts/toolchain-gcc7.cmake"
+        "name": "x64-osx-gcc",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-osx-gcc"
+        }
     },
     {
-        "name": "Gcc 8",
-        "toolchainFile": "${workspaceRoot}/deps/cmake-scripts/toolchain-gcc8.cmake"
+        "name": "x64-osx-homebrew",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-osx-homebrew"
+        }
+    },
+    {
+        "name": "x64-linux",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-linux"
+        }
+    },
+    {
+        "name": "x64-linux-musl",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-linux-musl"
+        }
     }
 ]
