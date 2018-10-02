@@ -56,19 +56,21 @@ std::string_view XmlNode::attribute(const std::string& name) const
     return attribute(name.c_str());
 }
 
-std::string XmlNode::attribute(const char* name, std::string_view valueIfNotPresent) const
+std::optional<std::string_view> XmlNode::optional_attribute(const char* name) const
 {
+    std::optional<std::string_view> result;
+
     auto value = attribute(name);
-    if (value.empty()) {
-        return std::string(valueIfNotPresent);
+    if (!value.empty()) {
+        result = value;
     }
 
-    return std::string(value);
+    return result;
 }
 
-std::string XmlNode::attribute(const std::string& name, std::string_view valueIfNotPresent) const
+std::optional<std::string_view> XmlNode::optional_attribute(const std::string& name) const
 {
-    return attribute(name.c_str(), valueIfNotPresent);
+    return optional_attribute(name.c_str());
 }
 
 std::string_view XmlNode::name() const
