@@ -24,7 +24,7 @@ idw_ipol::~idw_ipol()
 
 void idw_ipol::run(Eigen::VectorXd& values,
     Eigen::VectorXd& uncert,
-    boost::posix_time::ptime tstart,
+    boost::posix_time::ptime /*tstart*/,
     const std::map<std::string, double>& obs,
     const std::shared_ptr<rio::grid>& g) const
 {
