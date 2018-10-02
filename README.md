@@ -6,19 +6,20 @@ autogen.sh script to add the build structure. After that just ./configure; make;
 
 ## Build environment
 #### Required components:
-- a c++14 compiler
+- a c++17 compiler
 - cmake
+- vcpkg (https://github.com/Microsoft/vcpkg)
 - ninja-build is recommended
 
 ## Prerequisites
 The third party library dependencies can be compiled by calling the bootstrap script.
 
 ### On linux
-call bootstrap.sh and select the desired configuration and toolchain. Use the default toolchain if you
+call python bootstrap.py and select the desired configuration and toolchain. Use the default toolchain if you
 want to do a normal compilation.
 
 ### On windows
-call bootstrap.bat, it will build both debug and release versions of the prerequisites
+call python bootstrap.py, it will build both debug and release versions of the prerequisites
 
 This will build all third party libraries required by OPAQ
 The libraries will be located in build/local
@@ -32,7 +33,7 @@ The libraries will be located in build/local
 - Sqlite database library
 - GoogleTest unit testing library
 - boost infrastructure library
-- TinyXml xml library
+- Pugixml xml library
 - date header for easy date manipulation
 - GoogleBenchmark: micro benchmark library
 - sqllp11: type safe sql library
@@ -43,12 +44,12 @@ OPAQ uses cmake which should make the compilation process fairly straight forwar
 Use the build scripts to perform the cmake configuration and initial build.
 
 ### On linux
-call build.sh and select the desired configuration
-build/opaq_[config] will be the build directory, use it for incremental builds after you make changes.
+call python build.py and select the desired configuration
+build/opaq-[config] will be the build directory, use it for incremental builds after you make changes.
 
 ### On windows
-call build.bat, it will generate a visual studio solution and perform an initial build
-build/opaq will contain the visual studio solution, use it for development
+call python build.py, it will generate a visual studio solution and perform an initial build
+build/opaq-[config] will contain the visual studio solution, use it for development
 
 Make sure to call the bootstrap script first.
 
