@@ -83,8 +83,8 @@ public:
     std::string_view attribute(const char* name) const;
     std::string_view attribute(const std::string& name) const;
 
-    std::string attribute(const char* name, std::string_view valueIfNotPresent) const;
-    std::string attribute(const std::string& name, std::string_view valueIfNotPresent) const;
+    std::optional<std::string_view> optional_attribute(const char* name) const;
+    std::optional<std::string_view> optional_attribute(const std::string& name) const;
 
     std::string_view name() const;
     std::string_view value() const;
