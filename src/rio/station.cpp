@@ -1,7 +1,7 @@
-#include <boost/format.hpp>
-#include <sstream>
-
 #include "station.hpp"
+
+#include <fmt/format.h>
+#include <sstream>
 
 namespace rio {
 
@@ -11,11 +11,13 @@ station::station()
 }
 
 station::station(std::string name, int type, double x, double y, double alt)
-: _name(name), _x(x), _y(y), _alt(alt), _type(type)
+: _name(name)
+, _x(x)
+, _y(y)
+, _alt(alt)
+, _type(type)
+, _wkt(fmt::format("POINT({:.2f} {:.2f})", x, y))
 {
-    std::stringstream ss;
-    ss << boost::format("POINT(%.2f %.2f)") % x % y;
-    _wkt = ss.str();
 }
 
 station::~station()
@@ -35,5 +37,4 @@ std::ostream& operator<<(std::ostream& out, const station& s)
     out << std::endl;
     return out;
 }
-
 }
