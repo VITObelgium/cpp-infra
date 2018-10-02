@@ -119,6 +119,18 @@ template std::optional<float> XmlNode::value<float>() const;
 template std::optional<int32_t> XmlNode::value<int32_t>() const;
 template std::optional<int64_t> XmlNode::value<int64_t>() const;
 
+void XmlNode::print(std::ostream& os) const
+{
+    _pimpl->node.print(os);
+}
+
+std::string XmlNode::to_string() const
+{
+    std::ostringstream ss;
+    print(ss);
+    return ss.str();
+}
+
 bool XmlNode::operator!() const noexcept
 {
     return !_pimpl->node;
@@ -233,7 +245,7 @@ XmlDocument::~XmlDocument()             = default;
 XmlDocument::XmlDocument(XmlDocument&&) = default;
 XmlDocument& XmlDocument::operator=(XmlDocument&&) = default;
 
-XmlNode XmlDocument::rootNode() const
+XmlNode XmlDocument::root_node() const
 {
     XmlNode root;
     root._pimpl->node = _pimplDoc->doc.root().first_child();

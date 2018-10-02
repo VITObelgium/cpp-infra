@@ -104,6 +104,9 @@ public:
         return attribute<T>(name.c_str());
     }
 
+    void print(std::ostream& os) const;
+    std::string to_string() const;
+
     bool operator!() const noexcept;
     operator bool() const noexcept;
 
@@ -162,7 +165,7 @@ public:
 
     ~XmlDocument();
 
-    XmlNode rootNode() const;
+    XmlNode root_node() const;
 
 private:
     XmlDocument(const char* data, bool isPath);
