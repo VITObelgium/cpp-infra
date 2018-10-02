@@ -40,7 +40,7 @@ void OVL_IRCEL_model3::configure(const ConfigNode& configuration, const std::str
     setName(componentName);
 
     // read the path to the architecture files
-    pattern = std::string(configuration.child("ffnetfile_pattern").trimmedValue());
+    pattern = std::string(configuration.child("ffnetfile_pattern").trimmed_value());
     if (pattern.empty()) {
         throw BadConfigurationException("missing ffnetfile_pattern value");
     }

@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<rio>
+  <!-- Important note:
+       Wildcards to be used in this XML file
+       
+       %pol%  : the pollutant name
+       %aggr% : the aggregation time : da, 1h, ...
+       %ipol% : the mapper name
+       %grid% : the name of the grid
+       %cnf%  : the configuration name
+       %base% : the working directory
+
+       %timestamp%  : the current timestamp for the interpolation
+       %date%       : the current day for the interpolation
+       %start_time% : timestamp for the start of the run
+       %end_time%   : timestamp for the end of the run
+  -->
+  <!-- the default values for this deployment, no wildcards allowed here -->
+  <defaults>
+    <base_path>.</base_path>
+    <configuration>v2016</configuration>
+    <pollutant>pm10</pollutant>
+    <aggregation>1h</aggregation>
+    <mapper>clc12a</mapper>
+    <grid>4x4</grid>
+    <output>aps</output>
+    <!-- can be comma separated list -->
+  </defaults>
+
+  <!-- here we define the available outputs -->
+  <output>
+    <!-- simple ascii text writer -->
+    <handler name="txt" class="asciiwriter">
+      <location>%base%/output/%pol%_%ipol%_%grid%-%timestamp%.txt</location>
+      <field_separator>;</field_separator>
+      <precision>2</precision>
+      <!--
+	    <precision>6</precision><wkt>enable</wkt>
+      -->
+    </handler>
+
+    <!-- dutch aps format writer -->
+    <handler name="aps" class="apswriter">
+        <!-- location for values output and uncertainty output -->
+      <location>
+        <values>%base%/output/%pol%_%ipol%_%grid%-%timestamp%.aps</values>
+        <uncertainty>%base%/output/%pol%_%ipol%_%grid%-%timestamp%.err.aps</uncertainty>
+      </location>
+
+      <!-- need an aps configuration for each grid we want to use in the output writer.... -->
+      <map grid="4x4" srs="1" fmt="F7.1" missing="-999.0"
+           nx="70" ny="80" dx="4.0" dy="4.0" xull="0." yull="620.">%base%/grids/aps_4x4_grid.map</map>
+    </handler>        
+  
+    <!-- hdf5 writer -->
+    <handler name="hdf5" class="h5writer">
+      <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.h5</location>
+    </handler>
+
+    <!-- GeoJSON writer -->
+    <handler name="json" class="jsonwriter">
+      <location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.json</location>
+    </handler>
+
+  </output>
+
+  <!-- here are the different configurations in this deployment -->
+  <configuration name="v2010">
+    <author>Bino Maiheu</author>
+    <email>bino.maiheu@vito.be</email>
+    <description>This is the configuration for the RIVM deployment - v2010</description>
+    <missing_value>-9999.</missing_value>
+
+    <observations>
+      <dbqfile type="RIO" scale="1.0">%base%/data/%pol%_data_rio.txt</dbqfile>
+    </observations>
+
+    <!-- Note: the stations and grids tags here are generic, they can be
+	       overwritten inside the <mapper> model tags with specific versions -->
+    <stations>
+      <filename>%base%/stations/%cnf%/%pol%_stations_info_GIS_%ipol%.txt</filename>
+    </stations>    
+    <grids>
+      <grid name="4x4" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>      
+    </grids>
+
+    <!-- the pollutant configuration occurs in the pollutant tags below here... -->
+    <pollutant name="pm10,no2,o3" aggr="da,1h">
+      <detection_limit>1.0</detection_limit>
+      <mapper name="CorineID" class="rio_ipol">
+        <!-- general options -->
+        <options>
+          <logtrans>enable</logtrans>
+        </options>
+        <!-- correlation model and trend model with configuration files -->
+        <correlationmodel class="exp_spcorr">%base%/param/%cnf%/spcorr_%pol%_%aggr%_%ipol%.xml</correlationmodel>
+        <trendmodel class="polytrend">%base%/param/%cnf%/%pol%_trend_%pol%_%aggr%_%ipol%.xml</trendmodel>
+      </mapper>      
+    </pollutant>
+  </configuration>
+
+  <!-- here are the different configurations in this deployment -->
+  <configuration name="v2016">
+    <author>Bino Maiheu</author>
+    <email>bino.maiheu@vito.be</email>
+    <description>This is the configuration for the RIVM deployment - v2016</description>
+    <missing_value>-9999.</missing_value>
+
+    <observations>
+      <dbqfile type="RIO" scale="1.0">%base%/data/%pol%_data_rio.txt</dbqfile>
+    </observations>
+
+    <!-- Note: the stations and grids tags here are generic, they can be
+	       overwritten inside the <mapper> model tags with specific versions -->
+    <stations>
+      <filename>%base%/stations/%cnf%/%pol%_stations_info_GIS_%ipol%.txt</filename>
+    </stations>    
+    <grids>
+      <grid name="4x4" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>      
+    </grids>
+
+    <!-- the pollutant configuration occurs in the pollutant tags below here... -->
+    <pollutant name="pm10,no2,o3" aggr="da,1h">
+      <detection_limit>1.0</detection_limit>
+      <mapper name="clc12" class="rio_ipol">
+        <!-- general options -->
+        <options>
+          <logtrans>enable</logtrans>
+        </options>
+        <!-- correlation model and trend model with configuration files -->
+        <correlationmodel class="exp_spcorr">%base%/param/%cnf%/spcorr_%pol%_%aggr%_%ipol%.xml</correlationmodel>
+        <trendmodel class="polytrend">%base%/param/%cnf%/trend_%pol%_%aggr%_%ipol%.xml</trendmodel>
+      </mapper>      
+      <mapper name="clc12a" class="rio_ipol">
+        <!-- general options -->
+        <options>
+          <logtrans>enable</logtrans>
+        </options>
+        <!-- correlation model and trend model with configuration files -->
+        <correlationmodel class="exp_spcorr">%base%/param/%cnf%/spcorr_%pol%_%aggr%_%ipol%.xml</correlationmodel>
+        <trendmodel class="polytrend">%base%/param/%cnf%/trend_%pol%_%aggr%_%ipol%.xml</trendmodel>
+      </mapper>      
+    </pollutant>
+  </configuration>
+
+  <!-- here are the different configurations in this deployment -->
+  <configuration name="v2016t">
+    <author>Bino Maiheu</author>
+    <email>bino.maiheu@vito.be</email>
+    <description>This is the configuration for the RIVM deployment - v2016</description>
+    <missing_value>-9999.</missing_value>
+
+    <observations>
+      <dbqfile type="RIO" scale="1.0">%base%/data/%pol%_data_rio.txt</dbqfile>
+    </observations>
+
+    <!-- Note: the stations and grids tags here are generic, they can be
+	       overwritten inside the <mapper> model tags with specific versions -->
+    <stations>
+      <filename>%base%/stations/%cnf%/%pol%_stations_info_GIS_%ipol%.txt</filename>
+    </stations>    
+    <grids> 
+      <!-- explicitly using v2016 grid -->
+      <grid name="4x4" cellsize="4000.">%base%/grids/v2016/%pol%_grid_4x4_%ipol%.txt</grid>      
+    </grids>
+
+    <!-- the pollutant configuration occurs in the pollutant tags below here... -->
+    <pollutant name="pm10,no2,o3" aggr="da,1h">
+      <detection_limit>1.0</detection_limit>
+      <mapper name="clc12" class="rio_ipol">
+        <!-- general options -->
+        <options>
+          <logtrans>enable</logtrans>
+        </options>
+        <!-- correlation model and trend model with configuration files -->
+        <correlationmodel class="exp_spcorr">%base%/param/%cnf%/spcorr_%pol%_%aggr%_%ipol%.xml</correlationmodel>
+        <trendmodel class="polytrend">%base%/param/%cnf%/trend_%pol%_%aggr%_%ipol%.xml</trendmodel>
+      </mapper>      
+      <mapper name="clc12a" class="rio_ipol">
+        <!-- general options -->
+        <options>
+          <logtrans>enable</logtrans>
+        </options>
+        <!-- correlation model and trend model with configuration files -->
+        <correlationmodel class="exp_spcorr">%base%/param/%cnf%/spcorr_%pol%_%aggr%_%ipol%.xml</correlationmodel>
+        <trendmodel class="polytrend">%base%/param/%cnf%/trend_%pol%_%aggr%_%ipol%.xml</trendmodel>
+      </mapper>      
+    </pollutant>
+  </configuration>
+</rio>

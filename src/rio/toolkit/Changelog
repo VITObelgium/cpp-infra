@@ -1,0 +1,70 @@
+Changelog
+RIO Matlab Toolkit
+
+Authors: Jef Hooyberghs
+         Stijn Janssen
+		 Nele Veldeman
+		 Bino Maiheu
+
+v2.0 : - made the toolkit compatible with the FORTRAN XML setup file...
+		 
+v1.5 : - added rio_map and rio_display routines
+       - enabled log transformation
+	   - new rio validation routine with validation viewer, needs the validation 
+	     toolkit under svn://sublime.vito.local/KWL/RMA/MatlabToolkit/trunk
+	   - added long term support stuff in the xml setup file as some separate
+	     configurations
+	   - update of the OptimizeGUI routine where we have added an optimisation mode
+	     which maximizes the spatial correlation
+	   - added trend analysis tools (scripts from RIO 2012 project)
+	   - added tools to import SVPOL
+	   - updated the postprocessor to deal with hdf5 data, which the validation tool 
+	     now also spits out...
+	   - added an obsolete folder to archive old, obsolete code
+	     
+				 
+				 
+v1.4 : - restructured the configuration paths, now always separated in
+         pollutant subfolders, structure : 
+         ./drivers/<pol>
+         ./data/<pol>
+         ./param/<pol>/trend
+         ./param/<pol>/stat_param
+         ./param/<pol>/spatial_corr
+         ./drivers/<pol>
+         ./stations/<pol>
+
+         replaced the land_use folder with the generic name 'drivers' and
+         the rio_param is now just param for cosmetic reasons. 
+
+       - a new xml file now sets the paths to the configuration files
+         separately per folder, so no more base-path crap and hard coded
+         folder names to form the path of e.g. a trend function file
+
+       - routine rio_setup replaces rio_init, which is now obsolete.
+       - rio_log now writes to current working folder instead of base path
+	   - adjusted the utils a little, only the OptimizeGUI etc are still not
+	     compatible
+        
+
+v1.3 : - added maphdf5 (iguess)
+       - ???
+
+v1.2 : - rewritten some documentation for each routine
+       - added rio_version & startup.m
+			 - made rio.m compatible with fortran, in the sense that it is able to directly
+			   ingest ascii files e.g. pm10_data_rio.txt like the fortran version. Slightly
+				 altered the rio_createdb routine for this by adding an additional argument which 
+				 controls whether to save the parsed concentration data to disk (mat file) or 
+				 attach it to the cnf strcuture. 
+				 
+v1.1 : - added clc06d spatial driver in rio_avgtrend
+       - added possibility to exclude stations from trend fitting
+			 - added several tools : optimisatoin, data stripper
+			 - reorganized the utils folder, moved rio.m and riopp.m to main 
+			 - added the OptimizeGUI folder to the svn
+			 - all utilities have commont structure now
+			 
+
+				 
+v1.0 : - first stable release, used for rioNH3 and RIO 2009 project

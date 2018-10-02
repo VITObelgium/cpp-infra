@@ -1,0 +1,6 @@
+#pragma once
+
+// configured options from the build system
+#define RIO_VERSION  "${PACKAGE_VERSION_MAJOR}.${PACKAGE_VERSION_MINOR}.${PACKAGE_VERSION_REVISION}"
+
+

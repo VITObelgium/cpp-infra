@@ -1,0 +1,17 @@
+<?xml version="1.0" ?>
+<correlationmodel>
+  <class>exp_spcorr</class>
+  <short_range active="yes">20.</short_range>
+  <param>
+    <da>
+      <long>
+        <a>0.916734</a>
+        <tau>523.894158</tau>
+      </long>
+      <short>
+        <a>0.000000</a>
+        <b>0.000000</b>
+      </short>
+    </da>
+  </param>
+</correlationmodel>

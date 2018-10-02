@@ -1,0 +1,15 @@
+#pragma once
+
+#include "conf.hpp"
+#include "network.hpp"
+#include "grid.hpp"
+#include "dbqfile.hpp"
+#include "obshandler.hpp"
+#include "timeseries.hpp"
+#include "idw_ipol.hpp"
+#include "krige_ipol.hpp"
+#include "rio_ipol.hpp"
+#include "exp_spcorr.hpp"
+#include "trendmodel.hpp"
+#include "polytrend.hpp"
+#include "output.hpp"

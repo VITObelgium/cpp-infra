@@ -1,0 +1,563 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<RIO>	
+
+  <!-- The RIO XML configuration file
+      
+        Author  : Bino Maiheu, (c) 2013-2016 VITO NV
+        Contact : bino.maiheu@vito.be
+        Tel     : +3214336745
+  -->
+
+  <!-- This tag contains input / output options... -->
+  <IOOptions>
+    <!-- The input mode                       -->
+    <!-- 0: legacy integer input format       -->
+    <!-- 1: floating point F10.3 input format -->
+    <input_mode>0</input_mode>
+
+    
+    <!-- ASCII output mode (if requested..) -->
+    <!-- 0 : legacy integer 1h outptu, the rest was already floating point, pre RIO 4.0 -->
+    <!-- 1 : floating point F10.3 all the way -->
+    <ascii_output_mode>1</ascii_output_mode>
+  </IOOptions>
+
+
+  <H5Options>
+    <!-- Enable zlib compression for HDF5 output concentrations 
+         compression levels can be from 0 to 9, -1 disables the 
+         compression filter ! -->
+    <Compression>9</Compression>
+    <!-- NOT IMPLEMENTED YET...
+         By default the RIO results & measurements are written as
+         floating points, when scaling is enable we use a scaling and
+	 write the concentrations as int16.
+	 The scaling mode has the following options : 
+	 0 : disable
+	 1 : enable
+    <Scalingmode>1</Scalingmode> 
+         When scaling is enables, this gives the scale factor to translate
+         from the stored values to the real values, only used when scaling
+         is applied 
+    <Scalefactor>0.01</Scalefactor>--> 
+  </H5Options>
+
+  
+  <Configuration name="v2016" dbase="./data/v2016" drivers="./drivers/v2016"
+	         output="./output/v2016" stations="./stations/v2016" param="./param/v2016">
+    <!--
+	   Configuration v2016 for RIO, during ref task 2016. Updated statistical parameters
+	   to the period 2011-2015 (2010-2015 for PM2.5 given the smaller data amounts).
+    -->
+    <Description>RIO operionational version, configuration v2016</Description>	
+    
+	<!-- only used by MATLAB version -->
+	<Option name="logtrans">false</Option>
+	
+    <Pollutant name="pm25" desc="Particulate matter with diameter below 2.5 µm"  units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global"></Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+		<Grid name="4x4" grid_space="4000" />
+		<Grid name="1x1" grid_space="1000" />
+		<Aggregation name="da">
+			<avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.2" />
+			<stdtrend type="poly1" ref_level="10" indic_lo="0.0" indic_hi="100.0" />
+		</Aggregation>
+		<Aggregation name="1h">
+			<avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.2" />
+			<stdtrend type="poly1" ref_level="10" indic_lo="0.0" indic_hi="100.0" />
+		</Aggregation>
+      </Driver>			
+    </Pollutant>
+
+    <Pollutant name="pm10" desc="Particulate matter with diameter below 10 µm"  units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global"></Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+        <Grid name="4x4" grid_space="4000" />
+        <Grid name="1x1" grid_space="1000" />
+        <Aggregation name="da">
+          <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.1" />
+          <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+        <Aggregation name="1h">
+          <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.1" />
+          <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+      </Driver>
+    </Pollutant>
+
+    <Pollutant name="o3" desc="Ozone" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global"></Kriging>
+      <Stationlist>all</Stationlist>
+      <AltitudeCorrection slope="0.0253" /> <!-- ug/m3/m -->
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da" alt_corr="1">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h" alt_corr="1">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m1">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m8">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+
+  </Configuration>
+   
+  
+
+  <Configuration name="v3.4" dbase="./data/v3.4" drivers="./drivers/v3.4"
+	         output="./output/v3.4" stations="./stations/v3.4" param="./param/v3.4">
+    <!-- 
+	 Configuration of RIO deployment version 3.4 for IRCELINE
+	 Should be backward compatible with the previous release of RIO
+	 without XML configuration file. 
+	 Trends & long term statistics based upon 2004-2008. 
+    -->
+    <Description>RIO deployment configuration version v3.4</Description>	
+    
+    <!-- RIO v3.4 - NO2 -->
+    <Pollutant name="no2" desc="Nitrogen dioxide" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Driver name="CorineID" desc="Corine Land Cover 2000" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="belEUROS" grid_space="3000" />
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="70." indic_lo="0.0" indic_hi="1.4" />
+	  <stdtrend type="poly1" ref_level="15." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m1">
+	  <avgtrend type="poly2" ref_level="70." indic_lo="0.0" indic_hi="1.4" />
+	  <stdtrend type="poly1" ref_level="15." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+    
+    <!-- RIO v3.4 - O3 -->
+    <Pollutant name="o3" desc="Ozone" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Driver name="CorineID" desc="Corine Land Cover 2000" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="belEUROS" grid_space="3000" />			
+	<Aggregation name="1h">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="0.91" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>	
+    
+    <!-- RIO v3.4 - O3S -->
+    <!-- Note that this is a special one, normally we would have to make a 	
+	 new configuration for this guy which restricts the averaging in the 
+	 stat params to the summer period... -->
+    <Pollutant name="o3s" desc="Ozone in summer" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Driver name="CorineID" desc="Corine Land Cover 2000" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="belEUROS" grid_space="3000" />				
+	<Aggregation name="m1">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="0.91" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m8">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="0.91" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="0.91" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>	
+      
+      <Driver name="Pop" desc="Population density" dim="1" scale="1">
+	<!-- note that this guy doesnt contain the error trend files... -->
+	<Grid name="5x5" grid_space="5000" />			
+	<Aggregation name="m1">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="6.0" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m8">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="6.0" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">  
+	  <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="6.0" />
+	  <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>	
+    </Pollutant>
+    
+    <!-- RIO v3.4 - SO2 -->
+    <Pollutant name="so2"  desc="Sulphur dioxide" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Driver name="CorineID" desc="Corine Land Cover 2000" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="belEUROS" grid_space="3000" />			
+	<Aggregation name="da">  
+	  <avgtrend type="poly2" ref_level="20." indic_lo="0.0" indic_hi="2.7" />
+	  <stdtrend type="poly1" ref_level="5."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">  		
+	  <avgtrend type="poly2" ref_level="20." indic_lo="0.0" indic_hi="2.7" />
+	  <stdtrend type="poly1" ref_level="5."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+
+    <!-- RIO v3.4 - PM10 -->
+    <Pollutant name="pm10" desc="Particulate matter with diamter below 10 µm" 
+	       units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Driver name="CorineID" desc="Corine Land Cover 2000" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="belEUROS" grid_space="3000" />			
+	<Aggregation name="da">  
+	  <avgtrend type="poly2" ref_level="40." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="10."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">  			
+	  <avgtrend type="poly2" ref_level="40." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="10."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>	
+      <Driver name="clc06d" desc="Corine Land Cover 2006 - d" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="belEUROS" grid_space="3000" />			
+	<Aggregation name="da">  
+	  <avgtrend type="poly2" ref_level="40." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="10."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">  			
+	  <avgtrend type="poly2" ref_level="40." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="10."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>				
+    </Pollutant>
+
+    <!-- RIO v3.4 - PM25 -->
+    <Pollutant name="pm25" desc="Particulate matter with diameter below 2.5 µm" 
+	       units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Driver name="AODBETA" desc="Combined AOD and beta parameter" dim="1">
+	<Grid name="4x4" grid_space="4000" />			
+	<Aggregation name="da">  
+	  <avgtrend type="poly2" ref_level="20." indic_lo="0.0" indic_hi="0.3" />
+	  <stdtrend type="poly1" ref_level="10." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">  
+	  <avgtrend type="poly2" ref_level="20." indic_lo="0.0" indic_hi="0.3" />
+	  <stdtrend type="poly1" ref_level="10." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>	
+
+      <Driver name="AOD" desc="Pure AOD" dim="1">
+	<!-- note that this guy doesn't make a distinction between week/weekend 
+	     this still needs to be set in the code in this version... see how to
+	     deal with this in future...
+	-->
+	<Grid name="10x10" grid_space="10000" />	
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="20." indic_lo="0.0" indic_hi="0.3" />
+	  <stdtrend type="poly1" ref_level="10." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>	
+      
+    </Pollutant>
+    
+  </Configuration>
+  
+
+  <Configuration name="v3.6" dbase="./data/v3.6" drivers="./drivers/v3.6"
+	         output="./output/v3.6" stations="./stations/v3.6" param="./param/v3.6">
+    <!--
+	Configuration for version 3.6 of RIO, derived after the Ref task 2013 update
+	of the ai weights and trendfunctions. 
+	Trends & long term statistics based upon 2008-2012.
+    -->
+    <Description>RIO operionational version, configuration v3.6.</Description>	
+	  
+    <Pollutant name="nh3" desc="Ammonia (NH3)" units="µg/m3" scale="1">	
+      <DetectionLimit>0.</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global">
+	<BufferDistance>50</BufferDistance>
+	<MinimumStations>4</MinimumStations>
+      </Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="qcr0.7" desc="Corrected Emission with 0.7 dispersion parameter">
+	<Grid name="4x4" grid_space="4000" />
+	<Aggregation name="wk"> <!-- aggregation on weekly basis, or monthly we use the same notation --> 
+	  <avgtrend type="poly2" ref_level="5" indic_lo="0.0" indic_hi="0.7" />
+	  <stdtrend type="poly1" ref_level="1.5" indic_lo="0.0" indic_hi="1.5" /> 
+	  <!-- essentially no limit on linear increase of std, in old matlab code no limit was there as well... -->
+	</Aggregation>	    
+      </Driver>		
+      
+      <Driver name="edp4" desc="StEmDis parameter, a0=1.0, a1=4.0">
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="wk"> <!-- aggregation on weekly basis, or monthly we use the same notation --> 
+	  <avgtrend type="poly2" ref_level="5" indic_lo="0.0" indic_hi="0.3" />
+	  <stdtrend type="poly1" ref_level="1.5" indic_lo="0.0" indic_hi="1.0" /> 
+	  <!-- essentially no limit on linear increase of std, in old matlab code no limit was there as well... -->
+	</Aggregation>	    
+      </Driver>		
+      
+    </Pollutant>		  
+    
+    <Pollutant name="so2" desc="Sulphur dioxide" units="µg/m3" scale="1">	
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global">
+	<BufferDistance>50</BufferDistance>
+	<MinimumStations>4</MinimumStations>
+      </Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.5" />
+	  <stdtrend type="poly2" ref_level="10" indic_lo="0.0" indic_hi="1.5" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.5" />
+	  <stdtrend type="poly2" ref_level="10" indic_lo="0.0" indic_hi="1.5" />
+	</Aggregation>
+      </Driver>		
+    </Pollutant>		
+  
+    <Pollutant name="pm10" desc="Particulate matter with diamter below 10 µm" 
+	       units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global"></Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.1" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.1" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>	
+    </Pollutant>
+		
+    <Pollutant name="pm25" desc="Particulate matter with diameter below 2.5 µm" 
+	       units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global"></Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.2" />
+	  <stdtrend type="poly1" ref_level="10" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.2" />
+	  <stdtrend type="poly1" ref_level="10" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>			
+    </Pollutant>
+
+    <Pollutant name="no2" desc="Nitrogen dioxide" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global">
+	<BufferDistance>50</BufferDistance>
+	<MinimumStations>4</MinimumStations>
+      </Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="40" indic_lo="0.0" indic_hi="1.3" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="40" indic_lo="0.0" indic_hi="1.3" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m1">
+	  <avgtrend type="poly2" ref_level="40" indic_lo="0.0" indic_hi="1.3" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+
+    <Pollutant name="no" desc="Nitrogen oxide" units="µg/m3" scale="1">
+      <DetectionLimit>0.</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global">
+	<BufferDistance>50</BufferDistance>
+	<MinimumStations>4</MinimumStations>
+      </Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.4" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="15" indic_lo="0.0" indic_hi="1.4" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m1">
+	  <avgtrend type="poly2" ref_level="40" indic_lo="0.0" indic_hi="1.3" />
+	  <stdtrend type="poly1" ref_level="15" indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+    
+    <Pollutant name="o3" desc="Ozone" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global"></Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d" dim="1">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m1">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="m8">
+	  <avgtrend type="poly2" ref_level="50." indic_lo="0.0" indic_hi="1.0" />
+	  <stdtrend type="poly1" ref_level="20." indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+	
+
+    <!-- note the scale which converts the input value to internal RIO units 
+	 the detection limit is also in internal units -->
+    <Pollutant name="bc" desc="Black Carbon" units="µg/m3" scale="0.01">
+      <DetectionLimit>0.01</DetectionLimit> <!-- detection limit in internal units -->
+      <Kriging mode="global">
+	<BufferDistance>50</BufferDistance>
+	<MinimumStations>4</MinimumStations>
+      </Kriging>
+      <Stationlist>all</Stationlist>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d">
+	<Grid name="4x4" grid_space="4000" />
+	<Grid name="1x1" grid_space="1000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="2"   indic_lo="0.0" indic_hi="1.35" />
+	  <stdtrend type="poly1" ref_level="1.5" indic_lo="0.0" indic_hi="1.35" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="2"   indic_lo="0.0" indic_hi="1.35" />
+	  <stdtrend type="poly1" ref_level="1.5" indic_lo="0.0" indic_hi="1.35" />
+	</Aggregation>
+      </Driver>	
+    </Pollutant>
+    
+  </Configuration>
+  
+
+  <Configuration name="lts" dbase="./data/lts" drivers="./drivers/lts"  output="./output/lts" 
+		 stations="./stations/lts" param="./param/lts">
+
+    <!--
+	Long term support version of RIO, with trendfunctions and long term averages fitted for 
+	all available stations between 2000 and 2011. Use this version for generation of consistent
+	timeseries over all years. This version also restricts which stations are effectively used 
+	in the interpolation itself.
+    -->
+
+    <Description>Long term support release for RIO, using trend functions based on 
+    statistics from 2000 - 2011.</Description>
+
+    <!-- this option is not implemented in fortran version: 
+	 <Option name="logtrans">false</Option>		
+    -->
+    <Pollutant name="pm10" desc="Particulate matter with diamter below 10 µm" 
+	       units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit>
+      <StationList>40ML01 40OB01 40SZ02 41B011 41MEU1 41N043 41R001 41R012 41WOL1 42N045
+      42R020 42R801 42R832 43H201 43R240 44M705 44N029 44R701 44R731 44R740 44R750 45R501
+      45R502 45R510 45R511 45R512
+      </StationList>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d">
+	<Grid name="4x4" grid_space="4000" />
+	<Aggregation name="da">
+	  <avgtrend type="poly2" ref_level="40." indic_lo="0.0" indic_hi="1.0" />
+          <stdtrend type="poly1" ref_level="10."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+	<Aggregation name="1h">
+	  <avgtrend type="poly2" ref_level="40." indic_lo="0.0" indic_hi="1.0" />
+          <stdtrend type="poly1" ref_level="10."  indic_lo="0.0" indic_hi="100.0" />
+	</Aggregation>
+      </Driver>
+    </Pollutant>
+    
+    <Pollutant name="no2" desc="Nitrogen dioxide" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit>
+      <StationList>40LD01 40ML01 40OB01 40SZ01 40SZ02 41B004 41B005 41B006 41B011 41MEU1
+      41N043 41R001 41R002 41R012 41WOL1 42N016 42R010 42R020 42R801 42R821 42R822 42R830
+      42R832 42R891 42R892 42R893 42R894 42R897 43N066 43N070 43N073 43N085 43N100 43N121
+      43N132 43R201 43R240 44M702 44N012 44N029 44R701 44R721 44R731 44R740 44R750 45R501
+      45R502 45R512</StationList>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d">
+        <Grid name="4x4" grid_space="4000" />
+        <Aggregation name="1h">
+          <avgtrend type="poly2" ref_level="70." indic_lo="0.0" indic_hi="1.4" />
+          <stdtrend type="poly1" ref_level="15." indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+        <Aggregation name="m1">
+          <avgtrend type="poly2" ref_level="70." indic_lo="0.0" indic_hi="1.4" />
+          <stdtrend type="poly1" ref_level="15." indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+        <Aggregation name="da">
+          <avgtrend type="poly2" ref_level="70." indic_lo="0.0" indic_hi="1.4" />
+          <stdtrend type="poly1" ref_level="15." indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+      </Driver>
+    </Pollutant>
+    
+    <Pollutant name="o3" desc="Ozone" units="µg/m3" scale="1">
+      <DetectionLimit>1</DetectionLimit>
+      <StationList>41B011 41N043 41R001 41R012 41WOL1 42N016 42N035 42N040 42N046 42N054
+      42R801 42R831 43N066 43N070 43N073 43N085 43N093 43N100 43N113 43N121 43N132 43R201
+      43R240 44M705 44N012 44N029 44N051 44R701 44R740 45R502</StationList>
+      <Driver name="clc06d" desc="Corine Land Cover 2006, version d">
+        <Grid name="4x4" grid_space="4000" />
+	<Aggregation name="da">
+          <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="0.91" />
+          <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+	<Aggregation name="1h">
+          <avgtrend type="poly2" ref_level="80." indic_lo="0.0" indic_hi="0.91" />
+          <stdtrend type="poly1" ref_level="30." indic_lo="0.0" indic_hi="100.0" />
+        </Aggregation>
+      </Driver>
+    </Pollutant>
+    
+  </Configuration>
+  
+</RIO>

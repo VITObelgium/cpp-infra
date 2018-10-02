@@ -62,7 +62,7 @@ void IRCELMeteoProvider::configure(const ConfigNode& configuration, const std::s
         _nodata.emplace(id, nodata.value());
     }
 
-    _pattern        = configuration.child("file_pattern").trimmedValue();
+    _pattern        = configuration.child("file_pattern").trimmed_value();
     _backsearch     = configuration.child("backward_search").value<int32_t>().value_or(_backsearch);
     _timeResolution = std::chrono::hours(configuration.child("resolution").value<int32_t>().value_or(0));
 

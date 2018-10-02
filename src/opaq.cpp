@@ -60,7 +60,7 @@ std::string readLogName(const std::string& config_file)
 {
     try {
         auto doc = inf::ConfigDocument::loadFromFile(config_file);
-        return std::string(doc.child("opaq").child("logFile").trimmedValue());
+        return std::string(doc.child("opaq").child("logFile").trimmed_value());
     } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
     }

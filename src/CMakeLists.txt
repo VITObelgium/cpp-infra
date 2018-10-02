@@ -17,6 +17,7 @@ if (MSVC)
     add_definitions(/wd4503)
 endif ()
 
+add_subdirectory(rio)
 add_subdirectory(plugins)
 add_subdirectory(opaq_core)
 
