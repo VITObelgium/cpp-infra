@@ -81,7 +81,7 @@ TEST_F(ConfigReaderTest, iterateNamedChildren)
 
 TEST_F(ConfigReaderTest, rootNode)
 {
-    EXPECT_EQ("xml", doc.rootNode().name());
+    EXPECT_EQ("xml", doc.root_node().name());
 }
 
 TEST_F(ConfigReaderTest, rootChildren)
