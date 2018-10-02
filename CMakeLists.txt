@@ -37,7 +37,7 @@ option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
-cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -317,6 +317,10 @@ if (INFRA_UI_COMPONENTS)
     )
 
     if (INFRA_UI_COMPONENTS_LOCATION)
+         if (NOT INFRA_GDAL)
+            message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
+         endif ()
+
         target_sources(uiinfra PRIVATE
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
         )

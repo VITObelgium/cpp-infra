@@ -12,7 +12,7 @@ namespace inf {
 
 /* Typedef for prototype of handler function. */
 typedef int (*ini_handler)(void* user, const char* section,
-    const char* name, const char* value);
+                           const char* name, const char* value);
 
 /* Typedef for prototype of fgets-style reader function. */
 typedef char* (*ini_reader)(char* str, int num, void* stream);
@@ -105,7 +105,7 @@ inline static char* strncpy0(char* dest, const char* src, size_t size)
 /* Same as ini_parse(), but takes an ini_reader function pointer instead of
    filename. Used for implementing custom or string-based I/O. */
 inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
-    void* user)
+                            void* user)
 {
 /* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK
@@ -246,7 +246,7 @@ std::vector<std::string> IniReader::sections() const
     return result;
 }
 
-std::optional<std::string_view> IniReader::getString(std::string_view section, std::string_view name) const noexcept
+std::optional<std::string_view> IniReader::get_string(std::string_view section, std::string_view name) const noexcept
 {
     std::optional<std::string_view> result;
 
@@ -261,45 +261,59 @@ std::optional<std::string_view> IniReader::getString(std::string_view section, s
     return result;
 }
 
-std::optional<long> IniReader::getInteger(std::string_view section, std::string_view name) const noexcept
+std::optional<int32_t> IniReader::get_int32(std::string_view section, std::string_view name) const noexcept
 {
-    std::optional<long> result;
+    std::optional<int32_t> result;
 
-    auto valueStr = getString(section, name);
+    auto valueStr = get_string(section, name);
     if (valueStr) {
-        char* end;
-        // This parses "1234" (decimal) and also "0x4D2" (hex)
-        long n = std::strtol(valueStr->data(), &end, 0);
-        if (end > valueStr->data()) {
-            result = n;
-        }
+        result = str::to_int32(*valueStr);
     }
 
     return result;
 }
 
-std::optional<unsigned long> IniReader::getUnsignedInteger(std::string_view section, std::string_view name) const noexcept
+std::optional<uint32_t> IniReader::get_uint32(std::string_view section, std::string_view name) const noexcept
 {
-    std::optional<long> result;
+    std::optional<uint32_t> result;
 
-    auto valueStr = getString(section, name);
+    auto valueStr = get_string(section, name);
     if (valueStr) {
-        char* end;
-        // This parses "1234" (decimal) and also "0x4D2" (hex)
-        long n = std::strtoul(valueStr->data(), &end, 0);
-        if (end > valueStr->data()) {
-            result = n;
-        }
+        result = str::to_uint32(*valueStr);
     }
 
     return result;
 }
 
-std::optional<double> IniReader::getReal(std::string_view section, std::string_view name) const noexcept
+std::optional<int64_t> IniReader::get_int64(std::string_view section, std::string_view name) const noexcept
+{
+    std::optional<int64_t> result;
+
+    auto valueStr = get_string(section, name);
+    if (valueStr) {
+        result = str::to_int64(*valueStr);
+    }
+
+    return result;
+}
+
+std::optional<uint64_t> IniReader::get_uint64(std::string_view section, std::string_view name) const noexcept
+{
+    std::optional<uint64_t> result;
+
+    auto valueStr = get_string(section, name);
+    if (valueStr) {
+        result = str::to_uint64(*valueStr);
+    }
+
+    return result;
+}
+
+std::optional<double> IniReader::get_double(std::string_view section, std::string_view name) const noexcept
 {
     std::optional<double> result;
 
-    auto valueStr = getString(section, name);
+    auto valueStr = get_string(section, name);
     if (valueStr) {
         char* end;
         double n = strtod(valueStr->data(), &end);
@@ -311,11 +325,11 @@ std::optional<double> IniReader::getReal(std::string_view section, std::string_v
     return result;
 }
 
-std::optional<bool> IniReader::getBool(std::string_view section, std::string_view name) const noexcept
+std::optional<bool> IniReader::get_bool(std::string_view section, std::string_view name) const noexcept
 {
     std::optional<bool> result;
 
-    auto valueStr = getString(section, name);
+    auto valueStr = get_string(section, name);
     if (valueStr) {
         // Convert to lower case to make string comparisons case-insensitive
         std::string lower = str::lowercase(*valueStr);

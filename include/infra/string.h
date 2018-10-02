@@ -52,6 +52,21 @@ std::optional<int32_t> to_int32(std::string_view str) noexcept;
 int32_t to_int32_value(std::string_view str);
 
 /*!
+ * \brief string conversion to signed 32bit integer
+ * \param str string to parse
+ * \return optional uint32_t that contains a value if the string contained a valid integer
+ */
+std::optional<uint32_t> to_uint32(std::string_view str) noexcept;
+
+/*!
+ * \brief string conversion to signed 32bit integer
+ * \param str string to parse
+ * \return that uint32 value
+ * \throw InvalidArgument if the input string does not contain a valid integer
+ */
+uint32_t to_uint32_value(std::string_view str);
+
+/*!
  * \brief string conversion to signed 64bit integer
  * \param str string to parse
  * \return optional int64_t that contains a value if the string contained a valid integer
@@ -65,6 +80,21 @@ std::optional<int64_t> to_int64(std::string_view str) noexcept;
  * \throw InvalidArgument if the input string does not contain a valid integer
  */
 int64_t to_int64_value(std::string_view str);
+
+/*!
+ * \brief string conversion to signed 64bit integer
+ * \param str string to parse
+ * \return optional uint64_t that contains a value if the string contained a valid integer
+ */
+std::optional<uint64_t> to_uint64(std::string_view str) noexcept;
+
+/*!
+ * \brief string conversion to signed 64bit integer
+ * \param str string to parse
+ * \return the uint64 value
+ * \throw InvalidArgument if the input string does not contain a valid integer
+ */
+uint64_t to_uint64_value(std::string_view str);
 
 /*!
  * \brief string conversion to float
@@ -107,8 +137,12 @@ std::optional<T> to_numeric(std::string_view str) noexcept
 {
     if constexpr (std::is_same_v<int32_t, T>) {
         return to_int32(str);
+    } else if constexpr (std::is_same_v<uint32_t, T>) {
+        return to_uint32(str);
     } else if constexpr (std::is_same_v<int64_t, T>) {
         return to_int64(str);
+    } else if constexpr (std::is_same_v<uint64_t, T>) {
+        return to_uint64(str);
     } else if constexpr (std::is_same_v<float, T>) {
         return to_float(str);
     } else if constexpr (std::is_same_v<double, T>) {

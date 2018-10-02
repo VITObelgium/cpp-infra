@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/cast.h"
+#include "infra/typetraits.h"
 
 #include <optional>
 #include <set>
@@ -27,37 +28,38 @@ public:
     std::optional<T> get(std::string_view section, std::string_view name) const noexcept
     {
         if constexpr (std::is_same_v<T, std::string>) {
-            return optional_cast<std::string>(getString(section, name));
+            return optional_cast<std::string>(get_string(section, name));
         } else if constexpr (std::is_same_v<T, std::string_view>) {
-            return getString(section, name);
-        } else if constexpr (std::is_same_v<T, unsigned int> || std::is_same_v<T, unsigned long>) {
-            return getUnsignedInteger(section, name);
-        } else if constexpr (std::is_same_v<T, int> || std::is_same_v<T, long>) {
-            return getInteger(section, name);
+            return get_string(section, name);
+        } else if constexpr (std::is_same_v<T, uint32_t>) {
+            return get_uint32(section, name);
+        } else if constexpr (std::is_same_v<T, int32_t>) {
+            return get_int32(section, name);
+        } else if constexpr (std::is_same_v<T, uint64_t>) {
+            return get_uint64(section, name);
+        } else if constexpr (std::is_same_v<T, int64_t>) {
+            return get_int64(section, name);
         } else if constexpr (std::is_same_v<T, double>) {
-            return getReal(section, name);
+            return get_double(section, name);
         } else if constexpr (std::is_same_v<T, float>) {
-            return optional_cast<float>(getReal(section, name));
+            return optional_cast<float>(get_double(section, name));
         } else if constexpr (std::is_same_v<T, bool>) {
-            return getBool(section, name);
+            return get_bool(section, name);
         } else {
             static_assert(dependent_false<T>::value, "Unsupported ini type provided");
         }
     }
 
     std::optional<std::string_view>
-    getString(std::string_view section, std::string_view name) const noexcept;
-    std::optional<long> getInteger(std::string_view section, std::string_view name) const noexcept;
-    std::optional<unsigned long> getUnsignedInteger(std::string_view section, std::string_view name) const noexcept;
-    std::optional<double> getReal(std::string_view section, std::string_view name) const noexcept;
-    std::optional<bool> getBool(std::string_view section, std::string_view name) const noexcept;
+    get_string(std::string_view section, std::string_view name) const noexcept;
+    std::optional<int32_t> get_int32(std::string_view section, std::string_view name) const noexcept;
+    std::optional<uint32_t> get_uint32(std::string_view section, std::string_view name) const noexcept;
+    std::optional<int64_t> get_int64(std::string_view section, std::string_view name) const noexcept;
+    std::optional<uint64_t> get_uint64(std::string_view section, std::string_view name) const noexcept;
+    std::optional<double> get_double(std::string_view section, std::string_view name) const noexcept;
+    std::optional<bool> get_bool(std::string_view section, std::string_view name) const noexcept;
 
 private:
-    template <class TInternal>
-    struct dependent_false : std::false_type
-    {
-    };
-
     std::unordered_map<std::string, std::unordered_map<std::string, std::string>> _values;
 
     static int valueHandler(void* user, const char* section, const char* name, const char* value);
