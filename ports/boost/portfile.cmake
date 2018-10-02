@@ -62,9 +62,24 @@ set (B2_OPTIONS
     address-model=${ADDRESS_MODEL}
 )
 
+set (B2_OPTIONS_DBG
+    --stagedir=${CURRENT_PACKAGES_DIR}/debug
+    --build-dir=${BUILD_PATH_DEBUG}
+    --user-config=${BUILD_PATH_DEBUG}/user-config-vcpkg.jam
+    variant=debug
+)
+
+set (B2_OPTIONS_REL
+    --prefix=${CURRENT_PACKAGES_DIR}
+    --build-dir=${BUILD_PATH_RELEASE}
+    --user-config=${BUILD_PATH_RELEASE}/user-config-vcpkg.jam
+    variant=release
+)
+
 if (NOT VCPKG_CMAKE_SYSTEM_NAME)
     # windows native build
     set(CONFIG_CMD bootstrap.bat)
+    set(BUILD_CMD b2)
     if(VCPKG_PLATFORM_TOOLSET MATCHES "v141")
         set (TOOLSET msvc-14.1)
     elseif(VCPKG_PLATFORM_TOOLSET MATCHES "v140")
@@ -78,6 +93,7 @@ if (NOT VCPKG_CMAKE_SYSTEM_NAME)
     endif ()
 else ()
     set(CONFIG_CMD sh ./bootstrap.sh)
+    set(BUILD_CMD ./b2)
     list(APPEND B2_OPTIONS --layout=system)
     set (TOOLSET gcc-vcpkg)
 endif ()
@@ -103,25 +119,29 @@ else()
 endif()
 
 if ("zlib" IN_LIST FEATURES)
-    list(APPEND B2_OPTIONS_DBG -s ZLIB_LIBRARY_PATH="${CURRENT_INSTALLED_DIR}/debug/lib")
-    list(APPEND B2_OPTIONS_REL -s ZLIB_LIBRARY_PATH="${CURRENT_INSTALLED_DIR}/lib")
-    list(APPEND B2_OPTIONS -s ZLIB_INCLUDE="${CURRENT_INSTALLED_DIR}/include")
+    list(APPEND B2_OPTIONS_DBG -s ZLIB_LIBRARY_PATH=${CURRENT_INSTALLED_DIR}/debug/lib)
+    list(APPEND B2_OPTIONS_REL -s ZLIB_LIBRARY_PATH=${CURRENT_INSTALLED_DIR}/lib)
+    if (NOT VCPKG_CMAKE_SYSTEM_NAME)
+        list(APPEND B2_OPTIONS_DBG -s ZLIB_NAME=zlibd)
+        list(APPEND B2_OPTIONS_REL -s ZLIB_NAME=zlib)
+    endif ()
+    list(APPEND B2_OPTIONS -s ZLIB_INCLUDE=${CURRENT_INSTALLED_DIR}/include)
 else ()
     list(APPEND B2_OPTIONS -s NO_ZLIB=1)
 endif ()
 
 if ("bzip2" IN_LIST FEATURES)
-    list(APPEND B2_OPTIONS_DBG -s BZIP2_LIBRARY_PATH="${CURRENT_INSTALLED_DIR}/debug/lib")
-    list(APPEND B2_OPTIONS_REL -s BZIP2_LIBRARY_PATH="${CURRENT_INSTALLED_DIR}/lib")
-    list(APPEND B2_OPTIONS -s BZIP2_INCLUDE="${CURRENT_INSTALLED_DIR}/include")
+    list(APPEND B2_OPTIONS_DBG -s BZIP2_LIBRARY_PATH=${CURRENT_INSTALLED_DIR}/debug/lib)
+    list(APPEND B2_OPTIONS_REL -s BZIP2_LIBRARY_PATH=${CURRENT_INSTALLED_DIR}/lib)
+    list(APPEND B2_OPTIONS -s BZIP2_INCLUDE=${CURRENT_INSTALLED_DIR}/include)
 else ()
     list(APPEND B2_OPTIONS -s NO_BZIP2=1)
 endif ()
 
 if ("lzma" IN_LIST FEATURES)
-    list(APPEND B2_OPTIONS_DBG -s LZMA_LIBRARY_PATH="${CURRENT_INSTALLED_DIR}/debug/lib")
-    list(APPEND B2_OPTIONS_REL -s LZMA_LIBRARY_PATH="${CURRENT_INSTALLED_DIR}/lib")
-    list(APPEND B2_OPTIONS -s LZMA_INCLUDE="${CURRENT_INSTALLED_DIR}/include")
+    list(APPEND B2_OPTIONS_DBG -s LZMA_LIBRARY_PATH=${CURRENT_INSTALLED_DIR}/debug/lib)
+    list(APPEND B2_OPTIONS_REL -s LZMA_LIBRARY_PATH=${CURRENT_INSTALLED_DIR}/lib)
+    list(APPEND B2_OPTIONS -s LZMA_INCLUDE=${CURRENT_INSTALLED_DIR}/include)
 else ()
     list(APPEND B2_OPTIONS -s NO_LZMA=1)
 endif ()
@@ -174,29 +194,18 @@ vcpkg_execute_required_process(
 )
 
 message(STATUS "Building ${TARGET_TRIPLET}-dbg")
+if (VCPKG_VERBOSE)
+    message(STATUS "COMMAND ${BUILD_CMD} ${B2_OPTIONS_DBG} ${B2_OPTIONS} stage")
+endif ()
 vcpkg_execute_required_process(
-    COMMAND ./b2
-    --stagedir=${CURRENT_PACKAGES_DIR}/debug
-    --build-dir=${BUILD_PATH_DEBUG}
-    --user-config=${BUILD_PATH_DEBUG}/user-config-vcpkg.jam
-    "${B2_OPTIONS_DBG}"
-    "${B2_OPTIONS}"
-    variant=debug
-    stage
+    COMMAND ${BUILD_CMD} ${B2_OPTIONS_DBG} ${B2_OPTIONS} stage
     WORKING_DIRECTORY ${SOURCE_PATH}
     LOGNAME ${PORT}-build-${TARGET_TRIPLET}-debug
 )
 
 message(STATUS "Building ${TARGET_TRIPLET}-rel")
 vcpkg_execute_required_process(
-    COMMAND ./b2
-    --prefix=${CURRENT_PACKAGES_DIR}
-    --build-dir=${BUILD_PATH_RELEASE}
-    --user-config=${BUILD_PATH_RELEASE}/user-config-vcpkg.jam
-    "${B2_OPTIONS_REL}"
-    "${B2_OPTIONS}"
-    variant=release
-    install
+    COMMAND ${BUILD_CMD} ${B2_OPTIONS_REL} ${B2_OPTIONS} install
     WORKING_DIRECTORY ${SOURCE_PATH}
     LOGNAME ${PORT}-build-${TARGET_TRIPLET}-release
 )
