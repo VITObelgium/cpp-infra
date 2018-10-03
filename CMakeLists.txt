@@ -164,9 +164,9 @@ if (INFRA_LOGGING)
 endif ()
 
 if (INFRA_XML)
-    find_package(pugixml REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
-    target_sources(infra PRIVATE xmldocument.cpp)
+    find_package(pugixml CONFIG REQUIRED)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/configdocument.h)
+    target_sources(infra PRIVATE configdocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
 endif ()
 
