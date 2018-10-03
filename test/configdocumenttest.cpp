@@ -1,9 +1,9 @@
-#include "infra/configdocument.h"
+#include "infra/xmldocument.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-namespace infra::test {
+namespace inf::test {
 
 using namespace testing;
 
@@ -25,10 +25,10 @@ class ConfigReaderTest : public Test
 protected:
     ConfigReaderTest()
     {
-        doc = ConfigDocument::loadFromString(s_xmlData);
+        doc = XmlDocument::load_from_string(s_xmlData);
     }
 
-    ConfigDocument doc;
+    XmlDocument doc;
 };
 
 TEST_F(ConfigReaderTest, readFromString)
@@ -36,16 +36,16 @@ TEST_F(ConfigReaderTest, readFromString)
     EXPECT_EQ("5", doc.child("xml").child("node1").attribute("attr1"));
     EXPECT_EQ("6", doc.child("xml").child("node1").child("subnode1").attribute("attr1"));
 
-    EXPECT_EQ("5", doc.selectChild("xml.node1").attribute("attr1"));
-    EXPECT_EQ("6", doc.selectChild("xml.node1.subnode1").attribute("attr1"));
+    EXPECT_EQ("5", doc.select_child("xml.node1").attribute("attr1"));
+    EXPECT_EQ("6", doc.select_child("xml.node1.subnode1").attribute("attr1"));
 
     auto xmlNode = doc.child("xml");
-    EXPECT_EQ("5", xmlNode.selectChild("node1").attribute("attr1"));
-    EXPECT_EQ("6", xmlNode.selectChild("node1.subnode1").attribute("attr1"));
+    EXPECT_EQ("5", xmlNode.select_child("node1").attribute("attr1"));
+    EXPECT_EQ("6", xmlNode.select_child("node1.subnode1").attribute("attr1"));
 
-    EXPECT_EQ("\n            aValue\n        ", xmlNode.selectChild("node2").value());
-    EXPECT_EQ("aValue", xmlNode.selectChild("node2").trimmedValue());
-    EXPECT_EQ("some text", xmlNode.selectChild("node3").value());
+    EXPECT_EQ("\n            aValue\n        ", xmlNode.select_child("node2").value());
+    EXPECT_EQ("aValue", xmlNode.select_child("node2").trimmed_value());
+    EXPECT_EQ("some text", xmlNode.select_child("node3").value());
 }
 
 TEST_F(ConfigReaderTest, iterateChildren)
@@ -81,7 +81,7 @@ TEST_F(ConfigReaderTest, iterateNamedChildren)
 
 TEST_F(ConfigReaderTest, rootNode)
 {
-    EXPECT_EQ("xml", doc.rootNode().name());
+    EXPECT_EQ("xml", doc.root_node().name());
 }
 
 TEST_F(ConfigReaderTest, rootChildren)
