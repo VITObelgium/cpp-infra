@@ -59,6 +59,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(opaqui
     opaqcore
     opaqplugins
+    uiinfra
     Qt5::Gui
     Qt5::Charts
     Qt5::Widgets

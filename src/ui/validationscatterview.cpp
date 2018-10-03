@@ -4,20 +4,19 @@
 #include "validationresultsmodel.h"
 
 #include <QtCharts/QChart>
-#include <QtCharts/QValueAxis>
 #include <QtCharts/QChartView>
 #include <QtCharts/QHXYModelMapper>
 #include <QtCharts/QLegendMarker>
-#include <QtCharts/QScatterSeries>
 #include <QtCharts/QLineSeries>
+#include <QtCharts/QScatterSeries>
 #include <QtCharts/QSplineSeries>
+#include <QtCharts/QValueAxis>
 
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTableView>
 
-namespace opaq
-{
+namespace opaq {
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -36,7 +35,6 @@ ValidationScatterView::ValidationScatterView(QWidget* parent)
 
     auto* chartView = new QChartView(_chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(640, 480);
 
     _axisX = new QValueAxis();
     _axisX->setRange(0, 75);
@@ -50,11 +48,10 @@ ValidationScatterView::ValidationScatterView(QWidget* parent)
 
     // Add reference lines
     addReferenceOriginLine(500, 1000, Qt::PenStyle::DashLine, QColor(Qt::GlobalColor::black)); //   2x
-    addReferenceOriginLine(500, 500, Qt::PenStyle::SolidLine, QColor(Qt::GlobalColor::red));  //    x
+    addReferenceOriginLine(500, 500, Qt::PenStyle::SolidLine, QColor(Qt::GlobalColor::red));   //    x
     addReferenceOriginLine(500, 250, Qt::PenStyle::DashLine, QColor(Qt::GlobalColor::black));  // 0.5x
 
-    for (auto* marker : _chart->legend()->markers())
-    {
+    for (auto* marker : _chart->legend()->markers()) {
         marker->setVisible(false);
     }
 
@@ -66,8 +63,7 @@ ValidationScatterView::ValidationScatterView(QWidget* parent)
 
 void ValidationScatterView::setModel(ValidationResultsModel& model)
 {
-    for (auto* series : _modelSeries)
-    {
+    for (auto* series : _modelSeries) {
         _chart->removeSeries(series);
     }
 
@@ -75,8 +71,7 @@ void ValidationScatterView::setModel(ValidationResultsModel& model)
     _model = &model;
 
     auto rowCount = model.rowCount() - 1;
-    for (int i = 1; i < rowCount; i += 2)
-    {
+    for (int i = 1; i < rowCount; i += 2) {
         auto* series = new QScatterSeries();
         series->setMarkerSize(5.0);
         series->setName(model.headerData(i, Qt::Orientation::Horizontal, Qt::DisplayRole).value<QString>());
@@ -93,12 +88,11 @@ void ValidationScatterView::setModel(ValidationResultsModel& model)
         _modelSeries.push_back(series);
     }
 
-    for (auto* marker : _chart->legend()->markers())
-    {
+    for (auto* marker : _chart->legend()->markers()) {
         // Disconnect possible existing connection to avoid multiple connections
         disconnect(marker, &QLegendMarker::clicked, this, &ValidationScatterView::handleMarkerClicked);
         disconnect(marker, &QLegendMarker::hovered, this, &ValidationScatterView::handleMarkerHovered);
-        
+
         connect(marker, &QLegendMarker::clicked, this, &ValidationScatterView::handleMarkerClicked);
         connect(marker, &QLegendMarker::hovered, this, &ValidationScatterView::handleMarkerHovered);
     }
@@ -109,16 +103,13 @@ void ValidationScatterView::handleMarkerHovered(bool status)
     QLegendMarker* marker = qobject_cast<QLegendMarker*>(sender());
     Q_ASSERT(marker);
 
-    if (status)
-    {
+    if (status) {
         auto modelName = marker->series()->name().toStdString();
         _chart->legend()->setToolTip(QString("<b>RMSE</b>: %1<br/><b>BIAS</b>: %2<br/><b>R&sup2;</b>: %3")
-            .arg(_model->getRootMeanSquareError(modelName))
-            .arg(_model->getBias(modelName))
-            .arg(_model->getRSquare(modelName)));
-    }
-    else
-    {
+                                         .arg(_model->getRootMeanSquareError(modelName))
+                                         .arg(_model->getBias(modelName))
+                                         .arg(_model->getRSquare(modelName)));
+    } else {
         _chart->legend()->setToolTip("");
     }
 }
@@ -128,10 +119,8 @@ void ValidationScatterView::handleMarkerClicked()
     QLegendMarker* marker = qobject_cast<QLegendMarker*>(sender());
     Q_ASSERT(marker);
 
-    switch (marker->type())
-    {
-    case QLegendMarker::LegendMarkerTypeXY:
-    {
+    switch (marker->type()) {
+    case QLegendMarker::LegendMarkerTypeXY: {
         // Toggle visibility of series
         marker->series()->setVisible(!marker->series()->isVisible());
 
@@ -142,8 +131,7 @@ void ValidationScatterView::handleMarkerClicked()
         // Dim the marker, if series is not visible
         qreal alpha = 1.0;
 
-        if (!marker->series()->isVisible())
-        {
+        if (!marker->series()->isVisible()) {
             alpha = 0.5;
         }
 
@@ -190,4 +178,3 @@ void ValidationScatterView::addReferenceOriginLine(double x, double y, Qt::PenSt
 }
 
 }
-

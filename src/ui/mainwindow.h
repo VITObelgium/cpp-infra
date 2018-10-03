@@ -4,8 +4,8 @@
 
 #include <QMainWindow>
 
-class ToolBar;
-QT_FORWARD_DECLARE_CLASS(QMenu)
+QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
+QT_FORWARD_DECLARE_CLASS(QDockWidget)
 
 namespace opaq {
 
@@ -14,12 +14,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    typedef QMap<QString, QSize> CustomSizeHintMap;
-
-    MainWindow();
+    MainWindow(const std::shared_ptr<QAbstractItemModel>& logSink, QWidget* parent = nullptr);
 
 private:
-    Ui::MainWindow _ui;
-};
+    void setupDockWidgets();
 
+    Ui::MainWindow _ui;
+    std::shared_ptr<QAbstractItemModel> _logModel;
+    QDockWidget* _diagnoseDockWidget = nullptr;
+};
 }

@@ -4,6 +4,8 @@
 #include "infra/log.h"
 #include "mainwindow.h"
 #include "opaqconfig.h"
+#include "uiinfra/application.h"
+#include "uiinfra/logsinkmodel.h"
 
 #ifdef STATIC_QT
 #if defined WIN32
@@ -21,16 +23,17 @@ int main(int argc, char* argv[])
     QCoreApplication::addLibraryPath("./plugins");
 #endif
 
-    Log::add_console_sink(Log::Colored::On);
+    auto logSinkModel = std::make_shared<uiinfra::LogSinkModelMt>();
+    Log::add_custom_sink(logSinkModel);
     LogRegistration logging("opaq");
 
-    QApplication app(argc, argv);
+    uiinfra::Application app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");
     QCoreApplication::setOrganizationDomain("vito.be");
     QCoreApplication::setApplicationName("Opaq");
     QCoreApplication::setApplicationVersion(OPAQ_VERSION);
 
-    opaq::MainWindow mainWin;
+    opaq::MainWindow mainWin(logSinkModel);
     mainWin.setMinimumSize(640, 480);
     mainWin.show();
     return app.exec();

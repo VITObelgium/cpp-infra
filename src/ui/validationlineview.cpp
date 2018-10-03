@@ -4,16 +4,15 @@
 #include "validationresultsmodel.h"
 
 #include <QtCharts/QChartView>
-#include <QtCharts/QSplineSeries>
 #include <QtCharts/QHXYModelMapper>
 #include <QtCharts/QLegendMarker>
+#include <QtCharts/QSplineSeries>
 
 #include <QtWidgets/QGridLayout>
 #include <QtWidgets/QHeaderView>
 #include <QtWidgets/QTableView>
 
-namespace opaq
-{
+namespace opaq {
 
 QT_CHARTS_USE_NAMESPACE
 
@@ -31,7 +30,6 @@ ValidationLineView::ValidationLineView(QWidget* parent)
 
     auto* chartView = new QChartView(_chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(640, 480);
 
     _axisX = new QValueAxis();
     _axisX->setRange(0, 75);
@@ -56,14 +54,13 @@ void ValidationLineView::setModel(ValidationResultsModel& model)
     _axisX->setRange(0, model.columnCount());
 
     auto rowCount = model.rowCount() - 1;
-    for (int i = 1; i < rowCount; i+=2)
-    {
+    for (int i = 1; i < rowCount; i += 2) {
         auto* series = new QSplineSeries();
         series->setName(model.headerData(i, Qt::Orientation::Horizontal, Qt::DisplayRole).value<QString>());
         auto* mapper = new QHXYModelMapper(this);
 
         mapper->setXRow(0);
-        mapper->setYRow(i+1);
+        mapper->setYRow(i + 1);
         mapper->setSeries(series);
         mapper->setModel(&model);
         _chart->addSeries(series);
@@ -71,8 +68,7 @@ void ValidationLineView::setModel(ValidationResultsModel& model)
         series->attachAxis(_axisY);
     }
 
-    if (rowCount > 0)
-    {
+    if (rowCount > 0) {
         auto* series = new QSplineSeries();
         series->setName(tr("Observed"));
         auto* mapper = new QHXYModelMapper(this);
@@ -86,8 +82,7 @@ void ValidationLineView::setModel(ValidationResultsModel& model)
         series->attachAxis(_axisY);
     }
 
-    for (auto* marker : _chart->legend()->markers())
-    {
+    for (auto* marker : _chart->legend()->markers()) {
         // Disconnect possible existing connection to avoid multiple connections
         disconnect(marker, &QLegendMarker::clicked, this, &ValidationLineView::handleMarkerClicked);
         connect(marker, &QLegendMarker::clicked, this, &ValidationLineView::handleMarkerClicked);
@@ -99,10 +94,8 @@ void ValidationLineView::handleMarkerClicked()
     QLegendMarker* marker = qobject_cast<QLegendMarker*>(sender());
     Q_ASSERT(marker);
 
-    switch (marker->type())
-    {
-    case QLegendMarker::LegendMarkerTypeXY:
-    {
+    switch (marker->type()) {
+    case QLegendMarker::LegendMarkerTypeXY: {
         // Toggle visibility of series
         marker->series()->setVisible(!marker->series()->isVisible());
 
@@ -113,8 +106,7 @@ void ValidationLineView::handleMarkerClicked()
         // Dim the marker, if series is not visible
         qreal alpha = 1.0;
 
-        if (!marker->series()->isVisible())
-        {
+        if (!marker->series()->isVisible()) {
             alpha = 0.5;
         }
 

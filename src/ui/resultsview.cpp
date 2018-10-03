@@ -31,7 +31,6 @@ ResultsView::ResultsView(QWidget* parent)
 
     auto* chartView = new QChartView(_chart);
     chartView->setRenderHint(QPainter::Antialiasing);
-    chartView->setMinimumSize(640, 480);
 
     _axisX = new QValueAxis();
     _axisX->setRange(0, 4);
