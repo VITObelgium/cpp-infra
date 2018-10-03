@@ -92,9 +92,9 @@ std::optional<std::string_view> XmlNode::optional_value() const
 {
     std::optional<std::string_view> result;
 
-    auto* name = _pimpl->node.name();
-    if (std::strlen(name) > 0) {
-        result = std::string_view(name);
+    auto nodeValue = value();
+    if (!nodeValue.empty()) {
+        result = nodeValue;
     }
 
     return result;

@@ -81,7 +81,9 @@ public:
 
     ~Handle()
     {
-        std::fclose(ptr);
+        if (ptr) {
+            std::fclose(ptr);
+        }
     }
 
     bool is_open() const
