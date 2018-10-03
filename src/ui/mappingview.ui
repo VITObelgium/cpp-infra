@@ -227,23 +227,10 @@
         <item row="5" column="2">
          <widget class="QDateEdit" name="dateEdit"/>
         </item>
-        <item row="5" column="4">
-         <widget class="QDateEdit" name="dateEdit_2"/>
-        </item>
         <item row="5" column="0">
          <widget class="QLabel" name="label_6">
           <property name="text">
            <string>Start date:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="3">
-         <widget class="QLabel" name="label_7">
-          <property name="text">
-           <string>Stop date:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

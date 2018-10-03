@@ -18,7 +18,7 @@ cell::cell(size_t fid, double cx, double cy, double size, double alt)
     double ymin = _cy - .5 * _size;
     double ymax = _cy + .5 * _size;
 
-    _wkt = fmt::format("POLYGON(({.2f} {.2f}, {.2f} {.2f}, {.2f} {.2f}, {.2f} {.2f}, {.2f} {.2f} ))", xmin, ymin, xmax, ymin, xmax, ymax, xmin, ymax, xmin, ymin);
+    _wkt = fmt::format("POLYGON(({:.2f} {:.2f}, {:.2f} {:.2f}, {:.2f} {:.2f}, {:.2f} {:.2f}, {:.2f} {:.2f} ))", xmin, ymin, xmax, ymin, xmax, ymax, xmin, ymax, xmin, ymin);
 }
 
 cell::~cell()
