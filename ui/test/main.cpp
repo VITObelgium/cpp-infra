@@ -1,4 +1,3 @@
-#include "infra/gdal.h"
 #include "infra/log.h"
 
 #include <cstdlib>
