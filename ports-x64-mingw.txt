@@ -25,3 +25,4 @@ restinio[boost]
 sqlite3
 sqlpp11
 sqlpp11-connector-sqlite3
+boost[iostreams,zlib,program-options,regex,filesystem,thread,system,date-time]

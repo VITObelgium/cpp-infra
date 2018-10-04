@@ -18,6 +18,9 @@ target_compile_definitions(sqlite3 PRIVATE
     )
 target_include_directories(sqlite3 INTERFACE $<INSTALL_INTERFACE:include>)
 
+find_package(Threads REQUIRED)
+target_link_libraries(sqlite3 PRIVATE Threads::Threads ${CMAKE_DL_LIBS})
+
 if(CMAKE_SYSTEM_NAME MATCHES "WindowsStore")
     target_compile_definitions(sqlite3 PRIVATE -DSQLITE_OS_WINRT=1)
 endif()

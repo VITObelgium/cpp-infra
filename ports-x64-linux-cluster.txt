@@ -36,4 +36,4 @@ sqlpp11
 mapnik[gdal]
 sqlpp11-connector-sqlite3
 sqlpp11-connector-postgresql
-boost[iostreams,zlib,program-options,regex,filesystem,thread,system]
+boost[iostreams,zlib,program-options,regex,filesystem,thread,system,date-time]

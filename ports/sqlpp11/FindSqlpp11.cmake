@@ -1,4 +1,5 @@
 include(FindPackageHandleStandardArgs)
+include(CMakeFindDependencyMacro)
 
 find_path(Sqlpp11_INCLUDE_DIR
     NAMES sqlpp11/sqlpp11.h
@@ -39,8 +40,8 @@ find_package_handle_standard_args(Sqlpp11_Postgresql
     REQUIRED_VARS Sqlpp11_Postgresql_INCLUDE_DIR Sqlpp11_Postgresql_LIBRARY
 )
 
-find_package(sqlite3 CONFIG)
-find_package(PostgreSQL)
+find_dependency(sqlite3 CONFIG)
+find_dependency(PostgreSQL)
 
 mark_as_advanced(
     Sqlpp11_ROOT_DIR
