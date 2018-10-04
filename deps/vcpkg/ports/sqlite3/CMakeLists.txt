@@ -36,11 +36,13 @@ if(NOT SQLITE3_SKIP_TOOLS)
     )
 endif()
 
-install(TARGETS sqlite3 EXPORT sqlite3Config
+install(
+    TARGETS sqlite3
+    EXPORT sqlite3
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
 )
 
 install(FILES sqlite3.h sqlite3ext.h DESTINATION include CONFIGURATIONS Release)
-install(EXPORT sqlite3Config DESTINATION share/sqlite3)
+install(EXPORT sqlite3 FILE sqlite3-targets.cmake DESTINATION share/sqlite3)
