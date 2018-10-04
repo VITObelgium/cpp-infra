@@ -1,7 +1,6 @@
 find_package(fmt CONFIG REQUIRED)
 find_package(spdlog CONFIG REQUIRED)
 find_package(Threads)
-find_package(OpenSSL REQUIRED)
 find_package(Boost REQUIRED COMPONENTS system iostreams program_options)
 
 if (MSVC)

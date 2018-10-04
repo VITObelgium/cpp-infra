@@ -1,5 +1,6 @@
 find_package(hdf5 CONFIG REQUIRED)
 find_package(Sqlpp11 REQUIRED)
+find_package(ZLIB REQUIRED)
 
 add_library(opaqplugins
     PluginFactory.h
@@ -62,13 +63,20 @@ add_library(opaqplugins
     mapping/InverseDistanceWeighting.cpp
 )
 
+# hdf5 does not set zlib as a dependency
+get_target_property(HDF5_LINK_LIBRARIES hdf5::hdf5-static INTERFACE_LINK_LIBRARIES)
+list(APPEND HDF5_LINK_LIBRARIES ZLIB::ZLIB)
+set_target_properties(hdf5::hdf5-static PROPERTIES
+     INTERFACE_LINK_LIBRARIES "${HDF5_LINK_LIBRARIES}"
+)
+
 target_link_libraries(opaqplugins PRIVATE
     opaqcore
+    infra
     hdf5::hdf5_cpp-static
     Sqlpp11::Sqlpp11
     Sqlpp11::Sqlite3
     Eigen3::Eigen
-    infra
 )
 
 if (OPAQ_ENABLE_POSTGRESQL)
