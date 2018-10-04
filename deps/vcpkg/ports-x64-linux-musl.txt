@@ -27,4 +27,4 @@ http-parser
 pugixml
 restinio[boost]
 sqlite3
-boost[iostreams,zlib,program-options,regex,filesystem,thread,system]
+boost[iostreams,zlib,program-options,regex,filesystem,thread,system,date-time]
