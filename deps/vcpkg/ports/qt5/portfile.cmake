@@ -36,6 +36,8 @@ vcpkg_apply_patches(
     ${CMAKE_CURRENT_LIST_DIR}/mingw-cmake-prl-file-has-no-lib-prefix.patch
  )
 
+ set(OSX_LEGACY_SDK OFF)
+
  # z lib name is zlib.lib on windows, not zdll.lib
  vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/configure.json "-lzdll" "-lzlib")
  # jpeg lib name is jpeg.lib on windows, not libjpeg.lib
@@ -119,11 +121,20 @@ elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PLATFORM_OPTIONS -no-pch -c++std c++1z)
     #-device-option CROSS_COMPILE=${CROSS}
 elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+    if (OSX_LEGACY_SDK)
+        set(OSX_SDK_VERSION 10.13)
+        list(APPEND PLATFORM_OPTIONS -c++std c++14)
+    else ()
+        set(OSX_SDK_VERSION 10.14)
+        list(APPEND PLATFORM_OPTIONS -c++std c++1z)
+    endif ()
+
+    list(APPEND PLATFORM_OPTIONS -no-pch -sdk macosx${OSX_SDK_VERSION})
+
     vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/mkspecs/macx-clang/qmake.conf
         "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.11"
-        "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.14"
+        "QMAKE_MACOSX_DEPLOYMENT_TARGET = ${OSX_SDK_VERSION}"
     )
-    list(APPEND PLATFORM_OPTIONS -no-pch -c++std c++1z -sdk macosx10.14)
 elseif (MINGW AND (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin"))
     set(PLATFORM -xplatform win32-g++)
     list(APPEND PLATFORM_OPTIONS -opengl desktop)

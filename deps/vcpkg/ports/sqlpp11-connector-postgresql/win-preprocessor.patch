@@ -1,0 +1,12 @@
+diff -Naur a/src/prepared_statement.cpp b/src/prepared_statement.cpp
+--- a/src/prepared_statement.cpp	2018-03-18 14:52:10.000000000 +0100
++++ b/src/prepared_statement.cpp	2018-10-07 09:23:21.000000000 +0200
+@@ -157,7 +157,7 @@
+          // only update once an hour
+          if (now - last_query > 3600)
+          {
+-#ifdef _WINDOWS
++#ifdef _WIN32
+             offset = -_timezone;
+ #else
+             struct tm* tm  = std::localtime(&now);
