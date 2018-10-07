@@ -9,12 +9,9 @@ vcpkg_from_github(
     REF ${VERSION}
     SHA512 0d26dc80e6e7d9f13e95c6aaf9b7550aa86298010e4ddd35af6cc43eed315da78eb343034691117583140be393da7af6e7c53b4e429db37023171159d79dcb7c
     HEAD_REF master
-)
-
-vcpkg_apply_patches(
-    SOURCE_PATH ${SOURCE_PATH}
     PATCHES
-    ${CMAKE_CURRENT_LIST_DIR}/disable-shared.patch
+        ${CMAKE_CURRENT_LIST_DIR}/disable-shared.patch
+        ${CMAKE_CURRENT_LIST_DIR}/win-preprocessor.patch
 )
 
 vcpkg_configure_cmake(

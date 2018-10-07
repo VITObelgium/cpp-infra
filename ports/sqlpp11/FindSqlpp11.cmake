@@ -40,8 +40,8 @@ find_package_handle_standard_args(Sqlpp11_Postgresql
     REQUIRED_VARS Sqlpp11_Postgresql_INCLUDE_DIR Sqlpp11_Postgresql_LIBRARY
 )
 
-find_dependency(sqlite3 CONFIG)
-find_dependency(PostgreSQL)
+find_package(sqlite3 CONFIG QUIET)
+find_package(PostgreSQL QUIET)
 
 mark_as_advanced(
     Sqlpp11_ROOT_DIR
