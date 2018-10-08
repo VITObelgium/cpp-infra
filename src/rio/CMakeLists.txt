@@ -45,7 +45,7 @@ add_library(rio
     outputhandler.hpp outputhandler.cpp
     asciiwriter.hpp asciiwriter.cpp
     ircelwriter.hpp ircelwriter.cpp
-    apswriter.hpp apswriter.cpp 
+    apswriter.hpp apswriter.cpp
     h5writer.hpp h5writer.cpp
     jsonwriter.hpp jsonwriter.cpp
 )

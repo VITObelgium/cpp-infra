@@ -36,7 +36,7 @@ XmlNode getElementByAttribute(const inf::XmlNode& parent, const std::string& chi
 
     for (auto& el : parent.children(childName)) {
         if (refDoc) {
-            auto refPath = fs::path(el.attribute("ref"));
+            auto refPath = fs::path(std::string(el.attribute("ref")));
             if (!refPath.empty()) {
                 // ref attribute found
                 if (fs::exists(refPath)) {
@@ -92,7 +92,7 @@ inf::XmlNode getElementByAttributesList(const inf::XmlNode& parent, const std::s
 
     for (auto& el : parent.children(childName)) {
         if (refDoc != nullptr) {
-            auto refPath = fs::path(el.attribute("ref"));
+            auto refPath = fs::path(std::string(el.attribute("ref")));
             if (!refPath.empty()) {
                 // ref attribute found
                 if (fs::exists(refPath)) {
