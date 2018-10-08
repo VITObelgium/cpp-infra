@@ -16,7 +16,7 @@ function(vcpkg_assemble_compiler_flags CXXFLAGS_DEBUG CXXFLAGS_RELEASE)
     if (CMAKE_C_FLAGS_INIT)
         set (_calc_FLAGS "${CMAKE_C_FLAGS_INIT}")
     else ()
-        set (_calc_FLAGS "${CMAKE_C_FLAGS_INIT}")
+        set (_calc_FLAGS "-std=c++17")
     endif ()
 
     if (CMAKE_C_FLAGS_INIT_DEBUG)
