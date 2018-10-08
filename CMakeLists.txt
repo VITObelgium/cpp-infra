@@ -294,6 +294,10 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
         include/uiinfra/clearableabstractitemmodel.h
         include/uiinfra/colorconversion.h
+        include/uiinfra/coloredrectangledelegate.h ui/coloredrectangledelegate.cpp
+        include/uiinfra/colorcombobox.h ui/colorcombobox.cpp
+        include/uiinfra/colormapcombobox.h ui/colormapcombobox.cpp
+        include/uiinfra/containerconversion.h
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
@@ -301,6 +305,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/delegatecombobox.h ui/delegatecombobox.cpp
         include/uiinfra/readonlyproxy.h
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
+        include/uiinfra/gradientdelegate.h ui/gradientdelegate.cpp
         include/uiinfra/scopedcursor.h
         include/uiinfra/toolboxview.h ui/toolboxview.cpp
         include/uiinfra/treemodel.h ui/treemodel.cpp
