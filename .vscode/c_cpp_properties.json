@@ -2,15 +2,10 @@
     "configurations": [
         {
             "name": "Mac",
-            "compileCommands": "${workspaceRoot}/build/opaq-clang/compile_commands.json",
-            "cppStandard": "c++17",
-            "includePath": [
-                "${workspaceRoot}/build/local-toolchain-clang/include"
-            ]
+            "cppStandard": "c++17"
         },
         {
             "name": "Linux",
-            "compileCommands": "${workspaceRoot}/build/opaq-gcc/compile_commands.json",
             "cppStandard": "c++17"
         }
     ],
