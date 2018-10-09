@@ -241,7 +241,7 @@ private:
 
     void prepareStatements()
     {
-#ifndef _WIN32
+#ifndef _MSC_VER
         _statements.addPrediction         = _db.prepare(addPredictionQuery());
         _statements.getPrediction         = _db.prepare(getPredictionQuery());
         _statements.getPredictions        = _db.prepare(getPredictionsQuery());
