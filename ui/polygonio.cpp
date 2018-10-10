@@ -59,12 +59,12 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, const gdal::Coor
             break;
         }
         case gdal::Geometry::Type::MultiLine: {
-            QGeoPath path;
             auto multiLine = geometry.as<gdal::MultiLine>();
             for (int i = 0; i < multiLine.size(); ++i) {
+                QGeoPath path;
                 addLineToGeoPath(transformer, path, multiLine.line_at(i));
+                geoPaths.push_back(path);
             }
-            geoPaths.push_back(path);
             break;
         }
         case gdal::Geometry::Type::Polygon: {
