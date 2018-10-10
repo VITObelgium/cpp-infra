@@ -13,4 +13,9 @@ ToolboxItem::ToolboxItem(const QString& label, const QIcon& icon, QWidget* paren
 }
 
 ToolboxItem::~ToolboxItem() = default;
+
+void ToolboxItem::setText(const QString& text)
+{
+    _ui.label->setText(text);
+}
 }

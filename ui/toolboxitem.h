@@ -12,6 +12,8 @@ public:
     explicit ToolboxItem(const QString& label, const QIcon& icon, QWidget* parent = nullptr);
     ~ToolboxItem() override;
 
+    void setText(const QString& text);
+
 signals:
     void clicked();
 
