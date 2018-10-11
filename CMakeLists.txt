@@ -311,6 +311,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/treemodel.h ui/treemodel.cpp
         include/uiinfra/userinteraction.h ui/userinteraction.cpp
         include/uiinfra/stringinputdialog.h ui/stringinputdialog.cpp
+        include/uiinfra/stringconversion.h
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
         include/uiinfra/numericitemdelegates.h ui/numericitemdelegates.cpp
