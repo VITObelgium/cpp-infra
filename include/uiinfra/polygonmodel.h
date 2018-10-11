@@ -55,4 +55,41 @@ private:
     std::vector<std::pair<const PolygonData*, const QGeoPath*>> _visibleData;
     std::vector<QString> _visibleNames;
 };
+
+class PolygonModel2 : public QAbstractListModel
+{
+    Q_OBJECT
+
+public:
+    enum Roles
+    {
+        PathRole = Qt::UserRole + 1,
+        DisplayNameRole,
+        NameRole,
+        LineColorRole,
+        LineWidthRole
+    };
+
+    PolygonModel2(QObject* parent = nullptr);
+
+    QHash<int, QByteArray> roleNames() const override;
+    int rowCount(const QModelIndex& parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex& parent = QModelIndex()) const override;
+    QVariant data(const QModelIndex& index, int role = Qt::DisplayRole) const override;
+
+    void setPolygonData(std::shared_ptr<std::vector<PolygonData>> data);
+    void setVisibleData(std::vector<QString> names);
+    std::vector<QString> visibleData() const;
+
+    void clear();
+
+private:
+    void updateVisibleData();
+
+    int _rowCount;
+    int _colCount;
+    std::shared_ptr<std::vector<PolygonData>> _data;
+    std::vector<std::pair<const PolygonData*, QVariantList>> _visibleData;
+    std::vector<QString> _visibleNames;
+};
 }
