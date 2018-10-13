@@ -13,8 +13,8 @@ namespace uiinfra {
 class TreeNode
 {
 public:
-    TreeNode()  = default;
-    ~TreeNode() = default;
+    TreeNode()          = default;
+    virtual ~TreeNode() = default;
 
     TreeNode(TreeNode& parent)
     : _parent(&parent)
