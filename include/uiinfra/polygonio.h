@@ -16,6 +16,7 @@ namespace uiinfra {
 
 using OverlayMap = std::unordered_map<QString, std::vector<QGeoPath>>;
 
+std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg);
 OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg);
 std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, const inf::gdal::CoordinateTransformer& transformer);
 
