@@ -609,6 +609,20 @@ const char* Layer::name() const
     return _layer->GetName();
 }
 
+Rect<double> Layer::extent() const
+{
+    OGREnvelope env;
+    checkError(_layer->GetExtent(&env, TRUE), "Failed to get layer extent");
+
+    Rect<double> result;
+    result.topLeft.x     = env.MinX;
+    result.topLeft.y     = env.MaxY;
+    result.bottomRight.x = env.MaxX;
+    result.bottomRight.y = env.MinY;
+
+    return result;
+}
+
 OGRLayer* Layer::get()
 {
     return _layer;

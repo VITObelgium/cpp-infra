@@ -2,6 +2,7 @@
 
 #include "infra/exception.h"
 #include "infra/point.h"
+#include "infra/rect.h"
 
 #include <gdal_priv.h>
 #include <ogr_feature.h>
@@ -386,6 +387,8 @@ public:
     FeatureDefinitionRef layer_definition() const;
 
     const char* name() const;
+    Rect<double> extent() const;
+
     OGRLayer* get();
     const OGRLayer* get() const;
 
