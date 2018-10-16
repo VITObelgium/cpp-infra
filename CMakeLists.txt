@@ -93,6 +93,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/filesystem.h
     include/infra/color.h
     include/infra/colormap.h
+    include/infra/rect.h
     include/infra/threadpool.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h
