@@ -68,7 +68,7 @@ std::string read_as_text(const fs::path& filename);
 std::string read_as_text(const char* filename);
 std::string read_as_text(const std::string& filename);
 std::string read_as_text(const std::istream& filestream);
-void write_as_text(const std::string& filename, std::string_view contents);
+void write_as_text(const fs::path& filename, std::string_view contents);
 
 class Handle
 {
