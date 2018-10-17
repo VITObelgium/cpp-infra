@@ -302,6 +302,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
+        include/uiinfra/checkableitemproxymodel.h ui/checkableitemproxymodel.cpp
         include/uiinfra/comboboxdelegate.h ui/comboboxdelegate.cpp
         include/uiinfra/delegatecombobox.h ui/delegatecombobox.cpp
         include/uiinfra/readonlyproxy.h
