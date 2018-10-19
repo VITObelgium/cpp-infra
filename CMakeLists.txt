@@ -129,6 +129,8 @@ elseif (HAVE_BOOST_FILESYSTEM)
     target_compile_definitions(infra PUBLIC HAVE_BOOST_FILESYSTEM)
 endif ()
 
+target_compile_definitions(infra PUBLIC FMT_STRING_ALIAS=1)
+
 target_link_libraries(infra PUBLIC fmt::fmt)
 
 if (HAVE_BOOST_FILESYSTEM)
