@@ -103,6 +103,24 @@ std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg)
     return {};
 }
 
+std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg, inf::Rect<double>& extent)
+{
+    gdal::CoordinateTransformer transformer(epsg, 4326);
+    auto ds = gdal::VectorDataSet::create(shapePath, gdal::VectorType::Unknown);
+    if (ds.layer_count() > 0) {
+        try {
+            extent = ds.layer(0).extent();
+            transformer.transform_in_place(extent.topLeft);
+            transformer.transform_in_place(extent.bottomRight);
+            return dataSetToGeoPath(ds, transformer);
+        } catch (const std::exception& e) {
+            Log::warn("Failed to add overlay {} ({})", shapePath, e.what());
+        }
+    }
+
+    return {};
+}
+
 OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg)
 {
     Log::debug("Load overlays");
