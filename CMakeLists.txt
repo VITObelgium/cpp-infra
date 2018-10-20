@@ -302,6 +302,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/colorcombobox.h ui/colorcombobox.cpp
         include/uiinfra/colormapcombobox.h ui/colormapcombobox.cpp
         include/uiinfra/containerconversion.h
+        include/uiinfra/cursorposprovider.h ui/cursorposprovider.cpp
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
@@ -323,6 +324,8 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
+        include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
+
         ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
     )
@@ -332,8 +335,15 @@ if (INFRA_UI_COMPONENTS)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
          endif ()
 
+         find_package(Qt5QuickCompiler REQUIRED)
+         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
+
         target_sources(uiinfra PRIVATE
+            ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
+            include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
+            include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
+            ${INFRA_LOCATION_RESOURCES}
         )
     endif ()
 
