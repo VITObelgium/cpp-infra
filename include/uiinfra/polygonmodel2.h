@@ -35,8 +35,6 @@ public:
         NameRole,
         LineColorRole,
         LineWidthRole,
-        CoordinateRole,
-        ZoomLevelRole,
     };
 
     PolygonModel2(QObject* parent = nullptr);

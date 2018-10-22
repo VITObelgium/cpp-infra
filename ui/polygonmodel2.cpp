@@ -12,20 +12,6 @@ namespace uiinfra {
 
 using namespace inf;
 
-constexpr int s_renderSize = 256;
-
-// Calculate the zoom level where one pixel is equal to the cellsize at latitude 0.0
-static double calculateZoomLevel(const QGeoRectangle& extent)
-{
-    const double pixelSize = extent.topRight().distanceTo(extent.bottomLeft()) / s_renderSize;
-
-    Log::debug("distance: {}km pixelsize {}", extent.topRight().distanceTo(extent.bottomLeft()) / 1000.0, pixelSize);
-    Log::debug("zoom level: {}", std::log2((std::cos(0.0) * 2.0 * M_PI * 6378137.0) / pixelSize / 256.0));
-
-    // source: https://msdn.microsoft.com/en-us/library/bb259689.aspx
-    return std::log2((std::cos(0.0) * 2.0 * M_PI * 6378137.0) / pixelSize / 256.0);
-}
-
 PolygonModel2::PolygonModel2(QObject* parent)
 : QAbstractListModel(parent)
 , _rowCount(0)
@@ -41,8 +27,6 @@ QHash<int, QByteArray> PolygonModel2::roleNames() const
     roles[DisplayNameRole] = "DisplayName";
     roles[LineColorRole]   = "LineColor";
     roles[LineWidthRole]   = "LineWidth";
-    roles[CoordinateRole]  = "Coordinate";
-    roles[ZoomLevelRole]   = "ZoomLevel";
     return roles;
 }
 
@@ -71,10 +55,6 @@ QVariant PolygonModel2::data(const QModelIndex& index, int role) const
             return polygonData->name;
         } else if (role == DisplayNameRole) {
             return polygonData->displayName;
-        } else if (role == CoordinateRole) {
-            return QVariant::fromValue(polygonData->extent.topLeft());
-        } else if (role == ZoomLevelRole) {
-            return calculateZoomLevel(polygonData->extent);
         }
     }
 
