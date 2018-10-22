@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.1
 Item {
     id: legendView
     property alias model: listView.model
+    property alias count: listView.count
     implicitWidth: listView.implicitWidth
     implicitHeight: listView.implicitHeight
 
