@@ -84,6 +84,11 @@ double GeoMetadata::convert_row_centre_to_y(const int32_t row) const
     return (rows - row - 0.5) * cellSize + yll;
 }
 
+Point<double> GeoMetadata::convert_cell_centre_to_xy(const Cell& cell) const
+{
+    return Point<double>(convert_col_centre_to_x(cell.c), convert_row_centre_to_y(cell.r));
+}
+
 double GeoMetadata::convert_col_ll_to_x(const int32_t col) const
 {
     return (col * cellSize) + xll;
