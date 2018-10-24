@@ -25,6 +25,7 @@ using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 
 class Layer;
+class CoordinateTransformer;
 
 template <typename GeometryType>
 class Owner : public GeometryType
@@ -109,6 +110,12 @@ public:
 
     bool empty() const;
     void clear();
+
+    bool is_simple() const;
+    Owner<Geometry> simplify(double tolerance) const;
+    Owner<Geometry> simplify_preserve_topology(double tolerance) const;
+
+    void transform(CoordinateTransformer& transformer);
 
 private:
     OGRGeometry* _geometry = nullptr;
