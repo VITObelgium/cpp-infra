@@ -1,12 +1,18 @@
 #include "infra/gdalgeometry.h"
 #include "infra/exception.h"
 #include "infra/gdal-private.h"
+#include "infra/gdal.h"
 
 #include <ogrsf_frmts.h>
 
 namespace inf::gdal {
 
 using namespace std::string_literals;
+
+Geometry::Geometry(OGRGeometry* instance)
+: _geometry(instance)
+{
+}
 
 OGRGeometry* Geometry::get() noexcept
 {
@@ -56,9 +62,24 @@ void Geometry::clear()
     _geometry->empty();
 }
 
-Geometry::Geometry(OGRGeometry* instance)
-: _geometry(instance)
+bool Geometry::is_simple() const
 {
+    return _geometry->IsSimple();
+}
+
+Owner<Geometry> Geometry::simplify(double tolerance) const
+{
+    return Owner<Geometry>(checkPointer(_geometry->Simplify(tolerance), "Failed to simplify geometry"));
+}
+
+Owner<Geometry> Geometry::simplify_preserve_topology(double tolerance) const
+{
+    return Owner<Geometry>(checkPointer(_geometry->Simplify(tolerance), "Failed to simplify geometry preserving topology"));
+}
+
+void Geometry::transform(CoordinateTransformer& transformer)
+{
+    checkError(_geometry->transform(transformer.get()), "Failed to transform geometry");
 }
 
 template <typename WrappedType>

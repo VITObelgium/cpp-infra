@@ -21,6 +21,6 @@ std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg);
 std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg, inf::Rect<double>& extent);
 
 OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg);
-std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, const inf::gdal::CoordinateTransformer& transformer);
+std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, inf::gdal::CoordinateTransformer& transformer);
 
 }
