@@ -31,7 +31,9 @@ static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& pol
         for (auto& point : ring) {
             addPointToGeoPath(path, point);
         }
-        geoPaths.emplace_back(std::move(path));
+        if (!path.isEmpty()) {
+            geoPaths.emplace_back(std::move(path));
+        }
     }
 
     for (int i = 0; i < poly.interiorring_count(); ++i) {
@@ -40,7 +42,9 @@ static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& pol
         for (auto& point : ring) {
             addPointToGeoPath(path, point);
         }
-        geoPaths.emplace_back(std::move(path));
+        if (!path.isEmpty()) {
+            geoPaths.emplace_back(std::move(path));
+        }
     }
 }
 

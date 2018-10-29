@@ -94,6 +94,8 @@ public:
     OGRGeometry* get() noexcept;
     const OGRGeometry* get() const noexcept;
 
+    operator bool() const noexcept;
+
     Type type() const;
     std::string_view type_name() const;
 

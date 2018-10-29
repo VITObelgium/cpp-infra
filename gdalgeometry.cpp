@@ -24,6 +24,11 @@ const OGRGeometry* Geometry::get() const noexcept
     return _geometry;
 }
 
+Geometry::operator bool() const noexcept
+{
+    return _geometry != nullptr;
+}
+
 Geometry::Type Geometry::type() const
 {
     switch (wkbFlatten(_geometry->getGeometryType())) {
@@ -54,7 +59,7 @@ Owner<Geometry> Geometry::clone() const
 
 bool Geometry::empty() const
 {
-    return _geometry->IsEmpty();
+    return !_geometry || _geometry->IsEmpty();
 }
 
 void Geometry::clear()
@@ -117,7 +122,6 @@ Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 Line::Line(OGRSimpleCurve* curve)
 : GeometryPtr(curve)
 {
-    assert(curve);
 }
 
 int Line::point_count() const
@@ -147,9 +151,11 @@ Point<double> Line::endpoint()
 }
 
 LineIterator::LineIterator(const Line& line)
-: _iter(line.get()->getPointIterator())
 {
-    next();
+    if (line) {
+        _iter = line.get()->getPointIterator();
+        next();
+    }
 }
 
 LineIterator::~LineIterator()
