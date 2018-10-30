@@ -36,7 +36,7 @@ void TreeModel::clear()
 
 int TreeModel::rowCount(const QModelIndex& parent) const
 {
-    if (parent.column() > 0) {
+    if (parent.column() > 0 || !_root) {
         return 0;
     }
 
@@ -51,6 +51,10 @@ int TreeModel::columnCount(const QModelIndex& /*parent*/) const
 
 QModelIndex TreeModel::index(int row, int column, const QModelIndex& parent) const
 {
+    if (!_root) {
+        return QModelIndex();
+    }
+
     TreeNode* parentItem = parent.isValid() ? static_cast<TreeNode*>(parent.internalPointer()) : const_cast<TreeNode*>(_root.get());
 
     if (auto* child = parentItem->child(row); child != nullptr) {
@@ -102,6 +106,9 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex& index) const
 
     auto flags = QAbstractItemModel::flags(index);
     static_cast<const TreeNode*>(index.internalPointer())->updateFlags(index, flags);
+    if (!_editable) {
+        flags.setFlag(Qt::ItemIsEditable, false);
+    }
     return flags;
 }
 
@@ -112,6 +119,11 @@ QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int rol
     }
 
     return QVariant();
+}
+
+void TreeModel::setEditable(bool enabled)
+{
+    _editable = enabled;
 }
 
 }
