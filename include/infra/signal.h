@@ -22,8 +22,7 @@ public:
 
     ~Signal()
     {
-        std::lock_guard<std::mutex> lock(_mutex);
-        _subscribers.clear();
+        disconnect_all();
     }
 
     Signal& operator=(const Signal&) = delete;
@@ -61,6 +60,12 @@ public:
         for (auto& sub : _subscribers) {
             sub.callback(std::forward<CallArgs>(args)...);
         }
+    }
+
+    void disconnect_all()
+    {
+        std::lock_guard<std::mutex> lock(_mutex);
+        _subscribers.clear();
     }
 
 private:
