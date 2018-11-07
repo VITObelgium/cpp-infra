@@ -325,6 +325,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
         include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
+        include/uiinfra/tabletools.h ui/tabletools.cpp
 
         ui/toolboxitem.h ui/toolboxitem.cpp
         ${FORMS_HEADERS}
