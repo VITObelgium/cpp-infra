@@ -142,7 +142,7 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
         try {
             data.emplace(QString::fromStdString(shpName), dataSetToGeoPath(ds, transformer));
         } catch (const std::exception& e) {
-            Log::warn("Failed to add overlay {} ({})", shpPath.string(), e.what());
+            Log::warn("Failed to add overlay {} ({})", shpPath.u8string(), e.what());
         }
     }
 
