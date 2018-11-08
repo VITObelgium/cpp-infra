@@ -322,7 +322,7 @@ RasterDriver::RasterDriver(GDALDriver& driver)
 
 RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType)
 {
-    return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
+    return RasterDataSet(checkPointer(_driver.Create(filename.u8string().c_str(), cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
 }
 
 RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType)
@@ -334,7 +334,7 @@ RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, 
 {
     auto options = create_options_array(driverOptions);
     return RasterDataSet(checkPointer(_driver.CreateCopy(
-                                          filename.string().c_str(),
+                                          filename.u8string().c_str(),
                                           reference.get(),
                                           FALSE,
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
@@ -363,7 +363,7 @@ bool VectorDriver::isSupported(VectorType type)
 
 VectorDriver VectorDriver::create(const fs::path& filename)
 {
-    auto vectorType = guess_vectortype_from_filename(filename.string());
+    auto vectorType = guess_vectortype_from_filename(filename.u8string());
     if (vectorType != VectorType::Unknown) {
         return create(vectorType);
     }
@@ -400,14 +400,14 @@ VectorDataSet VectorDriver::create_dataset()
 VectorDataSet VectorDriver::create_dataset(const fs::path& filename)
 
 {
-    return VectorDataSet(checkPointer(_driver.Create(filename.string().c_str(), 0, 0, 0, GDT_Unknown, nullptr), "Failed to create vector data set"));
+    return VectorDataSet(checkPointer(_driver.Create(filename.u8string().c_str(), 0, 0, 0, GDT_Unknown, nullptr), "Failed to create vector data set"));
 }
 
 VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
 {
     auto options = create_options_array(driverOptions);
     return VectorDataSet(checkPointer(_driver.CreateCopy(
-                                          filename.string().c_str(),
+                                          filename.u8string().c_str(),
                                           reference.get(),
                                           FALSE,
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
