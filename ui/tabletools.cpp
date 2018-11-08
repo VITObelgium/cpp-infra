@@ -20,26 +20,18 @@ void itemSelectionToClipboard(const QItemSelectionModel* selectionModel)
         return;
     }
 
-    QStringList currentRow;
+    std::map<int, QStringList> rows;
 
     QString selected_text;
-    // You need a pair of indexes to find the row changes
-    int previousRow = indexes.front().row();
     for (auto& current : indexes) {
-        if (current.row() != previousRow) {
-            selected_text.append(currentRow.join('\t'));
-            selected_text.append('\n');
-            currentRow.clear();
-        }
-
-        currentRow.append(model->data(current).toString());
-        previousRow = current.row();
+        rows[current.row()].append(model->data(current).toString());
     }
 
-    if (!currentRow.empty()) {
-        selected_text.append(currentRow.join('\t'));
+    QStringList rowStrings;
+    for (auto& row : rows) {
+        rowStrings.push_back(row.second.join('\t'));
     }
 
-    QApplication::clipboard()->setText(selected_text);
+    QApplication::clipboard()->setText(rowStrings.join('\n'));
 }
 }
