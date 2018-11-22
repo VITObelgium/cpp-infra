@@ -47,7 +47,7 @@ constexpr bool fits_in_type(TInput value)
         // Type to check against is unsigned, so the value must be in range [0, TCheck::max]
         using Common = std::common_type_t<TInput, TCheck>;
         return value >= 0 && static_cast<Common>(value) <= static_cast<Common>(std::numeric_limits<TCheck>::max());
-    } else if (std::is_floating_point_v<TInput> || std::is_floating_point_v<TCheck>) {
+    } else if constexpr (std::is_floating_point_v<TInput> || std::is_floating_point_v<TCheck>) {
         // One of the type is floating point, upcast everything to double
         return static_cast<double>(value) >= static_cast<double>(std::numeric_limits<TCheck>::lowest()) &&
                static_cast<double>(value) <= static_cast<double>(std::numeric_limits<TCheck>::max());
