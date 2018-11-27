@@ -1,0 +1,298 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2018-07-27 16:23:55.000000000 +0200
++++ b/CMakeLists.txt	2018-11-16 10:56:12.258970000 +0100
+@@ -22,13 +22,14 @@
+ 
+ set(CMAKE_MODULE_PATH
+     $ENV{CMAKE_MODULE_PATH}
++    ${CMAKE_MODULE_PATH}
+     ${CMAKE_CURRENT_SOURCE_DIR}/devbase/cmake
+     ${CMAKE_CURRENT_SOURCE_DIR}/environment/cmake
+ )
+ include(PCRaster)
+ 
+ add_subdirectory(source)
+-add_subdirectory(documentation)
++#add_subdirectory(documentation)
+ 
+ # Create version information file
+ # Dummy target that does nothing. This enables us to attach build commands.
+diff -Naur a/devbase/cmake/DevBaseExternal.cmake b/devbase/cmake/DevBaseExternal.cmake
+--- a/devbase/cmake/DevBaseExternal.cmake	2018-03-27 10:48:27.000000000 +0200
++++ b/devbase/cmake/DevBaseExternal.cmake	2018-11-16 10:56:17.070883000 +0100
+@@ -44,7 +44,7 @@
+     set(Boost_USE_STATIC_RUNTIME OFF)
+     add_definitions(
+         # Use dynamic libraries.
+-        -DBOOST_ALL_DYN_LINK
++        # -DBOOST_ALL_DYN_LINK
+         # Prevent auto-linking.
+         -DBOOST_ALL_NO_LIB
+ 
+@@ -138,21 +138,19 @@
+ 
+ 
+ if(DEVBASE_GDAL_USEFUL OR DEVBASE_GDAL_REQUIRED)
+-    find_package(GDAL
++    find_package(Gdal
+         ${DEVBASE_REQUIRED_GDAL_VERSION})
+ 
+-    if(DEVBASE_GDAL_REQUIRED AND NOT GDAL_FOUND)
++    if(DEVBASE_GDAL_REQUIRED AND NOT Gdal_FOUND)
+         message(FATAL_ERROR "GDAL not found")
+     endif()
+ 
+     find_program(GDAL_TRANSLATE gdal_translate
+-        HINTS ${GDAL_INCLUDE_DIR}/../bin
++        HINTS ${Gdal_FOUND_INCLUDE_DIR}/../bin
+     )
+ 
+-    if(EXISTS "${GDAL_INCLUDE_DIR}/../share/gdal")
+-        set(GDAL_DATA "${GDAL_INCLUDE_DIR}/../share/gdal")
+-    elseif(EXISTS "${GDAL_INCLUDE_DIR}/../../share/gdal")
+-        set(GDAL_DATA "${GDAL_INCLUDE_DIR}/../../share/gdal")
++    if(Gdal_DATA_PATH)
++        set(GDAL_DATA "${Gdal_DATA_PATH}")
+     else()
+         message(FATAL_ERROR "GDal data dir not found")
+     endif()
+@@ -417,7 +415,7 @@
+ 
+ 
+ if(DEVBASE_XERCES_REQUIRED)
+-    find_package(XercesC REQUIRED)
++    find_package(XercesC CONFIG REQUIRED)
+ endif()
+ 
+ 
+diff -Naur a/devbase/cmake/DevBaseMacro.cmake b/devbase/cmake/DevBaseMacro.cmake
+--- a/devbase/cmake/DevBaseMacro.cmake	2018-03-27 10:48:27.000000000 +0200
++++ b/devbase/cmake/DevBaseMacro.cmake	2018-11-16 10:56:17.102889000 +0100
+@@ -197,10 +197,6 @@
+     add_executable(${TEST_EXE_NAME} ${TEST_MODULE_NAME}
+         ${ADD_UNIT_TEST_SUPPORT_NAMES}
+         ${ADD_UNIT_TEST_OBJECT_LIBRARIES})
+-    target_compile_definitions(${TEST_EXE_NAME}
+-        PRIVATE
+-            BOOST_ALL_DYN_LINK
+-    )
+     target_include_directories(${TEST_EXE_NAME}
+         PRIVATE
+             ${ADD_UNIT_TEST_INCLUDE_DIRS}
+diff -Naur a/environment/cmake/PCRaster.cmake b/environment/cmake/PCRaster.cmake
+--- a/environment/cmake/PCRaster.cmake	2018-07-27 16:23:55.000000000 +0200
++++ b/environment/cmake/PCRaster.cmake	2018-11-16 10:56:21.325824000 +0100
+@@ -1,7 +1,7 @@
+ set(CMAKE_C_STANDARD 11)
+ set(CMAKE_C_STANDARD_REQUIRED ON)
+ set(CMAKE_C_EXTENSIONS OFF)
+-set(CMAKE_CXX_STANDARD 14)
++set(CMAKE_CXX_STANDARD 17)
+ set(CMAKE_CXX_STANDARD_REQUIRED ON)
+ set(CMAKE_CXX_EXTENSIONS OFF)
+ set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+diff -Naur a/environment/cmake/PCRasterConfiguration.cmake b/environment/cmake/PCRasterConfiguration.cmake
+--- a/environment/cmake/PCRasterConfiguration.cmake	2018-07-27 16:23:55.000000000 +0200
++++ b/environment/cmake/PCRasterConfiguration.cmake	2018-11-16 10:56:21.329822000 +0100
+@@ -54,11 +54,11 @@
+ list(APPEND DEVBASE_REQUIRED_BOOST_COMPONENTS
+     date_time filesystem math_c99 program_options)
+ 
+-set(DEVBASE_OPENGL_REQUIRED TRUE)
++set(DEVBASE_OPENGL_REQUIRED FALSE)
+ set(DEVBASE_QT_REQUIRED TRUE)
+ set(DEVBASE_REQUIRED_QT_VERSION 5)
+ set(DEVBASE_REQUIRED_QT_COMPONENTS
+-    Core Gui OpenGL Sql Widgets Xml)
++    Core Gui Sql Widgets Xml)
+ if(PCRASTER_WITH_AGUILA)
+     set(DEVBASE_QWT_REQUIRED TRUE)
+ endif()
+@@ -96,9 +96,9 @@
+     else()
+         # Python 3
+         list(APPEND DEVBASE_REQUIRED_BOOST_COMPONENTS
+-            python3 numpy3)
+-        set(PCR_BOOST_PYTHON Boost::python3)
+-        set(PCR_BOOST_PYTHON_NUMPY Boost::python3 Boost::numpy3)
++            python37 numpy37)
++        set(PCR_BOOST_PYTHON Boost::python37)
++        set(PCR_BOOST_PYTHON_NUMPY Boost::python37 Boost::numpy37)
+     endif()
+ endif()
+ 
+@@ -112,7 +112,7 @@
+     set(CURSES_INCLUDE_DIRS ${PDCURSES_INCLUDE_DIR})
+     set(CURSES_LIBRARIES ${PDCURSES_LIBRARIES})
+ else()
+-    set(DEVBASE_CURSES_REQUIRED TRUE)
++    set(DEVBASE_CURSES_REQUIRED FALSE)
+     set(DEVBASE_CURSES_WIDE_CHARACTER_SUPPORT_REQUIRED FALSE)
+ endif()
+ 
+diff -Naur a/source/CMakeLists.txt b/source/CMakeLists.txt
+--- a/source/CMakeLists.txt	2018-07-27 16:23:55.000000000 +0200
++++ b/source/CMakeLists.txt	2018-11-16 10:56:23.161790000 +0100
+@@ -16,7 +16,7 @@
+ add_subdirectory(pcraster_xsd)
+ add_subdirectory(app)
+ add_subdirectory(mathx)
+-add_subdirectory(curr)
++#add_subdirectory(curr)
+ add_subdirectory(misc)
+ add_subdirectory(pcraster_moc)
+ add_subdirectory(pcrblock)
+@@ -33,7 +33,7 @@
+ add_subdirectory(calc)
+ add_subdirectory(pccts)
+ add_subdirectory(pcrxml)
+-add_subdirectory(linkinexamples)
++#add_subdirectory(linkinexamples)
+ add_subdirectory(pcraster_model_engine)
+ add_subdirectory(pcraster_old_calc)
+ add_subdirectory(pcraster_python)
+@@ -48,10 +48,10 @@
+ add_subdirectory(col2map)
+ add_subdirectory(map2asc)
+ add_subdirectory(map2col)
+-add_subdirectory(mapattr)
++#add_subdirectory(mapattr)
+ add_subdirectory(resample)
+ add_subdirectory(table)
+-add_subdirectory(legend)
++#add_subdirectory(legend)
+ 
+ if(PCRASTER_WITH_AGUILA)
+     add_subdirectory(pcraster_aguila)
+diff -Naur a/source/fern/devbase/cmake/DevBaseExternal.cmake b/source/fern/devbase/cmake/DevBaseExternal.cmake
+--- a/source/fern/devbase/cmake/DevBaseExternal.cmake	2018-03-27 10:48:27.000000000 +0200
++++ b/source/fern/devbase/cmake/DevBaseExternal.cmake	2018-11-16 10:56:24.031777000 +0100
+@@ -44,7 +44,7 @@
+     set(Boost_USE_STATIC_RUNTIME OFF)
+     add_definitions(
+         # Use dynamic libraries.
+-        -DBOOST_ALL_DYN_LINK
++        #-DBOOST_ALL_DYN_LINK
+         # Prevent auto-linking.
+         -DBOOST_ALL_NO_LIB
+ 
+diff -Naur a/source/fern/devbase/cmake/DevBaseMacro.cmake b/source/fern/devbase/cmake/DevBaseMacro.cmake
+--- a/source/fern/devbase/cmake/DevBaseMacro.cmake	2018-03-27 10:48:27.000000000 +0200
++++ b/source/fern/devbase/cmake/DevBaseMacro.cmake	2018-11-16 10:56:24.048779000 +0100
+@@ -197,10 +197,10 @@
+     add_executable(${TEST_EXE_NAME} ${TEST_MODULE_NAME}
+         ${ADD_UNIT_TEST_SUPPORT_NAMES}
+         ${ADD_UNIT_TEST_OBJECT_LIBRARIES})
+-    target_compile_definitions(${TEST_EXE_NAME}
+-        PRIVATE
+-            BOOST_ALL_DYN_LINK
+-    )
++    #target_compile_definitions(${TEST_EXE_NAME}
++    #    PRIVATE
++    #        BOOST_ALL_DYN_LINK
++    #)
+     target_include_directories(${TEST_EXE_NAME}
+         PRIVATE
+             ${ADD_UNIT_TEST_INCLUDE_DIRS}
+diff -Naur a/source/pcraster_dal/CMakeLists.txt b/source/pcraster_dal/CMakeLists.txt
+--- a/source/pcraster_dal/CMakeLists.txt	2018-07-27 16:23:55.000000000 +0200
++++ b/source/pcraster_dal/CMakeLists.txt	2018-11-16 10:56:34.580672000 +0100
+@@ -116,7 +116,7 @@
+         PCR_DAL_SHARED_LINK
+ )
+ 
+-add_library(pcraster_dal SHARED
++add_library(pcraster_dal
+     $<TARGET_OBJECTS:pcraster_dal_objects>
+ )
+ 
+@@ -132,7 +132,7 @@
+         pcraster::raster_format
+         pcraster::utils
+         Qt5::Sql
+-        ${GDAL_LIBRARIES}
++        Gdal::Gdal
+         Boost::filesystem
+         Boost::date_time
+ )
+@@ -269,11 +269,11 @@
+ 
+ # ------------------------------------------------------------------------------
+ 
+-install(
+-    TARGETS
+-        pcraster_dal
+-    RUNTIME
+-        DESTINATION lib COMPONENT Runtime
+-    LIBRARY
+-        DESTINATION lib COMPONENT Runtime
+-)
++# install(
++#     TARGETS
++#         pcraster_dal
++#     RUNTIME
++#         DESTINATION lib COMPONENT Runtime
++#     LIBRARY
++#         DESTINATION lib COMPONENT Runtime
++# )
+diff -Naur a/source/pcraster_model_engine/CMakeLists.txt b/source/pcraster_model_engine/CMakeLists.txt
+--- a/source/pcraster_model_engine/CMakeLists.txt	2018-07-27 16:23:55.000000000 +0200
++++ b/source/pcraster_model_engine/CMakeLists.txt	2018-11-16 11:05:00.817419417 +0100
+@@ -302,7 +302,7 @@
+         # see bugzilla 178
+ )
+ 
+-add_library(pcraster_model_engine SHARED
++add_library(pcraster_model_engine
+     $<TARGET_OBJECTS:pcraster_model_engine_objects>
+ )
+ 
+@@ -484,15 +484,6 @@
+ 
+ endif()
+ 
+-
+-install(
+-    TARGETS pcraster_model_engine
+-    RUNTIME
+-        DESTINATION lib COMPONENT Runtime
+-    LIBRARY
+-        DESTINATION lib COMPONENT Runtime
+-)
+-
+ install(
+     FILES
+         PCRaster.xsd
+diff -Naur a/source/pcraster_multicore/python/CMakeLists.txt b/source/pcraster_multicore/python/CMakeLists.txt
+--- a/source/pcraster_multicore/python/CMakeLists.txt	2018-07-27 16:23:55.000000000 +0200
++++ b/source/pcraster_multicore/python/CMakeLists.txt	2018-11-16 10:56:37.304042000 +0100
+@@ -84,7 +84,6 @@
+ )
+ 
+ add_dependencies(_pcraster_multicore
+-    generate_examples.sentinel
+     _pcraster
+     fill_python_directory_structure # Refactor
+     _pcraster_modflow_python        # Refactor
+diff -Naur a/source/pcraster_python/utils/CMakeLists.txt b/source/pcraster_python/utils/CMakeLists.txt
+--- a/source/pcraster_python/utils/CMakeLists.txt	2018-07-27 16:23:55.000000000 +0200
++++ b/source/pcraster_python/utils/CMakeLists.txt	2018-11-16 11:05:19.793520163 +0100
+@@ -1,4 +1,4 @@
+-add_library(pcraster_python_utils SHARED
++add_library(pcraster_python_utils
+     ppu_exception
+     Globals.cc
+ )
+@@ -19,12 +19,3 @@
+     PUBLIC
+         pcraster::model_engine
+ )
+-
+-install(
+-    TARGETS
+-        pcraster_python_utils
+-    RUNTIME
+-        DESTINATION lib COMPONENT Runtime
+-    LIBRARY
+-        DESTINATION lib COMPONENT Runtime
+-)

@@ -1,0 +1,12 @@
+diff -Naur a/VTK/IO/Export/module.cmake b/VTK/IO/Export/module.cmake
+--- a/VTK/IO/Export/module.cmake	2018-10-29 11:56:25.263667000 +0100
++++ b/VTK/IO/Export/module.cmake	2018-10-30 14:37:33.320978000 +0100
+@@ -4,6 +4,8 @@
+ elseif(VTK_RENDERING_BACKEND STREQUAL "OpenGL2")
+   set(gl2ps_depends vtkRenderingGL2PSOpenGL2)
+   set(gl2ps_test_depends vtkIOExportOpenGL2)
++else ()
++  set(gl2ps_depends vtkgl2ps)
+ endif()
+ vtk_module(vtkIOExport
+   GROUPS

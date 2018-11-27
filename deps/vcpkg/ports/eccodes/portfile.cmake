@@ -1,7 +1,7 @@
 include(vcpkg_common_functions)
 
 set(VERSION_MAJOR 2)
-set(VERSION_MINOR 8)
+set(VERSION_MINOR 9)
 set(VERSION_REVISION 2)
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION})
 set(PACKAGE_NAME ${PORT}-${VERSION}-Source)
@@ -11,7 +11,7 @@ set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/${PACKAGE_NAME})
 vcpkg_download_distfile(ARCHIVE
     URLS "https://software.ecmwf.int/wiki/download/attachments/45757960/${PACKAGE}"
     FILENAME "${PACKAGE}"
-    SHA512 942de24390df9de64a768e2f351c9acef5b0550a59695016b9753b22fbff260f8a6f9780240dbb2402bec372ee4c8224a68f3d70699a5df42b23c0a4c073114d
+    SHA512 94d077bb0f348c4d64883a4f0877439c123786c73d2b64e4bdfb3f7eb28e445ff1e0eeb57140261906b8aef8e22fd3d614528f1821877ebe6bcb9d38393921d9
 )
 
 vcpkg_extract_source_archive(${ARCHIVE})

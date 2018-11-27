@@ -1,5 +1,5 @@
 Source: boost
-Version: 1.67.0-1
+Version: 1.68.0-1
 Description: Peer-reviewed portable C++ source libraries
 
 Feature: zlib
@@ -37,3 +37,9 @@ Description: Build the regex library
 
 Feature: math
 Description: Build the math library
+
+Feature: python
+Description: Build the python library
+
+Feature: timer
+Description: Build the timer library

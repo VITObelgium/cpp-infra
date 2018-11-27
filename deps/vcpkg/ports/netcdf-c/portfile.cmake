@@ -15,13 +15,19 @@ vcpkg_download_distfile(ARCHIVE
 )
 vcpkg_extract_source_archive(${ARCHIVE})
 
+TEST_FEATURE("hdf5" WITH_HDF5)
+
+if (WITH_HDF5)
+    set(HDF5_PATCH ${CMAKE_CURRENT_LIST_DIR}/transitive-hdf5.patch)
+endif ()
+
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}
     PATCHES
         ${CMAKE_CURRENT_LIST_DIR}/no-install-deps.patch
         ${CMAKE_CURRENT_LIST_DIR}/config-pkg-location.patch
-        ${CMAKE_CURRENT_LIST_DIR}/transitive-hdf5.patch
         ${CMAKE_CURRENT_LIST_DIR}/remove-libm-check.patch
+        ${HDF5_PATCH}
 )
 
 if (VCPKG_CMAKE_SYSTEM_NAME STREQUAL Windows AND NOT CMAKE_HOST_WIN32)
@@ -38,13 +44,12 @@ vcpkg_configure_cmake(
         -DENABLE_EXAMPLES=OFF
         -DENABLE_TESTS=OFF
         -DENABLE_DYNAMIC_LOADING=OFF
-        -DUSE_HDF5=ON
+        -DUSE_HDF5=${WITH_HDF5}
+        -DENABLE_NETCDF_4=${WITH_HDF5}
         -DENABLE_DAP=OFF
         -DENABLE_DAP_REMOTE_TESTS=OFF
         -DDISABLE_INSTALL_DEPENDENCIES=ON
         -DConfigPackageLocation=share/netcdf
-    # OPTIONS_RELEASE -DOPTIMIZE=1
-    # OPTIONS_DEBUG -DDEBUGGABLE=1
 )
 
 vcpkg_install_cmake()

@@ -21,13 +21,10 @@ endforeach()
 message(STATUS "Gdal library: ${Gdal_LIBRARY}")
 message(STATUS "Gdal data path: ${Gdal_DATA_PATH}")
 
-find_package(TIFF QUIET)
-find_package(EXPAT QUIET)
-find_package(ZLIB QUIET)
-find_package(PROJ4 QUIET)
-find_package(PNG QUIET)
-find_package(GIF QUIET)
-find_package(Geos QUIET)
+find_package(TIFF REQUIRED QUIET)
+find_package(ZLIB REQUIRED QUIET)
+find_package(PROJ4 REQUIRED QUIET)
+find_package(PNG REQUIRED QUIET)
 
 if (NOT EMSCRIPTEN)
     find_package(Threads)
@@ -59,40 +56,32 @@ if(Gdal_FOUND AND NOT TARGET Gdal::Gdal)
             IMPORTED_LOCATION_DEBUG "${Gdal_LIBRARY_DEBUG}"
         )
     endif()
+
+    # required dependencies
+    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES TIFF::TIFF ${PROJ4_LIBRARIES} PNG::PNG ZLIB::ZLIB)
+
+    # optional dependencies
+    if (@WITH_EXPAT@)
+        find_package(EXPAT REQUIRED QUIET)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES EXPAT::EXPAT)
+    endif ()
+
+    # on windows the gif library is built into the gdal library
+    if (@WITH_GIF@ AND UNIX) 
+        find_package(GIF REQUIRED QUIET)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${GIF_LIBRARIES})
+    endif ()
+
+    if (@WITH_GEOS@)
+        find_package(Geos REQUIRED QUIET)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES Geos::Geosc)
+    endif ()
+
+    if (UNIX AND NOT EMSCRIPTEN)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads ${CMAKE_DL_LIBS})
+    endif ()
+
+    if (WIN32)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES ws2_32 psapi)
+    endif ()
 endif()
-
-if (TIFF_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES TIFF::TIFF)
-endif ()
-
-if (EXPAT_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES EXPAT::EXPAT)
-endif ()
-
-if (ZLIB_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES ZLIB::ZLIB)
-endif ()
-
-if (PROJ4_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${PROJ4_LIBRARIES})
-endif ()
-
-if (PNG_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES PNG::PNG)
-endif ()
-
-if (GIF_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES ${GIF_LIBRARIES})
-endif ()
-
-if (Geos_FOUND)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES Geos::Geosc)
-endif ()
-
-if (UNIX AND NOT EMSCRIPTEN)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES Threads::Threads ${CMAKE_DL_LIBS})
-endif ()
-
-if (WIN32)
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES ws2_32 psapi)
-endif ()

@@ -33,9 +33,6 @@
 ##
 ## For most projects, this should be `master`. The chosen branch should be one that is expected to be always buildable on all supported platforms.
 ##
-## ### PATCHES
-## A list of patches to be applied to the extracted sources.
-##
 ## Relative paths are based on the port directory.
 ##
 ## ## Notes:
@@ -45,9 +42,10 @@
 ##
 
 function(vcpkg_from_git)
-    set(oneValueArgs OUT_SOURCE_PATH GIT_URL REF HEAD_REF)
+    set(zeroValueArgs RECURSE_SUBMODULES)
+    set(oneValueArgs OUT_SOURCE_PATH URL REF HEAD_REF)
     set(multipleValuesArgs PATCHES)
-    cmake_parse_arguments(_vdud "" "${oneValueArgs}" "${multipleValuesArgs}" ${ARGN})
+    cmake_parse_arguments(_vdud "${zeroValueArgs}" "${oneValueArgs}" "${multipleValuesArgs}" ${ARGN})
 
     find_program(GIT_EXECUTABLE
         NAMES git
@@ -58,9 +56,13 @@ function(vcpkg_from_git)
         message(FATAL_ERROR "Could not find git binary")
     endif ()
 
-    if(NOT DEFINED _vdud_GIT_URL)
+    if(NOT DEFINED _vdud_URL)
         message(FATAL_ERROR "GIT_URL must be specified.")
     endif()
+
+    if (_vdud_RECURSE_SUBMODULES)
+        set(RECURSE_ARG --recurse)
+    endif ()
 
     if(NOT DEFINED _vdud_OUT_SOURCE_PATH)
         message(FATAL_ERROR "OUT_SOURCE_PATH must be specified.")
@@ -89,12 +91,17 @@ function(vcpkg_from_git)
 
         string(REPLACE "/" "-" SANITIZED_REF "${_vdud_REF}")
         set(LOGNAME clone-${TARGET_TRIPLET}-${_vdud_REF})
+        set(GIT_COMMAND ${GIT_EXECUTABLE} clone ${RECURSE_ARG} --depth=1 --branch ${_vdud_REF} --single-branch ${_vdud_URL})
+        if (VCPKG_VERBOSE)
+            string(JOIN " " GIT_COMMAND_STRING ${GIT_COMMAND})
+            message(STATUS "${GIT_COMMAND_STRING}")
+        endif ()
 
-        execute_process(COMMAND ${GIT_EXECUTABLE} clone --branch ${_vdud_REF} ${_vdud_GIT_URL}
+        execute_process(COMMAND ${GIT_COMMAND}
             WORKING_DIRECTORY ${WORKING_DIRECTORY}
             OUTPUT_FILE ${CURRENT_BUILDTREES_DIR}/${LOGNAME}-out.log
             ERROR_FILE ${CURRENT_BUILDTREES_DIR}/${LOGNAME}-err.log
-            RESULT_VARIABLE error_code
+            RESULT_VARIABLE git_error_code
         )
     else ()
         # The following is for --head scenarios
@@ -103,12 +110,17 @@ function(vcpkg_from_git)
         endif()
 
         set(LOGNAME clone-${TARGET_TRIPLET}-${_vdud_HEAD_REF})
+        set(GIT_COMMAND ${GIT_EXECUTABLE} clone ${RECURSE_ARG} --branch ${_vdud_HEAD_REF} --single-branch ${_vdud_URL})
+        if (VCPKG_VERBOSE)
+            string(JOIN " " GIT_COMMAND_STRING ${GIT_COMMAND})
+            message(STATUS "${GIT_COMMAND_STRING}")
+        endif ()
 
-        execute_process(COMMAND ${GIT_EXECUTABLE} clone --branch ${_vdud_HEAD_REF} ${_vdud_GIT_URL}
+        execute_process(COMMAND ${GIT_COMMAND}
             WORKING_DIRECTORY ${WORKING_DIRECTORY}
             OUTPUT_FILE ${CURRENT_BUILDTREES_DIR}/${LOGNAME}-out.log
             ERROR_FILE ${CURRENT_BUILDTREES_DIR}/${LOGNAME}-err.log
-            RESULT_VARIABLE error_code
+            RESULT_VARIABLE git_error_code
         )
     endif()
 
@@ -118,9 +130,18 @@ function(vcpkg_from_git)
         message(FATAL_ERROR "Expected a single subdirectory as result of git clone")
     endif ()
 
-    if(error_code AND NOT _ap_QUIET)
-        message(FATAL_ERROR "Git clone ref '${_vdud_REF}' from '${_vdud_GIT_URL}' failed.")
+    if(git_error_code AND NOT _ap_QUIET)
+        message(FATAL_ERROR "Git clone ref '${_vdud_REF}' from '${_vdud_URL}' failed.")
     endif()
 
     set("${_vdud_OUT_SOURCE_PATH}" ${WORKING_DIRECTORY}/${REPO_DIR} PARENT_SCOPE)    
+
+    # if (_vdud_PATCHES)
+    #     message(STATUS "PATCHES ${_vdud_PATCHES}")
+    #     vcpkg_apply_patches(
+    #         SOURCE_PATH ${OUT_SOURCE_PATH}
+    #         PATCHES ${_vdud_PATCHES}
+    #     )
+    # endif ()
+
 endfunction()

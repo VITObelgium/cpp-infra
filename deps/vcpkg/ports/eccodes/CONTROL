@@ -1,5 +1,5 @@
 Source: eccodes
-Version: 2.8.2
+Version: 2.9.2
 Description: API and a set of tools for decoding and encoding messages in the following formats (WMO FM-92 GRIB, WMO FM-94 BUFR, WMO GTS)
 
 Feature: tool
@@ -15,4 +15,4 @@ Build-Depends: libjpeg-turbo
 
 Feature: netcdf
 Description: Support for GRIB to NetCDF conversion
-Build-Depends: netcdf-c
+Build-Depends: netcdf-c[hdf5]

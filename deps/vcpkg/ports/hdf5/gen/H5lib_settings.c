@@ -35,7 +35,7 @@ char H5libhdf5_settings[]=
 	"\n"
 	"General Information:\n"
 	"-------------------\n"
-	"                   HDF5 Version: 1.10.1\n"
+	"                   HDF5 Version: 1.10.4\n"
 	"                  Configured on: 2018-05-02\n"
 	"                  Configured by: Unix Makefiles\n"
 	"                    Host system: Windows-6.1.7601\n"

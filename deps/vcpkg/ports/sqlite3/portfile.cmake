@@ -1,7 +1,8 @@
 include(vcpkg_common_functions)
 
-set(SQLITE_VERSION 3250200)
-set(SQLITE_HASH f87b4ab405f85df85b5d63e9e28c4db76202dc2d5461e0d0c626fa7521570d89a1122403c037704859ecb58ac1747ebf4b3c8a2f3a3c3d8492e8060df92e379f)
+set(VERSION 3.25.3)
+set(SQLITE_VERSION 3250300)
+set(SQLITE_HASH ca02db8fb49b4692c8616b090c3172e20d2f482941354569b216a712fe8f3095d8c3f7c3d76144b2b70ed8e7527b2124259c52ce2546487a7f62b579927754e8)
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/sqlite-amalgamation-${SQLITE_VERSION})
 
 vcpkg_download_distfile(ARCHIVE
@@ -34,6 +35,12 @@ file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/share)
 configure_file(
     ${CMAKE_CURRENT_LIST_DIR}/sqlite3-config.in.cmake
     ${CURRENT_PACKAGES_DIR}/share/sqlite3/sqlite3-config.cmake
+    @ONLY
+)
+
+configure_file(
+    ${CMAKE_CURRENT_LIST_DIR}/sqlite3.pc.in
+    ${CURRENT_PACKAGES_DIR}/lib/pkgconfig/sqlite3.pc
     @ONLY
 )
 

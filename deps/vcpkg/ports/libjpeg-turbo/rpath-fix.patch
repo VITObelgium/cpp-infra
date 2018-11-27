@@ -1,0 +1,14 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2018-07-27 18:47:48.000000000 +0200
++++ b/CMakeLists.txt	2018-11-12 12:06:07.956485000 +0100
+@@ -109,7 +109,9 @@
+ 
+ include(cmakescripts/GNUInstallDirs.cmake)
+ 
+-set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
++if(ENABLE_SHARED)
++    set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR})
++endif()
+ 
+ macro(report_directory var)
+   if(CMAKE_INSTALL_${var} STREQUAL CMAKE_INSTALL_FULL_${var})
