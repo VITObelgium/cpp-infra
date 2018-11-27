@@ -9,7 +9,16 @@ vcpkg_from_github(
     HEAD_REF master
 )
 
-file(INSTALL ${SOURCE_PATH}/include/ DESTINATION ${CURRENT_PACKAGES_DIR}/include)
+vcpkg_configure_cmake(
+    SOURCE_PATH ${SOURCE_PATH}
+    PREFER_NINJA
+    OPTIONS
+        -DGSL_TEST=OFF
+)
+
+vcpkg_install_cmake()
+
+file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug)
+
 file(INSTALL ${CMAKE_CURRENT_LIST_DIR}/FindGsl.cmake DESTINATION ${CURRENT_PACKAGES_DIR}/share/cmake)
-# Handle copyright
 file(INSTALL ${SOURCE_PATH}/LICENSE DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)

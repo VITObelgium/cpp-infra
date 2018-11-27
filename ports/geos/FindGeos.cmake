@@ -21,7 +21,7 @@ message(STATUS "Geos c library: ${Geosc_LIBRARY}")
 
 find_package_handle_standard_args(Geos
     FOUND_VAR Geos_FOUND
-    REQUIRED_VARS Geos_INCLUDE_DIR Geosc_INCLUDE_DIR Geos_LIBRARY Geosc_LIBRARY
+    REQUIRED_VARS Geos_INCLUDE_DIR Geosc_INCLUDE_DIR Geos_LIBRARY
 )
 
 mark_as_advanced(
@@ -39,7 +39,7 @@ if(Geos_FOUND AND NOT TARGET Geos::Geos)
     set_target_properties(Geos::Geos PROPERTIES
         IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
         INTERFACE_INCLUDE_DIRECTORIES "${Geos_INCLUDE_DIR}"
-        IMPORTED_LOCATION ${Geos_LIBRARY}
+        IMPORTED_LOCATION "${Geos_LIBRARY}"
     )
 
     if(Geos_LIBRARY_DEBUG)
@@ -50,17 +50,32 @@ if(Geos_FOUND AND NOT TARGET Geos::Geos)
 endif()
 
 if(Geos_FOUND AND NOT TARGET Geos::Geosc)
-    add_library(Geos::Geosc STATIC IMPORTED)
-    set_target_properties(Geos::Geosc PROPERTIES
-        IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-        INTERFACE_INCLUDE_DIRECTORIES "${Geosc_INCLUDE_DIR}"
-        INTERFACE_LINK_LIBRARIES Geos::Geos
-        IMPORTED_LOCATION ${Geosc_LIBRARY}
-    )
-
-    if(Geosc_LIBRARY_DEBUG)
+    if(Geosc_LIBRARY)
+        add_library(Geos::Geosc STATIC IMPORTED)
         set_target_properties(Geos::Geosc PROPERTIES
-            IMPORTED_LOCATION_DEBUG "${Geosc_LIBRARY_DEBUG}"
+            IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+            INTERFACE_INCLUDE_DIRECTORIES "${Geosc_INCLUDE_DIR}"
+            INTERFACE_LINK_LIBRARIES Geos::Geos
         )
-    endif()
+    
+    
+        set_target_properties(Geos::Geosc PROPERTIES
+            IMPORTED_LOCATION "${Geosc_LIBRARY}"
+        )
+
+        if(Geosc_LIBRARY_DEBUG)
+            set_target_properties(Geos::Geosc PROPERTIES
+                IMPORTED_LOCATION_DEBUG "${Geosc_LIBRARY_DEBUG}"
+            )
+        endif()
+    else ()
+        # when geos is built as static library the c symbols
+        # are inside the c++ library, so create an interface
+        # target that depends on the c++ library
+        add_library(Geos::Geosc INTERFACE IMPORTED)
+        set_target_properties(Geos::Geosc PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${Geosc_INCLUDE_DIR}"
+            INTERFACE_LINK_LIBRARIES Geos::Geos
+        )
+    endif()    
 endif()

@@ -9,7 +9,9 @@ vcpkg_from_github(
     REF ${VERSION}
     SHA512 6bf48189f35cf2ff20b09e27ab83b6fb36415bed7e5c818c1ea2c9b30b5fe0a60c0f7e9930e92a0637c7b567ccfead4a9208a3aff99be89fed361778cf8c45f1
     HEAD_REF master
-    PATCHES ${CMAKE_CURRENT_LIST_DIR}/msvc-fix.patch
+    PATCHES
+        ${CMAKE_CURRENT_LIST_DIR}/msvc-fix.patch
+        ${CMAKE_CURRENT_LIST_DIR}/float-precision.patch
 )
 
 vcpkg_configure_cmake(

@@ -9,6 +9,8 @@ vcpkg_from_github(
     REF ${VERSION}
     SHA512 99d1b36209dc879b12b99ed0809f1d21f760c62c25aa32d8f83b571d0819e35783ad20be0754288da9cd5fcb81cbb672031928d159ff9a64c3635dcbc4bda8fa
     HEAD_REF master
+    PATCHES
+        ${CMAKE_CURRENT_LIST_DIR}/float-precision.patch
 )
 
 vcpkg_configure_cmake(

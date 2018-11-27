@@ -1,0 +1,32 @@
+diff -Naur a/config/cmake/hdf5-config.cmake.in b/config/cmake/hdf5-config.cmake.in
+--- a/config/cmake/hdf5-config.cmake.in	2018-09-04 04:54:44.000000000 +0200
++++ b/config/cmake/hdf5-config.cmake.in	2018-11-13 13:31:06.116569316 +0100
+@@ -14,6 +14,7 @@
+ #-----------------------------------------------------------------------------
+ @PACKAGE_INIT@
+ 
++include(CMakeFindDependencyMacro)
+ string(TOUPPER @HDF5_PACKAGE@ HDF5_PACKAGE_NAME)
+ 
+ set (${HDF5_PACKAGE_NAME}_VALID_COMPONENTS
+@@ -68,6 +69,11 @@
+   set (${HDF5_PACKAGE_NAME}_JAVA_LIBRARIES "${${HDF5_PACKAGE_NAME}_JAVA_LIBRARY}")
+ endif ()
+ 
++if (${HDF5_PACKAGE_NAME}_ENABLE_Z_LIB_SUPPORT)
++    find_dependency(ZLIB)
++    set (${HDF5_PACKAGE_NAME}_LIBRARIES ZLIB::ZLIB)
++endif ()
++
+ #-----------------------------------------------------------------------------
+ # Directories
+ #-----------------------------------------------------------------------------
+@@ -111,7 +117,7 @@
+   if (${HDF5_PACKAGE_NAME}_ENABLE_SZIP_SUPPORT AND ${HDF5_PACKAGE_NAME}_PACKAGE_EXTLIBS AND NOT TARGET "szip")
+     include (@PACKAGE_SHARE_INSTALL_DIR@/@SZIP_PACKAGE_NAME@/@SZIP_PACKAGE_NAME@@HDF_PACKAGE_EXT@-targets.cmake)
+   endif ()
+-  include (@PACKAGE_SHARE_INSTALL_DIR@/@HDF5_PACKAGE@/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@-targets.cmake)
++  include (@PACKAGE_SHARE_INSTALL_DIR@/@HDF5_PACKAGE@@HDF_PACKAGE_EXT@-targets.cmake)
+ endif ()
+ 
+ # Handle default component(static) :

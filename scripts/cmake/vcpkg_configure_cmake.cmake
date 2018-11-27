@@ -62,6 +62,12 @@ function(vcpkg_configure_cmake)
         set(_csc_HOST_ARCHITECTURE $ENV{PROCESSOR_ARCHITECTURE})
     endif()
 
+    if(CMAKE_HOST_WIN32)
+        set(_PATHSEP ";")
+    else()
+        set(_PATHSEP ":")
+    endif()
+
     set(NINJA_CAN_BE_USED ON) # Ninja as generator
     set(NINJA_HOST ON) # Ninja as parallel configurator
     if(_csc_HOST_ARCHITECTURE STREQUAL "x86")
@@ -120,7 +126,7 @@ function(vcpkg_configure_cmake)
     if(GENERATOR STREQUAL "Ninja")
         vcpkg_find_acquire_program(NINJA)
         get_filename_component(NINJA_PATH ${NINJA} DIRECTORY)
-        set(ENV{PATH} "$ENV{PATH};${NINJA_PATH}")
+        set(ENV{PATH} "$ENV{PATH}${_PATHSEP}${NINJA_PATH}")
         list(APPEND _local_OPTIONS "-DCMAKE_MAKE_PROGRAM=${NINJA}")
     endif()
 
@@ -202,6 +208,17 @@ function(vcpkg_configure_cmake)
         )
     endif()
 
+    # Sets configuration variables for macOS builds
+    if(DEFINED VCPKG_INSTALL_NAME_DIR)
+        list(APPEND _local_OPTIONS "-DCMAKE_INSTALL_NAME_DIR=${VCPKG_INSTALL_NAME_DIR}")
+    endif()
+    if(DEFINED VCPKG_OSX_DEPLOYMENT_TARGET)
+        list(APPEND _local_OPTIONS "-DCMAKE_OSX_DEPLOYMENT_TARGET=${VCPKG_OSX_DEPLOYMENT_TARGET}")
+    endif()
+    if(DEFINED VCPKG_OSX_SYSROOT)
+        list(APPEND _local_OPTIONS "-DCMAKE_OSX_SYSROOT=${VCPKG_OSX_SYSROOT}")
+    endif()
+
     set(rel_command
         ${CMAKE_COMMAND} "${_local_OPTIONS}" "${_csc_OPTIONS}" "${_csc_OPTIONS_RELEASE}"
         -DCMAKE_BUILD_TYPE=Release
@@ -219,7 +236,7 @@ function(vcpkg_configure_cmake)
 
         vcpkg_find_acquire_program(NINJA)
         get_filename_component(NINJA_PATH ${NINJA} DIRECTORY)
-        set(ENV{PATH} "$ENV{PATH};${NINJA_PATH}")
+        set(ENV{PATH} "$ENV{PATH}${_PATHSEP}${NINJA_PATH}")
 
         #parallelize the configure step
         set(_contents
@@ -227,6 +244,13 @@ function(vcpkg_configure_cmake)
         )
 
         if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "release")
+            if (VCPKG_VERBOSE)
+                string(JOIN "\n" PRINT_COMMAND ${rel_command})
+                STRING(REPLACE "-C\n" "-C " PRINT_COMMAND "${PRINT_COMMAND}")
+                STRING(REPLACE "-G\n" "-G " PRINT_COMMAND "${PRINT_COMMAND}")
+                message(STATUS "Command: ${PRINT_COMMAND}")
+            endif ()
+
             set(rel_line "build ../CMakeCache.txt: CreateProcess\n  process = cmd /c \"cd .. &&")
             foreach(arg ${rel_command})
                 set(rel_line "${rel_line} \"${arg}\"")
@@ -235,6 +259,13 @@ function(vcpkg_configure_cmake)
         endif()
 
         if(NOT DEFINED VCPKG_BUILD_TYPE OR VCPKG_BUILD_TYPE STREQUAL "debug")
+            if (VCPKG_VERBOSE)
+                string(JOIN "\n" PRINT_COMMAND ${dbg_command})
+                STRING(REPLACE "-C\n" "-C " PRINT_COMMAND "${PRINT_COMMAND}")
+                STRING(REPLACE "-G\n" "-G " PRINT_COMMAND "${PRINT_COMMAND}")
+                message(STATUS "Command: ${PRINT_COMMAND}")
+            endif ()
+        
             set(dbg_line "build ../../${TARGET_TRIPLET}-dbg/CMakeCache.txt: CreateProcess\n  process = cmd /c \"cd ../../${TARGET_TRIPLET}-dbg &&")
             foreach(arg ${dbg_command})
                 set(dbg_line "${dbg_line} \"${arg}\"")
@@ -257,10 +288,9 @@ function(vcpkg_configure_cmake)
             file(MAKE_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg)
 
             if (VCPKG_VERBOSE)
-                STRING(REPLACE ";;" ";" PRINT_COMMAND "${dbg_command}")
-                STRING(REPLACE ";" "\n   " PRINT_COMMAND "${PRINT_COMMAND}")
-                STRING(REPLACE "-C\n   " "-C " PRINT_COMMAND "${PRINT_COMMAND}")
-                STRING(REPLACE "-G\n   " "-G " PRINT_COMMAND "${PRINT_COMMAND}")
+                string(JOIN "\n" PRINT_COMMAND ${dbg_command})
+                STRING(REPLACE "-C\n" "-C " PRINT_COMMAND "${PRINT_COMMAND}")
+                STRING(REPLACE "-G\n" "-G " PRINT_COMMAND "${PRINT_COMMAND}")
                 message(STATUS "Command: ${PRINT_COMMAND}")
             endif ()
 
@@ -275,10 +305,9 @@ function(vcpkg_configure_cmake)
             message(STATUS "Configuring ${TARGET_TRIPLET}-rel")
             file(MAKE_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel)
             if (VCPKG_VERBOSE)
-                STRING(REPLACE ";;" ";" PRINT_COMMAND "${rel_command}")
-                STRING(REPLACE ";" "\n   " PRINT_COMMAND "${PRINT_COMMAND}")
-                STRING(REPLACE "-C\n   " "-C " PRINT_COMMAND "${PRINT_COMMAND}")
-                STRING(REPLACE "-G\n   " "-G " PRINT_COMMAND "${PRINT_COMMAND}")
+                string(JOIN "\n" PRINT_COMMAND ${rel_command})
+                STRING(REPLACE "-C\n" "-C " PRINT_COMMAND "${PRINT_COMMAND}")
+                STRING(REPLACE "-G\n" "-G " PRINT_COMMAND "${PRINT_COMMAND}")
                 message(STATUS "Command: ${PRINT_COMMAND}")
             endif ()
             vcpkg_execute_required_process(

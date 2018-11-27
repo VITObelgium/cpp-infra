@@ -1,17 +1,17 @@
 include(vcpkg_common_functions)
 
 set(MAJOR 1)
-set(MINOR 67)
+set(MINOR 68)
 set(REVISION 0)
 set(VERSION ${MAJOR}.${MINOR}.${REVISION})
 set(VERSION_UNDERSCORE ${MAJOR}_${MINOR}_${REVISION})
 set(PACKAGE_NAME ${PORT}_${VERSION_UNDERSCORE})
 if (CMAKE_HOST_WIN32)
     set(PACKAGE ${PACKAGE_NAME}.7z)
-    set(SHA_SUM 5d6d4e93e48a6853ba84ae00dd73e1c6a55734c1de6654a1801b5efb54a0ea36c34fa8877ee08c3be0944a748ba6961bfb37c09e2ad583886e8ec4042e279de0)
+    set(SHA_SUM 230dfd27150d19e044389efa222fff5396379f687785dc5e0d1b0347cef1e1298c78efe9befbab4f212f60f4f894a83703c6f774c10afbc6e501f8ed054d11d7)
 else ()
     set(PACKAGE ${PACKAGE_NAME}.tar.bz2)
-    set(SHA_SUM 82bf33d7d2c3db109c9d1f12d40bc2d364c8c95262386f906ccd1a71cd71433bcc01829e968b4a13a5003cf0b50cbdf0b435a1d76530cea7bb05725c327411e8)
+    set(SHA_SUM f5ca2e0425af40eca7722712b985b863c88780e5be5ac24c78bcfdc63651bb67a39605d4f84089d76cab344fd34113fcb7befaa9a90481b381f6c53e9612b5f9)
 endif ()
 
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/${PACKAGE_NAME})
@@ -29,12 +29,6 @@ file(REMOVE_RECURSE ${BUILD_PATH_RELEASE})
 
 vcpkg_extract_source_archive(${ARCHIVE} ${CURRENT_BUILDTREES_DIR}/src)
 
-vcpkg_assemble_compiler_flags(BOOST_CXX_FLAGS_DEBUG BOOST_CXX_FLAGS_RELEASE)
-set (BOOST_CXX_FLAGS ${BOOST_CXX_FLAGS_DEBUG})
-configure_file(${CMAKE_CURRENT_LIST_DIR}/user-config.jam.in ${BUILD_PATH_DEBUG}/user-config-vcpkg.jam @ONLY)
-set (BOOST_CXX_FLAGS ${BOOST_CXX_FLAGS_RELEASE})
-configure_file(${CMAKE_CURRENT_LIST_DIR}/user-config.jam.in ${BUILD_PATH_RELEASE}/user-config-vcpkg.jam @ONLY)
-
 if(VCPKG_TARGET_ARCHITECTURE STREQUAL "x64")
     set (ADDRESS_MODEL 64)
 else ()
@@ -50,10 +44,11 @@ endif ()
 if (TRIPLET_SYSTEM_ARCH MATCHES "arm")
     set(ARCHITECTURE arm)
 else ()
-    set(ARCHITECTURE x86)   
+    set(ARCHITECTURE x86)
 endif()
 
 set (B2_OPTIONS
+    -d2
     --debug-configuration
     --ignore-site-config
     --disable-icu
@@ -95,7 +90,11 @@ else ()
     set(CONFIG_CMD sh ./bootstrap.sh)
     set(BUILD_CMD ./b2)
     list(APPEND B2_OPTIONS --layout=system)
-    set (TOOLSET gcc-vcpkg)
+    if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+        set (TOOLSET darwin-vcpkg)
+    else()
+        set (TOOLSET gcc-vcpkg)
+    endif()
 endif ()
 
 if (VCPKG_CMAKE_SYSTEM_NAME STREQUAL Windows AND CMAKE_HOST_UNIX)
@@ -179,12 +178,31 @@ if ("math" IN_LIST FEATURES)
     list(APPEND WITH_COMPONENTS --with-math)
 endif ()
 
+if ("timer" IN_LIST FEATURES)
+    list(APPEND WITH_COMPONENTS --with-timer)
+endif ()
+
+if ("python" IN_LIST FEATURES)
+    set(Python3_VERSION_MAJOR 3)
+    set(Python3_VERSION_MINOR 7)
+    set(Python3_EXECUTABLE /projects/urbflood/.miniconda3/bin/python)
+    set(Python3_INCLUDE_DIRS /projects/urbflood/.miniconda3/include/python${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}m)
+    set(Python3_LIBRARIES /projects/urbflood/.miniconda3/lib/libpython${Python3_VERSION_MAJOR}.${Python3_VERSION_MINOR}.so)
+    list(APPEND WITH_COMPONENTS --with-python)
+endif ()
+
 if (NOT WITH_COMPONENTS)
     # if no components are selected build with system, otherwise all components are built
     list(APPEND B2_OPTIONS --with-system)
 else ()
     list(APPEND B2_OPTIONS ${WITH_COMPONENTS})
 endif ()
+
+vcpkg_assemble_compiler_cxxflags(DEBUG BOOST_CXX_FLAGS_DEBUG RELEASE BOOST_CXX_FLAGS_RELEASE)
+set (BOOST_CXX_FLAGS ${BOOST_CXX_FLAGS_DEBUG})
+configure_file(${CMAKE_CURRENT_LIST_DIR}/user-config.jam.in ${BUILD_PATH_DEBUG}/user-config-vcpkg.jam @ONLY)
+set (BOOST_CXX_FLAGS ${BOOST_CXX_FLAGS_RELEASE})
+configure_file(${CMAKE_CURRENT_LIST_DIR}/user-config.jam.in ${BUILD_PATH_RELEASE}/user-config-vcpkg.jam @ONLY)
 
 message(STATUS "Configuring ${TARGET_TRIPLET}")
 vcpkg_execute_required_process(

@@ -1,19 +1,19 @@
 #!/bin/sh
 # C compiler
-export CC=@CMAKE_C_COMPILER@
+export CC="@CMAKE_C_COMPILER@"
 export CFLAGS="@EXPORT_CFLAGS@"
 export CPPFLAGS="@EXPORT_CFLAGS@"
 
 # C++ compiler
-export CXX=@CMAKE_CXX_COMPILER@
+export CXX="@CMAKE_CXX_COMPILER@"
 export CXXFLAGS="@EXPORT_CXXFLAGS@"
 
 # Linker
-export LD=@LINKER_EXECUTABLE@
+export LD="@LINKER_EXECUTABLE@"
 export LDFLAGS="@EXPORT_LDFLAGS@"
 
 # Tools
-export AR=@CMAKE_AR@
+export AR="@CMAKE_AR@"
 export RANLIB=@CMAKE_RANLIB@
 
 export WANT_AUTOMAKE=latest

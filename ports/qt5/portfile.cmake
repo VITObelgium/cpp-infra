@@ -43,8 +43,31 @@ vcpkg_apply_patches(
  # jpeg lib name is jpeg.lib on windows, not libjpeg.lib
  vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/src/gui/configure.json "-llibjpeg" "-ljpeg")
 
+ # copy the g++-cluster compiler specification
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/linux-g++-cluster DESTINATION ${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/mkspecs)
+
+set(OPTIONAL_ARGS)
+if(NOT "tools" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_ARGS -skip qttools)
+endif()
+
+if(NOT "qml" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_ARGS -skip qtquickcontrols -skip qtquickcontrols2 -skip qtdeclarative)
+endif()
+
+if(NOT "location" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_ARGS -skip qtlocation)
+endif()
+
+if(NOT "sql" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_ARGS -no-feature-sql -no-sql-db2 -no-sql-ibase -no-sql-mysql -no-sql-oci -no-sql-odbc -no-sql-psql -no-sql-sqlite2 -no-sql-sqlite -no-sql-tds)
+else ()
+    list(APPEND OPTIONAL_ARGS -sql-sqlite -system-sqlite)
+endif()
+
 set(QT_OPTIONS
     -I ${CURRENT_INSTALLED_DIR}/include
+    -verbose
     -opensource
     -confirm-license
     -nomake examples
@@ -60,8 +83,7 @@ set(QT_OPTIONS
     -system-libpng
     -system-libjpeg
     -system-pcre
-    -sql-sqlite
-    -system-sqlite
+    -skip qtdoc
     -skip qt3d
     -skip qtactiveqt
     -skip qtcanvas3d
@@ -70,16 +92,21 @@ set(QT_OPTIONS
     -skip qtgamepad
     -skip qtmultimedia
     -skip qtpurchasing
+    -skip qtremoteobjects
     -skip qtscript
     -skip qtsensors
     -skip qtserialbus
     -skip qtserialport
     -skip qtscxml
+    -skip qtspeech
+    -skip qtvirtualkeyboard
     -skip qtwebengine
     -skip qtwebchannel
     -skip qtwebsockets
     -skip qtwebview
     -skip qtwinextras
+    -no-feature-testlib
+    ${OPTIONAL_ARGS}
 )
 
 if (${VCPKG_LIBRARY_LINKAGE} STREQUAL "static")
@@ -113,6 +140,7 @@ if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SY
 elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (HOST MATCHES "x86_64-unknown-linux-gnu")
         set(PLATFORM -platform linux-g++-cluster)
+        list(APPEND PLATFORM_OPTIONS -no-opengl -sysroot ${CMAKE_SYSROOT})
     elseif (CMAKE_COMPILER_IS_GNUCXX)
         set(PLATFORM -platform linux-g++)
     else ()
@@ -179,7 +207,12 @@ set(QT_OPTIONS_DBG
 
 file(REMOVE_RECURSE ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg)
 
+set(ENV{PKG_CONFIG_LIBDIR} "${CURRENT_INSTALLED_DIR}/lib/pkgconfig")
 message(STATUS "Configuring ${TARGET_TRIPLET}-dbg")
+if(VCPKG_VERBOSE)
+    STRING(JOIN " " QT_ARGS ${QT_OPTIONS_DBG})
+    message(STATUS "${SOURCE_PATH}/${PACKAGE_NAME}/configure${CONFIG_SUFFIX} ${QT_ARGS}")
+endif()
 file(MAKE_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg)
 vcpkg_execute_required_process(
     COMMAND ${EXEC_COMMAND} ${SOURCE_PATH}/${PACKAGE_NAME}/configure${CONFIG_SUFFIX} ${QT_OPTIONS_DBG}

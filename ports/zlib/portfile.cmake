@@ -20,13 +20,17 @@ vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA
     OPTIONS
-        -DSKIP_INSTALL_FILES=ON
         -DSKIP_BUILD_EXAMPLES=ON
+    OPTIONS_RELEASE
+        -DINSTALL_PKGCONFIG_DIR=${CURRENT_PACKAGES_DIR}/lib/pkgconfig
+        -DSKIP_INSTALL_FILES=OFF
     OPTIONS_DEBUG
+        -DSKIP_INSTALL_FILES=ON
         -DSKIP_INSTALL_HEADERS=ON
 )
 
 vcpkg_install_cmake()
+vcpkg_fixup_pkgconfig_file()
 
 # Both dynamic and static are built, so keep only the one needed
 if(VCPKG_LIBRARY_LINKAGE STREQUAL static)
