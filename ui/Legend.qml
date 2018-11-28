@@ -4,6 +4,7 @@ import QtQuick.Layouts 1.1
 
 Item {
     id: legendView
+    property double scale: 1.0
     property alias model: listView.model
     property alias count: listView.count
     implicitWidth: listView.implicitWidth
@@ -24,31 +25,36 @@ Item {
         implicitHeight: contentItem.childrenRect.height + anchors.margins * 2
         anchors.margins: 5
         orientation: ListView.Vertical
-        spacing: 2
+        spacing: 2 * legendView.scale
         anchors.fill: parent
         delegate: Item {
             implicitWidth: legendItem.width
-            height: 20
+            height: 20 * legendView.scale
 
             RowLayout {
                 id: legendItem
-                implicitWidth: colorRectangle.width + colorText.width + spacing
+                implicitWidth: 20 * legendView.scale + colorText.width + spacing
                 Rectangle {
                     id: colorRectangle
-                    width: 20
-                    height: 20
+                    Layout.preferredWidth: 20 * legendView.scale
+                    Layout.preferredHeight: 20 * legendView.scale
+                    //anchors.bottom: parent.bottom
+                    //anchors.left: parent.left
+                    width: height
                     color: Color
-                    border.width: 1
                     border.color: "black"
                 }
 
                 Text {
                     id: colorText
                     text: Name
+                    //anchors.left: colorRectangle.right
                     verticalAlignment: Text.AlignVCenter
                     font.bold: true
+                    font.pointSize: 10.0 * legendView.scale
                 }
-                spacing: 5
+
+                spacing: 2 * legendView.scale
             }
         }
     }
