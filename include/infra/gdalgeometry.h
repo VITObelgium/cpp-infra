@@ -23,6 +23,7 @@ namespace inf::gdal {
 
 using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
+using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
 class Layer;
 class CoordinateTransformer;
@@ -248,7 +249,7 @@ Owner<GeometryType> createGeometry()
     return Owner<GeometryType>(new typename GeometryType::WrappedType());
 }
 
-using Field = std::variant<int32_t, int64_t, double, std::string_view>;
+using Field = std::variant<int32_t, int64_t, double, std::string_view, time_point>;
 
 class FieldDefinitionRef
 {
