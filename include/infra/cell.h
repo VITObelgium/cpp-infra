@@ -88,6 +88,14 @@ inline void increment_cell(Cell& cell, int32_t cols)
     }
 }
 
+inline double distance(const Cell& lhs, const Cell& rhs)
+{
+    auto x = rhs.c - lhs.c;
+    auto y = rhs.r - lhs.r;
+
+    return std::sqrt((x * x) + (y * y));
+}
+
 }
 
 namespace fmt {
