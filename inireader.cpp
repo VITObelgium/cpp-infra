@@ -12,7 +12,7 @@ namespace inf {
 
 /* Typedef for prototype of handler function. */
 typedef int (*ini_handler)(void* user, const char* section,
-                           const char* name, const char* value);
+    const char* name, const char* value);
 
 /* Typedef for prototype of fgets-style reader function. */
 typedef char* (*ini_reader)(char* str, int num, void* stream);
@@ -105,7 +105,7 @@ inline static char* strncpy0(char* dest, const char* src, size_t size)
 /* Same as ini_parse(), but takes an ini_reader function pointer instead of
    filename. Used for implementing custom or string-based I/O. */
 inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
-                            void* user)
+    void* user)
 {
 /* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK
@@ -228,9 +228,9 @@ static int ini_parse(const char* filename, ini_handler handler, void* user)
     return error;
 }
 
-IniReader::IniReader(const std::string& filename)
+IniReader::IniReader(const fs::path& filename)
 {
-    auto error = ini_parse(filename.c_str(), valueHandler, this);
+    auto error = ini_parse(filename.u8string().c_str(), valueHandler, this);
     if (error != 0) {
         throw RuntimeError("Failed to parse ini file, error on line {} ({})", error, filename);
     }
@@ -241,6 +241,17 @@ std::vector<std::string> IniReader::sections() const
     std::vector<std::string> result;
     for (const auto& keyValue : _values) {
         result.push_back(keyValue.first);
+    }
+
+    return result;
+}
+
+std::unordered_map<std::string, std::string> IniReader::section(std::string_view name) const
+{
+    std::unordered_map<std::string, std::string> result;
+
+    if (auto iter = _values.find(str::lowercase(name)); iter != _values.end()) {
+        result = iter->second;
     }
 
     return result;
