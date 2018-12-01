@@ -12,6 +12,7 @@
 #include "tools/FileTools.h"
 
 #include <algorithm>
+#include <iostream>
 
 namespace opaq {
 
