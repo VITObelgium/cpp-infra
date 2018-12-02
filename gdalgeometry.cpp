@@ -1,4 +1,5 @@
 #include "infra/gdalgeometry.h"
+#include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/gdal-private.h"
 #include "infra/gdal.h"
@@ -340,13 +341,14 @@ const std::type_info& FieldDefinitionRef::type() const
         return typeid(std::string_view);
     case OFTDate:
         return typeid(date_point);
+    case OFTDateTime:
+        return typeid(time_point);
+    case OFTTime:
     case OFTIntegerList:
     case OFTRealList:
     case OFTStringList:
     case OFTWideString:
     case OFTBinary:
-    case OFTTime:
-    case OFTDateTime:
     case OFTInteger64List:
     default:
         throw std::runtime_error("Type not implemented");
@@ -520,6 +522,17 @@ T Feature::field_as(int index) const
         return _feature->GetFieldAsInteger64(index);
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(index));
+    } else if constexpr (std::is_same_v<time_point, T>) {
+        int year, month, day, hour, minute, timezoneFlag;
+        float second;
+        if (_feature->GetFieldAsDateTime(index, &year, &month, &day, &hour, &minute, &second, &timezoneFlag) == FALSE) {
+            throw std::runtime_error("Failed to get field as date time");
+        }
+
+        auto date      = date::year_month_day(date::year(year), date::month(month), date::day(day));
+        auto timePoint = std::chrono::time_point_cast<std::chrono::milliseconds>(static_cast<date::sys_days>(date));
+        timePoint += std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::milliseconds(inf::truncate<int>(second * 1000));
+        return timePoint;
     } else {
         throw std::invalid_argument("Invalid field type");
     }
@@ -538,6 +551,8 @@ T Feature::field_as(std::string_view name) const
         return _feature->GetFieldAsInteger64(name.data());
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(name.data()));
+    } else if constexpr (std::is_same_v<time_point, T>) {
+        return field_as<T>(_feature->GetFieldIndex(name.data()));
     } else {
         throw std::invalid_argument("Invalid field type");
     }
@@ -549,12 +564,14 @@ template float Feature::field_as<float>(int index) const;
 template int32_t Feature::field_as<int32_t>(int index) const;
 template int64_t Feature::field_as<int64_t>(int index) const;
 template std::string_view Feature::field_as<std::string_view>(int index) const;
+template time_point Feature::field_as<time_point>(int index) const;
 
 template double Feature::field_as<double>(std::string_view index) const;
 template float Feature::field_as<float>(std::string_view index) const;
 template int32_t Feature::field_as<int32_t>(std::string_view index) const;
 template int64_t Feature::field_as<int64_t>(std::string_view index) const;
 template std::string_view Feature::field_as<std::string_view>(std::string_view index) const;
+template time_point Feature::field_as<time_point>(std::string_view index) const;
 
 bool Feature::operator==(const Feature& other) const
 {
