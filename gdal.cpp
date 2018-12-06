@@ -1,4 +1,5 @@
 #include "infra/gdal.h"
+#include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/gdallog.h"
@@ -153,7 +154,7 @@ Point<double> projected_to_geographic(int32_t epsg, Point<double> point)
 
     poLatLong  = utm.CloneGeogCS();
     auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
-                              "Failed to create transformation");
+        "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -340,7 +341,7 @@ RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, 
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-                                      "Failed to create data set copy"));
+        "Failed to create data set copy"));
 }
 
 RasterType RasterDriver::type() const
@@ -413,7 +414,7 @@ VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, 
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-                                      "Failed to create data set copy"));
+        "Failed to create data set copy"));
 }
 
 VectorType VectorDriver::type() const
@@ -441,9 +442,9 @@ const GDALRasterBand* RasterBand::get() const
 }
 
 static GDALDataset* createDataSet(const fs::path& filePath,
-                                  unsigned int openFlags,
-                                  const char* const* drivers,
-                                  const std::vector<std::string>& driverOpts)
+    unsigned int openFlags,
+    const char* const* drivers,
+    const std::vector<std::string>& driverOpts)
 {
     // use generic_u8string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
@@ -479,10 +480,10 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
     }
 
     return RasterDataSet(checkPointer(createDataSet(filePath,
-                                                    GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                                    nullptr,
-                                                    driverOpts),
-                                      "Failed to open raster file"));
+                                          GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                          nullptr,
+                                          driverOpts),
+        "Failed to open raster file"));
 }
 
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
@@ -627,6 +628,46 @@ void RasterDataSet::write_rasterdata(int band, int xOff, int yOff, int xSize, in
 {
     auto* bandPtr = _ptr->GetRasterBand(band);
     checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, const_cast<void*>(pData), bufXSize, bufYSize, resolveType(type), 0, 0), "Failed to write raster data");
+}
+
+void RasterDataSet::write_geometadata(const GeoMetadata& meta)
+{
+    if (raster_count() > 0) {
+        set_nodata_value(1, meta.nodata);
+    }
+
+    set_geotransform(std::array<double, 6>{{meta.xll, meta.cellSize, 0.0, meta.yll + (meta.cellSize * meta.rows), 0.0, -meta.cellSize}});
+    set_projection(meta.projection);
+}
+
+GeoMetadata RasterDataSet::geometadata() const
+{
+    GeoMetadata meta;
+
+    if (raster_count() != 1) {
+        throw RuntimeError("Only rasters with a single band are currently supported");
+    }
+
+    meta.cols       = x_size();
+    meta.rows       = y_size();
+    meta.nodata     = nodata_value(1);
+    meta.projection = projection();
+    fill_geometadata_from_geo_transform(meta, geotransform());
+
+    return meta;
+}
+
+void RasterDataSet::add_band(GDALDataType type, const void* data)
+{
+    // convert the data pointer to a string
+    std::array<char, 32> buf;
+    auto writtenCharacters = CPLPrintPointer(buf.data(), const_cast<void*>(data), truncate<int>(buf.size()));
+    buf[writtenCharacters] = 0;
+
+    auto pointerString = fmt::format("DATAPOINTER={}", buf.data());
+    std::array<const char*, 2> options{{pointerString.c_str(), nullptr}};
+
+    _ptr->AddBand(type, const_cast<char**>(options.data()));
 }
 
 GDALDataset* RasterDataSet::get() const
@@ -837,7 +878,7 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
     return VectorType::Unknown;
 }
 
-static void fillMetadataFromGeoTransform(inf::GeoMetadata& meta, const std::array<double, 6>& geoTrans)
+void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<double, 6>& geoTrans)
 {
     if (geoTrans[2] == 0.0 && geoTrans[4] == 0.0) {
         meta.cellSize = geoTrans[1];
@@ -848,28 +889,11 @@ static void fillMetadataFromGeoTransform(inf::GeoMetadata& meta, const std::arra
     meta.yll = geoTrans[3] + geoTrans[4] * 0.0 + geoTrans[5] * meta.rows;
 }
 
-inf::GeoMetadata read_metadata_from_dataset(const gdal::RasterDataSet& dataSet)
-{
-    inf::GeoMetadata meta;
-
-    if (dataSet.raster_count() != 1) {
-        throw RuntimeError("Only rasters with a single band are currently supported");
-    }
-
-    meta.cols       = dataSet.x_size();
-    meta.rows       = dataSet.y_size();
-    meta.nodata     = dataSet.nodata_value(1);
-    meta.projection = dataSet.projection();
-    fillMetadataFromGeoTransform(meta, dataSet.geotransform());
-
-    return meta;
-}
-
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-                            dataBuffer.size(), FALSE /*no ownership*/))
+      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+      dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 
