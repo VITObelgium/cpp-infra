@@ -17,17 +17,17 @@ struct Cell
     {
     }
 
-    bool operator==(const Cell& other) const noexcept
+    constexpr bool operator==(const Cell& other) const noexcept
     {
         return r == other.r && c == other.c;
     }
 
-    bool operator!=(const Cell& other) const noexcept
+    constexpr bool operator!=(const Cell& other) const noexcept
     {
         return !(*this == other);
     }
 
-    bool operator<(const Cell& other) const noexcept
+    constexpr bool operator<(const Cell& other) const noexcept
     {
         if (r != other.r) {
             return r < other.r;
