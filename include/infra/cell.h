@@ -10,8 +10,8 @@ namespace inf {
 // Represents a point in the raster using r,c coordinates
 struct Cell
 {
-    Cell() = default;
-    Cell(int32_t row, int32_t col)
+    constexpr Cell() = default;
+    constexpr Cell(int32_t row, int32_t col)
     : r(row)
     , c(col)
     {
@@ -31,13 +31,18 @@ struct Cell
     {
         if (r != other.r) {
             return r < other.r;
-        } else {
-            return c < other.c;
         }
+
+        return c < other.c;
     }
 
-    int32_t r = std::numeric_limits<int32_t>::max();
-    int32_t c = std::numeric_limits<int32_t>::max();
+    constexpr bool is_valid() const
+    {
+        return r >= 0 && c >= 0;
+    }
+
+    int32_t r = -1;
+    int32_t c = -1;
 };
 
 inline Cell left_cell(const Cell& cell) noexcept
