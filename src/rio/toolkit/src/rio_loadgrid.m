@@ -62,6 +62,8 @@ switch ( Cnf.grid_type )
         Cnf.grid_res  = 3000;
     case '4x4'
         Cnf.grid_res  = 4000;
+    case 'cn2018'
+        Cnf.grid_res  = 4000;
     case '5x5'
         Cnf.grid_res  = 5000;
     case '3x3'
