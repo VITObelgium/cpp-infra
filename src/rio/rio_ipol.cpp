@@ -2,8 +2,12 @@
 
 #include "exp_spcorr.hpp"
 #include "infra/exception.h"
+
 #include "parser.hpp"
+
+// supported trend models...
 #include "polytrend.hpp"
+#include "mlrtrend.hpp"
 
 namespace rio {
 
@@ -53,6 +57,10 @@ rio_ipol::rio_ipol(const config& cf, const std::shared_ptr<rio::network>& net)
     if (!tr_type.compare("polytrend")) {
         std::cout << " Set trend model : polytrend" << std::endl;
         _trend = std::make_unique<rio::polytrend>(tr_config);
+
+    } else if (!tr_type.compare("mlrtrend")) {
+        std::cout << " Set trend model : mlrtrend" << std::endl;
+        _trend = std::make_unique<rio::mlrtrend>(tr_config);
 
     } else {
         throw std::runtime_error("requested trendmodel \"" + tr_type + "\" in rio_ipol is not supported...");
@@ -150,5 +158,4 @@ void rio_ipol::run(Eigen::VectorXd& values,
 
     return;
 }
-
 }

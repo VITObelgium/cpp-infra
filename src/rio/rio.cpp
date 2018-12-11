@@ -27,9 +27,11 @@ std::string get_envvar(std::string const& key)
 int main(int argc, char* argv[])
 {
     std::cout << "+----------------------------------------------------+\n";
+    std::cout << "|                                                    |\n";
     std::cout << "|  RIO air quality mapping model           (((       |\n";
     std::cout << "|  Version 5.0                            (. .)      |\n";
     std::cout << "|  (c) VITO/VMM 2004-2018               <(( v ))>    |\n";
+    std::cout << "|                                          | |       |\n";
     std::cout << "+------------------------------------------m-m-------+" << std::endl;
 
     try {

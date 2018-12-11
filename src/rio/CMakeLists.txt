@@ -39,6 +39,7 @@ add_library(rio
     exp_spcorr.hpp exp_spcorr.cpp
     trendmodel.hpp trendmodel.cpp
     polytrend.hpp polytrend.cpp
+    mlrtrend.hpp mlrtrend.cpp
     xmltools.hpp xmltools.cpp
     parser.hpp parser.cpp
     output.hpp output.cpp
