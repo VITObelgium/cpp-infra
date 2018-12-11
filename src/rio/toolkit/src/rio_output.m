@@ -8,7 +8,8 @@
 %   cnf = rio_output( cnf, vals, grid, fmt, date, outpath )
 %
 %  The format string can be : 
-%   fmt : 'RIO' : standard RIO ascii files
+%   fmt : 'RIO'         standard RIO ascii files
+%       : 'RIO_IRCEL'   IRCEL format, which added the saroad code & date
 %
 %  A number of configuration structure parameters are relevant here : 
 %   - cnf.outputPath : location to store the output files, the files are written
@@ -131,6 +132,39 @@ switch ( fmt )
             fprintf(fid, fmt_stat, conv_id(k,:), export_stat(k,:) );
         end
         fclose(fid);               
+        
+        
+    case 'RIO_IRCEL'
+        
+        if ( cnf.agg_time ~= 4 ),
+            error( 'rio_output:: RIO_IRCEL not supported for agg_time other than 1h' );
+        end
+        
+        
+        %-- Write the grid...
+        fid = fopen(grid_file, 'wt');
+        if cnf.outputXY,
+            xx = export_grid(:,4:end);
+        else 
+            xx = export_grid(:,2:end);
+        end
+        
+        switch cnf.pol
+            case 'no2'
+                saroad_code = '42602';
+            otherwise
+                error( 'polluant not supported in rio_output for RIO_IRCEL (code saroad code..)' );
+        end
+        
+        fmtt = '%5d;%s;%s';
+        for  ii=1:size(xx,2), fmtt = [ fmtt ';%.2f' ]; end;
+        fmtt = [ fmtt '\n' ];
+        
+        for kk=1:size(grid,1)
+            fprintf(fid, fmtt, grid(kk,1), datestr(export_date, 'yyyymmdd'), saroad_code, xx(kk,:) );
+        end
+        fclose(fid);
+        
         
     otherwise
         error( 'rio_output:: unknown output format %s !', fmt );
