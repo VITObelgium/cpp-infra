@@ -23,7 +23,22 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAl
     warpOptions->panDstBands[0]   = 1;
     warpOptions->pfnTransformer   = GDALGenImgProjTransform;
     warpOptions->eResampleAlg     = GDALResampleAlg(enum_value(algo));
-    warpOptions->pTransformerArg  = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
+
+    auto srcNodataValue = srcDataSet.nodata_value(1);
+    if (srcNodataValue.has_value()) {
+        // will get freed by gdal
+        warpOptions->padfSrcNoDataReal    = static_cast<double*>(CPLMalloc(warpOptions->nBandCount * sizeof(double)));
+        warpOptions->padfSrcNoDataReal[0] = srcNodataValue.value();
+    }
+
+    auto dstNodataValue = dstDataSet.nodata_value(1);
+    if (dstNodataValue.has_value()) {
+        // will get freed by gdal
+        warpOptions->padfDstNoDataReal    = static_cast<double*>(CPLMalloc(warpOptions->nBandCount * sizeof(double)));
+        warpOptions->padfDstNoDataReal[0] = dstNodataValue.value();
+    }
+
+    warpOptions->pTransformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
                                                           nullptr,
                                                           dstDataSet.get(),
                                                           nullptr,
