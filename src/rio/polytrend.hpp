@@ -3,8 +3,6 @@
 #include <cmath>
 #include <string>
 
-#include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -29,6 +27,7 @@ public:
 
   void addtrend( double& v, double &e, const std::vector<double> proxy );
 
+protected:
   // some advanced polynomial
   static double poly( const std::vector<double>& p, double x );
   static double poly( const std::vector<double>& p, double x, double x_lo, double x_hi );

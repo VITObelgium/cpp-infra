@@ -2,20 +2,13 @@
 #include "infra/log.h"
 #include "infra/xmldocument.h"
 
+#include "strfun.hpp"
+
 #include "polytrend.hpp"
 
 namespace rio {
 
 using namespace inf;
-
-// helper routine
-static void str2vec(std::vector<double>& x, std::string s)
-{
-    x.clear();
-    std::vector<std::string> s_vec;
-    boost::split(s_vec, s, boost::is_any_of(",; \t"), boost::token_compress_on);
-    std::transform(s_vec.begin(), s_vec.end(), std::back_inserter(x), boost::lexical_cast<double, std::string>);
-}
 
 polytrend::polytrend(const std::string& config_file)
 : trendmodel()
@@ -135,10 +128,10 @@ void polytrend::select(const std::string& aggr, boost::posix_time::ptime tstart)
     std::string selection = wk + ss.str();
     if (selection.compare(_curr_sel)) {
         try {
-            str2vec(_p_avg, _trend.get<std::string>("trend." + selection + ".avg"));
-            str2vec(_p_avg_err, _trend.get<std::string>("trend." + selection + ".avg_err"));
-            str2vec(_p_std, _trend.get<std::string>("trend." + selection + ".std"));
-            str2vec(_p_std_err, _trend.get<std::string>("trend." + selection + ".std_err"));
+            rio::strfun::str2vec(_p_avg, _trend.get<std::string>("trend." + selection + ".avg"));
+            rio::strfun::str2vec(_p_avg_err, _trend.get<std::string>("trend." + selection + ".avg_err"));
+            rio::strfun::str2vec(_p_std, _trend.get<std::string>("trend." + selection + ".std"));
+            rio::strfun::str2vec(_p_std_err, _trend.get<std::string>("trend." + selection + ".std_err"));
         } catch (std::exception& e) {
             throw RuntimeError(std::string("cannot retrieve trend parameters : ") + e.what());
         }

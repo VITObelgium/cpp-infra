@@ -72,6 +72,13 @@ void split( std::vector<std::string>& list, const char *s )
   return;
 }
   
+static void str2vec(std::vector<double>& x, std::string s)
+{
+    x.clear();
+    std::vector<std::string> s_vec;
+    boost::split(s_vec, s, boost::is_any_of(",; \t"), boost::token_compress_on);
+    std::transform(s_vec.begin(), s_vec.end(), std::back_inserter(x), boost::lexical_cast<double, std::string>);
+}
 
 }
 
