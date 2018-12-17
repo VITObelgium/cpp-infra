@@ -81,6 +81,17 @@ void network::_load_file(std::string stationfile)
         // add to the network
         _stations.push_back(s);
     }
+
+    // perform some checks on the stations etc..
+    std::cout << " Checking network for consistency...\n";
+    int nproxy = -1;
+    for (auto& s : _stations) {
+        if (nproxy == -1)
+            nproxy = s.proxy().size();
+        else if (nproxy != s.proxy().size()) {
+            throw RuntimeError("size of proxy vector  for {} does not match previous stations", s.name());
+        }
+    }
 }
 
 std::ostream& operator<<(std::ostream& out, const network& net)
@@ -91,5 +102,4 @@ std::ostream& operator<<(std::ostream& out, const network& net)
 
     return out;
 }
-
 }
