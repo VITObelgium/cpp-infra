@@ -87,7 +87,7 @@ void network::_load_file(std::string stationfile)
     int nproxy = -1;
     for (auto& s : _stations) {
         if (nproxy == -1)
-            nproxy = s.proxy().size();
+            nproxy = static_cast<int>(s.proxy().size());
         else if (nproxy != s.proxy().size()) {
             throw RuntimeError("size of proxy vector  for {} does not match previous stations", s.name());
         }
