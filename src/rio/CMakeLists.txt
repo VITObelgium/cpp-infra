@@ -49,6 +49,7 @@ add_library(rio
     apswriter.hpp apswriter.cpp
     h5writer.hpp h5writer.cpp
     jsonwriter.hpp jsonwriter.cpp
+    ifdmwriter.hpp ifdmwriter.cpp
 )
 
 if(MINGW)
