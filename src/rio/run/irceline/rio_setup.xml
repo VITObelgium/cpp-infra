@@ -50,9 +50,20 @@
     <handler name="json" class="jsonwriter">
       <location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.json</location>
     </handler>
+	
+	<!-- IFDM writer -->
+	<!-- Writes out a flat unformatted stream binary for FORTRAN import -->
+    <handler name="ifdm" class="ifdmwriter">
+		<location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.bin</location>
+		<!-- grid definition header and mapping file
+			 mapping file starts with index 0/1 ???
+			 --->
+		<griddef grid="4x4" nx="70" ny="80" dx="4000." dy="4000."
+				  xull="0." yull="620." epsg="31360" missing="-9999">
+			%base%/grids/rio_4x4_grid.def
+		</griddef>
+	 </handler>
   </output>
-
-
 
   <!-- here are the different configurations in this deployment -->
   <configuration name="v2018">
@@ -157,8 +168,9 @@
     </stations>
     
     <grids>
-      <grid name="4x4" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>
-      <grid name="1x1" cellsize="1000.">%base%/grids/%cnf%/%pol%_grid_1x1_%ipol%.txt</grid>      
+      <grid name="awac" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_awac_%ipol%.txt</grid>
+	  <grid name="4x4"  cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>
+      <grid name="1x1"  cellsize="1000.">%base%/grids/%cnf%/%pol%_grid_1x1_%ipol%.txt</grid>      
     </grids>
     
     
@@ -213,6 +225,7 @@
     </stations>
     
     <grids>
+	  <grid name="awac" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_awac_%ipol%.txt</grid>
       <grid name="4x4" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>
       <grid name="1x1" cellsize="1000.">%base%/grids/%cnf%/%pol%_grid_1x1_%ipol%.txt</grid>      
     </grids>
