@@ -54,14 +54,23 @@
 	<!-- IFDM writer -->
 	<!-- Writes out a flat unformatted stream binary for FORTRAN import -->
     <handler name="ifdm" class="ifdmwriter">
-		<location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.bin</location>
-		<!-- grid definition header and mapping file
-			 mapping file starts with index 0/1 ???
-			 --->
-		<griddef grid="4x4" nx="70" ny="80" dx="4000." dy="4000."
-				  xull="0." yull="620." epsg="31360" missing="-9999">
-			%base%/grids/rio_4x4_grid.def
+		<location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.bin</location>		
+		
+		<griddef grid="4x4" epsg="31360" missing="-9999"
+		         nx="69" ny="57" dx="4000." dy="4000." xull="22000." yull="248000.">
+			%base%/grids/rio_4x4_grid.map
 		</griddef>
+		
+		<griddef grid="4x4e1" epsg="31360" missing="-9999"
+		         nx="71" ny="59" dx="4000." dy="4000." xull="18000." yull="252000.">
+			%base%/grids/rio_4x4e1_grid.map
+		</griddef>
+		
+		<griddef grid="4x4e2" epsg="31360" missing="-9999"
+		         nx="73" ny="61" dx="4000." dy="4000." xull="14000." yull="256000.">
+			%base%/grids/rio_4x4e2_grid.map
+		</griddef>
+		
 	 </handler>
   </output>
 

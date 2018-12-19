@@ -45,7 +45,7 @@ private:
     float _dy;   // y resolution of grid grid size
     int   _epsg; // grid projection code
 
-    float _missing; // missing value
+    int   _missing; // missing value
 
     int _nx; // number of columns in raster output
     int _ny; // number of rows in raster output
@@ -60,11 +60,14 @@ private:
     int _t0_min;   // min for start timestamp
     int _t0_sec;   // seconds for start timestamp
 
-    int _t0_mode; // 0: t0 is timestamp at start of measurement interval
-                  // 1: t0 is timestamp at end of interval (default, probably)
+    // timestamp mode
+    int _tmode; // 0: t0 is timestamp at start of measurement interval
+                // 1: t0 is timestamp at end of interval (default, probably)
 
     std::string _mapfile_pattern;
 
     std::vector<grididx_t> _griddef;
+
+    std::vector<float> _buffer; // 32 bit floating point buffer
 };
 }
