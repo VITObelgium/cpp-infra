@@ -66,7 +66,7 @@ void apswriter::init(const rio::config& cnf,
                     _apscf.missing = kv.second.get<double>("<xmlattr>.missing");
 
                     _apscf.nx = kv.second.get<int>("<xmlattr>.nx");
-                    _apscf.ny = kv.second.get<double>("<xmlattr>.ny");
+                    _apscf.ny = kv.second.get<int>("<xmlattr>.ny");
 
                     // std::cout << "nx=" << _apscf.nx << ", ny=" << _apscf.ny << std::endl;
                     // contents of the element is empty string...
