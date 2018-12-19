@@ -51,6 +51,8 @@ def cmake_configure(source_dir, build_dir, cmake_args, triplet=None, toolchain=N
     if toolchain is not None:
         args.append("-DCMAKE_TOOLCHAIN_FILE={}".format(toolchain))
 
+    args.append("-DCMAKE_BUILD_TYPE=Release")
+
     args.extend(cmake_args)
     args.append(source_dir)
 

@@ -25,6 +25,9 @@ set(CMAKE_SHARED_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} CACHE STRING "" FORCE)
 set(CMAKE_MODULE_LINKER_FLAGS ${CMAKE_EXE_LINKER_FLAGS} CACHE STRING "" FORCE)
 set(CMAKE_SYSROOT /tools/toolchains/${HOST}/${HOST}/sysroot CACHE PATH "" FORCE)
 
+# make sure the static openmp library is used
+set(OpenMP_gomp_LIBRARY "/tools/toolchains/${HOST}/${HOST}/lib64/libgomp.a" CACHE STRING "")
+
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
