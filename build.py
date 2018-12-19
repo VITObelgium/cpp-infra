@@ -28,7 +28,7 @@ if __name__ == "__main__":
         elif sys_platform == "mingw":
             triplet = "x64-mingw"
 
-        cmake_args = ["-DOPAQ_ENABLE_UI={}".format(build_ui), "-DSTATIC_QT=OFF", "-DCMAKE_BUILD_TYPE=Release"]
+        cmake_args = ["-DOPAQ_ENABLE_UI={}".format(build_ui), "-DSTATIC_QT=OFF"]
 
         if triplet == "x64-windows":
             cmake_args.extend(["-DCMAKE_PREFIX_PATH=C:/Qt/5.12.0/msvc2017_64"])
