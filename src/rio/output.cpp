@@ -8,6 +8,7 @@
 #include "infra/xmldocument.h"
 #include "ircelwriter.hpp"
 #include "jsonwriter.hpp"
+#include "ifdmwriter.hpp"
 
 #include "xmltools.hpp"
 
@@ -57,6 +58,10 @@ output::output(const XmlNode& el, std::vector<std::string> req_outputs)
         } else if (boost::equals(req_class, "jsonwriter")) {
             _list.push_back(std::make_unique<rio::jsonwriter>(outEl));
             std::cout << " Added jsonwriter to output list" << std::endl;
+
+        } else if (boost::equals(req_class, "ifdmwriter")) {
+            _list.push_back(std::make_unique<rio::ifdmwriter>(outEl));
+            std::cout << " Added ifdmwriter to output list" << std::endl;
 
         } else {
             throw RuntimeError("Invalid output class requested: {}", req_class);
