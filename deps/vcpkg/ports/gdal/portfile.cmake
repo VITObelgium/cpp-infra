@@ -30,6 +30,7 @@ TEST_FEATURE("jpeg" WITH_JPEG)
 TEST_FEATURE("gif" WITH_GIF)
 TEST_FEATURE("sqlite" WITH_SQLITE)
 TEST_FEATURE("expat" WITH_EXPAT)
+TEST_FEATURE("pcraster" WITH_PCRASTER)
 TEST_FEATURE("tools" WITH_TOOLS)
 
 if(NOT WITH_TOOLS)
@@ -105,6 +106,12 @@ if (UNIX OR MINGW)
     else ()
         list(APPEND AUTOCONF_OPTIONS --without-expat)
     endif()
+
+    if (WITH_PCRASTER)
+        list(APPEND AUTOCONF_OPTIONS --with-pcraster)
+    else ()
+        list(APPEND AUTOCONF_OPTIONS --without-pcraster)
+    endif ()
 
     #if("png" IN_LIST FEATURES)
         list(APPEND AUTOCONF_OPTIONS --with-png=${PREFIX_PATH})
@@ -182,7 +189,6 @@ if (UNIX OR MINGW)
             --without-grass
             --without-libgrass
             --without-cfitsio
-            --without-pcraster
             --without-netcdf
             --without-jpeg
             --without-ogdi
