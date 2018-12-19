@@ -113,6 +113,8 @@ int main(int argc, char* argv[])
                 values.fill(-9999.);
                 uncert.fill(-9999.);
             }
+
+            // always write output, even though the values are all missing... 
             out.write(curr_time, obs, values, uncert);
 
             curr_time += cf.tstep();
