@@ -17,11 +17,8 @@ the rectangular raster grid (which the ifdmwriter dumps), much in the same way a
 
 See below for an example of such a specification
 
- <output>
-    <!-- IFDM writer -->
-	<!-- Writes out a flat unformatted stream binary for FORTRAN import -->
-    <handler name="ifdm" class="ifdmwriter">
-		<!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
+ <output>    
+    <handler name="ifdm" class="ifdmwriter">		
 	  <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
 		
 		<griddef grid="4x4" epsg="31360" missing="-9999"
