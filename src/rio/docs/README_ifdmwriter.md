@@ -38,9 +38,8 @@ The example above will make the '-o ifdm' output option available to the user fo
 ## Header format specification
 
 Here we provide an over view of the header format for the binary RIO outputfile, we're not too concerned with storage space
-allocation in this first version, so just dumping floating point 32 bit reals and 
+allocation in this first version, so just dumping 32 bit float & ints
 
-|----------|----------|--------------|--------|--------------------------------------------------------------------------|
 | Variable |  C type  |  Fortan type | offset | explanation                                                              |
 |----------|----------|--------------|--------|--------------------------------------------------------------------------|
 | nbytes   |    int32 |    integer*4 |      0 | number of bytes in the header of the file                                |
@@ -68,7 +67,6 @@ allocation in this first version, so just dumping floating point 32 bit reals an
 | conf     | char[10] | character*10 |     94 | RIO configuration string                                                 |
 | author   | char[30] | character*30 |    104 | Responsible author for RIO configuration                                 |
 | email    | char[30] | character*30 |    134 | Email contact adress                                                     |
-|----------|----------|--------------|--------|--------------------------------------------------------------------------|
 
 Note that the offsets are 0-based, so in Fortran, don't forget to add a 1 in the read(pos=XX) statement. So for example just reading
 the pollutant would be : 
