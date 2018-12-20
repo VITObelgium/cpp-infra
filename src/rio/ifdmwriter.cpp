@@ -37,10 +37,10 @@ void ifdmwriter::init(const rio::config& cnf,
             //std::cout << "checking aps element : " << kv.first << std::endl;
             if (!kv.first.compare("griddef")) {
                 if (!kv.second.get<std::string>("<xmlattr>.grid").compare(cnf.grid())) {
-                    std::cout << " Found IFDM griddef for grid " << cnf.grid() << std::endl;
+                    std::cout << " Found ifdm griddef for grid " << cnf.grid() << std::endl;
 
-                    _xull    = kv.second.get<float>("<xmlattr>.xull");
-                    _yull    = kv.second.get<float>("<xmlattr>.yull");
+                    _xul     = kv.second.get<float>("<xmlattr>.xul");
+                    _yul     = kv.second.get<float>("<xmlattr>.yul");
                     _dx      = kv.second.get<float>("<xmlattr>.dx");
                     _dy      = kv.second.get<float>("<xmlattr>.dy");
                     _epsg    = kv.second.get<int>("<xmlattr>.epsg");
@@ -90,32 +90,75 @@ void ifdmwriter::init(const rio::config& cnf,
 
         fclose(fp);
     } catch (...) {
-        throw std::runtime_error("error importing aps mapping file : " + mapfile);
+        throw std::runtime_error("error importing ifdm griddef file : " + mapfile);
     }
 
     if (_griddef.size() != _grid->size())
         throw std::runtime_error("ifdm griddef file does not match grid size, got:" +
                                  std::to_string(_griddef.size()) + ", expected : " + std::to_string(_grid->size()));
 
-    std::cout << "Opening ifdm_input.bin ...\n";
-    _fs = std::fopen("ifdm_input.bin", "wb");
+    // construct filename
+    std::string filename = _pattern;
+    rio::parser::get()->process(filename);
+
+    std::cout << "Opening " << filename << "\n";
+    _fs = std::fopen(filename.c_str(), "wb");
     if (!_fs)
         throw std::runtime_error("unable to open ifdm outputfile...");
 
+    // get time information, cast to int to be really sure they are int's 
+    // and not some funky boost date type
+    int yr = static_cast<int>(cnf.start_time().date().year());
+    int mn = static_cast<int>(cnf.start_time().date().month());
+    int dy = static_cast<int>(cnf.start_time().date().day());
+
+    int hour = static_cast<int>(cnf.start_time().time_of_day().hours());
+    int min  = static_cast<int>(cnf.start_time().time_of_day().minutes());
+    int sec  = static_cast<int>(cnf.start_time().time_of_day().seconds());
+
+    int dt = 3600 * 24;
+    if ( ! cnf.aggr().compare("1h") ) dt = 3600;
+
     // write header
     std::cout << "Writing header...\n";
-    fwrite(&_nt, sizeof(int), 1, _fs); // 4 byte (32 bit) integers
-    fwrite(&_nx, sizeof(int), 1, _fs);
-    fwrite(&_ny, sizeof(int), 1, _fs);
 
-    fwrite(&_xull, sizeof(float), 1, _fs); // 4 byte float (32 bit)
-    fwrite(&_yull, sizeof(float), 1, _fs);
+    //1. set number of header bytes
+    int nbytes = 13 * sizeof(int) + 4 * sizeof(float) + 10*sizeof(char);
+    fwrite(&nbytes, sizeof(int), 1, _fs);
+
+    //2. write dimension information
+    fwrite(&_nt, sizeof(int), 1, _fs); // 4 byte (32 bit) integers
+    fwrite(&_nx, sizeof(int), 1, _fs);  
+    fwrite(&_ny, sizeof(int), 1, _fs); 
+
+    //3. write grid specifications
+    fwrite(&_xul, sizeof(float), 1, _fs);  // 4 byte float (32 bit)
+    fwrite(&_yul, sizeof(float), 1, _fs);
 
     fwrite(&_dx, sizeof(float), 1, _fs);
     fwrite(&_dy, sizeof(float), 1, _fs);
 
     fwrite(&_epsg, sizeof(int), 1, _fs);
+
+    // 4. write timing information
+    fwrite(&yr, sizeof(int), 1, _fs);
+    fwrite(&mn, sizeof(int), 1, _fs);
+    fwrite(&dy, sizeof(int), 1, _fs);
+    fwrite(&hour, sizeof(int), 1, _fs);
+    fwrite(&min, sizeof(int), 1, _fs);
+    fwrite(&sec, sizeof(int), 1, _fs);
+
+    fwrite(&dt, sizeof(int), 1, _fs);
+
+    // 5. missing value
     fwrite(&_missing, sizeof(int), 1, _fs);
+    
+    // 6. write optional run information
+    char str[10];
+    memset(str, 0, 10);
+    memcpy(str, cnf.pol().c_str(), cnf.pol().length());
+    fwrite(str, sizeof(char), 10, _fs);
+
 
     // prepare databuffer for single map
     _buffer.resize(_nx * _ny );
@@ -155,8 +198,9 @@ void ifdmwriter::close(void)
 {
     std::cout << "Closing ifdmwriter..." << std::endl;
 
-    // updating the number of entries, depending on the number of maps produced...
-    rewind(_fs);
+    // return the position of the filepointer to the second field, first we have 
+    // 4 bytes indicating the total length of the header in bytes, skip those...
+    fseek(_fs, 4, SEEK_SET);
     fwrite(&_nt, sizeof(int), 1, _fs);
 
     std::fclose(_fs);

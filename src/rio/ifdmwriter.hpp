@@ -39,26 +39,18 @@ private:
 
     FILE* _fs;
 
-    float _xull; // world x coordinate of upper left corner (grid edge point, not center point)
-    float _yull; // world y coordinate of upper left corner
-    float _dx;   // x resolution fo grid
-    float _dy;   // y resolution of grid grid size
-    int   _epsg; // grid projection code
+    float _xul; // world x coordinate of upper left corner (grid edge point, not center point)
+    float _yul; // world y coordinate of upper left corner
+    float _dx;  // x resolution fo grid
+    float _dy;  // y resolution of grid grid size
+    int _epsg;  // grid projection code
 
-    int   _missing; // missing value
+    int _missing; // missing value
 
     int _nx; // number of columns in raster output
     int _ny; // number of rows in raster output
 
     int _nt; // number of timesteps in file
-    int _dt; // timestep in seconds
-
-    int _t0_year;  // year for start timestamp
-    int _t0_month; // month for start timestamp
-    int _t0_day;   // day for start timestamp
-    int _t0_hour;  // hour for start timestamp
-    int _t0_min;   // min for start timestamp
-    int _t0_sec;   // seconds for start timestamp
 
     // timestamp mode
     int _tmode; // 0: t0 is timestamp at start of measurement interval
