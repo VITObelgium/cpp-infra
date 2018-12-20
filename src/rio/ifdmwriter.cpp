@@ -27,7 +27,7 @@ ifdmwriter::ifdmwriter(const XmlNode& cnf)
 , _pattern("rio_%timestamp%.txt")
 , _version(1)
 , _nt(0)
-, _tmode(1)
+, _tmode(0)
 {
     try {
         _pattern = _xml.get<std::string>("handler.location");
@@ -122,7 +122,7 @@ void ifdmwriter::init(const rio::config& cnf,
     std::cout << " Opening " << filename << "\n";
     _fs = std::fopen(filename.c_str(), "wb");
     if (!_fs)
-        throw std::runtime_error("unable to open ifdm outputfile...");
+        throw std::runtime_error("unable to open ifdm outputfile : " + filename);
 
     // get time information, cast to int to be really sure they are int's 
     // and not some funky boost date type
@@ -141,7 +141,7 @@ void ifdmwriter::init(const rio::config& cnf,
     std::cout << " Writing header...\n";
 
     //1. set number of header bytes
-    int nbytes = 14 * sizeof(int) + 4 * sizeof(float) + 88 * sizeof(char);
+    int nbytes = 15 * sizeof(int) + 4 * sizeof(float) + 98 * sizeof(char);
     fwrite(&nbytes, sizeof(int), 1, _fs);
     fwrite(&_version, sizeof(int), 1, _fs);    
     
@@ -172,10 +172,11 @@ void ifdmwriter::init(const rio::config& cnf,
     // 5. missing value
     fwrite(&_missing, sizeof(int), 1, _fs);
     
-    // 6. write optional run information : here we have 88 bytes
+    // 6. write optional run information : here we have 98 bytes
     fwrite_string(cnf.pol(), 4); 
     fwrite_string(cnf.aggr(), 4); 
     fwrite_string(cnf.ipol_class(), 10);
+    fwrite_string(cnf.ipol(), 10);
     fwrite_string(cnf.configuration(), 10);
     fwrite_string(cnf.author(), 30);
     fwrite_string(cnf.email(), 30);
