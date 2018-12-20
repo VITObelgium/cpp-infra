@@ -19,20 +19,16 @@ See below for an example of such a specification
 
  <output>    
     <handler name="ifdm" class="ifdmwriter">		
-	  <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
-		
+	  <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		
 		<griddef grid="4x4" epsg="31360" missing="-9999"
 		         nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
 			%base%/grids/rio_4x4_grid.map
-		</griddef>
-		
+		</griddef>		
 		<griddef grid="4x4e1" epsg="31360" missing="-9999"
 		         nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
 			%base%/grids/rio_4x4e1_grid.map
-		</griddef>
-		
+		</griddef>		
 	 </handler>
-
  </output>
 
 The example above will make the '-o ifdm' output option available to the user for the 4x4 and 4x4e1 grids. 
