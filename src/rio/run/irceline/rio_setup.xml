@@ -54,7 +54,7 @@
 	<!-- IFDM writer -->
 	<!-- Writes out a flat unformatted stream binary for FORTRAN import -->
     <handler name="ifdm" class="ifdmwriter">
-		<!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
+	  <!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
 	  <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
 		
 		<griddef grid="4x4" epsg="31360" missing="-9999"
