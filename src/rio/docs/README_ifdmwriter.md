@@ -12,10 +12,10 @@ The ifdmwriter makes a new type of output handler available which dumps the inte
 unformatted flat binary file which can easily be read into Fortran (IFDM). In the master RIO xml setup file, the user is
 required to specify a <handler> tag of class "ifdmwriter". And specifiying a typical output location for the file, together
 with a griddefinition for each of the grids the user wants to make available. In this grid definition, the grid layout should
-be specified in the attributes and a mapping file should be given, linking each RIO gridcell to its respective row and column in
-the rectangular raster grid (which the ifdmwriter dumps), much in the same way as the aps output format. 
+be specified in the attributes and a mapping file should be given, linking each RIO gridcell to its respective row and column
+in the rectangular raster grid (which the ifdmwriter dumps), much in the same way as the aps output format. 
 
-See below for an example of such a specification
+See below for an example of such a specification :
 
 ```xml
  <output>    
@@ -31,7 +31,7 @@ See below for an example of such a specification
 		</griddef>		
 	 </handler>
  </output>
- ```` 
+ ```
 
 The example above will make the '-o ifdm' output option available to the user for the 4x4 and 4x4e1 grids. 
 
@@ -63,21 +63,22 @@ allocation in this first version, so just dumping 32 bit float & ints
 | missing  |    int32 |    integer*4 |     72 | missing value                                                            |
 | pol      |  char[4] |  character*4 |     76 | pollutant name                                                           |
 | aggr     |  char[4] |  character*4 |     80 | aggregation time : 1h, da, m1, m8, ...                                   |
-| ipol     | char[10] | character*10 |     84 | interpolation model type                                                 |
-| conf     | char[10] | character*10 |     94 | RIO configuration string                                                 |
-| author   | char[30] | character*30 |    104 | Responsible author for RIO configuration                                 |
-| email    | char[30] | character*30 |    134 | Email contact adress                                                     |
+| class    | char[10] | character*10 |     84 | interpolation model class                                                |
+| ipol     | char[10] | character*10 |     94 | interpolation model                                                      |
+| conf     | char[10] | character*10 |    104 | RIO configuration string                                                 |
+| author   | char[30] | character*30 |    114 | Responsible author for RIO configuration                                 |
+| email    | char[30] | character*30 |    144 | Email contact adress                                                     |
 
-Note that the offsets are 0-based, so in Fortran, don't forget to add a 1 in the read(pos=XX) statement. So for example just reading
-the pollutant would be : 
+Note that the offsets are 0-based, so in Fortran, don't forget to add a 1 in the read(pos=XX) statement. So for example just
+reading the pollutant would be : 
 
 ```Fortran
   read(unit=1,pos=76+1) pol
   write(*,*)'pollutant       : ', trim(pol)
 ```
 
-The acutal data is ordered per timestep and then for the rasters in Fortran column-major order, meaning that the fastest changing
-index is the row index (y-coordinate), starting from the top left of the raster. 
+The acutal data is ordered per timestep and then for the rasters in Fortran column-major order, meaning that the fastest
+changing index is the row index (y-coordinate), starting from the top left of the raster. 
 
 ## Example read code
 
