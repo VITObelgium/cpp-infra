@@ -25,7 +25,9 @@ void ifdmwriter::fwrite_string(const std::string& s, unsigned int n)
 ifdmwriter::ifdmwriter(const XmlNode& cnf)
 : outputhandler(cnf)
 , _pattern("rio_%timestamp%.txt")
+, _version(1)
 , _nt(0)
+, _tmode(1)
 {
     try {
         _pattern = _xml.get<std::string>("handler.location");
@@ -139,9 +141,10 @@ void ifdmwriter::init(const rio::config& cnf,
     std::cout << " Writing header...\n";
 
     //1. set number of header bytes
-    int nbytes = 13 * sizeof(int) + 4 * sizeof(float) + 88 * sizeof(char);
+    int nbytes = 14 * sizeof(int) + 4 * sizeof(float) + 88 * sizeof(char);
     fwrite(&nbytes, sizeof(int), 1, _fs);
-
+    fwrite(&_version, sizeof(int), 1, _fs);    
+    
     //2. write dimension information
     fwrite(&_nt, sizeof(int), 1, _fs); // 4 byte (32 bit) integers
     fwrite(&_nx, sizeof(int), 1, _fs);  
@@ -163,6 +166,7 @@ void ifdmwriter::init(const rio::config& cnf,
     fwrite(&hour, sizeof(int), 1, _fs);
     fwrite(&min, sizeof(int),  1, _fs);
     fwrite(&sec, sizeof(int),  1, _fs);
+    fwrite(&_tmode, sizeof(int), 1, _fs);
     fwrite(&dt, sizeof(int),   1, _fs);
 
     // 5. missing value
@@ -216,7 +220,7 @@ void ifdmwriter::close(void)
 
     // return the position of the filepointer to the second field, first we have 
     // 4 bytes indicating the total length of the header in bytes, skip those...
-    fseek(_fs, 4, SEEK_SET);
+    fseek(_fs, 8, SEEK_SET);
     fwrite(&_nt, sizeof(int), 1, _fs);
 
     std::fclose(_fs);

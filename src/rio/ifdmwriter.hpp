@@ -39,11 +39,12 @@ private:
 
     FILE* _fs;
 
-    float _xul; // world x coordinate of upper left corner (grid edge point, not center point)
-    float _yul; // world y coordinate of upper left corner
-    float _dx;  // x resolution fo grid
-    float _dy;  // y resolution of grid grid size
-    int _epsg;  // grid projection code
+    int _version; // binary ifdmwriter format version
+    float _xul;   // world x coordinate of upper left corner (grid edge point, not center point)
+    float _yul;   // world y coordinate of upper left corner
+    float _dx;    // x resolution fo grid
+    float _dy;    // y resolution of grid grid size
+    int _epsg;    // grid projection code
 
     int _missing; // missing value
 
