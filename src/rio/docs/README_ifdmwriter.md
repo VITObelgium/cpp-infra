@@ -17,6 +17,7 @@ the rectangular raster grid (which the ifdmwriter dumps), much in the same way a
 
 See below for an example of such a specification
 
+```xml
  <output>    
     <handler name="ifdm" class="ifdmwriter">		
 	  <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		
@@ -30,6 +31,7 @@ See below for an example of such a specification
 		</griddef>		
 	 </handler>
  </output>
+ ```` 
 
 The example above will make the '-o ifdm' output option available to the user for the 4x4 and 4x4e1 grids. 
 
