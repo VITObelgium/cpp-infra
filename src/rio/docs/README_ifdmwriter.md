@@ -9,7 +9,8 @@ This file contains the discription of the ifdmwriter binary output file format f
 ## Header format specification
 
 Here we provide an over view of the header format for the 
-|
+
+
 | variable | C type  | Fortan type | offset | explanation                                                              |
 |----------|---------|-------------|--------|--------------------------------------------------------------------------|
 | nbytes   |   int32 |   integer*4 |      0 | number of bytes in the header of the file                                |
