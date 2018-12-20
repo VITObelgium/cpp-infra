@@ -7,8 +7,10 @@ program ifdm_input
   integer*4 :: t0_year, t0_month, t0_day, t0_hour, t0_min, t0_sec, dt
   real*4    :: xul, yul, dx, dy, xc, yc
   integer*4 :: epsg, missing
-  character*10 :: pol
-
+  character*4 :: pol, aggr
+  character*10 :: ipol_class, conf
+  character*30 :: author, email
+  
   real*4, allocatable :: conc(:,:)
 
   character(len=256) :: filename
@@ -25,7 +27,8 @@ program ifdm_input
   open(unit=1, file=trim(filename), access='stream', action='read', status='old', form='unformatted')
   read(unit=1) nbytes
   read(unit=1) nt, nx, ny, xul, yul, dx, dy, epsg, t0_year, t0_month, t0_day, t0_hour, t0_min, t0_sec, dt, missing
-  read(unit=1) pol
+  read(unit=1) pol, aggr, ipol_class, conf, author, email
+
 
   ! allocate array for concentrations
   allocate( conc(ny,nx) ) ! number of rows( = ny) x number of columns : nx
@@ -45,9 +48,14 @@ program ifdm_input
   write(*,'(a,I4,a,I2,a,I2,a,I2,a,I2,a,I2)')'start date      : ', t0_year, '-', t0_month, '-', t0_day, &
     ' ', t0_hour, ':', t0_min, ':', t0_sec
   write(*,*)'dt              : ', dt
-  write(*,*)'epsg            : ', epsg
+  write(*,*)'crs (epsg)      : ', epsg
   write(*,*)'missing_value   : ', missing
-  write(*,*)'pollutant       : ', pol
+  write(*,*)'pollutant       : ', trim(pol)
+  write(*,*)'aggregation     : ', trim(aggr)
+  write(*,*)'interpolator    : ', trim(ipol_class)
+  write(*,*)'configuration   : ', trim(conf)
+  write(*,*)'author          : ', trim(author)
+  write(*,*)'email           : ', trim(email)
 
   ! write ascii files for each concentration map...
   write(*,*)'*****************'

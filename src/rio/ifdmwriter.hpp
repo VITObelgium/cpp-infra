@@ -61,5 +61,8 @@ private:
     std::vector<grididx_t> _griddef;
 
     std::vector<float> _buffer; // 32 bit floating point buffer
+
+    // helper routine
+    void fwrite_string(const std::string& s, unsigned int n);
 };
 }

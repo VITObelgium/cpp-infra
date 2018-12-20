@@ -6,6 +6,22 @@ namespace rio {
 
 using namespace inf;
 
+
+void ifdmwriter::fwrite_string(const std::string& s, unsigned int n)
+{
+    // make a copy and resize, length() doesnt count the nul, or prob does the resize
+    
+    // just trim, don't throw...
+    //if (s.length() > n)
+    //    throw std::runtime_error( "string too large for size given in ifdmwriter::fwrite_string : " + s );
+
+    std::string str = s;
+    str.resize(n, ' '); // pad with spaces to allow trimming in fortran
+    fwrite(str.data(), n, 1, _fs);
+    return;
+}
+
+
 ifdmwriter::ifdmwriter(const XmlNode& cnf)
 : outputhandler(cnf)
 , _pattern("rio_%timestamp%.txt")
@@ -101,7 +117,7 @@ void ifdmwriter::init(const rio::config& cnf,
     std::string filename = _pattern;
     rio::parser::get()->process(filename);
 
-    std::cout << "Opening " << filename << "\n";
+    std::cout << " Opening " << filename << "\n";
     _fs = std::fopen(filename.c_str(), "wb");
     if (!_fs)
         throw std::runtime_error("unable to open ifdm outputfile...");
@@ -120,10 +136,10 @@ void ifdmwriter::init(const rio::config& cnf,
     if ( ! cnf.aggr().compare("1h") ) dt = 3600;
 
     // write header
-    std::cout << "Writing header...\n";
+    std::cout << " Writing header...\n";
 
     //1. set number of header bytes
-    int nbytes = 13 * sizeof(int) + 4 * sizeof(float) + 10*sizeof(char);
+    int nbytes = 13 * sizeof(int) + 4 * sizeof(float) + 88 * sizeof(char);
     fwrite(&nbytes, sizeof(int), 1, _fs);
 
     //2. write dimension information
@@ -141,24 +157,24 @@ void ifdmwriter::init(const rio::config& cnf,
     fwrite(&_epsg, sizeof(int), 1, _fs);
 
     // 4. write timing information
-    fwrite(&yr, sizeof(int), 1, _fs);
-    fwrite(&mn, sizeof(int), 1, _fs);
-    fwrite(&dy, sizeof(int), 1, _fs);
+    fwrite(&yr, sizeof(int),   1, _fs);
+    fwrite(&mn, sizeof(int),   1, _fs);
+    fwrite(&dy, sizeof(int),   1, _fs);
     fwrite(&hour, sizeof(int), 1, _fs);
-    fwrite(&min, sizeof(int), 1, _fs);
-    fwrite(&sec, sizeof(int), 1, _fs);
-
-    fwrite(&dt, sizeof(int), 1, _fs);
+    fwrite(&min, sizeof(int),  1, _fs);
+    fwrite(&sec, sizeof(int),  1, _fs);
+    fwrite(&dt, sizeof(int),   1, _fs);
 
     // 5. missing value
     fwrite(&_missing, sizeof(int), 1, _fs);
     
-    // 6. write optional run information
-    char str[10];
-    memset(str, 0, 10);
-    memcpy(str, cnf.pol().c_str(), cnf.pol().length());
-    fwrite(str, sizeof(char), 10, _fs);
-
+    // 6. write optional run information : here we have 88 bytes
+    fwrite_string(cnf.pol(), 4); 
+    fwrite_string(cnf.aggr(), 4); 
+    fwrite_string(cnf.ipol_class(), 10);
+    fwrite_string(cnf.configuration(), 10);
+    fwrite_string(cnf.author(), 30);
+    fwrite_string(cnf.email(), 30);
 
     // prepare databuffer for single map
     _buffer.resize(_nx * _ny );
