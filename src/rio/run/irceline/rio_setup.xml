@@ -23,8 +23,7 @@
     <aggregation>1h</aggregation>
     <mapper>clc06d</mapper>
     <grid>4x4</grid>
-    <output>txt</output>
-    <!-- can be comma separated list -->
+    <output>txt</output> <!-- can be comma separated list -->
   </defaults>
 
   <!-- here we define the available outputs -->
@@ -51,26 +50,41 @@
       <location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.json</location>
     </handler>
 	
-	<!-- IFDM writer -->
-	<!-- Writes out a flat unformatted stream binary for FORTRAN import -->
+	  <!-- IFDM writer -->
+	  <!-- Writes out a flat unformatted stream binary for FORTRAN import -->
     <handler name="ifdm" class="ifdmwriter">
-	  <!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
-	  <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
+	    <!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
+	    <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
+
+      <!-- Output timestamp convention, internally in RIO the timesteps are stored by an interval 
+           in the output we always write the normal time convention, i.e. hours from 0 to 23 
+           here you can set whether the timestamp written is the one before or after the hour. 
+           timestamp_convention : 
+
+           0 : timestamp written by the output writer is the one of the beginning of the interval to which the value applie (i.e. before the hour)
+           1 : timestamp written by the output writer is the one af the end of the interval to which the value applies (i.e. after the hour)           
+           
+           The default is 1
+           
+           Note that this convention only applied for time aggregations smaller than 1 day, for a day we always write the day itself... in this case
+           the output writer will set the timestamp_convention to -1 (n/a)
+           -->
+      <timestamp_convention>1</timestamp_convention>
 		
-		<griddef grid="4x4" epsg="31360" missing="-9999"
+		  <griddef grid="4x4" epsg="31360" missing="-9999"
 		         nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
-			%base%/grids/rio_4x4_grid.map
-		</griddef>
+			  %base%/grids/rio_4x4_grid.map
+		  </griddef>
 		
-		<griddef grid="4x4e1" epsg="31360" missing="-9999"
+		  <griddef grid="4x4e1" epsg="31360" missing="-9999"
 		         nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
-			%base%/grids/rio_4x4e1_grid.map
-		</griddef>
+			  %base%/grids/rio_4x4e1_grid.map
+		  </griddef>
 		
-		<griddef grid="4x4e2" epsg="31360" missing="-9999"
+		  <griddef grid="4x4e2" epsg="31360" missing="-9999"
 		         nx="73" ny="61" dx="4000." dy="4000." xul="14000." yul="256000.">
-			%base%/grids/rio_4x4e2_grid.map
-		</griddef>
+			  %base%/grids/rio_4x4e2_grid.map
+		  </griddef>
 		
 	 </handler>
   </output>
