@@ -26,6 +26,7 @@ void jsonwriter::init(const rio::config& cnf,
 {
     // do some parsing of cnf.getOutput();
     _polName = cnf.pol();
+    _dt      = cnf.tstep();
     _net     = net;
     _grid    = grid;
 
@@ -51,7 +52,8 @@ void jsonwriter::write(const boost::posix_time::ptime& curr_time,
         fprintf(fp, "      \"properties\": {\n");
         fprintf(fp, "        \"id\": %zd,\n", _grid->cells()[i].id());
         fprintf(fp, "        \"pollutant\": \"%s\",\n", _polName.c_str());
-        fprintf(fp, "        \"timestamp\" : \"%s\",\n", boost::posix_time::to_iso_string(curr_time).c_str());
+        fprintf(fp, "        \"start_time\" : \"%s\",\n", boost::posix_time::to_iso_string(curr_time).c_str());
+        fprintf(fp, "        \"end_time\" : \"%s\",\n", boost::posix_time::to_iso_string(curr_time + _dt).c_str());
         fprintf(fp, "        \"concentration\": %f,\n", values[i]);
         fprintf(fp, "        \"uncertainty\": %f\n", uncert[i]);
         fprintf(fp, "      },\n");
