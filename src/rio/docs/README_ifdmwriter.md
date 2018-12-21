@@ -59,7 +59,7 @@ allocation in this first version, so just dumping 32 bit float & ints
 | t0_min   |    int32 |    integer*4 |     56 | min of first timestep in the file                                        |
 | t0_sec   |    int32 |    integer*4 |     60 | sec of first timestep in the file                                        |
 | tmode    |    int32 |    integer*4 |     64 | mode for timestamp, 0: before the hour, 1: after the hour (default)      |
-| dt       |    int32 |    integer*4 |     68 | timestep in seconds, 3600 for 1h, 3600*24 for da,m1,m8                   |
+| dt       |    int32 |    integer*4 |     68 | timestep in seconds, 3600 for 1h, 86400 for da,m1,m8                     |
 | missing  |    int32 |    integer*4 |     72 | missing value                                                            |
 | pol      |  char[4] |  character*4 |     76 | pollutant name                                                           |
 | aggr     |  char[4] |  character*4 |     80 | aggregation time : 1h, da, m1, m8, ...                                   |
@@ -79,6 +79,15 @@ reading the pollutant would be :
 
 The acutal data is ordered per timestep and then for the rasters in Fortran column-major order, meaning that the fastest
 changing index is the row index (y-coordinate), starting from the top left of the raster. 
+
+## Configuration options
+
+Below we specify a number of configuration flags which are included in the header
+* *tmode* : contains the timestamp convention, indicating whether the timestamp t0 applies to the beginning or end of the measurmeent interval. 
+            The value is only defined for interpolations with a timeresolution below 1 day, otherwise the value is -1 (i.e. n/a)
+            tmode can be 0: the t0 timestamp is before the hour to which the concentration value applies, or 1 : the timestamp is after the hour
+            to which the concentration value applies (default). 
+* *t0_hour* : contains the hour for the concentration value. First of all see the note above regarding tmode and secondly, the hour runs from 0 to 23,                  always, so we are *not* using the 1 -> 24 h convention 
 
 ## Example read code
 
