@@ -1,5 +1,6 @@
 #pragma once
 
+#include <boost/date_time/posix_time/posix_time.hpp>
 #include "outputhandler.hpp"
 
 namespace rio {
@@ -36,6 +37,10 @@ private:
 
     std::shared_ptr<rio::network> _net;
     std::shared_ptr<rio::grid> _grid;
+
+    boost::posix_time::time_duration _dt;
+
+
 };
 
 }
