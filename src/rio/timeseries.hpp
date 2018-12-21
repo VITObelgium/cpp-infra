@@ -21,6 +21,8 @@ public:
   boost::posix_time::ptime first_time( void ) { return _times.front().begin(); }
   boost::posix_time::ptime last_time( void ) { return _times.back().last(); }  // end() is the first after the last
 
+  // Internally RIO works with the start times of the interval for looking up values etc...
+  // Nevertheless, in the datahandler & timeseries objects, the full timeintervals are stored...
   double get( boost::posix_time::ptime tstart ) const;
   double get( boost::posix_time::ptime tstart, bool& missing ) const;
   
