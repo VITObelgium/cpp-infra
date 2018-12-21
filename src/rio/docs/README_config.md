@@ -1,7 +1,7 @@
-This README file describes the RIO v5.0 model configuration
+# This README file describes the RIO v5.0 model configuration
 
-Author: Bino Maiheu
-Contact: bino.maiheu@vito.be
+* Author: Bino Maiheu
+* Contact: bino.maiheu@vito.be
 
 ## Timestamp conventions in RIO
 
