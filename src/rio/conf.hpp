@@ -146,6 +146,9 @@ private:
 
     std::vector<std::string> _out; //! output options
 
+    int _tmode; //! timestamp convention for command line options only for sub daily aggregations
+                //! 0: the requested timestamps at the command line indicate times before the hour
+                //! 1: the requested timestamps is after the hour
     boost::posix_time::ptime _tstart;
     boost::posix_time::ptime _tstop;
     boost::posix_time::time_duration _tstep;
