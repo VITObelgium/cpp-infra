@@ -15,6 +15,7 @@ using namespace inf;
 namespace po = boost::program_options;
 
 config::config()
+: _tmode(0)
 {
     // create the supported formates for date/time parsing
     _formats.push_back(std::locale(std::locale::classic(), new boost::posix_time::time_input_facet("%Y-%m-%d %H:%M:%S")));
@@ -192,7 +193,7 @@ void config::_update_parser()
 void config::parse_command_line(int argc, char* argv[])
 {
     po::options_description optionsDesc("Available options");
-    optionsDesc.add_options()("base,b", po::value<std::string>(&_base)->default_value(".")->value_name("<path>"), "base path for this run")("cnf,c", po::value<std::string>(&_cnf)->value_name("<name>"), "RIO configuration")("pol,p", po::value<std::string>(&_pol)->value_name("<name>"), "pollutant")("aggr,a", po::value<std::string>(&_aggr)->value_name("<1h,da,m1,m8,wk>"), "aggregation")("ipol,i", po::value<std::string>(&_ipol)->value_name("<name>"), "interpolation model")("grid,g", po::value<std::string>(&_grd)->value_name("<name>"), "grid name")("output,o", po::value<std::string>()->default_value("")->value_name("<type1>[,type2,...]"), "output option, comma separated [txt,hdf5,...]")("help,h", "show this message.")("debug,d", "switch on debugging mode");
+    optionsDesc.add_options()("base,b", po::value<std::string>(&_base)->default_value(".")->value_name("<path>"), "base path for this run")("cnf,c", po::value<std::string>(&_cnf)->value_name("<name>"), "RIO configuration")("pol,p", po::value<std::string>(&_pol)->value_name("<name>"), "pollutant")("aggr,a", po::value<std::string>(&_aggr)->value_name("<1h,da,m1,m8,wk>"), "aggregation")("ipol,i", po::value<std::string>(&_ipol)->value_name("<name>"), "interpolation model")("grid,g", po::value<std::string>(&_grd)->value_name("<name>"), "grid name")("output,o", po::value<std::string>()->default_value("")->value_name("<type1>[,type2,...]"), "output option, comma separated [txt,hdf5,...]")("tmode,t", po::value<int>(&_tmode)->value_name("[0,1]"), "timestamp convention")("help,h", "show this message.")("debug,d", "switch on debugging mode");
 
     po::options_description pidesc("Position independant options");
     pidesc.add_options()("tstart", po::value<std::string>()->default_value(""), "start time")("tstop", po::value<std::string>()->default_value(""), "stop time");
@@ -248,31 +249,48 @@ void config::parse_command_line(int argc, char* argv[])
         _tstop = _tstart;
     }
 
-    // set timestep
-    if (!_aggr.compare("1h"))
+    // set timestep and adjust the requeste start time and end time to the beginning of the interval
+    if (!_aggr.compare("1h")) {
         _tstep = boost::posix_time::hours(1);
-    else
+    } else
         _tstep = boost::posix_time::hours(24);
+
+    // check timemode convention
+    if (_tstep.hours() < 24) {
+        if ((_tmode != 0) && (_tmode != 1))
+            throw RuntimeError("please use 0 or 1 for timestamp convention...");
+
+        // if the user says the time mode is 1, then the given timestamps at the command line are after the hour,
+        // convert to internal 'before the hour' convention... 
+        if (_tmode == 1) {
+            std::cout << "Timestamp convention given after hour, converting to internal convention...\n";
+            _tstart -= _tstep;
+            _tstop -= _tstep;
+        }
+    }   
 }
 
 std::ostream& operator<<(std::ostream& output, const config& c)
 {
     output << "[Configuration]" << std::endl;
-    output << " Debugging mode     : " << (c._debug ? "on" : "off") << std::endl;
-    output << " Base path          : " << c._base << std::endl;
-    output << " Configuration      : " << c._cnf << std::endl;
-    output << " Pollutant          : " << c._pol << std::endl;
-    output << " Aggregation        : " << c._aggr << std::endl;
-    output << " Interpolator       : " << c._ipol << std::endl;
-    output << " Grid               : " << c._grd << std::endl;
-    output << " Output mode        :";
+    output << " Debugging mode   : " << (c._debug ? "on" : "off") << std::endl;
+    output << " Base path        : " << c._base << std::endl;
+    output << " Configuration    : " << c._cnf << std::endl;
+    output << " Pollutant        : " << c._pol << std::endl;
+    output << " Aggregation      : " << c._aggr << std::endl;
+    output << " Interpolator     : " << c._ipol << std::endl;
+    output << " Grid             : " << c._grd << std::endl;
+
+    output << " Output mode      :";
     for (auto s : c._out)
         output << " " << s;
     output << std::endl;
 
     output << "[Date range]" << std::endl;
-    output << " Start time : " << boost::posix_time::to_simple_string(c._tstart) << std::endl;
-    output << " Stop time  : " << boost::posix_time::to_simple_string(c._tstop) << std::endl;
+    output << " Internal start time        : " << boost::posix_time::to_simple_string(c._tstart) << std::endl;
+    output << " Internal stop time         : " << boost::posix_time::to_simple_string(c._tstop) << std::endl;
+    if (c._tstep.hours() < 24)
+        output << " Input timestamp convention : " << (c._tmode == 0 ? "before the hour" : "after the hour") << std::endl;
     return output; // for multiple << operators.
 }
 
