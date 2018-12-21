@@ -27,12 +27,18 @@ ifdmwriter::ifdmwriter(const XmlNode& cnf)
 , _pattern("rio_%timestamp%.txt")
 , _version(1)
 , _nt(0)
-, _tmode(0)
+, _tmode(-1)
 {
     try {
         _pattern = _xml.get<std::string>("handler.location");
     } catch (...) {
         throw std::runtime_error("invalid configuration in ifdmwriter XML config, <location> required");
+    }
+
+    try {
+        _tmode = _xml.get<int>("handler.timestamp_convention");
+    } catch (...) {
+        throw std::runtime_error("invalid configuration in ifdmwriter XML config, <timestamp_convention> required");
     }
 }
 
@@ -124,18 +130,24 @@ void ifdmwriter::init(const rio::config& cnf,
     if (!_fs)
         throw std::runtime_error("unable to open ifdm outputfile : " + filename);
 
+    // now depending on the tmode, we want to adjust this start_time or not
+    // in the cnf it is always the beginning of the interval (this is adjusted in the conf::parse_command_line method)
+    boost::posix_time::ptime t0 = cnf.start_time();    
+    if (cnf.tstep().hours() < 24 ) {
+        if (_tmode == 1) t0 += cnf.tstep();
+    }
+
     // get time information, cast to int to be really sure they are int's 
     // and not some funky boost date type
-    int yr = static_cast<int>(cnf.start_time().date().year());
-    int mn = static_cast<int>(cnf.start_time().date().month());
-    int dy = static_cast<int>(cnf.start_time().date().day());
+    int yr = static_cast<int>(t0.date().year());
+    int mn = static_cast<int>(t0.date().month());
+    int dy = static_cast<int>(t0.date().day());
 
-    int hour = static_cast<int>(cnf.start_time().time_of_day().hours());
-    int min  = static_cast<int>(cnf.start_time().time_of_day().minutes());
-    int sec  = static_cast<int>(cnf.start_time().time_of_day().seconds());
+    int hour = static_cast<int>(t0.time_of_day().hours());
+    int min  = static_cast<int>(t0.time_of_day().minutes());
+    int sec  = static_cast<int>(t0.time_of_day().seconds());
 
-    int dt = 3600 * 24;
-    if ( ! cnf.aggr().compare("1h") ) dt = 3600;
+    int dt = cnf.tstep().seconds(); // note that this returs int64_t, so can be dangerous..
 
     // write header
     std::cout << " Writing header...\n";
