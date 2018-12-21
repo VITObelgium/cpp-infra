@@ -15,22 +15,29 @@ This means that internally when RIO runs the main loop, the timestepping for one
 ### Specifying the time ranges
 Usually in AQ however, it is custom to provide the the measurements with a timestamp after the hour, therefore the user is able to request the correct interpolation timerange and specify to what side of the interval the requested timestamps apply. This is done with the -t switch, where 0 indicates before the hour and 1 after the hour : 
 
+```sh
  rio \[other_options...\] -a 1h -t 0 2017-01-01 2017-01-02
+```
 
 will interpolate the hourly values starting from the measurement for the first hour of 2017-01-01 (i.e. the hourly average from 2017-01-01 00:00 to 2017-01-01 01:00) to the first hour of 2017-01-02, whereas : 
 
+```sh
  rio \[other_options...\] -a 1h -t 1 2017-01-01 2017-01-02 
+```
 
 would interpolate the hourly values from the last hour of 2016-12-31 (, i.e. the hourly averaged concentration from 2016-12-31 23:00:00 to 2017-01-01 00:00:00) to the last hour of 2017-01-01, i.e. (from 2017-01-01 23:00 to 2017-01-02 00:00)
 
 To interpolate the 24 hourly values of 2017-01-01 would be then : 
 
+```sh
  rio \[other_options...\] -a 1h -t 1 "2017-01-01 01:00:00" 2017-01-02 
+```
 
 or
  
+```sh
  rio \[other_options...\] -a 1h -t 0 2017-01-01 "2017-01-01 23:00:00"
-
+```
 
 Note that :
 * the -t switch is only applicable for the sub-day time aggregations (hourly values) !
