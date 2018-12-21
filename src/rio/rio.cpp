@@ -92,7 +92,8 @@ int main(int argc, char* argv[])
         // some counters
         unsigned int nmaps = 0;
 
-        // start timeloop
+        // Start timeloop, internally the querying works with start times of the time interval
+        // to which the value applies. 
         std::cout << "Starting timeloop..." << std::endl;
         ptime curr_time = cf.start_time();
         while (curr_time <= cf.stop_time()) {
