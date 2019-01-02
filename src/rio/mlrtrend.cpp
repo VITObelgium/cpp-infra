@@ -135,7 +135,7 @@ void mlrtrend::select(const std::string& aggr, boost::posix_time::ptime tstart)
     std::stringstream ss;
     if (!aggr.compare("1h")) {
         // in case of 1h aggregation, add the hour of the day, otherwise just use the aggregation
-        long hr = tstart.time_of_day().hours() + 1;
+        auto hr = tstart.time_of_day().hours() + 1;
         ss << boost::format("h%02d") % hr;
     } else
         ss << aggr;
@@ -184,7 +184,7 @@ void mlrtrend::detrend(double& v, const std::string& station, const std::vector<
 }
 
 void mlrtrend::addtrend(double& v, double& e, const std::vector<double> proxy)
-{    
+{
     // get trend scale
     double scale = mlr_apply(_p_std, proxy, _xlo_std, _xhi_std);
     if (scale != 0.) {
@@ -206,11 +206,10 @@ void mlrtrend::addtrend(double& v, double& e, const std::vector<double> proxy)
 double mlrtrend::mlr_apply(const std::vector<double>& c, const std::vector<double>& x, const std::vector<double>& xlo, const std::vector<double>& xhi)
 {
     if (!((c.size() == x.size()) && (x.size() == xlo.size()) && (x.size() == xhi.size())))
-        throw RuntimeError( "Input proxy/coefficient/xlo/xhi vector sizes dont match in mlrtrend::apply..." );
+        throw RuntimeError("Input proxy/coefficient/xlo/xhi vector sizes dont match in mlrtrend::apply...");
 
     double y = 0.;
     for (unsigned int i = 0; i < c.size(); i++) {
-
         if (x[i] < xlo[i]) {
             y += c[i] * xlo[i];
         } else if (x[i] > xhi[i]) {

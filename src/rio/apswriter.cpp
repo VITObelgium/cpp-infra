@@ -172,8 +172,8 @@ void apswriter::write(const boost::posix_time::ptime& curr_time,
 
 void apswriter::write_buffer(FILE* fp)
 {
-    for (unsigned int i = 0; i < _apscf.ny; i++) {
-        for (unsigned int j = 0; j < _apscf.nx; j++)
+    for (int i = 0; i < _apscf.ny; i++) {
+        for (int j = 0; j < _apscf.nx; j++)
             fprintf(fp, _apscf.c_fmt.c_str(), _buffer[i * _apscf.nx + j]);
         fprintf(fp, "\n");
     }

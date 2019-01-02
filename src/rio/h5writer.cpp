@@ -25,7 +25,7 @@ h5writer::h5writer(const XmlNode& cnf)
 , _h5File(nullptr)
 , _data_scale_factor(1.0)
 , _data_fill_value(-9999.)
-, _time_fill_value(0.)
+, _time_fill_value(0)
 , _detection_limit(1.0)
 , _compression(9)
 , _write_hours(false)
@@ -178,7 +178,7 @@ void h5writer::_initStationInfo(const std::shared_ptr<rio::network> n)
         x.push_back(s.x());
         y.push_back(s.y());
         alt.push_back(s.alt());
-        type.push_back(s.type());
+        type.push_back(static_cast<int>(s.type()));
         st_name.push_back(s.name());
         wkt.push_back(s.wkt());
     }
@@ -371,7 +371,7 @@ void h5writer::write(const boost::posix_time::ptime& curr_time,
     writeField(_dyDS, &day);
 
     if (_write_hours) {
-        int hour = curr_time.time_of_day().hours();
+        int hour = static_cast<int>(curr_time.time_of_day().hours());
         writeField(_hrDS, &hour);
     }
 

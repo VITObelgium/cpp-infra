@@ -6,11 +6,10 @@ namespace rio {
 
 using namespace inf;
 
-
 void ifdmwriter::fwrite_string(const std::string& s, unsigned int n)
 {
     // make a copy and resize, length() doesnt count the nul, or prob does the resize
-    
+
     // just trim, don't throw...
     //if (s.length() > n)
     //    throw std::runtime_error( "string too large for size given in ifdmwriter::fwrite_string : " + s );
@@ -20,7 +19,6 @@ void ifdmwriter::fwrite_string(const std::string& s, unsigned int n)
     fwrite(str.data(), n, 1, _fs);
     return;
 }
-
 
 ifdmwriter::ifdmwriter(const XmlNode& cnf)
 : outputhandler(cnf)
@@ -132,12 +130,12 @@ void ifdmwriter::init(const rio::config& cnf,
 
     // now depending on the tmode, we want to adjust this start_time or not
     // in the cnf it is always the beginning of the interval (this is adjusted in the conf::parse_command_line method)
-    boost::posix_time::ptime t0 = cnf.start_time();    
-    if (cnf.tstep().hours() < 24 ) {
+    boost::posix_time::ptime t0 = cnf.start_time();
+    if (cnf.tstep().hours() < 24) {
         if (_tmode == 1) t0 += cnf.tstep();
     }
 
-    // get time information, cast to int to be really sure they are int's 
+    // get time information, cast to int to be really sure they are int's
     // and not some funky boost date type
     int yr = static_cast<int>(t0.date().year());
     int mn = static_cast<int>(t0.date().month());
@@ -147,7 +145,7 @@ void ifdmwriter::init(const rio::config& cnf,
     int min  = static_cast<int>(t0.time_of_day().minutes());
     int sec  = static_cast<int>(t0.time_of_day().seconds());
 
-    int dt = cnf.tstep().seconds(); // note that this returs int64_t, so can be dangerous..
+    int dt = static_cast<int>(cnf.tstep().seconds()); // note that this returs int64_t, so can be dangerous..
 
     // write header
     std::cout << " Writing header...\n";
@@ -155,15 +153,15 @@ void ifdmwriter::init(const rio::config& cnf,
     //1. set number of header bytes
     int nbytes = 15 * sizeof(int) + 4 * sizeof(float) + 98 * sizeof(char);
     fwrite(&nbytes, sizeof(int), 1, _fs);
-    fwrite(&_version, sizeof(int), 1, _fs);    
-    
+    fwrite(&_version, sizeof(int), 1, _fs);
+
     //2. write dimension information
     fwrite(&_nt, sizeof(int), 1, _fs); // 4 byte (32 bit) integers
-    fwrite(&_nx, sizeof(int), 1, _fs);  
-    fwrite(&_ny, sizeof(int), 1, _fs); 
+    fwrite(&_nx, sizeof(int), 1, _fs);
+    fwrite(&_ny, sizeof(int), 1, _fs);
 
     //3. write grid specifications
-    fwrite(&_xul, sizeof(float), 1, _fs);  // 4 byte float (32 bit)
+    fwrite(&_xul, sizeof(float), 1, _fs); // 4 byte float (32 bit)
     fwrite(&_yul, sizeof(float), 1, _fs);
 
     fwrite(&_dx, sizeof(float), 1, _fs);
@@ -172,21 +170,21 @@ void ifdmwriter::init(const rio::config& cnf,
     fwrite(&_epsg, sizeof(int), 1, _fs);
 
     // 4. write timing information
-    fwrite(&yr, sizeof(int),   1, _fs);
-    fwrite(&mn, sizeof(int),   1, _fs);
-    fwrite(&dy, sizeof(int),   1, _fs);
+    fwrite(&yr, sizeof(int), 1, _fs);
+    fwrite(&mn, sizeof(int), 1, _fs);
+    fwrite(&dy, sizeof(int), 1, _fs);
     fwrite(&hour, sizeof(int), 1, _fs);
-    fwrite(&min, sizeof(int),  1, _fs);
-    fwrite(&sec, sizeof(int),  1, _fs);
+    fwrite(&min, sizeof(int), 1, _fs);
+    fwrite(&sec, sizeof(int), 1, _fs);
     fwrite(&_tmode, sizeof(int), 1, _fs);
-    fwrite(&dt, sizeof(int),   1, _fs);
+    fwrite(&dt, sizeof(int), 1, _fs);
 
     // 5. missing value
     fwrite(&_missing, sizeof(int), 1, _fs);
-    
+
     // 6. write optional run information : here we have 98 bytes
-    fwrite_string(cnf.pol(), 4); 
-    fwrite_string(cnf.aggr(), 4); 
+    fwrite_string(cnf.pol(), 4);
+    fwrite_string(cnf.aggr(), 4);
     fwrite_string(cnf.ipol_class(), 10);
     fwrite_string(cnf.ipol(), 10);
     fwrite_string(cnf.configuration(), 10);
@@ -194,7 +192,7 @@ void ifdmwriter::init(const rio::config& cnf,
     fwrite_string(cnf.email(), 30);
 
     // prepare databuffer for single map
-    _buffer.resize(_nx * _ny );
+    _buffer.resize(_nx * _ny);
 
     return;
 }
@@ -202,24 +200,23 @@ void ifdmwriter::init(const rio::config& cnf,
 void ifdmwriter::write(const boost::posix_time::ptime& /*curr_time*/,
     const std::map<std::string, double>& /*obs*/,
     const Eigen::VectorXd& values,
-    const Eigen::VectorXd& uncert)
+    const Eigen::VectorXd& /*uncert*/)
 {
-
     // fill buffer with missing values
     std::fill(_buffer.begin(), _buffer.end(), static_cast<float>(_missing));
 
     // fill buffer with values
     for (unsigned int i = 0; i < values.size(); i++) {
         //unsigned int ix = (_griddef[i].row - 1) * _nx + (_griddef[i].col - 1);
-        
+
         // this is the correct layout to ensure proper reading in the file
         unsigned int ix = (_griddef[i].col - 1) * _ny + (_griddef[i].row - 1);
         if (ix >= _buffer.size()) throw std::runtime_error("griddef map file indexes outside of bounds for gridcell " + std::to_string(i + 1) + " ...");
-        _buffer[ix] = values(i);
+        _buffer[ix] = static_cast<float>(values(i));
     }
 
-    // dump the map    
-    fwrite(_buffer.data(), sizeof(float), _buffer.size(), _fs);    
+    // dump the map
+    fwrite(_buffer.data(), sizeof(float), _buffer.size(), _fs);
 
     // increment the _nt
     _nt++;
@@ -231,7 +228,7 @@ void ifdmwriter::close(void)
 {
     std::cout << "Closing ifdmwriter..." << std::endl;
 
-    // return the position of the filepointer to the second field, first we have 
+    // return the position of the filepointer to the second field, first we have
     // 4 bytes indicating the total length of the header in bytes, skip those...
     fseek(_fs, 8, SEEK_SET);
     fwrite(&_nt, sizeof(int), 1, _fs);

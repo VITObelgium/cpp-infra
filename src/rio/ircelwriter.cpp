@@ -89,7 +89,7 @@ void ircelwriter::write(const boost::posix_time::ptime& curr_time,
         _curr_day = req_day;
     }
     // get the hours
-    unsigned int hr = curr_time.time_of_day().hours();
+    auto hr = curr_time.time_of_day().hours();
 
     // append the date to the buffers
     _valbuf.col(hr) = values;
