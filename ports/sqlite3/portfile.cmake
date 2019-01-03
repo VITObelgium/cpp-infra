@@ -1,8 +1,8 @@
 include(vcpkg_common_functions)
 
-set(VERSION 3.25.3)
-set(SQLITE_VERSION 3250300)
-set(SQLITE_HASH ca02db8fb49b4692c8616b090c3172e20d2f482941354569b216a712fe8f3095d8c3f7c3d76144b2b70ed8e7527b2124259c52ce2546487a7f62b579927754e8)
+set(VERSION 3.26.0)
+set(SQLITE_VERSION 3260000)
+set(SQLITE_HASH ba089abd16857a65fc6cf26558a0d3e6f20c278b8df451b357eea5154f8ccd5645c9cfdb30d0fd4fe64f19dd2f876a6cc4a28455b7b013770c2ce9a607171107)
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/sqlite-amalgamation-${SQLITE_VERSION})
 
 vcpkg_download_distfile(ARCHIVE
@@ -46,3 +46,5 @@ configure_file(
 
 file(WRITE ${CURRENT_PACKAGES_DIR}/share/sqlite3/copyright "SQLite is in the Public Domain.\nhttp://www.sqlite.org/copyright.html\n")
 vcpkg_copy_pdbs()
+
+vcpkg_test_cmake(PACKAGE_NAME sqlite3)

@@ -6,14 +6,18 @@ import os
 import shutil
 import sysconfig
 
+
 def git_status_is_clean():
-    return subprocess.call(['git', 'diff', '--quiet'], shell=True) == 0
+    return subprocess.call(["git", "diff", "--quiet"], shell=True) == 0
+
 
 def git_revision_hash():
-    return subprocess.check_output(['git', 'rev-parse', 'HEAD'], shell=True).decode("utf-8").rstrip('\r\n')
+    return subprocess.check_output(["git", "rev-parse", "HEAD"], shell=True).decode("utf-8").rstrip("\r\n")
+
 
 def vcpkg_root_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
 
 def run_vcpkg(triplet, vcpkg_args):
     if not shutil.which("vcpkg"):
@@ -44,14 +48,14 @@ def cmake_configure(source_dir, build_dir, cmake_args, triplet=None, toolchain=N
         args.append("Visual Studio 15 2017 Win64")
     else:
         args.append("Ninja")
+        # do not append build type for msvc builds, otherwise debug libraries are not found (multi-config build)
+        args.append("-DCMAKE_BUILD_TYPE=Release")
 
     if triplet is not None:
         args.append("-DVCPKG_TARGET_TRIPLET={}".format(triplet))
 
     if toolchain is not None:
         args.append("-DCMAKE_TOOLCHAIN_FILE={}".format(toolchain))
-
-    args.append("-DCMAKE_BUILD_TYPE=Release")
 
     args.extend(cmake_args)
     args.append(source_dir)
@@ -90,14 +94,10 @@ def get_all_triplets():
                 triplet_useable_on_platform = True
             elif platform.startswith("linux"):
                 triplet_useable_on_platform = (
-                    "linux" in triplet_name
-                    or "mingw" in triplet_name
-                    or "musl" in triplet_name
+                    "linux" in triplet_name or "mingw" in triplet_name or "musl" in triplet_name
                 )
             elif platform.startswith("macosx"):
-                triplet_useable_on_platform = (
-                    "osx" in triplet_name or "mingw" in triplet_name
-                )
+                triplet_useable_on_platform = "osx" in triplet_name or "mingw" in triplet_name
             elif platform.startswith("win"):
                 triplet_useable_on_platform = "windows" in triplet_name
             elif platform.startswith("mingw"):
@@ -155,12 +155,8 @@ def prompt_for_triplet():
 
 
 def bootstrap_argparser():
-    parser = argparse.ArgumentParser(
-        description="Bootstrap vcpkg ports.", add_help=False
-    )
-    parser.add_argument(
-        "-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use"
-    )
+    parser = argparse.ArgumentParser(description="Bootstrap vcpkg ports.", add_help=False)
+    parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
     parser.add_argument(
         "-p",
         "--ports-dir",
@@ -201,31 +197,24 @@ def build_project(project_name, project_dir, triplet=None, cmake_args=[], build_
         triplet = prompt_for_triplet()
 
     if not build_dir:
-        build_dir = os.path.join(
-            project_dir, "build", "{}-{}".format(project_name, triplet)
-        )
+        build_dir = os.path.join(project_dir, "build", "{}-{}".format(project_name, triplet))
     os.makedirs(build_dir, exist_ok=True)
 
     vcpkg_root = vcpkg_root_dir()
-    toolchain_file = os.path.abspath(
-        os.path.join(vcpkg_root, "scripts", "buildsystems", "vcpkg.cmake")
-    )
+    toolchain_file = os.path.abspath(os.path.join(vcpkg_root, "scripts", "buildsystems", "vcpkg.cmake"))
 
     try:
-        cmake_configure(
-            project_dir, build_dir, cmake_args, triplet, toolchain=toolchain_file, generator=generator
-        )
+        cmake_configure(project_dir, build_dir, cmake_args, triplet, toolchain=toolchain_file, generator=generator)
         cmake_build(build_dir, config="Release")
     except subprocess.CalledProcessError as e:
         raise RuntimeError("Build failed: {}".format(e))
 
+
 def build_project_release(project_name, project_dir, triplet=None, cmake_args=[]):
     if not git_status_is_clean():
-        raise RuntimeError('Git status is not clean')
+        raise RuntimeError("Git status is not clean")
 
-    build_dir = os.path.join(
-        project_dir, "build", "{}-{}-dist".format(project_name, triplet)
-    )
+    build_dir = os.path.join(project_dir, "build", "{}-{}-dist".format(project_name, triplet))
 
     if os.path.exists(build_dir):
         shutil.rmtree(build_dir, ignore_errors=True)
@@ -234,13 +223,10 @@ def build_project_release(project_name, project_dir, triplet=None, cmake_args=[]
     cmake_args.append("-DPACKAGE_VERSION_COMMITHASH=" + git_hash)
     build_project(project_name, project_dir, triplet, cmake_args, build_dir)
 
+
 def build_argparser():
-    parser = argparse.ArgumentParser(
-        description="Build the project using vcpkg dependencies.", add_help=False
-    )
-    parser.add_argument(
-        "-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use"
-    )
+    parser = argparse.ArgumentParser(description="Build the project using vcpkg dependencies.", add_help=False)
+    parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
     parser.add_argument(
         "-s",
         "--source-dir",
@@ -256,13 +242,7 @@ def build_argparser():
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description="Bootstrap vcpkg ports.")
-        parser.add_argument(
-            "-t",
-            "--triplet",
-            dest="triplet",
-            metavar="TRIPLET",
-            help="the triplet to use",
-        )
+        parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
         parser.add_argument(
             "-p",
             "--ports-dir",

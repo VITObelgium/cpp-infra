@@ -1,21 +1,28 @@
 include(vcpkg_common_functions)
 
 set(MAJOR 5)
-set(MINOR 11)
-set(REVISION 2)
+set(MINOR 12)
+set(REVISION 0)
 set(VERSION ${MAJOR}.${MINOR}.${REVISION})
 set(RELEASE official)
 if (WIN32)
     set(TARBALL_EXTENSION zip)
-    set (SHASUM 57865cae59dae95cdcc7bc2b473946b7c23e22cc1aed375207a7b732d742ea741e8d8fff23b14b950e1800cfa1318a4610ec32314f44bbf5c9bc6d3148305545)
+    set (SHASUM c954418c6391955f8ff15a6e1b0ad2d08d75f21399213bd019dc46a714c7e5a58d5c094d8ff96d5deb47e4d81ffe5348960c55818237037e49cbad36d03feed8)
 else ()
     set(TARBALL_EXTENSION tar.xz)
-    set (SHASUM b9bce31322e26e99b4eeaa6bfa78f51480829284289a0a8acffd9d9028050293d20727b3dcd9adc70eddd18c82724e10154462efc6218062083333349a87a7a8)
+    set (SHASUM 0dd03d2645fb6dac5b58c8caf92b4a0a6900131f1ccfb02443a0df4702b5da0458f4c45e758d1b929ec709b0f4b36900df2fd60a058af9cc8c1a0748b6d57aae)
 endif ()
 set(PACKAGE_NAME qt-everywhere-src-${VERSION})
 set(PACKAGE ${PACKAGE_NAME}.${TARBALL_EXTENSION})
 
 find_package(PythonInterp REQUIRED)
+get_filename_component(PYTHON_DIR ${PYTHON_EXECUTABLE} DIRECTORY)
+message(STATUS "Python directory: ${PYTHON_DIR}")
+vcpkg_add_to_path(${PYTHON_DIR})
+
+if (CMAKE_HOST_WIN32 AND NOT MINGW)
+    vcpkg_find_acquire_program("JOM")
+endif ()
 
 # Extract source into architecture specific directory, because GDALs' build currently does not
 # support out of source builds.
@@ -28,7 +35,6 @@ vcpkg_download_distfile(ARCHIVE
 )
 
 vcpkg_extract_source_archive(${ARCHIVE} ${SOURCE_PATH})
-message(STATUS "PATCH PATH ${SOURCE_PATH}/${PACKAGE_NAME}")
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}/${PACKAGE_NAME}
     PATCHES
@@ -109,11 +115,15 @@ set(QT_OPTIONS
     ${OPTIONAL_ARGS}
 )
 
-if (${VCPKG_LIBRARY_LINKAGE} STREQUAL "static")
+if (VCPKG_LIBRARY_LINKAGE STREQUAL "static")
     list(APPEND QT_OPTIONS -static)
 else ()
     list(APPEND QT_OPTIONS -shared)
 endif ()
+
+if(VCPKG_CRT_LINKAGE STREQUAL "static")
+    list(APPEND QT_OPTIONS -static-runtime)
+endif()
 
 if (CMAKE_CXX_VISIBILITY_PRESET STREQUAL hidden)
     list(APPEND QT_OPTIONS -reduce-exports)
@@ -132,8 +142,14 @@ set(EXEC_COMMAND)
 
 set(PLATFORM_OPTIONS)
 if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME)
-    find_program(NMAKE nmake REQUIRED)
-    set(BUILD_COMMAND ${NMAKE})
+    find_program(JOM jom)
+    if (JOM)
+        set(BUILD_COMMAND ${JOM})
+    else ()
+        find_program(NMAKE nmake REQUIRED)
+        set(BUILD_COMMAND ${NMAKE})
+    endif ()
+
     set(CONFIG_SUFFIX .bat)
     list(APPEND QT_OPTIONS -platform win32-msvc2017)
     list(APPEND PLATFORM_OPTIONS -opengl desktop -mp)
@@ -172,10 +188,6 @@ elseif (MINGW)
     set(EXEC_COMMAND sh)
 endif()
 
-if (${VCPKG_CRT_LINKAGE} STREQUAL "static")
-    list(APPEND QT_OPTIONS -static-runtime)
-endif ()
-
 list(APPEND QT_OPTIONS ${PLATFORM} ${PLATFORM_OPTIONS})
 
 set(QT_OPTIONS_REL
@@ -184,11 +196,11 @@ set(QT_OPTIONS_REL
     -L ${CURRENT_INSTALLED_DIR}/lib
     -prefix ${CURRENT_INSTALLED_DIR}
     -extprefix ${CURRENT_PACKAGES_DIR}
-    -hostbindir ${CURRENT_INSTALLED_DIR}/tools
-    -archdatadir ${CURRENT_INSTALLED_DIR}/share/qt5
-    -datadir ${CURRENT_INSTALLED_DIR}/share/qt5
-    -plugindir ${CURRENT_INSTALLED_DIR}/share/qt5/plugins
-    -qmldir ${CURRENT_INSTALLED_DIR}/share/qt5/qml
+    -hostbindir ${CURRENT_PACKAGES_DIR}/tools
+    -archdatadir ${CURRENT_PACKAGES_DIR}/share/qt5
+    -datadir ${CURRENT_PACKAGES_DIR}/share/qt5
+    -plugindir ${CURRENT_PACKAGES_DIR}/share/qt5/plugins
+    -qmldir ${CURRENT_PACKAGES_DIR}/qml
 )
 
 set(QT_OPTIONS_DBG
@@ -200,9 +212,9 @@ set(QT_OPTIONS_DBG
     -hostbindir ${CURRENT_INSTALLED_DIR}/debug/tools
     -archdatadir ${CURRENT_INSTALLED_DIR}/debug/share/qt5
     -datadir ${CURRENT_INSTALLED_DIR}/debug/share/qt5
-    -plugindir ${CURRENT_INSTALLED_DIR}/debug/share/qt5/plugins
-    -qmldir ${CURRENT_INSTALLED_DIR}/debug/share/qt5/qml
-    -headerdir ${CURRENT_INSTALLED_DIR}/include
+    -plugindir ${CURRENT_INSTALLED_DIR}/plugins
+    -qmldir ${CURRENT_PACKAGES_DIR}/qml
+    -headerdir ${CURRENT_PACKAGES_DIR}/debug/include
 )
 
 file(REMOVE_RECURSE ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg)
@@ -256,10 +268,18 @@ file(COPY ${BIN_FILES} DESTINATION ${CURRENT_PACKAGES_DIR}/tools)
 file(REMOVE_RECURSE
     ${CURRENT_PACKAGES_DIR}/debug/bin
     ${CURRENT_PACKAGES_DIR}/debug/tools
+    ${CURRENT_PACKAGES_DIR}/debug/include
     ${CURRENT_PACKAGES_DIR}/debug/lib/pkgconfig
     ${CURRENT_PACKAGES_DIR}/debug/lib/cmake
     ${CURRENT_PACKAGES_DIR}/debug/share
-    ${CURRENT_PACKAGES_DIR}/bin)
+    ${CURRENT_PACKAGES_DIR}/bin
+)
+
+# bootstrap libs are only used for the tools and cause errors on windows as they link to a different crt
+file(REMOVE
+    ${CURRENT_PACKAGES_DIR}/debug/lib/Qt5Bootstrap.lib
+    ${CURRENT_PACKAGES_DIR}/lib/Qt5Bootstrap.lib
+)
 
 # Handle copyright
 file(INSTALL ${SOURCE_PATH}/${PACKAGE_NAME}/LICENSE.LGPLv3 DESTINATION  ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
