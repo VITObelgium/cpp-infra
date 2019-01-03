@@ -1,5 +1,6 @@
 #include "conf.hpp"
 #include "infra/exception.h"
+#include "infra/string.h"
 #include "parser.hpp"
 #include "strfun.hpp"
 #include "xmltools.hpp"
@@ -33,6 +34,34 @@ boost::posix_time::ptime config::_parse_datetime(const char* s)
     }
 
     return boost::posix_time::ptime();
+}
+
+std::vector<std::string_view> config::ipol_names() const
+{
+    std::vector<std::string_view> classes;
+
+    // find the requested configuration
+    auto cnfEl = rio::xml::getElementByAttribute(_domRoot, "configuration", "name", _cnf);
+    if (!cnfEl) {
+        throw RuntimeError("Cannot find requested configuration {} in XML setup file", _cnf);
+    }
+
+    for (auto& mapper : _pollutant.children("mapper")) {
+        classes.push_back(mapper.attribute("name"));
+    }
+
+    return classes;
+}
+
+std::vector<std::string_view> config::configurations() const
+{
+    std::vector<std::string_view> configs;
+
+    for (auto& config : _domRoot.children("configuration")) {
+        configs.push_back(config.attribute("name"));
+    }
+
+    return configs;
 }
 
 void config::_get_defaults(XmlNode el)
@@ -69,7 +98,7 @@ void config::_get_defaults(XmlNode el)
     }
 }
 
-// process the XML with the selected configuration elemetns
+// process the XML with the selected configuration elements
 void config::_get_runconfig()
 {
     if (!_domRoot) {
@@ -99,22 +128,21 @@ void config::_get_runconfig()
     }
 
     // get the model configuration
-    XmlNode polEl;
     try {
         std::vector<std::string> attNames = {"name", "aggr"};
         std::vector<std::string> attVals  = {_pol, _aggr};
-        polEl                             = rio::xml::getElementByAttributesList(cnfEl, "pollutant", attNames, attVals);
+        _pollutant                        = rio::xml::getElementByAttributesList(cnfEl, "pollutant", attNames, attVals);
 
     } catch (...) {
         throw RuntimeError("cannot find <pollutant> element with name={} and aggr={} in configuration {}", _pol, _aggr, _cnf);
     }
 
     // some additional pollutant specific configuration
-    _detection_limit = polEl.child("detection_limit").value<double>().value_or(1.0);
+    _detection_limit = _pollutant.child("detection_limit").value<double>().value_or(1.0);
 
     // now check the model
     try {
-        _modelConfig = rio::xml::getElementByAttribute(polEl, "mapper", "name", _ipol);
+        _modelConfig = rio::xml::getElementByAttribute(_pollutant, "mapper", "name", _ipol);
     } catch (...) {
         throw RuntimeError("cannot find <mapper> element with name={} for {}, {}", _ipol, _pol, _aggr);
     }
@@ -186,14 +214,24 @@ void config::_update_parser()
     // add start and end times for the requested run
     rio::parser::get()->add_pattern("%start_time%", boost::posix_time::to_iso_string(_tstart));
     rio::parser::get()->add_pattern("%end_time%", boost::posix_time::to_iso_string(_tstop));
-
-    return;
 }
 
 void config::parse_command_line(int argc, char* argv[])
 {
     po::options_description optionsDesc("Available options");
-    optionsDesc.add_options()("base,b", po::value<std::string>(&_base)->default_value(".")->value_name("<path>"), "base path for this run")("cnf,c", po::value<std::string>(&_cnf)->value_name("<name>"), "RIO configuration")("pol,p", po::value<std::string>(&_pol)->value_name("<name>"), "pollutant")("aggr,a", po::value<std::string>(&_aggr)->value_name("<1h,da,m1,m8,wk>"), "aggregation")("ipol,i", po::value<std::string>(&_ipol)->value_name("<name>"), "interpolation model")("grid,g", po::value<std::string>(&_grd)->value_name("<name>"), "grid name")("output,o", po::value<std::string>()->default_value("")->value_name("<type1>[,type2,...]"), "output option, comma separated [txt,hdf5,...]")("tmode,t", po::value<int>(&_tmode)->value_name("[0,1]"), "timestamp convention")("help,h", "show this message.")("debug,d", "switch on debugging mode");
+    // clang-format off
+    optionsDesc.add_options()
+        ("base,b", po::value<std::string>(&_base)->default_value(".")->value_name("<path>"), "base path for this run")
+        ("cnf,c", po::value<std::string>(&_cnf)->value_name("<name>"), "RIO configuration")
+        ("pol,p", po::value<std::string>(&_pol)->value_name("<name>"), "pollutant")
+        ("aggr,a", po::value<std::string>(&_aggr)->value_name("<1h,da,m1,m8,wk>"), "aggregation")
+        ("ipol,i", po::value<std::string>(&_ipol)->value_name("<name>"), "interpolation model")
+        ("grid,g", po::value<std::string>(&_grd)->value_name("<name>"), "grid name")
+        ("output,o", po::value<std::string>()->default_value("")->value_name("<type1>[,type2,...]"), "output option, comma separated [txt,hdf5,...]")
+        ("tmode,t", po::value<int>(&_tmode)->value_name("[0,1]"), "timestamp convention")
+        ("help,h", "show this message.")
+        ("debug,d", "switch on debugging mode");
+    // clang-format on
 
     po::options_description pidesc("Position independant options");
     pidesc.add_options()("tstart", po::value<std::string>()->default_value(""), "start time")("tstop", po::value<std::string>()->default_value(""), "stop time");
@@ -261,13 +299,56 @@ void config::parse_command_line(int argc, char* argv[])
             throw RuntimeError("please use 0 or 1 for timestamp convention...");
 
         // if the user says the time mode is 1, then the given timestamps at the command line are after the hour,
-        // convert to internal 'before the hour' convention... 
+        // convert to internal 'before the hour' convention...
         if (_tmode == 1) {
             std::cout << "Timestamp convention given after hour, converting to internal convention...\n";
             _tstart -= _tstep;
             _tstop -= _tstep;
         }
-    }   
+    }
+}
+
+void config::set_pol(std::string_view name)
+{
+    _pol = name;
+    _get_runconfig();
+}
+
+std::vector<std::string_view> config::pol_names() const
+{
+    std::vector<std::string_view> pollutants;
+
+    // find the requested configuration
+    auto cnfEl = rio::xml::getElementByAttribute(_domRoot, "configuration", "name", _cnf);
+    if (!cnfEl) {
+        throw RuntimeError("Cannot find requested configuration {} in XML setup file", _cnf);
+    }
+
+    for (auto& mapper : cnfEl.children("pollutant")) {
+        for (auto& name : str::split_view(mapper.attribute("name"), ",")) {
+            pollutants.push_back(name);
+        }
+    }
+
+    return pollutants;
+}
+
+std::vector<std::string_view> config::aggr_names() const
+{
+    return str::split_view(_pollutant.attribute("aggr"), ",");
+}
+
+void config::set_ipol(std::string_view name)
+{
+    _pol = name;
+    _get_runconfig();
+}
+
+void config::set_configuration(std::string_view name)
+{
+    _cnf = name;
+    _get_defaults(_domRoot.child("defaults"));
+    _get_runconfig();
 }
 
 std::ostream& operator<<(std::ostream& output, const config& c)

@@ -57,12 +57,12 @@
        </property>
        <layout class="QGridLayout" name="gridLayout_3">
         <item row="1" column="3" colspan="2">
-         <widget class="QLineEdit" name="lineEdit_2">
+         <widget class="QLineEdit" name="configDescriptionLabel">
           <property name="enabled">
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>Config description</string>
+           <string notr="true"/>
           </property>
           <property name="readOnly">
            <bool>true</bool>
@@ -70,7 +70,7 @@
          </widget>
         </item>
         <item row="2" column="2">
-         <widget class="QComboBox" name="integrationCombo"/>
+         <widget class="QComboBox" name="pollutantCombo"/>
         </item>
         <item row="0" column="0">
          <widget class="QLabel" name="configLabel">
@@ -112,18 +112,8 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Interpolation model:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="2">
-         <widget class="QComboBox" name="pollutantCombo">
+         <widget class="QComboBox" name="interpolationCombo">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -143,23 +133,7 @@
          </widget>
         </item>
         <item row="4" column="4">
-         <widget class="QComboBox" name="aggregationCombo">
-          <item>
-           <property name="text">
-            <string>Hourly</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Daily</string>
-           </property>
-          </item>
-          <item>
-           <property name="text">
-            <string>Monthly</string>
-           </property>
-          </item>
-         </widget>
+         <widget class="QComboBox" name="aggregationCombo"/>
         </item>
         <item row="0" column="1" colspan="4">
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -211,16 +185,6 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Pollutant:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="2">
          <widget class="QComboBox" name="nameCombo"/>
         </item>
@@ -231,6 +195,26 @@
          <widget class="QLabel" name="label_6">
           <property name="text">
            <string>Start date:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Pollutant:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Interpolation model:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

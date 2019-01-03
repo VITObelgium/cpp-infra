@@ -57,6 +57,10 @@ if(MINGW)
     target_compile_options(rio PRIVATE "$<$<CONFIG:DEBUG>:-Wa,-mbig-obj>")
 endif()
 
+target_include_directories(rio PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+)
+
 target_link_libraries(rio
     infra
     Eigen3::Eigen

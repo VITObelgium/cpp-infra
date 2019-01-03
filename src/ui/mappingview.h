@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Aggregation.h"
-#include "ConfigurationHandler.h"
 #include "DateTime.h"
 #include "Engine.h"
 #include "PollutantManager.h"
 #include "plugins/PluginFactory.h"
+#include "rio.hpp"
 
 #include "ui_mappingview.h"
 
@@ -13,6 +13,7 @@
 #include <QStandardItemModel>
 #include <QWidget>
 #include <memory>
+#include <string_view>
 
 namespace opaq {
 
@@ -37,17 +38,24 @@ private:
     void loadRecentConfigurations();
     void updateRecentConfiguration(const QString& filePath);
 
-    void updateStationModel(const std::vector<Station>& stations);
-    void updatePollutantModel();
+    void updateConfigurationsModel(const std::vector<std::string_view>& configurations);
+    void updatePollutantModel(const std::vector<std::string_view>& pollutants);
+    void updateInterpolationModel(const std::vector<std::string_view>& interpolations);
+    void updateAggregationModel(const std::vector<std::string_view>& aggregations);
+
+    void onConfigurationChange(const QString& configName);
+    void onPollutantChange(const QString& configName);
+    void onInterpolationChange(const QString& configName);
 
     Ui::MappingView _ui;
-    QStandardItemModel _stationModel;
+    QStandardItemModel _configurationModel;
+    QStandardItemModel _interpolationModel;
     QStandardItemModel _pollutantModel;
     QStandardItemModel _aggregationModel;
 
     config::PollutantManager _pollutantMgr;
-    ConfigurationHandler _config;
     PluginFactory _pluginFactory;
     Engine _engine;
+    rio::config _config;
 };
 }

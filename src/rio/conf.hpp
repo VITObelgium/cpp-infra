@@ -20,54 +20,66 @@ public:
     void parse_setup_file(const std::string& setup_file);
     void parse_command_line(int argc, char* argv[]);
 
-    bool debug(void) const
+    bool debug() const
     {
         return _debug;
     }
 
     friend std::ostream& operator<<(std::ostream& output, const config& c);
 
-    std::string base_path(void) const
+    std::string base_path() const
     {
         return _base;
     }
 
-    std::string pol(void) const
+    std::string pol() const
     {
         return _pol;
     }
 
-    std::string aggr(void) const
+    void set_pol(std::string_view name);
+
+    // returns the available pollutants for the current configuration
+    std::vector<std::string_view> pol_names() const;
+
+    std::string aggr() const
     {
         return _aggr;
     }
 
-    std::string grid(void) const
+    // returns the available aggregation periods for the current pollutant
+    std::vector<std::string_view> aggr_names() const;
+
+    std::string grid() const
     {
         return _grd;
     }
 
-    std::string ipol(void) const
+    std::string ipol() const
     {
         return _ipol;
     }
 
-    std::string configuration(void) const
+    void set_ipol(std::string_view name);
+
+    std::string configuration() const
     {
         return _cnf;
     }
 
-    boost::posix_time::ptime start_time(void) const
+    void set_configuration(std::string_view name);
+
+    boost::posix_time::ptime start_time() const
     {
         return _tstart;
     }
 
-    boost::posix_time::ptime stop_time(void) const
+    boost::posix_time::ptime stop_time() const
     {
         return _tstop;
     }
 
-    boost::posix_time::time_duration tstep(void) const
+    boost::posix_time::time_duration tstep() const
     {
         return _tstep;
     }
@@ -108,6 +120,9 @@ public:
         return _ipol_class;
     }
 
+    // returns the available interpolation methods for the current configuration
+    std::vector<std::string_view> ipol_names() const;
+
     double detection_limit() const
     {
         return _detection_limit;
@@ -132,6 +147,8 @@ public:
     {
         return _desc;
     }
+
+    std::vector<std::string_view> configurations() const;
 
 private:
     bool _debug;
@@ -162,7 +179,8 @@ private:
     inf::XmlNode _gridConfig; //! ditto for the grid
 
     inf::XmlNode _obsConfig;    //! ditto for the observations
-    inf::XmlNode _outputConfig; //! and for the outpu
+    inf::XmlNode _outputConfig; //! and for the output
+    inf::XmlNode _pollutant;    //! pollutant config
     inf::XmlNode _modelConfig;  //! model config
 
     std::string _ipol_class;
@@ -175,8 +193,8 @@ private:
 private:
     // some helper routines
     void _get_defaults(inf::XmlNode el);
-    void _get_runconfig(void);
-    void _update_parser(void);
+    void _get_runconfig();
+    void _update_parser();
 
     std::vector<std::locale> _formats;
     boost::posix_time::ptime _parse_datetime(const char* s);

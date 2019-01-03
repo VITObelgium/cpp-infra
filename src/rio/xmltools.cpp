@@ -14,7 +14,7 @@ static bool _checkMatchList(const XmlNode& el, const std::vector<std::string>& a
     for (size_t i = 0; i < attrNames.size(); ++i) {
         auto val = el.attribute(attrNames[i]);
         if (!val.empty()) {
-            auto lst = str::split(val, " \t;,", str::StrTokFlags);
+            auto lst = str::split_view(val, " \t;,", str::StrTokFlags);
             for (const auto& s : lst) {
                 if (s == attrValues[i]) {
                     matches++;

@@ -59,6 +59,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 target_link_libraries(opaqui
     opaqcore
     opaqplugins
+    rio
     uiinfra
     Qt5::Gui
     Qt5::Charts
@@ -77,15 +78,15 @@ install(TARGETS opaqui
 )
 
 if (STATIC_QT)
-    add_definitions("-DQT_CHARTS_STATICLIB")
+    target_compile_definitions(opaqui PRIVATE "-DQT_CHARTS_STATICLIB")
 
     find_package(OpenGL)
     #find_dependency(NAME QT_PLATFORMSUPPORT LIBNAMES Qt5PlatformSupport DEBUGLIBNAMES Qt5PlatformSupportd)
-    find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzz DEBUGLIBNAMES qtharfbuzzd)
-    find_dependency(NAME QT_PCRE LIBNAMES qtpcre2 DEBUGLIBNAMES qtpcre2d)
+    #find_dependency(NAME QT_HARFBUZZ LIBNAMES qtharfbuzz DEBUGLIBNAMES qtharfbuzzd)
+    #find_dependency(NAME QT_PCRE LIBNAMES qtpcre2 DEBUGLIBNAMES qtpcre2d)
 
     if (MSVC)
-        find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
+        #find_dependency(NAME QT_FREETYPE LIBNAMES qtfreetype DEBUGLIBNAMES qtfreetyped)
     else ()
         find_package(Png REQUIRED)
         list (APPEND Qt5Gui_LIBRARIES ${Png_LIBRARY})
