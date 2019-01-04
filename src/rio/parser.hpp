@@ -1,29 +1,23 @@
 #pragma once
 
-#include <string>
 #include <map>
+#include <string>
 
-namespace rio
-{
+namespace rio {
 
 class parser
 {
 public:
-  static parser* get();
-  ~parser();
-  
-  void process( std::string& s );
-  void clear();
-  void add_pattern( const std::string key, const std::string value );
+    static parser* get();
 
-  
+    void process(std::string& s);
+    void clear();
+    void add_pattern(const std::string& key, const std::string& value);
+
 private:
-  parser();
-  static parser* _instance;
+    parser() = default;
 
-  std::map<std::string, std::string> _patterns;
+    std::map<std::string, std::string> _patterns;
 };
-
-
 
 }

@@ -47,7 +47,7 @@ krige_ipol::~krige_ipol()
 void krige_ipol::run(Eigen::VectorXd& values,
     Eigen::VectorXd& uncert,
     boost::posix_time::ptime tstart,
-    const std::map<std::string, double>& obs,
+    const std::unordered_map<std::string, double>& obs,
     const std::shared_ptr<rio::grid>& g) const
 {
     // get the stations x and y values and observations

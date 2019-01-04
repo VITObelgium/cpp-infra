@@ -8,8 +8,14 @@
 #include "uiinfra/logsinkmodel.h"
 
 #ifdef STATIC_QT
-#if defined WIN32
+#ifdef WIN32
+Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin);
 Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+Q_IMPORT_PLUGIN(GeoServiceProviderFactoryEsri);
+
+Q_IMPORT_PLUGIN(QtQuick2Plugin)
+Q_IMPORT_PLUGIN(QtLocationDeclarativeModule)
+Q_IMPORT_PLUGIN(QtPositioningDeclarativeModule)
 #endif
 #endif
 
@@ -26,6 +32,10 @@ int main(int argc, char* argv[])
     auto logSinkModel = std::make_shared<uiinfra::LogSinkModelMt>();
     Log::add_custom_sink(logSinkModel);
     LogRegistration logging("opaq");
+
+#ifndef NDEBUG
+    Log::setLevel(Log::Level::Debug);
+#endif
 
     uiinfra::Application app(argc, argv);
     QCoreApplication::setOrganizationName("VITO");

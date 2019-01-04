@@ -84,7 +84,6 @@ int main(int argc, char* argv[])
         out.init(cf, net, grid);
 
         // Prepare datastructures
-        std::map<std::string, double> obs;
         Eigen::VectorXd values, uncert;
         values.resize(grid->size());
         uncert.resize(grid->size());
@@ -93,7 +92,7 @@ int main(int argc, char* argv[])
         unsigned int nmaps = 0;
 
         // Start timeloop, internally the querying works with start times of the time interval
-        // to which the value applies. 
+        // to which the value applies.
         std::cout << "Starting timeloop..." << std::endl;
         ptime curr_time = cf.start_time();
         while (curr_time <= cf.stop_time()) {
@@ -103,7 +102,7 @@ int main(int argc, char* argv[])
             rio::parser::get()->add_pattern("%timestamp%", boost::posix_time::to_iso_string(curr_time));
             rio::parser::get()->add_pattern("%date%", boost::gregorian::to_iso_string(curr_time.date()));
 
-            dbq->get(obs, curr_time, cf.pol(), cf.aggr());
+            auto obs = dbq->get(curr_time, cf.pol(), cf.aggr());
 
             // TODO : build this into the mappers
             if (obs.size() >= 5) {
@@ -115,7 +114,7 @@ int main(int argc, char* argv[])
                 uncert.fill(-9999.);
             }
 
-            // always write output, even though the values are all missing... 
+            // always write output, even though the values are all missing...
             out.write(curr_time, obs, values, uncert);
 
             curr_time += cf.tstep();

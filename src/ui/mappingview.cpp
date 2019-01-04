@@ -6,11 +6,15 @@
 #include "data/ForecastBuffer.h"
 #include "infra/cast.h"
 #include "infra/log.h"
+#include "infra/string.h"
+#include "modelrunner.hpp"
+#include "uiinfra/userinteraction.h"
 #include "uiutils.h"
 
 #include <array>
 #include <cassert>
 #include <cinttypes>
+#include <fmt/ostream.h>
 
 #include <QFileDialog>
 #include <QSettings>
@@ -32,9 +36,8 @@ MappingView::MappingView(QWidget* parent)
 {
     _ui.setupUi(this);
 
-    connect(_ui.browseButton, &QPushButton::clicked, this, [this]() {
-        showConfigFileSelector();
-    });
+    connect(_ui.browseButton, &QPushButton::clicked, this, &MappingView::showConfigFileSelector);
+    connect(_ui.computeButton, &QPushButton::clicked, this, &MappingView::compute);
 
     connect(_ui.configPathCombo, QOverload<const QString&>::of(&QComboBox::activated), this, [this](const QString& path) {
         loadConfiguration(path);
@@ -42,21 +45,12 @@ MappingView::MappingView(QWidget* parent)
 
     connect(_ui.nameCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onConfigurationChange);
     connect(_ui.pollutantCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onPollutantChange);
-    connect(_ui.interpolationCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onInterpolationChange);
-
-    /*
-    _aggregationModel.insertRows(0, static_cast<int>(s_aggregationTypes.size()));
-
-    for (size_t i = 0; i < s_aggregationTypes.size(); ++i) {
-        auto index = static_cast<int>(i);
-        _aggregationModel.setItem(index, 0, new QStandardItem(QString(Aggregation::getDisplayName(s_aggregationTypes[index]).c_str())));
-        _aggregationModel.setData(_aggregationModel.index(index, 0), s_aggregationTypes[index], Qt::UserRole);
-    }*/
 
     _ui.nameCombo->setModel(&_configurationModel);
     _ui.pollutantCombo->setModel(&_pollutantModel);
     _ui.interpolationCombo->setModel(&_interpolationModel);
     _ui.aggregationCombo->setModel(&_aggregationModel);
+    _ui.gridCombo->setModel(&_gridModel);
 
     loadRecentConfigurations();
 
@@ -119,9 +113,11 @@ void MappingView::updateRecentConfiguration(const QString& filePath)
 void MappingView::onConfigurationChange(const QString& configName)
 {
     try {
-        _config.set_configuration(configName.toStdString());
-        _ui.configDescriptionLabel->setText(QString::fromStdString(_config.desc()));
-        updatePollutantModel(_config.pol_names());
+        auto configString = configName.toStdString();
+        auto desc         = _config.desc(configString);
+        _ui.configDescriptionLabel->setText(QString::fromUtf8(desc.data(), truncate<int>(desc.size())));
+        updatePollutantModel(_config.pol_names(configString));
+        updateGridModel(_config.grid_names(configString));
     } catch (const std::exception& e) {
         Log::error("Failed to change configuration: {}", e.what());
     }
@@ -129,47 +125,42 @@ void MappingView::onConfigurationChange(const QString& configName)
 
 void MappingView::onPollutantChange(const QString& name)
 {
-    _config.set_pol(name.toStdString());
-    updateInterpolationModel(_config.ipol_names());
-    updateAggregationModel(_config.aggr_names());
+    if (!name.isEmpty()) {
+        auto configName    = _ui.nameCombo->currentText().toStdString();
+        auto pollutantName = name.toStdString();
+
+        updateInterpolationModel(_config.ipol_names(configName, pollutantName));
+        updateAggregationModel(_config.aggr_names(configName, pollutantName));
+    }
 }
 
-void MappingView::onInterpolationChange(const QString& name)
+static void fillModel(QStandardItemModel& model, const std::vector<std::string_view>& names)
 {
-    _config.set_ipol(name.toStdString());
+    model.clear();
+    model.insertRows(0, static_cast<int>(names.size()));
+
+    int row = 0;
+    for (auto& name : names) {
+        model.setItem(row++, 0, new QStandardItem(QString::fromUtf8(name.data(), truncate<int>(name.size()))));
+    }
 }
 
 void MappingView::updateConfigurationsModel(const std::vector<std::string_view>& configurations)
 {
-    _configurationModel.clear();
-    _configurationModel.insertRows(0, static_cast<int>(configurations.size()));
-
-    int row = 0;
-    for (auto& config : configurations) {
-        _configurationModel.setItem(row++, 0, new QStandardItem(QString::fromUtf8(config.data(), truncate<int>(config.size()))));
-    }
+    fillModel(_configurationModel, configurations);
+    _ui.nameCombo->setCurrentIndex(0);
 }
 
 void MappingView::updatePollutantModel(const std::vector<std::string_view>& pollutants)
 {
-    _pollutantModel.clear();
-    _pollutantModel.insertRows(0, static_cast<int>(pollutants.size()));
-
-    int row = 0;
-    for (auto& config : pollutants) {
-        _pollutantModel.setItem(row++, 0, new QStandardItem(QString::fromUtf8(config.data(), truncate<int>(config.size()))));
-    }
+    fillModel(_pollutantModel, pollutants);
+    _ui.pollutantCombo->setCurrentIndex(0);
 }
 
 void MappingView::updateInterpolationModel(const std::vector<std::string_view>& interpollations)
 {
-    _interpolationModel.clear();
-    _interpolationModel.insertRows(0, static_cast<int>(interpollations.size()));
-
-    int row = 0;
-    for (auto& config : interpollations) {
-        _interpolationModel.setItem(row++, 0, new QStandardItem(QString::fromUtf8(config.data(), truncate<int>(config.size()))));
-    }
+    fillModel(_interpolationModel, interpollations);
+    _ui.interpolationCombo->setCurrentIndex(0);
 }
 
 void MappingView::updateAggregationModel(const std::vector<std::string_view>& aggregations)
@@ -179,15 +170,46 @@ void MappingView::updateAggregationModel(const std::vector<std::string_view>& ag
 
     int row = 0;
     for (auto& aggr : aggregations) {
+        QStandardItem* item = new QStandardItem();
+
         if (aggr == "1h") {
-            _aggregationModel.setItem(row++, 0, new QStandardItem(tr("Hourly")));
+            item->setText(tr("Hourly"));
         } else if (aggr == "da") {
-            _aggregationModel.setItem(row++, 0, new QStandardItem(tr("Daily")));
+            item->setText(tr("Daily"));
         } else if (aggr == "mo") {
-            _aggregationModel.setItem(row++, 0, new QStandardItem(tr("Monthly")));
+            item->setText(tr("Monthly"));
+        }
+
+        if (item) {
+            item->setData(QString::fromUtf8(aggr.data(), truncate<int>(aggr.size())), Qt::UserRole);
+            _aggregationModel.setItem(row++, 0, item);
         } else {
             Log::warn("Unknown aggregation: {}", aggr);
         }
+    }
+
+    _ui.aggregationCombo->setCurrentIndex(0);
+}
+
+void MappingView::updateGridModel(const std::vector<std::string_view>& grids)
+{
+    fillModel(_gridModel, grids);
+    _ui.gridCombo->setCurrentIndex(0);
+}
+
+void MappingView::compute()
+{
+    try {
+        _config.apply_config(
+            _ui.nameCombo->currentText().toStdString(),
+            _ui.pollutantCombo->currentText().toStdString(),
+            _ui.interpolationCombo->currentText().toStdString(),
+            _ui.aggregationCombo->currentData(Qt::UserRole).toString().toStdString(),
+            _ui.gridCombo->currentText().toStdString());
+        rio::run_model(_config);
+    } catch (const std::exception& e) {
+        Log::error("Compute failed: {}", e.what());
+        uiinfra::displayError(tr("Mapping failed"), QString::fromUtf8(e.what()));
     }
 }
 

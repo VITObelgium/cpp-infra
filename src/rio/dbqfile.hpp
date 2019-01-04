@@ -19,8 +19,7 @@ public:
 
     // retrieve the data from the file
     // exclude missing stations
-    void get(std::map<std::string, double>& data,
-        boost::posix_time::ptime tstart, std::string pol, std::string agg);
+    std::unordered_map<std::string, double> get(boost::posix_time::ptime tstart, std::string pol, std::string agg) override;
 
 private:
     std::map<std::string, rio::timeseries> _db1h;

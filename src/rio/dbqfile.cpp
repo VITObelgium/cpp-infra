@@ -129,11 +129,9 @@ dbqfile::~dbqfile()
 {
 }
 
-void dbqfile::get(std::map<std::string, double>& data,
-    boost::posix_time::ptime tstart, std::string pol, std::string agg)
+std::unordered_map<std::string, double> dbqfile::get(boost::posix_time::ptime tstart, std::string pol, std::string agg)
 {
-    // clear  map
-    data.clear();
+    std::unordered_map<std::string, double> data;
 
     // get pointer to correct database archive, depending on aggregation
     std::map<std::string, rio::timeseries>* _db;
@@ -158,11 +156,11 @@ void dbqfile::get(std::map<std::string, double>& data,
                 if (!_net->get(it.first)) continue;
             }
 
-            data[it.first] = x; // otherwise don't insert in the map
+            data.emplace(it.first, x); // otherwise don't insert in the map
         }
     }
 
-    return;
+    return data;
 }
 
 void dbqfile::write_summary(void)

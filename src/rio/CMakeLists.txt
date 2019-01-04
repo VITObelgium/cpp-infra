@@ -40,6 +40,7 @@ add_library(rio
     trendmodel.hpp trendmodel.cpp
     polytrend.hpp polytrend.cpp
     mlrtrend.hpp mlrtrend.cpp
+    modelrunner.hpp modelrunner.cpp
     xmltools.hpp xmltools.cpp
     parser.hpp parser.cpp
     output.hpp output.cpp
@@ -50,6 +51,7 @@ add_library(rio
     h5writer.hpp h5writer.cpp
     jsonwriter.hpp jsonwriter.cpp
     ifdmwriter.hpp ifdmwriter.cpp
+    rio.hpp
 )
 
 if(MINGW)

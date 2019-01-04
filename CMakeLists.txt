@@ -37,9 +37,13 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# use release imports for relwithdebinfo config
+set(CMAKE_MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+
 option(OPAQ_SANITIZE_ADDRESS "Build with address sanitizer (detect invalid memory access and memory leaks)" OFF)
 option(OPAQ_ENABLE_WERROR "Treat warnings as errors" OFF)
 option(OPAQ_ENABLE_UI "Build the user interface" OFF)
+option(OPAQ_STATIC_RUNTIME "Use static runtime on windows" OFF)
 option(OPAQ_ENABLE_POSTGRESQL "Support postgresql in the sql plugin" OFF)
 option(OPAQ_ENABLE_PREDICTION_SERVICE "Build the prediction REST service" OFF)
 
@@ -78,7 +82,7 @@ set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
 set(Boost_USE_STATIC_LIBS ON)
-set(Boost_USE_STATIC_RUNTIME OFF)
+set(Boost_USE_STATIC_RUNTIME ${OPAQ_STATIC_RUNTIME})
 
 set(INFRA_XML ON CACHE BOOL "" FORCE)
 set(INFRA_LOGGING ON CACHE BOOL "" FORCE)

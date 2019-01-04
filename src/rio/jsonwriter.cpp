@@ -34,7 +34,7 @@ void jsonwriter::init(const rio::config& cnf,
 }
 
 void jsonwriter::write(const boost::posix_time::ptime& curr_time,
-    const std::map<std::string, double>& /*obs*/,
+    const std::unordered_map<std::string, double>& /*obs*/,
     const Eigen::VectorXd& values,
     const Eigen::VectorXd& uncert)
 {

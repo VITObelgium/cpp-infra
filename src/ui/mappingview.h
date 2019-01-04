@@ -42,16 +42,19 @@ private:
     void updatePollutantModel(const std::vector<std::string_view>& pollutants);
     void updateInterpolationModel(const std::vector<std::string_view>& interpolations);
     void updateAggregationModel(const std::vector<std::string_view>& aggregations);
+    void updateGridModel(const std::vector<std::string_view>& grids);
 
     void onConfigurationChange(const QString& configName);
     void onPollutantChange(const QString& configName);
-    void onInterpolationChange(const QString& configName);
+
+    void compute();
 
     Ui::MappingView _ui;
     QStandardItemModel _configurationModel;
     QStandardItemModel _interpolationModel;
     QStandardItemModel _pollutantModel;
     QStandardItemModel _aggregationModel;
+    QStandardItemModel _gridModel;
 
     config::PollutantManager _pollutantMgr;
     PluginFactory _pluginFactory;

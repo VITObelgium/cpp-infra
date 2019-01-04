@@ -6,8 +6,8 @@
 #include "parser.hpp"
 
 // supported trend models...
-#include "polytrend.hpp"
 #include "mlrtrend.hpp"
+#include "polytrend.hpp"
 
 namespace rio {
 
@@ -74,7 +74,7 @@ rio_ipol::~rio_ipol()
 void rio_ipol::run(Eigen::VectorXd& values,
     Eigen::VectorXd& uncert,
     boost::posix_time::ptime tstart,
-    const std::map<std::string, double>& obs,
+    const std::unordered_map<std::string, double>& obs,
     const std::shared_ptr<rio::grid>& g) const
 {
     // get the stations x and y values and observations

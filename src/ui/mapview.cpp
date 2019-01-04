@@ -43,7 +43,7 @@ MapView::MapView(QWidget* parent)
             assert(_qmlRaster);
             assert(_qmlRasterImage);
 
-            QObject::connect(_qmlMap, SIGNAL(mouseMoved(QVariant)), this, SLOT(onMouseMoveEvent(QVariant)));
+            //QObject::connect(_qmlMap, SIGNAL(mouseMoved(QVariant)), this, SLOT(onMouseMoveEvent(QVariant)));
         }
     });
 

@@ -6,9 +6,7 @@
 #include <string>
 #include <vector>
 
-#include <boost/algorithm/string.hpp>
 #include <boost/date_time.hpp>
-#include <boost/filesystem.hpp>
 
 namespace rio {
 
@@ -19,6 +17,13 @@ public:
 
     void parse_setup_file(const std::string& setup_file);
     void parse_command_line(int argc, char* argv[]);
+
+    void apply_config(
+        std::string_view config_name,
+        std::string_view pollutant,
+        std::string_view interpolation,
+        std::string_view aggregation,
+        std::string_view grid);
 
     bool debug() const
     {
@@ -37,37 +42,37 @@ public:
         return _pol;
     }
 
-    void set_pol(std::string_view name);
-
-    // returns the available pollutants for the current configuration
-    std::vector<std::string_view> pol_names() const;
+    // returns the available pollutants for the provided configuration
+    std::vector<std::string_view> pol_names(std::string_view config) const;
 
     std::string aggr() const
     {
         return _aggr;
     }
 
-    // returns the available aggregation periods for the current pollutant
-    std::vector<std::string_view> aggr_names() const;
+    // returns the available aggregation periods for the pollutant in the specified configuration
+    std::vector<std::string_view> aggr_names(std::string_view config, std::string_view pollutant) const;
 
     std::string grid() const
     {
         return _grd;
     }
 
+    // returns the available grids for the provided configuration
+    std::vector<std::string_view> grid_names(std::string_view config) const;
+
+    // returns the available interpolation methods for the pollutant in the specified configuration
+    std::vector<std::string_view> ipol_names(std::string_view config, std::string_view pollutant) const;
+
     std::string ipol() const
     {
         return _ipol;
     }
 
-    void set_ipol(std::string_view name);
-
     std::string configuration() const
     {
         return _cnf;
     }
-
-    void set_configuration(std::string_view name);
 
     boost::posix_time::ptime start_time() const
     {
@@ -120,9 +125,6 @@ public:
         return _ipol_class;
     }
 
-    // returns the available interpolation methods for the current configuration
-    std::vector<std::string_view> ipol_names() const;
-
     double detection_limit() const
     {
         return _detection_limit;
@@ -143,11 +145,7 @@ public:
         return _email;
     }
 
-    const std::string& desc() const
-    {
-        return _desc;
-    }
-
+    std::string_view desc(std::string_view config) const;
     std::vector<std::string_view> configurations() const;
 
 private:
@@ -188,13 +186,14 @@ private:
     double _missing_value;
     std::string _author;
     std::string _email;
-    std::string _desc;
 
 private:
     // some helper routines
     void _get_defaults(inf::XmlNode el);
     void _get_runconfig();
     void _update_parser();
+    inf::XmlNode _get_config_node(std::string_view config) const;
+    inf::XmlNode _get_pollutant_node(inf::XmlNode configNode, std::string_view pollutantName, std::string aggregation = "") const;
 
     std::vector<std::locale> _formats;
     boost::posix_time::ptime _parse_datetime(const char* s);

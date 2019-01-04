@@ -3,12 +3,12 @@
 #include "apswriter.hpp"
 #include "asciiwriter.hpp"
 #include "h5writer.hpp"
+#include "ifdmwriter.hpp"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/xmldocument.h"
 #include "ircelwriter.hpp"
 #include "jsonwriter.hpp"
-#include "ifdmwriter.hpp"
 
 #include "xmltools.hpp"
 
@@ -83,7 +83,7 @@ void output::init(const rio::config& cnf,
 }
 
 void output::write(const boost::posix_time::ptime& curr_time,
-    const std::map<std::string, double>& obs,
+    const std::unordered_map<std::string, double>& obs,
     const Eigen::VectorXd& values,
     const Eigen::VectorXd& uncert)
 {

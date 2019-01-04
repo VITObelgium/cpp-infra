@@ -36,21 +36,9 @@ boost::posix_time::ptime config::_parse_datetime(const char* s)
     return boost::posix_time::ptime();
 }
 
-std::vector<std::string_view> config::ipol_names() const
+std::string_view config::desc(std::string_view config) const
 {
-    std::vector<std::string_view> classes;
-
-    // find the requested configuration
-    auto cnfEl = rio::xml::getElementByAttribute(_domRoot, "configuration", "name", _cnf);
-    if (!cnfEl) {
-        throw RuntimeError("Cannot find requested configuration {} in XML setup file", _cnf);
-    }
-
-    for (auto& mapper : _pollutant.children("mapper")) {
-        classes.push_back(mapper.attribute("name"));
-    }
-
-    return classes;
+    return _get_config_node(config).child("description").value();
 }
 
 std::vector<std::string_view> config::configurations() const
@@ -114,7 +102,6 @@ void config::_get_runconfig()
     // some general, configuration specific configuration
     _author        = cnfEl.child("author").value();
     _email         = cnfEl.child("email").value();
-    _desc          = cnfEl.child("description").value();
     _missing_value = cnfEl.child("missing_value").value<double>().value_or(-9999.0);
 
     // find a *generic* station and grid tag, can be overwritten later on
@@ -128,14 +115,7 @@ void config::_get_runconfig()
     }
 
     // get the model configuration
-    try {
-        std::vector<std::string> attNames = {"name", "aggr"};
-        std::vector<std::string> attVals  = {_pol, _aggr};
-        _pollutant                        = rio::xml::getElementByAttributesList(cnfEl, "pollutant", attNames, attVals);
-
-    } catch (...) {
-        throw RuntimeError("cannot find <pollutant> element with name={} and aggr={} in configuration {}", _pol, _aggr, _cnf);
-    }
+    _pollutant = _get_pollutant_node(cnfEl, _pol, _aggr);
 
     // some additional pollutant specific configuration
     _detection_limit = _pollutant.child("detection_limit").value<double>().value_or(1.0);
@@ -308,23 +288,11 @@ void config::parse_command_line(int argc, char* argv[])
     }
 }
 
-void config::set_pol(std::string_view name)
-{
-    _pol = name;
-    _get_runconfig();
-}
-
-std::vector<std::string_view> config::pol_names() const
+std::vector<std::string_view> config::pol_names(std::string_view config) const
 {
     std::vector<std::string_view> pollutants;
 
-    // find the requested configuration
-    auto cnfEl = rio::xml::getElementByAttribute(_domRoot, "configuration", "name", _cnf);
-    if (!cnfEl) {
-        throw RuntimeError("Cannot find requested configuration {} in XML setup file", _cnf);
-    }
-
-    for (auto& mapper : cnfEl.children("pollutant")) {
+    for (auto& mapper : _get_config_node(config).children("pollutant")) {
         for (auto& name : str::split_view(mapper.attribute("name"), ",")) {
             pollutants.push_back(name);
         }
@@ -333,22 +301,50 @@ std::vector<std::string_view> config::pol_names() const
     return pollutants;
 }
 
-std::vector<std::string_view> config::aggr_names() const
+std::vector<std::string_view> config::ipol_names(std::string_view config, std::string_view pollutant) const
 {
-    return str::split_view(_pollutant.attribute("aggr"), ",");
+    std::vector<std::string_view> classes;
+
+    for (auto& mapper : _get_pollutant_node(_get_config_node(config), pollutant).children("mapper")) {
+        classes.push_back(mapper.attribute("name"));
+    }
+
+    return classes;
 }
 
-void config::set_ipol(std::string_view name)
+std::vector<std::string_view> config::aggr_names(std::string_view config, std::string_view pollutant) const
 {
-    _pol = name;
-    _get_runconfig();
+    auto pollutantNode = _get_pollutant_node(_get_config_node(config), pollutant);
+    return str::split_view(pollutantNode.attribute("aggr"), ",");
 }
 
-void config::set_configuration(std::string_view name)
+std::vector<std::string_view> config::grid_names(std::string_view config) const
 {
-    _cnf = name;
+    std::vector<std::string_view> grids;
+
+    for (auto& grid : _get_config_node(config).child("grids").children("grid")) {
+        grids.push_back(grid.attribute("name"));
+    }
+
+    return grids;
+}
+
+void config::apply_config(
+    std::string_view config_name,
+    std::string_view pollutant,
+    std::string_view interpolation,
+    std::string_view aggregation,
+    std::string_view grid)
+{
+    _cnf  = config_name;
+    _pol  = pollutant;
+    _ipol = interpolation;
+    _grd  = grid;
+    _aggr = aggregation;
+
     _get_defaults(_domRoot.child("defaults"));
     _get_runconfig();
+    _update_parser();
 }
 
 std::ostream& operator<<(std::ostream& output, const config& c)
@@ -375,4 +371,30 @@ std::ostream& operator<<(std::ostream& output, const config& c)
     return output; // for multiple << operators.
 }
 
-} //namespace
+inf::XmlNode config::_get_config_node(std::string_view config) const
+{
+    // find the requested configuration
+    auto cnfEl = rio::xml::getElementByAttribute(_domRoot, "configuration", "name", std::string(config));
+    if (!cnfEl) {
+        throw RuntimeError("Cannot find requested configuration {} in XML setup file", config);
+    }
+
+    return cnfEl;
+}
+
+inf::XmlNode config::_get_pollutant_node(inf::XmlNode configNode, std::string_view pollutantName, std::string aggregation) const
+{
+    try {
+        if (aggregation.empty()) {
+            aggregation = _domRoot.child("defaults").child("aggregation").value();
+        }
+
+        std::vector<std::string> attNames = {"name", "aggr"};
+        std::vector<std::string> attVals  = {std::string(pollutantName), aggregation};
+        return rio::xml::getElementByAttributesList(configNode, "pollutant", attNames, attVals);
+    } catch (...) {
+        throw RuntimeError("cannot find <pollutant> element with name={} and aggr={} in configuration {}", pollutantName, aggregation, configNode.attribute("name"));
+    }
+}
+
+}

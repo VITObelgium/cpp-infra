@@ -7,9 +7,9 @@ Item {
     id: mapView
     focus: true
 
-    Connections {
-        target: context
-    }
+    //Connections {
+    //    target: context
+    //}
 
     Rectangle
     {
@@ -112,22 +112,6 @@ Item {
 
         plugin: Plugin { name: "itemsoverlay" }
 
-        MapItemView {
-            model: context.overlayModel
-            delegate: MapPolyline {
-                id: poly
-                z: 2
-                line.width: 2
-                line.color: 'blue'
-
-                Component.onCompleted: {
-                    poly.setPath(PathData)
-                    poly.line.width = LineWidth
-                    poly.line.color = LineColor
-                }
-            }
-        }
-
         MapQuickItem {
             id: raster
             opacity: opacitySlider.value
@@ -140,14 +124,6 @@ Item {
                 smooth: false
             }
             anchorPoint: "0,0"
-        }
-
-        MouseArea {
-            anchors.fill: parent
-            hoverEnabled: true
-            onPositionChanged : {
-                map.mouseMoved(bgmap.toCoordinate(Qt.point(mouse.x, mouse.y)))
-            }
         }
     }
 

@@ -342,7 +342,7 @@ void h5writer::seth5attr(H5::H5Object& l, const char* name, std::string value)
  * This is where the main data writing happens...
  * */
 void h5writer::write(const boost::posix_time::ptime& curr_time,
-    const std::map<std::string, double>& obs,
+    const std::unordered_map<std::string, double>& obs,
     const Eigen::VectorXd& values,
     const Eigen::VectorXd& uncert)
 {
