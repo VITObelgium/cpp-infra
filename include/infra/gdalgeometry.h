@@ -2,6 +2,7 @@
 
 #include "infra/exception.h"
 #include "infra/point.h"
+#include "infra/rect.h"
 
 #include <gdal_priv.h>
 #include <ogr_feature.h>
@@ -22,8 +23,10 @@ namespace inf::gdal {
 
 using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
+using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
 class Layer;
+class CoordinateTransformer;
 
 template <typename GeometryType>
 class Owner : public GeometryType
@@ -92,6 +95,8 @@ public:
     OGRGeometry* get() noexcept;
     const OGRGeometry* get() const noexcept;
 
+    operator bool() const noexcept;
+
     Type type() const;
     std::string_view type_name() const;
 
@@ -108,6 +113,12 @@ public:
 
     bool empty() const;
     void clear();
+
+    bool is_simple() const;
+    Owner<Geometry> simplify(double tolerance) const;
+    Owner<Geometry> simplify_preserve_topology(double tolerance) const;
+
+    void transform(CoordinateTransformer& transformer);
 
 private:
     OGRGeometry* _geometry = nullptr;
@@ -238,7 +249,7 @@ Owner<GeometryType> createGeometry()
     return Owner<GeometryType>(new typename GeometryType::WrappedType());
 }
 
-using Field = std::variant<int32_t, int64_t, double, std::string_view>;
+using Field = std::variant<int32_t, int64_t, double, std::string_view, time_point>;
 
 class FieldDefinitionRef
 {
@@ -386,6 +397,8 @@ public:
     FeatureDefinitionRef layer_definition() const;
 
     const char* name() const;
+    Rect<double> extent() const;
+
     OGRLayer* get();
     const OGRLayer* get() const;
 

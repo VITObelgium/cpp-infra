@@ -105,6 +105,8 @@ std::vector<const char*> create_options_array(const std::vector<std::string>& dr
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
 
+void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<double, 6>& geoTrans);
+
 class RasterBand
 {
 public:
@@ -157,7 +159,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-                   "Failed to read raster data");
+            "Failed to read raster data");
     }
 
     template <typename T>
@@ -166,24 +168,21 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-                   "Failed to write raster data");
+            "Failed to write raster data");
     }
 
     void read_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const;
     void write_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, const void* pData, int bufXSize, int bufYSize) const;
 
+    void write_geometadata(const GeoMetadata& meta);
+    GeoMetadata geometadata() const;
+
+    void add_band(GDALDataType type, const void* data);
+
     template <typename T>
     void add_band(T* data)
     {
-        // convert the data pointer to a string
-        std::array<char, 32> buf;
-        auto writtenCharacters = CPLPrintPointer(buf.data(), const_cast<void*>(reinterpret_cast<const void*>(data)), static_cast<int>(buf.size()));
-        buf[writtenCharacters] = 0;
-
-        auto pointerString = fmt::format("DATAPOINTER={}", buf.data());
-        std::array<const char*, 2> options{{pointerString.c_str(), nullptr}};
-
-        _ptr->AddBand(TypeResolve<typename std::remove_cv<T>::type>::value, options.empty() ? nullptr : const_cast<char**>(options.data()));
+        add_band(TypeResolve<typename std::remove_cv<T>::type>::value, data);
     }
 
     template <typename T>
@@ -301,5 +300,4 @@ private:
     VSILFILE* _ptr;
 };
 
-inf::GeoMetadata read_metadata_from_dataset(const gdal::RasterDataSet& dataSet);
 }

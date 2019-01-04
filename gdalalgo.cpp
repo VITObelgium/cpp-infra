@@ -1,10 +1,102 @@
 #include "infra/gdalalgo.h"
+#include "infra/cast.h"
+#include "infra/enumutils.h"
 #include "infra/exception.h"
 
 #include <gdal_alg.h>
 #include <gdal_utils.h>
 
 namespace inf::gdal {
+
+void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo)
+{
+    static const std::array<const char*, 2> optionStrings{{"NUM_THREADS=ALL_CPUS", nullptr}};
+
+    auto warpOptions              = GDALCreateWarpOptions();
+    warpOptions->papszWarpOptions = CSLDuplicate(const_cast<char**>(optionStrings.data()));
+    warpOptions->hSrcDS           = srcDataSet.get();
+    warpOptions->hDstDS           = dstDataSet.get();
+    warpOptions->nBandCount       = 1;
+    warpOptions->panSrcBands      = reinterpret_cast<int*>(CPLMalloc(sizeof(int) * warpOptions->nBandCount));
+    warpOptions->panSrcBands[0]   = 1;
+    warpOptions->panDstBands      = reinterpret_cast<int*>(CPLMalloc(sizeof(int) * warpOptions->nBandCount));
+    warpOptions->panDstBands[0]   = 1;
+    warpOptions->pfnTransformer   = GDALGenImgProjTransform;
+    warpOptions->eResampleAlg     = GDALResampleAlg(enum_value(algo));
+
+    auto srcNodataValue = srcDataSet.nodata_value(1);
+    if (srcNodataValue.has_value()) {
+        // will get freed by gdal
+        warpOptions->padfSrcNoDataReal    = static_cast<double*>(CPLMalloc(warpOptions->nBandCount * sizeof(double)));
+        warpOptions->padfSrcNoDataReal[0] = srcNodataValue.value();
+    }
+
+    auto dstNodataValue = dstDataSet.nodata_value(1);
+    if (dstNodataValue.has_value()) {
+        // will get freed by gdal
+        warpOptions->padfDstNoDataReal    = static_cast<double*>(CPLMalloc(warpOptions->nBandCount * sizeof(double)));
+        warpOptions->padfDstNoDataReal[0] = dstNodataValue.value();
+    }
+
+    warpOptions->pTransformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
+                                                          nullptr,
+                                                          dstDataSet.get(),
+                                                          nullptr,
+                                                          FALSE, 0.0, 0),
+        "Failed to create actual warping transformer");
+
+    GDALWarpOperation operation;
+    operation.Initialize(warpOptions);
+    checkError(operation.ChunkAndWarpImage(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
+
+    GDALDestroyGenImgProjTransformer(warpOptions->pTransformerArg);
+    GDALDestroyWarpOptions(warpOptions);
+}
+
+GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
+{
+    if (meta.projection.empty()) {
+        throw RuntimeError("Metadata does not contain projection information");
+    }
+
+    OGRSpatialReference destSpatialRef;
+    if (destSpatialRef.importFromEPSG(destCrs) != OGRERR_NONE) {
+        throw RuntimeError("Failed to set destination warp metadata projection");
+    }
+
+    char* destProjectionPtr = nullptr;
+    destSpatialRef.exportToWkt(&destProjectionPtr);
+    if (destProjectionPtr == nullptr) {
+        throw RuntimeError("Failed to create destination warp metadata projection wkt");
+    }
+
+    GeoMetadata resultMeta;
+    resultMeta.nodata     = meta.nodata;
+    resultMeta.projection = destProjectionPtr;
+    CPLFree(destProjectionPtr);
+
+    auto memDriver  = gdal::RasterDriver::create(gdal::RasterType::Memory);
+    auto srcDataSet = memDriver.create_dataset<uint8_t>(meta.rows, meta.cols, 0);
+    srcDataSet.write_geometadata(meta);
+
+    // Create a transformer that maps from source pixel/line coordinates
+    // to destination georeferenced coordinates (not destination pixel line).
+    // We do that by omitting the destination dataset handle (setting it to nullptr).
+    auto* transformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
+                                                  nullptr,
+                                                  nullptr,
+                                                  resultMeta.projection.c_str(),
+                                                  FALSE, 0.0, 0),
+        "Failed to create warping transformer");
+
+    // Get information about the output size of the warped image
+    std::array<double, 6> dstGeoTransform;
+    gdal::checkError(GDALSuggestedWarpOutput(srcDataSet.get(), GDALGenImgProjTransform, transformerArg, dstGeoTransform.data(), &resultMeta.cols, &resultMeta.rows), "Failed to suggest warp output size");
+    GDALDestroyGenImgProjTransformer(transformerArg);
+    fill_geometadata_from_geo_transform(resultMeta, dstGeoTransform);
+
+    return resultMeta;
+}
 
 VectorDataSet polygonize(const RasterDataSet& ds)
 {
@@ -62,7 +154,7 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
         throw RuntimeError("Failed to rasterize dataset {}", errorCode);
     }
 
-    return std::make_pair(read_metadata_from_dataset(memDataSet), std::move(data));
+    return std::make_pair(memDataSet.geometadata(), std::move(data));
 }
 
 class VectorTranslateOptionsWrapper
@@ -151,7 +243,7 @@ std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const 
         throw RuntimeError("Failed to translate dataset {}", errorCode);
     }
 
-    return std::make_pair(read_metadata_from_dataset(memDataSet), std::move(data));
+    return std::make_pair(memDataSet.geometadata(), std::move(data));
 }
 
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
