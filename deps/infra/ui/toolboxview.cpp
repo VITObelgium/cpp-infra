@@ -6,27 +6,35 @@
 
 namespace uiinfra {
 
+static const char* s_idProperty = "itemid";
+
 ToolboxView::ToolboxView(QWidget* parent)
 : QToolBox(parent)
 {
 }
 
-void ToolboxView::addSection(const QString& name)
+int ToolboxView::addSection(const QString& sectionName)
 {
-    appendSection(name);
+    auto* sectionFrame = new QFrame(this);
+    auto* layout       = new QVBoxLayout(sectionFrame);
+    layout->setAlignment(Qt::AlignTop);
+    sectionFrame->setObjectName(sectionName);
+    sectionFrame->setLayout(layout);
+    sectionFrame->setBackgroundRole(QPalette::Light);
+    return addItem(sectionFrame, sectionName);
 }
 
-void ToolboxView::addItemToSection(const QString& sectionName, int itemId, const QString& itemName, QIcon icon)
+void ToolboxView::addItemToSection(int sectionIndex, int itemId, const QString& itemName, QIcon icon)
 {
-    auto* section = findChild<QFrame*>(sectionName);
-    if (!section) {
-        section = appendSection(sectionName);
+    auto* sectionFrame = qobject_cast<QFrame*>(widget(sectionIndex));
+    if (!sectionFrame) {
+        return;
     }
 
     auto* item = new ToolboxItem(itemName, icon, this);
-    item->setProperty("itemid", itemId);
+    item->setProperty(s_idProperty, itemId);
     connect(item, &ToolboxItem::clicked, this, &ToolboxView::onItemSelected);
-    section->layout()->addWidget(item);
+    sectionFrame->layout()->addWidget(item);
 }
 
 void ToolboxView::setItemsVisible(bool visible)
@@ -37,17 +45,19 @@ void ToolboxView::setItemsVisible(bool visible)
     }
 }
 
-QFrame* ToolboxView::appendSection(const QString& name)
+void ToolboxView::setSectionText(int sectionIndex, const QString& text)
 {
-    auto* sectionFrame = new QFrame(this);
-    auto* layout       = new QVBoxLayout(sectionFrame);
-    layout->setAlignment(Qt::AlignTop);
-    sectionFrame->setObjectName(name);
-    sectionFrame->setLayout(layout);
-    sectionFrame->setBackgroundRole(QPalette::Light);
-    addItem(sectionFrame, name);
+    setItemText(sectionIndex, text);
+}
 
-    return sectionFrame;
+void ToolboxView::setToolboxItemText(int itemId, const QString& text)
+{
+    for (auto* child : findChildren<ToolboxItem*>()) {
+        if (child->property(s_idProperty).toInt() == itemId) {
+            child->setText(text);
+            return;
+        }
+    }
 }
 
 void ToolboxView::onItemSelected()

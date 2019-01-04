@@ -14,16 +14,19 @@ class ToolboxView : public QToolBox
 public:
     explicit ToolboxView(QWidget* parent = nullptr);
 
-    void addSection(const QString& name);
+    int addSection(const QString& sectionName);
 
-    void addItemToSection(const QString& sectionName, int itemId, const QString& itemName, QIcon icon);
+    void addItemToSection(int sectionIndex, int itemId, const QString& itemName, QIcon icon);
     void setItemsVisible(bool visible);
+
+    //! Typically use on a language change event
+    void setSectionText(int sectionId, const QString& text);
+    void setToolboxItemText(int itemId, const QString& text);
 
 signals:
     void itemClicked(int);
 
 private:
-    QFrame* appendSection(const QString& name);
     void onItemSelected();
 };
 }

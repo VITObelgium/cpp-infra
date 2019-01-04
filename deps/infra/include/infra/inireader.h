@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/cast.h"
+#include "infra/filesystem.h"
 #include "infra/typetraits.h"
 
 #include <optional>
@@ -15,7 +16,7 @@ namespace inf {
 class IniReader
 {
 public:
-    IniReader(const std::string& filename);
+    IniReader(const fs::path& filename);
     IniReader(const IniReader&) = default;
     IniReader(IniReader&&)      = default;
     IniReader& operator=(const IniReader&) = default;
@@ -23,6 +24,8 @@ public:
 
     // Return the list of sections found in ini file
     std::vector<std::string> sections() const;
+    // Return all the key, values for the given section name
+    std::unordered_map<std::string, std::string> section(std::string_view name) const;
 
     template <typename T>
     std::optional<T> get(std::string_view section, std::string_view name) const noexcept
