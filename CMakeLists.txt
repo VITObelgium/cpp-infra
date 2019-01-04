@@ -318,6 +318,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
         ui/toolboxitem.h ui/toolboxitem.cpp
+        ui/qt5.natvis
         ${FORMS_HEADERS}
     )
 
