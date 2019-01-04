@@ -24,6 +24,7 @@ struct GeoMetadata
     int32_t convert_y_to_row(double y) const;
     double convert_col_centre_to_x(int32_t col) const;
     double convert_row_centre_to_y(int32_t row) const;
+    Point<double> convert_cell_centre_to_xy(const Cell& cell) const;
     double convert_col_ll_to_x(int32_t col) const;
     double convert_row_ll_to_y(int32_t row) const;
     Cell convert_xy_to_cell(double x, double y) const;

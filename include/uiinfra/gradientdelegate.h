@@ -25,7 +25,7 @@ public:
     void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
 private:
-    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     const QGradientStops* addGradient(const QString& cmapName) const;
 
     mutable QHash<QString, QGradientStops> _gradients;

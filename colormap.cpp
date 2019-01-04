@@ -1099,7 +1099,6 @@ const std::vector<Color> Cmap::Set3{
         {255, 237, 111},
     },
 };
-;
 
 // Qualitative maps from https://github.com/vega/vega/wiki/Scales
 const std::vector<Color> Cmap::Tab10{{

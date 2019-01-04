@@ -13,8 +13,8 @@ namespace uiinfra {
 class TreeNode
 {
 public:
-    TreeNode()  = default;
-    ~TreeNode() = default;
+    TreeNode()          = default;
+    virtual ~TreeNode() = default;
 
     TreeNode(TreeNode& parent)
     : _parent(&parent)
@@ -123,13 +123,11 @@ public:
 
     QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
 
+    void setEditable(bool enabled);
+
 private:
-    void populateTree();
-
-    template <typename NodeType>
-    void populateSubstanceGroup(TreeNode& parent);
-
     std::unique_ptr<TreeNode> _root;
     std::vector<QString> _headers;
+    bool _editable = true;
 };
 }

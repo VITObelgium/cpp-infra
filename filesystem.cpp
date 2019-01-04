@@ -49,26 +49,23 @@ fs::path absolute_to_relative_path(const fs::path& absPath, const fs::path& root
     // Start at the root path and while they are the same then do nothing then when they first
     // diverge take the entire from path, swap it with '..' segments, and then append the remainder of the to path.
     auto fromIter = root.begin();
-    auto toIter = absPath.begin();
+    auto toIter   = absPath.begin();
 
     // Loop through both while they are the same to find nearest common directory
-    while (fromIter != root.end() && toIter != absPath.end() && (*toIter) == (*fromIter))
-    {
+    while (fromIter != root.end() && toIter != absPath.end() && (*toIter) == (*fromIter)) {
         ++toIter;
         ++fromIter;
     }
 
     // Replace from path segments with '..' (from => nearest common directory)
     fs::path finalPath;
-    while (fromIter != root.end())
-    {
+    while (fromIter != root.end()) {
         finalPath /= "..";
         ++fromIter;
     }
 
     // Append the remainder of the to path (nearest common directory => to)
-    while (toIter != absPath.end())
-    {
+    while (toIter != absPath.end()) {
         finalPath /= *toIter;
         ++toIter;
     }
@@ -124,9 +121,9 @@ std::string read_as_text(const std::istream& fileStream)
     return buffer.str();
 }
 
-void write_as_text(const std::string& filename, std::string_view contents)
+void write_as_text(const fs::path& filename, std::string_view contents)
 {
-    std::ofstream fs(filename.c_str(), std::ios::trunc | std::ios::binary);
+    std::ofstream fs(filename.u8string().c_str(), std::ios::trunc | std::ios::binary);
     if (!fs.is_open()) {
         throw RuntimeError("Failed to open file for writing: {}", filename);
     }
