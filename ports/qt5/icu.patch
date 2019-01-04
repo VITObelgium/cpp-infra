@@ -1,0 +1,20 @@
+diff -Naur a/qtbase/src/corelib/configure.json b/qtbase/src/corelib/configure.json
+--- a/qtbase/src/corelib/configure.json	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/src/corelib/configure.json	2019-01-03 15:05:09.007925200 +0100
+@@ -67,14 +67,8 @@
+                 ]
+             },
+             "sources": [
+-                {
+-                    "builds": {
+-                        "debug": "-lsicuind -lsicuucd -lsicudtd",
+-                        "release": "-lsicuin -lsicuuc -lsicudt"
+-                    },
+-                    "condition": "config.win32 && !features.shared"
+-                },
+-                { "libs": "-licuin -licuuc -licudt", "condition": "config.win32 && features.shared" },
++                { "libs": "-licuin -licuuc -licudt", "condition": "config.win32" },
++                { "libs": "-licuind -licuucd -licudtd", "condition": "config.win32" },
+                 { "libs": "-licui18n -licuuc -licudata", "condition": "!config.win32" }
+             ],
+             "use": [
