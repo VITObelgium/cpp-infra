@@ -1,0 +1,33 @@
+From 41eb60bc3028e12541d59f37adc701d5317a8189 Mon Sep 17 00:00:00 2001
+From: Simon Hausmann <simon.hausmann@qt.io>
+Date: Tue, 27 Nov 2018 10:00:10 +0100
+Subject: [PATCH] Fix Qt Quick Compiler with CMake on Windows
+
+We must set the binary suffix variable before running the substitution
+pass on the .cmake.in file. This is simliar to what create_cmake.prf
+does. Otherwise we are going to look for "qmlcachegen" on Windows
+instead of "qmlcachegen.exe".
+
+[ChangeLog][Qml] Fix Qt Quick Compiler with CMake on Windows
+
+Task-number: QTBUG-71823
+Change-Id: I81a7452b7dc7f01c9114900b9c103122fec07cf6
+---
+ tools/qmlcachegen/qmlcachegen.pro | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/qtdeclarative/tools/qmlcachegen/qmlcachegen.pro b/qtdeclarative/tools/qmlcachegen/qmlcachegen.pro
+index 966269039..bee0b9a37 100644
+--- a/qtdeclarative/tools/qmlcachegen/qmlcachegen.pro
++++ b/qtdeclarative/tools/qmlcachegen/qmlcachegen.pro
+@@ -24,6 +24,7 @@ contains(CMAKE_BIN_DIR, "^\\.\\./.*") {
+ 
+ load(qt_build_paths)
+ 
++equals(QMAKE_HOST.os, Windows): CMAKE_BIN_SUFFIX = ".exe"
+ cmake_config_file.input = $$PWD/Qt5QuickCompilerConfig.cmake.in
+ cmake_config_file.output = $$MODULE_BASE_OUTDIR/lib/cmake/Qt5QuickCompiler/Qt5QuickCompilerConfig.cmake
+ QMAKE_SUBSTITUTES += cmake_config_file
+-- 
+2.20.1
+

@@ -1,0 +1,13 @@
+diff -Naur a/qtbase/src/plugins/sqldrivers/configure.json b/qtbase/src/plugins/sqldrivers/configure.json
+--- a/qtbase/src/plugins/sqldrivers/configure.json	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/src/plugins/sqldrivers/configure.json	2019-01-03 13:48:24.252364800 +0100
+@@ -151,7 +151,8 @@
+                 "main": "sqlite3_open_v2(0, 0, 0, 0);"
+             },
+             "sources": [
+-                { "type": "pkgConfig", "args": "sqlite3" },
++                { "type": "pkgConfig", "args": "--static sqlite3", "condition": "config.static"},
++                { "type": "pkgConfig", "args": "sqlite3", "condition": "!config.static"},
+                 "-lsqlite3"
+             ],
+             "use": [

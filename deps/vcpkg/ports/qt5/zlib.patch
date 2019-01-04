@@ -1,0 +1,11 @@
+diff -Naur a/qtbase/configure.json b/qtbase/configure.json
+--- a/qtbase/configure.json	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/configure.json	2019-01-03 15:49:00.162742200 +0100
+@@ -162,6 +162,7 @@
+             "sources": [
+                 { "libs": "-lzdll", "condition": "config.msvc" },
+                 { "libs": "-lzlib", "condition": "config.msvc" },
++                { "libs": "-lzlibd", "condition": "config.msvc" },
+                 { "libs": "-lz", "condition": "!config.msvc" },
+                 { "libs": "-s USE_ZLIB=1", "condition": "config.wasm" }
+             ]

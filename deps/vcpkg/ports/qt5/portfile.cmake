@@ -38,16 +38,19 @@ vcpkg_extract_source_archive(${ARCHIVE} ${SOURCE_PATH})
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}/${PACKAGE_NAME}
     PATCHES
-    ${CMAKE_CURRENT_LIST_DIR}/support-static-builds-with-cmake.patch
-    ${CMAKE_CURRENT_LIST_DIR}/mingw-cmake-prl-file-has-no-lib-prefix.patch
+        support-static-builds-with-cmake.patch
+        mingw-cmake-prl-file-has-no-lib-prefix.patch
+        zlib.patch
+        jpeg.patch
+        png.patch
+        sqlite3.patch
+        pcre2.patch
+        freetype.patch
+        harfbuzz.patch
+        qmlcachegen.patch # should be fixed in qt-5.12.1
  )
 
  set(OSX_LEGACY_SDK OFF)
-
- # z lib name is zlib.lib on windows, not zdll.lib
- vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/configure.json "-lzdll" "-lzlib")
- # jpeg lib name is jpeg.lib on windows, not libjpeg.lib
- vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/src/gui/configure.json "-llibjpeg" "-ljpeg")
 
  # copy the g++-cluster compiler specification
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/linux-g++-cluster DESTINATION ${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/mkspecs)
@@ -199,21 +202,21 @@ set(QT_OPTIONS_REL
     -hostbindir ${CURRENT_PACKAGES_DIR}/tools
     -archdatadir ${CURRENT_PACKAGES_DIR}/share/qt5
     -datadir ${CURRENT_PACKAGES_DIR}/share/qt5
-    -plugindir ${CURRENT_PACKAGES_DIR}/share/qt5/plugins
+    -plugindir ${CURRENT_PACKAGES_DIR}/plugins
     -qmldir ${CURRENT_PACKAGES_DIR}/qml
 )
 
 set(QT_OPTIONS_DBG
     ${QT_OPTIONS}
     -debug
-    -L ${CURRENT_INSTALLED_DIR}/lib
+    -L ${CURRENT_INSTALLED_DIR}/debug/lib
     -prefix ${CURRENT_INSTALLED_DIR}/debug
     -extprefix ${CURRENT_PACKAGES_DIR}/debug
-    -hostbindir ${CURRENT_INSTALLED_DIR}/debug/tools
-    -archdatadir ${CURRENT_INSTALLED_DIR}/debug/share/qt5
-    -datadir ${CURRENT_INSTALLED_DIR}/debug/share/qt5
-    -plugindir ${CURRENT_INSTALLED_DIR}/plugins
-    -qmldir ${CURRENT_PACKAGES_DIR}/qml
+    -hostbindir ${CURRENT_PACKAGES_DIR}/debug/tools
+    -archdatadir ${CURRENT_PACKAGES_DIR}/share/qt5/debug
+    -datadir ${CURRENT_PACKAGES_DIR}/share/qt5/debug
+    -plugindir ${CURRENT_PACKAGES_DIR}/debug/plugins
+    -qmldir ${CURRENT_PACKAGES_DIR}/debug/qml
     -headerdir ${CURRENT_PACKAGES_DIR}/debug/include
 )
 
@@ -254,6 +257,12 @@ vcpkg_execute_required_process(
     WORKING_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel
     LOGNAME qt-build-${TARGET_TRIPLET}-release
 )
+
+if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME)
+# fix the prl files
+    # qt-bug: file does not get installed
+    file(COPY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/qtbase/bin/qmake.exe DESTINATION ${CURRENT_PACKAGES_DIR}/tools)
+endif ()
 
 # Fix the cmake files
 file(RENAME ${CURRENT_PACKAGES_DIR}/lib/cmake ${CURRENT_PACKAGES_DIR}/share/cmake)
