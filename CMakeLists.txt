@@ -87,12 +87,14 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/line.h
     include/infra/point.h
     include/infra/process.h
+    include/infra/scopeguard.h
     include/infra/signal.h
     include/infra/string.h
     include/infra/exception.h
     include/infra/filesystem.h
     include/infra/color.h
     include/infra/colormap.h
+    include/infra/rect.h
     include/infra/threadpool.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h
@@ -127,6 +129,8 @@ elseif (HAVE_EXP_FILESYSTEM_H)
 elseif (HAVE_BOOST_FILESYSTEM)
     target_compile_definitions(infra PUBLIC HAVE_BOOST_FILESYSTEM)
 endif ()
+
+target_compile_definitions(infra PUBLIC FMT_STRING_ALIAS=1)
 
 target_link_libraries(infra PUBLIC fmt::fmt)
 
@@ -298,9 +302,11 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/colorcombobox.h ui/colorcombobox.cpp
         include/uiinfra/colormapcombobox.h ui/colormapcombobox.cpp
         include/uiinfra/containerconversion.h
+        include/uiinfra/cursorposprovider.h ui/cursorposprovider.cpp
         include/uiinfra/dateconversion.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
+        include/uiinfra/checkableitemproxymodel.h ui/checkableitemproxymodel.cpp
         include/uiinfra/comboboxdelegate.h ui/comboboxdelegate.cpp
         include/uiinfra/delegatecombobox.h ui/delegatecombobox.cpp
         include/uiinfra/readonlyproxy.h
@@ -311,12 +317,16 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/treemodel.h ui/treemodel.cpp
         include/uiinfra/userinteraction.h ui/userinteraction.cpp
         include/uiinfra/stringinputdialog.h ui/stringinputdialog.cpp
+        include/uiinfra/stringconversion.h
         include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
         include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
         include/uiinfra/numericitemdelegates.h ui/numericitemdelegates.cpp
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
+        include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
+        include/uiinfra/tabletools.h ui/tabletools.cpp
+
         ui/toolboxitem.h ui/toolboxitem.cpp
         ui/qt5.natvis
         ${FORMS_HEADERS}
@@ -327,8 +337,15 @@ if (INFRA_UI_COMPONENTS)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
          endif ()
 
+         find_package(Qt5QuickCompiler REQUIRED)
+         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
+
         target_sources(uiinfra PRIVATE
+            ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
+            include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
+            include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
+            ${INFRA_LOCATION_RESOURCES}
         )
     endif ()
 
