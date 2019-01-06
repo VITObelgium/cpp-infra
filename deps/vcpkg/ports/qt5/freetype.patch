@@ -6,7 +6,7 @@ diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
                  { "type": "pkgConfig", "args": "freetype2" },
                  { "type": "freetype", "libs": "-lfreetype", "condition": "!config.wasm" },
 +                { "libs": "-lfreetype", "condition": "config.msvc" },
-+                { "libs": "-lfreetyped", "condition": "config.msvc" },
++                { "libs": "-lfreetyped" },
                  { "type": "freetype", "libs": "-s USE_FREETYPE=1", "condition": "config.wasm" }
              ]
          },

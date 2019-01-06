@@ -7,7 +7,7 @@ diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
              "sources": [
 -                { "libs": "-llibjpeg", "condition": "config.msvc" },
 +                { "libs": "-ljpeg", "condition": "config.msvc" },
-+                { "libs": "-ljpegd", "condition": "config.msvc" },
++                { "libs": "-ljpegd" },
                  "-ljpeg"
              ]
          },

@@ -173,7 +173,7 @@ elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Darwin")
         list(APPEND PLATFORM_OPTIONS -c++std c++14)
     else ()
         set(OSX_SDK_VERSION 10.14)
-        list(APPEND PLATFORM_OPTIONS -c++std c++1z)
+        list(APPEND PLATFORM_OPTIONS -c++std c++14)
     endif ()
 
     list(APPEND PLATFORM_OPTIONS -no-pch -sdk macosx${OSX_SDK_VERSION})

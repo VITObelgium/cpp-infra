@@ -1,11 +1,12 @@
 diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
 --- a/qtbase/src/gui/configure.json	2018-12-03 11:15:26.000000000 +0100
 +++ b/qtbase/src/gui/configure.json	2019-01-03 15:50:29.562249000 +0100
-@@ -308,6 +308,7 @@
+@@ -308,6 +308,8 @@
                  { "type": "pkgConfig", "args": "libpng" },
                  { "libs": "-llibpng16", "condition": "config.msvc" },
                  { "libs": "-llibpng", "condition": "config.msvc" },
 +                { "libs": "-llibpngd", "condition": "config.msvc" },
                  { "libs": "-lpng16", "condition": "!config.msvc" },
                  { "libs": "-lpng", "condition": "!config.msvc" },
++                { "libs": "-lpngd", "condition": "!config.msvc" },
                  { "libs": "-s USE_LIBPNG=1", "condition": "config.wasm" }
