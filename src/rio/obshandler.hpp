@@ -1,7 +1,7 @@
 #pragma once
 
 #include <boost/date_time.hpp>
-#include <map>
+#include <unordered_map>
 #include <memory>
 
 #include "network.hpp"
