@@ -71,17 +71,17 @@
            -->
       <timestamp_convention>1</timestamp_convention>
 		
-		  <griddef grid="4x4" epsg="31360" missing="-9999"
+		  <griddef grid="4x4" epsg="31370" missing="-9999"
 		         nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
 			  %base%/grids/rio_4x4_grid.map
 		  </griddef>
 		
-		  <griddef grid="4x4e1" epsg="31360" missing="-9999"
+		  <griddef grid="4x4e1" epsg="31370" missing="-9999"
 		         nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
 			  %base%/grids/rio_4x4e1_grid.map
 		  </griddef>
 		
-		  <griddef grid="4x4e2" epsg="31360" missing="-9999"
+		  <griddef grid="4x4e2" epsg="31370" missing="-9999"
 		         nx="73" ny="61" dx="4000." dy="4000." xul="14000." yul="256000.">
 			  %base%/grids/rio_4x4e2_grid.map
 		  </griddef>
