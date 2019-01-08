@@ -1,0 +1,25 @@
+#!/bin/sh
+# C compiler
+export CC="@CMAKE_C_COMPILER@"
+export CFLAGS="@EXPORT_CFLAGS@"
+export CPPFLAGS="@EXPORT_CFLAGS@"
+
+# C++ compiler
+export CXX="@CMAKE_CXX_COMPILER@"
+export CXXFLAGS="@EXPORT_CXXFLAGS@"
+
+# Linker
+export LD="@LINKER_EXECUTABLE@"
+export LDFLAGS="@EXPORT_LDFLAGS@"
+
+# Tools
+export AR="@CMAKE_AR@"
+export RANLIB=@CMAKE_RANLIB@
+
+export WANT_AUTOMAKE=latest
+export PKG_CONFIG_PATH=@CURRENT_INSTALLED_DIR@/lib/pkgconfig
+
+echo "CFLAGS: $CFLAGS"
+echo "CXXFLAGS: $CXXFLAGS"
+echo "Running configure: @SOURCE_PATH@/configure $*"
+exec @SOURCE_DIR@/configure $*

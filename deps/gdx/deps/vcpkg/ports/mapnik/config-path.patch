@@ -1,0 +1,86 @@
+diff -Naur a/SConstruct b/SConstruct
+--- a/SConstruct	2018-04-12 14:46:14.000000000 +0200
++++ b/SConstruct	2018-06-17 14:43:27.000000000 +0200
+@@ -1492,6 +1492,36 @@
+         color_print(1,"C++ compiler does not support C++11 standard (-std=c++11), which is required. Please upgrade your compiler")
+         Exit(1)
+ 
++    if env['PATH']:
++        env['ENV']['PATH'] = fix_path(env['PATH']) + ':' + env['ENV']['PATH']
++
++    if env['PATH_REMOVE']:
++        for p in env['PATH_REMOVE'].split(':'):
++            if p in env['ENV']['PATH']:
++                env['ENV']['PATH'].replace(p,'')
++            rm_path(p,'LIBPATH',env)
++            rm_path(p,'CPPPATH',env)
++            rm_path(p,'CXXFLAGS',env)
++            rm_path(p,'CAIRO_LIBPATHS',env)
++            rm_path(p,'CAIRO_CPPPATHS',env)
++
++    if env['PATH_REPLACE']:
++        searches,replace = env['PATH_REPLACE'].split(':')
++        for search in searches.split(','):
++            if search in env['ENV']['PATH']:
++                env['ENV']['PATH'] = os.path.abspath(env['ENV']['PATH'].replace(search,replace))
++            def replace_path(set,s,r):
++                idx = 0
++                for i in env[set]:
++                    if s in i:
++                        env[set][idx] = os.path.abspath(env[set][idx].replace(s,r))
++                    idx +=1
++            replace_path('LIBPATH',search,replace)
++            replace_path('CPPPATH',search,replace)
++            replace_path('CXXFLAGS',search,replace)
++            replace_path('CAIRO_LIBPATHS',search,replace)
++            replace_path('CAIRO_CPPPATHS',search,replace)
++
+     if not env['HOST']:
+         for libname, headers, required, lang in REQUIRED_LIBSHEADERS:
+             if not conf.CheckLibWithHeader(libname, headers, lang):
+@@ -1972,6 +2002,8 @@
+         pickle_dict = {}
+         for i in pickle_store:
+             pickle_dict[i] = env.get(i)
++        #only pickle types of str (workaround for presence of SCons.Node.Fs object)
++        pickle_dict['LIBS'] = [lib for lib in pickle_dict['LIBS'] if type(lib) is str]
+         pickle.dump(pickle_dict,env_cache)
+         env_cache.close()
+         # fix up permissions on configure outputs
+@@ -2015,36 +2047,6 @@
+         env['ENV']['PKG_CONFIG_PATH'] = fix_path(env['PKG_CONFIG_PATH'])
+         # otherwise this variable == os.environ["PKG_CONFIG_PATH"]
+ 
+-    if env['PATH']:
+-        env['ENV']['PATH'] = fix_path(env['PATH']) + ':' + env['ENV']['PATH']
+-
+-    if env['PATH_REMOVE']:
+-        for p in env['PATH_REMOVE'].split(':'):
+-            if p in env['ENV']['PATH']:
+-                env['ENV']['PATH'].replace(p,'')
+-            rm_path(p,'LIBPATH',env)
+-            rm_path(p,'CPPPATH',env)
+-            rm_path(p,'CXXFLAGS',env)
+-            rm_path(p,'CAIRO_LIBPATHS',env)
+-            rm_path(p,'CAIRO_CPPPATHS',env)
+-
+-    if env['PATH_REPLACE']:
+-        searches,replace = env['PATH_REPLACE'].split(':')
+-        for search in searches.split(','):
+-            if search in env['ENV']['PATH']:
+-                env['ENV']['PATH'] = os.path.abspath(env['ENV']['PATH'].replace(search,replace))
+-            def replace_path(set,s,r):
+-                idx = 0
+-                for i in env[set]:
+-                    if s in i:
+-                        env[set][idx] = os.path.abspath(env[set][idx].replace(s,r))
+-                    idx +=1
+-            replace_path('LIBPATH',search,replace)
+-            replace_path('CPPPATH',search,replace)
+-            replace_path('CXXFLAGS',search,replace)
+-            replace_path('CAIRO_LIBPATHS',search,replace)
+-            replace_path('CAIRO_CPPPATHS',search,replace)
+-
+     # export env so it is available in build.py files
+     Export('env')
+ 

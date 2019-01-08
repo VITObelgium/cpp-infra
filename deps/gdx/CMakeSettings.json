@@ -1,0 +1,29 @@
+{
+    // See https://go.microsoft.com//fwlink//?linkid=834763 for more information about this file.
+    "configurations": [
+        {
+            "name": "x64-Debug",
+            "generator": "Ninja",
+            "inheritEnvironments": [ "msvc_x64" ],
+            "configurationType": "Debug",
+            "buildRoot": "${workspaceRoot}/build/${name}",
+            "cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=${workspaceRoot}/../deps/msvc-static-x64/local -DCMAKE_INSTALL_PREFIX=${workspaceRoot}/../deps/msvc-static-x64/local -DCMAKE_TOOLCHAIN_FILE=${workspaceRoot}/deps/cmake-scripts/toolchain-msvc.cmake"
+        },
+        {
+            "name": "x64-Release",
+            "generator": "Ninja",
+            "inheritEnvironments": [ "msvc_x64" ],
+            "configurationType": "Release",
+            "buildRoot": "${workspaceRoot}/build/${name}",
+            "cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=${workspaceRoot}/../deps/msvc-static-x64/local -DCMAKE_INSTALL_PREFIX=${workspaceRoot}/../deps/msvc-static-x64/local -DCMAKE_TOOLCHAIN_FILE=${workspaceRoot}/deps/cmake-scripts/toolchain-msvc.cmake"
+        },
+        {
+            "name": "x64-RelWithDebInfo",
+            "generator": "Ninja",
+            "inheritEnvironments": [ "msvc_x64" ],
+            "configurationType": "RelWithDebInfo",
+            "buildRoot": "${workspaceRoot}/build/${name}",
+            "cmakeCommandArgs": "-DCMAKE_PREFIX_PATH=${workspaceRoot}/../deps/msvc-static-x64/local -DCMAKE_INSTALL_PREFIX=${workspaceRoot}/../deps/msvc-static-x64/local -DCMAKE_TOOLCHAIN_FILE=${workspaceRoot}/deps/cmake-scripts/toolchain-msvc.cmake"
+        }
+    ]
+}

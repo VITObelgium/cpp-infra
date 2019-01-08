@@ -1,0 +1,15 @@
+diff -Naur a/src/XercesCConfig.cmake.in b/src/XercesCConfig.cmake.in
+--- a/src/XercesCConfig.cmake.in	2018-09-20 15:31:41.000000000 +0200
++++ b/src/XercesCConfig.cmake.in	2018-11-16 09:06:20.677063531 +0100
+@@ -5,6 +5,11 @@
+ add_library(XercesC::XercesC INTERFACE IMPORTED)
+ set_target_properties(XercesC::XercesC PROPERTIES INTERFACE_LINK_LIBRARIES xerces_xerces-c)
+ 
++if (@ICU_FOUND@)
++    find_package(ICU COMPONENTS i18n data uc dt REQUIRED QUIET)
++    set_property(TARGET XercesC::XercesC APPEND PROPERTY INTERFACE_LINK_LIBRARIES ICU::i18n ICU::data ICU::uc ICU::dt)
++endif ()
++
+ # For compatibility with FindXercesC.
+ set(XercesC_VERSION "@xerces-c_VERSION@")
+ get_target_property(XercesC_INCLUDE_DIRS xerces_xerces-c INTERFACE_INCLUDE_DIRECTORIES)
