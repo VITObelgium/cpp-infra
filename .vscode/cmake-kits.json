@@ -1,0 +1,26 @@
+[
+    {
+        "name": "x64-osx",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-osx",
+            "INFRA_EMBED_GDAL_DATA": "ON"
+        }
+    },
+    {
+        "name": "x64-osx-gcc",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-osx-gcc",
+            "INFRA_EMBED_GDAL_DATA": "ON"
+        }
+    },
+    {
+        "name": "x64-osx-homebrew",
+        "toolchainFile": "${workspaceRoot}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "cmakeSettings": {
+            "VCPKG_TARGET_TRIPLET": "x64-osx-homebrew",
+            "INFRA_EMBED_GDAL_DATA": "ON"
+        }
+    }
+]

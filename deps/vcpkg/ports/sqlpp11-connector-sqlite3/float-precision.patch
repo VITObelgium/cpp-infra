@@ -1,0 +1,20 @@
+diff -Naur a/include/sqlpp11/sqlite3/serializer.h b/include/sqlpp11/sqlite3/serializer.h
+--- a/include/sqlpp11/sqlite3/serializer.h	2018-06-01 10:17:16.000000000 +0200
++++ b/include/sqlpp11/sqlite3/serializer.h	2018-11-08 16:17:26.899452900 +0100
+@@ -42,6 +42,7 @@
+ #include <sqlpp11/with.h>
+ 
+ #include <cmath>
++#include <iomanip>
+ 
+ namespace sqlpp
+ {
+@@ -214,7 +215,7 @@
+           context << "'-Inf'";
+       }
+       else
+-        context << t._t;
++        context << std::defaultfloat << std::setprecision(std::numeric_limits<Operand::_value_t>::max_digits10) << t._t;
+       return context;
+     }
+   };

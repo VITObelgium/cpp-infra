@@ -1,0 +1,21 @@
+CONDA_BUILD_SYSROOT:
+  - /Users/dirk/Downloads/MacOSX10.9.sdk        # [osx]
+
+cxx_compiler:
+ - vs2017                     # [win]
+
+target_platform:
+  - win-64                     # [win]
+
+vc:
+  - 14                         # [win]
+
+python:
+  - 3.6
+  - 3.7
+
+libgdal:
+  - 2.3
+
+pin_run_as_build:
+  libgdal: x.x

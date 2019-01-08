@@ -1,0 +1,11 @@
+--- a/CMakeLists.txt	2016-05-13 23:17:37.000000000 +0200
++++ b/CMakeLists.txt	2016-12-20 14:50:17.641047000 +0100
+@@ -701,6 +701,6 @@
+ ENDIF()
+ 
+ # Build the Fortran examples
+-ADD_SUBDIRECTORY(examples)
+-ADD_SUBDIRECTORY(docs)
++#ADD_SUBDIRECTORY(examples)
++#ADD_SUBDIRECTORY(docs)
+ print_conf_summary()

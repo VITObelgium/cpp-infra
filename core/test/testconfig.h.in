@@ -1,0 +1,17 @@
+#pragma once
+
+#ifdef NDEBUG
+    #define CONFIG "Release"
+#else
+    #define CONFIG "Debug"
+#endif
+
+#ifdef WIN32
+    #define TEST_BINARY_DIR "${EXECUTABLE_OUTPUT_PATH}/" CONFIG
+#else
+    #define TEST_BINARY_DIR "${EXECUTABLE_OUTPUT_PATH}"
+#endif
+
+#cmakedefine HAVE_OPENCL
+#define TEST_DATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/data"
+#define GDAL_DATA "${GDAL_DATA_PATH}"

@@ -1,0 +1,20 @@
+diff -Naur a/include/sqlpp11/data_types/floating_point/operand.h b/include/sqlpp11/data_types/floating_point/operand.h
+--- a/include/sqlpp11/data_types/floating_point/operand.h	2018-07-06 07:46:32.000000000 +0200
++++ b/include/sqlpp11/data_types/floating_point/operand.h	2018-11-09 09:46:46.140748000 +0100
+@@ -27,6 +27,7 @@
+ #ifndef SQLPP11_DATA_TYPES_FLOATING_POINT_OPERAND_H
+ #define SQLPP11_DATA_TYPES_FLOATING_POINT_OPERAND_H
+ 
++#include <iomanip>
+ #include <sqlpp11/type_traits.h>
+ #include <sqlpp11/alias_operators.h>
+ #include <sqlpp11/serializer.h>
+@@ -71,7 +72,7 @@
+ 
+     static Context& _(const Operand& t, Context& context)
+     {
+-      context << t._t;
++      context << std::defaultfloat << std::setprecision(std::numeric_limits<Operand::_value_t>::max_digits10) << t._t;
+       return context;
+     }
+   };

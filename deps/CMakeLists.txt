@@ -1,0 +1,56 @@
+cmake_minimum_required(VERSION 3.9)
+project(Dependencies)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake-scripts/scripts")
+
+include(ExternalProject)
+include(Autotools)
+include(CMakeArguments)
+
+if (WIN32)
+    set (POSTFIX_CONFIG -DCMAKE_DEBUG_POSTFIX=d)
+endif ()
+
+option(STATIC_RUNTIME "Use static msvc runtime" ON)
+option(VS2017 "Use Visual Studio 2017" ON)
+option(32BIT "32 bit build" OFF)
+set(DOWNLOAD_DIR ${CMAKE_BINARY_DIR}/../dl CACHE PATH "Download directory")
+
+set(Python_ADDITIONAL_VERSIONS 3.6 3.4)
+find_package(PythonInterp REQUIRED)
+
+message (STATUS "System Host: ${CMAKE_HOST_SYSTEM}")
+message (STATUS "Target: ${CMAKE_SYSTEM_NAME}")
+message (STATUS "Cross compiling: ${CMAKE_CROSSCOMPILING}")
+message (STATUS "Host: ${HOST}")
+
+add_subdirectory(cmake-scripts/benchmark)
+add_subdirectory(cmake-scripts/gsl)
+add_subdirectory(cmake-scripts/date)
+add_subdirectory(cmake-scripts/fmt)
+add_subdirectory(cmake-scripts/spdlog)
+add_subdirectory(cmake-scripts/googletest)
+add_subdirectory(cmake-scripts/zlib)
+add_subdirectory(cmake-scripts/xz)
+add_subdirectory(cmake-scripts/libpng)
+add_subdirectory(cmake-scripts/libtiff)
+if (NOT MSVC)
+    # on windows gdal always uses internal giflib
+    add_subdirectory(cmake-scripts/giflib)
+endif ()
+add_subdirectory(cmake-scripts/expat)
+add_subdirectory(cmake-scripts/proj4)
+add_subdirectory(cmake-scripts/geos)
+add_subdirectory(cmake-scripts/gdal)
+add_subdirectory(cmake-scripts/eigen)
+
+if (NOT EMSCRIPTEN)
+    add_subdirectory(cmake-scripts/pybind11)
+
+    set(BOOST_COMPONENTS filesystem system program_options)
+    add_subdirectory(cmake-scripts/boost)
+endif ()
+
+if (HOST MATCHES ".*-musl")
+    add_subdirectory(cmake-scripts/libressl)
+    add_subdirectory(cmake-scripts/python)
+endif ()

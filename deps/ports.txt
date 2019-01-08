@@ -1,0 +1,12 @@
+gtest
+benchmark
+zlib
+tiff[lzw]
+fmt
+spdlog
+eigen3
+gdal[gif,expat,pcraster]
+gsl
+pybind11
+clara
+date

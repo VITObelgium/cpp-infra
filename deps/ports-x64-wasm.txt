@@ -1,0 +1,10 @@
+gtest
+zlib
+tiff[lzw]
+fmt
+spdlog
+eigen3
+gdal
+gsl
+date
+boost[filesystem]
