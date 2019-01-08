@@ -44,6 +44,11 @@ MapView::MapView(QWidget* parent)
             assert(_qmlRasterImage);
 
             //QObject::connect(_qmlMap, SIGNAL(mouseMoved(QVariant)), this, SLOT(onMouseMoveEvent(QVariant)));
+        } else if (status == QQuickWidget::Status::Error) {
+            Log::error("Qml error");
+            for (auto& error : _ui.mapWidget->errors()) {
+                Log::error(error.toString().toStdString());
+            }
         }
     });
 

@@ -16,29 +16,59 @@ qtquick_compiler_add_resources(UI_RESOURCES resources.qrc)
 
 function(find_qtdep)
     set (oneValueArgs NAME)
-    set (multiValueArgs LIBNAMES DEBUGLIBNAMES)
-    cmake_parse_arguments(find_dependency "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+    set (multiValueArgs LIBNAME)
+    cmake_parse_arguments(find_qtdep "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
 
-    message(STATUS "Find library ${find_dependency_NAME}")
+    message(STATUS "Find library ${find_qtdep_NAME}")
 
-    find_library(${find_dependency_NAME}_LIBRARY NAMES ${find_dependency_LIBNAMES})
-    find_library(${find_dependency_NAME}_LIBRARY_DEBUG NAMES ${find_dependency_DEBUGLIBNAMES})
+    find_library(${find_qtdep_NAME}_LIBRARY NAMES ${find_qtdep_LIBNAME})
+    find_library(${find_qtdep_NAME}_LIBRARY_DEBUG NAMES ${find_qtdep_LIBNAME}d)
 
-    if (${find_dependency_NAME}_LIBRARY AND ${find_dependency_NAME}_LIBRARY_DEBUG)
-        set(${find_dependency_NAME}_LIBRARY optimized ${${find_dependency_NAME}_LIBRARY} debug ${${find_dependency_NAME}_LIBRARY_DEBUG} PARENT_SCOPE)
-        message(STATUS "${find_dependency_NAME} library: ${${find_dependency_NAME}_LIBRARY}")
+    if (${find_qtdep_NAME}_LIBRARY AND ${find_qtdep_NAME}_LIBRARY_DEBUG)
+        set(${find_qtdep_NAME}_LIBRARY optimized ${${find_qtdep_NAME}_LIBRARY} debug ${${find_qtdep_NAME}_LIBRARY_DEBUG} PARENT_SCOPE)
+        message(STATUS "${find_qtdep_NAME} library: ${${find_qtdep_NAME}_LIBRARY}")
     endif ()
 
-    add_library(${find_dependency_NAME} STATIC IMPORTED)
+    add_library(${find_qtdep_NAME} STATIC IMPORTED)
 
-    if (${find_dependency_NAME}_LIBRARY)
-        set_property(TARGET ${find_dependency_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-        set_target_properties(${find_dependency_NAME} PROPERTIES IMPORTED_LOCATION_RELEASE "${${find_dependency_NAME}_LIBRARY}")
+    if (${find_qtdep_NAME}_LIBRARY)
+        set_property(TARGET ${find_qtdep_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+        set_target_properties(${find_qtdep_NAME} PROPERTIES IMPORTED_LOCATION_RELEASE "${${find_qtdep_NAME}_LIBRARY}")
     endif()
 
-    if (${find_dependency_NAME}_LIBRARY_DEBUG)
-        set_property(TARGET ${find_dependency_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-        set_target_properties(${find_dependency_NAME} PROPERTIES IMPORTED_LOCATION_DEBUG "${${find_dependency_NAME}_LIBRARY_DEBUG}")
+    if (${find_qtdep_NAME}_LIBRARY_DEBUG)
+        set_property(TARGET ${find_qtdep_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+        set_target_properties(${find_qtdep_NAME} PROPERTIES IMPORTED_LOCATION_DEBUG "${${find_qtdep_NAME}_LIBRARY_DEBUG}")
+    endif()
+endfunction()
+
+function(find_qtplugin)
+    set (oneValueArgs NAME LIBNAME SUBDIR)
+    cmake_parse_arguments(find_qtplugin "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
+
+    message(STATUS "Find plugin ${find_qtplugin_NAME}")
+
+    find_library(${find_qtplugin_NAME}_LIBRARY NAMES ${find_qtplugin_LIBNAME} HINTS ${CMAKE_PREFIX_PATH}/${find_qtplugin_SUBDIR})
+    find_library(${find_qtplugin_NAME}_LIBRARY_DEBUG NAMES ${find_qtplugin_LIBNAME}d HINTS ${CMAKE_PREFIX_PATH}/debug/${find_qtplugin_SUBDIR} ${CMAKE_PREFIX_PATH}/${find_qtplugin_SUBDIR})
+
+    if (${find_qtplugin_NAME}_LIBRARY AND ${find_qtplugin_NAME}_LIBRARY_DEBUG)
+        set(${find_qtplugin_NAME}_LIBRARY optimized ${${find_qtplugin_NAME}_LIBRARY} debug ${${find_qtplugin_NAME}_LIBRARY_DEBUG} PARENT_SCOPE)
+        message(STATUS "${find_qtplugin_NAME} library: ${${find_qtplugin_NAME}_LIBRARY}")
+    endif ()
+
+    if (NOT ${find_qtplugin_NAME}_LIBRARY)
+        message(FATAL_ERROR "${find_qtplugin_NAME} library not found")
+    endif ()
+
+    add_library(${find_qtplugin_NAME} STATIC IMPORTED)
+    if (${find_qtplugin_NAME}_LIBRARY)
+        set_property(TARGET ${find_qtplugin_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
+        set_target_properties(${find_qtplugin_NAME} PROPERTIES IMPORTED_LOCATION_RELEASE "${${find_qtplugin_NAME}_LIBRARY}")
+    endif()
+
+    if (${find_qtplugin_NAME}_LIBRARY_DEBUG)
+        set_property(TARGET ${find_qtplugin_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
+        set_target_properties(${find_qtplugin_NAME} PROPERTIES IMPORTED_LOCATION_DEBUG "${${find_qtplugin_NAME}_LIBRARY_DEBUG}")
     endif()
 endfunction()
 
@@ -78,9 +108,9 @@ source_group("Qt generated" FILES ${UI_RESOURCES} ${OPAQ_FORMS_HEADERS})
 set_target_properties(opaqui PROPERTIES AUTOMOC ON)
 
 if (MSVC)
-    set_target_properties(opaqui PROPERTIES LINK_FLAGS "/SUBSYSTEM:CONSOLE /ENTRY:mainCRTStartup")
+    set_target_properties(opaqui PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 elseif (MINGW)
-    set_target_properties(opaqui PROPERTIES LINK_FLAGS "-Wl,-subsystem,windows")
+    set_target_properties(opaqui PROPERTIES LINK_FLAGS_RELEASE "-Wl,-subsystem,windows")
 endif ()
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
@@ -109,39 +139,53 @@ if (STATIC_QT)
     target_compile_definitions(opaqui PRIVATE "-DQT_CHARTS_STATICLIB")
 
     find_package(OpenGL)
+    find_package(JPEG REQUIRED)
     find_package(Freetype REQUIRED)
 
     get_target_property(GUI_LIBS Qt5::Gui LINK_INTERFACE_LIBRARIES_RELEASE)
 
     find_package(Qt5Location REQUIRED)
-    find_package(Qt5PositioningQuick REQUIRED)
-    target_link_libraries(opaqui Qt5::GeoServiceProviderFactoryEsri Qt5::PositioningQuick)
+
+    find_qtdep(NAME Qt5PositioningQuick LIBNAME Qt5PositioningQuick)
+    
+    find_qtplugin(NAME JpegPlugin LIBNAME qjpeg SUBDIR plugins/imageformats)
+    find_qtplugin(NAME QtQuick2Plugin LIBNAME qtquick2plugin SUBDIR qml/QtQuick.2)
+    find_qtplugin(NAME QtQuick2TemplatesPlugin LIBNAME qtquicktemplates2plugin SUBDIR qml/QtQuick/Templates.2)
+    find_qtplugin(NAME QtQuick2WindowPlugin LIBNAME windowplugin SUBDIR qml/QtQuick/Window.2)
+    find_qtplugin(NAME QtQuickControls2Plugin LIBNAME qtquickcontrols2plugin SUBDIR qml/QtQuick/Controls.2)
+    find_qtplugin(NAME QtQuickControls2FusionPlugin LIBNAME qtquickcontrols2fusionstyleplugin SUBDIR qml/QtQuick/Controls.2/Fusion)
+    find_qtplugin(NAME QtQuickLocationPlugin LIBNAME declarative_location SUBDIR qml/QtLocation)
+    find_qtplugin(NAME QtQuickPositioningPlugin LIBNAME declarative_positioning SUBDIR qml/QtPositioning)
+
+    find_qtplugin(NAME QGeoServicesEsriPlugin LIBNAME qtgeoservices_esri SUBDIR plugins/geoservices)
+    find_qtplugin(NAME QGeoServicesOsmPlugin LIBNAME qtgeoservices_osm SUBDIR plugins/geoservices)
+    find_qtplugin(NAME QGeoServicesItemsOverlayPlugin LIBNAME qtgeoservices_itemsoverlay SUBDIR plugins/geoservices)
+
+    find_qtplugin(NAME QWindowsVistaStylePlugin LIBNAME qwindowsvistastyle SUBDIR plugins/styles)
+    find_qtplugin(NAME QWindowsIntegrationPlugin LIBNAME qwindows SUBDIR plugins/platforms)
+
+    target_link_libraries(opaqui
+        JpegPlugin
+        QtQuick2Plugin
+        QtQuick2WindowPlugin
+        QtQuick2TemplatesPlugin
+        QtQuickControls2Plugin
+        QtQuickControls2FusionPlugin
+        QtQuickLocationPlugin
+        QtQuickPositioningPlugin
+        QGeoServicesEsriPlugin
+        QGeoServicesOsmPlugin
+        QGeoServicesItemsOverlayPlugin
+        JPEG::JPEG
+        Freetype::Freetype
+    )
 
     if (MSVC)
-        find_qtdep(NAME QtFontDatabaseSupport LIBNAMES Qt5FontDatabaseSupport DEBUGLIBNAMES Qt5FontDatabaseSupportd)
-        find_qtdep(NAME QtThemeSupport LIBNAMES Qt5ThemeSupport DEBUGLIBNAMES Qt5ThemeSupport)
-        find_qtdep(NAME QtEventDispatcherSupport LIBNAMES Qt5EventDispatcherSupport DEBUGLIBNAMES Qt5EventDispatcherSupportd)
-        find_qtdep(NAME QtAccessibilitySupport LIBNAMES Qt5AccessibilitySupport DEBUGLIBNAMES Qt5AccessibilitySupportd)
-        find_qtdep(NAME QtUiAutomation LIBNAMES Qt5WindowsUIAutomationSupport DEBUGLIBNAMES Qt5WindowsUIAutomationSupportd)
-
-        find_library(QUICK2_PLUGIN_LIBRARY NAMES qtquick2plugin HINTS ${CMAKE_PREFIX_PATH}/qml/QtQuick.2)
-        if (NOT QUICK2_PLUGIN_LIBRARY)
-            message(FATAL_ERROR "Quick2 plugin not found: ${CMAKE_PREFIX_PATH}/qml/QtQuick.2")
-        endif ()
-
-        find_library(QUICK_LOCATION_LIBRARY NAMES declarative_location HINTS ${CMAKE_PREFIX_PATH}/qml/QtLocation)
-        if (NOT QUICK_LOCATION_LIBRARY)
-            message(FATAL_ERROR "Quick location plugin not found: ${CMAKE_PREFIX_PATH}/qml/QtLocation")
-        else ()
-            message(STATUS "Quick location plugin found: ${QUICK_LOCATION_LIBRARY}")
-        endif ()
-
-        find_library(QUICK_POSITIONING_LIBRARY NAMES declarative_positioning.lib HINTS ${CMAKE_PREFIX_PATH}/qml/QtPositioning)
-        if (NOT QUICK_POSITIONING_LIBRARY)
-            message(FATAL_ERROR "Quick2 positioning plugin not found: ${CMAKE_PREFIX_PATH}/qml/QtPositioning")
-        else ()
-            message(STATUS "Quick position plugin found: ${QUICK_POSITIONING_LIBRARY}")
-        endif ()
+        find_qtdep(NAME QtFontDatabaseSupport LIBNAME Qt5FontDatabaseSupport)
+        find_qtdep(NAME QtThemeSupport LIBNAME Qt5ThemeSupport)
+        find_qtdep(NAME QtEventDispatcherSupport LIBNAME Qt5EventDispatcherSupport)
+        find_qtdep(NAME QtAccessibilitySupport LIBNAME Qt5AccessibilitySupport)
+        find_qtdep(NAME QtUiAutomation LIBNAME Qt5WindowsUIAutomationSupport)
 
         target_link_libraries(opaqui
             version.lib
@@ -152,19 +196,12 @@ if (STATIC_QT)
             Userenv.lib
             UxTheme.lib
             QtThemeSupport
-            Qt5::QWindowsVistaStylePlugin
-            Qt5::QWindowsIntegrationPlugin
+            QWindowsVistaStylePlugin
+            QWindowsIntegrationPlugin
             QtFontDatabaseSupport
             QtEventDispatcherSupport
             QtAccessibilitySupport
             QtUiAutomation
-            Freetype::Freetype
-            ${QUICK2_PLUGIN_LIBRARY}
-            ${QUICK_LOCATION_LIBRARY}
-            ${QUICK_POSITIONING_LIBRARY}
         )
-    else ()
-        find_package(Png REQUIRED)
-        list (APPEND Qt5Gui_LIBRARIES ${Png_LIBRARY})
     endif ()
 endif ()
