@@ -1,0 +1,37 @@
+package:
+  name: gdx
+  version: 0.5.0
+
+source:
+  git_url: https://git.vito.be/scm/marvin-geodynamix/gdx-core.git
+  git_rev: 0.5.0
+
+build:
+  number: 0
+
+requirements:
+  build:
+    - {{ compiler('c') }}
+    - {{ compiler('cxx') }}
+    - cmake
+  host:
+    - python {{ python }}
+    - numpy >=1.15
+    - libgdal {{ libgdal }}
+    - pybind11 >=2.2
+    - eigen >=3.3 [unix]
+  run:
+    - python
+    - numpy
+    - libgdal
+    - pybind11
+    - eigen [unix]
+
+about:
+  home: http://www.freedesktop.org/wiki/Software/fontconfig/
+  license: GPL-3.0
+  license_file: LICENSE
+  summary: Software for environmental modelling
+  description: Software for environmental modelling
+  doc_url: http://pcraster.geo.uu.nl/pcraster/4.2.0/documentation/index.html
+  dev_url: https://github.com/pcraster/pcraster

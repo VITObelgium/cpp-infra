@@ -1,0 +1,21 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "files.exclude": {
+        "**/.git": true,
+        "**/.DS_Store": true,
+        "**/deps/vcpkg/buildtrees": true,
+        "**/deps/vcpkg/packages": true
+    },
+    "python.autoComplete.extraPaths": [
+        "${workspaceRoot}/build/gdx/Release"
+    ],
+    "python.linting.pylintArgs": [
+        "--init-hook='import sys; sys.path.append(\"${workspaceRoot}/build/gdx/Release\")'"
+    ],
+    "C_Cpp.intelliSenseEngine": "Default",
+    "C_Cpp.intelliSenseEngineFallback": "Disabled",
+    "cmake.configureOnOpen": true,
+    "editor.formatOnSave": true,
+    "cmake.buildDirectory": "${workspaceRoot}/build/vscode",
+    "python.formatting.provider": "black"
+}
