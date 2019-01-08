@@ -6,7 +6,7 @@ diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
              },
              "sources": [
 +                { "libs": "-lharfbuzz", "condition": "config.msvc" },
-+                { "libs": "-lharfbuzzd", "condition": "config.msvc" },
++                { "libs": "-lharfbuzzd" },
                  "-lharfbuzz"
              ]
          },

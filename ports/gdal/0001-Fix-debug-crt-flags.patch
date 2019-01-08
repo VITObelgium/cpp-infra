@@ -1,7 +1,7 @@
-diff -Nuar a/nmake.opt b/nmake.opt
---- a/nmake.opt	2018-05-04 09:05:46.000000000 +0200
-+++ b/nmake.opt	2018-05-11 22:58:39.387603800 +0200
-@@ -120,11 +120,21 @@
+diff -Naur a/nmake.opt b/nmake.opt
+--- a/nmake.opt	2018-12-14 22:34:20.000000000 +0100
++++ b/nmake.opt	2019-01-08 09:32:51.708053300 +0100
+@@ -131,11 +131,21 @@
  CXX_PDB_FLAGS=
  !ENDIF
  
@@ -16,7 +16,7 @@ diff -Nuar a/nmake.opt b/nmake.opt
 +!ENDIF
 +
  !IFNDEF OPTFLAGS
- !IFNDEF DEBUG
+ !IF "$(DEBUG)" == "0"
 -OPTFLAGS= $(CXX_ANALYZE_FLAGS) $(CXX_PDB_FLAGS) /nologo /MP /MD /EHsc /Ox /FC /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE /DNDEBUG
 +OPTFLAGS= $(CXX_ANALYZE_FLAGS) $(CXX_PDB_FLAGS) /nologo /MP $(CXX_CRT_FLAGS) /EHsc /Ox /D_CRT_SECURE_NO_DEPRECATE /D_CRT_NONSTDC_NO_DEPRECATE /DNDEBUG
  !ELSE

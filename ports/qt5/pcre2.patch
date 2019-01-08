@@ -6,7 +6,7 @@ diff -Naur a/qtbase/src/corelib/configure.json b/qtbase/src/corelib/configure.js
              "sources": [
                  { "type": "pkgConfig", "args": "libpcre2-16" },
 +                { "libs": "-lpcre2-16", "condition": "config.msvc" },
-+                { "libs": "-lpcre2-16d", "condition": "config.msvc" },
++                { "libs": "-lpcre2-16d" },
                  "-lpcre2-16"
              ]
          },
