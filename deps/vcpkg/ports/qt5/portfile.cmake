@@ -259,7 +259,19 @@ vcpkg_execute_required_process(
 )
 
 if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME)
-# fix the prl files
+    # fix the release prl files
+    vcpkg_execute_required_process(
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/fixprl.py
+        WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}/lib
+        LOGNAME fix-prl
+    )
+    # fix the debug prl files
+    vcpkg_execute_required_process(
+        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/fixprl.py
+        WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}/debug/lib
+        LOGNAME fix-prl
+    )
+    
     # qt-bug: file does not get installed
     file(COPY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/qtbase/bin/qmake.exe DESTINATION ${CURRENT_PACKAGES_DIR}/tools)
 endif ()

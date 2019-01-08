@@ -17,7 +17,7 @@ diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase
      )
  
  !!IF !isEmpty(CMAKE_WINDOWS_BUILD)
-@@ -214,12 +214,48 @@
+@@ -214,12 +214,52 @@
      list(APPEND _Qt5$${CMAKE_MODULE_NAME}_LIB_DEPENDENCIES \"$${CMAKE_INTERFACE_QT5_MODULE_DEPS}\")
  !!ENDIF
  
@@ -41,7 +41,11 @@ diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase
 +    if (EXISTS \"${prl_file_location}\")
 +        file(STRINGS \"${prl_file_location}\" prl_strings REGEX \"QMAKE_PRL_LIBS\")
 +        string(REGEX REPLACE \"QMAKE_PRL_LIBS *= *([^\\n]*)\" \"\\\\1\" static_depends ${prl_strings} )
-+        string(REGEX REPLACE \"\\\\$\\\\$\\\\[QT_INSTALL_LIBS\\\\]\" \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/lib\" static_depends \"${static_depends}\")
++        if (${Configuration} STREQUAL "RELEASE")
++            string(REGEX REPLACE \"\\\\$\\\\$\\\\[QT_INSTALL_LIBS\\\\]\" \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/lib\" static_depends \"${static_depends}\")
++        else ()
++           string(REGEX REPLACE \"\\\\$\\\\$\\\\[QT_INSTALL_LIBS\\\\]\" \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/debug/lib\" static_depends \"${static_depends}\")
++        endif ()
 +        string(STRIP ${static_depends} static_depends)
 +        separate_arguments(static_depends)
 +        if (_Qt5$${CMAKE_MODULE_NAME}_LIB_DEPENDENCIES)
@@ -52,11 +56,11 @@ diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase
 +endmacro()
 +
 +!!IF isEmpty(CMAKE_LIB_DIR_IS_ABSOLUTE)
-+    macro_process_prl_file(\"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/$${CMAKE_LIB_DIR}debug/$${CMAKE_PRL_FILE_LOCATION_RELEASE}\" DEBUG)
++    macro_process_prl_file(\"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/debug/$${CMAKE_LIB_DIR}$${CMAKE_PRL_FILE_LOCATION_DEBUG}\" DEBUG)
  !!ELSE
 -!!IF equals(TEMPLATE, aux)
 -    add_library(Qt5::$${CMAKE_MODULE_NAME} INTERFACE IMPORTED)
-+    macro_process_prl_file(\"$${CMAKE_LIB_DIR}debug/$${CMAKE_PRL_FILE_LOCATION_RELEASE}\" DEBUG)
++    macro_process_prl_file(\"$${CMAKE_LIB_DIR}../debug/lib/$${CMAKE_PRL_FILE_LOCATION_DEBUG}\" DEBUG)
 +!!ENDIF
 +!!IF isEmpty(CMAKE_LIB_DIR_IS_ABSOLUTE)
 +    macro_process_prl_file(\"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/$${CMAKE_LIB_DIR}$${CMAKE_PRL_FILE_LOCATION_RELEASE}\" RELEASE)
