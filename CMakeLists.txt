@@ -345,6 +345,7 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
             include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
+            include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
         )
     endif ()
