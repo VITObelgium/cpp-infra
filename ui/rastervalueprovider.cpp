@@ -3,9 +3,7 @@
 #include "infra/gdal.h"
 #include "infra/log.h"
 
-namespace uiinfra {
-
-using namespace inf;
+namespace inf::ui {
 
 RasterValueProviderQObject::RasterValueProviderQObject(QObject* parent)
 : QObject(parent)

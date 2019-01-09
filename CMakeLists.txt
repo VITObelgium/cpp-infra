@@ -84,6 +84,8 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
+    include/infra/legend.h
+    include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
     include/infra/process.h
@@ -102,6 +104,8 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    legend.cpp
+    legenddataanalyser.h legenddataanalyser.cpp
     process.cpp
     string.cpp
     exception.cpp
@@ -344,6 +348,7 @@ if (INFRA_UI_COMPONENTS)
             ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
             include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
+            include/uiinfra/legendmodel.h ui/legendmodel.cpp
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
             include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}

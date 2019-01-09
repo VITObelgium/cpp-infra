@@ -11,7 +11,7 @@ namespace inf::gdal {
 class CoordinateTransformer;
 }
 
-namespace uiinfra {
+namespace inf::ui {
 
 class RasterValueProviderQObject : public QObject
 {
