@@ -1,9 +1,11 @@
 #pragma once
 
-//#include "gdx/denseraster.h"
-//#include "infra/gdal.h"
+#include "imageprovider.h"
+#include "infra/gdal.h"
 #include "infra/point.h"
+#include "typeregistrations.h"
 #include "ui_mapview.h"
+#include "uiinfra/rastervalueprovider.h"
 
 #include <qgeorectangle.h>
 #include <qmenu.h>
@@ -20,33 +22,29 @@ class MapView : public QWidget
 
 public:
     MapView(QWidget* parent = nullptr);
+    void setData(const RasterPtr& data);
 
 signals:
     void mouseMoved(double, double, float);
-    //void rasterReadyForDisplay(RasterDataId id, const QGeoCoordinate& coord, double zoomLevel);
-    //void rasterOperationFailed();
+    void rasterReadyForDisplay(RasterDataId id, const QGeoCoordinate& coord, double zoomLevel);
+    void rasterOperationFailed();
 
 private:
     void setupQml();
 
-    /*void processRasterForDisplay(const std::shared_ptr<gdx::DenseRaster<float>>& raster);
+    void processRasterForDisplay(const RasterPtr& raster);
     void onRasterDisplay(RasterDataId raster, const QGeoCoordinate& coord, double zoomLevel);
     void onRasterOperationFailed();
-    void onSaveMap();*/
 
     Ui::MapView _ui;
-    QObject* _qmlMap         = nullptr;
-    QObject* _qmlRaster      = nullptr;
-    QObject* _qmlRasterImage = nullptr;
+    QObject* _qmlMap    = nullptr;
+    QObject* _qmlRaster = nullptr;
 
-    //inf::gdal::CoordinateTransformer _transformer;
-    //inf::Point<double> _previousCoordinate;
+    uiinfra::RasterValueProvider<gdx::DenseRaster<double>> _valueProvider;
+
+    ImageProviderRasterDataStorage _dataStorage;
 
     // Unwarped original raster data
-    //std::shared_ptr<gdx::DenseRaster<float>> _originalRasterSource;
-    // Unwarped displayed raster data
-    //std::shared_ptr<gdx::DenseRaster<float>> _currentRasterSource;
-    // The name of the raster data being displayed
-    //std::string _currentRasterName;
+    RasterPtr _originalDataSource;
 };
 }

@@ -4,10 +4,14 @@
 #include "AQNetworkProvider.h"
 #include "Station.h"
 #include "data/ForecastBuffer.h"
+#include "gridmapper.hpp"
 #include "infra/cast.h"
 #include "infra/log.h"
 #include "infra/string.h"
+#include "jobrunner.h"
+#include "memorywriter.hpp"
 #include "modelrunner.hpp"
+#include "typeregistrations.h"
 #include "uiinfra/userinteraction.h"
 #include "uiutils.h"
 
@@ -22,6 +26,7 @@
 namespace opaq {
 
 using namespace inf;
+using namespace std::string_literals;
 
 static const int32_t s_maxRecentPaths                            = 5;
 static const std::array<Aggregation::Type, 3> s_aggregationTypes = {
@@ -45,6 +50,9 @@ MappingView::MappingView(QWidget* parent)
 
     connect(_ui.nameCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onConfigurationChange);
     connect(_ui.pollutantCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onPollutantChange);
+    connect(this, &MappingView::computeProgress, _ui.progressBar, &QProgressBar::setValue);
+    connect(this, &MappingView::computeSucceeded, this, &MappingView::onComputeSucceeded);
+    connect(this, &MappingView::computeFailed, this, &MappingView::onComputeFailed);
 
     _ui.nameCombo->setModel(&_configurationModel);
     _ui.pollutantCombo->setModel(&_pollutantModel);
@@ -57,6 +65,11 @@ MappingView::MappingView(QWidget* parent)
     if (!_ui.configPathCombo->currentText().isEmpty()) {
         loadConfiguration(_ui.configPathCombo->currentText());
     }
+
+    _ui.progressBar->hide();
+
+    qRegisterMetaType<RasterPtr>("RasterPtr");
+    qRegisterMetaType<RasterDataId>("RasterDataId");
 }
 
 MappingView::~MappingView() = default;
@@ -134,6 +147,22 @@ void MappingView::onPollutantChange(const QString& name)
     }
 }
 
+void MappingView::onComputeSucceeded(const RasterPtr& raster)
+{
+    _ui.progressBar->hide();
+    _ui.computeButton->setText(tr("Compute"));
+    _ui.map->setData(raster);
+    setInteractionEnabled(true);
+}
+
+void MappingView::onComputeFailed(const QString& message)
+{
+    _ui.progressBar->hide();
+    uiinfra::displayError(tr("Mapping failed"), message);
+    _ui.computeButton->setText(tr("Compute"));
+    setInteractionEnabled(true);
+}
+
 static void fillModel(QStandardItemModel& model, const std::vector<std::string_view>& names)
 {
     model.clear();
@@ -197,20 +226,94 @@ void MappingView::updateGridModel(const std::vector<std::string_view>& grids)
     _ui.gridCombo->setCurrentIndex(0);
 }
 
+static inf::GeoMetadata create_metadata(double xul, double yul, double cellSize, int32_t rows, int32_t cols, int32_t epsg, std::optional<double> nodata)
+{
+    inf::GeoMetadata meta;
+    meta.xll      = xul;
+    meta.yll      = yul - (rows * cellSize);
+    meta.cellSize = cellSize;
+    meta.rows     = rows;
+    meta.cols     = cols;
+    meta.nodata   = nodata;
+    meta.set_projection_from_epsg(epsg);
+    return meta;
+}
+
 void MappingView::compute()
 {
-    try {
-        _config.apply_config(
-            _ui.nameCombo->currentText().toStdString(),
-            _ui.pollutantCombo->currentText().toStdString(),
-            _ui.interpolationCombo->currentText().toStdString(),
-            _ui.aggregationCombo->currentData(Qt::UserRole).toString().toStdString(),
-            _ui.gridCombo->currentText().toStdString());
-        rio::run_model(_config);
-    } catch (const std::exception& e) {
-        Log::error("Compute failed: {}", e.what());
-        uiinfra::displayError(tr("Mapping failed"), QString::fromUtf8(e.what()));
+    if (_ui.progressBar->isVisible()) {
+        // Calculation in progress
+        _ui.computeButton->setEnabled(false);
+        _cancel = true;
+        return;
     }
+
+    std::string configName     = _ui.nameCombo->currentText().toStdString();
+    std::string pollutant      = _ui.pollutantCombo->currentText().toStdString();
+    std::string interpollation = _ui.interpolationCombo->currentText().toStdString();
+    std::string aggregation    = _ui.aggregationCombo->currentData(Qt::UserRole).toString().toStdString();
+    std::string grid           = _ui.gridCombo->currentText().toStdString();
+    std::string startDate      = _ui.startDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
+    std::string endDate;
+    if (_ui.endDateCheck->isChecked()) {
+        endDate = _ui.endDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
+    }
+
+    static std::unordered_map<std::string, rio::griddefinition> s_definitionLookup{{
+        {"4x4"s, {create_metadata(22000, 248000, 4000, 57, 69, 31370, -9999), "%base%/grids/rio_4x4_grid.map"}},
+        {"4x4e1"s, {create_metadata(18000, 252000, 4000, 59, 71, 31370, -9999), "%base%/grids/rio_4x4e1_grid.map"}},
+        {"4x4e2"s, {create_metadata(14000, 256000, 4000, 61, 73, 31370, -9999), "%base%/grids/rio_4x4e2_grid.map"}},
+    }};
+
+    if (s_definitionLookup.count(grid) == 0) {
+        uiinfra::displayError(tr("Missing grid definition"), tr("No grid definition available for %1 grid").arg(grid.c_str()));
+        return;
+    }
+
+    setInteractionEnabled(false);
+
+    _cancel = false;
+    _ui.progressBar->setValue(0);
+    _ui.progressBar->show();
+    _ui.computeButton->setText(tr("Cancel"));
+
+    _ui.progressBar->setValue(0);
+
+    JobRunner::queue([=]() {
+        try {
+            _config.apply_config(
+                configName,
+                pollutant,
+                interpollation,
+                aggregation,
+                grid,
+                startDate,
+                endDate);
+
+            rio::output output(std::make_unique<rio::memorywriter>(s_definitionLookup.at(grid)));
+            rio::run_model(_config, output, [this](int progress) { emit computeProgress(progress);  return !_cancel; });
+
+            RasterDisplayData displayData;
+            auto memWriter = dynamic_cast<rio::memorywriter*>(output.list().front().get());
+            auto raster    = std::make_shared<gdx::DenseRaster<double>>(memWriter->metadata(), memWriter->data());
+            emit computeSucceeded(raster);
+        } catch (const std::exception& e) {
+            emit computeFailed(QString::fromStdString(e.what()));
+        }
+    });
+}
+
+void MappingView::setInteractionEnabled(bool enabled)
+{
+    _ui.configPathCombo->setEnabled(enabled);
+    _ui.browseButton->setEnabled(enabled);
+    _ui.nameCombo->setEnabled(enabled);
+    _ui.pollutantCombo->setEnabled(enabled);
+    _ui.gridCombo->setEnabled(enabled);
+    _ui.interpolationCombo->setEnabled(enabled);
+    _ui.aggregationCombo->setEnabled(enabled);
+    _ui.startDate->setEnabled(enabled);
+    _ui.endDate->setEnabled(enabled);
 }
 
 }

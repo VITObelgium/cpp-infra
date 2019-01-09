@@ -4,6 +4,10 @@ namespace rio {
 
 using namespace inf;
 
+outputhandler::outputhandler()
+{
+}
+
 outputhandler::outputhandler(const XmlNode& cnf)
 {
     if (!cnf) {

@@ -69,6 +69,11 @@ output::output(const XmlNode& el, std::vector<std::string> req_outputs)
     }
 }
 
+output::output(std::unique_ptr<rio::outputhandler> output)
+{
+    _list.push_back(std::move(output));
+}
+
 output::~output()
 {
 }

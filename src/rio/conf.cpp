@@ -23,11 +23,13 @@ config::config()
     _formats.push_back(std::locale(std::locale::classic(), new boost::posix_time::time_input_facet("%Y-%m-%d")));
 }
 
-boost::posix_time::ptime config::_parse_datetime(const char* s)
+boost::posix_time::ptime config::_parse_datetime(std::string_view s)
 {
+    std::string dateString(s);
+
     boost::posix_time::ptime pt;
     for (size_t i = 0; i < _formats.size(); ++i) {
-        std::istringstream is(s);
+        std::istringstream is(dateString);
         is.imbue(_formats[i]);
         is >> pt;
         if (pt != boost::posix_time::ptime()) return pt;
@@ -248,13 +250,13 @@ void config::parse_command_line(int argc, char* argv[])
 
     // parsing date/time
     if (vm.count("tstart") == 1) {
-        _tstart = _parse_datetime(vm["tstart"].as<std::string>().c_str());
+        _tstart = _parse_datetime(vm["tstart"].as<std::string>());
     } else {
         throw RuntimeError("*** error parsing command line options, see --help !");
     }
 
     if (vm.count("tstop") == 1) {
-        _tstop = _parse_datetime(vm["tstop"].as<std::string>().c_str());
+        _tstop = _parse_datetime(vm["tstop"].as<std::string>());
         if (_tstop.is_not_a_date_time()) {
             // fix as the argument is there as "" with the boost argument parser.. grmmbl
             std::cout << "Requested single date : " << _tstart << std::endl;
@@ -267,6 +269,11 @@ void config::parse_command_line(int argc, char* argv[])
         _tstop = _tstart;
     }
 
+    _configure_timestep();
+}
+
+void config::_configure_timestep()
+{
     // set timestep and adjust the requeste start time and end time to the beginning of the interval
     if (!_aggr.compare("1h")) {
         _tstep = boost::posix_time::hours(1);
@@ -334,15 +341,24 @@ void config::apply_config(
     std::string_view pollutant,
     std::string_view interpolation,
     std::string_view aggregation,
-    std::string_view grid)
+    std::string_view grid,
+    std::string_view startDate,
+    std::string_view endDate)
 {
-    _cnf  = config_name;
-    _pol  = pollutant;
-    _ipol = interpolation;
-    _grd  = grid;
-    _aggr = aggregation;
+    _cnf    = config_name;
+    _pol    = pollutant;
+    _ipol   = interpolation;
+    _grd    = grid;
+    _aggr   = aggregation;
+    _tstart = _parse_datetime(std::string(startDate));
+    if (endDate.empty()) {
+        _tstop = _tstart;
+    } else {
+        _tstop = _parse_datetime(std::string(endDate));
+    }
 
     _get_defaults(_domRoot.child("defaults"));
+    _configure_timestep();
     _get_runconfig();
     _update_parser();
 }

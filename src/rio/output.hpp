@@ -16,6 +16,7 @@ class output
 {
 public:
     output(const inf::XmlNode& el, std::vector<std::string> req_outputs);
+    output(std::unique_ptr<rio::outputhandler> output);
     virtual ~output();
 
     const std::vector<std::unique_ptr<rio::outputhandler>>& list()

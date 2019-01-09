@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unordered_map>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -26,6 +26,7 @@ namespace rio {
 class outputhandler
 {
 public:
+    outputhandler();
     outputhandler(const inf::XmlNode& cnf);
     virtual ~outputhandler() = default;
 

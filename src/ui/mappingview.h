@@ -32,6 +32,11 @@ public:
     explicit MappingView(QWidget* parent = nullptr);
     virtual ~MappingView();
 
+signals:
+    void computeProgress(int);
+    void computeSucceeded(RasterPtr);
+    void computeFailed(QString message);
+
 private:
     void showConfigFileSelector();
     void loadConfiguration(const QString& path);
@@ -46,8 +51,11 @@ private:
 
     void onConfigurationChange(const QString& configName);
     void onPollutantChange(const QString& configName);
+    void onComputeSucceeded(const RasterPtr& raster);
+    void onComputeFailed(const QString& message);
 
     void compute();
+    void setInteractionEnabled(bool enabled);
 
     Ui::MappingView _ui;
     QStandardItemModel _configurationModel;
@@ -60,5 +68,6 @@ private:
     PluginFactory _pluginFactory;
     Engine _engine;
     rio::config _config;
+    bool _cancel = false;
 };
 }

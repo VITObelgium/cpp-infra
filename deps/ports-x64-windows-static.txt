@@ -2,6 +2,8 @@ gtest
 benchmark
 boost[filesystem,regex,program-options,iostreams,date-time,zlib]
 hdf5[cpp]
+gsl
+gdal
 zlib
 fmt
 spdlog

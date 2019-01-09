@@ -23,7 +23,9 @@ public:
         std::string_view pollutant,
         std::string_view interpolation,
         std::string_view aggregation,
-        std::string_view grid);
+        std::string_view grid,
+        std::string_view startDate,
+        std::string_view endDate);
 
     bool debug() const
     {
@@ -191,11 +193,12 @@ private:
     // some helper routines
     void _get_defaults(inf::XmlNode el);
     void _get_runconfig();
+    void _configure_timestep();
     void _update_parser();
     inf::XmlNode _get_config_node(std::string_view config) const;
     inf::XmlNode _get_pollutant_node(inf::XmlNode configNode, std::string_view pollutantName, std::string aggregation = "") const;
 
     std::vector<std::locale> _formats;
-    boost::posix_time::ptime _parse_datetime(const char* s);
+    boost::posix_time::ptime _parse_datetime(std::string_view s);
 };
 }

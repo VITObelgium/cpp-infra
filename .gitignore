@@ -15,3 +15,4 @@ doc/doxygen_sqlite3.db
 build/
 .vs/
 .vscode/cquery_cached_index
+src/rio/run/irceline/output/

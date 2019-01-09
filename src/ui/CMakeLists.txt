@@ -86,7 +86,8 @@ qt5_wrap_ui(OPAQ_FORMS_HEADERS ${QT_UI_FILES})
 add_executable(opaqui
     mapview.qml
     main.cpp
-    uiutils.h
+    imageprovider.h imageprovider.cpp
+    jobrunner.h jobrunner.cpp
     mainwindow.h mainwindow.cpp
     runsimulationdialog.h runsimulationdialog.cpp
     stationresultsmodel.h stationresultsmodel.cpp
@@ -97,6 +98,8 @@ add_executable(opaqui
     opaqviewer.h opaqviewer.cpp
     opaqvalidation.h opaqvalidation.cpp
     resultsview.h resultsview.cpp
+    typeregistrations.h
+    uiutils.h
     validationlineview.h validationlineview.cpp
     validationscatterview.h validationscatterview.cpp
     ${UI_RESOURCES}
@@ -118,6 +121,7 @@ target_link_libraries(opaqui
     opaqcore
     opaqplugins
     rio
+    gdxcore
     uiinfra
     Qt5::Gui
     Qt5::Charts
@@ -126,7 +130,6 @@ target_link_libraries(opaqui
     Qt5::QuickControls2
     Qt5::QuickWidgets
     Qt5::Positioning
-    ${EXTRA_LIBS}
 )
 
 install(TARGETS opaqui

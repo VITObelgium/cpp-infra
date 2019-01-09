@@ -1,4 +1,5 @@
 #include "modelrunner.hpp"
+#include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/log.h"
 #include "infra/string.h"
@@ -10,7 +11,15 @@ namespace rio {
 
 using namespace inf;
 
-void run_model(const config& cf)
+void run_model(const config& cf, std::function<bool(int)> progressCb)
+{
+    // Setup the requested output handlers
+    Log::info("[Output handlers]");
+    rio::output out(cf.outputConfig(), cf.req_output());
+
+    run_model(cf, out, progressCb);
+}
+void run_model(const config& cf, output& output, std::function<bool(int)> progressCb)
 {
     // read network
     Log::info("[Network]");
@@ -43,10 +52,7 @@ void run_model(const config& cf)
         throw RuntimeError("unknown mapping model type : {}", cf.ipol_class());
     }
 
-    // Setup the requested output handlers
-    Log::info("[Output handlers]");
-    rio::output out(cf.outputConfig(), cf.req_output());
-    out.init(cf, net, grid);
+    output.init(cf, net, grid);
 
     // Prepare datastructures
     Eigen::VectorXd values, uncert;
@@ -59,8 +65,12 @@ void run_model(const config& cf)
     // Start timeloop, internally the querying works with start times of the time interval
     // to which the value applies.
     Log::info("Starting timeloop...");
-    auto curr_time = cf.start_time();
-    while (curr_time <= cf.stop_time()) {
+    auto curr_time  = cf.start_time();
+    bool keepGoing  = true;
+    int currentStep = 0;
+    int timeSteps   = truncate<int>((cf.stop_time() - cf.start_time()).total_seconds() / cf.tstep().total_seconds());
+
+    while (curr_time <= cf.stop_time() && keepGoing) {
         Log::info("Interpolating {}", curr_time);
 
         // update the current_time and day pattern
@@ -80,13 +90,18 @@ void run_model(const config& cf)
         }
 
         // always write output, even though the values are all missing...
-        out.write(curr_time, obs, values, uncert);
+        output.write(curr_time, obs, values, uncert);
 
         curr_time += cf.tstep();
+
+        if (progressCb) {
+            float progress = currentStep++ / float(timeSteps);
+            keepGoing      = progressCb(truncate<int>(progress * 100));
+        }
     }
 
     // close each output handler
-    out.close();
+    output.close();
 
     // Starting online postprocessing ... some things are approximations (e.g. online percentiles)
     // For accurate results best compute offline postproessing

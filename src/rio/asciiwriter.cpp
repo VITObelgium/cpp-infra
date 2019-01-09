@@ -34,10 +34,10 @@ asciiwriter::asciiwriter(const XmlNode& cnf)
     // probably much better ways of handling this...
     switch (_fs) {
     case '\t': // deal with the tab character properly
-        sprintf(_fmt, "%%zd\\t%%.0f\\t%%.0f\\t%%.%df\\t%%.%df\\n", _pr, _pr);
+        sprintf(_fmt, "%%zd\\t%%.0f\\t%%.0f\\t%%.%df\\t%%.%df\n", _pr, _pr);
         break;
     default:
-        sprintf(_fmt, "%%zd%c%%.0f%c%%.0f%c%%.%df%c%%.%df\\n", _fs, _fs, _fs, _pr, _fs, _pr);
+        sprintf(_fmt, "%%zd%c%%.0f%c%%.0f%c%%.%df%c%%.%df\n", _fs, _fs, _fs, _pr, _fs, _pr);
         break;
     }
 

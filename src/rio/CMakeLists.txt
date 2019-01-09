@@ -31,6 +31,7 @@ add_library(rio
     obshandler.hpp obshandler.cpp
     dbqfile.hpp dbqfile.cpp
     timeseries.hpp timeseries.cpp
+    gridmapper.hpp gridmapper.cpp
     mapper.hpp mapper.cpp
     idw_ipol.hpp idw_ipol.cpp
     krige_ipol.hpp krige_ipol.cpp
@@ -47,6 +48,7 @@ add_library(rio
     outputhandler.hpp outputhandler.cpp
     asciiwriter.hpp asciiwriter.cpp
     ircelwriter.hpp ircelwriter.cpp
+    memorywriter.hpp memorywriter.cpp
     apswriter.hpp apswriter.cpp
     h5writer.hpp h5writer.cpp
     jsonwriter.hpp jsonwriter.cpp

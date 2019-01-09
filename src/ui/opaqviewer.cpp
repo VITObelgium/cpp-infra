@@ -1,17 +1,16 @@
 #include "opaqviewer.h"
 
-#include "Engine.h"
 #include "AQNetwork.h"
 #include "AQNetworkProvider.h"
 #include "ConfigurationHandler.h"
+#include "Engine.h"
 #include "uiutils.h"
 
 #include <cassert>
 
 Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
-namespace opaq
-{
+namespace opaq {
 
 using namespace chrono_literals;
 
@@ -56,8 +55,8 @@ void OpaqViewer::setModels(const std::vector<config::Component>& models)
 void OpaqViewer::setStationModel(QAbstractItemModel& model)
 {
     _ui.stationComboBox->setModel(&model);
-    
-    connect(&model, &QAbstractListModel::dataChanged, [this] () {
+
+    connect(&model, &QAbstractListModel::dataChanged, [this]() {
         _ui.stationComboBox->setCurrentIndex(0);
     });
 }
@@ -65,7 +64,7 @@ void OpaqViewer::setStationModel(QAbstractItemModel& model)
 void OpaqViewer::setPollutantModel(QAbstractItemModel& model)
 {
     _ui.pollutantComboBox->setModel(&model);
-    
+
     connect(&model, &QAbstractListModel::dataChanged, [this]() {
         _ui.pollutantComboBox->setCurrentIndex(0);
     });
@@ -94,8 +93,7 @@ void OpaqViewer::setForecastHorizon(chrono::days fcHor)
 
 void OpaqViewer::updateResultsForCurrentStation()
 {
-    if (!_buffer)
-    {
+    if (!_buffer) {
         // no simulation has run yet
         return;
     }
@@ -103,8 +101,7 @@ void OpaqViewer::updateResultsForCurrentStation()
     _model.updateResults(*_buffer, basetime(), station(), _forecastHorizon, pollutant(), aggregation());
     _ui.tableView->setRowHidden(0, true);
 
-    for (int i = 0; i <= static_cast<int>(_forecastHorizon.count()); ++i)
-    {
+    for (int i = 0; i <= static_cast<int>(_forecastHorizon.count()); ++i) {
         _ui.tableView->setColumnWidth(i, 60);
     }
 }
@@ -139,25 +136,20 @@ void OpaqViewer::runSimulation()
     _config->getOpaqRun().setPollutantName(pollutant(), Aggregation::getName(aggregation()));
 
     auto baseTime = basetime();
-    if (baseTime != chrono::date_time())
-    {
+    if (baseTime != chrono::date_time()) {
         _config->getOpaqRun().clearBaseTimes();
-        
+
         int dayCount = 1;
-        for (int i = 0; i < dayCount; ++i)
-        {
+        for (int i = 0; i < dayCount; ++i) {
             _config->getOpaqRun().addBaseTime(baseTime);
             baseTime += 1_d;
         }
     }
 
-    try
-    {
+    try {
         _engine->run(_config->getOpaqRun());
         updateResultsForCurrentStation();
-    }
-    catch (const std::exception& e)
-    {
+    } catch (const std::exception& e) {
         displayError(this, tr("Failed to run simulation"), e.what());
     }
 }

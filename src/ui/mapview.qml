@@ -1,4 +1,4 @@
-import QtQuick 2.5
+import QtQuick 2.11
 import QtQuick.Controls 2.3
 import QtPositioning 5.5
 import QtLocation 5.6
@@ -101,6 +101,33 @@ Item {
         value: 0.7
     }
 
+    Item {
+        id: textInfoItem
+        width: childrenRect.width
+        height: childrenRect.height
+        anchors.left: parent.left
+        anchors.bottom: parent.bottom
+        anchors.margins: 5
+        visible: false
+        z: 1
+
+        Rectangle {
+            color: "darkslategray"
+            width: childrenRect.width
+            height: childrenRect.height
+            radius: 2
+
+            Text {
+                id: cursorInfoText
+                padding: 2
+                leftPadding: 4
+                rightPadding: 4
+                color: "white"
+                font.pointSize: 10
+            }
+        }
+    }
+
     Map {
         z: -1
         id: map
@@ -113,17 +140,30 @@ Item {
         plugin: Plugin { name: "itemsoverlay" }
 
         MapQuickItem {
+            property alias source: rasterimage.source
+
             id: raster
             opacity: opacitySlider.value
             visible: false
             objectName: "raster"
             sourceItem: Image {
+                id: rasterimage
                 z: 0
                 asynchronous: true
-                objectName: "rasterimage"
                 smooth: false
             }
             anchorPoint: "0,0"
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+            onPositionChanged : {
+                if (valueprovider) {
+                    cursorInfoText.text = valueprovider.rasterValueString(map.toCoordinate(Qt.point(mouse.x, mouse.y)))
+                    textInfoItem.visible = cursorInfoText.text.length > 0
+                }
+            }
         }
     }
 
