@@ -22,6 +22,7 @@
 
 #include <QFileDialog>
 #include <QSettings>
+#include <qstringlistmodel.h>
 
 namespace opaq {
 
@@ -42,15 +43,24 @@ MappingView::MappingView(QWidget* parent)
     _ui.setupUi(this);
 
     connect(_ui.browseButton, &QPushButton::clicked, this, &MappingView::showConfigFileSelector);
-    connect(_ui.computeButton, &QPushButton::clicked, this, &MappingView::compute);
-
     connect(_ui.configPathCombo, QOverload<const QString&>::of(&QComboBox::activated), this, [this](const QString& path) {
         loadConfiguration(path);
     });
 
     connect(_ui.nameCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onConfigurationChange);
     connect(_ui.pollutantCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onPollutantChange);
-    connect(this, &MappingView::computeProgress, _ui.progressBar, &QProgressBar::setValue);
+    connect(_ui.invertColorMapCheck, &QCheckBox::stateChanged, this, &MappingView::populateColorMapCombo);
+
+    connect(_ui.colorMapCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
+        _ui.map->setColorMap(_ui.colorMapCombo->currentText().toStdString());
+    });
+
+    connect(_ui.gridCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
+    connect(_ui.aggregationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
+    connect(_ui.interpolationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
+    connect(_ui.pollutantCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
+    connect(_ui.startDate, &QDateTimeEdit::dateTimeChanged, this, &MappingView::compute);
+
     connect(this, &MappingView::computeSucceeded, this, &MappingView::onComputeSucceeded);
     connect(this, &MappingView::computeFailed, this, &MappingView::onComputeFailed);
 
@@ -61,12 +71,11 @@ MappingView::MappingView(QWidget* parent)
     _ui.gridCombo->setModel(&_gridModel);
 
     loadRecentConfigurations();
+    populateColorMapCombo(_ui.invertColorMapCheck->isChecked());
 
     if (!_ui.configPathCombo->currentText().isEmpty()) {
         loadConfiguration(_ui.configPathCombo->currentText());
     }
-
-    _ui.progressBar->hide();
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
     qRegisterMetaType<RasterDataId>("RasterDataId");
@@ -127,11 +136,19 @@ void MappingView::updateRecentConfiguration(const QString& filePath)
 void MappingView::onConfigurationChange(const QString& configName)
 {
     try {
+        QSignalBlocker blocker1(_ui.pollutantCombo), blocker2(_ui.interpolationCombo), blocker3(_ui.aggregationCombo), blocker4(_ui.gridCombo);
+
         auto configString = configName.toStdString();
         auto desc         = _config.desc(configString);
         _ui.configDescriptionLabel->setText(QString::fromUtf8(desc.data(), truncate<int>(desc.size())));
         updatePollutantModel(_config.pol_names(configString));
         updateGridModel(_config.grid_names(configString));
+
+        auto pollutant = _ui.pollutantCombo->currentText().toStdString();
+        updateInterpolationModel(_config.ipol_names(configString, pollutant));
+        updateAggregationModel(_config.aggr_names(configString, pollutant));
+
+        compute();
     } catch (const std::exception& e) {
         Log::error("Failed to change configuration: {}", e.what());
     }
@@ -150,17 +167,13 @@ void MappingView::onPollutantChange(const QString& name)
 
 void MappingView::onComputeSucceeded(const RasterPtr& raster)
 {
-    _ui.progressBar->hide();
-    _ui.computeButton->setText(tr("Compute"));
     _ui.map->setData(raster);
     setInteractionEnabled(true);
 }
 
 void MappingView::onComputeFailed(const QString& message)
 {
-    _ui.progressBar->hide();
     uiinfra::displayError(tr("Mapping failed"), message);
-    _ui.computeButton->setText(tr("Compute"));
     setInteractionEnabled(true);
 }
 
@@ -242,13 +255,6 @@ static inf::GeoMetadata create_metadata(double xul, double yul, double cellSize,
 
 void MappingView::compute()
 {
-    if (_ui.progressBar->isVisible()) {
-        // Calculation in progress
-        _ui.computeButton->setEnabled(false);
-        _cancel = true;
-        return;
-    }
-
     std::string configName     = _ui.nameCombo->currentText().toStdString();
     std::string pollutant      = _ui.pollutantCombo->currentText().toStdString();
     std::string interpollation = _ui.interpolationCombo->currentText().toStdString();
@@ -256,9 +262,6 @@ void MappingView::compute()
     std::string grid           = _ui.gridCombo->currentText().toStdString();
     std::string startDate      = _ui.startDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
     std::string endDate;
-    if (_ui.endDateCheck->isChecked()) {
-        endDate = _ui.endDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
-    }
 
     static std::unordered_map<std::string, rio::griddefinition> s_definitionLookup{{
         {"4x4"s, {create_metadata(22000, 248000, 4000, 57, 69, 31370, -9999), "%base%/grids/rio_4x4_grid.map"}},
@@ -273,13 +276,6 @@ void MappingView::compute()
 
     setInteractionEnabled(false);
 
-    _cancel = false;
-    _ui.progressBar->setValue(0);
-    _ui.progressBar->show();
-    _ui.computeButton->setText(tr("Cancel"));
-
-    _ui.progressBar->setValue(0);
-
     JobRunner::queue([=]() {
         try {
             _config.apply_config(
@@ -292,7 +288,7 @@ void MappingView::compute()
                 endDate);
 
             rio::output output(std::make_unique<rio::memorywriter>(s_definitionLookup.at(grid)));
-            rio::run_model(_config, output, [this](int progress) { emit computeProgress(progress);  return !_cancel; });
+            rio::run_model(_config, output);
 
             RasterDisplayData displayData;
             auto memWriter = dynamic_cast<rio::memorywriter*>(output.list().front().get());
@@ -314,8 +310,74 @@ void MappingView::setInteractionEnabled(bool enabled)
     _ui.interpolationCombo->setEnabled(enabled);
     _ui.aggregationCombo->setEnabled(enabled);
     _ui.startDate->setEnabled(enabled);
-    _ui.endDateCheck->setEnabled(enabled);
-    _ui.endDate->setEnabled(enabled && _ui.endDateCheck->isChecked());
+}
+
+void MappingView::populateColorMapCombo(bool invertGradients)
+{
+    static QStringList colorMaps = {
+        // diverging
+        QStringLiteral("rdylgn"),
+        QStringLiteral("rdylbu"),
+        QStringLiteral("piyg"),
+        QStringLiteral("prgn"),
+        QStringLiteral("brbg"),
+        QStringLiteral("puor"),
+        QStringLiteral("rdgy"),
+        QStringLiteral("rdbu"),
+        QStringLiteral("spectral"),
+        // sequential
+        QStringLiteral("greys"),
+        QStringLiteral("purples"),
+        QStringLiteral("blues"),
+        QStringLiteral("greens"),
+        QStringLiteral("oranges"),
+        QStringLiteral("reds"),
+        QStringLiteral("ylorbr"),
+        QStringLiteral("ylorrd"),
+        QStringLiteral("orrd"),
+        QStringLiteral("purd"),
+        QStringLiteral("rdpu"),
+        QStringLiteral("bupu"),
+        QStringLiteral("gnbu"),
+        QStringLiteral("pubu"),
+        QStringLiteral("ylgnbu"),
+        QStringLiteral("pubugn"),
+        QStringLiteral("bugn"),
+        QStringLiteral("ylgn"),
+        // sequential 2
+        QStringLiteral("gray"),
+        QStringLiteral("bone"),
+        QStringLiteral("pink"),
+        QStringLiteral("spring"),
+        QStringLiteral("summer"),
+        QStringLiteral("autumn"),
+        QStringLiteral("winter"),
+        QStringLiteral("cool"),
+        QStringLiteral("hot"),
+        QStringLiteral("copper"),
+        // miscellaneous
+        QStringLiteral("gist_earth"),
+        QStringLiteral("terrain"),
+        QStringLiteral("gist_stern"),
+        QStringLiteral("hsv"),
+        QStringLiteral("jet"),
+        QStringLiteral("spectral"),
+        QStringLiteral("gist_ncar"),
+    };
+
+    auto currentIndex = _ui.colorMapCombo->currentIndex();
+
+    auto cmaps = colorMaps;
+    if (invertGradients) {
+        std::transform(cmaps.begin(), cmaps.end(), cmaps.begin(), [](const QString& cmap) {
+            return cmap + "_r";
+        });
+    }
+
+    _ui.colorMapCombo->setModel(new QStringListModel(cmaps, this));
+    if (currentIndex >= 0) {
+        _ui.colorMapCombo->setCurrentIndex(currentIndex);
+    }
 }
 
 }

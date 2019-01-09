@@ -24,6 +24,7 @@ using namespace inf;
 
 MapView::MapView(QWidget* parent)
 : QWidget(parent)
+, _colorMap("rdylgn_r")
 {
     QQuickStyle::setStyle(QStringLiteral("Fusion"));
 
@@ -90,6 +91,11 @@ void MapView::setData(const RasterPtr& data)
     if (_qmlLegend) {
         _qmlLegend->setProperty("show", true);
     }
+}
+
+void MapView::setColorMap(std::string_view name)
+{
+    _colorMap = name;
 }
 
 void MapView::setupQml()
@@ -185,7 +191,7 @@ void MapView::processRasterForDisplay(const RasterPtr& raster)
         _originalDataSource = raster;
         auto warped         = std::make_shared<gdx::DenseRaster<double>>(gdx::warp_raster(*_originalDataSource, 3857));
 
-        auto legend = create_numeric_legend(getDataSample<float>(*warped, 100000), 6, "rdylgn_r", LegendScaleType::Linear);
+        auto legend = create_numeric_legend(getDataSample<float>(*warped, 100000), 6, _colorMap, LegendScaleType::Linear);
         generate_legend_names(legend, 2, "");
 
         auto displayData = createRasterDisplayData("rdylgn_r", warped);

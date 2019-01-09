@@ -191,19 +191,6 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="3">
-         <widget class="QPushButton" name="computeButton">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="text">
-           <string>Compute</string>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="0">
          <widget class="QLabel" name="configLabel">
           <property name="sizePolicy">
@@ -242,44 +229,15 @@
             </property>
            </widget>
           </item>
-          <item>
-           <widget class="QCheckBox" name="endDateCheck">
-            <property name="text">
-             <string>End date:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDateTimeEdit" name="endDate">
-            <property name="enabled">
-             <bool>false</bool>
-            </property>
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="calendarPopup">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
          </layout>
         </item>
+        <item row="5" column="3">
+         <widget class="inf::ui::ColorMapComboBox" name="colorMapCombo"/>
+        </item>
         <item row="5" column="2">
-         <widget class="QProgressBar" name="progressBar">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-          <property name="textVisible">
-           <bool>false</bool>
+         <widget class="QCheckBox" name="invertColorMapCheck">
+          <property name="text">
+           <string>Invert</string>
           </property>
          </widget>
         </item>
@@ -307,24 +265,12 @@
    <header>mapview.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>inf::ui::ColorMapComboBox</class>
+   <extends>QComboBox</extends>
+   <header>uiinfra/colormapcombobox.h</header>
+  </customwidget>
  </customwidgets>
  <resources/>
- <connections>
-  <connection>
-   <sender>endDateCheck</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>endDate</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>455</x>
-     <y>152</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>584</x>
-     <y>147</y>
-    </hint>
-   </hints>
-  </connection>
- </connections>
+ <connections/>
 </ui>

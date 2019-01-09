@@ -56,6 +56,7 @@ private:
 
     void compute();
     void setInteractionEnabled(bool enabled);
+    void populateColorMapCombo(bool invertGradients);
 
     Ui::MappingView _ui;
     QStandardItemModel _configurationModel;
@@ -68,6 +69,5 @@ private:
     PluginFactory _pluginFactory;
     Engine _engine;
     rio::config _config;
-    bool _cancel = false;
 };
 }

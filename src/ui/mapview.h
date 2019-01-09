@@ -25,6 +25,7 @@ class MapView : public QWidget
 public:
     MapView(QWidget* parent = nullptr);
     void setData(const RasterPtr& data);
+    void setColorMap(std::string_view name);
 
 private:
 signals:
@@ -52,5 +53,7 @@ private:
 
     // Unwarped original raster data
     RasterPtr _originalDataSource;
+
+    std::string _colorMap;
 };
 }
