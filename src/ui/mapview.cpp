@@ -1,5 +1,6 @@
 #include "mapview.h"
 
+#include "gdx/algo/minimum.h"
 #include "gdx/denserasterio.h"
 #include "imageprovider.h"
 #include "infra/log.h"
@@ -41,8 +42,11 @@ MapView::MapView(QWidget* parent)
             auto* object = _ui.mapWidget->rootObject();
             _qmlMap      = object->findChild<QObject*>(QStringLiteral("map"));
             _qmlRaster   = object->findChild<QObject*>(QStringLiteral("raster"));
+            _qmlLegend   = object->findChild<QObject*>(QStringLiteral("raster"));
+
             assert(_qmlMap);
             assert(_qmlRaster);
+            assert(_qmlLegend);
 
             //QObject::connect(_qmlMap, SIGNAL(mouseMoved(QVariant)), this, SLOT(onMouseMoveEvent(QVariant)));
         } else if (status == QQuickWidget::Status::Error) {
@@ -57,6 +61,7 @@ MapView::MapView(QWidget* parent)
 
     connect(this, &MapView::rasterReadyForDisplay, this, &MapView::onRasterDisplay);
     connect(this, &MapView::rasterOperationFailed, this, &MapView::onRasterOperationFailed);
+    connect(this, &MapView::legendUpdated, this, &MapView::onUpdateLegend);
 }
 
 static QGeoRectangle rasterViewPort(const inf::GeoMetadata& meta)
@@ -81,11 +86,17 @@ void MapView::setData(const RasterPtr& data)
     if (_qmlMap && data->metadata().projection_epsg().has_value()) {
         _qmlMap->setProperty("visibleRegion", QVariant::fromValue(rasterViewPort(data->metadata())));
     }
+
+    if (_qmlLegend) {
+        _qmlLegend->setProperty("show", true);
+    }
 }
 
 void MapView::setupQml()
 {
     _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("valueprovider"), &_valueProvider);
+    _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("legendmodel"), &_legendModel);
+
     _ui.mapWidget->setSource(QUrl(QStringLiteral("qrc:/mapview.qml")));
     _ui.mapWidget->engine()->addImageProvider(QStringLiteral("opaq"), new AsyncImageProvider(_dataStorage));
 }
@@ -115,15 +126,73 @@ static RasterDisplayData createRasterDisplayData(const std::string& colorMap, co
     return data;
 }
 
+template <typename TResult, typename TRaster>
+std::vector<TResult> getDataSample(const gdx::DenseRaster<TRaster>& raster, size_t numSamples)
+{
+    std::vector<TResult> values;
+    values.reserve(numSamples);
+
+    // return numSamples random samples from the raster where we don't take in account the nodata values.
+
+    // (1) find minimum and maximum cell values and insert them into values and usedCells;
+    auto [minCell, maxCell] = gdx::minmax_cell(raster);
+
+    values.push_back(truncate<TResult>(raster[minCell]));
+    values.push_back(truncate<TResult>(raster[maxCell]));
+
+    // (2) loop n-2 times and insert a random cell (if not already present);
+    gdx::Cell currentCell(0, 0);
+    gdx::Cell finalCell(raster.rows(), 0);
+    const auto datasize = raster.size();
+
+    size_t sampleCount = 2; // we already added two elements.
+    srand((unsigned)time(nullptr));
+    const size_t size = datasize - 2; // for min and max, which are already selected
+    size_t itemsRead(0);
+
+    while (sampleCount != numSamples) {
+        while (currentCell != finalCell && (raster.is_nodata(currentCell) || currentCell == minCell || currentCell == maxCell)) {
+            increment_cell(currentCell, raster.cols());
+        }
+
+        if (currentCell == finalCell) {
+            break;
+        }
+
+        // (1) draw random number U
+        const double U        = ((double)rand() / (double)RAND_MAX);
+        const double treshold = (double)(numSamples - sampleCount) / ((double)(size - itemsRead));
+        if (U < treshold) {
+            // get this cell into the sample
+            values.push_back(truncate<TResult>(raster[currentCell]));
+            ++sampleCount;
+        }
+
+        increment_cell(currentCell, raster.cols());
+        ++itemsRead;
+
+        if (currentCell == finalCell) {
+            break;
+        }
+    }
+
+    return values;
+}
+
 void MapView::processRasterForDisplay(const RasterPtr& raster)
 {
     try {
         _originalDataSource = raster;
         auto warped         = std::make_shared<gdx::DenseRaster<double>>(gdx::warp_raster(*_originalDataSource, 3857));
-        auto displayData    = createRasterDisplayData("rdylgn_r", warped);
-        auto id             = _dataStorage.putRasterData(displayData);
+
+        auto legend = create_numeric_legend(getDataSample<float>(*warped, 100000), 6, "rdylgn_r", LegendScaleType::Linear);
+        generate_legend_names(legend, 2, "");
+
+        auto displayData = createRasterDisplayData("rdylgn_r", warped);
+        auto id          = _dataStorage.putRasterData(displayData);
         _valueProvider.setData(warped);
 
+        emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
         emit rasterReadyForDisplay(id, displayData.coordinate, displayData.zoomLevel);
     } catch (const std::exception& e) {
         Log::error("Failed to display raster data: {}", e.what());
@@ -149,6 +218,11 @@ void MapView::onRasterDisplay(RasterDataId id, const QGeoCoordinate& coordinate,
 void MapView::onRasterOperationFailed()
 {
     unsetCursor();
+}
+
+void MapView::onUpdateLegend(Legend legend)
+{
+    _legendModel.setLegend(std::move(legend));
 }
 
 }

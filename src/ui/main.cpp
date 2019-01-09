@@ -20,6 +20,7 @@ Q_IMPORT_PLUGIN(QGeoServiceProviderFactoryOsm);
 Q_IMPORT_PLUGIN(QGeoServiceProviderFactoryItemsOverlay);
 
 Q_IMPORT_PLUGIN(QtQuick2Plugin)
+Q_IMPORT_PLUGIN(QtQuickLayoutsPlugin)
 Q_IMPORT_PLUGIN(QtQuickControls2Plugin)
 Q_IMPORT_PLUGIN(QtQuickControls2FusionStylePlugin)
 Q_IMPORT_PLUGIN(QtQuick2WindowPlugin)

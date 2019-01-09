@@ -1,15 +1,14 @@
-import QtQuick 2.11
+import QtQuick 2.12
 import QtQuick.Controls 2.3
+import QtQuick.Layouts 1.11
 import QtPositioning 5.5
 import QtLocation 5.6
+
+import "qrc:/qmlcontrols"
 
 Item {
     id: mapView
     focus: true
-
-    //Connections {
-    //    target: context
-    //}
 
     Rectangle
     {
@@ -163,6 +162,30 @@ Item {
                     cursorInfoText.text = valueprovider.rasterValueString(map.toCoordinate(Qt.point(mouse.x, mouse.y)))
                     textInfoItem.visible = cursorInfoText.text.length > 0
                 }
+            }
+        }
+    }
+
+    RowLayout {
+        property bool show: true
+        id: legend
+        objectName: "legend"
+        x: 5
+        y: 5
+        z: 1
+        height: parent.height - 10
+        visible: legenditem.count > 0 && show
+
+        Legend {
+            opacity:0.8
+            id: legenditem
+            objectName: "legenditem"
+            model: legendmodel
+
+            DragHandler {
+                id: handler
+                target: legend
+                acceptedButtons: Qt.RightButton
             }
         }
     }

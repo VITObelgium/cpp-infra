@@ -152,6 +152,7 @@ if (STATIC_QT)
     find_qtdep(NAME Qt5PositioningQuick LIBNAME Qt5PositioningQuick)
     
     find_qtplugin(NAME JpegPlugin LIBNAME qjpeg SUBDIR plugins/imageformats)
+    find_qtplugin(NAME QtQuickLayoutsPlugin LIBNAME qquicklayoutsplugin SUBDIR qml/QtQuick/Layouts)
     find_qtplugin(NAME QtQuick2Plugin LIBNAME qtquick2plugin SUBDIR qml/QtQuick.2)
     find_qtplugin(NAME QtQuick2TemplatesPlugin LIBNAME qtquicktemplates2plugin SUBDIR qml/QtQuick/Templates.2)
     find_qtplugin(NAME QtQuick2WindowPlugin LIBNAME windowplugin SUBDIR qml/QtQuick/Window.2)
@@ -169,6 +170,7 @@ if (STATIC_QT)
 
     target_link_libraries(opaqui
         JpegPlugin
+        QtQuickLayoutsPlugin
         QtQuick2Plugin
         QtQuick2WindowPlugin
         QtQuick2TemplatesPlugin

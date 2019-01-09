@@ -70,6 +70,7 @@ MappingView::MappingView(QWidget* parent)
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
     qRegisterMetaType<RasterDataId>("RasterDataId");
+    qRegisterMetaType<Legend>("inf::Legend");
 }
 
 MappingView::~MappingView() = default;
@@ -313,7 +314,8 @@ void MappingView::setInteractionEnabled(bool enabled)
     _ui.interpolationCombo->setEnabled(enabled);
     _ui.aggregationCombo->setEnabled(enabled);
     _ui.startDate->setEnabled(enabled);
-    _ui.endDate->setEnabled(enabled);
+    _ui.endDateCheck->setEnabled(enabled);
+    _ui.endDate->setEnabled(enabled && _ui.endDateCheck->isChecked());
 }
 
 }

@@ -2,9 +2,11 @@
 
 #include "imageprovider.h"
 #include "infra/gdal.h"
+#include "infra/legend.h"
 #include "infra/point.h"
 #include "typeregistrations.h"
 #include "ui_mapview.h"
+#include "uiinfra/legendmodel.h"
 #include "uiinfra/rastervalueprovider.h"
 
 #include <qgeorectangle.h>
@@ -24,10 +26,11 @@ public:
     MapView(QWidget* parent = nullptr);
     void setData(const RasterPtr& data);
 
+private:
 signals:
-    void mouseMoved(double, double, float);
     void rasterReadyForDisplay(RasterDataId id, const QGeoCoordinate& coord, double zoomLevel);
     void rasterOperationFailed();
+    void legendUpdated(inf::Legend legend);
 
 private:
     void setupQml();
@@ -35,12 +38,15 @@ private:
     void processRasterForDisplay(const RasterPtr& raster);
     void onRasterDisplay(RasterDataId raster, const QGeoCoordinate& coord, double zoomLevel);
     void onRasterOperationFailed();
+    void onUpdateLegend(inf::Legend legend);
 
     Ui::MapView _ui;
     QObject* _qmlMap    = nullptr;
     QObject* _qmlRaster = nullptr;
+    QObject* _qmlLegend = nullptr;
 
-    uiinfra::RasterValueProvider<gdx::DenseRaster<double>> _valueProvider;
+    inf::ui::RasterValueProvider<gdx::DenseRaster<double>> _valueProvider;
+    inf::ui::LegendModel _legendModel;
 
     ImageProviderRasterDataStorage _dataStorage;
 
