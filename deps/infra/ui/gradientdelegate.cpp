@@ -7,9 +7,7 @@
 #include <qlistview.h>
 #include <qpainter.h>
 
-namespace uiinfra {
-
-using namespace inf;
+namespace inf::ui {
 
 GradientDelegate::GradientDelegate(QObject* parent)
 : QStyledItemDelegate(parent)
@@ -22,7 +20,7 @@ void GradientDelegate::setHeight(int height)
     _height = height;
 }
 
-void uiinfra::GradientDelegate::setRole(int role)
+void GradientDelegate::setRole(int role)
 {
     _role = role;
 }
