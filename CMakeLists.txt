@@ -44,6 +44,8 @@ option(OPAQ_STATIC_RUNTIME "Use static runtime on windows" OFF)
 option(OPAQ_ENABLE_POSTGRESQL "Support postgresql in the sql plugin" OFF)
 option(OPAQ_ENABLE_PREDICTION_SERVICE "Build the prediction REST service" OFF)
 
+message(STATUS "Opaq ui enabled: ${OPAQ_ENABLE_UI}")
+
 if (OPAQ_SANITIZE_ADDRESS)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fno-omit-frame-pointer")
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
