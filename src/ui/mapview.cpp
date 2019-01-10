@@ -43,13 +43,11 @@ MapView::MapView(QWidget* parent)
             auto* object = _ui.mapWidget->rootObject();
             _qmlMap      = object->findChild<QObject*>(QStringLiteral("map"));
             _qmlRaster   = object->findChild<QObject*>(QStringLiteral("raster"));
-            _qmlLegend   = object->findChild<QObject*>(QStringLiteral("raster"));
+            _qmlLegend   = object->findChild<QObject*>(QStringLiteral("legend"));
 
             assert(_qmlMap);
             assert(_qmlRaster);
             assert(_qmlLegend);
-
-            //QObject::connect(_qmlMap, SIGNAL(mouseMoved(QVariant)), this, SLOT(onMouseMoveEvent(QVariant)));
         } else if (status == QQuickWidget::Status::Error) {
             Log::error("Qml error");
             for (auto& error : _ui.mapWidget->errors()) {
@@ -79,9 +77,8 @@ void MapView::setData(const RasterPtr& data)
 {
     setCursor(Qt::WaitCursor);
 
-    _originalDataSource = data;
-    JobRunner::queue([this]() {
-        processRasterForDisplay(_originalDataSource);
+    JobRunner::queue([this, data]() {
+        processRasterForDisplay(data);
     });
 
     if (_qmlMap && data->metadata().projection_epsg().has_value()) {
@@ -96,6 +93,13 @@ void MapView::setData(const RasterPtr& data)
 void MapView::setColorMap(std::string_view name)
 {
     _colorMap = name;
+
+    if (_warpedDataSource) {
+        setCursor(Qt::WaitCursor);
+        JobRunner::queue([this]() {
+            applyColorMap();
+        });
+    }
 }
 
 void MapView::setupQml()
@@ -188,18 +192,8 @@ std::vector<TResult> getDataSample(const gdx::DenseRaster<TRaster>& raster, size
 void MapView::processRasterForDisplay(const RasterPtr& raster)
 {
     try {
-        _originalDataSource = raster;
-        auto warped         = std::make_shared<gdx::DenseRaster<double>>(gdx::warp_raster(*_originalDataSource, 3857));
-
-        auto legend = create_numeric_legend(getDataSample<float>(*warped, 100000), 6, _colorMap, LegendScaleType::Linear);
-        generate_legend_names(legend, 2, "");
-
-        auto displayData = createRasterDisplayData("rdylgn_r", warped);
-        auto id          = _dataStorage.putRasterData(displayData);
-        _valueProvider.setData(warped);
-
-        emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
-        emit rasterReadyForDisplay(id, displayData.coordinate, displayData.zoomLevel);
+        _warpedDataSource = std::make_shared<gdx::DenseRaster<double>>(gdx::warp_raster(*raster, 3857));
+        applyColorMap();
     } catch (const std::exception& e) {
         Log::error("Failed to display raster data: {}", e.what());
         emit rasterOperationFailed();
@@ -229,6 +223,19 @@ void MapView::onRasterOperationFailed()
 void MapView::onUpdateLegend(Legend legend)
 {
     _legendModel.setLegend(std::move(legend));
+}
+
+void MapView::applyColorMap()
+{
+    auto legend = create_numeric_legend(getDataSample<float>(*_warpedDataSource, 100000), 6, _colorMap, LegendScaleType::Linear);
+    generate_legend_names(legend, 2, "");
+
+    auto displayData = createRasterDisplayData(_colorMap, _warpedDataSource);
+    auto id          = _dataStorage.putRasterData(displayData);
+    _valueProvider.setData(_warpedDataSource);
+
+    emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
+    emit rasterReadyForDisplay(id, displayData.coordinate, displayData.zoomLevel);
 }
 
 }

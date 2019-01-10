@@ -99,7 +99,6 @@ add_executable(opaqui
     opaqvalidation.h opaqvalidation.cpp
     resultsview.h resultsview.cpp
     typeregistrations.h
-    uiutils.h
     validationlineview.h validationlineview.cpp
     validationscatterview.h validationscatterview.cpp
     ${UI_RESOURCES}

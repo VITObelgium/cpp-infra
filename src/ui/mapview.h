@@ -41,6 +41,8 @@ private:
     void onRasterOperationFailed();
     void onUpdateLegend(inf::Legend legend);
 
+    void applyColorMap();
+
     Ui::MapView _ui;
     QObject* _qmlMap    = nullptr;
     QObject* _qmlRaster = nullptr;
@@ -51,8 +53,7 @@ private:
 
     ImageProviderRasterDataStorage _dataStorage;
 
-    // Unwarped original raster data
-    RasterPtr _originalDataSource;
+    RasterPtr _warpedDataSource;
 
     std::string _colorMap;
 };

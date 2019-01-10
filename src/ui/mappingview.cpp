@@ -13,7 +13,6 @@
 #include "modelrunner.hpp"
 #include "typeregistrations.h"
 #include "uiinfra/userinteraction.h"
-#include "uiutils.h"
 
 #include <array>
 #include <cassert>
@@ -106,7 +105,7 @@ void MappingView::loadConfiguration(const QString& path)
         updateRecentConfiguration(path);
         updateConfigurationsModel(_config.configurations());
     } catch (const std::exception& e) {
-        displayError(this, tr("Failed to load config file"), e.what());
+        ui::displayError(tr("Failed to load config file"), e.what());
     }
 }
 
@@ -173,7 +172,8 @@ void MappingView::onComputeSucceeded(const RasterPtr& raster)
 
 void MappingView::onComputeFailed(const QString& message)
 {
-    uiinfra::displayError(tr("Mapping failed"), message);
+    Log::error("Mapping failed {}", message.toStdString());
+    //ui::displayError(tr("Mapping failed"), message);
     setInteractionEnabled(true);
 }
 
@@ -270,7 +270,8 @@ void MappingView::compute()
     }};
 
     if (s_definitionLookup.count(grid) == 0) {
-        uiinfra::displayError(tr("Missing grid definition"), tr("No grid definition available for %1 grid").arg(grid.c_str()));
+        Log::error("No grid definition available for {} grid", grid);
+        //ui::displayError(tr("Missing grid definition"), tr("No grid definition available for %1 grid").arg(grid.c_str()));
         return;
     }
 
