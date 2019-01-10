@@ -60,4 +60,9 @@ void RasterValueProviderQObject::setMetadata(const inf::GeoMetadata& meta)
         _transformer.reset();
     }
 }
+
+void RasterValueProviderQObject::clearMetadata()
+{
+    _transformer.reset();
+}
 }
