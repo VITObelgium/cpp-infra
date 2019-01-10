@@ -73,6 +73,22 @@ static QGeoRectangle rasterViewPort(const inf::GeoMetadata& meta)
     return QGeoRectangle(QGeoCoordinate(topLeft.y, topLeft.x), QGeoCoordinate(bottomRight.y, bottomRight.x));
 }
 
+void MapView::clearData()
+{
+    if (_qmlLegend) {
+        _qmlLegend->setProperty("show", false);
+    }
+
+    if (_qmlRaster) {
+        _qmlRaster->setProperty("source", "");
+        _qmlRaster->setProperty("visible", false);
+    }
+
+    _legendModel.clear();
+    _valueProvider.clearData();
+    _dataStorage.clear();
+}
+
 void MapView::setData(const RasterPtr& data)
 {
     setCursor(Qt::WaitCursor);
@@ -218,6 +234,7 @@ void MapView::onRasterDisplay(RasterDataId id, const QGeoCoordinate& coordinate,
 void MapView::onRasterOperationFailed()
 {
     unsetCursor();
+    clearData();
 }
 
 void MapView::onUpdateLegend(Legend legend)

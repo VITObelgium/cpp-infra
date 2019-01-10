@@ -24,6 +24,7 @@ class MapView : public QWidget
 
 public:
     MapView(QWidget* parent = nullptr);
+    void clearData();
     void setData(const RasterPtr& data);
     void setColorMap(std::string_view name);
 

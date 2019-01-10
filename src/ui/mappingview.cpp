@@ -172,6 +172,7 @@ void MappingView::onComputeSucceeded(const RasterPtr& raster)
 
 void MappingView::onComputeFailed(const QString& message)
 {
+    _ui.map->clearData();
     Log::error("Mapping failed {}", message.toStdString());
     //ui::displayError(tr("Mapping failed"), message);
     setInteractionEnabled(true);
@@ -310,7 +311,11 @@ void MappingView::setInteractionEnabled(bool enabled)
     _ui.gridCombo->setEnabled(enabled);
     _ui.interpolationCombo->setEnabled(enabled);
     _ui.aggregationCombo->setEnabled(enabled);
-    _ui.startDate->setEnabled(enabled);
+    _ui.colorMapCombo->setEnabled(enabled);
+    _ui.invertColorMapCheck->setEnabled(enabled);
+
+    // use readonly instead of enabled, otherwise focus jumps to next date section
+    _ui.startDate->setReadOnly(!enabled);
 }
 
 void MappingView::populateColorMapCombo(bool invertGradients)
@@ -380,5 +385,4 @@ void MappingView::populateColorMapCombo(bool invertGradients)
         _ui.colorMapCombo->setCurrentIndex(currentIndex);
     }
 }
-
 }
