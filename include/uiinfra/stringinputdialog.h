@@ -7,7 +7,7 @@ namespace Ui {
 class StringInputDialog;
 }
 
-namespace uiinfra {
+namespace inf::ui {
 
 class VersionsModel;
 
