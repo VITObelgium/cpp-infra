@@ -3,7 +3,7 @@
 
 #include <qmessagebox.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 StringInputDialog::StringInputDialog(QWidget* parent)
 : QDialog(parent)
