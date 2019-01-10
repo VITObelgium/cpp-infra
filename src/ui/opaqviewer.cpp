@@ -4,7 +4,8 @@
 #include "AQNetworkProvider.h"
 #include "ConfigurationHandler.h"
 #include "Engine.h"
-#include "uiutils.h"
+
+#include "uiinfra/userinteraction.h"
 
 #include <cassert>
 
@@ -12,6 +13,7 @@ Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
 namespace opaq {
 
+using namespace inf;
 using namespace chrono_literals;
 
 OpaqViewer::OpaqViewer(QWidget* parent)
@@ -150,7 +152,7 @@ void OpaqViewer::runSimulation()
         _engine->run(_config->getOpaqRun());
         updateResultsForCurrentStation();
     } catch (const std::exception& e) {
-        displayError(this, tr("Failed to run simulation"), e.what());
+        ui::displayError(tr("Failed to run simulation"), e.what());
     }
 }
 

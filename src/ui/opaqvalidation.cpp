@@ -1,15 +1,16 @@
 #include "opaqvalidation.h"
-#include "config/Component.h"
-#include "Engine.h"
 #include "ConfigurationHandler.h"
+#include "Engine.h"
+#include "config/Component.h"
+#include "uiinfra/userinteraction.h"
 
-#include "uiutils.h"
 #include "ui_opaqvalidation.h"
 
 Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
-namespace opaq
-{
+namespace opaq {
+
+using namespace inf;
 
 OpaqValidation::OpaqValidation(QWidget* parent)
 : QWidget(parent)
@@ -37,8 +38,7 @@ void OpaqValidation::setEngine(Engine& engine)
 
 void OpaqValidation::setModels(const std::vector<config::Component>& models)
 {
-    for (auto& model : models)
-    {
+    for (auto& model : models) {
         auto* item = new QListWidgetItem();
         item->setData(Qt::DisplayRole, model.name.c_str());
         item->setData(Qt::CheckStateRole, Qt::Checked);
@@ -110,14 +110,11 @@ void OpaqValidation::runValidation()
     auto pol = pollutant();
     _config->getOpaqRun().setPollutantName(pollutant(), Aggregation::getName(aggregation()));
 
-    try
-    {
+    try {
         _model.clear();
-        for (int i = 0; i < _ui.modelsListWidget->count(); ++i)
-        {
+        for (int i = 0; i < _ui.modelsListWidget->count(); ++i) {
             auto* model = _ui.modelsListWidget->item(i);
-            if (model->checkState() == Qt::CheckState::Checked)
-            {
+            if (model->checkState() == Qt::CheckState::Checked) {
                 auto results = _engine->validate(_config->getOpaqRun(), forecastHorizon(), station(), startTime(), endTime(), model->text().toStdString());
                 _model.addResult(model->text().toStdString(), std::move(results));
             }
@@ -125,14 +122,10 @@ void OpaqValidation::runValidation()
 
         _ui.scatterView->setModel(_model);
         _ui.lineView->setModel(_model);
-    }
-    catch (const opaq::ParseException& e)
-    {
-        displayError(this, tr("Failed to parse date"), e.what());
-    }
-    catch (const std::exception& e)
-    {
-        displayError(this, tr("Failed to run validation"), e.what());
+    } catch (const opaq::ParseException& e) {
+        ui::displayError(tr("Failed to parse date"), e.what());
+    } catch (const std::exception& e) {
+        ui::displayError(tr("Failed to run validation"), e.what());
     }
 }
 

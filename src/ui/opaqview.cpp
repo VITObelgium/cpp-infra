@@ -4,7 +4,7 @@
 #include "AQNetworkProvider.h"
 #include "Station.h"
 #include "data/ForecastBuffer.h"
-#include "uiutils.h"
+#include "uiinfra/userinteraction.h"
 
 #include <array>
 #include <cassert>
@@ -16,6 +16,8 @@
 Q_DECLARE_METATYPE(opaq::Aggregation::Type)
 
 namespace opaq {
+
+using namespace inf;
 
 static const int32_t s_maxRecentPaths                            = 5;
 static const std::array<Aggregation::Type, 3> s_aggregationTypes = {
@@ -115,7 +117,7 @@ void OpaqView::loadConfiguration(const QString& path)
 
         _ui.tabWidget->setDisabled(false);
     } catch (const std::exception& e) {
-        displayError(this, tr("Failed to load config file"), e.what());
+        ui::displayError(tr("Failed to load config file"), e.what());
     }
 }
 
