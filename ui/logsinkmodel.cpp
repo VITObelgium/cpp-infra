@@ -45,6 +45,10 @@ QVariant LogSinkModel<Mutex>::data(const QModelIndex& index, int role) const
         return _messages.at(size_t(index.row())).message;
     }
 
+    if (role == Qt::TextAlignmentRole) {
+        return int(Qt::AlignVCenter | Qt::AlignLeft);
+    }
+
     if (role == Qt::DecorationRole) {
         switch (_messages.at(size_t(index.row())).level) {
         case spdlog::level::debug:
