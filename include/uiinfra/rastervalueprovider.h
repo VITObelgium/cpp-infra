@@ -26,6 +26,7 @@ public:
 
 protected:
     void setMetadata(const inf::GeoMetadata& meta);
+    void clearMetadata();
 
 private:
     virtual std::optional<double> getValue(inf::Cell cell) const noexcept = 0;
@@ -41,6 +42,12 @@ public:
     explicit RasterValueProvider(QObject* parent = nullptr)
     : RasterValueProviderQObject(parent)
     {
+    }
+
+    void clearData()
+    {
+        _raster.reset();
+        clearMetadata();
     }
 
     void setData(const std::shared_ptr<RasterType>& data)
