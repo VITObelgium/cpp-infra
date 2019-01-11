@@ -61,6 +61,10 @@ MapView::MapView(QWidget* parent)
     connect(this, &MapView::rasterReadyForDisplay, this, &MapView::onRasterDisplay);
     connect(this, &MapView::rasterOperationFailed, this, &MapView::onRasterOperationFailed);
     connect(this, &MapView::legendUpdated, this, &MapView::onUpdateLegend);
+
+    if (_qmlLegend) {
+        _qmlLegend->setProperty("show", true);
+    }
 }
 
 static QGeoRectangle rasterViewPort(const inf::GeoMetadata& meta)
@@ -75,10 +79,6 @@ static QGeoRectangle rasterViewPort(const inf::GeoMetadata& meta)
 
 void MapView::clearData()
 {
-    if (_qmlLegend) {
-        _qmlLegend->setProperty("show", false);
-    }
-
     if (_qmlRaster) {
         _qmlRaster->setProperty("source", "");
         _qmlRaster->setProperty("visible", false);
@@ -99,10 +99,6 @@ void MapView::setData(const RasterPtr& data)
 
     if (_qmlMap && data->metadata().projection_epsg().has_value()) {
         _qmlMap->setProperty("visibleRegion", QVariant::fromValue(rasterViewPort(data->metadata())));
-    }
-
-    if (_qmlLegend) {
-        _qmlLegend->setProperty("show", true);
     }
 }
 
