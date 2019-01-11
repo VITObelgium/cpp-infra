@@ -22,14 +22,17 @@ public:
     std::unordered_map<std::string, double> get(boost::posix_time::ptime tstart, std::string pol, std::string agg) override;
 
 private:
-    std::map<std::string, rio::timeseries> _db1h;
-    std::map<std::string, rio::timeseries> _dbda;
-    std::map<std::string, rio::timeseries> _dbm1;
-    std::map<std::string, rio::timeseries> _dbm8;
+    std::unordered_map<std::string, rio::timeseries> _db1h;
+    std::unordered_map<std::string, rio::timeseries> _dbda;
+    std::unordered_map<std::string, rio::timeseries> _dbm1;
+    std::unordered_map<std::string, rio::timeseries> _dbm8;
 
     double _scale; //! value to scale the input data with : internally the values will be stored as _scale * [what is read]
 
     void load_riofile(std::string filename);
+
+    // implementation using mmap en zero copy approach (roughly 6x to 8x speedup :-)
+    void load_riofile_faster(const std::string& filename);
 
     void write_summary(void);
 };

@@ -71,6 +71,7 @@ target_link_libraries(rio
     Boost::boost
     Boost::date_time
     Boost::program_options
+    Boost::iostreams
     Boost::system
     hdf5::hdf5_cpp-static
     ZLIB::ZLIB

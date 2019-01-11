@@ -1,11 +1,13 @@
 #include "dbqfile.hpp"
 #include "infra/exception.h"
+#include "infra/log.h"
 #include "infra/string.h"
 #include "infra/xmldocument.h"
 #include "strfun.hpp"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time.hpp>
+#include <boost/iostreams/device/mapped_file.hpp>
 #include <iostream>
 #include <stdexcept>
 
@@ -61,7 +63,7 @@ dbqfile::dbqfile(std::string filename, std::string type, double scale)
 : _scale(scale)
 {
     if (boost::iequals(type, "RIO")) {
-        load_riofile(filename);
+        load_riofile_faster(filename);
     } else {
         throw std::runtime_error("File type " + type + " is not supported by dbqfile");
     }
@@ -125,6 +127,81 @@ void dbqfile::load_riofile(std::string filename)
     return;
 }
 
+void dbqfile::load_riofile_faster(const std::string& filename)
+{
+    Log::info("Importing {}", filename);
+    // parse whole file & store in database...
+
+    boost::iostreams::mapped_file_source mmapFile(filename);
+    if (!mmapFile.is_open()) {
+        throw RuntimeError("Failed to open {}", filename);
+    }
+
+    std::string_view fileContents(mmapFile.data(), mmapFile.size());
+    auto lines = str::split_view(fileContents, '\n', str::SplitOpt::Trim);
+
+    for (auto& line : lines) {
+        if (line.empty() || line[0] == '#') continue;
+
+        auto items = str::split_view(line, " \t;,", str::StrTokFlags);
+
+        if (items.size() != 29) {
+            Log::warn("Invalid dbq line: {}", line);
+            continue;
+        }
+
+        auto name = std::string(items[0]);
+        auto date = items[1];
+
+        if (date.size() != 8) {
+            Log::warn("Invalid date length in dbq line: {}", line);
+            continue;
+        }
+
+        auto year = str::to_int32(date.substr(0, 4));
+        auto mon  = str::to_int32(date.substr(4, 2));
+        auto day  = str::to_int32(date.substr(6, 2));
+
+        if (!(year.has_value() && mon.has_value() && day.has_value())) {
+            Log::warn("Invalid date in dbq line: {}", line);
+            continue;
+        }
+
+        // construct the date& time periods
+        boost::posix_time::ptime t1(boost::gregorian::date(*year, *mon, *day));
+        boost::posix_time::time_period dt(t1, hours(24));
+
+        // m1
+        auto m1 = str::to_double(items[2]);
+        if (!m1.has_value()) {
+            continue;
+        }
+
+        _dbm1[name].insert(dt, _scale * *m1);
+
+        // m8
+        auto m8 = str::to_double(items[3]);
+        if (!m8.has_value()) {
+            continue;
+        }
+        _dbm8[name].insert(dt, _scale * *m8);
+
+        // da
+        auto da = str::to_double(items[4]);
+        if (!da.has_value()) {
+            continue;
+        }
+        _dbda[name].insert(dt, _scale * *da);
+
+        // 24 hourly values
+        boost::posix_time::time_period dt1h(t1, hours(1));
+        for (int i = 5; i < 5 + 24; ++i) {
+            _db1h[name].insert(dt1h, _scale * str::to_double(items[i]).value_or(-9999.0));
+            dt1h.shift(hours(1));
+        }
+    }
+}
+
 dbqfile::~dbqfile()
 {
 }
@@ -134,7 +211,7 @@ std::unordered_map<std::string, double> dbqfile::get(boost::posix_time::ptime ts
     std::unordered_map<std::string, double> data;
 
     // get pointer to correct database archive, depending on aggregation
-    std::map<std::string, rio::timeseries>* _db;
+    std::unordered_map<std::string, rio::timeseries>* _db;
     if (!agg.compare("m1")) {
         _db = &_dbm1;
     } else if (!agg.compare("m8")) {
