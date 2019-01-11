@@ -389,6 +389,14 @@ if (INFRA_UI_COMPONENTS)
     )
 
     target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location date_interface)
+    if (STATIC_QT AND MSVC)
+        target_link_libraries(uiinfra PRIVATE
+            version.lib
+            Netapi32.lib
+            Iphlpapi.lib
+            Userenv.lib
+        )
+    endif ()
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
