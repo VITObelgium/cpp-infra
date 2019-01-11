@@ -74,7 +74,6 @@ RasterDisplayData ImageProviderRasterDataStorage::getRasterData(RasterDataId id)
 void ImageProviderRasterDataStorage::clear()
 {
     std::scoped_lock lock(_mutex);
-    _nextId = 0;
     _data.clear();
 }
 
@@ -105,7 +104,7 @@ public:
 
                 } catch (const std::exception& e) {
                     Log::error("Failed to create image from raster: {}", e.what());
-                    _error = QString::fromLocal8Bit(e.what());
+                    _error = QString::fromUtf8(e.what());
                 }
             }
 
