@@ -141,16 +141,11 @@ if (STATIC_QT)
     target_compile_definitions(opaqui PRIVATE "-DQT_CHARTS_STATICLIB")
 
     find_package(OpenGL)
-    find_package(JPEG REQUIRED)
     find_package(Freetype REQUIRED)
-
-    get_target_property(GUI_LIBS Qt5::Gui LINK_INTERFACE_LIBRARIES_RELEASE)
-
     find_package(Qt5Location REQUIRED)
 
     find_qtdep(NAME Qt5PositioningQuick LIBNAME Qt5PositioningQuick)
     
-    find_qtplugin(NAME JpegPlugin LIBNAME qjpeg SUBDIR plugins/imageformats)
     find_qtplugin(NAME QtQuickLayoutsPlugin LIBNAME qquicklayoutsplugin SUBDIR qml/QtQuick/Layouts)
     find_qtplugin(NAME QtQuick2Plugin LIBNAME qtquick2plugin SUBDIR qml/QtQuick.2)
     find_qtplugin(NAME QtQuick2TemplatesPlugin LIBNAME qtquicktemplates2plugin SUBDIR qml/QtQuick/Templates.2)
@@ -164,11 +159,7 @@ if (STATIC_QT)
     find_qtplugin(NAME QGeoServicesOsmPlugin LIBNAME qtgeoservices_osm SUBDIR plugins/geoservices)
     find_qtplugin(NAME QGeoServicesItemsOverlayPlugin LIBNAME qtgeoservices_itemsoverlay SUBDIR plugins/geoservices)
 
-    find_qtplugin(NAME QWindowsVistaStylePlugin LIBNAME qwindowsvistastyle SUBDIR plugins/styles)
-    find_qtplugin(NAME QWindowsIntegrationPlugin LIBNAME qwindows SUBDIR plugins/platforms)
-
     target_link_libraries(opaqui
-        JpegPlugin
         QtQuickLayoutsPlugin
         QtQuick2Plugin
         QtQuick2WindowPlugin
@@ -180,7 +171,7 @@ if (STATIC_QT)
         QGeoServicesEsriPlugin
         QGeoServicesOsmPlugin
         QGeoServicesItemsOverlayPlugin
-        JPEG::JPEG
+        Qt5::QJpegPlugin
         Freetype::Freetype
     )
 
@@ -192,20 +183,16 @@ if (STATIC_QT)
         find_qtdep(NAME QtUiAutomation LIBNAME Qt5WindowsUIAutomationSupport)
 
         target_link_libraries(opaqui
-            version.lib
             Dwmapi.lib
-            Netapi32.lib
             Wtsapi32.lib
-            Iphlpapi.lib
-            Userenv.lib
             UxTheme.lib
             QtThemeSupport
-            QWindowsVistaStylePlugin
-            QWindowsIntegrationPlugin
             QtFontDatabaseSupport
             QtEventDispatcherSupport
             QtAccessibilitySupport
             QtUiAutomation
+            Qt5::QWindowsVistaStylePlugin
+            Qt5::QWindowsIntegrationPlugin
         )
     endif ()
 endif ()
