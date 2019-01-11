@@ -51,6 +51,7 @@ foreach(BUILD_TYPE debug release)
             ${CMAKE_CURRENT_LIST_DIR}/0001-Fix-debug-crt-flags.patch
             ${CMAKE_CURRENT_LIST_DIR}/optional-tools.patch
             ${CMAKE_CURRENT_LIST_DIR}/geos-link.patch
+            ${CMAKE_CURRENT_LIST_DIR}/ngw.patch # fixed in the next release
             ${OPTIONAL_PATCHES}
     )
 
