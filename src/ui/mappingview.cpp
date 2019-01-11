@@ -356,7 +356,7 @@ void MappingView::compute()
 
 void MappingView::setInteractionEnabled(bool enabled)
 {
-    _ui.configPathCombo->setEnabled(enabled);
+    /*_ui.configPathCombo->setEnabled(enabled);
     _ui.browseConfigButton->setEnabled(enabled);
     _ui.browseForecastButton->setEnabled(enabled);
     _ui.nameCombo->setEnabled(enabled);
@@ -365,7 +365,7 @@ void MappingView::setInteractionEnabled(bool enabled)
     _ui.interpolationCombo->setEnabled(enabled);
     _ui.aggregationCombo->setEnabled(enabled);
     _ui.colorMapCombo->setEnabled(enabled);
-    _ui.invertColorMapCheck->setEnabled(enabled);
+    _ui.invertColorMapCheck->setEnabled(enabled);*/
 
     // use readonly instead of enabled, otherwise focus jumps to next date section
     _ui.startDate->setReadOnly(!enabled);
