@@ -2,7 +2,7 @@
 
 #include <qcombobox.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 /*! Combobox that uses the item delegate to paint the current item
  */

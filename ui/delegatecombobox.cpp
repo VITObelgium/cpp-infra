@@ -8,7 +8,7 @@
 #include <qlistwidget.h>
 #include <qstylepainter.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 DelegateComboBox::DelegateComboBox(QWidget* widget)
 : QComboBox(widget)

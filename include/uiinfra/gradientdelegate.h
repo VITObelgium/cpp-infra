@@ -7,7 +7,7 @@ class QModelIndex;
 class QWidget;
 class QVariant;
 
-namespace uiinfra {
+namespace inf::ui {
 
 /*! Item delegate that draws a rectangle filled with the gradient from the configured model role */
 class GradientDelegate : public QStyledItemDelegate

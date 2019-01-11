@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace uiinfra {
+namespace inf::ui {
 
 ColorMapComboBox::ColorMapComboBox(QWidget* parent)
 : DelegateComboBox(parent)

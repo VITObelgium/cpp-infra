@@ -84,6 +84,8 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
+    include/infra/legend.h
+    include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
     include/infra/process.h
@@ -102,6 +104,8 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    legend.cpp
+    legenddataanalyser.h legenddataanalyser.cpp
     process.cpp
     string.cpp
     exception.cpp
@@ -328,6 +332,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/tabletools.h ui/tabletools.cpp
 
         ui/toolboxitem.h ui/toolboxitem.cpp
+        ui/qt5.natvis
         ${FORMS_HEADERS}
     )
 
@@ -343,7 +348,9 @@ if (INFRA_UI_COMPONENTS)
             ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
             include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
+            include/uiinfra/legendmodel.h ui/legendmodel.cpp
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
+            include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
         )
     endif ()
@@ -382,6 +389,14 @@ if (INFRA_UI_COMPONENTS)
     )
 
     target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location date_interface)
+    if (STATIC_QT AND MSVC)
+        target_link_libraries(uiinfra PRIVATE
+            version.lib
+            Netapi32.lib
+            Iphlpapi.lib
+            Userenv.lib
+        )
+    endif ()
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
