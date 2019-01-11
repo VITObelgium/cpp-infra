@@ -168,13 +168,14 @@ def bootstrap_argparser():
     return parser
 
 
-def bootstrap(ports_dir, triplet=None):
+def bootstrap(ports_dir, triplet=None, additional_ports = []):
     if triplet is None:
         triplet = prompt_for_triplet()
 
     ports_file = select_ports_file(ports_dir, triplet)
     print("Using ports defined in: {}".format(os.path.abspath(ports_file)))
     ports_to_install = read_ports_from_ports_file(ports_file)
+    ports_to_install.extend(additional_ports)
 
     try:
         vcpkg_install_ports(triplet, ports_to_install)

@@ -24,8 +24,6 @@ if (CMAKE_HOST_WIN32 AND NOT MINGW)
     vcpkg_find_acquire_program("JOM")
 endif ()
 
-# Extract source into architecture specific directory, because GDALs' build currently does not
-# support out of source builds.
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src-${TARGET_TRIPLET})
 message(STATUS "Qt source path ${SOURCE_PATH}")
 vcpkg_download_distfile(ARCHIVE
@@ -39,6 +37,7 @@ vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}/${PACKAGE_NAME}
     PATCHES
         support-static-builds-with-cmake.patch
+        support-static-builds-with-cmake-qtplugins.patch
         mingw-cmake-prl-file-has-no-lib-prefix.patch
         zlib.patch
         jpeg.patch
@@ -49,6 +48,22 @@ vcpkg_apply_patches(
         harfbuzz.patch
         qmlcachegen.patch # should be fixed in qt-5.12.1
  )
+
+if (MINGW AND NOT CMAKE_CROSSCOMPILING)
+    set (FILES_TO_FIX
+        qtbase/include/QtEventDispatcherSupport/${VERSION}/QtEventDispatcherSupport/private/qwindowsguieventdispatcher_p.h
+        qtbase/include/QtFontDatabaseSupport/${VERSION}/QtFontDatabaseSupport/private/qwindowsfontdatabase_ft_p.h
+        qtbase/include/QtWindowsUIAutomationSupport/${VERSION}/QtWindowsUIAutomationSupport/private/qwindowsuiawrapper_p.h
+    )
+
+    foreach(FILE_TO_FIX IN LISTS FILES_TO_FIX)
+        # fix for include going wrong on native mingw build
+        vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/${FILE_TO_FIX}
+            "../../../../../"
+            "../../../../"
+        )
+    endforeach()
+endif ()
 
  set(OSX_LEGACY_SDK OFF)
 
@@ -113,7 +128,6 @@ set(QT_OPTIONS
     -skip qtwebchannel
     -skip qtwebsockets
     -skip qtwebview
-    -skip qtwinextras
     -no-feature-testlib
     ${OPTIONAL_ARGS}
 )
@@ -187,7 +201,7 @@ elseif (MINGW AND (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_HOST_SYSTEM_
     list(APPEND PLATFORM_OPTIONS -opengl desktop)
 elseif (MINGW)
     set(PLATFORM -platform win32-g++)
-    list(APPEND PLATFORM_OPTIONS -opengl desktop)
+    list(APPEND PLATFORM_OPTIONS -angle)
     set(EXEC_COMMAND sh)
 endif()
 
