@@ -41,7 +41,8 @@ MappingView::MappingView(QWidget* parent)
 {
     _ui.setupUi(this);
 
-    connect(_ui.browseButton, &QPushButton::clicked, this, &MappingView::showConfigFileSelector);
+    connect(_ui.browseConfigButton, &QPushButton::clicked, this, &MappingView::showConfigFileSelector);
+    connect(_ui.browseForecastButton, &QPushButton::clicked, this, &MappingView::showForecastFileSelector);
     connect(_ui.configPathCombo, QOverload<const QString&>::of(&QComboBox::activated), this, [this](const QString& path) {
         loadConfiguration(path);
     });
@@ -70,10 +71,20 @@ MappingView::MappingView(QWidget* parent)
     _ui.gridCombo->setModel(&_gridModel);
 
     loadRecentConfigurations();
+    loadRecentForecasts();
+
     populateColorMapCombo(_ui.invertColorMapCheck->isChecked());
 
     if (!_ui.configPathCombo->currentText().isEmpty()) {
         loadConfiguration(_ui.configPathCombo->currentText());
+    }
+
+    if (!_ui.forecastPathCombo->currentText().isEmpty()) {
+        try {
+            _dbq = std::make_unique<rio::dbqfile>(_ui.forecastPathCombo->currentText().toStdString(), "RIO"s);
+        } catch (const std::exception& e) {
+            Log::error("Failed to load forecast data: {}", e.what());
+        }
     }
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
@@ -85,13 +96,29 @@ MappingView::~MappingView() = default;
 
 void MappingView::showConfigFileSelector()
 {
-    auto filename = QFileDialog::getOpenFileName(this, tr("Load mapping configuration"), "", tr("Config Files (*.xml)"));
+    auto filename = QFileDialog::getOpenFileName(this, tr("Load mapping configuration"), "", tr("Config files (*.xml)"));
     if (filename.isEmpty()) {
         return;
     }
 
     loadConfiguration(filename);
     _ui.configPathCombo->setCurrentIndex(0);
+}
+
+void MappingView::showForecastFileSelector()
+{
+    auto filename = QFileDialog::getOpenFileName(this, tr("Load forecast data"), "", tr("Forecast files (*.dat *.txt *.csv)"));
+    if (filename.isEmpty()) {
+        return;
+    }
+
+    try {
+        _dbq = std::make_unique<rio::dbqfile>(filename.toStdString(), "RIO"s);
+        updateRecentForecasts(filename);
+        _ui.forecastPathCombo->setCurrentIndex(0);
+    } catch (const std::exception& e) {
+        ui::displayError(tr("Failed to load forecast data"), e.what());
+    }
 }
 
 void MappingView::loadConfiguration(const QString& path)
@@ -102,7 +129,7 @@ void MappingView::loadConfiguration(const QString& path)
         QDir::setCurrent(fileInfo.absoluteDir().path());
 
         _config.parse_setup_file(path.toStdString());
-        updateRecentConfiguration(path);
+        updateRecentConfigurations(path);
         updateConfigurationsModel(_config.configurations());
     } catch (const std::exception& e) {
         ui::displayError(tr("Failed to load config file"), e.what());
@@ -117,19 +144,37 @@ void MappingView::loadRecentConfigurations()
     _ui.configPathCombo->addItems(recentFilePaths);
 }
 
-void MappingView::updateRecentConfiguration(const QString& filePath)
+void MappingView::loadRecentForecasts()
 {
     QSettings settings;
-    QStringList recentFilePaths = settings.value("RecentMappingConfigs").toStringList();
+    auto recentFilePaths = settings.value("RecentForecasts").toStringList();
+    _ui.forecastPathCombo->clear();
+    _ui.forecastPathCombo->addItems(recentFilePaths);
+}
+
+void MappingView::updateRecentConfigurations(const QString& filePath)
+{
+    updateRecentpathsList("RecentMappingConfigs", filePath);
+    loadRecentConfigurations();
+}
+
+void MappingView::updateRecentForecasts(const QString& filePath)
+{
+    updateRecentpathsList("RecentForecasts", filePath);
+    loadRecentForecasts();
+}
+
+void MappingView::updateRecentpathsList(const QString& settingsName, const QString& filePath)
+{
+    QSettings settings;
+    QStringList recentFilePaths = settings.value(settingsName).toStringList();
     recentFilePaths.removeAll(filePath);
     recentFilePaths.prepend(filePath);
     while (recentFilePaths.size() > s_maxRecentPaths) {
         recentFilePaths.removeLast();
     }
 
-    settings.setValue("RecentMappingConfigs", recentFilePaths);
-
-    loadRecentConfigurations();
+    settings.setValue(settingsName, recentFilePaths);
 }
 
 void MappingView::onConfigurationChange(const QString& configName)
@@ -262,6 +307,7 @@ void MappingView::compute()
     std::string aggregation    = _ui.aggregationCombo->currentData(Qt::UserRole).toString().toStdString();
     std::string grid           = _ui.gridCombo->currentText().toStdString();
     std::string startDate      = _ui.startDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
+    std::string forecastData   = _ui.forecastPathCombo->currentText().toStdString();
     std::string endDate;
 
     static std::unordered_map<std::string, rio::griddefinition> s_definitionLookup{{
@@ -269,12 +315,6 @@ void MappingView::compute()
         {"4x4e1"s, {create_metadata(18000, 252000, 4000, 59, 71, 31370, -9999), "%base%/grids/rio_4x4e1_grid.map"}},
         {"4x4e2"s, {create_metadata(14000, 256000, 4000, 61, 73, 31370, -9999), "%base%/grids/rio_4x4e2_grid.map"}},
     }};
-
-    if (s_definitionLookup.count(grid) == 0) {
-        Log::error("No grid definition available for {} grid", grid);
-        //ui::displayError(tr("Missing grid definition"), tr("No grid definition available for %1 grid").arg(grid.c_str()));
-        return;
-    }
 
     setInteractionEnabled(false);
 
@@ -289,8 +329,20 @@ void MappingView::compute()
                 startDate,
                 endDate);
 
+            if (s_definitionLookup.count(grid) == 0) {
+                throw RuntimeError("No grid definition available for {} grid", grid);
+            }
+
+            if (!_dbq) {
+                throw RuntimeError("No valid forecast data loaded");
+            }
+
             rio::output output(std::make_unique<rio::memorywriter>(s_definitionLookup.at(grid)));
-            rio::run_model(_config, output);
+            rio::modelcomponents rioComponents;
+            rioComponents.obsHandler    = _dbq.get();
+            rioComponents.outputHandler = &output;
+
+            rio::run_model(_config, rioComponents);
 
             RasterDisplayData displayData;
             auto memWriter = dynamic_cast<rio::memorywriter*>(output.list().front().get());
@@ -305,7 +357,8 @@ void MappingView::compute()
 void MappingView::setInteractionEnabled(bool enabled)
 {
     _ui.configPathCombo->setEnabled(enabled);
-    _ui.browseButton->setEnabled(enabled);
+    _ui.browseConfigButton->setEnabled(enabled);
+    _ui.browseForecastButton->setEnabled(enabled);
     _ui.nameCombo->setEnabled(enabled);
     _ui.pollutantCombo->setEnabled(enabled);
     _ui.gridCombo->setEnabled(enabled);

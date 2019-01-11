@@ -39,9 +39,14 @@ signals:
 
 private:
     void showConfigFileSelector();
+    void showForecastFileSelector();
+
     void loadConfiguration(const QString& path);
     void loadRecentConfigurations();
-    void updateRecentConfiguration(const QString& filePath);
+    void loadRecentForecasts();
+    void updateRecentConfigurations(const QString& filePath);
+    void updateRecentForecasts(const QString& filePath);
+    void updateRecentpathsList(const QString& settingsName, const QString& filePath);
 
     void updateConfigurationsModel(const std::vector<std::string_view>& configurations);
     void updatePollutantModel(const std::vector<std::string_view>& pollutants);
@@ -69,5 +74,6 @@ private:
     PluginFactory _pluginFactory;
     Engine _engine;
     rio::config _config;
+    std::unique_ptr<rio::obshandler> _dbq;
 };
 }

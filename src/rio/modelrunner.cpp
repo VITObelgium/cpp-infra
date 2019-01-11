@@ -13,13 +13,10 @@ using namespace inf;
 
 void run_model(const config& cf, std::function<bool(int)> progressCb)
 {
-    // Setup the requested output handlers
-    Log::info("[Output handlers]");
-    rio::output out(cf.outputConfig(), cf.req_output());
-
-    run_model(cf, out, progressCb);
+    run_model(cf, modelcomponents(), progressCb);
 }
-void run_model(const config& cf, output& output, std::function<bool(int)> progressCb)
+
+void run_model(const config& cf, modelcomponents components, std::function<bool(int)> progressCb)
 {
     // read network
     Log::info("[Network]");
@@ -31,10 +28,15 @@ void run_model(const config& cf, output& output, std::function<bool(int)> progre
     auto grid = std::make_shared<rio::grid>(cf.grid(), cf.gridConfig());
     Log::debug("{}", *grid);
 
-    // the observation database
-    Log::info("[Observation handler]");
-    auto dbq = std::make_unique<rio::dbqfile>(cf.obsConfig());
-    dbq->setNetwork(net);
+    std::unique_ptr<rio::obshandler> obs;
+    if (components.obsHandler == nullptr) {
+        // the observation database
+        Log::info("[Observation handler]");
+        obs                   = std::make_unique<rio::dbqfile>(cf.obsConfig());
+        components.obsHandler = obs.get();
+    }
+
+    components.obsHandler->setNetwork(net);
 
     // the interpolation model
     Log::info("[Interpolation model]");
@@ -52,7 +54,15 @@ void run_model(const config& cf, output& output, std::function<bool(int)> progre
         throw RuntimeError("unknown mapping model type : {}", cf.ipol_class());
     }
 
-    output.init(cf, net, grid);
+    std::unique_ptr<rio::output> output;
+    if (components.outputHandler == nullptr) {
+        // Setup the requested output handlers
+        Log::info("[Output handlers]");
+        output                   = std::make_unique<rio::output>(cf.outputConfig(), cf.req_output());
+        components.outputHandler = output.get();
+    }
+
+    components.outputHandler->init(cf, net, grid);
 
     // Prepare datastructures
     Eigen::VectorXd values, uncert;
@@ -77,7 +87,7 @@ void run_model(const config& cf, output& output, std::function<bool(int)> progre
         rio::parser::get()->add_pattern("%timestamp%", boost::posix_time::to_iso_string(curr_time));
         rio::parser::get()->add_pattern("%date%", boost::gregorian::to_iso_string(curr_time.date()));
 
-        auto obs = dbq->get(curr_time, cf.pol(), cf.aggr());
+        auto obs = components.obsHandler->get(curr_time, cf.pol(), cf.aggr());
 
         // TODO : build this into the mappers
         if (obs.size() >= 5) {
@@ -90,7 +100,7 @@ void run_model(const config& cf, output& output, std::function<bool(int)> progre
         }
 
         // always write output, even though the values are all missing...
-        output.write(curr_time, obs, values, uncert);
+        components.outputHandler->write(curr_time, obs, values, uncert);
 
         curr_time += cf.tstep();
 
@@ -101,7 +111,7 @@ void run_model(const config& cf, output& output, std::function<bool(int)> progre
     }
 
     // close each output handler
-    output.close();
+    components.outputHandler->close();
 
     // Starting online postprocessing ... some things are approximations (e.g. online percentiles)
     // For accurate results best compute offline postproessing

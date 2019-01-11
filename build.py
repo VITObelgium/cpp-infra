@@ -31,13 +31,16 @@ if __name__ == "__main__":
             triplet = "x64-windows-static" if args.static_runtime else "x64-windows"
         elif sys_platform == "mingw":
             triplet = "x64-mingw"
+        else:
+            triplet = vcpkg.prompt_for_triplet()
 
         cmake_args = ["-DOPAQ_ENABLE_UI={}".format(build_ui)]
 
-        if triplet == "x64-windows":
-            cmake_args.append("-DCMAKE_PREFIX_PATH=C:/Qt/5.12.0/msvc2017_64")
-        elif triplet == "x64-mingw" or triplet == "x64-windows-static":
-            cmake_args.append("-DSTATIC_QT=ON")
+        if build_ui:
+            if triplet == "x64-windows":
+                cmake_args.append("-DCMAKE_PREFIX_PATH=C:/Qt/5.12.0/msvc2017_64")
+            elif triplet == "x64-mingw" or triplet == "x64-windows-static":
+                cmake_args.append("-DSTATIC_QT=ON")
 
         if triplet == "x64-windows-static":
             cmake_args.append("-DOPAQ_STATIC_RUNTIME=ON")

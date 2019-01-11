@@ -44,7 +44,9 @@ int main(int argc, char* argv[])
     Log::add_custom_sink(logSinkModel);
     LogRegistration logging("opaq");
 
-#ifndef NDEBUG
+#ifdef NDEBUG
+    Log::setLevel(Log::Level::Info);
+#else
     Log::setLevel(Log::Level::Debug);
 #endif
 
