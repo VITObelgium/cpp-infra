@@ -22,6 +22,10 @@ QHash<int, QByteArray> LegendModel::roleNames() const
 
 int LegendModel::rowCount(const QModelIndex& /*parent*/) const
 {
+    if (_legend.entries.empty()) {
+        return 0;
+    }
+
     return truncate<int>(_legend.numberOfClasses);
 }
 
