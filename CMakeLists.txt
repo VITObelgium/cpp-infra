@@ -79,6 +79,10 @@ if (MINGW)
     add_definitions("-DMINGW_HAS_SECURE_API")
 endif ()
 
+if (APPLE)
+    set(CMAKE_OSX_DEPLOYMENT_TARGET 10.12)
+endif()
+
 include_directories(
     ${CMAKE_BINARY_DIR}
 )

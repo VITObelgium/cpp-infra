@@ -210,6 +210,7 @@ if (STATIC_QT)
             QtClipboardSupport
             QtPrintSupport
             QtGraphicsSupport
+            Qt5::QMacStylePlugin
             Qt5::QCocoaIntegrationPlugin
             "-framework AppKit"
             "-framework CoreServices"
