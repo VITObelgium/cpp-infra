@@ -78,7 +78,7 @@ void generate_colors(std::string_view cmapName, Legend& legend)
 void generate_legend_names(Legend& legend, int decimals, std::string_view unit)
 {
     for (auto& entry : legend.entries) {
-        entry.name = fmt::format("{:.{}f}{} ... {:.{}f}{}", entry.lowerBound, decimals, unit, entry.upperBound, decimals, unit);
+        entry.name = fmt::format("{:.{}f} ... {:.{}f} {}", entry.lowerBound, decimals, entry.upperBound, decimals, unit);
     }
 }
 

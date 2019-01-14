@@ -24,6 +24,9 @@ public:
     Q_INVOKABLE double rasterValue(const QGeoCoordinate& coord) const noexcept;
     Q_INVOKABLE QString rasterValueString(const QGeoCoordinate& coord) const noexcept;
 
+    void setUnit(std::string_view unit);
+    void setPrecision(int decimals);
+
 protected:
     void setMetadata(const inf::GeoMetadata& meta);
     void clearMetadata();
@@ -32,6 +35,8 @@ private:
     virtual std::optional<double> getValue(inf::Cell cell) const noexcept = 0;
 
     inf::GeoMetadata _metadata;
+    std::string _unit;
+    int _decimals = 6;
     std::unique_ptr<inf::gdal::CoordinateTransformer> _transformer;
 };
 
