@@ -4,6 +4,7 @@
 #include "infra/gdal.h"
 #include "infra/legend.h"
 #include "infra/point.h"
+#include "legendsettings.h"
 #include "typeregistrations.h"
 #include "ui_mapview.h"
 #include "uiinfra/legendmodel.h"
@@ -27,6 +28,7 @@ public:
     void clearData();
     void setData(const RasterPtr& data);
     void setColorMap(std::string_view name);
+    void applyLegendSettings(const LegendSettings& settings);
 
 private:
 signals:
@@ -57,5 +59,6 @@ private:
     RasterPtr _warpedDataSource;
 
     std::string _colorMap;
+    LegendSettings _legendSettings;
 };
 }

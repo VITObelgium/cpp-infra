@@ -21,8 +21,7 @@ namespace config {
 struct Component;
 }
 
-class Station;
-class ForecastBuffer;
+struct LegendSettings;
 
 class MappingView : public QWidget
 {
@@ -31,6 +30,8 @@ class MappingView : public QWidget
 public:
     explicit MappingView(QWidget* parent = nullptr);
     virtual ~MappingView();
+
+    void applyLegendSettings(const LegendSettings& settings);
 
 signals:
     void computeProgress(int);

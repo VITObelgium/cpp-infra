@@ -18,6 +18,7 @@ public:
 
 private:
     void setupDockWidgets();
+    void showPreferences();
 
     Ui::MainWindow _ui;
     std::shared_ptr<QAbstractItemModel> _logModel;

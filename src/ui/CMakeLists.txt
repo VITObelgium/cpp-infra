@@ -80,6 +80,7 @@ set(QT_UI_FILES
     opaqview.ui
     opaqviewer.ui
     opaqvalidation.ui
+    preferencesdialog.ui
 )
 qt5_wrap_ui(OPAQ_FORMS_HEADERS ${QT_UI_FILES})
 
@@ -88,6 +89,7 @@ add_executable(opaqui
     main.cpp
     imageprovider.h imageprovider.cpp
     jobrunner.h jobrunner.cpp
+    legendsettings.h
     mainwindow.h mainwindow.cpp
     runsimulationdialog.h runsimulationdialog.cpp
     stationresultsmodel.h stationresultsmodel.cpp
@@ -97,6 +99,7 @@ add_executable(opaqui
     opaqview.h opaqview.cpp
     opaqviewer.h opaqviewer.cpp
     opaqvalidation.h opaqvalidation.cpp
+    preferencesdialog.h preferencesdialog.cpp
     resultsview.h resultsview.cpp
     typeregistrations.h
     validationlineview.h validationlineview.cpp

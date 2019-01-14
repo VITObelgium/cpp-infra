@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include "preferencesdialog.h"
 #include "runsimulationdialog.h"
 #include "uiinfra/logview.h"
 
@@ -16,6 +17,9 @@ MainWindow::MainWindow(const std::shared_ptr<QAbstractItemModel>& logSink, QWidg
     setupDockWidgets();
 
     connect(_ui.actionQuit, &QAction::triggered, this, &QMainWindow::close);
+    connect(_ui.actionPreferences, &QAction::triggered, this, &MainWindow::showPreferences);
+
+    _ui.mapping->applyLegendSettings(PreferencesDialog().legendSettings());
 }
 
 void MainWindow::setupDockWidgets()
@@ -32,6 +36,16 @@ void MainWindow::setupDockWidgets()
 
     _ui.menuView->addAction(_diagnoseDockWidget->toggleViewAction());
     _diagnoseDockWidget->toggleViewAction()->setShortcut(Qt::CTRL + Qt::Key_D);
+}
+
+void MainWindow::showPreferences()
+{
+    PreferencesDialog dlg;
+    if (dlg.exec() == QDialog::Accepted) {
+        dlg.saveSettings();
+
+        _ui.mapping->applyLegendSettings(dlg.legendSettings());
+    }
 }
 
 }

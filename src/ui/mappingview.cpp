@@ -94,6 +94,12 @@ MappingView::MappingView(QWidget* parent)
 
 MappingView::~MappingView() = default;
 
+void MappingView::applyLegendSettings(const LegendSettings& settings)
+{
+    _ui.map->applyLegendSettings(settings);
+    compute();
+}
+
 void MappingView::showConfigFileSelector()
 {
     auto filename = QFileDialog::getOpenFileName(this, tr("Load mapping configuration"), "", tr("Config files (*.xml)"));

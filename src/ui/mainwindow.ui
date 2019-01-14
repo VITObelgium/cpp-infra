@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="opaq::OpaqView" name="forecast">
        <attribute name="title">
@@ -59,6 +59,7 @@
     <property name="title">
      <string>File</string>
     </property>
+    <addaction name="actionPreferences"/>
     <addaction name="actionQuit"/>
    </widget>
    <widget class="QMenu" name="menuView">
@@ -78,6 +79,14 @@
   <action name="actionDiagnostics">
    <property name="text">
     <string>Diagnostics</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+;</string>
    </property>
   </action>
  </widget>

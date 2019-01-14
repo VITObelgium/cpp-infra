@@ -22,6 +22,8 @@
 namespace opaq {
 using namespace inf;
 
+static const std::string s_unit(u8"µg/m³");
+
 MapView::MapView(QWidget* parent)
 : QWidget(parent)
 , _colorMap("rdylgn_r")
@@ -65,6 +67,9 @@ MapView::MapView(QWidget* parent)
     if (_qmlLegend) {
         _qmlLegend->setProperty("show", true);
     }
+
+    _valueProvider.setUnit(s_unit);
+    _valueProvider.setPrecision(2);
 }
 
 static QGeoRectangle rasterViewPort(const inf::GeoMetadata& meta)
@@ -112,6 +117,11 @@ void MapView::setColorMap(std::string_view name)
             applyColorMap();
         });
     }
+}
+
+void MapView::applyLegendSettings(const LegendSettings& settings)
+{
+    _legendSettings = settings;
 }
 
 void MapView::setupQml()
@@ -240,8 +250,8 @@ void MapView::onUpdateLegend(Legend legend)
 
 void MapView::applyColorMap()
 {
-    auto legend = create_numeric_legend(getDataSample<float>(*_warpedDataSource, 100000), 6, _colorMap, LegendScaleType::Linear);
-    generate_legend_names(legend, 2, "");
+    auto legend = create_numeric_legend(getDataSample<float>(*_warpedDataSource, 100000), _legendSettings.categories, _colorMap, LegendScaleType::Linear);
+    generate_legend_names(legend, 2, s_unit);
 
     auto displayData = createRasterDisplayData(_colorMap, _warpedDataSource);
     auto id          = _dataStorage.putRasterData(displayData);
