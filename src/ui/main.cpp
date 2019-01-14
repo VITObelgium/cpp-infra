@@ -6,8 +6,8 @@
 #include "uiinfra/application.h"
 #include "uiinfra/logsinkmodel.h"
 
-#include <QtGlobal>
 #include <QApplication>
+#include <QtGlobal>
 #include <QtPlugin>
 #include <qmessagebox.h>
 
@@ -32,8 +32,10 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 #endif
 
 #ifdef Q_OS_MACOS
+Q_IMPORT_PLUGIN(QSQLiteDriverPlugin);
 Q_IMPORT_PLUGIN(QMacStylePlugin);
 Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
+Q_IMPORT_PLUGIN(QGeoServiceProviderFactoryMapboxGL);
 #endif
 #endif
 

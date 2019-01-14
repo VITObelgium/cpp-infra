@@ -205,6 +205,7 @@ if (STATIC_QT)
         find_qtdep(NAME QtClipboardSupport LIBNAME Qt5ClipboardSupport)
         find_qtdep(NAME QtPrintSupport LIBNAME Qt5PrintSupport)
         find_qtdep(NAME QtGraphicsSupport LIBNAME Qt5GraphicsSupport)
+        find_package(Qt5Sql REQUIRED)
 
         target_link_libraries(opaqui
             QtClipboardSupport
@@ -212,6 +213,8 @@ if (STATIC_QT)
             QtGraphicsSupport
             Qt5::QMacStylePlugin
             Qt5::QCocoaIntegrationPlugin
+            Qt5::Sql
+            Qt5::QSQLiteDriverPlugin
             "-framework AppKit"
             "-framework CoreServices"
             "-framework Carbon"
@@ -221,5 +224,11 @@ if (STATIC_QT)
             "-framework Metal"
             -lcups
         )
+    endif ()
+
+    if (NOT MSVC)
+        find_qtdep(NAME QMapboxgl LIBNAME qmapboxgl)
+        find_qtplugin(NAME QGeoServicesMapboxglPlugin LIBNAME qtgeoservices_mapboxgl SUBDIR plugins/geoservices)
+        target_link_libraries(opaqui QMapboxgl QGeoServicesMapboxglPlugin)
     endif ()
 endif ()
