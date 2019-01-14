@@ -39,11 +39,13 @@ if __name__ == "__main__":
         if build_ui:
             if triplet == "x64-windows":
                 cmake_args.append("-DCMAKE_PREFIX_PATH=C:/Qt/5.12.0/msvc2017_64")
-            elif triplet == "x64-mingw" or triplet == "x64-windows-static":
+            elif triplet == "x64-mingw" or triplet == "x64-windows-static" or triplet.startswith("x64-osx"):
                 cmake_args.append("-DSTATIC_QT=ON")
 
         if triplet == "x64-windows-static":
             cmake_args.append("-DOPAQ_STATIC_RUNTIME=ON")
+        elif triplet.startswith("x64-osx"):
+            cmake_args.append("-DVCPKG_ALLOW_SYSTEM_LIBS=ON")
 
         if args.build_dist:
             vcpkg.build_project_release(
