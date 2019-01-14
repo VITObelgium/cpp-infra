@@ -16,3 +16,4 @@ build/
 .vs/
 .vscode/cquery_cached_index
 src/rio/run/irceline/output/
+CMakeLists.txt.user
