@@ -36,6 +36,7 @@ vcpkg_extract_source_archive(${ARCHIVE} ${SOURCE_PATH})
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}/${PACKAGE_NAME}
     PATCHES
+        cmake-debug-plugin-name-osx.patch
         support-static-builds-with-cmake.patch
         support-static-builds-with-cmake-qtplugins.patch
         mingw-cmake-prl-file-has-no-lib-prefix.patch
@@ -313,7 +314,9 @@ file(REMOVE_RECURSE
 # bootstrap libs are only used for the tools and cause errors on windows as they link to a different crt
 file(REMOVE
     ${CURRENT_PACKAGES_DIR}/debug/lib/Qt5Bootstrap.lib
+    ${CURRENT_PACKAGES_DIR}/debug/lib/Qt5Bootstrap.prl
     ${CURRENT_PACKAGES_DIR}/lib/Qt5Bootstrap.lib
+    ${CURRENT_PACKAGES_DIR}/lib/Qt5Bootstrap.prl
 )
 
 # Handle copyright

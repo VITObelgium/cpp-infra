@@ -1,0 +1,21 @@
+diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in
+--- a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in	2018-12-03 12:15:26.000000000 +0100
++++ b/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in	2019-01-12 11:24:31.000000000 +0100
+@@ -341,7 +341,16 @@
+     )
+ !!ENDIF // TEMPLATE != aux
+ 
+-    file(GLOB pluginTargets \"${CMAKE_CURRENT_LIST_DIR}/Qt5$${CMAKE_MODULE_NAME}_*Plugin.cmake\")
++    file(GLOB pluginTargetsMaybe \"${CMAKE_CURRENT_LIST_DIR}/Qt5$${CMAKE_MODULE_NAME}_*.cmake\")
++    unset(pluginTargets)
++    if (pluginTargetsMaybe)
++        foreach(pluginTarget ${pluginTargetsMaybe})
++            file(STRINGS ${pluginTarget} matched REGEX Qt5$${CMAKE_MODULE_NAME}_PLUGINS)
++            if (matched)
++                list(APPEND pluginTargets ${pluginTarget})
++            endif()
++        endforeach()
++    endif()
+ 
+     macro(_populate_$${CMAKE_MODULE_NAME}_plugin_properties Plugin Configuration PLUGIN_LOCATION)
+         set_property(TARGET Qt5::${Plugin} APPEND PROPERTY IMPORTED_CONFIGURATIONS ${Configuration})

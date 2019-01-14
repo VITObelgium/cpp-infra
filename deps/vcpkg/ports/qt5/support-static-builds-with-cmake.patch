@@ -17,7 +17,7 @@ diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase
      )
  
  !!IF !isEmpty(CMAKE_WINDOWS_BUILD)
-@@ -214,12 +214,52 @@
+@@ -214,12 +214,55 @@
      list(APPEND _Qt5$${CMAKE_MODULE_NAME}_LIB_DEPENDENCIES \"$${CMAKE_INTERFACE_QT5_MODULE_DEPS}\")
  !!ENDIF
  
@@ -48,6 +48,9 @@ diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase
 +        endif ()
 +        string(STRIP ${static_depends} static_depends)
 +        separate_arguments(static_depends)
++        if (APPLE)
++            string(REPLACE \"-framework;\" \"-framework \" static_depends \"${static_depends}\")
++        endif()
 +        if (_Qt5$${CMAKE_MODULE_NAME}_LIB_DEPENDENCIES)
 +            set(_list_sep \";\")
 +        endif()
