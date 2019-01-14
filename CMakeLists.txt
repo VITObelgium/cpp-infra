@@ -281,7 +281,6 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
     find_package(Qt5Widgets CONFIG REQUIRED)
     find_package(Qt5Core CONFIG REQUIRED)
-    find_package(Qt5Location CONFIG REQUIRED)
     find_package(date CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
@@ -337,12 +336,14 @@ if (INFRA_UI_COMPONENTS)
     )
 
     if (INFRA_UI_COMPONENTS_LOCATION)
-         if (NOT INFRA_GDAL)
+        find_package(Qt5Location CONFIG REQUIRED)
+    
+        if (NOT INFRA_GDAL)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
-         endif ()
+        endif ()
 
-         find_package(Qt5QuickCompiler REQUIRED)
-         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
+        find_package(Qt5QuickCompiler REQUIRED)
+        qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
 
         target_sources(uiinfra PRIVATE
             ui/Legend.qml
@@ -352,6 +353,10 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
             include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
+        )
+
+        target_link_libraries(uiinfra PUBLIC
+            Qt5::Location
         )
     endif ()
 
