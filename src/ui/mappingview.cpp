@@ -265,8 +265,12 @@ void MappingView::updateAggregationModel(const std::vector<std::string_view>& ag
             item->setText(tr("Hourly"));
         } else if (aggr == "da") {
             item->setText(tr("Daily"));
-        } else if (aggr == "mo") {
-            item->setText(tr("Monthly"));
+        } else if (aggr == "wk") {
+            item->setText(tr("Weekly"));
+        } else if (aggr == "m1") {
+            item->setText(tr("Max 1h"));
+        } else if (aggr == "m1") {
+            item->setText(tr("Max 8h"));
         }
 
         if (item) {
@@ -373,6 +377,7 @@ void MappingView::setInteractionEnabled(bool enabled)
 
 void MappingView::populateColorMapCombo(bool invertGradients)
 {
+    //https://matplotlib.org/examples/color/colormaps_reference.html
     static QStringList colorMaps = {
         // diverging
         QStringLiteral("rdylgn"),

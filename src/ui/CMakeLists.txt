@@ -101,6 +101,7 @@ add_executable(opaqui
     typeregistrations.h
     validationlineview.h validationlineview.cpp
     validationscatterview.h validationscatterview.cpp
+    opaq.rc
     ${UI_RESOURCES}
     ${OPAQ_FORMS_HEADERS}
 )
@@ -110,6 +111,7 @@ source_group("Qt generated" FILES ${UI_RESOURCES} ${OPAQ_FORMS_HEADERS})
 set_target_properties(opaqui PROPERTIES AUTOMOC ON)
 
 if (MSVC)
+    target_sources(opaqui PRIVATE opaq.rc ${CMAKE_BINARY_DIR}/version.rc)
     set_target_properties(opaqui PROPERTIES LINK_FLAGS_RELEASE "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 elseif (MINGW)
     set_target_properties(opaqui PROPERTIES LINK_FLAGS_RELEASE "-Wl,-subsystem,windows")
