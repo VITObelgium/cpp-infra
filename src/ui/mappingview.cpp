@@ -29,11 +29,6 @@ using namespace inf;
 using namespace std::string_literals;
 
 static const int32_t s_maxRecentPaths                            = 5;
-static const std::array<Aggregation::Type, 3> s_aggregationTypes = {
-    Aggregation::DayAvg,
-    Aggregation::Max1h,
-    Aggregation::Max8h,
-};
 
 MappingView::MappingView(QWidget* parent)
 : QWidget(parent)

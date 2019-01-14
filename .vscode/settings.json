@@ -1,7 +1,10 @@
 {
     "cmake.buildDirectory": "${workspaceRoot}/build/opaq-clang",
     "cmake.configureSettings": {
-        "CMAKE_PREFIX_PATH": "${workspaceRoot}/build/local-toolchain-clang"
+        "CMAKE_PREFIX_PATH": "${workspaceRoot}/build/local-toolchain-clang",
+        "VCPKG_ALLOW_SYSTEM_LIBS": "ON",
+        "STATIC_QT": "ON",
+        "OPAQ_ENABLE_UI": "ON"
     },
     "cmake.installPrefix": "${workspaceRoot}/build/local-toolchain-clang",
     "files.exclude": {

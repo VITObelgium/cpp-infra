@@ -24,7 +24,7 @@ public:
         const Eigen::VectorXd& values,
         const Eigen::VectorXd& uncert) override;
 
-    void close(void);
+    void close(void) override;
 
     const inf::GeoMetadata& metadata() const;
     const std::vector<double>& data() const;

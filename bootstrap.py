@@ -10,6 +10,7 @@ from buildtools import vcpkg
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description="Bootstrap opaq.")
+        parser.add_argument("--ui", dest="ui_enabled", action="store_true", help="build the ui")
         parser.add_argument(
             "--static", dest="static_runtime", default=False, action="store_true", help="Use the static runtime (windows only)"
         )
@@ -22,10 +23,14 @@ if __name__ == "__main__":
         if triplet and args.static_runtime:
             triplet += "-static"
 
+        extras = []
+        if args.ui_enabled:
+            extras.extend(["qt5[qml,tools,location,sql]", "gdal", "gsl"])
+
         if args.upgrade:
             vcpkg.upgrade(triplet=triplet)
         else:
-            vcpkg.bootstrap(ports_dir=os.path.join(".", "deps"), triplet=triplet)
+            vcpkg.bootstrap(ports_dir=os.path.join(".", "deps"), triplet=triplet, additional_ports=extras)
     except KeyboardInterrupt:
         print("\nInterrupted")
         sys.exit(-1)

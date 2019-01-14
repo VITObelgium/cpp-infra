@@ -8,6 +8,7 @@
 #include <qgeocoordinate.h>
 #include <qquickimageprovider.h>
 #include <vector>
+#include <unordered_map>
 
 namespace opaq {
 

@@ -6,15 +6,13 @@
 #include "uiinfra/application.h"
 #include "uiinfra/logsinkmodel.h"
 
+#include <QtGlobal>
 #include <QApplication>
 #include <QtPlugin>
 #include <qmessagebox.h>
 
 #ifdef STATIC_QT
-#ifdef WIN32
 Q_IMPORT_PLUGIN(QJpegPlugin);
-Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin);
-Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 Q_IMPORT_PLUGIN(GeoServiceProviderFactoryEsri);
 Q_IMPORT_PLUGIN(QGeoServiceProviderFactoryOsm);
 Q_IMPORT_PLUGIN(QGeoServiceProviderFactoryItemsOverlay);
@@ -27,6 +25,14 @@ Q_IMPORT_PLUGIN(QtQuick2WindowPlugin)
 Q_IMPORT_PLUGIN(QtQuickTemplates2Plugin)
 Q_IMPORT_PLUGIN(QtLocationDeclarativeModule)
 Q_IMPORT_PLUGIN(QtPositioningDeclarativeModule)
+
+#ifdef Q_OS_WIN
+Q_IMPORT_PLUGIN(QWindowsVistaStylePlugin);
+Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
+#endif
+
+#ifdef Q_OS_MACOS
+Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 #endif
 #endif
 

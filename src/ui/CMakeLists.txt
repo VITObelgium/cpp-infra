@@ -146,10 +146,14 @@ if (STATIC_QT)
     target_compile_definitions(opaqui PRIVATE "-DQT_CHARTS_STATICLIB")
 
     find_package(OpenGL)
+    find_package(JPEG)
     find_package(Freetype REQUIRED)
     find_package(Qt5Location REQUIRED)
-
+    
     find_qtdep(NAME Qt5PositioningQuick LIBNAME Qt5PositioningQuick)
+    find_qtdep(NAME QtFontDatabaseSupport LIBNAME Qt5FontDatabaseSupport)
+    find_qtdep(NAME QtThemeSupport LIBNAME Qt5ThemeSupport)
+    find_qtdep(NAME QtAccessibilitySupport LIBNAME Qt5AccessibilitySupport)
     
     find_qtplugin(NAME QtQuickLayoutsPlugin LIBNAME qquicklayoutsplugin SUBDIR qml/QtQuick/Layouts)
     find_qtplugin(NAME QtQuick2Plugin LIBNAME qtquick2plugin SUBDIR qml/QtQuick.2)
@@ -159,13 +163,16 @@ if (STATIC_QT)
     find_qtplugin(NAME QtQuickControls2FusionPlugin LIBNAME qtquickcontrols2fusionstyleplugin SUBDIR qml/QtQuick/Controls.2/Fusion)
     find_qtplugin(NAME QtQuickLocationPlugin LIBNAME declarative_location SUBDIR qml/QtLocation)
     find_qtplugin(NAME QtQuickPositioningPlugin LIBNAME declarative_positioning SUBDIR qml/QtPositioning)
-
+    
     find_qtplugin(NAME QGeoServicesEsriPlugin LIBNAME qtgeoservices_esri SUBDIR plugins/geoservices)
     find_qtplugin(NAME QGeoServicesOsmPlugin LIBNAME qtgeoservices_osm SUBDIR plugins/geoservices)
     find_qtplugin(NAME QGeoServicesItemsOverlayPlugin LIBNAME qtgeoservices_itemsoverlay SUBDIR plugins/geoservices)
-
+    
     target_link_libraries(opaqui
+        QtFontDatabaseSupport    
         QtQuickLayoutsPlugin
+        QtThemeSupport
+        QtAccessibilitySupport
         QtQuick2Plugin
         QtQuick2WindowPlugin
         QtQuick2TemplatesPlugin
@@ -177,27 +184,41 @@ if (STATIC_QT)
         QGeoServicesOsmPlugin
         QGeoServicesItemsOverlayPlugin
         Qt5::QJpegPlugin
+        JPEG::JPEG
         Freetype::Freetype
     )
 
     if (MSVC)
-        find_qtdep(NAME QtFontDatabaseSupport LIBNAME Qt5FontDatabaseSupport)
-        find_qtdep(NAME QtThemeSupport LIBNAME Qt5ThemeSupport)
         find_qtdep(NAME QtEventDispatcherSupport LIBNAME Qt5EventDispatcherSupport)
-        find_qtdep(NAME QtAccessibilitySupport LIBNAME Qt5AccessibilitySupport)
         find_qtdep(NAME QtUiAutomation LIBNAME Qt5WindowsUIAutomationSupport)
 
         target_link_libraries(opaqui
             Dwmapi.lib
             Wtsapi32.lib
             UxTheme.lib
-            QtThemeSupport
-            QtFontDatabaseSupport
             QtEventDispatcherSupport
-            QtAccessibilitySupport
             QtUiAutomation
             Qt5::QWindowsVistaStylePlugin
             Qt5::QWindowsIntegrationPlugin
+        )
+    elseif(APPLE)
+        find_qtdep(NAME QtClipboardSupport LIBNAME Qt5ClipboardSupport)
+        find_qtdep(NAME QtPrintSupport LIBNAME Qt5PrintSupport)
+        find_qtdep(NAME QtGraphicsSupport LIBNAME Qt5GraphicsSupport)
+
+        target_link_libraries(opaqui
+            QtClipboardSupport
+            QtPrintSupport
+            QtGraphicsSupport
+            Qt5::QCocoaIntegrationPlugin
+            "-framework AppKit"
+            "-framework CoreServices"
+            "-framework Carbon"
+            "-framework IOKit"
+            "-framework QuartzCore"
+            "-framework CoreVideo"
+            "-framework Metal"
+            -lcups
         )
     endif ()
 endif ()
