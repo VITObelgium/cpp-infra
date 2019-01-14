@@ -37,7 +37,7 @@ QString RasterValueProviderQObject::rasterValueString(const QGeoCoordinate& coor
             auto cell     = _metadata.convert_xy_to_cell(mapCoord.x, mapCoord.y);
             if (_metadata.is_on_map(cell)) {
                 if (auto rasterValue = getValue(cell); rasterValue.has_value()) {
-                    return QString("(X: %1, Y: %2) %3").arg(int(mapCoord.x)).arg(int(mapCoord.y)).arg(*rasterValue, 0, 'f', 6);
+                    return QString("(X: %1, Y: %2) %3 %4").arg(int(mapCoord.x)).arg(int(mapCoord.y)).arg(*rasterValue, 0, 'f', _decimals).arg(_unit.c_str());
                 } else {
                     return QString("(X: %1, Y: %2) NODATA").arg(int(mapCoord.x)).arg(int(mapCoord.y));
                 }
@@ -48,6 +48,16 @@ QString RasterValueProviderQObject::rasterValueString(const QGeoCoordinate& coor
     }
 
     return QString();
+}
+
+void RasterValueProviderQObject::setUnit(std::string_view unit)
+{
+    _unit = unit;
+}
+
+void RasterValueProviderQObject::setPrecision(int decimals)
+{
+    _decimals = decimals;
 }
 
 void RasterValueProviderQObject::setMetadata(const inf::GeoMetadata& meta)
