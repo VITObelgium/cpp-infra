@@ -26,9 +26,9 @@ void itemSelectionToClipboard(const QItemSelectionModel* selectionModel, char do
     for (auto& current : indexes) {
         QVariant data = model->data(current);
         if (data.type() == QVariant::Double) {
-            // make sure to convert to string in the current locale, otherwise tools like excel
+            // make sure to convert to string in the system locale, otherwise tools like excel
             // don't understand it
-            rows[current.row()].append(QLocale().toString(data.toDouble(), doubleFormat, precision));
+            rows[current.row()].append(QLocale::system().toString(data.toDouble(), doubleFormat, precision));
         } else {
             rows[current.row()].append(data.toString());
         }
