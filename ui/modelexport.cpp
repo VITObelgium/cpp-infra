@@ -8,9 +8,7 @@
 #include <qfiledialog.h>
 #include <xlsxwriter.h>
 
-namespace uiinfra {
-
-using namespace inf;
+namespace inf::ui {
 
 namespace xl {
 class WorkBook
@@ -43,7 +41,7 @@ public:
 
 void exportModel(QWidget* parent, QAbstractItemModel* model, std::string_view name)
 {
-    auto filename = QFileDialog::getSaveFileName(parent, QStringLiteral("Tabel opslaan"), QString::fromStdString(std::string(name)), QStringLiteral("Spreadsheet (*.xlsx)"));
+    auto filename = QFileDialog::getSaveFileName(parent, QApplication::tr("Export table"), QString::fromStdString(std::string(name)), QStringLiteral("Spreadsheet (*.xlsx)"));
     if (!filename.isEmpty()) {
         exportModel(model, name, fs::path(filename.toStdString()));
     }

@@ -6,7 +6,7 @@
 QT_FORWARD_DECLARE_CLASS(QWidget)
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
 
-namespace uiinfra {
+namespace inf::ui {
 
 // First shows a file selector to determine the file path
 void exportModel(QWidget* parent, QAbstractItemModel* model, std::string_view name);
