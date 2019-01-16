@@ -55,23 +55,6 @@ void replaceAll(std::string& str, const std::string& from, const std::string& to
     }
 }
 
-void split(std::vector<std::string>& list, const char* s)
-{
-    char* ptok;
-    char* p = strdup(s);
-
-    list.clear();
-
-    if (!(ptok = strtok(p, SEPCHAR))) return;
-    list.push_back(ptok);
-    while (ptok = strtok(NULL, SEPCHAR))
-        list.push_back(ptok);
-
-    free(p);
-
-    return;
-}
-
 void str2vec(std::vector<double>& x, std::string s)
 {
     x.clear();

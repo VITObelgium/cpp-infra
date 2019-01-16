@@ -74,7 +74,7 @@
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
-     <normaloff>:/data/close.svg</normaloff>:/data/close.svg</iconset>
+     <normaloff>:/data/exit.svg</normaloff>:/data/exit.svg</iconset>
    </property>
    <property name="text">
     <string>Quit</string>

@@ -53,6 +53,7 @@ MappingView::MappingView(QWidget* parent)
 
     connect(_ui.gridCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::onGridChange);
     connect(_ui.gridCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
+    connect(_ui.aggregationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::onAggregationChange);
     connect(_ui.aggregationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
     connect(_ui.interpolationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
     connect(_ui.pollutantCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
@@ -182,6 +183,19 @@ void MappingView::updateRecentpathsList(const QString& settingsName, const QStri
     settings.setValue(settingsName, recentFilePaths);
 }
 
+void MappingView::onAggregationChange(int /*index*/)
+{
+    std::string aggregation = _ui.aggregationCombo->currentData(Qt::UserRole).toString().toStdString();
+    if (aggregation == "1h" || aggregation == "m1" || aggregation == "m8") {
+        _ui.startDate->setDisplayFormat("dd/MM/yyyy HH:mm");
+    } else {
+        _ui.startDate->setDisplayFormat("dd/MM/yyyy");
+        auto date = _ui.startDate->dateTime();
+        date.setTime(QTime()); // clears the time part to midnight
+        _ui.startDate->setDateTime(date);
+    }
+}
+
 void MappingView::onGridChange(int index)
 {
     auto* gridDef = inf::find_in_map(_gridDefs, _ui.gridCombo->itemText(index).toStdString());
@@ -205,8 +219,9 @@ void MappingView::onConfigurationChange(const QString& configName)
         updateInterpolationModel(_config.ipol_names(configString, pollutant));
         updateAggregationModel(_config.aggr_names(configString, pollutant));
 
-        // make sure the map zooms to the current grid region
+        // call the change handlers, as the signals were blocked
         onGridChange(_ui.gridCombo->currentIndex());
+        onAggregationChange(_ui.aggregationCombo->currentIndex());
 
         compute();
     } catch (const std::exception& e) {
@@ -236,7 +251,6 @@ void MappingView::onComputeFailed(const QString& message)
 {
     _ui.map->clearData();
     Log::error("Mapping failed {}", message.toStdString());
-    //ui::displayError(tr("Mapping failed"), message);
     setInteractionEnabled(true);
 }
 
@@ -286,7 +300,7 @@ void MappingView::updateAggregationModel(const std::vector<std::string_view>& ag
             item->setText(tr("Weekly"));
         } else if (aggr == "m1") {
             item->setText(tr("Max 1h"));
-        } else if (aggr == "m1") {
+        } else if (aggr == "m8") {
             item->setText(tr("Max 8h"));
         }
 

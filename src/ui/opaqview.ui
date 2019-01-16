@@ -65,7 +65,11 @@
           <item>
            <widget class="QPushButton" name="browseButton">
             <property name="text">
-             <string>Browse ...</string>
+             <string notr="true"/>
+            </property>
+            <property name="icon">
+             <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
+              <normaloff>:/data/browse.svg</normaloff>:/data/browse.svg</iconset>
             </property>
            </widget>
           </item>
@@ -112,6 +116,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc"/>
+ </resources>
  <connections/>
 </ui>

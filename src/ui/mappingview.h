@@ -55,6 +55,7 @@ private:
     void updateAggregationModel(const std::vector<std::string_view>& aggregations);
     void updateGridModel(const std::vector<std::string_view>& grids);
 
+    void onAggregationChange(int index);
     void onGridChange(int index);
     void onConfigurationChange(const QString& configName);
     void onPollutantChange(const QString& configName);
