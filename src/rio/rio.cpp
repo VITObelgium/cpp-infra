@@ -39,9 +39,11 @@ int main(int argc, char* argv[])
     std::cout << "|                                          | |       |\n";
     std::cout << "+------------------------------------------m-m-------+" << std::endl;
 
+    Log::add_console_sink(Log::Colored::On);
+    inf::LogRegistration logging("rio");
+
     try {
-        Log::add_console_sink(Log::Colored::On);
-        inf::LogRegistration logging("rio");
+        
         Log::set_level(Log::Level::Info);
         Log::set_pattern("%v");
 

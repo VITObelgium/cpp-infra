@@ -85,6 +85,8 @@ add_executable(rioapp rio.cpp)
 target_link_libraries(rioapp PRIVATE rio)
 if (MSVC)
     set_target_properties(rioapp PROPERTIES OUTPUT_NAME "riocli")
+else ()
+    set_target_properties(rioapp PROPERTIES OUTPUT_NAME "rio")
 endif()
 
 install(TARGETS rioapp
