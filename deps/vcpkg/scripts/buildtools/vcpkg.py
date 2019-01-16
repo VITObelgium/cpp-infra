@@ -19,7 +19,7 @@ def vcpkg_root_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def run_vcpkg(triplet, vcpkg_args):
+def run_vcpkgt, vcpkg_args):
     if not shutil.which("vcpkg"):
         raise RuntimeError("vcpkg executable not found in the PATH environment")
 
@@ -30,7 +30,7 @@ def run_vcpkg(triplet, vcpkg_args):
         args += ["--triplet", triplet]
     args += vcpkg_args
 
-    subprocess.check_call(args)
+    return subprocess.check_output(args).decode("UTF-8")
 
 
 def cmake_configure(source_dir, build_dir, cmake_args, triplet=None, toolchain=None, generator=None):
@@ -74,12 +74,12 @@ def cmake_build(build_dir, config=None):
 def vcpkg_install_ports(triplet, ports):
     args = ["install", "--recurse"]
     args += ports
-    run_vcpkg(triplet, args)
+    run_vcpkgt, args)
 
 
 def vcpkg_upgrade_ports(triplet):
     args = ["upgrade", "--no-dry-run"]
-    run_vcpkg(triplet, args)
+    run_vcpkgt, args)
 
 
 def get_all_triplets():
@@ -224,10 +224,40 @@ def build_project_release(project_name, project_dir, triplet=None, cmake_args=[]
     cmake_args.append("-DPACKAGE_VERSION_COMMITHASH=" + git_hash)
     build_project(project_name, project_dir, triplet, cmake_args, build_dir)
 
+def vcpkg_list_ports(triplet):
+    args = ["list"]
+    ports = set()
+    for line in run_vcpkg(triplet, args).splitlines():
+        name, trip = tuple(line.split()[0].split(":"))
+        if triplet is None or trip == triplet:
+            if not "[" in name:
+                ports.add(name)
+
+    return ports
+
+def clean(triplet, all):
+    if triplet is None:
+        shutil.rmtree(os.path.join(vcpkg_root_dir(), "installed"))
+        shutil.rmtree(os.path.join(vcpkg_root_dir(), "buildtrees"))
+        shutil.rmtree(os.path.join(vcpkg_root_dir(), "packages"))
+        return
+
+    for directory in os.listdir(os.path.join(vcpkg_root_dir(), "packages")):
+        package, package_triplet = tuple(directory.split("_"))
+        if package.startswith("."):
+            continue
+        if package_triplet == triplet:
+            shutil.rmtree(os.path.join(vcpkg_root_dir(), "packages", directory))
+
+    ports = vcpkg_list_ports(triplet)
+    if len(ports) > 0:
+        run_vcpkg(triplet, ["remove", "--recurse"] + list(ports))
+
 
 def build_argparser():
     parser = argparse.ArgumentParser(description="Build the project using vcpkg dependencies.", add_help=False)
     parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
+    parser.add_argument("--clean", dest="clean", help="clean the vcpkg build directories")
     parser.add_argument(
         "-s",
         "--source-dir",
