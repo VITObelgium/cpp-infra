@@ -14,12 +14,17 @@ struct modelcomponents
     output* outputHandler  = nullptr;
 };
 
+struct modelruninfo
+{
+    int mapsProcessed = 0;
+};
+
 /*! Run the model as configured in the rio config
  * \param cf the rio configuration
  * \param progresscb callback that gets called with a value between 0 and 100 to indicate progress
  *                   if the callback returns false the calculation is interrupted
  */
-void run_model(const config& cf, std::function<bool(int)> progressCb = nullptr);
+modelruninfo run_model(const config& cf, std::function<bool(int)> progressCb = nullptr);
 
 /*! Run the model as configured in the rio config with te possibility to override configured components
  * \param cf the rio configuration
@@ -27,5 +32,5 @@ void run_model(const config& cf, std::function<bool(int)> progressCb = nullptr);
  * \param progresscb callback that gets called with a value between 0 and 100 to indicate progress
  *                   if the callback returns false the calculation is interrupted
  */
-void run_model(const config& cf, modelcomponents components, std::function<bool(int)> progressCb = nullptr);
+modelruninfo run_model(const config& cf, modelcomponents components, std::function<bool(int)> progressCb = nullptr);
 }

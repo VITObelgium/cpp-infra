@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <string>
-#include <iostream>
+#include <iosfwd>
 
 namespace rio
 {

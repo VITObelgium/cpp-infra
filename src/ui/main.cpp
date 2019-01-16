@@ -55,9 +55,9 @@ int main(int argc, char* argv[])
     LogRegistration logging("opaq");
 
 #ifdef NDEBUG
-    Log::setLevel(Log::Level::Info);
+    Log::set_level(Log::Level::Info);
 #else
-    Log::setLevel(Log::Level::Debug);
+    Log::set_level(Log::Level::Debug);
 #endif
 
     try {

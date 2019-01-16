@@ -1,5 +1,6 @@
 #include "grid.hpp"
 #include "infra/exception.h"
+#include "infra/log.h"
 #include "infra/string.h"
 #include "infra/xmldocument.h"
 #include "parser.hpp"
@@ -55,7 +56,7 @@ void grid::_load_file(std::string filename)
 {
     _cells.clear();
 
-    std::cout << " Importing " << filename << std::endl;
+    Log::debug("Importing {}", filename);
     FILE* fp = fopen(filename.c_str(), "r");
     if (!fp) throw std::runtime_error("Unable to open file: " + filename);
 

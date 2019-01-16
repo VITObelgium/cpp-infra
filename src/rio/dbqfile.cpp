@@ -8,7 +8,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
-#include <iostream>
+#include <fmt/ostream.h>
 #include <stdexcept>
 
 using namespace boost::gregorian;
@@ -71,7 +71,7 @@ dbqfile::dbqfile(std::string filename, std::string type, double scale)
 
 void dbqfile::load_riofile(std::string filename)
 {
-    std::cout << " Importing " << filename << std::endl;
+    Log::debug("Importing {}", filename);
     // parse whole file & store in database...
 
     FILE* fp = fopen(filename.c_str(), "r");
@@ -129,7 +129,7 @@ void dbqfile::load_riofile(std::string filename)
 
 void dbqfile::load_riofile_faster(const std::string& filename)
 {
-    Log::info("Importing {}", filename);
+    Log::debug("Importing {}", filename);
     // parse whole file & store in database...
 
     boost::iostreams::mapped_file_source mmapFile(filename);
@@ -240,31 +240,15 @@ std::unordered_map<std::string, double> dbqfile::get(boost::posix_time::ptime ts
     return data;
 }
 
-void dbqfile::write_summary(void)
+void dbqfile::write_summary()
 {
-    std::cout << "[List of stations]" << std::endl;
+    Log::debug("[List of stations]");
     for (const auto& it : _dbm1) {
-        std::cout << it.first << std::endl;
-        std::cout << " - da range : "
-                  << _dbda[it.first].first_time() << " - "
-                  << _dbda[it.first].last_time()
-                  << ", step : " << _dbda[it.first].interval()
-                  << ", size : " << _dbda[it.first].size() << std::endl;
-        std::cout << " - m1 range : "
-                  << _dbm1[it.first].first_time() << " - "
-                  << _dbm1[it.first].last_time()
-                  << ", step : " << _dbm1[it.first].interval()
-                  << ", size : " << _dbm1[it.first].size() << std::endl;
-        std::cout << " - m8 range : "
-                  << _dbm8[it.first].first_time() << " - "
-                  << _dbm8[it.first].last_time()
-                  << ", step : " << _dbm8[it.first].interval()
-                  << ", size : " << _dbm8[it.first].size() << std::endl;
-        std::cout << " - 1h range : "
-                  << _db1h[it.first].first_time() << " - "
-                  << _db1h[it.first].last_time()
-                  << ", step : " << _db1h[it.first].interval()
-                  << ", size : " << _db1h[it.first].size() << std::endl;
+        Log::debug(it.first);
+        Log::debug(" - da range : {} - {}, step: {}, size: {}", _dbda[it.first].first_time(), _dbda[it.first].last_time(), _dbda[it.first].interval(), _dbda[it.first].size());
+        Log::debug(" - m1 range : {} - {}, step: {}, size: {}", _dbm1[it.first].first_time(), _dbm1[it.first].last_time(), _dbm1[it.first].interval(), _dbm1[it.first].size());
+        Log::debug(" - m8 range : {} - {}, step: {}, size: {}", _dbm8[it.first].first_time(), _dbm8[it.first].last_time(), _dbm8[it.first].interval(), _dbm8[it.first].size());
+        Log::debug(" - 1h range : {} - {}, step: {}, size: {}", _db1h[it.first].first_time(), _db1h[it.first].last_time(), _db1h[it.first].interval(), _db1h[it.first].size());
     }
 
     return;

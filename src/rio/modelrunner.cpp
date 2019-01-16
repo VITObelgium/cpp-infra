@@ -12,12 +12,12 @@ namespace rio {
 
 using namespace inf;
 
-void run_model(const config& cf, std::function<bool(int)> progressCb)
+modelruninfo run_model(const config& cf, std::function<bool(int)> progressCb)
 {
-    run_model(cf, modelcomponents(), progressCb);
+    return run_model(cf, modelcomponents(), progressCb);
 }
 
-void run_model(const config& cf, modelcomponents components, std::function<bool(int)> progressCb)
+modelruninfo run_model(const config& cf, modelcomponents components, std::function<bool(int)> progressCb)
 {
     // read network
     Log::info("[Network]");
@@ -77,8 +77,8 @@ void run_model(const config& cf, modelcomponents components, std::function<bool(
     values.resize(grid->size());
     uncert.resize(grid->size());
 
-    // some counters
-    unsigned int nmaps = 0;
+    // some run statistics
+    modelruninfo runInfo;
 
     // Start timeloop, internally the querying works with start times of the time interval
     // to which the value applies.
@@ -100,7 +100,7 @@ void run_model(const config& cf, modelcomponents components, std::function<bool(
         // TODO : build this into the mappers
         if (obs.size() >= 5) {
             model->run(values, uncert, curr_time, obs, grid);
-            nmaps++;
+            ++runInfo.mapsProcessed;
         } else {
             Log::warn("less than 5 observations, skipping");
             values.fill(-9999.);
@@ -128,5 +128,7 @@ void run_model(const config& cf, modelcomponents components, std::function<bool(
     // add calculate the averages, etc..
     // add streaming percentiles via: https://github.com/sengelha/streaming-percentiles-cpp
     // however --> for the high percentiles this might not be suitable... ??
+
+    return runInfo;
 }
 }

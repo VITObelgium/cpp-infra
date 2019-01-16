@@ -1,6 +1,5 @@
-#include <iostream>
-
 #include "h5writer.hpp"
+#include "infra/log.h"
 #include "parser.hpp"
 
 /*
@@ -437,7 +436,7 @@ void h5writer::writeField(H5::DataSet& ds, const data_type* vals)
 
 void h5writer::close(void)
 {
-    std::cout << "Closing hdf5 output in " << _h5FileName << "..." << std::endl;
+    Log::debug("Closing hdf5 output in {}", _h5FileName);
     _h5File->close();
 
     return;

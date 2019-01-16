@@ -1,6 +1,7 @@
 #include "network.hpp"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
+#include "infra/log.h"
 #include "infra/xmldocument.h"
 #include "parser.hpp"
 #include "strfun.hpp"
@@ -37,7 +38,7 @@ void network::_load_file(std::string stationfile)
 {
     _stations.clear();
 
-    std::cout << " Importing " << stationfile << std::endl;
+    Log::debug("Importing {}", stationfile);
 
     file::Handle fp(stationfile.c_str(), "r");
     if (!fp.is_open()) {
@@ -83,7 +84,7 @@ void network::_load_file(std::string stationfile)
     }
 
     // perform some checks on the stations etc..
-    std::cout << " Checking network for consistency...\n";
+    Log::debug("Checking network for consistency...");
     int nproxy = -1;
     for (auto& s : _stations) {
         if (nproxy == -1)

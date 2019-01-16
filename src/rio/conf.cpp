@@ -1,5 +1,6 @@
 #include "conf.hpp"
 #include "infra/exception.h"
+#include "infra/log.h"
 #include "infra/string.h"
 #include "parser.hpp"
 #include "strfun.hpp"
@@ -7,7 +8,6 @@
 
 #include <boost/program_options.hpp>
 
-#include <iostream>
 #include <stdexcept>
 
 namespace rio {
@@ -96,7 +96,7 @@ void config::_get_defaults(XmlNode el)
         throw RuntimeError("no defaults in setup xml file...");
     }
 
-    std::cout << "Reading defaults from setup file..." << std::endl;
+    Log::info("Reading defaults from setup file...");
     _base = el.child("base_path").optional_trimmed_value().value_or(".");
 
     if (_cnf.empty()) {
@@ -192,7 +192,7 @@ void config::_get_runconfig()
 void config::parse_setup_file(const std::string& setup_file)
 {
     // try to import the setup file
-    std::cout << "Using deployment in : " << setup_file << std::endl;
+    Log::info("Using deployment in: {}", setup_file);
     _dom = XmlDocument::load_from_file(setup_file);
     if (!_dom) {
         throw RuntimeError("unable to load/parse xml setupfile: {}", setup_file);

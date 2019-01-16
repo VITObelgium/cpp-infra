@@ -101,6 +101,9 @@
       </griddef>
     
    </handler>
+   <handler name="tiff" class="rasterwriter">
+      <location>%base%/output/%pol%_%ipol%_%grid%-%timestamp%.tif</location>
+   </handler>
   </output>
 
   <!-- here are the different configurations in this deployment -->

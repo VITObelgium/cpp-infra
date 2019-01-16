@@ -50,6 +50,7 @@ add_library(rio
     asciiwriter.hpp asciiwriter.cpp
     ircelwriter.hpp ircelwriter.cpp
     memorywriter.hpp memorywriter.cpp
+    rasterwriter.hpp rasterwriter.cpp
     apswriter.hpp apswriter.cpp
     h5writer.hpp h5writer.cpp
     jsonwriter.hpp jsonwriter.cpp
@@ -68,6 +69,7 @@ target_include_directories(rio PUBLIC
 
 target_link_libraries(rio
     infra
+    gdxcore
     Eigen3::Eigen
     Boost::boost
     Boost::date_time
