@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
         extras = []
         if args.ui_enabled:
-            extras.extend(["qt5[qml,tools,location,sql]", "gdal", "gsl"])
+            extras.append("qt5[qml,tools,location,sql]")
 
         if args.upgrade:
             vcpkg.upgrade(triplet=triplet)
