@@ -5,9 +5,9 @@
 #include <qclipboard.h>
 #include <qitemselectionmodel.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
-void itemSelectionToClipboard(const QItemSelectionModel* selectionModel)
+void itemSelectionToClipboard(const QItemSelectionModel* selectionModel, char doubleFormat, int precision)
 {
     if (!selectionModel) {
         return;
@@ -24,7 +24,14 @@ void itemSelectionToClipboard(const QItemSelectionModel* selectionModel)
 
     QString selected_text;
     for (auto& current : indexes) {
-        rows[current.row()].append(model->data(current).toString());
+        QVariant data = model->data(current);
+        if (data.type() == QVariant::Double) {
+            // make sure to convert to string in the system locale, otherwise tools like excel
+            // don't understand it
+            rows[current.row()].append(QLocale::system().toString(data.toDouble(), doubleFormat, precision));
+        } else {
+            rows[current.row()].append(data.toString());
+        }
     }
 
     QStringList rowStrings;
