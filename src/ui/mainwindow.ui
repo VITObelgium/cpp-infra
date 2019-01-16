@@ -30,7 +30,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="opaq::OpaqView" name="forecast">
        <attribute name="title">
@@ -72,16 +72,19 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionQuit">
+   <property name="icon">
+    <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
+     <normaloff>:/data/close.svg</normaloff>:/data/close.svg</iconset>
+   </property>
    <property name="text">
     <string>Quit</string>
    </property>
   </action>
-  <action name="actionDiagnostics">
-   <property name="text">
-    <string>Diagnostics</string>
-   </property>
-  </action>
   <action name="actionPreferences">
+   <property name="icon">
+    <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
+     <normaloff>:/data/tools.svg</normaloff>:/data/tools.svg</iconset>
+   </property>
    <property name="text">
     <string>Preferences</string>
    </property>
@@ -104,6 +107,8 @@
    <container>1</container>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc"/>
+ </resources>
  <connections/>
 </ui>

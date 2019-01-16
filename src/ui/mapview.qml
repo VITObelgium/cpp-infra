@@ -1,5 +1,5 @@
 import QtQuick 2.12
-import QtQuick.Controls 2.3
+import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.11
 import QtPositioning 5.5
 import QtLocation 5.6
@@ -157,11 +157,44 @@ Item {
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
+
             onPositionChanged : {
                 if (valueprovider) {
                     cursorInfoText.text = valueprovider.rasterValueString(map.toCoordinate(Qt.point(mouse.x, mouse.y)))
                     textInfoItem.visible = cursorInfoText.text.length > 0
                 }
+            }
+        }
+
+        MapItemView {
+            id: pointSources
+            objectName: "pointSources"
+            model: pointsourcemodel
+            delegate: MapQuickItem {
+                    
+                sourceItem: Rectangle {
+                    z: 1
+                    id: rectangle
+                    width: 14
+                    height: 14
+                    color: Color
+                    border.width: 2
+                    border.color: "white"
+                    smooth: true
+                    radius: 7
+
+                    ToolTip.text: "<b> " + Name + "</b> (" + Value + " µg/m³)"
+                    ToolTip.visible: tooltipArea.containsMouse
+
+                    MouseArea {
+                        id: tooltipArea
+                        hoverEnabled: true
+                        anchors.fill: parent
+                    }
+                }
+                
+                coordinate: QtPositioning.coordinate(Latitude, Longitude)
+                anchorPoint: Qt.point(sourceItem.width / 2, sourceItem.height / 2)
             }
         }
     }

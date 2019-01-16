@@ -35,7 +35,7 @@ public:
 
 signals:
     void computeProgress(int);
-    void computeSucceeded(RasterPtr);
+    void computeSucceeded(RasterPtr, PointSourcePtr);
     void computeFailed(QString message);
 
 private:
@@ -55,9 +55,10 @@ private:
     void updateAggregationModel(const std::vector<std::string_view>& aggregations);
     void updateGridModel(const std::vector<std::string_view>& grids);
 
+    void onGridChange(int index);
     void onConfigurationChange(const QString& configName);
     void onPollutantChange(const QString& configName);
-    void onComputeSucceeded(const RasterPtr& raster);
+    void onComputeSucceeded(const RasterPtr& raster, const PointSourcePtr& pointSources);
     void onComputeFailed(const QString& message);
 
     void compute();
@@ -76,5 +77,6 @@ private:
     Engine _engine;
     rio::config _config;
     std::unique_ptr<rio::obshandler> _dbq;
+    std::unordered_map<std::string, rio::griddefinition> _gridDefs;
 };
 }

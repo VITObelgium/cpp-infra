@@ -99,6 +99,7 @@ add_executable(opaqui
     opaqview.h opaqview.cpp
     opaqviewer.h opaqviewer.cpp
     opaqvalidation.h opaqvalidation.cpp
+    pointsourcemodel.h pointsourcemodel.cpp
     preferencesdialog.h preferencesdialog.cpp
     resultsview.h resultsview.cpp
     typeregistrations.h
@@ -148,6 +149,7 @@ if (STATIC_QT)
     find_package(OpenGL)
     find_package(JPEG)
     find_package(Freetype REQUIRED)
+    find_package(Qt5Svg REQUIRED)
     find_package(Qt5Location REQUIRED)
     
     find_qtdep(NAME Qt5PositioningQuick LIBNAME Qt5PositioningQuick)
@@ -183,6 +185,8 @@ if (STATIC_QT)
         QGeoServicesEsriPlugin
         QGeoServicesOsmPlugin
         QGeoServicesItemsOverlayPlugin
+        Qt5::Svg
+        Qt5::QSvgPlugin
         Qt5::QJpegPlugin
         JPEG::JPEG
         Freetype::Freetype

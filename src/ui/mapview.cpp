@@ -45,11 +45,9 @@ MapView::MapView(QWidget* parent)
             auto* object = _ui.mapWidget->rootObject();
             _qmlMap      = object->findChild<QObject*>(QStringLiteral("map"));
             _qmlRaster   = object->findChild<QObject*>(QStringLiteral("raster"));
-            _qmlLegend   = object->findChild<QObject*>(QStringLiteral("legend"));
 
             assert(_qmlMap);
             assert(_qmlRaster);
-            assert(_qmlLegend);
         } else if (status == QQuickWidget::Status::Error) {
             Log::error("Qml error");
             for (auto& error : _ui.mapWidget->errors()) {
@@ -63,10 +61,6 @@ MapView::MapView(QWidget* parent)
     connect(this, &MapView::rasterReadyForDisplay, this, &MapView::onRasterDisplay);
     connect(this, &MapView::rasterOperationFailed, this, &MapView::onRasterOperationFailed);
     connect(this, &MapView::legendUpdated, this, &MapView::onUpdateLegend);
-
-    if (_qmlLegend) {
-        _qmlLegend->setProperty("show", true);
-    }
 
     _valueProvider.setUnit(s_unit);
     _valueProvider.setPrecision(2);
@@ -92,6 +86,7 @@ void MapView::clearData()
     _legendModel.clear();
     _valueProvider.clearData();
     _dataStorage.clear();
+    _pointSourceModel.clear();
 }
 
 void MapView::setData(const RasterPtr& data)
@@ -101,10 +96,11 @@ void MapView::setData(const RasterPtr& data)
     JobRunner::queue([this, data]() {
         processRasterForDisplay(data);
     });
+}
 
-    if (_qmlMap && data->metadata().projection_epsg().has_value()) {
-        _qmlMap->setProperty("visibleRegion", QVariant::fromValue(rasterViewPort(data->metadata())));
-    }
+void MapView::setPointSourceData(std::vector<PointSourceModelData> data)
+{
+    _pointSourceModel.setModelData(std::move(data));
 }
 
 void MapView::setColorMap(std::string_view name)
@@ -124,10 +120,18 @@ void MapView::applyLegendSettings(const LegendSettings& settings)
     _legendSettings = settings;
 }
 
+void MapView::setVisibleRegion(const inf::GeoMetadata& meta)
+{
+    if (_qmlMap && meta.projection_epsg().has_value()) {
+        _qmlMap->setProperty("visibleRegion", QVariant::fromValue(rasterViewPort(meta)));
+    }
+}
+
 void MapView::setupQml()
 {
     _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("valueprovider"), &_valueProvider);
     _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("legendmodel"), &_legendModel);
+    _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("pointsourcemodel"), &_pointSourceModel);
 
     _ui.mapWidget->setSource(QUrl(QStringLiteral("qrc:/mapview.qml")));
     _ui.mapWidget->engine()->addImageProvider(QStringLiteral("opaq"), new AsyncImageProvider(_dataStorage));
@@ -245,6 +249,7 @@ void MapView::onRasterOperationFailed()
 
 void MapView::onUpdateLegend(Legend legend)
 {
+    _pointSourceModel.setLegend(legend);
     _legendModel.setLegend(std::move(legend));
 }
 
@@ -253,8 +258,10 @@ void MapView::applyColorMap()
     auto legend = create_numeric_legend(getDataSample<float>(*_warpedDataSource, 100000), _legendSettings.categories, _colorMap, LegendScaleType::Linear);
     generate_legend_names(legend, 2, s_unit);
 
-    auto displayData = createRasterDisplayData(_colorMap, _warpedDataSource);
-    auto id          = _dataStorage.putRasterData(displayData);
+    auto displayData   = createRasterDisplayData(_colorMap, _warpedDataSource);
+    displayData.legend = legend;
+
+    auto id = _dataStorage.putRasterData(displayData);
     _valueProvider.setData(_warpedDataSource);
 
     emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread

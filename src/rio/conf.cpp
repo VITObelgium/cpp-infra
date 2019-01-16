@@ -15,6 +15,30 @@ namespace rio {
 using namespace inf;
 namespace po = boost::program_options;
 
+static griddefinition parse_grid_definition(const inf::XmlNode& node)
+{
+    griddefinition def;
+
+    try {
+        def.name           = node.attribute("grid");
+        def.mapfilePattern = node.child("mapping").value();
+
+        def.metadata.cols     = node.attribute<int32_t>("nx").value();
+        def.metadata.rows     = node.attribute<int32_t>("ny").value();
+        def.metadata.cellSize = node.attribute<double>("dx").value();
+
+        def.metadata.xll = node.attribute<double>("xul").value();
+        def.metadata.yll = node.attribute<double>("yul").value() - (def.metadata.rows * def.metadata.cellSize);
+
+        def.metadata.set_projection_from_epsg(node.attribute<int32_t>("epsg").value());
+        def.metadata.nodata = node.attribute<double>("missing").value();
+    } catch (const std::bad_optional_access&) {
+        throw RuntimeError("Incomplete grid definition for grid: {}", def.name);
+    }
+
+    return def;
+}
+
 config::config()
 : _tmode(0)
 {
@@ -41,6 +65,18 @@ boost::posix_time::ptime config::_parse_datetime(std::string_view s)
 std::string_view config::desc(std::string_view config) const
 {
     return _get_config_node(config).child("description").value();
+}
+
+std::unordered_map<std::string, griddefinition> config::grid_definitions() const
+{
+    std::unordered_map<std::string, griddefinition> definitions;
+
+    for (auto& definitionNode : _domRoot.child("griddefs").children("griddef")) {
+        auto def = parse_grid_definition(definitionNode);
+        definitions.emplace(def.name, def);
+    }
+
+    return definitions;
 }
 
 std::vector<std::string_view> config::configurations() const

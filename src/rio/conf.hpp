@@ -1,5 +1,6 @@
 #pragma once
 
+#include "griddefinition.hpp"
 #include "infra/xmldocument.h"
 
 #include <memory>
@@ -146,6 +147,8 @@ public:
     {
         return _email;
     }
+
+    std::unordered_map<std::string, griddefinition> grid_definitions() const;
 
     std::string_view desc(std::string_view config) const;
     std::vector<std::string_view> configurations() const;

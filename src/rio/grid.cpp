@@ -12,8 +12,8 @@ namespace rio {
 
 using namespace inf;
 
-grid::grid(const std::string& name, const XmlNode& cnf)
-: _cellsize(0.)
+grid::grid(const std::string& name, const inf::XmlNode& cnf)
+: _cellsize(0.0)
 {
     if (!cnf) {
         throw std::runtime_error("Invalid TiXmlElement pointer in grid()...");
@@ -39,6 +39,16 @@ grid::grid(const std::string& name, const XmlNode& cnf)
     rio::parser::get()->process(gridfile);
 
     _load_file(gridfile);
+}
+
+const griddefinition& grid::definition() const
+{
+    return _definition;
+}
+
+void grid::set_definition(griddefinition def)
+{
+    _definition = std::move(def);
 }
 
 void grid::_load_file(std::string filename)

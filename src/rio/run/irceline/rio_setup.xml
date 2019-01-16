@@ -26,13 +26,27 @@
     <output>txt</output> <!-- can be comma separated list -->
   </defaults>
 
+  <griddefs>
+    <griddef grid="4x4" epsg="31370" missing="-9999" nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
+      <mapping>%base%/grids/rio_4x4_grid.map</mapping>
+    </griddef>
+    
+    <griddef grid="4x4e1" epsg="31370" missing="-9999" nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
+      <mapping>%base%/grids/rio_4x4e1_grid.map</mapping>
+    </griddef>
+    
+    <griddef grid="4x4e2" epsg="31370" missing="-9999" nx="73" ny="61" dx="4000." dy="4000." xul="14000." yul="256000.">
+      <mapping>%base%/grids/rio_4x4e2_grid.map</mapping>
+    </griddef>
+  </griddefs>
+
   <!-- here we define the available outputs -->
   <output>
     <!-- simple ascii text writer -->
     <handler name="txt" class="asciiwriter">
       <location>%base%/output/%pol%_%ipol%_%grid%-%timestamp%.txt</location>
       <field_separator>;</field_separator>
-      <precision>2</precision>        
+      <precision>2</precision>
     </handler>
 
     <!-- ircel output writer -->
@@ -49,12 +63,12 @@
     <handler name="json" class="jsonwriter">
       <location>%base%/output/%pol%_%ipol%_%grid%_%timestamp%.json</location>
     </handler>
-	
-	  <!-- IFDM writer -->
-	  <!-- Writes out a flat unformatted stream binary for FORTRAN import -->
+  
+    <!-- IFDM writer -->
+    <!-- Writes out a flat unformatted stream binary for FORTRAN import -->
     <handler name="ifdm" class="ifdmwriter">
-	    <!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
-	    <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
+      <!-- <location>%base%/output/%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>		-->
+      <location>rio_%pol%_%ipol%_%grid%-%start_time%-%end_time%.bin</location>
 
       <!-- Output timestamp convention, internally in RIO the timesteps are stored by an interval 
            in the output we always write the normal time convention, i.e. hours from 0 to 23 
@@ -70,23 +84,23 @@
            the output writer will set the timestamp_convention to -1 (n/a)
            -->
       <timestamp_convention>1</timestamp_convention>
-		
-		  <griddef grid="4x4" epsg="31370" missing="-9999"
-		         nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
-			  %base%/grids/rio_4x4_grid.map
-		  </griddef>
-		
-		  <griddef grid="4x4e1" epsg="31370" missing="-9999"
-		         nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
-			  %base%/grids/rio_4x4e1_grid.map
-		  </griddef>
-		
-		  <griddef grid="4x4e2" epsg="31370" missing="-9999"
-		         nx="73" ny="61" dx="4000." dy="4000." xul="14000." yul="256000.">
-			  %base%/grids/rio_4x4e2_grid.map
-		  </griddef>
-		
-	 </handler>
+    
+      <griddef grid="4x4" epsg="31370" missing="-9999"
+             nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
+        %base%/grids/rio_4x4_grid.map
+      </griddef>
+    
+      <griddef grid="4x4e1" epsg="31370" missing="-9999"
+             nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
+        %base%/grids/rio_4x4e1_grid.map
+      </griddef>
+    
+      <griddef grid="4x4e2" epsg="31370" missing="-9999"
+             nx="73" ny="61" dx="4000." dy="4000." xul="14000." yul="256000.">
+        %base%/grids/rio_4x4e2_grid.map
+      </griddef>
+    
+   </handler>
   </output>
 
   <!-- here are the different configurations in this deployment -->
@@ -101,7 +115,7 @@
     </observations>
 
     <!-- Note: the stations and grids tags here are generic, they can be
-	       overwritten inside the <mapper> model tags with specific versions -->
+         overwritten inside the <mapper> model tags with specific versions -->
     <stations>
       <filename>%base%/stations/%cnf%/%pol%_stations_%ipol%.txt</filename>
     </stations>
@@ -186,14 +200,14 @@
     </observations>
 
     <!-- Note: the stations and grids tags here are generic, they can be
-	       overwritten inside the <mapper> model tags with specific versions -->
+         overwritten inside the <mapper> model tags with specific versions -->
     <stations>
       <filename>%base%/stations/%cnf%/%pol%_stations_info_GIS_%ipol%.txt</filename>
     </stations>
     
     <grids>
       <grid name="awac" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_awac_%ipol%.txt</grid>
-	  <grid name="4x4"  cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>
+    <grid name="4x4"  cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>
       <grid name="1x1"  cellsize="1000.">%base%/grids/%cnf%/%pol%_grid_1x1_%ipol%.txt</grid>      
     </grids>
     
@@ -243,13 +257,13 @@
     </observations>
 
     <!-- Note: the stations and grids tags here are generic, they can be
-	       overwritten inside the <mapper> model tags with specific versions -->
+         overwritten inside the <mapper> model tags with specific versions -->
     <stations>
       <filename>%base%/stations/%cnf%/%pol%_stations_info_GIS_%ipol%.txt</filename>
     </stations>
     
     <grids>
-	  <grid name="awac" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_awac_%ipol%.txt</grid>
+    <grid name="awac" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_awac_%ipol%.txt</grid>
       <grid name="4x4" cellsize="4000.">%base%/grids/%cnf%/%pol%_grid_4x4_%ipol%.txt</grid>
       <grid name="1x1" cellsize="1000.">%base%/grids/%cnf%/%pol%_grid_1x1_%ipol%.txt</grid>      
     </grids>

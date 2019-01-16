@@ -5,6 +5,7 @@
 #include "Station.h"
 #include "data/ForecastBuffer.h"
 #include "gridmapper.hpp"
+#include "infra/algo.h"
 #include "infra/cast.h"
 #include "infra/log.h"
 #include "infra/string.h"
@@ -28,7 +29,7 @@ namespace opaq {
 using namespace inf;
 using namespace std::string_literals;
 
-static const int32_t s_maxRecentPaths                            = 5;
+static const int32_t s_maxRecentPaths = 5;
 
 MappingView::MappingView(QWidget* parent)
 : QWidget(parent)
@@ -50,6 +51,7 @@ MappingView::MappingView(QWidget* parent)
         _ui.map->setColorMap(_ui.colorMapCombo->currentText().toStdString());
     });
 
+    connect(_ui.gridCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::onGridChange);
     connect(_ui.gridCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
     connect(_ui.aggregationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
     connect(_ui.interpolationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
@@ -83,6 +85,7 @@ MappingView::MappingView(QWidget* parent)
     }
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
+    qRegisterMetaType<PointSourcePtr>("PointSourcePtr");
     qRegisterMetaType<RasterDataId>("RasterDataId");
     qRegisterMetaType<Legend>("inf::Legend");
 }
@@ -130,6 +133,7 @@ void MappingView::loadConfiguration(const QString& path)
         QDir::setCurrent(fileInfo.absoluteDir().path());
 
         _config.parse_setup_file(path.toStdString());
+        _gridDefs = _config.grid_definitions();
         updateRecentConfigurations(path);
         updateConfigurationsModel(_config.configurations());
     } catch (const std::exception& e) {
@@ -178,6 +182,14 @@ void MappingView::updateRecentpathsList(const QString& settingsName, const QStri
     settings.setValue(settingsName, recentFilePaths);
 }
 
+void MappingView::onGridChange(int index)
+{
+    auto* gridDef = inf::find_in_map(_gridDefs, _ui.gridCombo->itemText(index).toStdString());
+    if (gridDef != nullptr) {
+        _ui.map->setVisibleRegion(gridDef->metadata);
+    }
+}
+
 void MappingView::onConfigurationChange(const QString& configName)
 {
     try {
@@ -192,6 +204,9 @@ void MappingView::onConfigurationChange(const QString& configName)
         auto pollutant = _ui.pollutantCombo->currentText().toStdString();
         updateInterpolationModel(_config.ipol_names(configString, pollutant));
         updateAggregationModel(_config.aggr_names(configString, pollutant));
+
+        // make sure the map zooms to the current grid region
+        onGridChange(_ui.gridCombo->currentIndex());
 
         compute();
     } catch (const std::exception& e) {
@@ -210,9 +225,10 @@ void MappingView::onPollutantChange(const QString& name)
     }
 }
 
-void MappingView::onComputeSucceeded(const RasterPtr& raster)
+void MappingView::onComputeSucceeded(const RasterPtr& raster, const PointSourcePtr& pointSources)
 {
     _ui.map->setData(raster);
+    _ui.map->setPointSourceData(*pointSources);
     setInteractionEnabled(true);
 }
 
@@ -291,19 +307,6 @@ void MappingView::updateGridModel(const std::vector<std::string_view>& grids)
     _ui.gridCombo->setCurrentIndex(0);
 }
 
-static inf::GeoMetadata create_metadata(double xul, double yul, double cellSize, int32_t rows, int32_t cols, int32_t epsg, std::optional<double> nodata)
-{
-    inf::GeoMetadata meta;
-    meta.xll      = xul;
-    meta.yll      = yul - (rows * cellSize);
-    meta.cellSize = cellSize;
-    meta.rows     = rows;
-    meta.cols     = cols;
-    meta.nodata   = nodata;
-    meta.set_projection_from_epsg(epsg);
-    return meta;
-}
-
 void MappingView::compute()
 {
     std::string configName     = _ui.nameCombo->currentText().toStdString();
@@ -314,12 +317,6 @@ void MappingView::compute()
     std::string startDate      = _ui.startDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
     std::string forecastData   = _ui.forecastPathCombo->currentText().toStdString();
     std::string endDate;
-
-    static std::unordered_map<std::string, rio::griddefinition> s_definitionLookup{{
-        {"4x4"s, {create_metadata(22000, 248000, 4000, 57, 69, 31370, -9999), "%base%/grids/rio_4x4_grid.map"}},
-        {"4x4e1"s, {create_metadata(18000, 252000, 4000, 59, 71, 31370, -9999), "%base%/grids/rio_4x4e1_grid.map"}},
-        {"4x4e2"s, {create_metadata(14000, 256000, 4000, 61, 73, 31370, -9999), "%base%/grids/rio_4x4e2_grid.map"}},
-    }};
 
     setInteractionEnabled(false);
 
@@ -334,7 +331,7 @@ void MappingView::compute()
                 startDate,
                 endDate);
 
-            if (s_definitionLookup.count(grid) == 0) {
+            if (_gridDefs.count(grid) == 0) {
                 throw RuntimeError("No grid definition available for {} grid", grid);
             }
 
@@ -342,7 +339,7 @@ void MappingView::compute()
                 throw RuntimeError("No valid forecast data loaded");
             }
 
-            rio::output output(std::make_unique<rio::memorywriter>(s_definitionLookup.at(grid)));
+            rio::output output(std::make_unique<rio::memorywriter>(_gridDefs.at(grid)));
             rio::modelcomponents rioComponents;
             rioComponents.obsHandler    = _dbq.get();
             rioComponents.outputHandler = &output;
@@ -352,7 +349,30 @@ void MappingView::compute()
             RasterDisplayData displayData;
             auto memWriter = dynamic_cast<rio::memorywriter*>(output.list().front().get());
             auto raster    = std::make_shared<gdx::DenseRaster<double>>(memWriter->metadata(), memWriter->data());
-            emit computeSucceeded(raster);
+
+            auto& obs = memWriter->observations();
+
+            auto pointSourceData = std::make_shared<std::vector<PointSourceModelData>>();
+            pointSourceData->reserve(obs.size());
+
+            gdal::CoordinateTransformer _transformer(memWriter->metadata().projection_epsg().value(), 4326);
+
+            auto& stations = rioComponents.obsHandler->network()->st_list();
+            for (auto& station : stations) {
+                auto iter = obs.find(station.name());
+                if (iter != obs.end()) {
+                    auto coord = _transformer.transform(inf::Point(station.x(), station.y()));
+
+                    PointSourceModelData ps;
+                    ps.name      = QString::fromStdString(station.name());
+                    ps.latitude  = coord.y;
+                    ps.longitude = coord.x;
+                    ps.value     = iter->second;
+                    pointSourceData->emplace_back(std::move(ps));
+                }
+            }
+
+            emit computeSucceeded(raster, pointSourceData);
         } catch (const std::exception& e) {
             emit computeFailed(QString::fromStdString(e.what()));
         }
@@ -361,17 +381,6 @@ void MappingView::compute()
 
 void MappingView::setInteractionEnabled(bool enabled)
 {
-    /*_ui.configPathCombo->setEnabled(enabled);
-    _ui.browseConfigButton->setEnabled(enabled);
-    _ui.browseForecastButton->setEnabled(enabled);
-    _ui.nameCombo->setEnabled(enabled);
-    _ui.pollutantCombo->setEnabled(enabled);
-    _ui.gridCombo->setEnabled(enabled);
-    _ui.interpolationCombo->setEnabled(enabled);
-    _ui.aggregationCombo->setEnabled(enabled);
-    _ui.colorMapCombo->setEnabled(enabled);
-    _ui.invertColorMapCheck->setEnabled(enabled);*/
-
     // use readonly instead of enabled, otherwise focus jumps to next date section
     _ui.startDate->setReadOnly(!enabled);
 }

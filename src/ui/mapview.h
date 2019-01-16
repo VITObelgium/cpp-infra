@@ -5,6 +5,7 @@
 #include "infra/legend.h"
 #include "infra/point.h"
 #include "legendsettings.h"
+#include "pointsourcemodel.h"
 #include "typeregistrations.h"
 #include "ui_mapview.h"
 #include "uiinfra/legendmodel.h"
@@ -27,8 +28,10 @@ public:
     MapView(QWidget* parent = nullptr);
     void clearData();
     void setData(const RasterPtr& data);
+    void setPointSourceData(std::vector<PointSourceModelData> data);
     void setColorMap(std::string_view name);
     void applyLegendSettings(const LegendSettings& settings);
+    void setVisibleRegion(const inf::GeoMetadata& meta);
 
 private:
 signals:
@@ -49,7 +52,6 @@ private:
     Ui::MapView _ui;
     QObject* _qmlMap    = nullptr;
     QObject* _qmlRaster = nullptr;
-    QObject* _qmlLegend = nullptr;
 
     inf::ui::RasterValueProvider<gdx::DenseRaster<double>> _valueProvider;
     inf::ui::LegendModel _legendModel;
@@ -60,5 +62,6 @@ private:
 
     std::string _colorMap;
     LegendSettings _legendSettings;
+    PointSourceModel _pointSourceModel;
 };
 }

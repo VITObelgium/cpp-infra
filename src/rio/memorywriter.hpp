@@ -28,11 +28,13 @@ public:
 
     const inf::GeoMetadata& metadata() const;
     const std::vector<double>& data() const;
+    const std::unordered_map<std::string, double>& observations() const;
 
 private:
     std::shared_ptr<rio::network> _net;
     std::shared_ptr<rio::grid> _grid;
     std::unordered_map<int64_t, inf::Cell> _gridMapping;
+    std::unordered_map<std::string, double> _obs;
 
     inf::GeoMetadata _gridMeta;
     std::string _gridMapPattern;

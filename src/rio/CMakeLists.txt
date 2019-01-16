@@ -31,6 +31,7 @@ add_library(rio
     obshandler.hpp obshandler.cpp
     dbqfile.hpp dbqfile.cpp
     timeseries.hpp timeseries.cpp
+    griddefinition.hpp
     gridmapper.hpp gridmapper.cpp
     mapper.hpp mapper.cpp
     idw_ipol.hpp idw_ipol.cpp
@@ -80,7 +81,9 @@ target_link_libraries(rio
 
 add_executable(rioapp rio.cpp)
 target_link_libraries(rioapp PRIVATE rio)
-set_target_properties(rioapp PROPERTIES OUTPUT_NAME "rio")
+if (MSVC)
+    set_target_properties(rioapp PROPERTIES OUTPUT_NAME "riocli")
+endif()
 
 install(TARGETS rioapp
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

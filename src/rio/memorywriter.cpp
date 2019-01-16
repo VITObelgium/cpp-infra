@@ -29,7 +29,7 @@ void memorywriter::init(const rio::config& /*cnf*/,
 }
 
 void memorywriter::write(const boost::posix_time::ptime& /*curr_time*/,
-    const std::unordered_map<std::string, double>& /*obs*/,
+    const std::unordered_map<std::string, double>& obs,
     const Eigen::VectorXd& values,
     const Eigen::VectorXd& /*uncert*/)
 {
@@ -48,6 +48,8 @@ void memorywriter::write(const boost::posix_time::ptime& /*curr_time*/,
         assert(gridIndex <= _output.size());
         _output[gridIndex] = values[valueIndex];
     }
+
+    _obs = obs;
 }
 
 void memorywriter::close()
@@ -62,6 +64,11 @@ const inf::GeoMetadata& memorywriter::metadata() const
 const std::vector<double>& memorywriter::data() const
 {
     return _output;
+}
+
+const std::unordered_map<std::string, double>& memorywriter::observations() const
+{
+    return _obs;
 }
 
 }

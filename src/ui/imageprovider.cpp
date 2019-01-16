@@ -21,19 +21,30 @@ static QImage createRasterImage(const RasterDisplayData& data, QSize* size)
         return QImage();
     }
 
-    //auto maxValue = iter->upperBound;
-    //auto maxColor = iter->color;
+    auto iter = std::max_element(data.legend.entries.begin(), data.legend.entries.end(), [](auto& lhs, auto& rhs) {
+        return lhs.upperBound < rhs.upperBound;
+    });
 
-    auto cmap     = ColorMap::create(data.colorMap);
-    auto maxValue = gdx::maximum(*data.raster);
+    auto maxValue = iter->upperBound;
+    auto maxColor = iter->color;
 
     auto rgbaData = std::make_unique<std::vector<Color>>(data.raster->size());
     std::transform(optional_value_begin(*data.raster), optional_value_end(*data.raster), rgbaData->begin(), [&](const auto& value) {
-        if (value.is_nodata()) {
+        if (value.is_nodata() || (data.legend.zeroIsNodata && *value == 0)) {
             return Color{0, 0, 0, 0};
         }
 
-        return cmap.get_color(truncate<float>(*value / maxValue));
+        for (auto& entry : data.legend.entries) {
+            if (*value >= entry.lowerBound && *value < entry.upperBound) {
+                return entry.color;
+            }
+        }
+
+        if (*value >= maxValue) {
+            return maxColor;
+        }
+
+        return Color{0, 0, 0, 0};
     });
 
     auto width  = data.raster->cols();

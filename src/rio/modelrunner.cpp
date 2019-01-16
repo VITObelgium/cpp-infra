@@ -1,4 +1,5 @@
 #include "modelrunner.hpp"
+#include "griddefinition.hpp"
 #include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/log.h"
@@ -23,10 +24,17 @@ void run_model(const config& cf, modelcomponents components, std::function<bool(
     auto net = std::make_shared<rio::network>(cf.stationConfig());
     Log::debug("{}", *net);
 
+    auto gridName = cf.grid();
+
     // read grid
     Log::info("[Mapping grid]");
-    auto grid = std::make_shared<rio::grid>(cf.grid(), cf.gridConfig());
+    auto grid = std::make_shared<rio::grid>(gridName, cf.gridConfig());
     Log::debug("{}", *grid);
+
+    const auto gridDefs = cf.grid_definitions();
+    if (gridDefs.count(gridName) > 0) {
+        grid->set_definition(gridDefs.at(gridName));
+    }
 
     std::unique_ptr<rio::obshandler> obs;
     if (components.obsHandler == nullptr) {

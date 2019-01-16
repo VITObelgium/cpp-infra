@@ -32,10 +32,10 @@ void MainWindow::setupDockWidgets()
     _diagnoseDockWidget->setWidget(logView);
     addDockWidget(Qt::BottomDockWidgetArea, _diagnoseDockWidget);
     _diagnoseDockWidget->hide();
+    _diagnoseDockWidget->toggleViewAction()->setIcon(QIcon(QStringLiteral(":/data/bug.svg")));
     _diagnoseDockWidget->toggleViewAction()->setChecked(false);
-
-    _ui.menuView->addAction(_diagnoseDockWidget->toggleViewAction());
     _diagnoseDockWidget->toggleViewAction()->setShortcut(Qt::CTRL + Qt::Key_D);
+    _ui.menuView->addAction(_diagnoseDockWidget->toggleViewAction());
 }
 
 void MainWindow::showPreferences()

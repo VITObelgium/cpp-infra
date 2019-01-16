@@ -12,6 +12,7 @@
 #include <qmessagebox.h>
 
 #ifdef STATIC_QT
+Q_IMPORT_PLUGIN(QSvgPlugin);
 Q_IMPORT_PLUGIN(QJpegPlugin);
 Q_IMPORT_PLUGIN(GeoServiceProviderFactoryEsri);
 Q_IMPORT_PLUGIN(QGeoServiceProviderFactoryOsm);

@@ -6,6 +6,7 @@ namespace rio {
 class config;
 class output;
 class obshandler;
+class network;
 
 struct modelcomponents
 {

@@ -11,12 +11,6 @@
 
 namespace rio {
 
-struct griddefinition
-{
-    inf::GeoMetadata metadata;
-    std::string mapfilePattern;
-};
-
 std::unordered_map<int64_t, inf::Cell> read_mapping_file(const fs::path& path);
 
 }
