@@ -16,14 +16,14 @@ public:
 
     void init(const rio::config& cnf,
         const std::shared_ptr<rio::network> net,
-        const std::shared_ptr<rio::grid> grid);
+        const std::shared_ptr<rio::grid> grid) override;
 
     void write(const boost::posix_time::ptime& curr_time,
         const std::unordered_map<std::string, double>& obs,
         const Eigen::VectorXd& values,
         const Eigen::VectorXd& uncert) override;
 
-    void close(void);
+    void close(void) override;
 
 private:
     std::shared_ptr<rio::network> _net;

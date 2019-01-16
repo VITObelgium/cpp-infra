@@ -23,7 +23,7 @@ public:
         const Eigen::VectorXd& values,
         const Eigen::VectorXd& uncert) override;
 
-    void close(void);
+    void close() override;
 
 private:
     void write_buffers(const std::string& fname);

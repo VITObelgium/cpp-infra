@@ -138,7 +138,7 @@ void h5writer::_createDataSets(const rio::config& cnf)
         _yrDS = _tmGrp.createDataSet("year", H5::PredType::NATIVE_INT, _tm_dspace, cparms_time);
         _mnDS = _tmGrp.createDataSet("month", H5::PredType::NATIVE_INT, _tm_dspace, cparms_time);
         _dyDS = _tmGrp.createDataSet("day", H5::PredType::NATIVE_INT, _tm_dspace, cparms_time);
-        _hrDS;
+
         if (!cnf.aggr().compare("1h"))
             _hrDS = _tmGrp.createDataSet("hour", H5::PredType::NATIVE_INT, _tm_dspace, cparms_time);
     } catch (const H5::Exception& err) {

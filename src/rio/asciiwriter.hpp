@@ -19,7 +19,7 @@ public:
         const Eigen::VectorXd& values,
         const Eigen::VectorXd& uncert) override;
 
-    void close(void);
+    void close() override;
 
 private:
     std::string _pattern; //! output filename pattern
