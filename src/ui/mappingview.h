@@ -43,6 +43,7 @@ private:
     void showForecastFileSelector();
 
     void loadConfiguration(const QString& path);
+    void loadForecastData(const std::string& path);
     void loadRecentConfigurations();
     void loadRecentForecasts();
     void updateRecentConfigurations(const QString& filePath);

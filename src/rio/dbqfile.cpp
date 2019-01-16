@@ -5,6 +5,7 @@
 #include "infra/xmldocument.h"
 #include "strfun.hpp"
 
+#include <algorithm>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time.hpp>
 #include <boost/iostreams/device/mapped_file.hpp>
@@ -238,6 +239,58 @@ std::unordered_map<std::string, double> dbqfile::get(boost::posix_time::ptime ts
     }
 
     return data;
+}
+
+boost::posix_time::ptime dbqfile::first_time() const
+{
+    boost::posix_time::ptime first;
+    for (const auto& [name, ts] : _dbda) {
+        (void)name;
+        first = std::min(ts.first_time(), first);
+    }
+
+    for (const auto& [name, ts] : _dbm1) {
+        (void)name;
+        first = std::min(ts.first_time(), first);
+    }
+
+    for (const auto& [name, ts] : _dbm8) {
+        (void)name;
+        first = std::min(ts.first_time(), first);
+    }
+
+    for (const auto& [name, ts] : _db1h) {
+        (void)name;
+        first = std::min(ts.first_time(), first);
+    }
+
+    return first;
+}
+
+boost::posix_time::ptime dbqfile::last_time() const
+{
+    boost::posix_time::ptime last = from_time_t(0);
+    for (const auto& [name, ts] : _dbda) {
+        (void)name;
+        last = std::max(ts.last_time(), last);
+    }
+
+    for (const auto& [name, ts] : _dbm1) {
+        (void)name;
+        last = std::max(ts.last_time(), last);
+    }
+
+    for (const auto& [name, ts] : _dbm8) {
+        (void)name;
+        last = std::max(ts.last_time(), last);
+    }
+
+    for (const auto& [name, ts] : _db1h) {
+        (void)name;
+        last = std::max(ts.last_time(), last);
+    }
+
+    return last;
 }
 
 void dbqfile::write_summary()

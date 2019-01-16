@@ -78,11 +78,7 @@ MappingView::MappingView(QWidget* parent)
     }
 
     if (!_ui.forecastPathCombo->currentText().isEmpty()) {
-        try {
-            _dbq = std::make_unique<rio::dbqfile>(_ui.forecastPathCombo->currentText().toStdString(), "RIO"s);
-        } catch (const std::exception& e) {
-            Log::error("Failed to load forecast data: {}", e.what());
-        }
+        loadForecastData(_ui.forecastPathCombo->currentText().toStdString());
     }
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
@@ -117,12 +113,12 @@ void MappingView::showForecastFileSelector()
         return;
     }
 
-    try {
-        _dbq = std::make_unique<rio::dbqfile>(filename.toStdString(), "RIO"s);
+    loadForecastData(filename.toStdString());
+    if (_dbq) {
         updateRecentForecasts(filename);
         _ui.forecastPathCombo->setCurrentIndex(0);
-    } catch (const std::exception& e) {
-        ui::displayError(tr("Failed to load forecast data"), e.what());
+    } else {
+        ui::displayError(tr("Error"), tr("Failed to load forecast data"));
     }
 }
 
@@ -139,6 +135,22 @@ void MappingView::loadConfiguration(const QString& path)
         updateConfigurationsModel(_config.configurations());
     } catch (const std::exception& e) {
         ui::displayError(tr("Failed to load config file"), e.what());
+    }
+}
+
+void MappingView::loadForecastData(const std::string& path)
+{
+    try {
+        _dbq       = std::make_unique<rio::dbqfile>(path, "RIO"s);
+        auto first = _dbq->first_time().date();
+        auto last  = _dbq->last_time().date();
+        Log::info("{} - {}", first, last);
+
+        _ui.startDate->setMinimumDate(QDate(first.year(), first.month(), first.day()));
+        _ui.startDate->setMaximumDate(QDate(last.year(), last.month(), last.day()));
+    } catch (const std::exception& e) {
+        _dbq.reset();
+        Log::error("Failed to load forecast data: {}", e.what());
     }
 }
 

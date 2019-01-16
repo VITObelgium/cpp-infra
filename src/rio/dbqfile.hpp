@@ -20,6 +20,8 @@ public:
     // retrieve the data from the file
     // exclude missing stations
     std::unordered_map<std::string, double> get(boost::posix_time::ptime tstart, std::string pol, std::string agg) override;
+    boost::posix_time::ptime first_time() const override;
+    boost::posix_time::ptime last_time() const override;
 
 private:
     std::unordered_map<std::string, rio::timeseries> _db1h;
@@ -34,7 +36,7 @@ private:
     // implementation using mmap en zero copy approach (roughly 6x to 8x speedup :-)
     void load_riofile_faster(const std::string& filename);
 
-    void write_summary(void);
+    void write_summary();
 };
 
 }
