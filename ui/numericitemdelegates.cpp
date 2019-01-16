@@ -45,7 +45,7 @@ FloatingPointItemDelegate::FloatingPointItemDelegate(char format, int decimals, 
 
 QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& /*locale*/) const
 {
-    return QLocale().toString(value.toDouble(), _format, _decimals);
+    return QLocale::system().toString(value.toDouble(), _format, _decimals);
 }
 
 void FloatingPointItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
