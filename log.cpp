@@ -67,7 +67,7 @@ void Log::initialize(const std::string& name)
     }
 
     _log = std::make_shared<spdlog::logger>(name, begin(_sinks), end(_sinks));
-    _log->set_pattern("[%l] %v");
+    _log->set_pattern("%^[%l] %v%$");
     _log->set_level(spdlog::level::warn);
 }
 
