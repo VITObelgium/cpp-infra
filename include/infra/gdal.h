@@ -74,6 +74,41 @@ enum class VectorType
     Unknown
 };
 
+/*! Wrapper around the OGRSpatialReference class
+ * Needed as the OGRSpatialReference destructor is deprecated
+ * so it is very easy to misuse the OGRSpatialReference API
+ */
+class SpatialReference
+{
+public:
+    SpatialReference();
+    SpatialReference(int32_t epsg);
+    ~SpatialReference() noexcept;
+
+    SpatialReference clone() const;
+    SpatialReference clone_geo_cs() const;
+
+    void import_from_epsg(int32_t epsg);
+    void import_from_wkt(const char* wkt);
+
+    std::string export_to_pretty_wkt() const;
+    std::string export_to_pretty_wkt_simplified() const;
+
+    int32_t epsg_geog_cs() const;
+    std::string_view authority_code(const char* key) const;
+
+    void set_proj_cs(const char* projCs);
+    void set_well_known_geog_cs(const char* geogCs);
+    void set_utm(int zone, bool north = true);
+
+    OGRSpatialReference* get() noexcept;
+
+private:
+    SpatialReference(OGRSpatialReference* instance);
+
+    std::unique_ptr<OGRSpatialReference> _srs;
+};
+
 class CoordinateTransformer
 {
 public:
@@ -85,8 +120,8 @@ public:
     OGRCoordinateTransformation* get();
 
 private:
-    OGRSpatialReference _sourceSRS;
-    OGRSpatialReference _targetSRS;
+    SpatialReference _sourceSRS;
+    SpatialReference _targetSRS;
     std::unique_ptr<OGRCoordinateTransformation> _transformer;
 };
 
