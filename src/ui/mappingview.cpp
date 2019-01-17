@@ -5,7 +5,6 @@
 #include "Station.h"
 #include "data/ForecastBuffer.h"
 #include "gridmapper.hpp"
-#include "imageprovider.h"
 #include "infra/algo.h"
 #include "infra/cast.h"
 #include "infra/log.h"
@@ -13,6 +12,7 @@
 #include "jobrunner.h"
 #include "memorywriter.hpp"
 #include "modelrunner.hpp"
+#include "rasterdisplaydata.h"
 #include "typeregistrations.h"
 #include "uiinfra/userinteraction.h"
 
