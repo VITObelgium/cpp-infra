@@ -27,19 +27,19 @@
   </defaults>
 
   <griddefs>
-    <griddef grid="4x4" epsg="31370" missing="-9999" nx="69" ny="57" dx="4000." dy="4000." xul="22000." yul="248000.">
+    <griddef grid="4x4" epsg="31370" missing="-9999" nx="69" ny="57" cellsize="4000." xul="22000." yul="248000.">
       <mapping>%base%/grids/rio_4x4_grid.map</mapping>
     </griddef>
     
-    <griddef grid="4x4e1" epsg="31370" missing="-9999" nx="71" ny="59" dx="4000." dy="4000." xul="18000." yul="252000.">
+    <griddef grid="4x4e1" epsg="31370" missing="-9999" nx="71" ny="59" cellsize="4000." xul="18000." yul="252000.">
       <mapping>%base%/grids/rio_4x4e1_grid.map</mapping>
     </griddef>
     
-    <griddef grid="4x4e2" epsg="31370" missing="-9999" nx="73" ny="61" dx="4000." dy="4000." xul="14000." yul="256000.">
+    <griddef grid="4x4e2" epsg="31370" missing="-9999" nx="73" ny="61" cellsize="4000." xul="14000." yul="256000.">
       <mapping>%base%/grids/rio_4x4e2_grid.map</mapping>
     </griddef>
 
-    <griddef grid="1x1" epsg="31370" missing="-9999" nx="274" ny="224" dx="1000." dy="1000." xul="22000." yul="245000.">
+    <griddef grid="1x1" epsg="31370" missing="-9999" nx="274" ny="224" cellsize="1000." xul="22000." yul="245000.">
       <mapping>%base%/grids/rio_1x1_grid.map</mapping>
     </griddef>
   </griddefs>

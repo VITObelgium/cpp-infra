@@ -25,7 +25,7 @@ static griddefinition parse_grid_definition(const inf::XmlNode& node)
 
         def.metadata.cols     = node.attribute<int32_t>("nx").value();
         def.metadata.rows     = node.attribute<int32_t>("ny").value();
-        def.metadata.cellSize = node.attribute<double>("dx").value();
+        def.metadata.cellSize = node.attribute<double>("cellsize").value();
 
         def.metadata.xll = node.attribute<double>("xul").value();
         def.metadata.yll = node.attribute<double>("yul").value() - (def.metadata.rows * def.metadata.cellSize);
