@@ -1,0 +1,4 @@
+Source: sqlpp11-connector-postgresql
+Version: 0.54-1
+Description: PostgreSQL connector for sqlpp11 library
+Build-Depends: sqlpp11,libpq,boost

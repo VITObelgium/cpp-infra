@@ -1,0 +1,16 @@
+diff -Naur a/capi/CMakeLists.txt b/capi/CMakeLists.txt
+--- a/capi/CMakeLists.txt	2018-09-11 06:44:45.000000000 +0200
++++ b/capi/CMakeLists.txt	2018-10-24 14:25:48.730596100 +0200
+@@ -39,10 +39,10 @@
+       SOVERSION ${CAPI_SOVERSION}
+       CLEAN_DIRECT_OUTPUT 1)
+   endif()
+-
++  
++  add_dependencies(geos_c geos_revision)
+ endif()
+ 
+-add_dependencies(geos_c geos_revision)
+ 
+ #################################################################################
+ # Installation

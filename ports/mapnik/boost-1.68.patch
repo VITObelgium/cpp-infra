@@ -1,0 +1,73 @@
+From c067eb7eec32fdd6d1c3d0e90b13a889459f2756 Mon Sep 17 00:00:00 2001
+From: Tomek Dubrownik <t.dubrownik@gmail.com>
+Date: Sat, 29 Sep 2018 13:43:44 +0800
+Subject: [PATCH] Compatibility patch for Boost GIL v1.68
+
+A number of basic typedef were removed in the Boost GIL 1.68 release,
+notably `bits32` and `bits32f`. Additionally the
+`GIL_DEFINE_ALL_TYPEDEFS` macro signature changed.
+
+This commit introduces compatibility type aliases and conditionally
+calls the new macro if `BOOST_VERSION` is high enough.
+---
+ deps/boost/gil/extension/toolbox/hsl.hpp | 6 +++++-
+ deps/boost/gil/extension/toolbox/hsv.hpp | 8 +++++++-
+ include/mapnik/image_filter.hpp          | 8 ++++++++
+ 3 files changed, 20 insertions(+), 2 deletions(-)
+
+diff --git a/deps/boost/gil/extension/toolbox/hsl.hpp b/deps/boost/gil/extension/toolbox/hsl.hpp
+index b1b9c1bf55..6ad73a1fc4 100644
+--- a/deps/boost/gil/extension/toolbox/hsl.hpp
++++ b/deps/boost/gil/extension/toolbox/hsl.hpp
+@@ -43,8 +43,12 @@ typedef mpl::vector3< hsl_color_space::hue_t
+ /// \ingroup LayoutModel
+ typedef layout<hsl_t> hsl_layout_t;
+ 
+-
++#if BOOST_VERSION >= 106800
++using bits32f = boost::gil::float32_t;
++GIL_DEFINE_ALL_TYPEDEFS( 32f, float32_t, hsl );
++#else
+ GIL_DEFINE_ALL_TYPEDEFS( 32f, hsl );
++#endif
+ 
+ /// \ingroup ColorConvert
+ /// \brief RGB to HSL
+diff --git a/deps/boost/gil/extension/toolbox/hsv.hpp b/deps/boost/gil/extension/toolbox/hsv.hpp
+index dc6e14e24d..e0fbc688d3 100644
+--- a/deps/boost/gil/extension/toolbox/hsv.hpp
++++ b/deps/boost/gil/extension/toolbox/hsv.hpp
+@@ -44,7 +44,13 @@ typedef mpl::vector3< hsv_color_space::hue_t
+ typedef layout<hsv_t> hsv_layout_t;
+ 
+ 
+-GIL_DEFINE_ALL_TYPEDEFS( 32f, hsv )
++#if BOOST_VERSION >= 106800
++using bits32 = uint32_t;
++using bits32f = float32_t;
++GIL_DEFINE_ALL_TYPEDEFS( 32f, float32_t, hsv )
++#else
++GIL_DEFINE_ALL_TYPEDEFS( 32f, hsv );
++#endif
+ 
+ /// \ingroup ColorConvert
+ /// \brief RGB to HSV
+diff --git a/include/mapnik/image_filter.hpp b/include/mapnik/image_filter.hpp
+index 87250e3f86..0a626cd091 100644
+--- a/include/mapnik/image_filter.hpp
++++ b/include/mapnik/image_filter.hpp
+@@ -47,6 +47,14 @@
+ // stl
+ #include <cmath>
+ 
++#if BOOST_VERSION >= 106800
++namespace boost {
++namespace gil {
++    using bits32f = boost::gil::float32_t;
++}
++}
++#endif
++
+ // 8-bit YUV
+ //Y = ( (  66 * R + 129 * G +  25 * B + 128) >> 8) +  16
+ //U = ( ( -38 * R -  74 * G + 112 * B + 128) >> 8) + 128

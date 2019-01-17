@@ -1,0 +1,17 @@
+Source: qt5
+Version: 5.12.0-1
+Description: Complete software development framework
+Build-Depends: zlib, freetype, harfbuzz, libjpeg-turbo, libpng, pcre2
+
+Feature: qml
+Description: qml support
+
+Feature: location
+Description: location support
+
+Feature: sql
+Description: sql support
+Build-Depends: sqlite3
+
+Feature: tools
+Description: build the tools (qtlinguist, ...)

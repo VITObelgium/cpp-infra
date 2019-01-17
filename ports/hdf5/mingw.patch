@@ -1,0 +1,28 @@
+diff -Naur a/src/H5win32defs.h b/src/H5win32defs.h
+--- a/src/H5win32defs.h	2018-09-04 04:54:44.000000000 +0200
++++ b/src/H5win32defs.h	2018-11-13 15:15:29.817658132 +0100
+@@ -54,7 +54,11 @@
+  * Also note that the variadic macro is using a VC++ extension
+  * where the comma is dropped if nothing is passed to the ellipsis.
+  */
++#ifndef H5_HAVE_MINGW
+ #define HDopen(S,F,...)       _open(S, F | _O_BINARY, __VA_ARGS__)
++#else
++#define HDopen(S,F,...)       _open(S, F | _O_BINARY, ##__VA_ARGS__)
++#endif
+ #define HDread(F,M,Z)       _read(F,M,Z)
+ #define HDrmdir(S)          _rmdir(S)
+ #define HDsetvbuf(F,S,M,Z)  setvbuf(F,S,M,(Z>1?Z:2))
+@@ -82,10 +86,12 @@
+  */
+ #define HDmemset(X,C,Z)     memset((void*)(X),C,Z)
+ 
++#ifndef H5_HAVE_MINGW
+ struct timezone {
+     int tz_minuteswest;
+     int tz_dsttime;
+ };
++#endif
+ 
+ /* time.h before VS2015 does not include timespec */
+ #if (_MSC_VER < 1900)

@@ -1,0 +1,12 @@
+diff -Naur a/qtbase/src/corelib/configure.json b/qtbase/src/corelib/configure.json
+--- a/qtbase/src/corelib/configure.json	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/src/corelib/configure.json	2019-01-03 15:02:56.455117900 +0100
+@@ -170,6 +170,8 @@
+             },
+             "sources": [
+                 { "type": "pkgConfig", "args": "libpcre2-16" },
++                { "libs": "-lpcre2-16", "condition": "config.msvc" },
++                { "libs": "-lpcre2-16d" },
+                 "-lpcre2-16"
+             ]
+         },
