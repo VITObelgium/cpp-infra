@@ -173,6 +173,7 @@ endif ()
 
 if (INFRA_XML)
     find_package(pugixml CONFIG REQUIRED)
+    set_target_properties(pugixml PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
     target_sources(infra PRIVATE xmldocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
