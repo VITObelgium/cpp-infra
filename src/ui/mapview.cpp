@@ -222,13 +222,13 @@ static QImage createRasterImage(const RasterDisplayData& data)
         dataPtr);
 }
 
-void MapView::onRasterDisplay(const RasterDisplayData& displayData)
+void MapView::onRasterDisplay(const RasterDisplayData& displayData, QPixmap pixmap)
 {
     if (_qmlRaster && _qmlRasterImage) {
         _qmlRaster->setProperty("visible", true);
         _qmlRaster->setProperty("coordinate", QVariant::fromValue(displayData.coordinate));
         _qmlRaster->setProperty("zoomLevel", displayData.zoomLevel);
-        _qmlRasterImage->setImage(QPixmap::fromImage(createRasterImage(displayData)));
+        _qmlRasterImage->setImage(pixmap);
     } else {
         Log::warn("Raster display failed. Qml error");
     }
@@ -268,7 +268,7 @@ void MapView::applyColorMap()
 
         _valueProvider.setData(_warpedDataSource);
         emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
-        emit rasterReadyForDisplay(displayData);
+        emit rasterReadyForDisplay(displayData, QPixmap::fromImage(createRasterImage(displayData)));
     } else {
         auto legend = create_numeric_legend(_legendSettings.minValue.value_or(0.0), _legendSettings.maxValue.value_or(100), _legendSettings.categories, _colorMap, LegendScaleType::Linear);
         generate_legend_names(legend, 2, s_unit);

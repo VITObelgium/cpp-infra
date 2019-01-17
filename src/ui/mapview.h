@@ -40,7 +40,7 @@ public:
 
 private:
 signals:
-    void rasterReadyForDisplay(const RasterDisplayData& displayData);
+    void rasterReadyForDisplay(const RasterDisplayData& displayData, QPixmap image);
     void rasterOperationFailed();
     void legendUpdated(inf::Legend legend);
 
@@ -48,7 +48,7 @@ private:
     void setupQml();
 
     void processRasterForDisplay(const RasterPtr& raster);
-    void onRasterDisplay(const RasterDisplayData& displayData);
+    void onRasterDisplay(const RasterDisplayData& displayData, QPixmap image);
     void onRasterOperationFailed();
     void onUpdateLegend(inf::Legend legend);
 
