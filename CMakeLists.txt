@@ -36,6 +36,7 @@ option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
+option(INFRA_INSTALL_DEVELOPMENT_FILES "Install the infra development files (headers/libs)" ON)
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
 
@@ -173,6 +174,7 @@ endif ()
 
 if (INFRA_XML)
     find_package(pugixml CONFIG REQUIRED)
+    set_target_properties(pugixml PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
     target_sources(infra PRIVATE xmldocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
@@ -247,17 +249,19 @@ set_target_properties(infra PROPERTIES
 
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
 
-install(TARGETS infra EXPORT infra-targets
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
-)
+if (INFRA_INSTALL_DEVELOPMENT_FILES)
+    install(TARGETS infra EXPORT infra-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
+    )
 
-install(EXPORT infra-targets
-    FILE InfraTargets.cmake
-    NAMESPACE Infra::
-    DESTINATION ${INSTALL_CONFIGDIR}
-)
+    install(EXPORT infra-targets
+        FILE InfraTargets.cmake
+        NAMESPACE Infra::
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
+endif ()
 
 if (INFRA_IS_TOPLEVEL)
     write_basic_package_version_file("InfraConfigVersion.cmake"
@@ -270,11 +274,13 @@ if (INFRA_IS_TOPLEVEL)
         INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
     )
 
-    install(FILES
-        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
-        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
-        DESTINATION ${INSTALL_CONFIGDIR}
-    )
+    if (INFRA_INSTALL_DEVELOPMENT_FILES)
+        install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
+            DESTINATION ${INSTALL_CONFIGDIR}
+        )
+    endif ()
 endif ()
 
 if (INFRA_UI_COMPONENTS)
