@@ -30,7 +30,7 @@ OpaqViewer::OpaqViewer(QWidget* parent)
 
     _ui.basetimeDateEdit->setDate(QDate::currentDate());
 
-    connect(_ui.stationComboBox, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), [this](int) {
+    connect(_ui.stationComboBox, QOverload<int>::of(&QComboBox::currentIndexChanged), [this](int) {
         updateResultsForCurrentStation();
     });
 

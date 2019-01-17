@@ -80,9 +80,15 @@ void PointSourceModel::setLegend(const Legend& legend)
 
 void PointSourceModel::setModelData(std::vector<PointSourceModelData> data)
 {
-    beginResetModel();
-    _data = std::move(data);
-    endResetModel();
+    if (data.size() != _data.size()) {
+        // TODO: investigate: this causes memory leak inside the qml engine
+        beginResetModel();
+        _data = std::move(data);
+        endResetModel();
+    } else {
+        _data = std::move(data);
+        emit dataChanged(index(0, 0), index(rowCount() - 1, 0));
+    }
 }
 
 void PointSourceModel::clear()
@@ -94,6 +100,10 @@ void PointSourceModel::clear()
 
 QColor PointSourceModel::colorValue(float value) const
 {
+    if (std::isnan(value)) {
+        return QColor(0, 0, 0);
+    }
+
     for (auto& entry : _legend.entries) {
         if (value >= entry.lowerBound && value < entry.upperBound) {
             return uiinfra::toQColor(entry.color);

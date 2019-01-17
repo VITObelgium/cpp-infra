@@ -168,59 +168,6 @@ static RasterDisplayData createRasterDisplayData(const std::string& colorMap, co
     return data;
 }
 
-template <typename TResult, typename TRaster>
-std::vector<TResult> getDataSample(const gdx::DenseRaster<TRaster>& raster, size_t numSamples)
-{
-    std::vector<TResult> values;
-    values.reserve(numSamples);
-
-    // return numSamples random samples from the raster where we don't take in account the nodata values.
-
-    // (1) find minimum and maximum cell values and insert them into values and usedCells;
-    auto [minCell, maxCell] = gdx::minmax_cell(raster);
-
-    values.push_back(truncate<TResult>(raster[minCell]));
-    values.push_back(truncate<TResult>(raster[maxCell]));
-
-    // (2) loop n-2 times and insert a random cell (if not already present);
-    gdx::Cell currentCell(0, 0);
-    gdx::Cell finalCell(raster.rows(), 0);
-    const auto datasize = raster.size();
-
-    size_t sampleCount = 2; // we already added two elements.
-    srand((unsigned)time(nullptr));
-    const size_t size = datasize - 2; // for min and max, which are already selected
-    size_t itemsRead(0);
-
-    while (sampleCount != numSamples) {
-        while (currentCell != finalCell && (raster.is_nodata(currentCell) || currentCell == minCell || currentCell == maxCell)) {
-            increment_cell(currentCell, raster.cols());
-        }
-
-        if (currentCell == finalCell) {
-            break;
-        }
-
-        // (1) draw random number U
-        const double U        = ((double)rand() / (double)RAND_MAX);
-        const double treshold = (double)(numSamples - sampleCount) / ((double)(size - itemsRead));
-        if (U < treshold) {
-            // get this cell into the sample
-            values.push_back(truncate<TResult>(raster[currentCell]));
-            ++sampleCount;
-        }
-
-        increment_cell(currentCell, raster.cols());
-        ++itemsRead;
-
-        if (currentCell == finalCell) {
-            break;
-        }
-    }
-
-    return values;
-}
-
 void MapView::processRasterForDisplay(const RasterPtr& raster)
 {
     try {
@@ -303,16 +250,30 @@ void MapView::onUpdateLegend(Legend legend)
 
 void MapView::applyColorMap()
 {
-    auto legend = create_numeric_legend(getDataSample<float>(*_warpedDataSource, 100000), _legendSettings.categories, _colorMap, LegendScaleType::Linear);
-    generate_legend_names(legend, 2, s_unit);
+    if (_warpedDataSource) {
+        double rasterMin = 0, rasterMax = 100;
 
-    auto displayData   = createRasterDisplayData(_colorMap, _warpedDataSource);
-    displayData.legend = legend;
+        if (!_legendSettings.minValue.has_value() || !_legendSettings.maxValue.has_value()) {
+            std::tie(rasterMin, rasterMax) = gdx::minmax(*_warpedDataSource);
+        }
 
-    _valueProvider.setData(_warpedDataSource);
+        auto legendMin = _legendSettings.minValue.value_or(rasterMin);
+        auto legendMax = _legendSettings.maxValue.value_or(rasterMax);
 
-    emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
-    emit rasterReadyForDisplay(displayData);
+        auto legend = create_numeric_legend(legendMin, legendMax, _legendSettings.categories, _colorMap, LegendScaleType::Linear);
+        generate_legend_names(legend, 2, s_unit);
+
+        auto displayData   = createRasterDisplayData(_colorMap, _warpedDataSource);
+        displayData.legend = legend;
+
+        _valueProvider.setData(_warpedDataSource);
+        emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
+        emit rasterReadyForDisplay(displayData);
+    } else {
+        auto legend = create_numeric_legend(_legendSettings.minValue.value_or(0.0), _legendSettings.maxValue.value_or(100), _legendSettings.categories, _colorMap, LegendScaleType::Linear);
+        generate_legend_names(legend, 2, s_unit);
+        emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
+    }
 }
 
 }

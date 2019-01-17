@@ -170,7 +170,6 @@ Item {
             objectName: "pointSources"
             model: pointsourcemodel
             delegate: MapQuickItem {
-                    
                 sourceItem: Rectangle {
                     z: 1
                     id: rectangle
@@ -182,7 +181,7 @@ Item {
                     smooth: true
                     radius: 7
 
-                    ToolTip.text: "<b> " + Name + "</b> (" + Value + " µg/m³)"
+                    ToolTip.text: "<b> " + Name + "</b> (" + (isNaN(Value) ? "No Measurement)" : Value + " µg/m³)")
                     ToolTip.visible: tooltipArea.containsMouse
 
                     MouseArea {

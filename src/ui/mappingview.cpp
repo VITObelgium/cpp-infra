@@ -385,17 +385,21 @@ void MappingView::compute()
 
             auto& stations = rioComponents.obsHandler->network()->st_list();
             for (auto& station : stations) {
+                auto coord = _transformer.transform(inf::Point(station.x(), station.y()));
+
+                PointSourceModelData ps;
+                ps.name      = QString::fromStdString(station.name());
+                ps.latitude  = coord.y;
+                ps.longitude = coord.x;
+
                 auto iter = obs.find(station.name());
                 if (iter != obs.end()) {
-                    auto coord = _transformer.transform(inf::Point(station.x(), station.y()));
-
-                    PointSourceModelData ps;
-                    ps.name      = QString::fromStdString(station.name());
-                    ps.latitude  = coord.y;
-                    ps.longitude = coord.x;
-                    ps.value     = iter->second;
-                    pointSourceData->emplace_back(std::move(ps));
+                    ps.value = iter->second;
+                } else {
+                    ps.value = std::numeric_limits<double>::quiet_NaN();
                 }
+
+                pointSourceData->emplace_back(std::move(ps));
             }
 
             emit computeSucceeded(raster, pointSourceData);
