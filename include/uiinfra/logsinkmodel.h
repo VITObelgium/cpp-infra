@@ -15,6 +15,8 @@ public:
     LogSinkModel(QObject* parent = nullptr);
 
 protected:
+    void set_formatter_(std::unique_ptr<spdlog::formatter> sink_formatter) override;
+
     void sink_it_(const spdlog::details::log_msg& msg) override;
     void flush_() override;
 

@@ -3,11 +3,10 @@
 #include <qlistview.h>
 #include <qpainter.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 ColoredRectangleDelegate::ColoredRectangleDelegate(QObject* parent)
 : QStyledItemDelegate(parent)
-
 {
 }
 

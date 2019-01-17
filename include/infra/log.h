@@ -55,7 +55,8 @@ public:
     static void add_console_sink(Colored option);
     static void add_custom_sink(const spdlog::sink_ptr& sink);
 
-    static void setLevel(Level level);
+    static void set_level(Level level);
+    static void set_pattern(std::string_view pattern);
 
     template <class... T>
     static void debug(const char* format, const T&... arg)
