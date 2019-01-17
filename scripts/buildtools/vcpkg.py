@@ -46,6 +46,8 @@ def cmake_configure(source_dir, build_dir, cmake_args, triplet=None, toolchain=N
         args.append(generator)
     elif sysconfig.get_platform() == "win-amd64":
         args.append("Visual Studio 15 2017 Win64")
+    elif sysconfig.get_platform() == "win32":
+        args.append("Visual Studio 15 2017")
     else:
         args.append("Ninja")
         # do not append build type for msvc builds, otherwise debug libraries are not found (multi-config build)
