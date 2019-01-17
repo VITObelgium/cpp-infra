@@ -3,6 +3,7 @@
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/gdallog.h"
+#include "infra/string.h"
 
 #ifdef EMBED_GDAL_DATA
 #include "embedgdaldata.h"
@@ -103,17 +104,111 @@ Unsigned signedToUnsigned(Signed value, const char* valueDesc)
 
 } // namespace
 
-CoordinateTransformer::CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg)
+SpatialReference::SpatialReference()
+: _srs(std::make_unique<OGRSpatialReference>())
 {
-    _sourceSRS.importFromEPSG(sourceEpsg);
-    _targetSRS.importFromEPSG(destEpsg);
+}
 
-    auto* transformation = OGRCreateCoordinateTransformation(&_sourceSRS, &_targetSRS);
-    if (!transformation) {
-        throw RuntimeError("Failed to create transformation from EPSG:{} to EPSG:{}", sourceEpsg, destEpsg);
+SpatialReference::SpatialReference(int32_t epsg)
+: SpatialReference()
+{
+    import_from_epsg(epsg);
+}
+
+SpatialReference::SpatialReference(OGRSpatialReference* instance)
+: _srs(instance)
+{
+}
+
+SpatialReference::~SpatialReference() noexcept
+{
+    // don't simply let the unique_ptr call the destructor, it is deprecated
+    OGRSpatialReference::DestroySpatialReference(_srs.release());
+}
+
+SpatialReference SpatialReference::clone() const
+{
+    return SpatialReference(_srs->Clone());
+}
+
+SpatialReference SpatialReference::clone_geo_cs() const
+{
+    return SpatialReference(_srs->CloneGeogCS());
+}
+
+void SpatialReference::import_from_epsg(int32_t epsg)
+{
+    checkError(_srs->importFromEPSG(epsg), "Failed to import spatial reference from epsg");
+}
+
+void SpatialReference::import_from_wkt(const char* wkt)
+{
+    checkError(_srs->importFromWkt(wkt), "Failed to import spatial reference from WKT");
+}
+
+std::string SpatialReference::export_to_pretty_wkt() const
+{
+    CplPointer<char> friendlyWkt;
+    checkError(_srs->exportToPrettyWkt(friendlyWkt.ptrAddress(), FALSE), "Failed to export projection to pretty WKT");
+    return std::string(friendlyWkt);
+}
+
+std::string SpatialReference::export_to_pretty_wkt_simplified() const
+{
+    CplPointer<char> friendlyWkt;
+    checkError(_srs->exportToPrettyWkt(friendlyWkt.ptrAddress(), TRUE), "Failed to export projection to simplified pretty WKT");
+    return std::string(friendlyWkt);
+}
+
+int32_t SpatialReference::epsg_geog_cs() const
+{
+    auto epsg = _srs->GetEPSGGeogCS();
+    if (epsg == -1) {
+        throw RuntimeError("Geo coordinate system could not be determined");
     }
 
-    _transformer.reset(transformation);
+    return epsg;
+}
+
+std::string_view SpatialReference::authority_code(const char* key) const
+{
+    auto* code = _srs->GetAuthorityCode(key);
+    if (code == nullptr) {
+        throw RuntimeError("Could not get authority code for '{}'", key);
+    }
+
+    return std::string_view(code);
+}
+
+void SpatialReference::set_proj_cs(const char* projCs)
+{
+    _srs->SetProjCS(projCs);
+}
+
+void SpatialReference::set_well_known_geog_cs(const char* geogCs)
+{
+    _srs->SetWellKnownGeogCS(geogCs);
+}
+
+void SpatialReference::set_utm(int zone, bool north)
+{
+    _srs->SetUTM(zone, north ? TRUE : FALSE);
+}
+
+OGRSpatialReference* SpatialReference::get() noexcept
+{
+    return _srs.get();
+}
+
+CoordinateTransformer::CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg)
+{
+    _sourceSRS.import_from_epsg(sourceEpsg);
+    _targetSRS.import_from_epsg(destEpsg);
+
+    _transformer.reset(OGRCreateCoordinateTransformation(_sourceSRS.get(), _targetSRS.get()));
+    if (!_transformer) {
+        throw RuntimeError("Failed to create transformation from EPSG:{} to EPSG:{}", sourceEpsg, destEpsg);
+    }
 }
 
 Point<double> CoordinateTransformer::transform(const Point<double>& point) const
@@ -146,14 +241,13 @@ Point<double> convert_point_projected(int32_t sourceEpsg, int32_t destEpsg, Poin
 
 Point<double> projected_to_geographic(int32_t epsg, Point<double> point)
 {
-    OGRSpatialReference utm, *poLatLong;
-    utm.importFromEPSG(epsg);
-    utm.SetProjCS("UTM 17 / WGS84");
-    utm.SetWellKnownGeogCS("WGS84");
-    utm.SetUTM(17);
+    SpatialReference utm(epsg);
+    utm.set_proj_cs("UTM 17 / WGS84");
+    utm.set_well_known_geog_cs("WGS84");
+    utm.set_utm(17);
 
-    poLatLong  = utm.CloneGeogCS();
-    auto trans = checkPointer(OGRCreateCoordinateTransformation(&utm, poLatLong),
+    auto poLatLong = utm.clone_geo_cs();
+    auto trans     = checkPointer(OGRCreateCoordinateTransformation(utm.get(), poLatLong.get()),
         "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
@@ -165,30 +259,23 @@ Point<double> projected_to_geographic(int32_t epsg, Point<double> point)
 
 std::string projection_to_friendly_name(const std::string& projection)
 {
-    OGRSpatialReference spatialRef;
-    checkError(spatialRef.importFromWkt(projection.c_str()), "Failed to import projection WKT");
-    CplPointer<char> friendlyWkt;
-    checkError(spatialRef.exportToPrettyWkt(friendlyWkt.ptrAddress(), TRUE), "Failed to export projection to pretty WKT");
-
-    return std::string(friendlyWkt);
+    SpatialReference spatialRef;
+    spatialRef.import_from_wkt(projection.c_str());
+    return spatialRef.export_to_pretty_wkt_simplified();
 }
 
 std::string projection_from_epsg(int32_t epsg)
 {
-    OGRSpatialReference spatialRef;
-    checkError(spatialRef.importFromEPSG(epsg), fmt::format("Failed to create projection from epsg:{}", epsg));
-
-    CplPointer<char> friendlyWkt;
-    spatialRef.exportToWkt(friendlyWkt.ptrAddress());
-    return std::string(friendlyWkt);
+    SpatialReference spatialRef(epsg);
+    return spatialRef.export_to_pretty_wkt();
 }
 
 int32_t projection_to_geo_epsg(const std::string& projection)
 {
-    OGRSpatialReference spatialRef;
-    checkError(spatialRef.importFromWkt(projection.c_str()), "Failed to import projection WKT");
+    SpatialReference spatialRef;
+    spatialRef.import_from_wkt(projection.c_str());
 
-    auto epsg = spatialRef.GetEPSGGeogCS();
+    auto epsg = spatialRef.epsg_geog_cs();
     if (epsg < 0) {
         throw RuntimeError("Failed to determine epsg from projection");
     }
@@ -198,11 +285,15 @@ int32_t projection_to_geo_epsg(const std::string& projection)
 
 int32_t projection_to_epsg(const std::string& projection)
 {
-    OGRSpatialReference spatialRef;
-    checkError(spatialRef.importFromWkt(projection.c_str()), "Failed to import projection WKT");
+    SpatialReference spatialRef;
+    spatialRef.import_from_wkt(projection.c_str());
 
-    std::string epsgCode;
-    return std::atoi(checkPointer(spatialRef.GetAuthorityCode("PROJCS"), "Failed to get projection authority code"));
+    auto code  = spatialRef.authority_code("PROJCS");
+    auto value = str::to_int32(code);
+    if (!value.has_value()) {
+        throw RuntimeError("Failed to convert authority code to integer: {}", code);
+    }
+    return *value;
 }
 
 Registration::Registration()
@@ -906,4 +997,5 @@ MemoryFile::~MemoryFile()
 {
     VSIFCloseL(_ptr);
 }
+
 }
