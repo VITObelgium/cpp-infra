@@ -81,8 +81,6 @@ target_include_directories(opaqcore INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(opaqcore
 PUBLIC
     infra
-    fmt::fmt
-    spdlog::spdlog
     Boost::disable_autolinking
 PRIVATE
     Boost::system

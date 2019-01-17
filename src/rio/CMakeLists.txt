@@ -6,8 +6,8 @@ find_package(Boost REQUIRED COMPONENTS date_time system filesystem program_optio
 
 find_package(Eigen3 REQUIRED)
 find_package(hdf5 CONFIG REQUIRED)
+set_target_properties(hdf5::hdf5_cpp-static PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 find_package(ZLIB REQUIRED)
-find_package(fmt CONFIG REQUIRED)
 
 get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
 foreach(dir ${dirs})
@@ -78,7 +78,6 @@ target_link_libraries(rio
     Boost::system
     hdf5::hdf5_cpp-static
     ZLIB::ZLIB
-    fmt::fmt
 )
 
 add_executable(rioapp rio.cpp)

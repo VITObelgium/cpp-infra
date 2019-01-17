@@ -2,6 +2,8 @@ find_package(hdf5 CONFIG REQUIRED)
 find_package(Sqlpp11 REQUIRED)
 find_package(ZLIB REQUIRED)
 
+set_target_properties(hdf5::hdf5_cpp-static PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+
 add_library(opaqplugins
     PluginFactory.h
     PluginFactory.cpp
