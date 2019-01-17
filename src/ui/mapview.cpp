@@ -1,10 +1,13 @@
 #include "mapview.h"
 
+#include "gdx/algo/algorithm.h"
+#include "gdx/algo/maximum.h"
 #include "gdx/algo/minimum.h"
 #include "gdx/denserasterio.h"
-#include "imageprovider.h"
 #include "infra/log.h"
 #include "jobrunner.h"
+#include "rasterdisplaydata.h"
+#include "uiinfra/pixmapimage.h"
 
 #include <cassert>
 #include <cmath>
@@ -16,6 +19,7 @@
 #include <qqmlcontext.h>
 #include <qqmlengine.h>
 #include <qquickitem.h>
+#include <qquickpainteditem.h>
 #include <qquickstyle.h>
 #include <qwidgetaction.h>
 
@@ -42,12 +46,14 @@ MapView::MapView(QWidget* parent)
         if (status == QQuickWidget::Status::Ready) {
             Log::debug("Qml status ready: {}", QMetaEnum::fromType<QQuickWidget::Status>().valueToKey(status));
 
-            auto* object = _ui.mapWidget->rootObject();
-            _qmlMap      = object->findChild<QObject*>(QStringLiteral("map"));
-            _qmlRaster   = object->findChild<QObject*>(QStringLiteral("raster"));
+            auto* object    = _ui.mapWidget->rootObject();
+            _qmlMap         = object->findChild<QObject*>(QStringLiteral("map"));
+            _qmlRaster      = object->findChild<QObject*>(QStringLiteral("raster"));
+            _qmlRasterImage = object->findChild<ui::PixmapImage*>(QStringLiteral("rasterimage"));
 
             assert(_qmlMap);
             assert(_qmlRaster);
+            assert(_qmlRasterImage);
         } else if (status == QQuickWidget::Status::Error) {
             Log::error("Qml error");
             for (auto& error : _ui.mapWidget->errors()) {
@@ -85,7 +91,6 @@ void MapView::clearData()
 
     _legendModel.clear();
     _valueProvider.clearData();
-    _dataStorage.clear();
     _pointSourceModel.clear();
 }
 
@@ -129,12 +134,13 @@ void MapView::setVisibleRegion(const inf::GeoMetadata& meta)
 
 void MapView::setupQml()
 {
+    qmlRegisterType<ui::PixmapImage>("inf.ui.location", 1, 0, "PixmapImage");
+
     _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("valueprovider"), &_valueProvider);
     _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("legendmodel"), &_legendModel);
     _ui.mapWidget->rootContext()->setContextProperty(QStringLiteral("pointsourcemodel"), &_pointSourceModel);
 
     _ui.mapWidget->setSource(QUrl(QStringLiteral("qrc:/mapview.qml")));
-    _ui.mapWidget->engine()->addImageProvider(QStringLiteral("opaq"), new AsyncImageProvider(_dataStorage));
 }
 
 // Calculate the zoom level where one pixel is equal to the cellsize at latitude 0.0
@@ -226,14 +232,56 @@ void MapView::processRasterForDisplay(const RasterPtr& raster)
     }
 }
 
-void MapView::onRasterDisplay(RasterDataId id, const QGeoCoordinate& coordinate, double zoomLevel)
+static QImage createRasterImage(const RasterDisplayData& data)
 {
-    auto imageId = QStringLiteral("image://opaq/%1").arg(id.value());
-    if (_qmlRaster) {
-        _qmlRaster->setProperty("source", imageId);
+    if (!data.raster) {
+        return QImage();
+    }
+
+    auto iter = std::max_element(data.legend.entries.begin(), data.legend.entries.end(), [](auto& lhs, auto& rhs) {
+        return lhs.upperBound < rhs.upperBound;
+    });
+
+    auto maxValue = iter->upperBound;
+    auto maxColor = iter->color;
+
+    auto rgbaData = std::make_unique<std::vector<Color>>(data.raster->size());
+    std::transform(optional_value_begin(*data.raster), optional_value_end(*data.raster), rgbaData->begin(), [&](const auto& value) {
+        if (value.is_nodata() || (data.legend.zeroIsNodata && *value == 0)) {
+            return Color{0, 0, 0, 0};
+        }
+
+        for (auto& entry : data.legend.entries) {
+            if (*value >= entry.lowerBound && *value < entry.upperBound) {
+                return entry.color;
+            }
+        }
+
+        if (*value >= maxValue) {
+            return maxColor;
+        }
+
+        return Color{0, 0, 0, 0};
+    });
+
+    auto width  = data.raster->cols();
+    auto height = data.raster->rows();
+
+    auto dataPtr = rgbaData.release();
+    return QImage(
+        reinterpret_cast<uint8_t*>(dataPtr->data()), width, height, QImage::Format_RGBA8888, [](void* data) {
+            delete reinterpret_cast<std::vector<Color>*>(data);
+        },
+        dataPtr);
+}
+
+void MapView::onRasterDisplay(const RasterDisplayData& displayData)
+{
+    if (_qmlRaster && _qmlRasterImage) {
         _qmlRaster->setProperty("visible", true);
-        _qmlRaster->setProperty("coordinate", QVariant::fromValue(coordinate));
-        _qmlRaster->setProperty("zoomLevel", zoomLevel);
+        _qmlRaster->setProperty("coordinate", QVariant::fromValue(displayData.coordinate));
+        _qmlRaster->setProperty("zoomLevel", displayData.zoomLevel);
+        _qmlRasterImage->setImage(QPixmap::fromImage(createRasterImage(displayData)));
     } else {
         Log::warn("Raster display failed. Qml error");
     }
@@ -261,11 +309,10 @@ void MapView::applyColorMap()
     auto displayData   = createRasterDisplayData(_colorMap, _warpedDataSource);
     displayData.legend = legend;
 
-    auto id = _dataStorage.putRasterData(displayData);
     _valueProvider.setData(_warpedDataSource);
 
     emit legendUpdated(std::move(legend)); // decouple: models used in qml cannot be reset outside the ui thread
-    emit rasterReadyForDisplay(id, displayData.coordinate, displayData.zoomLevel);
+    emit rasterReadyForDisplay(displayData);
 }
 
 }

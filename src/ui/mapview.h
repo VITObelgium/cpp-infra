@@ -1,6 +1,5 @@
 #pragma once
 
-#include "imageprovider.h"
 #include "infra/gdal.h"
 #include "infra/legend.h"
 #include "infra/point.h"
@@ -18,7 +17,13 @@
 QT_FORWARD_DECLARE_CLASS(QWidgetAction)
 QT_FORWARD_DECLARE_CLASS(QAbstractListModel)
 
+namespace inf::ui {
+class PixmapImage;
+}
+
 namespace opaq {
+
+struct RasterDisplayData;
 
 class MapView : public QWidget
 {
@@ -35,7 +40,7 @@ public:
 
 private:
 signals:
-    void rasterReadyForDisplay(RasterDataId id, const QGeoCoordinate& coord, double zoomLevel);
+    void rasterReadyForDisplay(const RasterDisplayData& displayData);
     void rasterOperationFailed();
     void legendUpdated(inf::Legend legend);
 
@@ -43,20 +48,19 @@ private:
     void setupQml();
 
     void processRasterForDisplay(const RasterPtr& raster);
-    void onRasterDisplay(RasterDataId raster, const QGeoCoordinate& coord, double zoomLevel);
+    void onRasterDisplay(const RasterDisplayData& displayData);
     void onRasterOperationFailed();
     void onUpdateLegend(inf::Legend legend);
 
     void applyColorMap();
 
     Ui::MapView _ui;
-    QObject* _qmlMap    = nullptr;
-    QObject* _qmlRaster = nullptr;
+    QObject* _qmlMap                      = nullptr;
+    QObject* _qmlRaster                   = nullptr;
+    inf::ui::PixmapImage* _qmlRasterImage = nullptr;
 
     inf::ui::RasterValueProvider<gdx::DenseRaster<double>> _valueProvider;
     inf::ui::LegendModel _legendModel;
-
-    ImageProviderRasterDataStorage _dataStorage;
 
     RasterPtr _warpedDataSource;
 

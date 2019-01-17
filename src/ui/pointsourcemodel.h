@@ -49,6 +49,7 @@ private:
     std::vector<PointSourceModelData> _data;
     inf::Legend _legend;
     float _maxValue = 0.f;
+    QColor _minColor;
     QColor _maxColor;
 };
 }

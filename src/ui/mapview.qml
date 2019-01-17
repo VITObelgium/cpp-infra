@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.11
 import QtPositioning 5.5
 import QtLocation 5.6
 
+import inf.ui.location 1.0
+
 import "qrc:/qmlcontrols"
 
 Item {
@@ -139,16 +141,13 @@ Item {
         plugin: Plugin { name: "itemsoverlay" }
 
         MapQuickItem {
-            property alias source: rasterimage.source
-
             id: raster
             opacity: opacitySlider.value
-            visible: false
             objectName: "raster"
-            sourceItem: Image {
+            sourceItem: PixmapImage {
+                objectName: "rasterimage"
                 id: rasterimage
                 z: 0
-                asynchronous: true
                 smooth: false
             }
             anchorPoint: "0,0"

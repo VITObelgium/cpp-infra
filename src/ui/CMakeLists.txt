@@ -87,7 +87,7 @@ qt5_wrap_ui(OPAQ_FORMS_HEADERS ${QT_UI_FILES})
 add_executable(opaqui
     mapview.qml
     main.cpp
-    imageprovider.h imageprovider.cpp
+    rasterdisplaydata.h
     jobrunner.h jobrunner.cpp
     legendsettings.h
     mainwindow.h mainwindow.cpp

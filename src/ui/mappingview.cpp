@@ -5,6 +5,7 @@
 #include "Station.h"
 #include "data/ForecastBuffer.h"
 #include "gridmapper.hpp"
+#include "imageprovider.h"
 #include "infra/algo.h"
 #include "infra/cast.h"
 #include "infra/log.h"
@@ -83,7 +84,7 @@ MappingView::MappingView(QWidget* parent)
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
     qRegisterMetaType<PointSourcePtr>("PointSourcePtr");
-    qRegisterMetaType<RasterDataId>("RasterDataId");
+    qRegisterMetaType<RasterDisplayData>("RasterDisplayData");
     qRegisterMetaType<Legend>("inf::Legend");
 }
 
@@ -144,7 +145,6 @@ void MappingView::loadForecastData(const std::string& path)
         _dbq       = std::make_unique<rio::dbqfile>(path, "RIO"s);
         auto first = _dbq->first_time().date();
         auto last  = _dbq->last_time().date();
-        Log::info("{} - {}", first, last);
 
         _ui.startDate->setMinimumDate(QDate(first.year(), first.month(), first.day()));
         _ui.startDate->setMaximumDate(QDate(last.year(), last.month(), last.day()));

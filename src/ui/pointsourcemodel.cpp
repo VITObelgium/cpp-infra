@@ -69,6 +69,7 @@ void PointSourceModel::setLegend(const Legend& legend)
     });
 
     _maxValue = iter->upperBound;
+    _minColor = uiinfra::toQColor(_legend.entries.front().color);
     _maxColor = uiinfra::toQColor(iter->color);
 
     int rows = rowCount();
@@ -103,6 +104,6 @@ QColor PointSourceModel::colorValue(float value) const
         return _maxColor;
     }
 
-    return QColor();
+    return _minColor;
 }
 }
