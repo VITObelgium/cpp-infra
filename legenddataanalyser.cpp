@@ -55,7 +55,7 @@ void LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double
             maxValue = _sampleData[_sampleData.size() - 1];
         }
         _classBounds = inf::calculate_classbounds(scaleType, _nClasses, minValue, maxValue, _sampleData);
-    } catch (const std::exception& e) {
+    } catch (const std::exception&) {
         _classBounds.clear();
     }
 }
