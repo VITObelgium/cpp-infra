@@ -19,7 +19,7 @@ def vcpkg_root_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def run_vcpkgt, vcpkg_args):
+def run_vcpkg(triplet, vcpkg_args):
     if not shutil.which("vcpkg"):
         raise RuntimeError("vcpkg executable not found in the PATH environment")
 
@@ -74,12 +74,12 @@ def cmake_build(build_dir, config=None):
 def vcpkg_install_ports(triplet, ports):
     args = ["install", "--recurse"]
     args += ports
-    run_vcpkgt, args)
+    run_vcpkg(triplet, args)
 
 
 def vcpkg_upgrade_ports(triplet):
     args = ["upgrade", "--no-dry-run"]
-    run_vcpkgt, args)
+    run_vcpkg(triplet, args)
 
 
 def get_all_triplets():
