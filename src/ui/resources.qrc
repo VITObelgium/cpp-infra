@@ -1,9 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>mapview.qml</file>
-        <file>data/bug.svg</file>
-        <file>data/exit.svg</file>
-        <file>data/tools.svg</file>
-        <file>data/browse.svg</file>
-    </qresource>
-</RCC>

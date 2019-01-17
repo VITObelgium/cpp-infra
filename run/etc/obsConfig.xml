@@ -1,9 +1,0 @@
-<?xml version="1.0" ?>
-<config>
-	<!-- specify resolution of base data in minutes, for standard hourly RIO data this is 
-		 60 minutes in other words -->
-	<resolution>60</resolution>
-
-	<!-- the file parttern for the observation files -->
-  	<file_pattern>./data/obs/%pol%_data_rio.txt</file_pattern>
-</config>

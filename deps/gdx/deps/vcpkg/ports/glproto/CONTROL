@@ -1,4 +1,0 @@
-Source: glproto
-Version: 1.4.17
-Description: X.org GLProto protocol headers.
-Build-Depends: xorg-macros

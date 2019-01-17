@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/qmlcontrols">
-        <file>Legend.qml</file>
-    </qresource>
-</RCC>

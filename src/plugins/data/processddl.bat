@@ -1,2 +1,0 @@
-python ddl2cpp PredictionScheme.ddl PredictionScheme opaq
-pause
