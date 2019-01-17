@@ -45,7 +45,6 @@ MappingView::MappingView(QWidget* parent)
     });
 
     connect(_ui.nameCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onConfigurationChange);
-    connect(_ui.pollutantCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onPollutantChange);
     connect(_ui.invertColorMapCheck, &QCheckBox::stateChanged, this, &MappingView::populateColorMapCombo);
 
     connect(_ui.colorMapCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, [this]() {
@@ -57,6 +56,7 @@ MappingView::MappingView(QWidget* parent)
     connect(_ui.aggregationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::onAggregationChange);
     connect(_ui.aggregationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
     connect(_ui.interpolationCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
+    connect(_ui.pollutantCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onPollutantChange);
     connect(_ui.pollutantCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MappingView::compute);
     connect(_ui.startDate, &QDateTimeEdit::dateTimeChanged, this, &MappingView::compute);
 
@@ -247,6 +247,7 @@ void MappingView::onPollutantChange(const QString& name)
         auto configName    = _ui.nameCombo->currentText().toStdString();
         auto pollutantName = name.toStdString();
 
+        QSignalBlocker blocker1(_ui.interpolationCombo), blocker2(_ui.aggregationCombo);
         updateInterpolationModel(_config.ipol_names(configName, pollutantName));
         updateAggregationModel(_config.aggr_names(configName, pollutantName));
     }
