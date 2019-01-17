@@ -19,7 +19,7 @@ def vcpkg_root_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
 
-def run_vcpkg(triplet, vcpkg_args):
+def _create_vcpkg_command(triplet, vcpkg_args):
     if not shutil.which("vcpkg"):
         raise RuntimeError("vcpkg executable not found in the PATH environment")
 
@@ -30,7 +30,15 @@ def run_vcpkg(triplet, vcpkg_args):
         args += ["--triplet", triplet]
     args += vcpkg_args
 
-    return subprocess.check_output(args).decode("UTF-8")
+    return args
+
+
+def run_vcpkg(triplet, vcpkg_args):
+    subprocess.check_call(_create_vcpkg_command(triplet, vcpkg_args))
+
+
+def run_vcpkg_output(triplet, vcpkg_args):
+    return subprocess.check_output(_create_vcpkg_command(triplet, vcpkg_args)).decode("UTF-8")
 
 
 def cmake_configure(source_dir, build_dir, cmake_args, triplet=None, toolchain=None, generator=None):
@@ -229,7 +237,7 @@ def build_project_release(project_name, project_dir, triplet=None, cmake_args=[]
 def vcpkg_list_ports(triplet):
     args = ["list"]
     ports = set()
-    for line in run_vcpkg(triplet, args).splitlines():
+    for line in run_vcpkg_output(triplet, args).splitlines():
         name, trip = tuple(line.split()[0].split(":"))
         if triplet is None or trip == triplet:
             if not "[" in name:
