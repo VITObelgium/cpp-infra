@@ -85,6 +85,8 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
+    include/infra/legend.h
+    include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
     include/infra/process.h
@@ -103,6 +105,8 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    legend.cpp
+    legenddataanalyser.h legenddataanalyser.cpp
     process.cpp
     string.cpp
     exception.cpp
@@ -170,6 +174,7 @@ endif ()
 
 if (INFRA_XML)
     find_package(pugixml CONFIG REQUIRED)
+    set_target_properties(pugixml PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
     target_sources(infra PRIVATE xmldocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
@@ -282,7 +287,6 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui CONFIG REQUIRED)
     find_package(Qt5Widgets CONFIG REQUIRED)
     find_package(Qt5Core CONFIG REQUIRED)
-    find_package(Qt5Location CONFIG REQUIRED)
     find_package(date CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
@@ -333,23 +337,32 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/tabletools.h ui/tabletools.cpp
 
         ui/toolboxitem.h ui/toolboxitem.cpp
+        ui/qt5.natvis
         ${FORMS_HEADERS}
     )
 
     if (INFRA_UI_COMPONENTS_LOCATION)
-         if (NOT INFRA_GDAL)
+        find_package(Qt5Location CONFIG REQUIRED)
+    
+        if (NOT INFRA_GDAL)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
-         endif ()
+        endif ()
 
-         find_package(Qt5QuickCompiler REQUIRED)
-         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
+        find_package(Qt5QuickCompiler REQUIRED)
+        qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
 
         target_sources(uiinfra PRIVATE
             ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
             include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
+            include/uiinfra/legendmodel.h ui/legendmodel.cpp
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
+            include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
+        )
+
+        target_link_libraries(uiinfra PUBLIC
+            Qt5::Location
         )
     endif ()
 
@@ -387,6 +400,14 @@ if (INFRA_UI_COMPONENTS)
     )
 
     target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location date_interface)
+    if (STATIC_QT AND MSVC)
+        target_link_libraries(uiinfra PRIVATE
+            version.lib
+            Netapi32.lib
+            Iphlpapi.lib
+            Userenv.lib
+        )
+    endif ()
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)

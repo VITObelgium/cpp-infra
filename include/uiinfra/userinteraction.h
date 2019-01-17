@@ -2,7 +2,7 @@
 
 #include <qmessagebox.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 bool askForConfirmation(const QString& title, const QString& message);
 QString askForString(QWidget* parent, const QString& title, const QString& name);

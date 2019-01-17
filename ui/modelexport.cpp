@@ -8,9 +8,7 @@
 #include <qfiledialog.h>
 #include <xlsxwriter.h>
 
-namespace uiinfra {
-
-using namespace inf;
+namespace inf::ui {
 
 namespace xl {
 class WorkBook
@@ -41,15 +39,18 @@ public:
 };
 }
 
-void exportModel(QWidget* parent, QAbstractItemModel* model, std::string_view name)
+bool exportModel(QWidget* parent, QAbstractItemModel* model, std::string_view name, Flags<ExportModelOptions> options)
 {
-    auto filename = QFileDialog::getSaveFileName(parent, QStringLiteral("Tabel opslaan"), QString::fromStdString(std::string(name)), QStringLiteral("Spreadsheet (*.xlsx)"));
+    auto filename = QFileDialog::getSaveFileName(parent, QApplication::tr("Export table"), QString::fromStdString(std::string(name)), QStringLiteral("Spreadsheet (*.xlsx)"));
     if (!filename.isEmpty()) {
-        exportModel(model, name, fs::path(filename.toStdString()));
+        exportModel(model, name, fs::path(filename.toStdString()), options);
+        return true;
     }
+
+    return false;
 }
 
-void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outputPath)
+void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outputPath, Flags<ExportModelOptions> options)
 {
     if (fs::exists(outputPath)) {
         fs::remove(outputPath);
@@ -75,16 +76,19 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
     format_set_bold(headerFormat);
     format_set_bg_color(headerFormat, qtColor.rgba());
 
-    bool hasVerticalHeaders = model->headerData(0, Qt::Vertical).isValid();
+    bool hasVerticalHeaders = model->headerData(0, Qt::Vertical).isValid() && !options.is_set(ExportModelOptions::NoVerticalHeaders);
     int32_t colOffset       = hasVerticalHeaders ? 1 : 0;
+    int32_t rowOffset       = options.is_set(ExportModelOptions::NoHorizontalHeaders) ? 0 : 1;
 
-    for (int j = 0; j < model->columnCount(); ++j) {
-        auto data = model->headerData(j, Qt::Horizontal);
-        worksheet_write_string(ws, 0, colOffset + j, data.toString().toUtf8(), headerFormat);
+    if (!options.is_set(ExportModelOptions::NoHorizontalHeaders)) {
+        for (int j = 0; j < model->columnCount(); ++j) {
+            auto data = model->headerData(j, Qt::Horizontal);
+            worksheet_write_string(ws, 0, colOffset + j, data.toString().toUtf8(), headerFormat);
+        }
     }
 
     for (int i = 0; i < model->rowCount(); ++i) {
-        const int row = i + 1;
+        const int row = i + rowOffset;
         if (hasVerticalHeaders) {
             worksheet_write_string(ws, row, 0, model->headerData(i, Qt::Vertical).toString().toUtf8(), headerFormat);
         }

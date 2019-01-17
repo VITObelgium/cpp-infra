@@ -4,7 +4,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QItemSelectionModel)
 
-namespace uiinfra {
+namespace inf::ui {
 
-void itemSelectionToClipboard(const QItemSelectionModel* selectionModel);
+void itemSelectionToClipboard(const QItemSelectionModel* selectionModel, char doubleFormat = 'f', int precision = 10);
 }
