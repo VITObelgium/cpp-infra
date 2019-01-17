@@ -67,7 +67,7 @@ void Log::initialize(const std::string& name)
     }
 
     _log = std::make_shared<spdlog::logger>(name, begin(_sinks), end(_sinks));
-    _log->set_pattern("[%l] %v");
+    _log->set_pattern("%^[%l] %v%$");
     _log->set_level(spdlog::level::warn);
 }
 
@@ -78,7 +78,7 @@ void Log::uninitialize()
     _log.reset();
 }
 
-void Log::setLevel(Level level)
+void Log::set_level(Level level)
 {
     if (!_log) {
         throw std::runtime_error("Initialise the logging system before setting the log level");
@@ -105,5 +105,10 @@ void Log::setLevel(Level level)
     }
 
     _log->set_level(spdLevel);
+}
+
+void Log::set_pattern(std::string_view pattern)
+{
+    _log->set_pattern(fmt::format("%^{}%$", pattern));
 }
 }
