@@ -2,7 +2,7 @@ include(vcpkg_common_functions)
 
 set(VERSION_MAJOR 0)
 set(VERSION_MINOR 4)
-set(VERSION_REVISION 8)
+set(VERSION_REVISION 8.4)
 
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION})
 set(PACKAGE ${PORT}-${VERSION}-full.tar.bz2)
@@ -11,7 +11,7 @@ set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/${PORT}-${VERSION}-full)
 vcpkg_download_distfile(ARCHIVE
     URLS "https://bitbucket.org/sobjectizerteam/${PORT}-${VERSION_MAJOR}.${VERSION_MINOR}/downloads/${PACKAGE}"
     FILENAME "${PACKAGE}"
-    SHA512 b77f1ef3c769a02ad53c777f04a4df3fa027ffa7ac8f09aca6e813c16de3b4bf69c5e6161c5960918c0ce9752f8f8b9f8f2a3a0b5c744bad969f6186583bd70a
+    SHA512 d1706f64f55cd703c1ad43fd0898c4250e5ee7a2ee9246ae0de53023b3aefbeee542b7584f6f745969e81000626358d4d7be1743faabcdf55cb5ddf7db0abc4d
 )
 
 vcpkg_extract_source_archive(${ARCHIVE})

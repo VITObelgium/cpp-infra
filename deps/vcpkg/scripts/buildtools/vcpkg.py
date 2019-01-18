@@ -141,7 +141,9 @@ def read_ports_from_ports_file(ports_file):
     with open(ports_file) as f:
         content = f.readlines()
         for line in content:
-            ports_to_install.append(line.strip())
+            line = line.strip()
+            if not line.startswith("#"):
+                ports_to_install.append(line)
 
     return ports_to_install
 
