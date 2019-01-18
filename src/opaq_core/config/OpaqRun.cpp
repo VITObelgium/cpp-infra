@@ -11,27 +11,9 @@ OpaqRun::OpaqRun()
 {
 }
 
-void OpaqRun::addPlugin(const Plugin& plugin)
-{
-    _plugins.push_back(plugin);
-}
-
 void OpaqRun::addComponent(const Component& component)
 {
     _components.push_back(component);
-}
-
-Plugin OpaqRun::getPlugin(const std::string& pluginName)
-{
-    auto iter = std::find_if(_plugins.begin(), _plugins.end(), [&](config::Plugin& plugin) {
-        return plugin.name == pluginName;
-    });
-
-    if (iter == _plugins.end()) {
-        throw BadConfigurationException("Plugin with name '{}' not found.", pluginName);
-    }
-
-    return *iter;
 }
 
 const Component& OpaqRun::getComponent(std::string_view componentName)
@@ -45,11 +27,6 @@ const Component& OpaqRun::getComponent(std::string_view componentName)
     }
 
     return *iter;
-}
-
-std::vector<Plugin> OpaqRun::getPlugins()
-{
-    return _plugins;
 }
 
 std::vector<Component> OpaqRun::getComponents()

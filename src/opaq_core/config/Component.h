@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Plugin.h"
 #include "infra/xmldocument.h"
 
 #include <string>
@@ -19,7 +18,7 @@ namespace config {
 struct Component
 {
     std::string name;
-    Plugin plugin;
+    std::string plugin;
     inf::XmlNode config;
 };
 }

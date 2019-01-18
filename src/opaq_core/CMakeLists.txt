@@ -43,7 +43,6 @@ set (CORE_CONFIG_SOURCES
     config/Component.h
     config/OpaqRun.h
     config/OpaqRun.cpp
-    config/Plugin.h
     config/ForecastStage.h
     config/ForecastStage.cpp
     config/MappingStage.h

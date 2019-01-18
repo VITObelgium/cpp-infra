@@ -13,7 +13,6 @@
 #include "Component.h"
 #include "ForecastStage.h"
 #include "MappingStage.h"
-#include "Plugin.h"
 
 #include <boost/optional.hpp>
 #include <string>
@@ -35,13 +34,9 @@ class OpaqRun
 public:
     OpaqRun();
 
-    void addPlugin(const Plugin& plugin);
     void addComponent(const Component& component);
-
-    Plugin getPlugin(const std::string& pluginName);
     const Component& getComponent(std::string_view componentName);
 
-    std::vector<Plugin> getPlugins();
     std::vector<Component> getComponents();
 
     std::string getPollutantName() const;
@@ -69,7 +64,6 @@ public:
     void setMappingStage(MappingStage mappingStage);
 
 private:
-    std::vector<Plugin> _plugins;
     std::vector<Component> _components;
 
     std::string _pollutantName;

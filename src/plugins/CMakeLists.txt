@@ -79,6 +79,7 @@ target_link_libraries(opaqplugins PRIVATE
     Sqlpp11::Sqlpp11
     Sqlpp11::Sqlite3
     Eigen3::Eigen
+    Boost::boost
 )
 
 if (OPAQ_ENABLE_POSTGRESQL)

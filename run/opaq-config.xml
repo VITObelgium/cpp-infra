@@ -5,7 +5,6 @@
 
   <!-- Master OPAQ configuration settings -->
   <pollutants ref="etc/pollutants.xml" />
-  <plugins    ref="etc/plugins.xml" />
   <components ref="etc/components.xml" />
 
   <!-- Run configuration -->

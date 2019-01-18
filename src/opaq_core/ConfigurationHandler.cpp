@@ -93,17 +93,6 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
          in the OPAQ configuration
          --------------------------------------------------------------------- */
 
-        // Parsing plugins section
-        XmlDocument pluginsDoc;
-        auto pluginsElement = XmlTools::getElement(rootElement, "plugins", &pluginsDoc);
-
-        // adjusting this to make use of attributes, the config looks much cleaner this way...
-        for (auto& pluginElement : pluginsElement.children("plugin")) {
-            config::Plugin plugin;
-            plugin.name = pluginElement.attribute("name");
-            _opaqRun.addPlugin(plugin);
-        }
-
         // Parsing components section
         XmlDocument componentsDoc;
         auto componentsElement = XmlTools::getElement(rootElement, "components", &componentsDoc);
@@ -112,7 +101,7 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
 
             config::Component component;
             component.name   = componentElement.attribute("name");
-            component.plugin = _opaqRun.getPlugin(std::string(componentElement.attribute("plugin")));
+            component.plugin = componentElement.attribute("plugin");
             component.config = XmlTools::getElement(componentElement, "config", &_configDocs.back());
             _opaqRun.addComponent(component);
         }
@@ -220,18 +209,6 @@ void ConfigurationHandler::parseConfigurationFile(const std::string& filename, c
 
 void ConfigurationHandler::validateConfiguration(config::PollutantManager& pollutantMgr)
 {
-    // check for plugins with the same name
-    auto plugins = _opaqRun.getPlugins();
-
-    for (auto it1 = plugins.begin(); it1 != plugins.end(); ++it1) {
-        auto name = it1->name;
-        for (auto it2 = it1 + 1; it2 != plugins.end(); ++it2) {
-            if (name == it2->name) {
-                throw BadConfigurationException("Found 2 plugins with the same name: {}", name);
-            }
-        }
-    }
-
     // check for components with the same name
     auto components = _opaqRun.getComponents();
     for (auto it1 = components.begin(); it1 != components.end(); ++it1) {

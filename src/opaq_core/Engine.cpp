@@ -242,8 +242,8 @@ void Engine::initComponents(const std::vector<config::Component>& components)
     _compMgr.destroyComponents();
     for (auto& component : components) {
         try {
-            Log::info(s_logSrc, "Creating component {} from plugin {}", component.name, component.plugin.name);
-            _compMgr.createComponent<Component>(component.name, component.plugin.name, component.config);
+            Log::info(s_logSrc, "Creating component {} from plugin {}", component.name, component.plugin);
+            _compMgr.createComponent<Component>(component.name, component.plugin, component.config);
         } catch (const std::exception& e) {
             Log::critical(s_logSrc, "Error while creating & configuring component {} ({})", component.name, e.what());
             throw std::runtime_error("Failed to initialize components");
