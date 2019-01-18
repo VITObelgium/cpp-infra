@@ -46,7 +46,23 @@
         <string>Configuration</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="4" column="0">
+        <item row="0" column="0">
+         <widget class="QLabel" name="configLabel">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="text">
+           <string>RIO configuration:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="label">
           <property name="text">
            <string>Pollutant:</string>
@@ -56,17 +72,7 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="label_6">
-          <property name="text">
-           <string>Start date:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="3">
+        <item row="1" column="1" colspan="3">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QComboBox" name="nameCombo"/>
@@ -92,34 +98,20 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_7">
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_6">
           <property name="text">
-           <string>Forecast data:</string>
+           <string>Start date:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="6" column="2" colspan="2">
-         <widget class="QCheckBox" name="invertColorMapCheck">
-          <property name="text">
-           <string>Invert color map</string>
-          </property>
-         </widget>
+        <item row="0" column="1" colspan="3">
+         <widget class="opaq::FileSelectionComboBox" name="configPath" native="true"/>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label_5">
-          <property name="text">
-           <string>Name:</string>
-          </property>
-          <property name="alignment">
-           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-          </property>
-         </widget>
-        </item>
-        <item row="6" column="1">
+        <item row="3" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -157,88 +149,24 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="configLabel">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_5">
           <property name="text">
-           <string>RIO configuration:</string>
+           <string>Name:</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
           </property>
          </widget>
         </item>
-        <item row="0" column="1" colspan="3">
-         <layout class="QHBoxLayout" name="horizontalLayout">
-          <property name="leftMargin">
-           <number>0</number>
+        <item row="3" column="2" colspan="2">
+         <widget class="QCheckBox" name="invertColorMapCheck">
+          <property name="text">
+           <string>Invert color map</string>
           </property>
-          <item>
-           <widget class="QComboBox" name="configPathCombo">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="editable">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="browseConfigButton">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="icon">
-             <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
-              <normaloff>:/data/browse.svg</normaloff>:/data/browse.svg</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
+         </widget>
         </item>
-        <item row="1" column="1" colspan="3">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
-          <item>
-           <widget class="QComboBox" name="forecastPathCombo">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="editable">
-             <bool>false</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="browseForecastButton">
-            <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="icon">
-             <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
-              <normaloff>:/data/browse.svg</normaloff>:/data/browse.svg</iconset>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="4" column="1" colspan="3">
+        <item row="2" column="1" colspan="3">
          <layout class="QHBoxLayout" name="horizontalLayout_7">
           <item>
            <widget class="QComboBox" name="pollutantCombo">
@@ -330,6 +258,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>opaq::FileSelectionComboBox</class>
+   <extends>QWidget</extends>
+   <header>fileselectioncombobox.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>opaq::MapView</class>
    <extends>QWidget</extends>

@@ -20,6 +20,8 @@ private:
     void setupDockWidgets();
     void showPreferences();
 
+    void onForecastDataPathChanged(const QString& path);
+
     Ui::MainWindow _ui;
     std::shared_ptr<QAbstractItemModel> _logModel;
     QDockWidget* _diagnoseDockWidget = nullptr;

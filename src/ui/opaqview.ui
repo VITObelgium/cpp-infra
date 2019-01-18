@@ -50,26 +50,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QComboBox" name="configPathCombo">
+           <widget class="opaq::FileSelectionComboBox" name="configPath" native="true">
             <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+             <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
               <horstretch>0</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
-            </property>
-            <property name="editable">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="browseButton">
-            <property name="text">
-             <string notr="true"/>
-            </property>
-            <property name="icon">
-             <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
-              <normaloff>:/data/browse.svg</normaloff>:/data/browse.svg</iconset>
             </property>
            </widget>
           </item>
@@ -103,6 +89,12 @@
   </layout>
  </widget>
  <customwidgets>
+  <customwidget>
+   <class>opaq::FileSelectionComboBox</class>
+   <extends>QWidget</extends>
+   <header>fileselectioncombobox.h</header>
+   <container>1</container>
+  </customwidget>
   <customwidget>
    <class>opaq::OpaqViewer</class>
    <extends>QWidget</extends>

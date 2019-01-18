@@ -19,7 +19,6 @@ namespace opaq {
 
 using namespace inf;
 
-static const int32_t s_maxRecentPaths                            = 5;
 static const std::array<Aggregation::Type, 3> s_aggregationTypes = {
     Aggregation::DayAvg,
     Aggregation::Max1h,
@@ -31,13 +30,7 @@ OpaqView::OpaqView(QWidget* parent)
 {
     _ui.setupUi(this);
 
-    connect(_ui.browseButton, &QPushButton::clicked, this, [this]() {
-        showConfigFileSelector();
-    });
-
-    connect(_ui.configPathCombo, static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::activated), this, [this](const QString& path) {
-        loadConfiguration(path);
-    });
+    connect(_ui.configPath, &FileSelectionComboBox::pathChanged, this, &OpaqView::loadConfiguration);
 
     _aggregationModel.insertRows(0, static_cast<int>(s_aggregationTypes.size()));
 
@@ -47,8 +40,8 @@ OpaqView::OpaqView(QWidget* parent)
         _aggregationModel.setData(_aggregationModel.index(index, 0), s_aggregationTypes[index], Qt::UserRole);
     }
 
-    loadRecentConfigurations();
-    _ui.configPathCombo->setCurrentIndex(-1);
+    _ui.configPath->setFileSelectorFilter(tr("Config files (*.xml)"));
+    _ui.configPath->setConfigName("RecentForecastConfigs");
 
     _ui.viewerTab->setConfig(_config);
     _ui.viewerTab->setEngine(_engine);
@@ -73,23 +66,10 @@ void OpaqView::setModels(const std::vector<config::Component>& models)
     _ui.validationTab->setModels(models);
 }
 
-void OpaqView::showConfigFileSelector()
-{
-    auto filename = QFileDialog::getOpenFileName(this, tr("Load configuration"), "", tr("Config Files (*.xml)"));
-    if (filename.isEmpty()) {
-        return;
-    }
-
-    loadConfiguration(filename);
-    _ui.configPathCombo->setCurrentIndex(0);
-}
-
 void OpaqView::loadConfiguration(const QString& path)
 {
     try {
         _ui.viewerTab->resetForecastBuffer();
-
-        updateRecentConfiguration(path);
 
         QFileInfo fileInfo(path);
         // Change the working directory to the config file so the relative paths can be found
@@ -119,29 +99,6 @@ void OpaqView::loadConfiguration(const QString& path)
     } catch (const std::exception& e) {
         ui::displayError(tr("Failed to load config file"), e.what());
     }
-}
-
-void OpaqView::loadRecentConfigurations()
-{
-    QSettings settings;
-    auto recentFilePaths = settings.value("RecentConfigs").toStringList();
-    _ui.configPathCombo->clear();
-    _ui.configPathCombo->addItems(recentFilePaths);
-}
-
-void OpaqView::updateRecentConfiguration(const QString& filePath)
-{
-    QSettings settings;
-    QStringList recentFilePaths = settings.value("RecentConfigs").toStringList();
-    recentFilePaths.removeAll(filePath);
-    recentFilePaths.prepend(filePath);
-    while (recentFilePaths.size() > s_maxRecentPaths) {
-        recentFilePaths.removeLast();
-    }
-
-    settings.setValue("RecentConfigs", recentFilePaths);
-
-    loadRecentConfigurations();
 }
 
 void OpaqView::updateStationModel(const std::vector<Station>& stations)

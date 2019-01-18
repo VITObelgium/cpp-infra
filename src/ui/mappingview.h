@@ -32,6 +32,7 @@ public:
     virtual ~MappingView();
 
     void applyLegendSettings(const LegendSettings& settings);
+    void setForecastDataPath(const std::string& path);
 
 signals:
     void computeProgress(int);
@@ -39,16 +40,8 @@ signals:
     void computeFailed(QString message);
 
 private:
-    void showConfigFileSelector();
-    void showForecastFileSelector();
-
     void loadConfiguration(const QString& path);
     void loadForecastData(const std::string& path);
-    void loadRecentConfigurations();
-    void loadRecentForecasts();
-    void updateRecentConfigurations(const QString& filePath);
-    void updateRecentForecasts(const QString& filePath);
-    void updateRecentpathsList(const QString& settingsName, const QString& filePath);
 
     void updateConfigurationsModel(const std::vector<std::string_view>& configurations);
     void updatePollutantModel(const std::vector<std::string_view>& pollutants);

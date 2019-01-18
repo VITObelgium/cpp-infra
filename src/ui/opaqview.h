@@ -34,10 +34,7 @@ public:
 private:
     void setModels(const std::vector<config::Component>& models);
 
-    void showConfigFileSelector();
     void loadConfiguration(const QString& path);
-    void loadRecentConfigurations();
-    void updateRecentConfiguration(const QString& filePath);
 
     void updateStationModel(const std::vector<Station>& stations);
     void updatePollutantModel();

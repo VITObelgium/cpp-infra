@@ -73,7 +73,7 @@ function(find_qtplugin)
 endfunction()
 
 set(QT_UI_FILES
-    runsimulationdialog.ui
+    fileselectioncombobox.ui
     mappingview.ui
     mainwindow.ui
     mapview.ui
@@ -81,6 +81,7 @@ set(QT_UI_FILES
     opaqviewer.ui
     opaqvalidation.ui
     preferencesdialog.ui
+    runsimulationdialog.ui
 )
 qt5_wrap_ui(OPAQ_FORMS_HEADERS ${QT_UI_FILES})
 
@@ -88,6 +89,7 @@ add_executable(opaqui
     mapview.qml
     main.cpp
     rasterdisplaydata.h
+    fileselectioncombobox.h fileselectioncombobox.cpp
     jobrunner.h jobrunner.cpp
     legendsettings.h
     mainwindow.h mainwindow.cpp

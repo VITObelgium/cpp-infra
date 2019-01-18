@@ -38,12 +38,7 @@ MappingView::MappingView(QWidget* parent)
 {
     _ui.setupUi(this);
 
-    connect(_ui.browseConfigButton, &QPushButton::clicked, this, &MappingView::showConfigFileSelector);
-    connect(_ui.browseForecastButton, &QPushButton::clicked, this, &MappingView::showForecastFileSelector);
-    connect(_ui.configPathCombo, QOverload<const QString&>::of(&QComboBox::activated), this, [this](const QString& path) {
-        loadConfiguration(path);
-    });
-
+    connect(_ui.configPath, &FileSelectionComboBox::pathChanged, this, &MappingView::loadConfiguration);
     connect(_ui.nameCombo, QOverload<const QString&>::of(&QComboBox::currentIndexChanged), this, &MappingView::onConfigurationChange);
     connect(_ui.invertColorMapCheck, &QCheckBox::stateChanged, this, &MappingView::populateColorMapCombo);
 
@@ -69,17 +64,13 @@ MappingView::MappingView(QWidget* parent)
     _ui.aggregationCombo->setModel(&_aggregationModel);
     _ui.gridCombo->setModel(&_gridModel);
 
-    loadRecentConfigurations();
-    loadRecentForecasts();
+    _ui.configPath->setFileSelectorFilter(tr("Config files (*.xml)"));
+    _ui.configPath->setConfigName("RecentMappingConfigs");
 
     populateColorMapCombo(_ui.invertColorMapCheck->isChecked());
 
-    if (!_ui.configPathCombo->currentText().isEmpty()) {
-        loadConfiguration(_ui.configPathCombo->currentText());
-    }
-
-    if (!_ui.forecastPathCombo->currentText().isEmpty()) {
-        loadForecastData(_ui.forecastPathCombo->currentText().toStdString());
+    if (!_ui.configPath->currentPath().isEmpty()) {
+        loadConfiguration(_ui.configPath->currentPath());
     }
 
     qRegisterMetaType<RasterPtr>("RasterPtr");
@@ -96,31 +87,10 @@ void MappingView::applyLegendSettings(const LegendSettings& settings)
     compute();
 }
 
-void MappingView::showConfigFileSelector()
+void MappingView::setForecastDataPath(const std::string& path)
 {
-    auto filename = QFileDialog::getOpenFileName(this, tr("Load mapping configuration"), "", tr("Config files (*.xml)"));
-    if (filename.isEmpty()) {
-        return;
-    }
-
-    loadConfiguration(filename);
-    _ui.configPathCombo->setCurrentIndex(0);
-}
-
-void MappingView::showForecastFileSelector()
-{
-    auto filename = QFileDialog::getOpenFileName(this, tr("Load forecast data"), "", tr("Forecast files (*.dat *.txt *.csv)"));
-    if (filename.isEmpty()) {
-        return;
-    }
-
-    loadForecastData(filename.toStdString());
-    if (_dbq) {
-        updateRecentForecasts(filename);
-        _ui.forecastPathCombo->setCurrentIndex(0);
-    } else {
-        ui::displayError(tr("Error"), tr("Failed to load forecast data"));
-    }
+    loadForecastData(path);
+    compute();
 }
 
 void MappingView::loadConfiguration(const QString& path)
@@ -132,7 +102,6 @@ void MappingView::loadConfiguration(const QString& path)
 
         _config.parse_setup_file(path.toStdString());
         _gridDefs = _config.grid_definitions();
-        updateRecentConfigurations(path);
         updateConfigurationsModel(_config.configurations());
     } catch (const std::exception& e) {
         ui::displayError(tr("Failed to load config file"), e.what());
@@ -152,47 +121,6 @@ void MappingView::loadForecastData(const std::string& path)
         _dbq.reset();
         Log::error("Failed to load forecast data: {}", e.what());
     }
-}
-
-void MappingView::loadRecentConfigurations()
-{
-    QSettings settings;
-    auto recentFilePaths = settings.value("RecentMappingConfigs").toStringList();
-    _ui.configPathCombo->clear();
-    _ui.configPathCombo->addItems(recentFilePaths);
-}
-
-void MappingView::loadRecentForecasts()
-{
-    QSettings settings;
-    auto recentFilePaths = settings.value("RecentForecasts").toStringList();
-    _ui.forecastPathCombo->clear();
-    _ui.forecastPathCombo->addItems(recentFilePaths);
-}
-
-void MappingView::updateRecentConfigurations(const QString& filePath)
-{
-    updateRecentpathsList("RecentMappingConfigs", filePath);
-    loadRecentConfigurations();
-}
-
-void MappingView::updateRecentForecasts(const QString& filePath)
-{
-    updateRecentpathsList("RecentForecasts", filePath);
-    loadRecentForecasts();
-}
-
-void MappingView::updateRecentpathsList(const QString& settingsName, const QString& filePath)
-{
-    QSettings settings;
-    QStringList recentFilePaths = settings.value(settingsName).toStringList();
-    recentFilePaths.removeAll(filePath);
-    recentFilePaths.prepend(filePath);
-    while (recentFilePaths.size() > s_maxRecentPaths) {
-        recentFilePaths.removeLast();
-    }
-
-    settings.setValue(settingsName, recentFilePaths);
 }
 
 void MappingView::onAggregationChange(int /*index*/)
@@ -342,7 +270,6 @@ void MappingView::compute()
     std::string aggregation    = _ui.aggregationCombo->currentData(Qt::UserRole).toString().toStdString();
     std::string grid           = _ui.gridCombo->currentText().toStdString();
     std::string startDate      = _ui.startDate->dateTime().toString(QStringLiteral("yyyy-MM-dd HH:mm:ss")).toStdString();
-    std::string forecastData   = _ui.forecastPathCombo->currentText().toStdString();
     std::string endDate;
 
     setInteractionEnabled(false);

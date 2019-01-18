@@ -14,10 +14,15 @@ MainWindow::MainWindow(const std::shared_ptr<QAbstractItemModel>& logSink, QWidg
 {
     _ui.setupUi(this);
 
+    _ui.forecastPath->setFileSelectorFilter(tr("Config files (Forecast files (*.dat *.txt *.csv)"));
+    _ui.forecastPath->setConfigName("RecentForecasts");
+    _ui.forecastPath->setLabel(tr("Forecast data:"));
+
     setupDockWidgets();
 
     connect(_ui.actionQuit, &QAction::triggered, this, &QMainWindow::close);
     connect(_ui.actionPreferences, &QAction::triggered, this, &MainWindow::showPreferences);
+    connect(_ui.forecastPath, &FileSelectionComboBox::pathChanged, this, &MainWindow::onForecastDataPathChanged);
 
     _ui.mapping->applyLegendSettings(PreferencesDialog().legendSettings());
 }
@@ -46,6 +51,11 @@ void MainWindow::showPreferences()
 
         _ui.mapping->applyLegendSettings(dlg.legendSettings());
     }
+}
+
+void MainWindow::onForecastDataPathChanged(const QString& path)
+{
+    _ui.mapping->setForecastDataPath(path.toStdString());
 }
 
 }
