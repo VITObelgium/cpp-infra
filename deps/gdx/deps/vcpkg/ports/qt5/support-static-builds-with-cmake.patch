@@ -1,6 +1,6 @@
 diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in
---- a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in	2018-06-15 09:29:31.000000000 +0200
-+++ b/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in	2018-07-17 21:58:33.000000000 +0200
+--- a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in	2019-01-18 11:04:33.656091600 +0100
 @@ -59,13 +59,13 @@
  !!ENDIF
      _qt5_$${CMAKE_MODULE_NAME}_check_file_exists(${imported_location})
@@ -67,3 +67,40 @@ diff -Naur a/qtbase/mkspecs/features/data/cmake/Qt5BasicConfig.cmake.in b/qtbase
  !!ELSE
      add_library(Qt5::$${CMAKE_MODULE_NAME} SHARED IMPORTED)
  !!ENDIF
+@@ -343,6 +386,26 @@
+ 
+     file(GLOB pluginTargets \"${CMAKE_CURRENT_LIST_DIR}/Qt5$${CMAKE_MODULE_NAME}_*Plugin.cmake\")
+ 
++    macro(macro_process_prl_file_plugin Plugin prl_file_location Configuration)
++        if (EXISTS \"${prl_file_location}\")
++            file(STRINGS \"${prl_file_location}\" prl_strings REGEX \"QMAKE_PRL_LIBS\")
++            string(REGEX REPLACE \"QMAKE_PRL_LIBS *= *([^\\n]*)\" \"\\\\1\" static_depends ${prl_strings} )
++            if (${Configuration} STREQUAL "RELEASE")
++                string(REGEX REPLACE \"\\\\$\\\\$\\\\[QT_INSTALL_LIBS\\\\]\" \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/lib\" static_depends \"${static_depends}\")
++            else ()
++            string(REGEX REPLACE \"\\\\$\\\\$\\\\[QT_INSTALL_LIBS\\\\]\" \"${_qt5$${CMAKE_MODULE_NAME}_install_prefix}/debug/lib\" static_depends \"${static_depends}\")
++            endif ()
++            string(STRIP ${static_depends} static_depends)
++            separate_arguments(static_depends)
++            if (APPLE)
++                string(REPLACE \"-framework;\" \"-framework \" static_depends \"${static_depends}\")
++            endif()
++            set_target_properties(Qt5::$${Plugin} PROPERTIES
++                \"IMPORTED_LINK_INTERFACE_LIBRARIES_${Configuration}\" \"${static_depends}\"
++            )
++        endif()
++    endmacro()
++
+     macro(_populate_$${CMAKE_MODULE_NAME}_plugin_properties Plugin Configuration PLUGIN_LOCATION)
+         set_property(TARGET Qt5::${Plugin} APPEND PROPERTY IMPORTED_CONFIGURATIONS ${Configuration})
+ 
+@@ -355,6 +418,9 @@
+         set_target_properties(Qt5::${Plugin} PROPERTIES
+             \"IMPORTED_LOCATION_${Configuration}\" ${imported_location}
+         )
++
++        string(REPLACE ".$${CMAKE_PlUGIN_EXT}" ".prl" plugin_prl_file ${PLUGIN_LOCATION})
++        macro_process_prl_file_plugin(${Plugin} ${plugin_prl_file} ${Configuration})
+     endmacro()
+ 
+     if (pluginTargets)

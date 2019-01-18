@@ -24,19 +24,6 @@ if (CMAKE_HOST_WIN32 AND NOT MINGW)
     vcpkg_find_acquire_program("JOM")
 endif ()
 
-set (OPTIONAL_ARGS)
-if(NOT "tools" IN_LIST FEATURES)
-    list(APPEND OPTIONAL_SKIPS -skip qttools)
-endif ()
-
-if(NOT "qml" IN_LIST FEATURES)
-    list(APPEND OPTIONAL_ARGS -skip qtquickcontrols -skip qtquickcontrols2 -skip qtdeclarative)
-endif ()
-
-# Extract source into architecture specific directory, because GDALs' build currently does not
-# support out of source builds.
-set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src-${TARGET_TRIPLET})
-message(STATUS "Qt source path ${SOURCE_PATH}")
 vcpkg_download_distfile(ARCHIVE
     URLS "http://download.qt.io/archive/qt/${MAJOR}.${MINOR}/${VERSION}/single/${PACKAGE}"
     FILENAME "${PACKAGE}"

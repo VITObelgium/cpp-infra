@@ -6,6 +6,7 @@ else if "@VCPKG_CMAKE_SYSTEM_NAME@" = "Darwin"
 {
     using darwin : vcpkg : @CMAKE_CXX_COMPILER@ :
         <cxxstd>17
+        <cxxflags>"@BOOST_CXX_FLAGS@"
         <ranlib>@CMAKE_RANLIB@
         <archiver>@CMAKE_AR@
         <linkflags>"@CMAKE_EXE_LINKER_FLAGS@"
