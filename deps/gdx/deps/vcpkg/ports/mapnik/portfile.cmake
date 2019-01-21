@@ -33,6 +33,7 @@ foreach(BUILD_TYPE debug release)
         ${CMAKE_CURRENT_LIST_DIR}/config-path.patch
         ${CMAKE_CURRENT_LIST_DIR}/gdallib-detection.patch
         ${CMAKE_CURRENT_LIST_DIR}/boost-1.68.patch
+        ${CMAKE_CURRENT_LIST_DIR}/boost-gil-includes.patch
     )
 endforeach()
 
