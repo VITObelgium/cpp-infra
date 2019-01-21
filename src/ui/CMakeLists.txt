@@ -14,64 +14,6 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 qtquick_compiler_add_resources(UI_RESOURCES resources.qrc)
 
-function(find_qtdep)
-    set (oneValueArgs NAME)
-    set (multiValueArgs LIBNAME)
-    cmake_parse_arguments(find_qtdep "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
-    message(STATUS "Find library ${find_qtdep_NAME}")
-
-    find_library(${find_qtdep_NAME}_LIBRARY NAMES ${find_qtdep_LIBNAME})
-    find_library(${find_qtdep_NAME}_LIBRARY_DEBUG NAMES ${find_qtdep_LIBNAME}d)
-
-    if (${find_qtdep_NAME}_LIBRARY AND ${find_qtdep_NAME}_LIBRARY_DEBUG)
-        set(${find_qtdep_NAME}_LIBRARY optimized ${${find_qtdep_NAME}_LIBRARY} debug ${${find_qtdep_NAME}_LIBRARY_DEBUG} PARENT_SCOPE)
-        message(STATUS "${find_qtdep_NAME} library: ${${find_qtdep_NAME}_LIBRARY}")
-    endif ()
-
-    add_library(${find_qtdep_NAME} STATIC IMPORTED)
-
-    if (${find_qtdep_NAME}_LIBRARY)
-        set_property(TARGET ${find_qtdep_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-        set_target_properties(${find_qtdep_NAME} PROPERTIES IMPORTED_LOCATION_RELEASE "${${find_qtdep_NAME}_LIBRARY}")
-    endif()
-
-    if (${find_qtdep_NAME}_LIBRARY_DEBUG)
-        set_property(TARGET ${find_qtdep_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-        set_target_properties(${find_qtdep_NAME} PROPERTIES IMPORTED_LOCATION_DEBUG "${${find_qtdep_NAME}_LIBRARY_DEBUG}")
-    endif()
-endfunction()
-
-function(find_qtplugin)
-    set (oneValueArgs NAME LIBNAME SUBDIR)
-    cmake_parse_arguments(find_qtplugin "${options}" "${oneValueArgs}" "${multiValueArgs}" ${ARGN})
-
-    message(STATUS "Find plugin ${find_qtplugin_NAME}")
-
-    find_library(${find_qtplugin_NAME}_LIBRARY NAMES ${find_qtplugin_LIBNAME} HINTS ${CMAKE_PREFIX_PATH}/${find_qtplugin_SUBDIR})
-    find_library(${find_qtplugin_NAME}_LIBRARY_DEBUG NAMES ${find_qtplugin_LIBNAME}d HINTS ${CMAKE_PREFIX_PATH}/debug/${find_qtplugin_SUBDIR} ${CMAKE_PREFIX_PATH}/${find_qtplugin_SUBDIR})
-
-    if (${find_qtplugin_NAME}_LIBRARY AND ${find_qtplugin_NAME}_LIBRARY_DEBUG)
-        set(${find_qtplugin_NAME}_LIBRARY optimized ${${find_qtplugin_NAME}_LIBRARY} debug ${${find_qtplugin_NAME}_LIBRARY_DEBUG} PARENT_SCOPE)
-        message(STATUS "${find_qtplugin_NAME} library: ${${find_qtplugin_NAME}_LIBRARY}")
-    endif ()
-
-    if (NOT ${find_qtplugin_NAME}_LIBRARY)
-        message(FATAL_ERROR "${find_qtplugin_NAME} library not found")
-    endif ()
-
-    add_library(${find_qtplugin_NAME} STATIC IMPORTED)
-    if (${find_qtplugin_NAME}_LIBRARY)
-        set_property(TARGET ${find_qtplugin_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS RELEASE)
-        set_target_properties(${find_qtplugin_NAME} PROPERTIES IMPORTED_LOCATION_RELEASE "${${find_qtplugin_NAME}_LIBRARY}")
-    endif()
-
-    if (${find_qtplugin_NAME}_LIBRARY_DEBUG)
-        set_property(TARGET ${find_qtplugin_NAME} APPEND PROPERTY IMPORTED_CONFIGURATIONS DEBUG)
-        set_target_properties(${find_qtplugin_NAME} PROPERTIES IMPORTED_LOCATION_DEBUG "${${find_qtplugin_NAME}_LIBRARY_DEBUG}")
-    endif()
-endfunction()
-
 set(QT_UI_FILES
     fileselectioncombobox.ui
     mappingview.ui
@@ -146,18 +88,12 @@ install(TARGETS opaqui
 )
 
 if (STATIC_QT)
+    include(FindQtPlugin)
+
     target_compile_definitions(opaqui PRIVATE "-DQT_CHARTS_STATICLIB")
 
-    find_package(OpenGL)
-    find_package(JPEG)
-    find_package(Freetype REQUIRED)
     find_package(Qt5Svg REQUIRED)
     find_package(Qt5Location REQUIRED)
-    
-    find_qtdep(NAME Qt5PositioningQuick LIBNAME Qt5PositioningQuick)
-    find_qtdep(NAME QtFontDatabaseSupport LIBNAME Qt5FontDatabaseSupport)
-    find_qtdep(NAME QtThemeSupport LIBNAME Qt5ThemeSupport)
-    find_qtdep(NAME QtAccessibilitySupport LIBNAME Qt5AccessibilitySupport)
     
     find_qtplugin(NAME QtQuickLayoutsPlugin LIBNAME qquicklayoutsplugin SUBDIR qml/QtQuick/Layouts)
     find_qtplugin(NAME QtQuick2Plugin LIBNAME qtquick2plugin SUBDIR qml/QtQuick.2)
@@ -168,15 +104,8 @@ if (STATIC_QT)
     find_qtplugin(NAME QtQuickLocationPlugin LIBNAME declarative_location SUBDIR qml/QtLocation)
     find_qtplugin(NAME QtQuickPositioningPlugin LIBNAME declarative_positioning SUBDIR qml/QtPositioning)
     
-    find_qtplugin(NAME QGeoServicesEsriPlugin LIBNAME qtgeoservices_esri SUBDIR plugins/geoservices)
-    find_qtplugin(NAME QGeoServicesOsmPlugin LIBNAME qtgeoservices_osm SUBDIR plugins/geoservices)
-    find_qtplugin(NAME QGeoServicesItemsOverlayPlugin LIBNAME qtgeoservices_itemsoverlay SUBDIR plugins/geoservices)
-    
     target_link_libraries(opaqui
-        QtFontDatabaseSupport    
         QtQuickLayoutsPlugin
-        QtThemeSupport
-        QtAccessibilitySupport
         QtQuick2Plugin
         QtQuick2WindowPlugin
         QtQuick2TemplatesPlugin
@@ -184,56 +113,31 @@ if (STATIC_QT)
         QtQuickControls2FusionPlugin
         QtQuickLocationPlugin
         QtQuickPositioningPlugin
-        QGeoServicesEsriPlugin
-        QGeoServicesOsmPlugin
-        QGeoServicesItemsOverlayPlugin
-        Qt5::Svg
+        Qt5::Location
+        Qt5::GeoServiceProviderFactoryEsri
+        Qt5::QGeoServiceProviderFactoryOsm
+        Qt5::QGeoServiceProviderFactoryItemsOverlay
         Qt5::QSvgPlugin
         Qt5::QJpegPlugin
-        JPEG::JPEG
-        Freetype::Freetype
     )
 
     if (MSVC)
-        find_qtdep(NAME QtEventDispatcherSupport LIBNAME Qt5EventDispatcherSupport)
-        find_qtdep(NAME QtUiAutomation LIBNAME Qt5WindowsUIAutomationSupport)
-
         target_link_libraries(opaqui
-            Dwmapi.lib
-            Wtsapi32.lib
-            UxTheme.lib
-            QtEventDispatcherSupport
-            QtUiAutomation
             Qt5::QWindowsVistaStylePlugin
             Qt5::QWindowsIntegrationPlugin
         )
     elseif(APPLE)
-        find_qtdep(NAME QtClipboardSupport LIBNAME Qt5ClipboardSupport)
-        find_qtdep(NAME QtPrintSupport LIBNAME Qt5PrintSupport)
-        find_qtdep(NAME QtGraphicsSupport LIBNAME Qt5GraphicsSupport)
         find_package(Qt5Sql REQUIRED)
 
         target_link_libraries(opaqui
-            QtClipboardSupport
-            QtPrintSupport
-            QtGraphicsSupport
-            Qt5::QMacStylePlugin
-            Qt5::QCocoaIntegrationPlugin
             Qt5::Sql
             Qt5::QSQLiteDriverPlugin
-            "-framework AppKit"
-            "-framework CoreServices"
-            "-framework Carbon"
-            "-framework IOKit"
-            "-framework QuartzCore"
-            "-framework CoreVideo"
-            "-framework Metal"
-            -lcups
+            Qt5::QMacStylePlugin
+            Qt5::QCocoaIntegrationPlugin
         )
     endif ()
 
     if (NOT MSVC)
-        find_qtdep(NAME QMapboxgl LIBNAME qmapboxgl)
         find_qtplugin(NAME QGeoServicesMapboxglPlugin LIBNAME qtgeoservices_mapboxgl SUBDIR plugins/geoservices)
         target_link_libraries(opaqui QMapboxgl QGeoServicesMapboxglPlugin)
     endif ()

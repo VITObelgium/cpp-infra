@@ -30,8 +30,6 @@ namespace opaq {
 using namespace inf;
 using namespace std::string_literals;
 
-static const int32_t s_maxRecentPaths = 5;
-
 MappingView::MappingView(QWidget* parent)
 : QWidget(parent)
 , _engine(_pollutantMgr, _pluginFactory)
