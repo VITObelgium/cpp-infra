@@ -330,5 +330,7 @@ file(REMOVE
     ${CURRENT_PACKAGES_DIR}/lib/Qt5Bootstrap.prl
 )
 
+file(INSTALL ${CMAKE_CURRENT_LIST_DIR}/FindQtPlugin.cmake DESTINATION ${CURRENT_PACKAGES_DIR}/share/cmake)
+
 # Handle copyright
 file(INSTALL ${SOURCE_PATH}/LICENSE.LGPLv3 DESTINATION  ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
