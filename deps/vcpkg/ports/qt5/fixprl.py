@@ -2,7 +2,7 @@ import os
 import re
 from glob import glob
 
-files = [y for x in os.walk('.') for y in glob(os.path.join(x[0], '*.prl'))]
+files = glob('**/*.prl', recursive=True)
 libpattern = re.compile(r"[-][l]\S*\s")
 libdirpattern = re.compile(r"[-][L]\S*\s")
 
@@ -21,3 +21,4 @@ for f in files:
     new_file = open(f, "w")
     new_file.write(builder)
     new_file.close()
+    print("processed: " + f)
