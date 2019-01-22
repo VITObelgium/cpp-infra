@@ -95,6 +95,24 @@
    <addaction name="menuView"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QDockWidget" name="diagnoseDockWidget">
+   <property name="floating">
+    <bool>false</bool>
+   </property>
+   <property name="features">
+    <set>QDockWidget::DockWidgetClosable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="allowedAreas">
+    <set>Qt::AllDockWidgetAreas</set>
+   </property>
+   <property name="windowTitle">
+    <string>Diagnostics</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>8</number>
+   </attribute>
+   <widget class="uiinfra::LogView" name="logView"/>
+  </widget>
   <action name="actionQuit">
    <property name="icon">
     <iconset resource="../../build/opaq-x64-windows-static/src/ui/resources_qmlcache.qrc">
@@ -134,6 +152,12 @@
    <class>opaq::FileSelectionComboBox</class>
    <extends>QWidget</extends>
    <header>fileselectioncombobox.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>uiinfra::LogView</class>
+   <extends>QWidget</extends>
+   <header>uiinfra/logview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

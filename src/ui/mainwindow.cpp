@@ -4,8 +4,6 @@
 #include "runsimulationdialog.h"
 #include "uiinfra/logview.h"
 
-#include <qdockwidget.h>
-
 namespace opaq {
 
 MainWindow::MainWindow(const std::shared_ptr<QAbstractItemModel>& logSink, QWidget* parent)
@@ -29,18 +27,12 @@ MainWindow::MainWindow(const std::shared_ptr<QAbstractItemModel>& logSink, QWidg
 
 void MainWindow::setupDockWidgets()
 {
-    _diagnoseDockWidget = new QDockWidget(tr("Diagnostics"), this);
-    _diagnoseDockWidget->setObjectName("Diagnostics");
-    _diagnoseDockWidget->setAllowedAreas(Qt::BottomDockWidgetArea | Qt::TopDockWidgetArea | Qt::RightDockWidgetArea | Qt::LeftDockWidgetArea);
-    auto logView = new uiinfra::LogView(_diagnoseDockWidget);
-    logView->setModel(_logModel.get());
-    _diagnoseDockWidget->setWidget(logView);
-    addDockWidget(Qt::BottomDockWidgetArea, _diagnoseDockWidget);
-    _diagnoseDockWidget->hide();
-    _diagnoseDockWidget->toggleViewAction()->setIcon(QIcon(QStringLiteral(":/data/bug.svg")));
-    _diagnoseDockWidget->toggleViewAction()->setChecked(false);
-    _diagnoseDockWidget->toggleViewAction()->setShortcut(Qt::CTRL + Qt::Key_D);
-    _ui.menuView->addAction(_diagnoseDockWidget->toggleViewAction());
+    _ui.logView->setModel(_logModel.get());
+    _ui.diagnoseDockWidget->toggleViewAction()->setShortcut(Qt::CTRL + Qt::Key_D);
+    _ui.diagnoseDockWidget->hide();
+    _ui.diagnoseDockWidget->toggleViewAction()->setChecked(false);
+    _ui.diagnoseDockWidget->toggleViewAction()->setIcon(QIcon(QStringLiteral(":/data/bug.svg")));
+    _ui.menuView->addAction(_ui.diagnoseDockWidget->toggleViewAction());
 }
 
 void MainWindow::showPreferences()

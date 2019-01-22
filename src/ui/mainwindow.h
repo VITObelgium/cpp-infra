@@ -5,7 +5,6 @@
 #include <QMainWindow>
 
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
-QT_FORWARD_DECLARE_CLASS(QDockWidget)
 
 namespace opaq {
 
@@ -24,6 +23,5 @@ private:
 
     Ui::MainWindow _ui;
     std::shared_ptr<QAbstractItemModel> _logModel;
-    QDockWidget* _diagnoseDockWidget = nullptr;
 };
 }
