@@ -1,0 +1,33 @@
+set(VCPKG_TARGET_ARCHITECTURE x64)
+set(VCPKG_CRT_LINKAGE static)
+set(VCPKG_LIBRARY_LINKAGE static)
+
+set(VCPKG_CMAKE_SYSTEM_NAME Darwin)
+set(VCPKG_LINKER_FLAGS "-stdlib=libc++")
+set(CMAKE_EXE_LINKER_FLAGS ${VCPKG_LINKER_FLAGS} CACHE STRING "")
+set(CMAKE_SHARED_LINKER_FLAGS ${VCPKG_LINKER_FLAGS} CACHE STRING "")
+set(CMAKE_MODULE_LINKER_FLAGS ${VCPKG_LINKER_FLAGS} CACHE STRING "")
+
+set(CMAKE_C_COMPILER /usr/local/opt/llvm/bin/clang CACHE STRING "")
+set(CMAKE_ASM_COMPILER /usr/local/opt/llvm/bin/clang CACHE STRING "")
+set(CMAKE_CXX_COMPILER /usr/local/opt/llvm/bin/clang++ CACHE STRING "")
+
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+set(OpenMP_C "${CMAKE_C_COMPILER}")
+set(OpenMP_C_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument" CACHE STRING "")
+set(OpenMP_C_LIB_NAMES "omp" "gomp" "iomp5" CACHE STRING "")
+set(OpenMP_CXX "${CMAKE_CXX_COMPILER}" CACHE STRING "")
+set(OpenMP_CXX_FLAGS "-fopenmp=libomp -Wno-unused-command-line-argument" CACHE STRING "")
+set(OpenMP_CXX_LIB_NAMES "omp" "gomp" "iomp5" CACHE STRING "")
+set(OpenMP_omp_LIBRARY "/usr/local/opt/llvm/lib/libomp.dylib" CACHE STRING "")
+set(OpenMP_gomp_LIBRARY "/usr/local/opt/llvm/lib/libgomp.dylib" CACHE STRING "")
+set(OpenMP_iomp5_LIBRARY "/usr/local/opt/llvm/lib/libiomp5.dylib" CACHE STRING "")
+
+set(CMAKE_FIND_ROOT_PATH "/usr/local/opt/llvm" CACHE STRING "")
+if (NOT VCPKG_ALLOW_SYSTEM_LIBS)
+    set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+    set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+endif ()

@@ -1,0 +1,12 @@
+diff -Naur a/src/build.py b/src/build.py
+--- a/src/build.py	2018-04-12 14:46:14.000000000 +0200
++++ b/src/build.py	2018-06-17 15:08:32.000000000 +0200
+@@ -81,7 +81,7 @@
+    lib_env['LIBS'].append('proj')
+ 
+ if '-DHAVE_TIFF' in env['CPPDEFINES']:
+-   lib_env['LIBS'].append('tiff')
++   lib_env['LIBS'].append(['tiff', 'lzma'])
+    enabled_imaging_libraries.append('tiff_reader.cpp')
+ 
+ if '-DHAVE_WEBP' in env['CPPDEFINES']:

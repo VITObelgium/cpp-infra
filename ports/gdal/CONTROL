@@ -1,0 +1,30 @@
+Source: gdal
+Version: 2.4.0
+Description: The Geographic Data Abstraction Library for reading and writing geospatial raster and vector data.
+Build-Depends: proj4, libpng, tiff[lzw], liblzma
+
+Feature: geos
+Description: Geometry Engine support
+Build-Depends: geos
+
+Feature: jpeg
+Description: Jpeg support
+Build-Depends: libjpeg-turbo
+
+Feature: gif
+Description: Gif support
+Build-Depends: giflib (!windows)
+
+Feature: sqlite
+Description: Sqlite support
+Build-Depends: sqlite3
+
+Feature: expat
+Description: Expat support needed for excel driver
+Build-Depends: expat
+
+Feature: pcraster
+Description: Support reading and writing pcraster map files
+
+Feature: tools
+Description: Build the gdal tools

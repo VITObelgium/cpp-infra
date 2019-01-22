@@ -1,0 +1,12 @@
+diff -x '.*' -Naur a/qtbase/mkspecs/features/create_cmake.prf b/qtbase/mkspecs/features/create_cmake.prf
+--- a/qtbase/mkspecs/features/create_cmake.prf	2018-12-03 12:15:26.000000000 +0100
++++ b/qtbase/mkspecs/features/create_cmake.prf	2019-01-12 11:02:51.000000000 +0100
+@@ -153,7 +153,7 @@
+             else: CMAKE_PlUGIN_EXT = .a
+ 
+             CMAKE_PLUGIN_LOCATION_RELEASE = $$PLUGIN_TYPE/lib$${TARGET}$${CMAKE_PlUGIN_EXT}
+-            CMAKE_PLUGIN_LOCATION_DEBUG = $$PLUGIN_TYPE/lib$${TARGET}$${CMAKE_PlUGIN_EXT}
++            CMAKE_PLUGIN_LOCATION_DEBUG = $$PLUGIN_TYPE/lib$${TARGET}_debug$${CMAKE_PlUGIN_EXT}
+         } else {
+             isEmpty(CMAKE_STATIC_TYPE): CMAKE_PlUGIN_EXT = .so
+             else: CMAKE_PlUGIN_EXT = .a

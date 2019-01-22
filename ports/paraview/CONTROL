@@ -1,0 +1,12 @@
+Source: paraview
+Version: 5.5.2
+Description: Multi-platform data analysis and visualization application.
+Build-Depends: zlib, libpng, tiff, libxml2, jsoncpp, freetype, hdf5, expat, libjpeg-turbo, proj4, lz4, libtheora, netcdf-c
+
+Feature: mpi
+Description: MPI functionality for paraview
+Build-Depends: openmpi (linux), msmpi (windows)
+
+Feature: osmesa
+Description: Build with osmesa support
+Build-Depends: mesa (linux)

@@ -1,0 +1,57 @@
+From b01834b56c2b0da4366ec4e780e1d1bc7246c6eb Mon Sep 17 00:00:00 2001
+From: Christoph Haag <christoph.haag@collabora.com>
+Date: Tue, 18 Sep 2018 01:08:07 +0200
+Subject: [PATCH] meson: add option to statically link llvm
+
+Reviewed-by: Dylan Baker <dylan@pnwbakers.com>
+---
+ meson.build       | 4 ++++
+ meson_options.txt | 6 ++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/meson.build b/meson.build
+index 0588ebf8e7a..5e250470ed1 100644
+--- a/meson.build
++++ b/meson.build
+@@ -1188,6 +1188,8 @@ else
+   _llvm_version = '>= 3.3.0'
+ endif
+ 
++_shared_llvm = get_option('shared-llvm')
++
+ _llvm = get_option('llvm')
+ if _llvm == 'auto'
+   dep_llvm = dependency(
+@@ -1196,6 +1198,7 @@ if _llvm == 'auto'
+     modules : llvm_modules,
+     optional_modules : llvm_optional_modules,
+     required : with_amd_vk or with_gallium_radeonsi or with_gallium_swr or with_gallium_opencl,
++    static : not _shared_llvm
+   )
+   with_llvm = dep_llvm.found()
+ elif _llvm == 'true'
+@@ -1204,6 +1207,7 @@ elif _llvm == 'true'
+     version : _llvm_version,
+     modules : llvm_modules,
+     optional_modules : llvm_optional_modules,
++    static : not _shared_llvm,
+   )
+   with_llvm = true
+ else
+diff --git a/meson_options.txt b/meson_options.txt
+index 5676ef5e45d..18c03921db2 100644
+--- a/meson_options.txt
++++ b/meson_options.txt
+@@ -237,6 +237,12 @@ option(
+   choices : ['auto', 'true', 'false'],
+   description : 'Build with LLVM support.'
+ )
++option(
++  'shared-llvm',
++  type : 'boolean',
++  value : true,
++  description : 'Whether to link llvm shared or statically.'
++)
+ option(
+   'valgrind',
+   type : 'combo',

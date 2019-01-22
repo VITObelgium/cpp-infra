@@ -1,0 +1,196 @@
+diff -Naur -x '.*' a/config/cmake/HDF5UseFortran.cmake b/config/cmake/HDF5UseFortran.cmake
+--- a/config/cmake/HDF5UseFortran.cmake	2017-04-25 16:45:02.000000000 +0200
++++ b/config/cmake/HDF5UseFortran.cmake	2018-07-03 21:50:28.000000000 +0200
+@@ -131,6 +131,9 @@
+ # Determine the available KINDs for REALs and INTEGERs
+ #-----------------------------------------------------------------------------
+ 
++if(MINGW AND CMAKE_CROSSCOMPILING)
++set(PROG_OUTPUT "1,2,4,8,16\n4,8,10,16\n33\n5\n4\n")
++else()
+ READ_SOURCE ("PROGRAM FC_AVAIL_KINDS" "END PROGRAM FC_AVAIL_KINDS" CODE)
+ FORTRAN_RUN ("REAL and INTEGER KINDs"
+   "${CODE}"
+@@ -146,6 +149,7 @@
+ # dnl    -- LINE 5 --  number of valid real kinds
+ 
+ file (READ "${CMAKE_BINARY_DIR}/pac_fconftest.out" PROG_OUTPUT)
++endif()
+ # Convert the string to a list of strings by replacing the carriage return with a semicolon
+ string (REGEX REPLACE "\n" ";" PROG_OUTPUT "${PROG_OUTPUT}")
+ 
+@@ -188,6 +192,9 @@
+ # **********
+ string (REGEX REPLACE "," ";" VAR "${pac_validIntKinds}")
+ 
++if (MINGW AND CMAKE_CROSSCOMPILING)
++set(PAC_FC_ALL_INTEGER_KINDS_SIZEOF "\{1,2,4,8,16\}")
++else()
+ foreach (KIND ${VAR} )
+   set (PROG_SRC
+     "
+@@ -220,6 +227,7 @@
+ string (REGEX REPLACE " " "" pack_int_sizeof "${pack_int_sizeof}")
+ 
+ set (PAC_FC_ALL_INTEGER_KINDS_SIZEOF "\{${pack_int_sizeof}\}")
++endif()
+ 
+ message (STATUS "....FOUND SIZEOF for INTEGER KINDs ${PAC_FC_ALL_INTEGER_KINDS_SIZEOF}")
+ # **********
+@@ -227,6 +235,9 @@
+ # **********
+ string (REGEX REPLACE "," ";" VAR "${pac_validRealKinds}")
+ 
++if (MINGW AND CMAKE_CROSSCOMPILING)
++set(pack_real_sizeof "4,8,16,16")
++else ()
+ #find the maximum kind of the real
+ list (LENGTH VAR LEN_VAR)
+ math (EXPR _LEN "${LEN_VAR}-1")
+@@ -262,6 +273,7 @@
+ string (REGEX REPLACE ",$" "" pack_real_sizeof "${pack_real_sizeof}")
+ #Remove spaces
+ string (REGEX REPLACE " " "" pack_real_sizeof "${pack_real_sizeof}")
++endif ()
+ 
+ set (H5CONFIG_F_RKIND_SIZEOF "INTEGER, DIMENSION(1:num_rkinds) :: rkind_sizeof = (/${pack_real_sizeof}/)")
+ 
+@@ -278,6 +290,9 @@
+ #-----------------------------------------------------------------------------
+ # Find sizeof of native kinds
+ #-----------------------------------------------------------------------------
++if (MINGW AND CMAKE_CROSSCOMPILING)
++set(PROG_OUTPUT "                    4\n           4\n                    4\n           4\n                    8\n           8\n")
++else ()
+ FORTRAN_RUN ("SIZEOF NATIVE KINDs"
+   "
+        PROGRAM main
+@@ -305,7 +320,7 @@
+ # dnl    -- LINE 4 --  kind of REAL
+ # dnl    -- LINE 5 --  sizeof DOUBLE PRECISION
+ # dnl    -- LINE 6 --  kind of DOUBLE PRECISION
+-
++endif ()
+ # Convert the string to a list of strings by replacing the carriage return with a semicolon
+ string (REGEX REPLACE "\n" ";" PROG_OUTPUT "${PROG_OUTPUT}")
+ 
+@@ -418,6 +433,9 @@
+     endif ()
+ endmacro ()
+ 
++if (MINGW AND CMAKE_CROSSCOMPILING)
++SET(PROG_OUTPUT "4\n")
++else ()
+ set (PROG_SRC
+     "
+ #include <float.h>
+@@ -448,6 +466,7 @@
+ )
+ 
+ C_RUN ("maximum decimal precision for C" ${PROG_SRC} PROG_OUTPUT)
++endif ()
+ 
+ # dnl The output from the above program will be:
+ # dnl    -- LINE 1 --  long double decimal precision
+@@ -459,6 +478,9 @@
+ list (GET PROG_OUTPUT 0 LDBL_DIG)
+ list (GET PROG_OUTPUT 1 FLT128_DIG)
+ 
++if (MINGW AND CMAKE_CROSSCOMPILING)
++set(H5_PAC_C_MAX_REAL_PRECISION 33)
++else ()
+ if (SIZEOF___FLOAT128 EQUAL 0 OR FLT128_DIG EQUAL 0)
+   set (H5_HAVE_FLOAT128 0)
+   set (SIZEOF___FLOAT128 0)
+@@ -466,6 +488,7 @@
+ else ()
+   set(H5_PAC_C_MAX_REAL_PRECISION ${FLT128_DIG})
+ endif ()
++endif ()
+ 
+ 
+ # Setting definition if there is a 16 byte fortran integer
+diff -Naur -x '.*' a/fortran/src/CMakeLists.txt b/fortran/src/CMakeLists.txt
+--- a/fortran/src/CMakeLists.txt	2017-04-13 12:26:10.000000000 +0200
++++ b/fortran/src/CMakeLists.txt	2018-07-03 21:50:28.000000000 +0200
+@@ -86,6 +86,10 @@
+     ${HDF5_F90_SRC_SOURCE_DIR}/H5match_types.c
+ )
+ set (CMD $<TARGET_FILE:H5match_types>)
++if (MINGW AND CMAKE_CROSSCOMPILING)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5f90i_gen.h ${HDF5_F90_BINARY_DIR}/H5f90i_gen.h COPYONLY)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5fortran_types.F90 ${HDF5_F90_BINARY_DIR}/H5fortran_types.F90 COPYONLY)
++else ()
+ add_custom_command (
+     OUTPUT ${HDF5_F90_BINARY_DIR}/H5f90i_gen.h
+            ${HDF5_F90_BINARY_DIR}/H5fortran_types.F90
+@@ -93,6 +97,7 @@
+     WORKING_DIRECTORY ${HDF5_F90_BINARY_DIR}
+     DEPENDS H5match_types
+ )
++endif()
+ set_source_files_properties (${HDF5_F90_BINARY_DIR}/H5f90i_gen.h PROPERTIES GENERATED TRUE)
+ set_source_files_properties (${HDF5_F90_BINARY_DIR}/H5fortran_types.F90 PROPERTIES GENERATED TRUE)
+ 
+@@ -161,6 +166,9 @@
+     ${HDF5_F90_SRC_SOURCE_DIR}/H5Pff.F90
+ )
+ set (CMD $<TARGET_FILE:H5_buildiface>)
++if (MINGW AND CMAKE_CROSSCOMPILING)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5_gen.F90 ${HDF5_F90_BINARY_DIR}/H5_gen.F90 COPYONLY)
++else ()
+ add_custom_command (
+     OUTPUT ${HDF5_F90_BINARY_DIR}/H5_gen.F90
+     COMMAND ${CMD}
+@@ -168,6 +176,7 @@
+     DEPENDS ${f90_F_GEN_SOURCES}
+     COMMENT "Generating the H5_gen.F90 file"
+ )
++endif()
+ add_custom_target (H5gen ALL
+     DEPENDS ${HDF5_F90_BINARY_DIR}/H5_gen.F90
+ )
+diff -Naur -x '.*' a/hl/fortran/src/CMakeLists.txt b/hl/fortran/src/CMakeLists.txt
+--- a/hl/fortran/src/CMakeLists.txt	2017-04-13 12:26:10.000000000 +0200
++++ b/hl/fortran/src/CMakeLists.txt	2018-07-03 21:50:28.000000000 +0200
+@@ -114,6 +114,10 @@
+ )
+ 
+ set (CMD $<TARGET_FILE:H5HL_buildiface>)
++if (MINGW AND CMAKE_CROSSCOMPILING)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5TBff_gen.F90 ${HDF5_HL_F90_SRC_BINARY_DIR}/H5TBff_gen.F90 COPYONLY)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5LTff_gen.F90 ${HDF5_HL_F90_SRC_BINARY_DIR}/H5LTff_gen.F90 COPYONLY)
++else ()
+ add_custom_command (
+     OUTPUT ${HDF5_HL_F90_SRC_BINARY_DIR}/H5LTff_gen.F90 ${HDF5_HL_F90_SRC_BINARY_DIR}/H5TBff_gen.F90
+     COMMAND ${CMD}
+@@ -121,6 +125,7 @@
+     DEPENDS ${HDF5_HL_F90_F_BASE_SOURCES}
+     COMMENT "Generating the H5LTff_gen.F90, H5TBff_gen.F90 files"
+ )
++endif ()
+ add_custom_target (H5HLgen ALL
+     DEPENDS ${HDF5_HL_F90_SRC_BINARY_DIR}/H5LTff_gen.F90 ${HDF5_HL_F90_SRC_BINARY_DIR}/H5TBff_gen.F90
+ )
+diff -Naur -x '.*' a/src/CMakeLists.txt b/src/CMakeLists.txt
+--- a/src/CMakeLists.txt	2017-04-13 12:26:12.000000000 +0200
++++ b/src/CMakeLists.txt	2018-07-03 21:53:20.000000000 +0200
+@@ -842,6 +842,10 @@
+ # Setup the H5Detect utility which generates H5Tinit with platform
+ # specific type checks inside
+ #-----------------------------------------------------------------------------
++if (MINGW AND CMAKE_CROSSCOMPILING)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5Tinit.c ${HDF5_BINARY_DIR}/H5Tinit.c COPYONLY)
++configure_file(${CMAKE_SOURCE_DIR}/gen/H5lib_settings.c ${HDF5_BINARY_DIR}/H5lib_settings.c COPYONLY)
++else ()
+ add_executable (H5detect ${HDF5_SRC_DIR}/H5detect.c)
+ TARGET_C_PROPERTIES (H5detect STATIC " " " ")
+ if (MSVC OR MINGW)
+@@ -870,6 +874,7 @@
+     DEPENDS H5make_libsettings
+     WORKING_DIRECTORY ${HDF5_BINARY_DIR}
+ )
++endif ()
+ 
+ #-----------------------------------------------------------------------------
+ # Add H5Tinit source to build - generated by H5Detect/CMake at configure time

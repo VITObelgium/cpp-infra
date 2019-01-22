@@ -1,0 +1,11 @@
+diff -Naur a/VTK/IO/Export/CMakeLists.txt b/VTK/IO/Export/CMakeLists.txt
+--- a/VTK/IO/Export/CMakeLists.txt	2018-10-29 11:56:24.972676000 +0100
++++ b/VTK/IO/Export/CMakeLists.txt	2018-10-29 12:24:27.276546000 +0100
+@@ -1,6 +1,6 @@
+ set(Module_SRCS
+   vtkExporter.cxx
+-  vtkGL2PSExporter.cxx
++  #vtkGL2PSExporter.cxx
+   vtkIVExporter.cxx
+   vtkOBJExporter.cxx
+   vtkOOGLExporter.cxx

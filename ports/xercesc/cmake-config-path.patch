@@ -1,0 +1,16 @@
+diff -Naur a/src/CMakeLists.txt b/src/CMakeLists.txt
+--- a/src/CMakeLists.txt	2018-09-20 15:31:41.000000000 +0200
++++ b/src/CMakeLists.txt	2018-11-16 09:50:05.784478302 +0100
+@@ -1308,11 +1308,7 @@
+ endif()
+ set_target_properties(xerces-c PROPERTIES FOLDER "Library")
+ 
+-if(WIN32)
+-  set(xerces_config_dir "cmake")
+-else()
+-  set(xerces_config_dir "${CMAKE_INSTALL_LIBDIR}/cmake/XercesC")
+-endif()
++set(xerces_config_dir "${CMAKE_INSTALL_DATADIR}/XercesC")
+ 
+ install(TARGETS xerces-c
+   EXPORT XercesCConfigInternal

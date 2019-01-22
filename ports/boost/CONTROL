@@ -1,0 +1,45 @@
+Source: boost
+Version: 1.69.0-1
+Description: Peer-reviewed portable C++ source libraries
+
+Feature: zlib
+Description: zlib compression support
+Build-Depends: zlib
+
+Feature: bzip2
+Description: bzip2 compression support
+Build-Depends: bzip2
+
+Feature: lzma
+Description: lzma compression support
+Build-Depends: liblzma
+
+Feature: system
+Description: Build the system library
+
+Feature: filesystem
+Description: Build the filesystem library
+
+Feature: date-time
+Description: Build the date-time library
+
+Feature: thread
+Description: Build the thread library
+
+Feature: iostreams
+Description: Build the iostreams library
+
+Feature: program-options
+Description: Build the program_options library
+
+Feature: regex
+Description: Build the regex library
+
+Feature: math
+Description: Build the math library
+
+Feature: python
+Description: Build the python library
+
+Feature: timer
+Description: Build the timer library

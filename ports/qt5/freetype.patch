@@ -1,0 +1,12 @@
+diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
+--- a/qtbase/src/gui/configure.json	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/src/gui/configure.json	2019-01-03 14:56:27.492889400 +0100
+@@ -165,6 +165,8 @@
+             "sources": [
+                 { "type": "pkgConfig", "args": "freetype2" },
+                 { "type": "freetype", "libs": "-lfreetype", "condition": "!config.wasm" },
++                { "libs": "-lfreetype", "condition": "config.msvc" },
++                { "libs": "-lfreetyped" },
+                 { "type": "freetype", "libs": "-s USE_FREETYPE=1", "condition": "config.wasm" }
+             ]
+         },

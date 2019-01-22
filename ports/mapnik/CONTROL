@@ -1,0 +1,8 @@
+Source: mapnik
+Version: 3.0.22
+Description: Toolkit for developing mapping applications
+Build-Depends: zlib, boost[zlib], boost[program-options], boost[regex], boost[filesystem], boost[system], icu, freetype, harfbuzz, libpng, tiff, proj4
+
+Feature: gdal
+Description: Gdal input plugin support
+Build-Depends: gdal

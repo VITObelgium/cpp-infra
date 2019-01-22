@@ -1,0 +1,13 @@
+diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
+--- a/qtbase/src/gui/configure.json	2018-12-03 11:15:26.000000000 +0100
++++ b/qtbase/src/gui/configure.json	2019-01-03 13:37:57.851001400 +0100
+@@ -294,7 +294,8 @@
+                 "main": "jpeg_create_compress(cinfo);"
+             },
+             "sources": [
+-                { "libs": "-llibjpeg", "condition": "config.msvc" },
++                { "libs": "-ljpeg", "condition": "config.msvc" },
++                { "libs": "-ljpegd" },
+                 "-ljpeg"
+             ]
+         },
