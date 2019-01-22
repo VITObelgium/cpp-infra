@@ -156,13 +156,13 @@ if (UNIX OR MINGW)
     list (SORT _variableNames)
 
     vcpkg_execute_required_process(
-        COMMAND ./autogen.sh
+        COMMAND sh ./autogen.sh
         WORKING_DIRECTORY ${SOURCE_PATH_DEBUG}
         LOGNAME autogen-${TARGET_TRIPLET}-dbg
     )
 
     vcpkg_execute_required_process(
-        COMMAND ./autogen.sh
+        COMMAND sh ./autogen.sh
         WORKING_DIRECTORY ${SOURCE_PATH_RELEASE}
         LOGNAME autogen-${TARGET_TRIPLET}-rel
     )

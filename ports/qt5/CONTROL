@@ -1,7 +1,10 @@
 Source: qt5
-Version: 5.12.0-1
+Version: 5.12.0-3
 Description: Complete software development framework
 Build-Depends: zlib, freetype, harfbuzz, libjpeg-turbo, libpng, pcre2
+
+Feature: angle
+Description: enable angle for gl rendering (windows only)
 
 Feature: qml
 Description: qml support

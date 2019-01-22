@@ -1,14 +1,14 @@
 include(vcpkg_common_functions)
 set(MAJOR 2)
-set(MINOR 8)
-set(REVISION 2)
+set(MINOR 9)
+set(REVISION 0)
 set(VERSION ${MAJOR}.${MINOR}.${REVISION})
 set(PACKAGE ${PORT}-${VERSION}.tar.gz)
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/${PORT}-${VERSION})
 vcpkg_download_distfile(ARCHIVE_FILE
     URLS "http://ftp.openbsd.org/pub/OpenBSD/LibreSSL/${PACKAGE}" "http://mirror.nl.datapacket.com/openbsd/LibreSSL/${PACKAGE}"
     FILENAME "${PACKAGE}"
-    SHA512 bfcc55904efbb591c9edd56169d611e735108dfc6a49f771a64ad1ddd028d3a658f5593116c379911edc77f95eba475daec9c0adea0549e8b4b94d1072adf733
+    SHA512 db7fec664bef8d76204ca691c11df236abce3c85b2a51011eec5bd302e273b62fa3cfce0430980915c3f3ce34176d5ef9c187902f0b39d7fc151e69e552b499c
 )
 vcpkg_extract_source_archive(${ARCHIVE_FILE})
 
