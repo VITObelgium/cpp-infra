@@ -1,4 +1,0 @@
-% execute the following command to compile the tools
-
-mcc -v -I .\src -d build -m rio.m
-mcc -v -I .\src -d build -m riopp.m

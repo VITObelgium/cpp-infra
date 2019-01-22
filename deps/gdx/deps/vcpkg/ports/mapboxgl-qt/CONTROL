@@ -1,4 +1,0 @@
-Source: mapboxgl-qt
-Version: 1.3.0
-Description: Interactive, thoroughly customizable maps in Qt applications, powered by vector tiles and OpenGL
-Build-Depends: zlib, icu, qt5, libjpeg-turbo, libpng, sqlite3
