@@ -24,6 +24,17 @@ if (CMAKE_HOST_WIN32 AND NOT MINGW)
     vcpkg_find_acquire_program("JOM")
 endif ()
 
+set (OPTIONAL_ARGS)
+if(NOT "tools" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_SKIPS -skip qttools)
+endif ()
+
+if(NOT "qml" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_ARGS -skip qtquickcontrols -skip qtquickcontrols2 -skip qtdeclarative)
+endif ()
+
+# Extract source into architecture specific directory, because GDALs' build currently does not
+# support out of source builds.
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src-${TARGET_TRIPLET})
 message(STATUS "Qt source path ${SOURCE_PATH}")
 vcpkg_download_distfile(ARCHIVE
@@ -32,9 +43,10 @@ vcpkg_download_distfile(ARCHIVE
     SHA512 ${SHASUM}
 )
 
-vcpkg_extract_source_archive(${ARCHIVE} ${SOURCE_PATH})
-vcpkg_apply_patches(
-    SOURCE_PATH ${SOURCE_PATH}/${PACKAGE_NAME}
+vcpkg_extract_source_archive_ex(
+    ARCHIVE ${ARCHIVE}
+    REF ${PORT}
+    OUT_SOURCE_PATH SOURCE_PATH
     PATCHES
         cmake-debug-plugin-name-osx.patch
         support-static-builds-with-cmake.patch
@@ -59,7 +71,7 @@ if (MINGW AND NOT CMAKE_CROSSCOMPILING)
 
     foreach(FILE_TO_FIX IN LISTS FILES_TO_FIX)
         # fix for include going wrong on native mingw build
-        vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/${FILE_TO_FIX}
+        vcpkg_replace_string(${SOURCE_PATH}/${FILE_TO_FIX}
             "../../../../../"
             "../../../../"
         )
@@ -68,8 +80,8 @@ endif ()
 
  set(OSX_LEGACY_SDK OFF)
 
- # copy the g++-cluster compiler specification
-file(COPY ${CMAKE_CURRENT_LIST_DIR}/linux-g++-cluster DESTINATION ${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/mkspecs)
+# copy the g++-cluster compiler specification
+file(COPY ${CMAKE_CURRENT_LIST_DIR}/linux-g++-cluster DESTINATION ${SOURCE_PATH}/qtbase/mkspecs)
 
 set(OPTIONAL_ARGS)
 if(NOT "tools" IN_LIST FEATURES)
@@ -168,9 +180,15 @@ if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SY
         set(BUILD_COMMAND ${NMAKE})
     endif ()
 
+    if("angle" IN_LIST FEATURES)
+        list(APPEND PLATFORM_OPTIONS -angle)
+    else ()
+        list(APPEND PLATFORM_OPTIONS -opengl desktop)
+    endif()
+
     set(CONFIG_SUFFIX .bat)
     list(APPEND QT_OPTIONS -platform win32-msvc2017)
-    list(APPEND PLATFORM_OPTIONS -opengl desktop -mp)
+    list(APPEND PLATFORM_OPTIONS -mp)
 elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (HOST MATCHES "x86_64-unknown-linux-gnu")
         set(PLATFORM -platform linux-g++-cluster)
@@ -193,7 +211,7 @@ elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Darwin")
 
     list(APPEND PLATFORM_OPTIONS -no-pch -sdk macosx${OSX_SDK_VERSION})
 
-    vcpkg_replace_string(${SOURCE_PATH}/${PACKAGE_NAME}/qtbase/mkspecs/macx-clang/qmake.conf
+    vcpkg_replace_string(${SOURCE_PATH}/qtbase/mkspecs/macx-clang/qmake.conf
         "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.11"
         "QMAKE_MACOSX_DEPLOYMENT_TARGET = ${OSX_SDK_VERSION}"
     )
@@ -201,6 +219,16 @@ elseif (MINGW AND (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_HOST_SYSTEM_
     set(PLATFORM -xplatform win32-g++)
     list(APPEND PLATFORM_OPTIONS -opengl desktop)
 elseif (MINGW)
+    set (DIRECTX_SDK_DIR "c:/Program Files (x86)/Microsoft DirectX SDK (June 2010)/")
+    if (NOT EXISTS ${DIRECTX_SDK_DIR})
+        message (FATAL_ERROR "The DirectX SDK needs to be installed in: ${DIRECTX_SDK_DIR}")
+    endif ()
+
+    set(BUILD_COMMAND jom)
+    set(ENV{DXSDK_DIR} "${DIRECTX_SDK_DIR}")
+    vcpkg_replace_string(${SOURCE_PATH}/qtbase/src/angle/src/common/common.pri "Utilities\\\\bin\\\\x64\\\\fxc.exe" "Utilities/bin/x64/fxc.exe")
+    vcpkg_replace_string(${SOURCE_PATH}/qtbase/src/angle/src/common/common.pri "Utilities\\\\bin\\\\x86\\\\fxc.exe" "Utilities/bin/x86/fxc.exe")
+
     set(PLATFORM -platform win32-g++)
     list(APPEND PLATFORM_OPTIONS -angle)
     set(EXEC_COMMAND sh)
@@ -241,11 +269,11 @@ set(ENV{PKG_CONFIG_LIBDIR} "${CURRENT_INSTALLED_DIR}/lib/pkgconfig")
 message(STATUS "Configuring ${TARGET_TRIPLET}-dbg")
 if(VCPKG_VERBOSE)
     STRING(JOIN " " QT_ARGS ${QT_OPTIONS_DBG})
-    message(STATUS "${SOURCE_PATH}/${PACKAGE_NAME}/configure${CONFIG_SUFFIX} ${QT_ARGS}")
+    message(STATUS "${SOURCE_PATH}/configure${CONFIG_SUFFIX} ${QT_ARGS}")
 endif()
 file(MAKE_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg)
 vcpkg_execute_required_process(
-    COMMAND ${EXEC_COMMAND} ${SOURCE_PATH}/${PACKAGE_NAME}/configure${CONFIG_SUFFIX} ${QT_OPTIONS_DBG}
+    COMMAND ${EXEC_COMMAND} ${SOURCE_PATH}/configure${CONFIG_SUFFIX} ${QT_OPTIONS_DBG}
     WORKING_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg
     LOGNAME qt-configure-${TARGET_TRIPLET}-debug
 )
@@ -254,7 +282,7 @@ message(STATUS "Configuring ${TARGET_TRIPLET}-rel")
 message(STATUS "${QT_OPTIONS_REL}")
 file(MAKE_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel)
 vcpkg_execute_required_process(
-    COMMAND ${EXEC_COMMAND} ${SOURCE_PATH}/${PACKAGE_NAME}/configure${CONFIG_SUFFIX} ${QT_OPTIONS_REL}
+    COMMAND ${EXEC_COMMAND} ${SOURCE_PATH}/configure${CONFIG_SUFFIX} ${QT_OPTIONS_REL}
     WORKING_DIRECTORY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel
     LOGNAME qt-configure-${TARGET_TRIPLET}-release
 )
@@ -274,19 +302,15 @@ vcpkg_execute_required_process(
 )
 
 if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME)
-    # fix the release prl files
+    # fix the prl files
     vcpkg_execute_required_process(
         COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/fixprl.py
-        WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}/lib
+        WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}
         LOGNAME fix-prl
     )
-    # fix the debug prl files
-    vcpkg_execute_required_process(
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/fixprl.py
-        WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}/debug/lib
-        LOGNAME fix-prl
-    )
-    
+endif ()
+
+if (EXISTS ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/qtbase/bin/qmake.exe)
     # qt-bug: file does not get installed
     file(COPY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/qtbase/bin/qmake.exe DESTINATION ${CURRENT_PACKAGES_DIR}/tools)
 endif ()
@@ -320,4 +344,4 @@ file(REMOVE
 )
 
 # Handle copyright
-file(INSTALL ${SOURCE_PATH}/${PACKAGE_NAME}/LICENSE.LGPLv3 DESTINATION  ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
+file(INSTALL ${SOURCE_PATH}/LICENSE.LGPLv3 DESTINATION  ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
