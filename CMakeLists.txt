@@ -321,6 +321,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/readonlyproxy.h
         include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
         include/uiinfra/gradientdelegate.h ui/gradientdelegate.cpp
+        include/uiinfra/pixmapimage.h ui/pixmapimage.cpp
         include/uiinfra/scopedcursor.h
         include/uiinfra/toolboxview.h ui/toolboxview.cpp
         include/uiinfra/treemodel.h ui/treemodel.cpp
