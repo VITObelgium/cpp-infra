@@ -12,6 +12,7 @@ class PixmapImage : public QQuickPaintedItem
     Q_OBJECT
 public:
     PixmapImage(QQuickItem* parent = nullptr);
+    Q_INVOKABLE const QPixmap image() const;
     Q_INVOKABLE void setImage(QPixmap pixmapContainer);
     Q_INVOKABLE void clear();
 

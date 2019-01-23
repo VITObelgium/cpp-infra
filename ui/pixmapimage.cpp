@@ -9,6 +9,11 @@ PixmapImage::PixmapImage(QQuickItem* parent)
 {
 }
 
+Q_INVOKABLE const QPixmap PixmapImage::image() const
+{
+    return _pixmap;
+}
+
 void PixmapImage::setImage(QPixmap pixmap)
 {
     _pixmap = pixmap;
