@@ -41,6 +41,7 @@ struct Legend
     std::vector<LegendEntry> entries;
     inf::ColorMap cmap;
     std::string colorMapName;
+    std::string title;
     bool zeroIsNodata = false;
 };
 
