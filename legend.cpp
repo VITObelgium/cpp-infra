@@ -1,8 +1,8 @@
 #include "infra/legend.h"
 #include "infra/exception.h"
+#include "infra/legenddataanalyser.h"
 #include "infra/log.h"
 #include "infra/string.h"
-#include "legenddataanalyser.h"
 
 #include <fmt/format.h>
 #include <fstream>

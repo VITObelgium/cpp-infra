@@ -1,4 +1,4 @@
-#include "legenddataanalyser.h"
+#include "infra/legenddataanalyser.h"
 
 #include "infra/cast.h"
 #include "infra/exception.h"
