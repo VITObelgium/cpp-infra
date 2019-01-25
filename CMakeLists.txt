@@ -87,6 +87,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumflags.h
     include/infra/generator.h
     include/infra/legend.h
+    include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
@@ -107,7 +108,7 @@ set(INFRA_PUBLIC_HEADERS
 
 add_library(infra
     legend.cpp
-    legenddataanalyser.h legenddataanalyser.cpp
+    legenddataanalyser.cpp
     process.cpp
     string.cpp
     exception.cpp
