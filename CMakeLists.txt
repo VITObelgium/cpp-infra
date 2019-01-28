@@ -398,6 +398,12 @@ if (INFRA_UI_COMPONENTS)
         target_link_libraries(uiinfra PUBLIC
             Qt5::Location
         )
+
+        if (INFRA_GDAL)
+            target_sources(uiinfra PRIVATE
+                include/uiinfra/polygonio.h ui/polygonio.cpp
+            )
+        endif ()
     endif ()
 
     if (INFRA_UI_COMPONENTS_XLSX_EXPORT)
@@ -406,12 +412,6 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/modelexport.h ui/modelexport.cpp
         )
         target_link_libraries(uiinfra PRIVATE XslxWriter::XslxWriter)
-    endif ()
-
-    if (INFRA_GDAL)
-        target_sources(uiinfra PRIVATE
-            include/uiinfra/polygonio.h ui/polygonio.cpp
-        )
     endif ()
 
     if (INFRA_LOGGING)

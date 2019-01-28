@@ -10,20 +10,25 @@ namespace inf {
 template <typename T>
 struct Point
 {
-    Point() = default;
-    Point(T x_, T y_) noexcept
+    constexpr Point() = default;
+    constexpr Point(T x_, T y_) noexcept
     : x(x_), y(y_)
     {
     }
 
-    bool operator==(const Point<T>& other) const
+    constexpr bool operator==(const Point<T>& other) const
     {
         return x == other.x && y == other.y;
     }
 
-    bool operator!=(const Point<T>& other) const
+    constexpr bool operator!=(const Point<T>& other) const
     {
         return !(*this == other);
+    }
+
+    constexpr bool is_valid() const
+    {
+        return x != std::numeric_limits<T>::max() && y != std::numeric_limits<T>::max();
     }
 
     T x = std::numeric_limits<T>::max();
