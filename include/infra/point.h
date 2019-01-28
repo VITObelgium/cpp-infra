@@ -35,6 +35,18 @@ struct Point
     T y = std::numeric_limits<T>::max();
 };
 
+template <typename T>
+constexpr Point<T> operator-(const Point<T>& lhs, const Point<T>& rhs)
+{
+    return Point<T>(lhs.x - rhs.x, lhs.y - rhs.y);
+}
+
+template <typename T>
+constexpr Point<T> operator+(const Point<T>& lhs, const Point<T>& rhs)
+{
+    return Point<T>(lhs.x + rhs.x, lhs.y + rhs.y);
+}
+
 }
 
 namespace fmt {
