@@ -122,12 +122,18 @@ bool GeoMetadata::is_on_map(const int32_t r, const int32_t c) const
 void GeoMetadata::compute_rect_on_map_around(const int32_t row, const int32_t col, const int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const
 {
     r0 = row - radius;
+    if (r0 < 0) {
+        r0 = 0;
+    }
     r1 = row + radius;
     if (r1 > rows - 1) {
         r1 = rows - 1;
     }
 
     c0 = col - radius;
+    if (c0 < 0) {
+        c0 = 0;
+    }
     c1 = col + radius;
     if (c1 > cols - 1) {
         c1 = cols - 1;
