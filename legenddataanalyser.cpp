@@ -201,8 +201,11 @@ std::vector<std::tuple<double, double>> LegendDataAnalyser::classbounds() const
     std::vector<std::tuple<double, double>> bounds;
     bounds.reserve(_nClasses);
 
-    for (int i = 0; i < _nClasses; i++) {
-        bounds.emplace_back(_classBounds[i], _classBounds[i + 1]);
+    if (!_classBounds.empty()) {
+        assert(_classBounds.size() == _nClasses + 1);
+        for (int i = 0; i < _nClasses; i++) {
+            bounds.emplace_back(_classBounds[i], _classBounds[i + 1]);
+        }
     }
 
     return bounds;
