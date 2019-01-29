@@ -83,6 +83,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
+    include/infra/cpuinfo.h
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
@@ -108,6 +109,7 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    cpuinfo.cpp
     legend.cpp
     legenddataanalyser.cpp
     process.cpp
