@@ -10,15 +10,15 @@ namespace inf {
 struct Coordinate
 {
     constexpr Coordinate() = default;
-    constexpr Coordinate(double lon, double lat) noexcept
-    : longitude(lon)
-    , latitude(lat)
+    constexpr Coordinate(double lat, double lon) noexcept
+    : latitude(lat)
+    , longitude(lon)
     {
     }
 
     constexpr bool operator==(const Coordinate& other) const
     {
-        return longitude == other.longitude && latitude == other.latitude;
+        return latitude == other.latitude && longitude == other.longitude;
     }
 
     constexpr bool operator!=(const Coordinate& other) const
@@ -28,26 +28,27 @@ struct Coordinate
 
     constexpr bool is_valid() const
     {
-        return longitude != std::numeric_limits<double>::max() && latitude != std::numeric_limits<double>::max();
+        return latitude != std::numeric_limits<double>::max() && longitude != std::numeric_limits<double>::max();
     }
 
-    double longitude = std::numeric_limits<double>::max();
     double latitude  = std::numeric_limits<double>::max();
+    double longitude = std::numeric_limits<double>::max();
 };
 
 constexpr Coordinate operator-(const Coordinate& lhs, const Coordinate& rhs)
 {
-    return Coordinate(lhs.longitude - rhs.longitude, lhs.latitude - rhs.latitude);
+    return Coordinate(lhs.latitude - rhs.latitude, lhs.longitude - rhs.longitude);
 }
 
 constexpr Coordinate operator+(const Coordinate& lhs, const Coordinate& rhs)
 {
-    return Coordinate(lhs.longitude + rhs.longitude, lhs.latitude + rhs.latitude);
+    return Coordinate(lhs.latitude + rhs.latitude, lhs.longitude + rhs.longitude);
 }
 
 }
 
 namespace fmt {
+template <>
 struct formatter<inf::Coordinate>
 {
     template <typename ParseContext>

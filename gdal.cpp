@@ -699,6 +699,7 @@ void RasterDataSet::set_metadata(const std::string& name, const std::string& val
 
 RasterBand RasterDataSet::rasterband(int bandNr) const
 {
+    assert(bandNr > 0);
     return RasterBand(checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index"));
 }
 
