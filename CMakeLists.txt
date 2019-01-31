@@ -83,6 +83,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
+    include/infra/coordinate.h
     include/infra/cpuinfo.h
     include/infra/enumutils.h
     include/infra/enumflags.h
