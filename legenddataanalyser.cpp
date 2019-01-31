@@ -1,6 +1,7 @@
-#include "legenddataanalyser.h"
+#include "infra/legenddataanalyser.h"
 
 #include "infra/cast.h"
+#include "infra/exception.h"
 
 #include <algorithm>
 #include <cmath>
@@ -41,221 +42,32 @@ LegendDataAnalyser::LegendDataAnalyser(std::vector<float> sampleData)
     }
 }
 
-void LegendDataAnalyser::set_number_of_classes(const int n)
+void LegendDataAnalyser::set_number_of_classes(int n)
 {
-    _nClasses = (n > 0) ? n : 0;
-    _classBounds.resize(_nClasses + 1);
+    _nClasses = std::max(0, n);
 }
 
-LegendDataAnalyser::ClassboundsCalculationResult LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double minValue /* =0 */, double maxValue /* =-1 */)
+void LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double minValue, double maxValue)
 {
-    _classBoundsOk = false;
-    if (minValue >= maxValue) {
-        if (_sampleData.size() < 1) {
-            assert(false);
-            return ClassboundsCalculationResult::DataRequiredForDerivationOfMinMax;
+    try {
+        if (minValue >= maxValue) {
+            minValue = _sampleData[0];
+            maxValue = _sampleData[_sampleData.size() - 1];
         }
-        minValue = _sampleData[0];
-        maxValue = _sampleData[_sampleData.size() - 1];
+        _classBounds = inf::calculate_classbounds(scaleType, _nClasses, minValue, maxValue, _sampleData);
+    } catch (const std::exception&) {
+        _classBounds.clear();
     }
-    _classBounds[0]         = minValue;
-    _classBounds[_nClasses] = maxValue;
-
-    if (scaleType == LegendScaleType::Linear) { // Linear sequence
-        double x = (maxValue - minValue) / _nClasses;
-        for (int i = 1; i < _nClasses; i++)
-            _classBounds[i] = minValue + i * x;
-    } else if (scaleType == LegendScaleType::Arithmetic) { // Arithmetic sequence
-        double x = (maxValue - minValue) / (_nClasses * (_nClasses + 1) / 2);
-        for (int i = 1; i < _nClasses; i++) {
-            _classBounds[i] = _classBounds[i - 1] + i * x;
-        }
-    } else if (scaleType == LegendScaleType::Geometric) { // Geometric sequence
-        if (minValue <= 0) {
-            // calculate for minValue = 1 and then transpose back
-            double logMax = log10(maxValue + 1 - minValue);
-            double x      = pow(10., logMax / _nClasses);
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] = pow(x, (double)i);
-            }
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] -= 1 - minValue;
-            }
-        } else {
-            double logMin = log10(minValue);
-            double logMax = log10(maxValue);
-            double x      = pow(10., (logMax - logMin) / _nClasses);
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] = _classBounds[i - 1] * x;
-            }
-        }
-    } else if (scaleType == LegendScaleType::OverGeometric) { // Over-Geometric sequence
-        if (minValue <= 0) {
-            // calculate for minValue = 1 and then transpose back
-            double logMax   = log10(maxValue + 1 - minValue);
-            double x        = pow(10., logMax / (_nClasses * (_nClasses + 1) / 2));
-            _classBounds[1] = x;
-            for (int i = 2; i < _nClasses; i++) {
-                _classBounds[i] = _classBounds[i - 1] * pow(x, (double)i);
-            }
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] -= 1 - minValue;
-            }
-        } else {
-            double logMin = log10(minValue);
-            double logMax = log10(maxValue);
-            double x      = pow(10., (logMax - logMin) / (_nClasses * (_nClasses + 1) / 2));
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] = _classBounds[i - 1] * pow(x, (double)i);
-            }
-        }
-    } else if (scaleType == LegendScaleType::Harmonic) { // Harmonic sequence
-        if (minValue <= 0) {
-            // calculate for minValue = 1 and then transpose back
-            double invMax = 1 / (maxValue + 1 - minValue);
-            double x      = (1 - invMax) / _nClasses;
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] = 1 / (1 - i * x) - 1 + minValue;
-            }
-        } else {
-            double invMin = 1 / minValue;
-            double invMax = 1 / maxValue;
-            double x      = (invMin - invMax) / _nClasses;
-            for (int i = 1; i < _nClasses; i++) {
-                _classBounds[i] = 1 / (invMin - i * x);
-            }
-        }
-    } else if (scaleType == LegendScaleType::Quantiles) { // Quantiles
-        if (_sampleData.size() < 1) return ClassboundsCalculationResult::NotEnoughDataForThisScale;
-
-        int n    = truncate<int>(_sampleData.size());
-        int iMin = 0, iMax = n - 1;
-        while (iMin < n && _sampleData[iMin] < minValue)
-            ++iMin;
-        while (iMax >= 0 && _sampleData[iMax] > maxValue)
-            --iMax;
-        n = iMax - iMin + 1;
-        if (n < 1) return ClassboundsCalculationResult::NotEnoughDataForThisScale;
-
-        // put an equal amount of observations in each class
-        float amplitude = float(n) / _nClasses;
-        float index     = float(iMin);
-        for (int i = 1; i < _nClasses; i++) {
-            _classBounds[i] = _sampleData[int(index)]; //(sampleData[int(index)] + sampleData[int(index) + 1]) / 2;
-            index += amplitude;
-            if (index > iMax) {
-                index = truncate<float>(iMax); // fix possible rounding error
-            }
-        }
-    } else if (scaleType == LegendScaleType::StandardisedDescretisation) { // Standaardised discretisation
-        if (_sampleData.size() < 1) return ClassboundsCalculationResult::NotEnoughDataForThisScale;
-
-        int n    = truncate<int>(_sampleData.size());
-        int iMin = 0, iMax = n - 1;
-        while (iMin < n && _sampleData[iMin] < minValue)
-            ++iMin;
-        while (iMax >= 0 && _sampleData[iMax] > maxValue)
-            --iMax;
-        n = iMax - iMin + 1;
-        if (n < 1) return ClassboundsCalculationResult::NotEnoughDataForThisScale;
-
-        // calculate average and standard deviation
-        double ave = 0;
-        double sd  = 0;
-        /*
-        if (!_FreqValue.empty()) {
-            for (int i = 0; i < _FreqValue.size(); i++) {
-                ave += _FreqValue[i] * _FreqNr[i];
-                sd += _FreqValue[i] * _FreqValue[i] * _FreqNr[i];
-            }
-        }
-        else {
-        */
-        for (int i = iMin; i <= iMax; i++) {
-            ave += _sampleData[i];
-            sd += _sampleData[i] * _sampleData[i];
-        }
-        //}
-        ave = ave / n;
-        sd  = sqrt(sd / n - ave * ave);
-
-        for (int i = 1; i < _nClasses; i++) {
-            _classBounds[i] = ave + (-_nClasses / 2.0 + i) * sd;
-            // Proof (with inductions).
-            // Basis: with two classes classbound[1] = ave
-            // Induction: each extra class results in:
-            // classbound[1] getting a half sd earlier
-            // classbound[_nClasses-1] getting a half sd later
-            // QED.
-        }
-
-        for (int h = 1; h < _nClasses - 1; h++)
-            assert(fabs(_classBounds[h] + sd - _classBounds[h + 1]) < 0.0001);
-        // check if bounds are not lower than minValue or higher than maxValue
-        for (int i = 1; i < _nClasses; i++) {
-            if (_classBounds[i] < minValue)
-                _classBounds[i] = minValue;
-            else if (_classBounds[i] > maxValue)
-                _classBounds[i] = maxValue;
-        }
-        for (int h = 0; h < _nClasses; h++)
-            assert(_classBounds[h] <= _classBounds[h + 1]);
-    } else if (scaleType == LegendScaleType::MethodOfBertin) { // Method of Bertin
-        if (_sampleData.size() < 1) return ClassboundsCalculationResult::NotEnoughDataForThisScale;
-
-        int n    = truncate<int>(_sampleData.size());
-        int iMin = 0, iMax = n - 1;
-        while (iMin < n && _sampleData[iMin] < minValue)
-            ++iMin;
-        while (iMax >= 0 && _sampleData[iMax] > maxValue)
-            --iMax;
-        n = iMax - iMin + 1;
-        if (n < 1) return ClassboundsCalculationResult::NotEnoughDataForThisScale;
-
-        // calculate average
-        double ave = 0;
-        for (int i = iMin; i <= iMax; ++i) {
-            ave += _sampleData[i];
-        }
-        ave = ave / n;
-
-        // calculate class widths
-        double xLeft  = 2 * (ave - minValue) / _nClasses;
-        double xRight = 2 * (maxValue - ave) / _nClasses;
-
-        double value = minValue;
-        // left intervals
-        int i;
-        for (i = 1; i < (_nClasses + 1) / 2.; i++) {
-            value += xLeft;
-            _classBounds[i] = value;
-        }
-        if (_nClasses % 2 == 1) {
-            // center interval, i = (_nClasses + 1) / 2
-            value += (xLeft + xRight) / 2;
-            _classBounds[i] = value;
-            i++;
-        }
-        // right intervals
-        for (; i < _nClasses; i++) {
-            value += xRight;
-            _classBounds[i] = value;
-        }
-    } else {
-        assert(false);
-        return ClassboundsCalculationResult::BadLegendScaleType;
-    }
-    _classBoundsOk = true;
-    return ClassboundsCalculationResult::FullClassBounds;
 }
 
 void LegendDataAnalyser::calculate_statistics(LegendScaleType scaleType, double minValue, double maxValue)
 {
-    if (!_classBoundsOk) {
+    if (_classBounds.empty()) {
         assert(false);
         _varByClass = 0;
         return;
     }
+
     if (_sampleData.size() < 1) {
         _varByClass = 0;
         return;
@@ -389,8 +201,11 @@ std::vector<std::tuple<double, double>> LegendDataAnalyser::classbounds() const
     std::vector<std::tuple<double, double>> bounds;
     bounds.reserve(_nClasses);
 
-    for (int i = 0; i < _nClasses; i++) {
-        bounds.emplace_back(_classBounds[i], _classBounds[i + 1]);
+    if (!_classBounds.empty()) {
+        assert(_classBounds.size() == _nClasses + 1);
+        for (int i = 0; i < _nClasses; i++) {
+            bounds.emplace_back(_classBounds[i], _classBounds[i + 1]);
+        }
     }
 
     return bounds;
@@ -399,5 +214,222 @@ std::vector<std::tuple<double, double>> LegendDataAnalyser::classbounds() const
 float LegendDataAnalyser::effectiveness() const
 {
     return inf::truncate<float>(_varByClass);
+}
+
+std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClasses, double minValue, double maxValue)
+{
+    if (minValue >= maxValue) {
+        throw InvalidArgument("Minimum class bound must be lower the maxim class bound ({} <-> {})", minValue, maxValue);
+    }
+
+    std::vector<double> classBounds(numClasses + 1);
+    classBounds[0]          = minValue;
+    classBounds[numClasses] = maxValue;
+
+    if (scaleType == LegendScaleType::Linear) { // Linear sequence
+        double x = (maxValue - minValue) / numClasses;
+        for (int i = 1; i < numClasses; i++) {
+            classBounds[i] = minValue + i * x;
+        }
+    } else if (scaleType == LegendScaleType::Arithmetic) { // Arithmetic sequence
+        double x = (maxValue - minValue) / (numClasses * (numClasses + 1) / 2);
+        for (int i = 1; i < numClasses; i++) {
+            classBounds[i] = classBounds[i - 1] + i * x;
+        }
+    } else if (scaleType == LegendScaleType::Geometric) { // Geometric sequence
+        if (minValue <= 0) {
+            // calculate for minValue = 1 and then transpose back
+            double logMax = log10(maxValue + 1 - minValue);
+            double x      = pow(10., logMax / numClasses);
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] = pow(x, (double)i);
+            }
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] -= 1 - minValue;
+            }
+        } else {
+            double logMin = log10(minValue);
+            double logMax = log10(maxValue);
+            double x      = pow(10., (logMax - logMin) / numClasses);
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] = classBounds[i - 1] * x;
+            }
+        }
+    } else if (scaleType == LegendScaleType::OverGeometric) { // Over-Geometric sequence
+        if (minValue <= 0) {
+            // calculate for minValue = 1 and then transpose back
+            double logMax  = log10(maxValue + 1 - minValue);
+            double x       = pow(10., logMax / (numClasses * (numClasses + 1) / 2));
+            classBounds[1] = x;
+            for (int i = 2; i < numClasses; i++) {
+                classBounds[i] = classBounds[i - 1] * pow(x, (double)i);
+            }
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] -= 1 - minValue;
+            }
+        } else {
+            double logMin = log10(minValue);
+            double logMax = log10(maxValue);
+            double x      = pow(10., (logMax - logMin) / (numClasses * (numClasses + 1) / 2));
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] = classBounds[i - 1] * pow(x, (double)i);
+            }
+        }
+    } else if (scaleType == LegendScaleType::Harmonic) { // Harmonic sequence
+        if (minValue <= 0) {
+            // calculate for minValue = 1 and then transpose back
+            double invMax = 1 / (maxValue + 1 - minValue);
+            double x      = (1 - invMax) / numClasses;
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] = 1 / (1 - i * x) - 1 + minValue;
+            }
+        } else {
+            double invMin = 1 / minValue;
+            double invMax = 1 / maxValue;
+            double x      = (invMin - invMax) / numClasses;
+            for (int i = 1; i < numClasses; i++) {
+                classBounds[i] = 1 / (invMin - i * x);
+            }
+        }
+    } else {
+        throw InvalidArgument("Invalid legend scale type provided");
+    }
+
+    return classBounds;
+}
+
+std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClasses, double minValue, double maxValue, const std::vector<float>& sampleData)
+{
+    switch (scaleType) {
+    case LegendScaleType::Quantiles:
+    case LegendScaleType::StandardisedDescretisation:
+    case LegendScaleType::MethodOfBertin:
+        // Only these methods require the sample data
+        if (sampleData.empty()) {
+            throw RuntimeError("Empty sample data provided");
+        }
+        break;
+    default:
+        // rely on the implementation without sample data
+        return calculate_classbounds(scaleType, numClasses, minValue, maxValue);
+    }
+
+    std::vector<double> classBounds(numClasses + 1);
+    classBounds[0]          = minValue;
+    classBounds[numClasses] = maxValue;
+
+    int n = truncate<int>(sampleData.size());
+
+    if (scaleType == LegendScaleType::Quantiles) {
+        int iMin = 0, iMax = n - 1;
+        while (iMin < n && sampleData[iMin] < minValue) {
+            ++iMin;
+        }
+        while (iMax >= 0 && sampleData[iMax] > maxValue) {
+            --iMax;
+        }
+        n = iMax - iMin + 1;
+        if (n < 1) {
+            throw RuntimeError("Not enough sample data provided");
+        }
+
+        // put an equal amount of observations in each class
+        float amplitude = float(n) / numClasses;
+        float index     = float(iMin);
+        for (int i = 1; i < numClasses; i++) {
+            classBounds[i] = sampleData[int(index)]; //(sampleData[int(index)] + sampleData[int(index) + 1]) / 2;
+            index += amplitude;
+            if (index > iMax) {
+                index = truncate<float>(iMax); // fix possible rounding error
+            }
+        }
+    } else if (scaleType == LegendScaleType::StandardisedDescretisation) {
+        int iMin = 0, iMax = n - 1;
+        while (iMin < n && sampleData[iMin] < minValue)
+            ++iMin;
+        while (iMax >= 0 && sampleData[iMax] > maxValue)
+            --iMax;
+        n = iMax - iMin + 1;
+        if (n < 1) {
+            throw RuntimeError("Not enough sample data provided");
+        }
+
+        // calculate average and standard deviation
+        double avg = 0;
+        double sd  = 0;
+        for (int i = iMin; i <= iMax; i++) {
+            avg += sampleData[i];
+            sd += sampleData[i] * sampleData[i];
+        }
+        avg = avg / n;
+        sd  = sqrt(sd / n - avg * avg);
+
+        for (int i = 1; i < numClasses; i++) {
+            classBounds[i] = avg + (-numClasses / 2.0 + i) * sd;
+            // Proof (with inductions).
+            // Basis: with two classes classbound[1] = ave
+            // Induction: each extra class results in:
+            // classbound[1] getting a half sd earlier
+            // classbound[numClasses-1] getting a half sd later
+            // QED.
+        }
+
+        for (int h = 1; h < numClasses - 1; h++) {
+            assert(fabs(classBounds[h] + sd - classBounds[h + 1]) < 0.0001);
+        }
+        // check if bounds are not lower than minValue or higher than maxValue
+        for (int i = 1; i < numClasses; i++) {
+            if (classBounds[i] < minValue)
+                classBounds[i] = minValue;
+            else if (classBounds[i] > maxValue)
+                classBounds[i] = maxValue;
+        }
+
+        for (int h = 0; h < numClasses; h++) {
+            assert(classBounds[h] <= classBounds[h + 1]);
+        }
+    } else if (scaleType == LegendScaleType::MethodOfBertin) {
+        int iMin = 0, iMax = n - 1;
+        while (iMin < n && sampleData[iMin] < minValue)
+            ++iMin;
+        while (iMax >= 0 && sampleData[iMax] > maxValue)
+            --iMax;
+        n = iMax - iMin + 1;
+        if (n < 1) {
+            throw RuntimeError("Not enough sample data provided");
+        }
+
+        // calculate average
+        double avg = 0;
+        for (int i = iMin; i <= iMax; ++i) {
+            avg += sampleData[i];
+        }
+        avg /= n;
+
+        // calculate class widths
+        double xLeft  = 2 * (avg - minValue) / numClasses;
+        double xRight = 2 * (maxValue - avg) / numClasses;
+
+        double value = minValue;
+        // left intervals
+        int i;
+        for (i = 1; i < (numClasses + 1) / 2.; i++) {
+            value += xLeft;
+            classBounds[i] = value;
+        }
+        if (numClasses % 2 == 1) {
+            // center interval, i = (_nClasses + 1) / 2
+            value += (xLeft + xRight) / 2;
+            classBounds[i] = value;
+            i++;
+        }
+        // right intervals
+        for (; i < numClasses; i++) {
+            value += xRight;
+            classBounds[i] = value;
+        }
+    }
+
+    return classBounds;
 }
 }

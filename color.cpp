@@ -1,25 +1,17 @@
 #include "infra/color.h"
 
+#include "fmt/format.h"
+
 namespace inf {
 
-Color::Color(uint8_t r_, uint8_t g_, uint8_t b_) noexcept
-: Color(r_, g_, b_, 255)
+std::string Color::to_hex_rgb() const noexcept
 {
+    return fmt::format(fmt("#{:02X}{:02X}{:02X}"), r, g, b);
 }
 
-Color::Color(uint8_t r_, uint8_t g_, uint8_t b_, uint8_t a_) noexcept
-: r(r_)
-, g(g_)
-, b(b_)
-, a(a_)
+std::string Color::to_hex_argb() const noexcept
 {
+    return fmt::format(fmt("#{:02X}{:02X}{:02X}{:02X}"), a, r, g, b);
 }
 
-bool Color::operator==(const Color& other) const noexcept
-{
-    return r == other.r &&
-           g == other.g &&
-           b == other.b &&
-           a == other.a;
-}
 }

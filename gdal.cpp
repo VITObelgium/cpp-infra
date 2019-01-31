@@ -115,6 +115,12 @@ SpatialReference::SpatialReference(int32_t epsg)
     import_from_epsg(epsg);
 }
 
+SpatialReference::SpatialReference(const char* wkt)
+: SpatialReference()
+{
+    import_from_wkt(wkt);
+}
+
 SpatialReference::SpatialReference(OGRSpatialReference* instance)
 : _srs(instance)
 {
@@ -160,11 +166,20 @@ std::string SpatialReference::export_to_pretty_wkt_simplified() const
     return std::string(friendlyWkt);
 }
 
-int32_t SpatialReference::epsg_geog_cs() const
+std::optional<int32_t> SpatialReference::epsg_cs() const
+{
+    try {
+        return str::to_int32(authority_code("PROJCS"));
+    } catch (const std::exception&) {
+        return std::optional<int32_t>();
+    }
+}
+
+std::optional<int32_t> SpatialReference::epsg_geog_cs() const
 {
     auto epsg = _srs->GetEPSGGeogCS();
     if (epsg == -1) {
-        throw RuntimeError("Geo coordinate system could not be determined");
+        return std::optional<int32_t>();
     }
 
     return epsg;
@@ -270,30 +285,16 @@ std::string projection_from_epsg(int32_t epsg)
     return spatialRef.export_to_pretty_wkt();
 }
 
-int32_t projection_to_geo_epsg(const std::string& projection)
+std::optional<int32_t> projection_to_geo_epsg(const std::string& projection)
 {
-    SpatialReference spatialRef;
-    spatialRef.import_from_wkt(projection.c_str());
-
-    auto epsg = spatialRef.epsg_geog_cs();
-    if (epsg < 0) {
-        throw RuntimeError("Failed to determine epsg from projection");
-    }
-
-    return epsg;
+    SpatialReference spatialRef(projection.c_str());
+    return spatialRef.epsg_geog_cs();
 }
 
-int32_t projection_to_epsg(const std::string& projection)
+std::optional<int32_t> projection_to_epsg(const std::string& projection)
 {
-    SpatialReference spatialRef;
-    spatialRef.import_from_wkt(projection.c_str());
-
-    auto code  = spatialRef.authority_code("PROJCS");
-    auto value = str::to_int32(code);
-    if (!value.has_value()) {
-        throw RuntimeError("Failed to convert authority code to integer: {}", code);
-    }
-    return *value;
+    SpatialReference spatialRef(projection.c_str());
+    return str::to_int32(spatialRef.authority_code("PROJCS"));
 }
 
 Registration::Registration()
@@ -699,6 +700,7 @@ void RasterDataSet::set_metadata(const std::string& name, const std::string& val
 
 RasterBand RasterDataSet::rasterband(int bandNr) const
 {
+    assert(bandNr > 0);
     return RasterBand(checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index"));
 }
 

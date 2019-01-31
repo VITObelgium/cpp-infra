@@ -3,6 +3,7 @@ find_package(GMock REQUIRED)
 
 add_executable(infratest
     casttest.cpp
+    colortest.cpp
     colormaptest.cpp
     inireadertest.cpp
     filesystemtest.cpp

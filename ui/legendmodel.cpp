@@ -209,6 +209,11 @@ void LegendModel::setNumberOfClasses(int count)
     endResetModel();
 }
 
+QString LegendModel::legendTitle() const
+{
+    return QString::fromStdString(_legend.title);
+}
+
 void LegendModel::clear()
 {
     beginResetModel();
@@ -220,4 +225,5 @@ bool LegendModel::isNumeric() const
 {
     return _legend.type == Legend::Type::Numeric;
 }
+
 }

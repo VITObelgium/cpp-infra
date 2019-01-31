@@ -7,11 +7,31 @@ namespace inf {
 
 struct Color
 {
-    Color() = default;
-    Color(uint8_t r_, uint8_t g_, uint8_t b_) noexcept;
-    Color(uint8_t r_, uint8_t g_, uint8_t b_, uint8_t a_) noexcept;
+    constexpr Color() = default;
 
-    bool operator==(const Color& other) const noexcept;
+    constexpr Color(uint8_t r_, uint8_t g_, uint8_t b_) noexcept
+    : Color(r_, g_, b_, 255)
+    {
+    }
+
+    constexpr Color(uint8_t r_, uint8_t g_, uint8_t b_, uint8_t a_) noexcept
+    : r(r_)
+    , g(g_)
+    , b(b_)
+    , a(a_)
+    {
+    }
+
+    constexpr bool operator==(const Color& other) const noexcept
+    {
+        return r == other.r &&
+               g == other.g &&
+               b == other.b &&
+               a == other.a;
+    }
+
+    std::string to_hex_rgb() const noexcept;
+    std::string to_hex_argb() const noexcept;
 
     uint8_t r = 0;
     uint8_t g = 0;

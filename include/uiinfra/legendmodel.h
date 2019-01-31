@@ -41,6 +41,8 @@ public:
     int numberOfClasses() const;
     void setNumberOfClasses(int count);
 
+    QString legendTitle() const;
+
     void clear();
 
 private:
