@@ -3,6 +3,7 @@
 #include "infra/geometadata.h"
 #include "infra/point.h"
 
+#include <memory>
 #include <optional>
 #include <qgeocoordinate.h>
 #include <qobject.h>

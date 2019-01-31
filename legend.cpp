@@ -1,13 +1,27 @@
 #include "infra/legend.h"
 #include "infra/exception.h"
+#include "infra/legenddataanalyser.h"
 #include "infra/log.h"
 #include "infra/string.h"
-#include "legenddataanalyser.h"
 
 #include <fmt/format.h>
 #include <fstream>
 
 namespace inf {
+
+Legend create_numeric_legend(double min, double max, int numberOfClasses, std::string_view cmapName, LegendScaleType method)
+{
+    Legend legend;
+    legend.type            = Legend::Type::Numeric;
+    legend.numberOfClasses = numberOfClasses;
+    legend.colorMapName    = cmapName;
+    legend.entries.resize(numberOfClasses);
+
+    generate_colors(cmapName, legend);
+    generate_bounds(min, max, method, legend);
+
+    return legend;
+}
 
 Legend create_numeric_legend(std::vector<float> sampleData, int numberOfClasses, std::string_view cmapName, LegendScaleType method)
 {
@@ -44,6 +58,17 @@ Legend create_legend(std::vector<float> sampleData, int numberOfClasses, std::st
     generate_bounds(std::move(sampleData), method, legend);
 
     return legend;
+}
+
+void generate_bounds(double min, double max, LegendScaleType method, Legend& legend)
+{
+    auto bounds = inf::calculate_classbounds(method, legend.numberOfClasses, min, max);
+    assert(bounds.size() == legend.numberOfClasses + 1);
+    assert(legend.numberOfClasses == legend.entries.size());
+    for (int i = 0; i < legend.numberOfClasses; ++i) {
+        legend.entries[i].lowerBound = bounds[i];
+        legend.entries[i].upperBound = bounds[i + 1];
+    }
 }
 
 void generate_bounds(std::vector<float> sampleData, LegendScaleType scaleType, Legend& legend)

@@ -26,19 +26,20 @@ if (INFRA_IS_TOPLEVEL)
     )
 endif ()
 
-option(INFRA_LOGGING "Enable logging functionality" ON)
-option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
+option(INFRA_LOGGING "Enable logging functionality" OFF)
+option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
 cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
-option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
+option(INFRA_ENABLE_TESTS "Build the unit tests" OFF)
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 option(INFRA_INSTALL_DEVELOPMENT_FILES "Install the infra development files (headers/libs)" ON)
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
-cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -82,10 +83,13 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
+    include/infra/coordinate.h
+    include/infra/cpuinfo.h
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
     include/infra/legend.h
+    include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
@@ -97,7 +101,9 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/filesystem.h
     include/infra/color.h
     include/infra/colormap.h
+    include/infra/conversion.h
     include/infra/rect.h
+    include/infra/size.h
     include/infra/threadpool.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h
@@ -105,8 +111,9 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    cpuinfo.cpp
     legend.cpp
-    legenddataanalyser.h legenddataanalyser.cpp
+    legenddataanalyser.cpp
     process.cpp
     string.cpp
     exception.cpp
@@ -145,7 +152,7 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
     if (HAVE_FILESYSTEM_H OR HAVE_EXP_FILESYSTEM_H)
         target_link_libraries(infra PRIVATE stdc++fs)
     endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT CMAKE_HOST_WIN32)
     if (HAVE_FILESYSTEM_H)
         find_library(CPP_FS_LIB c++fs)
         if (CPP_FS_LIB)
@@ -284,9 +291,10 @@ if (INFRA_IS_TOPLEVEL)
 endif ()
 
 if (INFRA_UI_COMPONENTS)
-    find_package(Qt5Gui CONFIG REQUIRED)
-    find_package(Qt5Widgets CONFIG REQUIRED)
-    find_package(Qt5Core CONFIG REQUIRED)
+    find_package(Qt5Gui REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5Core REQUIRED)
+    find_package(Qt5Network REQUIRED)
     find_package(date CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
@@ -333,13 +341,44 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
-        include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
         include/uiinfra/tabletools.h ui/tabletools.cpp
 
         ui/toolboxitem.h ui/toolboxitem.cpp
         ui/qt5.natvis
         ${FORMS_HEADERS}
     )
+
+    target_link_libraries(uiinfra PUBLIC
+        Qt5::Network
+        Qt5::Gui
+        Qt5::Widgets
+        Qt5::Core
+        date_interface
+    )
+
+    if (STATIC_QT AND MSVC)
+        target_link_libraries(uiinfra PRIVATE
+            version.lib
+            Iphlpapi.lib
+            Netapi32.lib
+            Userenv.lib
+        )
+
+        get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
+        if ("ssl" IN_LIST QT_NETWORK_FEATURES)
+            message(STATUS "Qt network SSL enabled")
+            target_link_libraries(uiinfra PRIVATE
+                Crypt32.lib
+            )
+        endif ()
+    endif ()
+
+    if (INFRA_UI_COMPONENTS_QML)
+        target_sources(uiinfra PRIVATE
+            include/uiinfra/pixmapimage.h ui/pixmapimage.cpp
+            include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
+        )
+    endif ()
 
     if (INFRA_UI_COMPONENTS_LOCATION)
         find_package(Qt5Location CONFIG REQUIRED)
@@ -364,6 +403,12 @@ if (INFRA_UI_COMPONENTS)
         target_link_libraries(uiinfra PUBLIC
             Qt5::Location
         )
+
+        if (INFRA_GDAL)
+            target_sources(uiinfra PRIVATE
+                include/uiinfra/polygonio.h ui/polygonio.cpp
+            )
+        endif ()
     endif ()
 
     if (INFRA_UI_COMPONENTS_XLSX_EXPORT)
@@ -372,12 +417,6 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/modelexport.h ui/modelexport.cpp
         )
         target_link_libraries(uiinfra PRIVATE XslxWriter::XslxWriter)
-    endif ()
-
-    if (INFRA_GDAL)
-        target_sources(uiinfra PRIVATE
-            include/uiinfra/polygonio.h ui/polygonio.cpp
-        )
     endif ()
 
     if (INFRA_LOGGING)
@@ -398,16 +437,6 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
-
-    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location date_interface)
-    if (STATIC_QT AND MSVC)
-        target_link_libraries(uiinfra PRIVATE
-            version.lib
-            Netapi32.lib
-            Iphlpapi.lib
-            Userenv.lib
-        )
-    endif ()
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)

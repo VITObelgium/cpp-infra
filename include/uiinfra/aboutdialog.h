@@ -9,17 +9,19 @@ class AboutDialog;
 
 namespace uiinfra {
 
+struct OpenSourceUsageInfo
+{
+    QString name;
+    QString website;
+    QString license;
+    QString licenseLink;
+};
+
+QString createOpenSourceUsageMessage(const std::vector<OpenSourceUsageInfo>& usages);
+
 class AboutDialog : public QDialog
 {
 public:
-    struct OpenSourceInfo
-    {
-        QString name;
-        QString website;
-        QString license;
-        QString licenseLink;
-    };
-
     AboutDialog(QWidget* parent = nullptr);
     ~AboutDialog();
 
@@ -30,11 +32,11 @@ public:
     void setLogo(QString resourceId);
     void setCopyrightInfo(QString copyright);
 
-    void addOpenSourceUsage(OpenSourceInfo info);
+    void addOpenSourceUsage(OpenSourceUsageInfo info);
     void createOpensourceMessage();
 
 private:
     std::unique_ptr<Ui::AboutDialog> _ui;
-    std::vector<OpenSourceInfo> _openSource;
+    std::vector<OpenSourceUsageInfo> _openSource;
 };
 }

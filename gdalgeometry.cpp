@@ -3,6 +3,7 @@
 #include "infra/exception.h"
 #include "infra/gdal-private.h"
 #include "infra/gdal.h"
+#include "infra/string.h"
 
 #include <ogrsf_frmts.h>
 
@@ -609,6 +610,16 @@ Layer::~Layer()
     if (_layer) {
         _layer->Dereference();
     }
+}
+
+std::optional<int32_t> Layer::epsg() const
+{
+    auto* epsg = _layer->GetSpatialRef()->GetAuthorityCode("PROJCS");
+    if (epsg == nullptr) {
+        return std::optional<int32_t>();
+    }
+
+    return str::to_int32(epsg);
 }
 
 int64_t Layer::feature_count() const
