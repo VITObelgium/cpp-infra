@@ -614,12 +614,13 @@ Layer::~Layer()
 
 std::optional<int32_t> Layer::epsg() const
 {
-    auto* epsg = _layer->GetSpatialRef()->GetAuthorityCode("PROJCS");
-    if (epsg == nullptr) {
-        return std::optional<int32_t>();
+    if (auto* spatialRef = _layer->GetSpatialRef(); spatialRef != nullptr) {
+        if (auto* epsg = _layer->GetSpatialRef()->GetAuthorityCode("PROJCS"); epsg != nullptr) {
+            return str::to_int32(epsg);
+        }
     }
 
-    return str::to_int32(epsg);
+    return std::optional<int32_t>();
 }
 
 int64_t Layer::feature_count() const
