@@ -83,6 +83,7 @@ class SpatialReference
 public:
     SpatialReference();
     SpatialReference(int32_t epsg);
+    SpatialReference(const char* wkt);
     ~SpatialReference() noexcept;
 
     SpatialReference clone() const;
@@ -94,7 +95,8 @@ public:
     std::string export_to_pretty_wkt() const;
     std::string export_to_pretty_wkt_simplified() const;
 
-    int32_t epsg_geog_cs() const;
+    std::optional<int32_t> epsg_cs() const;
+    std::optional<int32_t> epsg_geog_cs() const;
     std::string_view authority_code(const char* key) const;
 
     void set_proj_cs(const char* projCs);
@@ -133,8 +135,8 @@ Point<double> convert_point_projected(int32_t sourceEpsg, int32_t destEpsg, Poin
 Point<double> projected_to_geographic(int32_t epsg, Point<double>);
 std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
-int32_t projection_to_geo_epsg(const std::string& projection);
-int32_t projection_to_epsg(const std::string& projection);
+std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
+std::optional<int32_t> projection_to_epsg(const std::string& projection);
 std::vector<const char*> create_options_array(const std::vector<std::string>& driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);

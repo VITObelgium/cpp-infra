@@ -385,6 +385,8 @@ public:
 
     Layer& operator=(Layer&&) = default;
 
+    std::optional<int32_t> epsg() const;
+
     int64_t feature_count() const;
     Feature feature(int64_t index) const;
 
