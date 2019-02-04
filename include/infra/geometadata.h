@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/cell.h"
+#include "infra/coordinate.h"
 #include "infra/point.h"
 
 #include <array>
@@ -28,6 +29,7 @@ struct GeoMetadata
     double convert_col_ll_to_x(int32_t col) const;
     double convert_row_ll_to_y(int32_t row) const;
     Cell convert_xy_to_cell(double x, double y) const;
+    Cell convert_coordinate_to_cell(const Coordinate& coord) const;
     bool is_xy(double x, double y, int32_t row, int32_t col) const;
     bool is_on_map(const Cell& cell) const;
     bool is_on_map(int32_t r, int32_t c) const;
