@@ -53,6 +53,13 @@ class Layer;
 class RasterDriver;
 class VectorDriver;
 
+enum class FileType
+{
+    Raster,
+    Vector,
+    Unknown,
+};
+
 enum class RasterType
 {
     Memory,
@@ -61,7 +68,7 @@ enum class RasterType
     Gif,
     Png,
     PcRaster,
-    Unknown
+    Unknown,
 };
 
 enum class VectorType
@@ -71,7 +78,7 @@ enum class VectorType
     Tab,
     ShapeFile,
     Xlsx,
-    Unknown
+    Unknown,
 };
 
 /*! Wrapper around the OGRSpatialReference class
@@ -170,6 +177,7 @@ public:
 
     RasterDataSet& operator=(RasterDataSet&&);
 
+    bool is_valid() const;
     int32_t raster_count() const;
 
     int32_t x_size() const;
@@ -251,6 +259,7 @@ public:
 
     VectorDataSet& operator=(VectorDataSet&&);
 
+    bool is_valid() const;
     int32_t layer_count() const;
 
     std::string projection() const;
@@ -307,7 +316,7 @@ private:
 class VectorDriver
 {
 public:
-    static bool isSupported(VectorType);
+    static bool is_supported(VectorType);
     static VectorDriver create(VectorType);
     static VectorDriver create(const fs::path& filename);
 
@@ -323,6 +332,8 @@ public:
 private:
     GDALDriver& _driver;
 };
+
+FileType detect_file_type(const fs::path& path);
 
 class MemoryFile
 {
