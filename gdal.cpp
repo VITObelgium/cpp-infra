@@ -445,7 +445,7 @@ RasterType RasterDriver::type() const
     }
 }
 
-bool VectorDriver::isSupported(VectorType type)
+bool VectorDriver::is_supported(VectorType type)
 {
     if (type == VectorType::Unknown) {
         throw InvalidArgument("Invalid vector type specified");
@@ -533,7 +533,7 @@ const GDALRasterBand* RasterBand::get() const
     return _band;
 }
 
-static GDALDataset* createDataSet(const fs::path& filePath,
+static GDALDataset* create_data_set(const fs::path& filePath,
     unsigned int openFlags,
     const char* const* drivers,
     const std::vector<std::string>& driverOpts)
@@ -554,7 +554,7 @@ static GDALDataset* createDataSet(const fs::path& filePath,
 
 RasterDataSet RasterDataSet::create(const fs::path& filePath, const std::vector<std::string>& driverOpts)
 {
-    auto* dataSet = createDataSet(filePath, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, driverOpts);
+    auto* dataSet = create_data_set(filePath, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, driverOpts);
     if (!dataSet) {
         throw RuntimeError("Failed to open raster file '{}'", filePath);
     }
@@ -571,7 +571,7 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
         }
     }
 
-    return RasterDataSet(checkPointer(createDataSet(filePath,
+    return RasterDataSet(checkPointer(create_data_set(filePath,
                                           GDAL_OF_READONLY | GDAL_OF_RASTER,
                                           nullptr,
                                           driverOpts),
@@ -603,6 +603,11 @@ RasterDataSet& RasterDataSet::operator=(RasterDataSet&& rhs)
     _ptr     = rhs._ptr;
     rhs._ptr = nullptr;
     return *this;
+}
+
+bool RasterDataSet::is_valid() const
+{
+    return _ptr != nullptr;
 }
 
 int32_t RasterDataSet::raster_count() const
@@ -775,7 +780,7 @@ RasterDriver RasterDataSet::driver()
 
 VectorDataSet VectorDataSet::create(const fs::path& filePath, const std::vector<std::string>& driverOptions)
 {
-    auto* dsPtr = createDataSet(filePath, GDAL_OF_READONLY | GDAL_OF_VECTOR, nullptr, driverOptions);
+    auto* dsPtr = create_data_set(filePath, GDAL_OF_READONLY | GDAL_OF_VECTOR, nullptr, driverOptions);
     if (!dsPtr) {
         throw RuntimeError("Failed to open vector file '{}'", filePath);
     }
@@ -794,7 +799,7 @@ VectorDataSet VectorDataSet::create(const fs::path& filePath, VectorType type, c
 
     std::array<const char*, 2> drivers{{s_vectorDriverLookup.at(type), nullptr}};
 
-    auto* dsPtr = createDataSet(filePath, GDAL_OF_READONLY | GDAL_OF_VECTOR, drivers.data(), driverOptions);
+    auto* dsPtr = create_data_set(filePath, GDAL_OF_READONLY | GDAL_OF_VECTOR, drivers.data(), driverOptions);
     if (!dsPtr) {
         throw RuntimeError("Failed to open vector file '{}'", filePath);
     }
@@ -827,6 +832,11 @@ VectorDataSet& VectorDataSet::operator=(VectorDataSet&& rhs)
     _ptr     = rhs._ptr;
     rhs._ptr = nullptr;
     return *this;
+}
+
+bool VectorDataSet::is_valid() const
+{
+    return _ptr != nullptr;
 }
 
 int32_t VectorDataSet::layer_count() const
@@ -865,7 +875,7 @@ Layer VectorDataSet::create_layer(const std::string& name, const std::vector<std
     return create_layer(name, Geometry::Type::Unknown, driverOptions);
 }
 
-static OGRwkbGeometryType toGdalType(Geometry::Type type)
+static OGRwkbGeometryType to_gdal_type(Geometry::Type type)
 {
     switch (type) {
     case Geometry::Type::Point:
@@ -890,7 +900,7 @@ Layer VectorDataSet::create_layer(const std::string& name, Geometry::Type type, 
 {
     assert(_ptr);
     auto options = create_options_array(driverOptions);
-    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, toGdalType(type), const_cast<char**>(options.data())), "Layer creation failed"));
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), const_cast<char**>(options.data())), "Layer creation failed"));
 }
 
 GDALDataset* VectorDataSet::get() const
@@ -969,6 +979,17 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
     }
 
     return VectorType::Unknown;
+}
+
+FileType detect_file_type(const fs::path& path)
+{
+    if (auto ds = RasterDataSet(create_data_set(path, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, {})); ds.is_valid()) {
+        return FileType::Raster;
+    } else if (auto ds = VectorDataSet(create_data_set(path, GDAL_OF_READONLY | GDAL_OF_VECTOR, nullptr, {})); ds.is_valid()) {
+        return FileType::Vector;
+    }
+
+    return FileType::Unknown;
 }
 
 void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<double, 6>& geoTrans)
