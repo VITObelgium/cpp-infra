@@ -2,7 +2,7 @@
 
 #include <QStyledItemDelegate>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class IntegerItemDelegate : public QStyledItemDelegate
 {

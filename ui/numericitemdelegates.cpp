@@ -2,7 +2,7 @@
 
 #include <qspinbox.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 IntegerItemDelegate::IntegerItemDelegate(QObject* parent)
 : QStyledItemDelegate(parent)
