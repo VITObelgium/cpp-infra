@@ -243,6 +243,23 @@ void CoordinateTransformer::transform_in_place(Point<double>& point) const
     }
 }
 
+Coordinate CoordinateTransformer::transform(const Coordinate& coord) const
+{
+    Coordinate result = coord;
+    if (!_transformer->Transform(1, &result.longitude, &result.latitude)) {
+        throw RuntimeError("Failed to transform coordinate {}", coord);
+    }
+
+    return result;
+}
+
+void CoordinateTransformer::transform_in_place(Coordinate& coord) const
+{
+    if (!_transformer->Transform(1, &coord.longitude, &coord.latitude)) {
+        throw RuntimeError("Failed to perform transformation");
+    }
+}
+
 OGRCoordinateTransformation* CoordinateTransformer::get()
 {
     return _transformer.get();
