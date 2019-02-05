@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+
 #include "infra/colormap.h"
 #include "infra/exception.h"
 #include "infra/string.h"
@@ -1183,6 +1185,23 @@ const std::vector<Color> Cmap::Tab20c{{
     {217, 217, 217}, // #d9d9d9
 }};
 
+static auto mapper33 = [](double x) -> uint8_t {
+    int32_t val = static_cast<int32_t>(std::round(std::abs(2.0 * x - 0.5) * 255.0));
+    return static_cast<uint8_t>(std::clamp(val, 0, 255));
+};
+
+static auto mapper13 = [](double x) -> uint8_t {
+    int32_t val = static_cast<int32_t>(std::round(std::sin(x * M_PI) * 255.0));
+    return static_cast<uint8_t>(std::clamp(val, 0, 255));
+};
+
+static auto mapper10 = [](double x) -> uint8_t {
+    int32_t val = static_cast<int32_t>(std::round(std::cos(x * M_PI / 2.0) * 255.0));
+    return static_cast<uint8_t>(std::clamp(val, 0, 255));
+};
+
+const ColorMapper Cmap::rainbow{std::function<uint8_t(double)>(mapper33), std::function<uint8_t(double)>(mapper13), std::function<uint8_t(double)>(mapper10)};
+
 static uint8_t remap(float start, float end, float mapStart, float mapEnd, float value)
 {
     assert(start < end);
@@ -1276,6 +1295,21 @@ ColorMap::ColorMap(const std::array<Color, 256>& cmap, bool reverse)
     }
 }
 
+ColorMap::ColorMap(const ColorMapper& cmap, bool reverse)
+{
+    std::array<Color, 256> values;
+    for (size_t i = 0; i < _cmap.size(); ++i) {
+        double mapVal = i / 255.0;
+        values[i]     = Color(cmap.red(mapVal), cmap.green(mapVal), cmap.blue(mapVal));
+    }
+
+    if (reverse) {
+        std::copy(rbegin(values), rend(values), begin(_cmap));
+    } else {
+        _cmap = values;
+    }
+}
+
 ColorMap ColorMap::qualitative(const std::vector<Color>& clist)
 {
     std::array<Color, 256> cmap;
@@ -1361,12 +1395,18 @@ ColorMap ColorMap::create(std::string_view name)
         {"terrain", Cmap::terrain},
     };
 
+    static const std::unordered_map<std::string, const ColorMapper&> cmapLookup4 = {
+        {"rainbow", Cmap::rainbow},
+    };
+
     if (cmapLookup1.find(lowername) != cmapLookup1.end()) {
         return ColorMap(cmapLookup1.at(lowername), reverse);
     } else if (cmapLookup2.find(lowername) != cmapLookup2.end()) {
         return ColorMap(cmapLookup2.at(lowername), reverse);
     } else if (cmapLookup3.find(lowername) != cmapLookup3.end()) {
         return ColorMap(cmapLookup3.at(lowername), reverse);
+    } else if (cmapLookup4.find(lowername) != cmapLookup4.end()) {
+        return ColorMap(cmapLookup4.at(lowername), reverse);
     } else {
         throw InvalidArgument("Unsupported color map: {}", name);
     }
