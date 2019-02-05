@@ -73,7 +73,7 @@ TEST(GdalTest, convertPointProjected)
 
 TEST(GdalTest, createExcelFile)
 {
-    if (!gdal::VectorDriver::isSupported(gdal::VectorType::Xlsx)) {
+    if (!gdal::VectorDriver::is_supported(gdal::VectorType::Xlsx)) {
         return;
     }
 
