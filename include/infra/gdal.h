@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/coordinate.h"
 #include "infra/filesystem.h"
 #include "infra/gdal-private.h"
 #include "infra/gdalgeometry.h"
@@ -53,6 +54,13 @@ class Layer;
 class RasterDriver;
 class VectorDriver;
 
+enum class FileType
+{
+    Raster,
+    Vector,
+    Unknown,
+};
+
 enum class RasterType
 {
     Memory,
@@ -61,7 +69,7 @@ enum class RasterType
     Gif,
     Png,
     PcRaster,
-    Unknown
+    Unknown,
 };
 
 enum class VectorType
@@ -71,7 +79,7 @@ enum class VectorType
     Tab,
     ShapeFile,
     Xlsx,
-    Unknown
+    Unknown,
 };
 
 /*! Wrapper around the OGRSpatialReference class
@@ -118,6 +126,9 @@ public:
 
     Point<double> transform(const Point<double>& point) const;
     void transform_in_place(Point<double>& point) const;
+
+    Coordinate transform(const Coordinate& coord) const;
+    void transform_in_place(Coordinate& coord) const;
 
     OGRCoordinateTransformation* get();
 
@@ -170,6 +181,7 @@ public:
 
     RasterDataSet& operator=(RasterDataSet&&);
 
+    bool is_valid() const;
     int32_t raster_count() const;
 
     int32_t x_size() const;
@@ -251,6 +263,7 @@ public:
 
     VectorDataSet& operator=(VectorDataSet&&);
 
+    bool is_valid() const;
     int32_t layer_count() const;
 
     std::string projection() const;
@@ -307,7 +320,7 @@ private:
 class VectorDriver
 {
 public:
-    static bool isSupported(VectorType);
+    static bool is_supported(VectorType);
     static VectorDriver create(VectorType);
     static VectorDriver create(const fs::path& filename);
 
@@ -323,6 +336,8 @@ public:
 private:
     GDALDriver& _driver;
 };
+
+FileType detect_file_type(const fs::path& path);
 
 class MemoryFile
 {

@@ -104,6 +104,11 @@ Cell GeoMetadata::convert_xy_to_cell(const double x, const double y) const
     return Cell(convert_y_to_row(y), convert_x_to_col(x));
 }
 
+Cell GeoMetadata::convert_coordinate_to_cell(const Coordinate& coord) const
+{
+    return Cell(convert_y_to_row(coord.latitude), convert_x_to_col(coord.longitude));
+}
+
 bool GeoMetadata::is_xy(const double x, const double y, const int32_t row, const int32_t col) const
 {
     return (row == convert_y_to_row(y) && col == convert_x_to_col(x));
