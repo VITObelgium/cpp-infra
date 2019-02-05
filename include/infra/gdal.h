@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/coordinate.h"
 #include "infra/filesystem.h"
 #include "infra/gdal-private.h"
 #include "infra/gdalgeometry.h"
@@ -125,6 +126,9 @@ public:
 
     Point<double> transform(const Point<double>& point) const;
     void transform_in_place(Point<double>& point) const;
+
+    Coordinate transform(const Coordinate& coord) const;
+    void transform_in_place(Coordinate& coord) const;
 
     OGRCoordinateTransformation* get();
 
