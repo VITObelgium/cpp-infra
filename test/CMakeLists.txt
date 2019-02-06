@@ -19,6 +19,11 @@ if (INFRA_XML)
     )
 endif ()
 
+if (INFRA_CHARSET)
+    target_sources(infratest PRIVATE
+        charsettest.cpp
+    )
+endif ()
 
 if (INFRA_GDAL)
     target_sources(infratest PRIVATE
@@ -27,6 +32,12 @@ if (INFRA_GDAL)
     )
 
     target_compile_definitions(infratest PRIVATE HAVE_GDAL)
+endif ()
+
+if (INFRA_GDAL AND INFRA_CHARSET)
+    target_sources(infratest PRIVATE
+        csvreadertest.cpp
+    )
 endif ()
 
 target_link_libraries(infratest

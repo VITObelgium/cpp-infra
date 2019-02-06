@@ -630,7 +630,7 @@ int64_t Layer::feature_count() const
 
 Feature Layer::feature(int64_t index) const
 {
-    assert(index < _layer->GetFeatureCount());
+    assert(index != OGRNullFID);
     return Feature(checkPointer(_layer->GetFeature(index), "Failed to get feature from layer"));
 }
 

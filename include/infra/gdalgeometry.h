@@ -388,7 +388,10 @@ public:
     std::optional<int32_t> epsg() const;
 
     int64_t feature_count() const;
-    Feature feature(int64_t index) const;
+    /*! obtain the feature with the specified id
+     * The id is not an index! Don't expect iteration from 0 to feature_count to work
+     */
+    Feature feature(int64_t id) const;
 
     int field_index(std::string_view name) const;
     void set_spatial_filter(Point<double> point);
