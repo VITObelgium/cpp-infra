@@ -521,6 +521,8 @@ T Feature::field_as(int index) const
         return _feature->GetFieldAsInteger(index);
     } else if constexpr (std::is_same_v<int64_t, T>) {
         return _feature->GetFieldAsInteger64(index);
+    } else if constexpr (std::is_same_v<std::string, T>) {
+        return std::string(_feature->GetFieldAsString(index));
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(index));
     } else if constexpr (std::is_same_v<time_point, T>) {
@@ -550,6 +552,8 @@ T Feature::field_as(std::string_view name) const
         return _feature->GetFieldAsInteger(name.data());
     } else if constexpr (std::is_same_v<int64_t, T>) {
         return _feature->GetFieldAsInteger64(name.data());
+    } else if constexpr (std::is_same_v<std::string, T>) {
+        return std::string(_feature->GetFieldAsString(name.data()));
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(name.data()));
     } else if constexpr (std::is_same_v<time_point, T>) {
@@ -564,6 +568,7 @@ template double Feature::field_as<double>(int index) const;
 template float Feature::field_as<float>(int index) const;
 template int32_t Feature::field_as<int32_t>(int index) const;
 template int64_t Feature::field_as<int64_t>(int index) const;
+template std::string Feature::field_as<std::string>(int index) const;
 template std::string_view Feature::field_as<std::string_view>(int index) const;
 template time_point Feature::field_as<time_point>(int index) const;
 
@@ -571,6 +576,7 @@ template double Feature::field_as<double>(std::string_view index) const;
 template float Feature::field_as<float>(std::string_view index) const;
 template int32_t Feature::field_as<int32_t>(std::string_view index) const;
 template int64_t Feature::field_as<int64_t>(std::string_view index) const;
+template std::string Feature::field_as<std::string>(std::string_view index) const;
 template std::string_view Feature::field_as<std::string_view>(std::string_view index) const;
 template time_point Feature::field_as<time_point>(std::string_view index) const;
 

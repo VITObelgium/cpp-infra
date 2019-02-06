@@ -7,11 +7,11 @@
 
 namespace inf {
 
-class CsvLine
+class CsvRow
 {
 public:
-    CsvLine() = default;
-    CsvLine(const gdal::Feature& feat, inf::CharacterSet charSet);
+    CsvRow() = default;
+    CsvRow(const gdal::Feature& feat, inf::CharacterSet charSet);
 
     template <typename T>
     std::optional<T> get_column_as(int32_t index) const noexcept
@@ -36,7 +36,7 @@ public:
     std::optional<int64_t> get_int64(int32_t index) const noexcept;
     std::optional<double> get_double(int32_t index) const noexcept;
 
-    bool operator==(const CsvLine& other) const;
+    bool operator==(const CsvRow& other) const;
 
 private:
     const gdal::Feature* _feature = nullptr;
@@ -45,19 +45,19 @@ private:
 
 // Iteration is not thread safe!
 // Do not iterate simultaneously from different threads.
-class CsvLineIterator
+class CsvRowIterator
 {
 public:
-    CsvLineIterator() = default;
-    CsvLineIterator(gdal::Layer layer, inf::CharacterSet charSet);
-    CsvLineIterator(const CsvLineIterator&) = delete;
-    CsvLineIterator(CsvLineIterator&&)      = default;
+    CsvRowIterator() = default;
+    CsvRowIterator(gdal::Layer layer, inf::CharacterSet charSet);
+    CsvRowIterator(const CsvRowIterator&) = delete;
+    CsvRowIterator(CsvRowIterator&&)      = default;
 
-    CsvLineIterator& operator++();
-    CsvLineIterator& operator=(CsvLineIterator&& other);
-    bool operator==(const CsvLineIterator& other) const;
-    bool operator!=(const CsvLineIterator& other) const;
-    CsvLine operator*();
+    CsvRowIterator& operator++();
+    CsvRowIterator& operator=(CsvRowIterator&& other);
+    bool operator==(const CsvRowIterator& other) const;
+    bool operator!=(const CsvRowIterator& other) const;
+    CsvRow operator*();
 
 private:
     gdal::LayerIterator _iterator;
@@ -75,8 +75,8 @@ public:
 
     int32_t column_count();
 
-    CsvLineIterator begin() const;
-    CsvLineIterator end() const;
+    CsvRowIterator begin() const;
+    CsvRowIterator end() const;
 
 private:
     inf::CharacterSet _charset;
@@ -85,12 +85,12 @@ private:
 };
 
 // support for range based for loops
-inline CsvLineIterator begin(const CsvReader& reader)
+inline CsvRowIterator begin(const CsvReader& reader)
 {
     return reader.begin();
 }
 
-inline CsvLineIterator end(const CsvReader& reader)
+inline CsvRowIterator end(const CsvReader& reader)
 {
     return reader.end();
 }
