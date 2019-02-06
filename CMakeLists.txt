@@ -372,13 +372,6 @@ if (INFRA_UI_COMPONENTS)
     )
 
     if (STATIC_QT AND MSVC)
-        target_link_libraries(uiinfra PRIVATE
-            version.lib
-            Iphlpapi.lib
-            Netapi32.lib
-            Userenv.lib
-        )
-
         get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
         if ("ssl" IN_LIST QT_NETWORK_FEATURES)
             message(STATUS "Qt network SSL enabled")
