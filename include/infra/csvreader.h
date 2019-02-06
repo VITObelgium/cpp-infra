@@ -3,6 +3,7 @@
 #include "infra/cast.h"
 #include "infra/charset.h"
 #include "infra/gdal.h"
+#include "infra/typetraits.h"
 
 namespace inf {
 
