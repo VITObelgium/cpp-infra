@@ -55,7 +55,7 @@ CharacterSet detect_character_set_from_data(const std::string_view data)
 std::string convert_to_utf8(std::string_view input)
 {
     std::string result;
-    icu::UnicodeString(input.data(), input.size(), US_INV).toUTF8String(result);
+    icu::UnicodeString(input.data(), truncate<int32_t>(input.size()), US_INV).toUTF8String(result);
     return result;
 }
 
