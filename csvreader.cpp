@@ -29,6 +29,11 @@ CsvRow::CsvRow(const gdal::Feature& feat, inf::CharacterSet charSet)
 {
 }
 
+bool CsvRow::column_is_empty(int32_t index) const noexcept
+{
+    return _feature->field_as<std::string_view>(index).empty();
+}
+
 std::string CsvRow::get_string(int32_t index) const noexcept
 {
     if (_charSet == CharacterSet::Utf8) {

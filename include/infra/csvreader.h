@@ -13,6 +13,8 @@ public:
     CsvRow() = default;
     CsvRow(const gdal::Feature& feat, inf::CharacterSet charSet);
 
+    bool column_is_empty(int32_t index) const noexcept;
+
     template <typename T>
     std::optional<T> get_column_as(int32_t index) const noexcept
     {
