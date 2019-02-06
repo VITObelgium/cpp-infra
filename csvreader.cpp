@@ -13,23 +13,23 @@ int32_t CsvReader::column_count()
     return _layer.layer_definition().field_count();
 }
 
-CsvLineIterator CsvReader::begin() const
+CsvRowIterator CsvReader::begin() const
 {
-    return CsvLineIterator(_layer, _charset);
+    return CsvRowIterator(_layer, _charset);
 }
 
-CsvLineIterator CsvReader::end() const
+CsvRowIterator CsvReader::end() const
 {
-    return CsvLineIterator();
+    return CsvRowIterator();
 }
 
-CsvLine::CsvLine(const gdal::Feature& feat, inf::CharacterSet charSet)
+CsvRow::CsvRow(const gdal::Feature& feat, inf::CharacterSet charSet)
 : _feature(&feat)
 , _charSet(charSet)
 {
 }
 
-std::string CsvLine::get_string(int32_t index) const noexcept
+std::string CsvRow::get_string(int32_t index) const noexcept
 {
     if (_charSet == CharacterSet::Utf8) {
         return std::string(_feature->field_as<std::string_view>(index));
@@ -38,44 +38,44 @@ std::string CsvLine::get_string(int32_t index) const noexcept
     }
 }
 
-std::optional<int32_t> CsvLine::get_int32(int32_t index) const noexcept
+std::optional<int32_t> CsvRow::get_int32(int32_t index) const noexcept
 {
     return _feature->field_as<int32_t>(index);
 }
 
-std::optional<int64_t> CsvLine::get_int64(int32_t index) const noexcept
+std::optional<int64_t> CsvRow::get_int64(int32_t index) const noexcept
 {
     return _feature->field_as<int64_t>(index);
 }
 
-std::optional<double> CsvLine::get_double(int32_t index) const noexcept
+std::optional<double> CsvRow::get_double(int32_t index) const noexcept
 {
-    return _feature->field_as<double>(index);
+    return CPLAtofM(_feature->field_as<std::string>(index).c_str());
 }
 
-bool CsvLine::operator==(const CsvLine& other) const
+bool CsvRow::operator==(const CsvRow& other) const
 {
     return _feature == other._feature;
 }
 
-CsvLineIterator::CsvLineIterator(gdal::Layer layer, inf::CharacterSet charSet)
+CsvRowIterator::CsvRowIterator(gdal::Layer layer, inf::CharacterSet charSet)
 : _iterator(std::move(layer))
 , _charset(charSet)
 {
 }
 
-CsvLine CsvLineIterator::operator*()
+CsvRow CsvRowIterator::operator*()
 {
-    return CsvLine(*_iterator, _charset);
+    return CsvRow(*_iterator, _charset);
 }
 
-CsvLineIterator& CsvLineIterator::operator++()
+CsvRowIterator& CsvRowIterator::operator++()
 {
     ++_iterator;
     return *this;
 }
 
-CsvLineIterator& CsvLineIterator::operator=(CsvLineIterator&& other)
+CsvRowIterator& CsvRowIterator::operator=(CsvRowIterator&& other)
 {
     if (this != &other) {
         _iterator = std::move(other._iterator);
@@ -84,12 +84,12 @@ CsvLineIterator& CsvLineIterator::operator=(CsvLineIterator&& other)
     return *this;
 }
 
-bool CsvLineIterator::operator==(const CsvLineIterator& other) const
+bool CsvRowIterator::operator==(const CsvRowIterator& other) const
 {
     return _iterator == other._iterator;
 }
 
-bool CsvLineIterator::operator!=(const CsvLineIterator& other) const
+bool CsvRowIterator::operator!=(const CsvRowIterator& other) const
 {
     return !(*this == other);
 }
