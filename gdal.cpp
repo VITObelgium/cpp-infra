@@ -60,6 +60,7 @@ static const std::unordered_map<RasterType, const char*>
         {RasterType::Gif, "GIF"},
         {RasterType::Png, "PNG"},
         {RasterType::PcRaster, "PCRaster"},
+        {RasterType::Netcdf, "netCDF"},
     }};
 
 static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLookup{{
@@ -69,6 +70,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
     {"GIF", RasterType::Gif},
     {"PNG", RasterType::Png},
     {"PCRaster", RasterType::PcRaster},
+    {"netCDF", RasterType::Netcdf},
 }};
 
 static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
@@ -215,6 +217,16 @@ OGRSpatialReference* SpatialReference::get() noexcept
     return _srs.get();
 }
 
+CoordinateTransformer::CoordinateTransformer(SpatialReference source, SpatialReference dest)
+: _sourceSRS(std::move(source))
+, _targetSRS(std::move(dest))
+{
+    _transformer.reset(OGRCreateCoordinateTransformation(_sourceSRS.get(), _targetSRS.get()));
+    if (!_transformer) {
+        throw RuntimeError("Failed to create transformation");
+    }
+}
+
 CoordinateTransformer::CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg)
 {
     _sourceSRS.import_from_epsg(sourceEpsg);
@@ -280,7 +292,7 @@ Point<double> projected_to_geographic(int32_t epsg, Point<double> point)
 
     auto poLatLong = utm.clone_geo_cs();
     auto trans     = checkPointer(OGRCreateCoordinateTransformation(utm.get(), poLatLong.get()),
-        "Failed to create transformation");
+                              "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -381,7 +393,7 @@ void unregisterEmbeddedData()
 #endif
 }
 
-std::vector<const char*> create_options_array(const std::vector<std::string>& driverOptions)
+std::vector<const char*> create_string_array(const std::vector<std::string>& driverOptions)
 {
     std::vector<const char*> options(driverOptions.size());
     std::transform(driverOptions.begin(), driverOptions.end(), options.begin(), [](auto& str) {
@@ -391,7 +403,7 @@ std::vector<const char*> create_options_array(const std::vector<std::string>& dr
     return options;
 }
 
-bool RasterDriver::isSupported(RasterType type)
+bool RasterDriver::is_supported(RasterType type)
 {
     if (type == RasterType::Unknown) {
         throw InvalidArgument("Invalid raster type specified");
@@ -442,7 +454,7 @@ RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t n
 
 RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
 {
-    auto options = create_options_array(driverOptions);
+    auto options = create_string_array(driverOptions);
     return RasterDataSet(checkPointer(_driver.CreateCopy(
                                           filename.u8string().c_str(),
                                           reference.get(),
@@ -450,7 +462,7 @@ RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, 
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-        "Failed to create data set copy"));
+                                      "Failed to create data set copy"));
 }
 
 RasterType RasterDriver::type() const
@@ -515,7 +527,7 @@ VectorDataSet VectorDriver::create_dataset(const fs::path& filename)
 
 VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
 {
-    auto options = create_options_array(driverOptions);
+    auto options = create_string_array(driverOptions);
     return VectorDataSet(checkPointer(_driver.CreateCopy(
                                           filename.u8string().c_str(),
                                           reference.get(),
@@ -523,7 +535,7 @@ VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, 
                                           options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
                                           nullptr,
                                           nullptr),
-        "Failed to create data set copy"));
+                                      "Failed to create data set copy"));
 }
 
 VectorType VectorDriver::type() const
@@ -551,16 +563,16 @@ const GDALRasterBand* RasterBand::get() const
 }
 
 static GDALDataset* create_data_set(const fs::path& filePath,
-    unsigned int openFlags,
-    const char* const* drivers,
-    const std::vector<std::string>& driverOpts)
+                                    unsigned int openFlags,
+                                    const char* const* drivers,
+                                    const std::vector<std::string>& driverOpts)
 {
     // use generic_u8string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
     // which is not recognized by gdal
     std::string path = filePath.generic_u8string();
 
-    auto options = create_options_array(driverOpts);
+    auto options = create_string_array(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
         path.c_str(),
         openFlags,
@@ -589,10 +601,10 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
     }
 
     return RasterDataSet(checkPointer(create_data_set(filePath,
-                                          GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                          nullptr,
-                                          driverOpts),
-        "Failed to open raster file"));
+                                                      GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                                      nullptr,
+                                                      driverOpts),
+                                      "Failed to open raster file"));
 }
 
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
@@ -715,9 +727,51 @@ void RasterDataSet::set_projection(const std::string& proj)
     }
 }
 
+std::string RasterDataSet::metadata_item(const std::string& name, const std::string& domain)
+{
+    std::string result;
+
+    if (auto* value = _ptr->GetMetadataItem(name.c_str(), domain.c_str()); value != nullptr) {
+        result.assign(value);
+    }
+
+    return result;
+}
+
+std::unordered_map<std::string, std::string> RasterDataSet::metadata(const std::string& domain)
+{
+    std::unordered_map<std::string, std::string> result;
+
+    char** data = _ptr->GetMetadata(domain.c_str());
+    int index   = 0;
+    while (data[index] != nullptr) {
+        auto keyValue = str::split_view(data[index++], '=');
+        if (keyValue.size() == 2) {
+            result.emplace(keyValue[0], keyValue[1]);
+        }
+    }
+
+    return result;
+}
+
 void RasterDataSet::set_metadata(const std::string& name, const std::string& value, const std::string& domain)
 {
     checkError(_ptr->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set metadata");
+}
+
+std::vector<std::string> RasterDataSet::metadata_domains() const
+{
+    std::vector<std::string> result;
+
+    char** data = checkPointer(_ptr->GetMetadataDomainList(), "Failed to obtain metadata domains");
+    int index   = 0;
+    while (data[index] != nullptr) {
+        result.push_back(data[index++]);
+    }
+
+    CSLDestroy(data);
+
+    return result;
 }
 
 RasterBand RasterDataSet::rasterband(int bandNr) const
@@ -757,15 +811,20 @@ void RasterDataSet::write_geometadata(const GeoMetadata& meta)
 
 GeoMetadata RasterDataSet::geometadata() const
 {
-    GeoMetadata meta;
-
     if (raster_count() != 1) {
-        throw RuntimeError("Only rasters with a single band are currently supported");
+        throw RuntimeError("Multiple raster bands present, specify the band number");
     }
+
+    return geometadata(1);
+}
+
+GeoMetadata RasterDataSet::geometadata(int bandNr) const
+{
+    GeoMetadata meta;
 
     meta.cols       = x_size();
     meta.rows       = y_size();
-    meta.nodata     = nodata_value(1);
+    meta.nodata     = nodata_value(bandNr);
     meta.projection = projection();
     fill_geometadata_from_geo_transform(meta, geotransform());
 
@@ -916,7 +975,7 @@ static OGRwkbGeometryType to_gdal_type(Geometry::Type type)
 Layer VectorDataSet::create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions)
 {
     assert(_ptr);
-    auto options = create_options_array(driverOptions);
+    auto options = create_string_array(driverOptions);
     return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), const_cast<char**>(options.data())), "Layer creation failed"));
 }
 
@@ -977,6 +1036,8 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
         return RasterType::Png;
     } else if (ext == ".map") {
         return RasterType::PcRaster;
+    } else if (ext == ".nc") {
+        return RasterType::Netcdf;
     }
 
     return RasterType::Unknown;
@@ -1023,8 +1084,8 @@ void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<dou
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-      dataBuffer.size(), FALSE /*no ownership*/))
+                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+                            dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

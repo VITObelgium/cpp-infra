@@ -18,6 +18,7 @@
 
 #include <chrono>
 #include <optional>
+#include <unordered_map>
 #include <variant>
 
 namespace inf::gdal {
@@ -69,6 +70,7 @@ enum class RasterType
     Gif,
     Png,
     PcRaster,
+    Netcdf,
     Unknown,
 };
 
@@ -93,6 +95,8 @@ public:
     SpatialReference(int32_t epsg);
     SpatialReference(const char* wkt);
     ~SpatialReference() noexcept;
+
+    SpatialReference(SpatialReference&&) = default;
 
     SpatialReference clone() const;
     SpatialReference clone_geo_cs() const;
@@ -122,6 +126,7 @@ private:
 class CoordinateTransformer
 {
 public:
+    CoordinateTransformer(SpatialReference source, SpatialReference dest);
     CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg);
 
     Point<double> transform(const Point<double>& point) const;
@@ -148,7 +153,7 @@ std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
 std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
 std::optional<int32_t> projection_to_epsg(const std::string& projection);
-std::vector<const char*> create_options_array(const std::vector<std::string>& driverOptions);
+std::vector<const char*> create_string_array(const std::vector<std::string>& driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
@@ -197,7 +202,10 @@ public:
     std::string projection() const;
     void set_projection(const std::string& proj);
 
+    std::string metadata_item(const std::string& name, const std::string& domain = "");
+    std::unordered_map<std::string, std::string> metadata(const std::string& domain = "");
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
+    std::vector<std::string> metadata_domains() const;
 
     RasterBand rasterband(int index) const;
 
@@ -208,7 +216,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-            "Failed to read raster data");
+                   "Failed to read raster data");
     }
 
     template <typename T>
@@ -217,7 +225,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                   "Failed to write raster data");
     }
 
     void read_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const;
@@ -225,6 +233,7 @@ public:
 
     void write_geometadata(const GeoMetadata& meta);
     GeoMetadata geometadata() const;
+    GeoMetadata geometadata(int bandNr) const;
 
     void add_band(GDALDataType type, const void* data);
 
@@ -285,7 +294,7 @@ private:
 class RasterDriver
 {
 public:
-    static bool isSupported(RasterType);
+    static bool is_supported(RasterType);
     static RasterDriver create(RasterType);
     static RasterDriver create(const fs::path& filename);
 
