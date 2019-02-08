@@ -289,7 +289,10 @@ public:
     std::string_view name() const;
 
     int field_count() const;
-    int field_index(std::string_view name) const;
+    /*! obtain the index of the provided field name, returns -1 if not found */
+    int field_index(std::string_view name) const noexcept;
+    /*! obtain the index of the provided field name, throws RuntimError if field not present */
+    int required_field_index(std::string_view name) const;
     FieldDefinitionRef field_definition(int index) const;
 
     OGRFeatureDefn* get() noexcept;
@@ -387,6 +390,8 @@ public:
 
     std::optional<int32_t> epsg() const;
 
+    void set_ignored_fields(const std::vector<std::string>& fieldnames);
+
     int64_t feature_count() const;
     /*! obtain the feature with the specified id
      * The id is not an index! Don't expect iteration from 0 to feature_count to work
@@ -406,6 +411,9 @@ public:
 
     OGRLayer* get();
     const OGRLayer* get() const;
+
+    OGRLayerH handle();
+    const OGRLayerH handle() const;
 
 private:
     OGRLayer* _layer;

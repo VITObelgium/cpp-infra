@@ -76,6 +76,7 @@ else ()
     message(WARNING "no filesystem implementation found")
 endif ()
 
+find_package(date CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -84,6 +85,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
+    include/infra/chrono.h
     include/infra/coordinate.h
     include/infra/cpuinfo.h
     include/infra/enumutils.h
@@ -145,7 +147,7 @@ endif ()
 
 target_compile_definitions(infra PUBLIC FMT_STRING_ALIAS=1)
 
-target_link_libraries(infra PUBLIC fmt::fmt)
+target_link_libraries(infra PUBLIC fmt::fmt date_interface)
 
 if (HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
@@ -199,7 +201,6 @@ endif ()
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
     find_package(Gsl REQUIRED)
-    find_package(date CONFIG REQUIRED)
 
     list (APPEND INFRA_PUBLIC_HEADERS
         include/infra/gdal.h
@@ -248,7 +249,7 @@ if (INFRA_GDAL)
         target_sources(infra PRIVATE csvreader.cpp)
     endif ()
 
-    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl date_interface)
+    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl)
 endif ()
 
 if (INFRA_NUMERIC)

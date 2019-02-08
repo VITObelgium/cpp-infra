@@ -410,9 +410,19 @@ int FeatureDefinitionRef::field_count() const
     return _def->GetFieldCount();
 }
 
-int FeatureDefinitionRef::field_index(std::string_view name) const
+int FeatureDefinitionRef::field_index(std::string_view name) const noexcept
 {
     return _def->GetFieldIndex(name.data());
+}
+
+int FeatureDefinitionRef::required_field_index(std::string_view name) const
+{
+    int index = _def->GetFieldIndex(name.data());
+    if (index < 0) {
+        throw RuntimeError("Field not present: {}", name);
+    }
+
+    return index;
 }
 
 FieldDefinitionRef FeatureDefinitionRef::field_definition(int index) const
@@ -629,6 +639,12 @@ std::optional<int32_t> Layer::epsg() const
     return std::optional<int32_t>();
 }
 
+void Layer::set_ignored_fields(const std::vector<std::string>& fieldnames)
+{
+    auto fields = create_string_array(fieldnames);
+    checkError(_layer->SetIgnoredFields(fields.data()), "Failed to ignore layer fields");
+}
+
 int64_t Layer::feature_count() const
 {
     return _layer->GetFeatureCount();
@@ -693,6 +709,16 @@ OGRLayer* Layer::get()
 const OGRLayer* Layer::get() const
 {
     return _layer;
+}
+
+OGRLayerH Layer::handle()
+{
+    return OGRLayer::ToHandle(_layer);
+}
+
+const OGRLayerH Layer::handle() const
+{
+    return OGRLayer::ToHandle(_layer);
 }
 
 LayerIterator::LayerIterator()
