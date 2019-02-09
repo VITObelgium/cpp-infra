@@ -69,7 +69,7 @@ const QGradientStops* GradientDelegate::addGradient(const QString& cmapName) con
         QGradientStops stops;
         stops.reserve(truncate<int>(cmap.size()));
         for (size_t i = 0; i < cmap.size(); ++i) {
-            stops.push_back(QGradientStop(i / double(cmap.size() - 1), uiinfra::toQColor(cmap.get_color(truncate<uint8_t>(i)))));
+            stops.push_back(QGradientStop(i / double(cmap.size() - 1), toQColor(cmap.get_color(truncate<uint8_t>(i)))));
         }
 
         return &(*_gradients.insert(cmapName, stops));
