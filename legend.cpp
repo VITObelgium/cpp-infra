@@ -16,6 +16,7 @@ Legend create_numeric_legend(double min, double max, int numberOfClasses, std::s
     legend.numberOfClasses = numberOfClasses;
     legend.colorMapName    = cmapName;
     legend.entries.resize(numberOfClasses);
+    legend.cmap = ColorMap::create(cmapName);
 
     generate_colors(cmapName, legend);
     generate_bounds(min, max, method, legend);
@@ -30,6 +31,7 @@ Legend create_numeric_legend(std::vector<float> sampleData, int numberOfClasses,
     legend.numberOfClasses = numberOfClasses;
     legend.colorMapName    = cmapName;
     legend.entries.resize(numberOfClasses);
+    legend.cmap = ColorMap::create(cmapName);
 
     generate_colors(cmapName, legend);
     generate_bounds(std::move(sampleData), method, legend);
