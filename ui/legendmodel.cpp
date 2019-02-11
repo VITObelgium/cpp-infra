@@ -50,7 +50,7 @@ QVariant LegendModel::data(const QModelIndex& index, int role) const
 
     try {
         if ((role == Qt::BackgroundColorRole || role == ColorRole) && index.column() == 0) {
-            return uiinfra::toQColor(_legend.entries[index.row()].color);
+            return ui::toQColor(_legend.entries[index.row()].color);
         }
 
         if (role != Qt::DisplayRole && role != Qt::EditRole && role != NameRole) {
@@ -95,7 +95,7 @@ bool LegendModel::setData(const QModelIndex& index, const QVariant& value, int r
     switch (index.column()) {
     case 0:
         if (role == Qt::BackgroundColorRole) {
-            item.color = uiinfra::fromQColor(value.value<QColor>());
+            item.color = ui::fromQColor(value.value<QColor>());
         }
         break;
     case 1:
