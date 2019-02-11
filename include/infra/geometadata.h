@@ -35,6 +35,12 @@ struct GeoMetadata
     bool is_on_map(int32_t r, int32_t c) const;
     void compute_rect_on_map_around(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
 
+    template <typename T>
+    Cell convert_point_to_cell(const Point<T> point) const
+    {
+        return Cell(convert_y_to_row(point.y), convert_x_to_col(point.x));
+    }
+
     Point<double> center() const;
     Point<double> top_left() const;
     Point<double> bottom_right() const;
