@@ -86,6 +86,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/cast.h
     include/infra/cell.h
     include/infra/chrono.h
+    include/infra/cliprogressbar.h
     include/infra/coordinate.h
     include/infra/cpuinfo.h
     include/infra/enumutils.h

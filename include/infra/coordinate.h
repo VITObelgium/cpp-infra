@@ -35,6 +35,14 @@ struct Coordinate
     double longitude = std::numeric_limits<double>::max();
 };
 
+inline double distance(const Coordinate& lhs, const Coordinate& rhs)
+{
+    auto lat = rhs.latitude - lhs.latitude;
+    auto lon = rhs.longitude - lhs.longitude;
+
+    return std::sqrt((lat * lat) + (lon * lon));
+}
+
 constexpr Coordinate operator-(const Coordinate& lhs, const Coordinate& rhs)
 {
     return Coordinate(lhs.latitude - rhs.latitude, lhs.longitude - rhs.longitude);
