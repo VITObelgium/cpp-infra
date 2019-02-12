@@ -15,7 +15,7 @@ static void gdalErrorHandler(CPLErr errClass, int /*err_no*/, const char* msg)
         Log::debug("GDAL {}", msg);
         break;
     case CE_Warning:
-        Log::warn("GDAL {}", msg);
+        Log::debug("GDAL {}", msg);
         break;
     case CE_Failure:
         Log::error("GDAL {}", msg);
