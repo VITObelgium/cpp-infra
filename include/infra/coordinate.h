@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cinttypes>
+#include <cmath>
 #include <fmt/core.h>
 #include <limits>
 
