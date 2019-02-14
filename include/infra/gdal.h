@@ -210,7 +210,7 @@ public:
 
     RasterBand rasterband(int index) const;
 
-    const type_info& band_datatype(int index) const;
+    const std::type_info& band_datatype(int index) const;
 
     template <typename T>
     void read_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const

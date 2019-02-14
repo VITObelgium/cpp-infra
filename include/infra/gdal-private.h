@@ -75,7 +75,7 @@ inline GDALDataType resolveType(const std::type_info& info)
     return GDT_Unknown;
 }
 
-inline const type_info& resolveType(GDALDataType type)
+inline const std::type_info& resolveType(GDALDataType type)
 {
     switch (type) {
     case GDT_Byte:
