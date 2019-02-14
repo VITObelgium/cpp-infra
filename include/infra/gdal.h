@@ -210,14 +210,14 @@ public:
 
     RasterBand rasterband(int index) const;
 
-    GDALDataType band_datatype(int index) const;
+    const type_info& band_datatype(int index) const;
 
     template <typename T>
     void read_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-            "Failed to read raster data");
+                   "Failed to read raster data");
     }
 
     template <typename T>
@@ -226,7 +226,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                   "Failed to write raster data");
     }
 
     void read_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const;
