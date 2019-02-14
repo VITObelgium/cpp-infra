@@ -782,7 +782,7 @@ RasterBand RasterDataSet::rasterband(int bandNr) const
     return RasterBand(checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index"));
 }
 
-const type_info& RasterDataSet::band_datatype(int bandNr) const
+const std::type_info& RasterDataSet::band_datatype(int bandNr) const
 {
     assert(_ptr);
     assert(bandNr > 0);
