@@ -82,9 +82,11 @@ void generate_bounds(std::vector<float> sampleData, LegendScaleType scaleType, L
 
     size_t index = 0;
     for (auto& entry : legend.entries) {
-        auto [lower, upper] = bounds[index++];
-        entry.lowerBound    = lower;
-        entry.upperBound    = upper;
+        if (index < bounds.size()) {
+            auto [lower, upper] = bounds[index++];
+            entry.lowerBound    = lower;
+            entry.upperBound    = upper;
+        }
     }
 }
 

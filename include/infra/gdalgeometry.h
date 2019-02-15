@@ -268,6 +268,18 @@ protected:
 class FieldDefinition : public FieldDefinitionRef
 {
 public:
+    template <typename T>
+    static FieldDefinition create(const char* name)
+    {
+        return FieldDefinition(name, typeid(T));
+    }
+
+    template <typename T>
+    static FieldDefinition create(const std::string& name)
+    {
+        return FieldDefinition(name, typeid(T));
+    }
+
     FieldDefinition() = default;
     FieldDefinition(const char* name, const std::type_info& typeInfo);
     FieldDefinition(const std::string& name, const std::type_info& typeInfo);
@@ -279,6 +291,8 @@ public:
 
     FieldDefinition(FieldDefinition&&);
     FieldDefinition& operator=(FieldDefinition&&);
+
+    void set_width(int width);
 };
 
 class FeatureDefinitionRef
@@ -389,6 +403,7 @@ public:
     Layer& operator=(Layer&&) = default;
 
     std::optional<int32_t> epsg() const;
+    void set_projection_from_epsg(int32_t epsg);
 
     void set_ignored_fields(const std::vector<std::string>& fieldnames);
 

@@ -394,6 +394,11 @@ FieldDefinition& FieldDefinition::operator=(FieldDefinition&& other)
     return *this;
 }
 
+void FieldDefinition::set_width(int width)
+{
+    _def->SetWidth(width);
+}
+
 FeatureDefinitionRef::FeatureDefinitionRef(OGRFeatureDefn* def)
 : _def(def)
 {
@@ -637,6 +642,11 @@ std::optional<int32_t> Layer::epsg() const
     }
 
     return std::optional<int32_t>();
+}
+
+void Layer::set_projection_from_epsg(int32_t epsg)
+{
+    SpatialReference spatialRef(epsg);
 }
 
 void Layer::set_ignored_fields(const std::vector<std::string>& fieldnames)

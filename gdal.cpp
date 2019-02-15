@@ -219,6 +219,11 @@ OGRSpatialReference* SpatialReference::get() noexcept
     return _srs.get();
 }
 
+const OGRSpatialReference* SpatialReference::get() const noexcept
+{
+    return _srs.get();
+}
+
 CoordinateTransformer::CoordinateTransformer(SpatialReference source, SpatialReference dest)
 : _sourceSRS(std::move(source))
 , _targetSRS(std::move(dest))
@@ -979,6 +984,13 @@ Layer VectorDataSet::create_layer(const std::string& name, Geometry::Type type, 
     assert(_ptr);
     auto options = create_string_array(driverOptions);
     return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), const_cast<char**>(options.data())), "Layer creation failed"));
+}
+
+Layer VectorDataSet::create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions)
+{
+    assert(_ptr);
+    auto options = create_string_array(driverOptions);
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), spatialRef.get(), to_gdal_type(type), const_cast<char**>(options.data())), "Layer creation failed"));
 }
 
 GDALDataset* VectorDataSet::get() const

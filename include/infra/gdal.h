@@ -117,6 +117,7 @@ public:
     void set_utm(int zone, bool north = true);
 
     OGRSpatialReference* get() noexcept;
+    const OGRSpatialReference* get() const noexcept;
 
 private:
     SpatialReference(OGRSpatialReference* instance);
@@ -284,6 +285,9 @@ public:
     Layer layer(int index);
     Layer create_layer(const std::string& name, const std::vector<std::string>& driverOptions = {});
     Layer create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
+
+    /*! Make sure to keep the spatial reference object alive while working with the dataset! */
+    Layer create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
 
     GDALDataset* get() const;
     VectorDriver driver();
