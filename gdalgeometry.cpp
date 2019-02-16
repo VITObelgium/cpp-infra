@@ -726,7 +726,7 @@ OGRLayerH Layer::handle()
     return OGRLayer::ToHandle(_layer);
 }
 
-const OGRLayerH Layer::handle() const
+const void* Layer::handle() const
 {
     return OGRLayer::ToHandle(_layer);
 }
