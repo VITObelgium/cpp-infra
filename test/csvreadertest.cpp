@@ -20,7 +20,6 @@ static void verifyCsvData(const fs::path& p)
             EXPECT_EQ(2015, row.get_int32(0));
             EXPECT_EQ(u8"4-nonylphénol", row.get_column_as<std::string>(12).value());
         } else {
-            auto val = row.get_int32(0);
             EXPECT_EQ(2016, row.get_int32(0));
             EXPECT_EQ(u8"Anthracène", row.get_column_as<std::string>(12).value());
         }
