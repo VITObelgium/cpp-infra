@@ -196,7 +196,7 @@ if (INFRA_CHARSET)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/charset.h)
     target_sources(infra PRIVATE charset.cpp)
     target_compile_definitions(infra PRIVATE U_USING_ICU_NAMESPACE U_STATIC_IMPLEMENTATION )
-    target_link_libraries(infra PRIVATE ICU::i18n ICU::data ICU::uc)
+    target_link_libraries(infra PRIVATE ICU::i18n ICU::uc ICU::data)
 endif ()
 
 if (INFRA_GDAL)
