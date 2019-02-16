@@ -428,7 +428,7 @@ public:
     const OGRLayer* get() const;
 
     OGRLayerH handle();
-    const OGRLayerH handle() const;
+    const void* handle() const;
 
 private:
     OGRLayer* _layer;
