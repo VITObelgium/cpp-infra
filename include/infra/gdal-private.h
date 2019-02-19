@@ -1,5 +1,6 @@
 #pragma once
 
+#include <complex>
 #include <gdal_priv.h>
 #include <typeinfo>
 
@@ -72,6 +73,38 @@ inline GDALDataType resolveType(const std::type_info& info)
     }
 
     return GDT_Unknown;
+}
+
+inline const std::type_info& resolveType(GDALDataType type)
+{
+    switch (type) {
+    case GDT_Byte:
+        return typeid(uint8_t);
+    case GDT_UInt16:
+        return typeid(uint16_t);
+    case GDT_Int16:
+        return typeid(int16_t);
+    case GDT_UInt32:
+        return typeid(uint32_t);
+    case GDT_Int32:
+        return typeid(int32_t);
+    case GDT_Float32:
+        return typeid(float);
+    case GDT_Float64:
+        return typeid(double);
+    case GDT_CInt16:
+        return typeid(int16_t);
+        return typeid(std::complex<int16_t>);
+    case GDT_CInt32:
+        return typeid(std::complex<int32_t>);
+    case GDT_CFloat32:
+        return typeid(std::complex<float>);
+    case GDT_CFloat64:
+        return typeid(std::complex<double>);
+    case GDT_Unknown:
+    default:
+        return typeid(void);
+    }
 }
 
 void throwLastError(const char* msg);

@@ -5,7 +5,8 @@
 #include "uiinfra/gradientdelegate.h"
 
 #include <qcombobox.h>
-namespace uiinfra {
+
+namespace inf::ui {
 
 /*! Combobox for selecting a color map
  */

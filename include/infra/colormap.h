@@ -3,6 +3,7 @@
 #include "infra/color.h"
 
 #include <array>
+#include <functional>
 #include <vector>
 
 namespace inf {
@@ -19,6 +20,19 @@ struct ColorDict
     std::vector<Entry> red;
     std::vector<Entry> green;
     std::vector<Entry> blue;
+};
+
+struct ColorMapper
+{
+    template <typename MapperFunc>
+    ColorMapper(MapperFunc&& r, MapperFunc&& g, MapperFunc&& b)
+    : red(r), green(g), blue(b)
+    {
+    }
+
+    std::function<uint8_t(double)> red;
+    std::function<uint8_t(double)> green;
+    std::function<uint8_t(double)> blue;
 };
 
 struct ColorInfo
@@ -41,6 +55,7 @@ public:
     explicit ColorMap(const std::vector<Color>& clist, bool reverse = false);
     explicit ColorMap(const std::vector<ColorInfo>& clist, bool reverse = false);
     explicit ColorMap(const std::array<Color, 256>& cmap, bool reverse = false);
+    explicit ColorMap(const ColorMapper& cmap, bool reverse = false);
 
     static ColorMap qualitative(const std::vector<Color>& cdict);
     static ColorMap create(std::string_view name);
@@ -79,6 +94,8 @@ struct Cmap
     static const ColorDict gistEarth;
     static const ColorDict gistNcar;
     static const ColorDict gistStern;
+
+    static const ColorMapper rainbow;
 
     static const std::vector<ColorInfo> terrain;
 

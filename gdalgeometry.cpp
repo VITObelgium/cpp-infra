@@ -3,6 +3,7 @@
 #include "infra/exception.h"
 #include "infra/gdal-private.h"
 #include "infra/gdal.h"
+#include "infra/string.h"
 
 #include <ogrsf_frmts.h>
 
@@ -393,6 +394,11 @@ FieldDefinition& FieldDefinition::operator=(FieldDefinition&& other)
     return *this;
 }
 
+void FieldDefinition::set_width(int width)
+{
+    _def->SetWidth(width);
+}
+
 FeatureDefinitionRef::FeatureDefinitionRef(OGRFeatureDefn* def)
 : _def(def)
 {
@@ -409,9 +415,19 @@ int FeatureDefinitionRef::field_count() const
     return _def->GetFieldCount();
 }
 
-int FeatureDefinitionRef::field_index(std::string_view name) const
+int FeatureDefinitionRef::field_index(std::string_view name) const noexcept
 {
     return _def->GetFieldIndex(name.data());
+}
+
+int FeatureDefinitionRef::required_field_index(std::string_view name) const
+{
+    int index = _def->GetFieldIndex(name.data());
+    if (index < 0) {
+        throw RuntimeError("Field not present: {}", name);
+    }
+
+    return index;
 }
 
 FieldDefinitionRef FeatureDefinitionRef::field_definition(int index) const
@@ -520,6 +536,8 @@ T Feature::field_as(int index) const
         return _feature->GetFieldAsInteger(index);
     } else if constexpr (std::is_same_v<int64_t, T>) {
         return _feature->GetFieldAsInteger64(index);
+    } else if constexpr (std::is_same_v<std::string, T>) {
+        return std::string(_feature->GetFieldAsString(index));
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(index));
     } else if constexpr (std::is_same_v<time_point, T>) {
@@ -549,6 +567,8 @@ T Feature::field_as(std::string_view name) const
         return _feature->GetFieldAsInteger(name.data());
     } else if constexpr (std::is_same_v<int64_t, T>) {
         return _feature->GetFieldAsInteger64(name.data());
+    } else if constexpr (std::is_same_v<std::string, T>) {
+        return std::string(_feature->GetFieldAsString(name.data()));
     } else if constexpr (std::is_same_v<std::string_view, T>) {
         return std::string_view(_feature->GetFieldAsString(name.data()));
     } else if constexpr (std::is_same_v<time_point, T>) {
@@ -563,6 +583,7 @@ template double Feature::field_as<double>(int index) const;
 template float Feature::field_as<float>(int index) const;
 template int32_t Feature::field_as<int32_t>(int index) const;
 template int64_t Feature::field_as<int64_t>(int index) const;
+template std::string Feature::field_as<std::string>(int index) const;
 template std::string_view Feature::field_as<std::string_view>(int index) const;
 template time_point Feature::field_as<time_point>(int index) const;
 
@@ -570,6 +591,7 @@ template double Feature::field_as<double>(std::string_view index) const;
 template float Feature::field_as<float>(std::string_view index) const;
 template int32_t Feature::field_as<int32_t>(std::string_view index) const;
 template int64_t Feature::field_as<int64_t>(std::string_view index) const;
+template std::string Feature::field_as<std::string>(std::string_view index) const;
 template std::string_view Feature::field_as<std::string_view>(std::string_view index) const;
 template time_point Feature::field_as<time_point>(std::string_view index) const;
 
@@ -611,6 +633,28 @@ Layer::~Layer()
     }
 }
 
+std::optional<int32_t> Layer::epsg() const
+{
+    if (auto* spatialRef = _layer->GetSpatialRef(); spatialRef != nullptr) {
+        if (auto* epsg = _layer->GetSpatialRef()->GetAuthorityCode("PROJCS"); epsg != nullptr) {
+            return str::to_int32(epsg);
+        }
+    }
+
+    return std::optional<int32_t>();
+}
+
+void Layer::set_projection_from_epsg(int32_t epsg)
+{
+    SpatialReference spatialRef(epsg);
+}
+
+void Layer::set_ignored_fields(const std::vector<std::string>& fieldnames)
+{
+    auto fields = create_string_array(fieldnames);
+    checkError(_layer->SetIgnoredFields(fields.data()), "Failed to ignore layer fields");
+}
+
 int64_t Layer::feature_count() const
 {
     return _layer->GetFeatureCount();
@@ -618,7 +662,7 @@ int64_t Layer::feature_count() const
 
 Feature Layer::feature(int64_t index) const
 {
-    assert(index < _layer->GetFeatureCount());
+    assert(index != OGRNullFID);
     return Feature(checkPointer(_layer->GetFeature(index), "Failed to get feature from layer"));
 }
 
@@ -675,6 +719,16 @@ OGRLayer* Layer::get()
 const OGRLayer* Layer::get() const
 {
     return _layer;
+}
+
+OGRLayerH Layer::handle()
+{
+    return OGRLayer::ToHandle(_layer);
+}
+
+const void* Layer::handle() const
+{
+    return OGRLayer::ToHandle(_layer);
 }
 
 LayerIterator::LayerIterator()

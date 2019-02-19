@@ -6,6 +6,21 @@
 
 namespace uiinfra {
 
+QString createOpenSourceUsageMessage(const std::vector<OpenSourceUsageInfo>& usages)
+{
+    QString openSourceInfo("<center><b>Open Source Libraries</b></center>");
+
+    for (auto& info : usages) {
+        openSourceInfo.append(QString("<center><p><a href=\"%1\">%2</a> (<a href=\"%3\">%4</a>)</p></center>")
+                                  .arg(info.website)
+                                  .arg(info.name)
+                                  .arg(info.licenseLink)
+                                  .arg(info.license));
+    }
+
+    return openSourceInfo;
+}
+
 AboutDialog::AboutDialog(QWidget* parent)
 : QDialog(parent)
 , _ui(std::make_unique<Ui::AboutDialog>())
@@ -51,7 +66,7 @@ void AboutDialog::setCopyrightInfo(QString copyright)
     _ui->copyrightLabel->setText(copyright);
 }
 
-void AboutDialog::addOpenSourceUsage(OpenSourceInfo info)
+void AboutDialog::addOpenSourceUsage(OpenSourceUsageInfo info)
 {
     _ui->acknowledgementsButton->setVisible(true);
     _openSource.push_back(info);
@@ -59,18 +74,7 @@ void AboutDialog::addOpenSourceUsage(OpenSourceInfo info)
 
 void AboutDialog::createOpensourceMessage()
 {
-    QString openSourceInfo;
-
-    openSourceInfo.append("<center><b>Open Source Libraries</b></center>");
-
-    for (auto& info : _openSource) {
-        openSourceInfo.append(QString("<center><p><a href=\"%1\">%2</a> (<a href=\"%3\">%4</a>)</p></center>")
-                                  .arg(info.website)
-                                  .arg(info.name)
-                                  .arg(info.licenseLink)
-                                  .arg(info.license));
-    }
-
-    _ui->licenseEdit->setHtml(openSourceInfo);
+    _ui->licenseEdit->setHtml(createOpenSourceUsageMessage(_openSource));
 }
+
 }

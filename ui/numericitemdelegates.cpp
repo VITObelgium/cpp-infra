@@ -2,7 +2,7 @@
 
 #include <qspinbox.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 IntegerItemDelegate::IntegerItemDelegate(QObject* parent)
 : QStyledItemDelegate(parent)
@@ -24,9 +24,9 @@ QWidget* IntegerItemDelegate::createEditor(QWidget* parent, const QStyleOptionVi
     return sb;
 }
 
-QString IntegerItemDelegate::displayText(const QVariant& value, const QLocale& /*locale*/) const
+QString IntegerItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    return QLocale().toString(value.toInt());
+    return locale.toString(value.toInt());
 }
 
 void IntegerItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const
@@ -43,9 +43,9 @@ FloatingPointItemDelegate::FloatingPointItemDelegate(char format, int decimals, 
 {
 }
 
-QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& /*locale*/) const
+QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    return QLocale().toString(value.toDouble(), _format, _decimals);
+    return locale.toString(value.toDouble(), _format, _decimals);
 }
 
 void FloatingPointItemDelegate::setEditorData(QWidget* editor, const QModelIndex& index) const

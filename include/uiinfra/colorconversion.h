@@ -4,7 +4,7 @@
 
 #include <qcolor.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 inline QColor toQColor(const inf::Color& color)
 {

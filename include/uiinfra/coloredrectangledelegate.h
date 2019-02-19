@@ -8,7 +8,7 @@ class QModelIndex;
 class QWidget;
 class QVariant;
 
-namespace uiinfra {
+namespace inf::ui {
 
 /*! Item delegate that draws a rectangle with the configured role color */
 class ColoredRectangleDelegate : public QStyledItemDelegate

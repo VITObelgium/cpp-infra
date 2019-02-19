@@ -26,19 +26,21 @@ if (INFRA_IS_TOPLEVEL)
     )
 endif ()
 
-option(INFRA_LOGGING "Enable logging functionality" ON)
-option(INFRA_GDAL "Enable gdal wrapper for reading gis data" ON)
+option(INFRA_LOGGING "Enable logging functionality" OFF)
+option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
 cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
-option(INFRA_ENABLE_TESTS "Build the unit tests" ON)
+option(INFRA_CHARSET "Enable the character set utility classes" OFF)
+option(INFRA_ENABLE_TESTS "Build the unit tests" OFF)
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 option(INFRA_INSTALL_DEVELOPMENT_FILES "Install the infra development files (headers/libs)" ON)
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
-cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" ON "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
+cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -74,6 +76,7 @@ else ()
     message(WARNING "no filesystem implementation found")
 endif ()
 
+find_package(date CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -82,9 +85,16 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
+    include/infra/chrono.h
+    include/infra/cliprogressbar.h
+    include/infra/coordinate.h
+    include/infra/cpuinfo.h
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
+    include/infra/legend.h
+    include/infra/legenddataanalyser.h 
+    include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
     include/infra/process.h
@@ -95,7 +105,9 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/filesystem.h
     include/infra/color.h
     include/infra/colormap.h
+    include/infra/conversion.h
     include/infra/rect.h
+    include/infra/size.h
     include/infra/threadpool.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h
@@ -103,6 +115,9 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    cpuinfo.cpp
+    legend.cpp
+    legenddataanalyser.cpp
     process.cpp
     string.cpp
     exception.cpp
@@ -133,7 +148,7 @@ endif ()
 
 target_compile_definitions(infra PUBLIC FMT_STRING_ALIAS=1)
 
-target_link_libraries(infra PUBLIC fmt::fmt)
+target_link_libraries(infra PUBLIC fmt::fmt date_interface)
 
 if (HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
@@ -141,7 +156,7 @@ elseif (CMAKE_COMPILER_IS_GNUCXX)
     if (HAVE_FILESYSTEM_H OR HAVE_EXP_FILESYSTEM_H)
         target_link_libraries(infra PRIVATE stdc++fs)
     endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT CMAKE_HOST_WIN32)
     if (HAVE_FILESYSTEM_H)
         find_library(CPP_FS_LIB c++fs)
         if (CPP_FS_LIB)
@@ -170,15 +185,23 @@ endif ()
 
 if (INFRA_XML)
     find_package(pugixml CONFIG REQUIRED)
+    set_target_properties(pugixml PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
     target_sources(infra PRIVATE xmldocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
 endif ()
 
+if (INFRA_CHARSET)
+    find_package(ICU COMPONENTS i18n data uc REQUIRED)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/charset.h)
+    target_sources(infra PRIVATE charset.cpp)
+    target_compile_definitions(infra PRIVATE U_USING_ICU_NAMESPACE U_STATIC_IMPLEMENTATION )
+    target_link_libraries(infra PRIVATE ICU::i18n ICU::uc ICU::data)
+endif ()
+
 if (INFRA_GDAL)
     find_package(Gdal REQUIRED)
     find_package(Gsl REQUIRED)
-    find_package(date CONFIG REQUIRED)
 
     list (APPEND INFRA_PUBLIC_HEADERS
         include/infra/gdal.h
@@ -221,7 +244,13 @@ if (INFRA_GDAL)
         list (APPEND INFRA_PUBLIC_HEADERS include/infra/gdallog.h)
         target_sources(infra PRIVATE gdallog.cpp)
     endif ()
-    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl date_interface)
+
+    if (INFRA_CHARSET)
+        list (APPEND INFRA_PUBLIC_HEADERS include/infra/csvreader.h)
+        target_sources(infra PRIVATE csvreader.cpp)
+    endif ()
+
+    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl)
 endif ()
 
 if (INFRA_NUMERIC)
@@ -279,10 +308,10 @@ if (INFRA_IS_TOPLEVEL)
 endif ()
 
 if (INFRA_UI_COMPONENTS)
-    find_package(Qt5Gui CONFIG REQUIRED)
-    find_package(Qt5Widgets CONFIG REQUIRED)
-    find_package(Qt5Core CONFIG REQUIRED)
-    find_package(Qt5Location CONFIG REQUIRED)
+    find_package(Qt5Gui REQUIRED)
+    find_package(Qt5Widgets REQUIRED)
+    find_package(Qt5Core REQUIRED)
+    find_package(Qt5Network REQUIRED)
     find_package(date CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
@@ -329,28 +358,67 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
-        include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
         include/uiinfra/tabletools.h ui/tabletools.cpp
 
         ui/toolboxitem.h ui/toolboxitem.cpp
+        ui/qt5.natvis
         ${FORMS_HEADERS}
     )
 
-    if (INFRA_UI_COMPONENTS_LOCATION)
-         if (NOT INFRA_GDAL)
-            message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
-         endif ()
+    target_link_libraries(uiinfra PUBLIC
+        Qt5::Network
+        Qt5::Gui
+        Qt5::Widgets
+        Qt5::Core
+        date_interface
+    )
 
-         find_package(Qt5QuickCompiler REQUIRED)
-         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
+    if (STATIC_QT AND MSVC)
+        get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
+        if ("ssl" IN_LIST QT_NETWORK_FEATURES)
+            message(STATUS "Qt network SSL enabled")
+            target_link_libraries(uiinfra PRIVATE
+                Crypt32.lib
+            )
+        endif ()
+    endif ()
+
+    if (INFRA_UI_COMPONENTS_QML)
+        target_sources(uiinfra PRIVATE
+            include/uiinfra/pixmapimage.h ui/pixmapimage.cpp
+            include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
+        )
+    endif ()
+
+    if (INFRA_UI_COMPONENTS_LOCATION)
+        find_package(Qt5Location CONFIG REQUIRED)
+    
+        if (NOT INFRA_GDAL)
+            message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
+        endif ()
+
+        find_package(Qt5QuickCompiler REQUIRED)
+        qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
 
         target_sources(uiinfra PRIVATE
             ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
             include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
+            include/uiinfra/legendmodel.h ui/legendmodel.cpp
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
+            include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
         )
+
+        target_link_libraries(uiinfra PUBLIC
+            Qt5::Location
+        )
+
+        if (INFRA_GDAL)
+            target_sources(uiinfra PRIVATE
+                include/uiinfra/polygonio.h ui/polygonio.cpp
+            )
+        endif ()
     endif ()
 
     if (INFRA_UI_COMPONENTS_XLSX_EXPORT)
@@ -359,12 +427,6 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/modelexport.h ui/modelexport.cpp
         )
         target_link_libraries(uiinfra PRIVATE XslxWriter::XslxWriter)
-    endif ()
-
-    if (INFRA_GDAL)
-        target_sources(uiinfra PRIVATE
-            include/uiinfra/polygonio.h ui/polygonio.cpp
-        )
     endif ()
 
     if (INFRA_LOGGING)
@@ -385,8 +447,6 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
-
-    target_link_libraries(uiinfra PUBLIC Qt5::Gui Qt5::Widgets Qt5::Core Qt5::Location date_interface)
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)

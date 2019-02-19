@@ -9,13 +9,20 @@ template <typename Mutex>
 LogSinkModel<Mutex>::LogSinkModel(QObject* parent)
 : QAbstractListModel(parent)
 {
+    this->formatter_ = std::make_unique<spdlog::pattern_formatter>("[%T] [%l] %v", spdlog::pattern_time_type::local, "");
+}
+
+template <typename Mutex>
+void LogSinkModel<Mutex>::set_formatter_(std::unique_ptr<spdlog::formatter> /*sink_formatter*/)
+{
+    // Don't use globally configured formmatter (contains eol in messages, messes up the text layout)
 }
 
 template <typename Mutex>
 void LogSinkModel<Mutex>::sink_it_(const spdlog::details::log_msg& msg)
 {
     fmt::memory_buffer formatted;
-    spdlog::sinks::sink::formatter_->format(msg, formatted);
+    this->formatter_->format(msg, formatted);
 
     std::lock_guard<Mutex> lock(_mutex);
     auto rows = size();
@@ -43,6 +50,10 @@ QVariant LogSinkModel<Mutex>::data(const QModelIndex& index, int role) const
 
     if (role == Qt::DisplayRole) {
         return _messages.at(size_t(index.row())).message;
+    }
+
+    if (role == Qt::TextAlignmentRole) {
+        return int(Qt::AlignVCenter | Qt::AlignLeft);
     }
 
     if (role == Qt::DecorationRole) {

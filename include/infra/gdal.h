@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/coordinate.h"
 #include "infra/filesystem.h"
 #include "infra/gdal-private.h"
 #include "infra/gdalgeometry.h"
@@ -17,6 +18,7 @@
 
 #include <chrono>
 #include <optional>
+#include <unordered_map>
 #include <variant>
 
 namespace inf::gdal {
@@ -53,6 +55,13 @@ class Layer;
 class RasterDriver;
 class VectorDriver;
 
+enum class FileType
+{
+    Raster,
+    Vector,
+    Unknown,
+};
+
 enum class RasterType
 {
     Memory,
@@ -61,7 +70,8 @@ enum class RasterType
     Gif,
     Png,
     PcRaster,
-    Unknown
+    Netcdf,
+    Unknown,
 };
 
 enum class VectorType
@@ -71,22 +81,67 @@ enum class VectorType
     Tab,
     ShapeFile,
     Xlsx,
-    Unknown
+    GeoJson,
+    Unknown,
+};
+
+/*! Wrapper around the OGRSpatialReference class
+ * Needed as the OGRSpatialReference destructor is deprecated
+ * so it is very easy to misuse the OGRSpatialReference API
+ */
+class SpatialReference
+{
+public:
+    SpatialReference();
+    SpatialReference(int32_t epsg);
+    SpatialReference(const char* wkt);
+    ~SpatialReference() noexcept;
+
+    SpatialReference(SpatialReference&&) = default;
+
+    SpatialReference clone() const;
+    SpatialReference clone_geo_cs() const;
+
+    void import_from_epsg(int32_t epsg);
+    void import_from_wkt(const char* wkt);
+
+    std::string export_to_pretty_wkt() const;
+    std::string export_to_pretty_wkt_simplified() const;
+
+    std::optional<int32_t> epsg_cs() const;
+    std::optional<int32_t> epsg_geog_cs() const;
+    std::string_view authority_code(const char* key) const;
+
+    void set_proj_cs(const char* projCs);
+    void set_well_known_geog_cs(const char* geogCs);
+    void set_utm(int zone, bool north = true);
+
+    OGRSpatialReference* get() noexcept;
+    const OGRSpatialReference* get() const noexcept;
+
+private:
+    SpatialReference(OGRSpatialReference* instance);
+
+    std::unique_ptr<OGRSpatialReference> _srs;
 };
 
 class CoordinateTransformer
 {
 public:
+    CoordinateTransformer(SpatialReference source, SpatialReference dest);
     CoordinateTransformer(int32_t sourceEpsg, int32_t destEpsg);
 
     Point<double> transform(const Point<double>& point) const;
     void transform_in_place(Point<double>& point) const;
 
+    Coordinate transform(const Coordinate& coord) const;
+    void transform_in_place(Coordinate& coord) const;
+
     OGRCoordinateTransformation* get();
 
 private:
-    OGRSpatialReference _sourceSRS;
-    OGRSpatialReference _targetSRS;
+    SpatialReference _sourceSRS;
+    SpatialReference _targetSRS;
     std::unique_ptr<OGRCoordinateTransformation> _transformer;
 };
 
@@ -98,9 +153,9 @@ Point<double> convert_point_projected(int32_t sourceEpsg, int32_t destEpsg, Poin
 Point<double> projected_to_geographic(int32_t epsg, Point<double>);
 std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
-int32_t projection_to_geo_epsg(const std::string& projection);
-int32_t projection_to_epsg(const std::string& projection);
-std::vector<const char*> create_options_array(const std::vector<std::string>& driverOptions);
+std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
+std::optional<int32_t> projection_to_epsg(const std::string& projection);
+std::vector<const char*> create_string_array(const std::vector<std::string>& driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
@@ -133,6 +188,7 @@ public:
 
     RasterDataSet& operator=(RasterDataSet&&);
 
+    bool is_valid() const;
     int32_t raster_count() const;
 
     int32_t x_size() const;
@@ -148,18 +204,21 @@ public:
     std::string projection() const;
     void set_projection(const std::string& proj);
 
+    std::string metadata_item(const std::string& name, const std::string& domain = "");
+    std::unordered_map<std::string, std::string> metadata(const std::string& domain = "");
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
+    std::vector<std::string> metadata_domains() const;
 
     RasterBand rasterband(int index) const;
 
-    GDALDataType band_datatype(int index) const;
+    const std::type_info& band_datatype(int index) const;
 
     template <typename T>
     void read_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-            "Failed to read raster data");
+                   "Failed to read raster data");
     }
 
     template <typename T>
@@ -168,7 +227,7 @@ public:
         auto* bandPtr = _ptr->GetRasterBand(band);
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                   "Failed to write raster data");
     }
 
     void read_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const;
@@ -176,6 +235,7 @@ public:
 
     void write_geometadata(const GeoMetadata& meta);
     GeoMetadata geometadata() const;
+    GeoMetadata geometadata(int bandNr) const;
 
     void add_band(GDALDataType type, const void* data);
 
@@ -214,6 +274,7 @@ public:
 
     VectorDataSet& operator=(VectorDataSet&&);
 
+    bool is_valid() const;
     int32_t layer_count() const;
 
     std::string projection() const;
@@ -225,6 +286,9 @@ public:
     Layer create_layer(const std::string& name, const std::vector<std::string>& driverOptions = {});
     Layer create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
 
+    /*! Make sure to keep the spatial reference object alive while working with the dataset! */
+    Layer create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
+
     GDALDataset* get() const;
     VectorDriver driver();
 
@@ -235,7 +299,7 @@ private:
 class RasterDriver
 {
 public:
-    static bool isSupported(RasterType);
+    static bool is_supported(RasterType);
     static RasterDriver create(RasterType);
     static RasterDriver create(const fs::path& filename);
 
@@ -270,7 +334,7 @@ private:
 class VectorDriver
 {
 public:
-    static bool isSupported(VectorType);
+    static bool is_supported(VectorType);
     static VectorDriver create(VectorType);
     static VectorDriver create(const fs::path& filename);
 
@@ -286,6 +350,8 @@ public:
 private:
     GDALDriver& _driver;
 };
+
+FileType detect_file_type(const fs::path& path);
 
 class MemoryFile
 {
