@@ -3,7 +3,7 @@
 #include <date/date.h>
 #include <qdatetime.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 template <class Clock, class Duration>
 QDate toDate(const std::chrono::time_point<Clock, Duration>& tp)
