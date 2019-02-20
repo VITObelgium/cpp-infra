@@ -1,7 +1,11 @@
 Source: gdal
-Version: 2.4.0
+Version: 2.4.0-3
 Description: The Geographic Data Abstraction Library for reading and writing geospatial raster and vector data.
-Build-Depends: proj4, libpng, tiff[lzw], liblzma
+Build-Depends: proj4, tiff[lzw], liblzma, libpng (windows), libiconv
+
+Feature: png
+Description: Png support
+Build-Depends: libpng (!windows)
 
 Feature: geos
 Description: Geometry Engine support
@@ -25,6 +29,10 @@ Build-Depends: expat
 
 Feature: pcraster
 Description: Support reading and writing pcraster map files
+
+Feature: netcdf
+Description: Support reading netcdf files
+Build-Depends: netcdf-c[hdf5]
 
 Feature: tools
 Description: Build the gdal tools

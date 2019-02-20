@@ -1,8 +1,9 @@
---- netcdf-c-4.4.1.1/CMakeLists.txt	2016-11-21 19:27:08.000000000 +0100
-+++ netcdf-c-4.4.1.1/CMakeLists.txt.mod	2016-12-20 14:20:53.090938000 +0100
-@@ -770,15 +770,6 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2019-02-16 08:11:14.000000000 +0100
++++ b/CMakeLists.txt	2019-02-16 13:15:20.000000000 +0100
+@@ -832,15 +832,6 @@
+ ENDIF()
  
- # Check to see if libtool supports
  
 -# Check for the math library so it can be explicitly linked.
 -IF(NOT WIN32)

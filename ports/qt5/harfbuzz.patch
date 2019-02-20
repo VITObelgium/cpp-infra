@@ -1,9 +1,9 @@
 diff -Naur a/qtbase/src/gui/configure.json b/qtbase/src/gui/configure.json
---- a/qtbase/src/gui/configure.json	2018-12-03 11:15:26.000000000 +0100
-+++ b/qtbase/src/gui/configure.json	2019-01-03 14:58:07.757531700 +0100
-@@ -224,6 +224,8 @@
-                 ]
+--- a/qtbase/src/gui/configure.json	2019-01-28 18:11:52.000000000 +0100
++++ b/qtbase/src/gui/configure.json	2019-02-02 12:05:54.000000000 +0100
+@@ -301,6 +301,8 @@
              },
+             "headers": "harfbuzz/hb.h",
              "sources": [
 +                { "libs": "-lharfbuzz", "condition": "config.msvc" },
 +                { "libs": "-lharfbuzzd" },

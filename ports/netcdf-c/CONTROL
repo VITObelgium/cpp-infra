@@ -1,5 +1,5 @@
 Source: netcdf-c
-Version: 4.4.1.1-2
+Version: 4.6.2-1
 Description: a set of self-describing, machine-independent data formats that support the creation, access, and sharing of array-oriented scientific data.
 
 Feature: hdf5

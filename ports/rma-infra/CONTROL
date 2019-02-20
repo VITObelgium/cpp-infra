@@ -1,5 +1,5 @@
 Source: rma-infra
-Version: 0.9.1
+Version: 0.9.2
 Description: c++ infrastructure classes (logging, string operations, ...)
 Build-Depends: fmt
 

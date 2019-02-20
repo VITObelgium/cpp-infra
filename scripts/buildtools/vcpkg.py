@@ -12,7 +12,11 @@ def git_status_is_clean():
 
 
 def git_revision_hash():
-    return subprocess.check_output(["git", "rev-parse", "HEAD"], shell=True).decode("utf-8").rstrip("\r\n")
+    return (
+        subprocess.check_output(["git", "rev-parse", "HEAD"], shell=True)
+        .decode("utf-8")
+        .rstrip("\r\n")
+    )
 
 
 def vcpkg_root_dir():
@@ -38,10 +42,14 @@ def run_vcpkg(triplet, vcpkg_args):
 
 
 def run_vcpkg_output(triplet, vcpkg_args):
-    return subprocess.check_output(_create_vcpkg_command(triplet, vcpkg_args)).decode("UTF-8")
+    return subprocess.check_output(_create_vcpkg_command(triplet, vcpkg_args)).decode(
+        "UTF-8"
+    )
 
 
-def cmake_configure(source_dir, build_dir, cmake_args, triplet=None, toolchain=None, generator=None):
+def cmake_configure(
+    source_dir, build_dir, cmake_args, triplet=None, toolchain=None, generator=None
+):
     if not shutil.which("cmake"):
         raise RuntimeError("cmake executable not found in the PATH environment")
 
@@ -107,10 +115,14 @@ def get_all_triplets():
                 triplet_useable_on_platform = True
             elif platform.startswith("linux"):
                 triplet_useable_on_platform = (
-                    "linux" in triplet_name or "mingw" in triplet_name or "musl" in triplet_name
+                    "linux" in triplet_name
+                    or "mingw" in triplet_name
+                    or "musl" in triplet_name
                 )
             elif platform.startswith("macosx"):
-                triplet_useable_on_platform = "osx" in triplet_name or "mingw" in triplet_name
+                triplet_useable_on_platform = (
+                    "osx" in triplet_name or "mingw" in triplet_name
+                )
             elif platform.startswith("win"):
                 triplet_useable_on_platform = "windows" in triplet_name
             elif platform.startswith("mingw"):
@@ -170,8 +182,19 @@ def prompt_for_triplet():
 
 
 def bootstrap_argparser():
-    parser = argparse.ArgumentParser(description="Bootstrap vcpkg ports.", add_help=False)
-    parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
+    parser = argparse.ArgumentParser(
+        description="Bootstrap vcpkg ports.", add_help=False
+    )
+    parser.add_argument(
+        "-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use"
+    )
+    parser.add_argument(
+        "--upgrade",
+        dest="upgrade",
+        default=False,
+        action="store_true",
+        help="Upgrade installed packages",
+    )
     parser.add_argument(
         "-p",
         "--ports-dir",
@@ -179,11 +202,17 @@ def bootstrap_argparser():
         metavar="PORTS_DIR",
         help="directory containing the ports file descriptions",
     )
+    parser.add_argument(
+        "--clean",
+        action="store_true",
+        dest="clean",
+        help="clean the vcpkg build directories",
+    )
 
     return parser
 
 
-def bootstrap(ports_dir, triplet=None, additional_ports = []):
+def bootstrap(ports_dir, triplet=None, additional_ports=[]):
     if triplet is None:
         triplet = prompt_for_triplet()
 
@@ -208,41 +237,72 @@ def upgrade(triplet=None):
         raise RuntimeError("Upgrade failed: {}".format(e))
 
 
-def build_project(project_name, project_dir, triplet=None, cmake_args=[], build_dir=None, generator=None, target=None):
+def build_project(
+    project_dir,
+    triplet=None,
+    cmake_args=[],
+    build_dir=None,
+    generator=None,
+    target=None,
+    build_name=None,
+):
     if triplet is None:
         triplet = prompt_for_triplet()
 
+    if build_name:
+        project_build_dir = "{}-{}".format(build_name, triplet)
+    else:
+        project_build_dir = "{}".format(triplet)
+
     if not build_dir:
-        build_dir = os.path.join(project_dir, "build", "{}-{}".format(project_name, triplet))
+        build_dir = os.path.join(project_dir, "build", project_build_dir)
     os.makedirs(build_dir, exist_ok=True)
 
     vcpkg_root = vcpkg_root_dir()
-    toolchain_file = os.path.abspath(os.path.join(vcpkg_root, "scripts", "buildsystems", "vcpkg.cmake"))
+    toolchain_file = os.path.abspath(
+        os.path.join(vcpkg_root, "scripts", "buildsystems", "vcpkg.cmake")
+    )
 
     try:
-        cmake_configure(project_dir, build_dir, cmake_args, triplet, toolchain=toolchain_file, generator=generator)
+        cmake_configure(
+            project_dir,
+            build_dir,
+            cmake_args,
+            triplet,
+            toolchain=toolchain_file,
+            generator=generator,
+        )
         cmake_build(build_dir, config="Release", target=target)
     except subprocess.CalledProcessError as e:
         raise RuntimeError("Build failed: {}".format(e))
 
 
-def build_project_release(project_name, project_dir, triplet=None, cmake_args=[]):
+def build_project_release(project_dir, triplet=None, cmake_args=[], build_name=None):
     if not git_status_is_clean():
         raise RuntimeError("Git status is not clean")
 
-    build_dir = os.path.join(project_dir, "build", "{}-{}-dist".format(project_name, triplet))
+    if build_name:
+        build_dir = "{}-{}-dist".format(build_name, triplet)
+    else:
+        build_dir = "{}-dist".format(triplet)
+
+    build_dir = os.path.join(project_dir, "build", build_dir)
 
     if os.path.exists(build_dir):
         shutil.rmtree(build_dir, ignore_errors=True)
 
     git_hash = git_revision_hash()
     cmake_args.append("-DPACKAGE_VERSION_COMMITHASH=" + git_hash)
-    build_project(project_name, project_dir, triplet, cmake_args, build_dir)
+    build_project(project_dir, triplet, cmake_args, build_dir)
+
 
 def vcpkg_list_ports(triplet):
     args = ["list"]
     ports = set()
     for line in run_vcpkg_output(triplet, args).splitlines():
+        if line.startswith('No packages are installed'):
+            return ports
+        
         name, trip = tuple(line.split()[0].split(":"))
         if triplet is None or trip == triplet:
             if not "[" in name:
@@ -250,7 +310,8 @@ def vcpkg_list_ports(triplet):
 
     return ports
 
-def clean(triplet, all):
+
+def clean(triplet):
     if triplet is None:
         shutil.rmtree(os.path.join(vcpkg_root_dir(), "installed"))
         shutil.rmtree(os.path.join(vcpkg_root_dir(), "buildtrees"))
@@ -269,15 +330,13 @@ def clean(triplet, all):
         run_vcpkg(triplet, ["remove", "--recurse"] + list(ports))
 
 
-def bootstrap_argparser():
-    parser = argparse.ArgumentParser(description="Build all the third party project dependencies.", add_help=False)
-    parser.add_argument("--clean", dest="clean", help="clean the vcpkg build directories")
-    parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
-
-
 def build_argparser():
-    parser = argparse.ArgumentParser(description="Build the project using vcpkg dependencies.", add_help=False)
-    parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
+    parser = argparse.ArgumentParser(
+        description="Build the project using vcpkg dependencies.", add_help=False
+    )
+    parser.add_argument(
+        "-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use"
+    )
     parser.add_argument(
         "-s",
         "--source-dir",
@@ -293,7 +352,13 @@ def build_argparser():
 if __name__ == "__main__":
     try:
         parser = argparse.ArgumentParser(description="Bootstrap vcpkg ports.")
-        parser.add_argument("-t", "--triplet", dest="triplet", metavar="TRIPLET", help="the triplet to use")
+        parser.add_argument(
+            "-t",
+            "--triplet",
+            dest="triplet",
+            metavar="TRIPLET",
+            help="the triplet to use",
+        )
         parser.add_argument(
             "-p",
             "--ports-dir",

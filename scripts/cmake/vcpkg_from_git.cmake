@@ -91,7 +91,7 @@ function(vcpkg_from_git)
 
         string(REPLACE "/" "-" SANITIZED_REF "${_vdud_REF}")
         set(LOGNAME clone-${TARGET_TRIPLET}-${_vdud_REF})
-        set(GIT_COMMAND ${GIT_EXECUTABLE} clone ${RECURSE_ARG} --depth=1 --branch ${_vdud_REF} --single-branch ${_vdud_URL})
+        set(GIT_COMMAND ${GIT_EXECUTABLE} clone ${RECURSE_ARG} --branch ${_vdud_REF} --single-branch ${_vdud_URL})
         if (VCPKG_VERBOSE)
             string(JOIN " " GIT_COMMAND_STRING ${GIT_COMMAND})
             message(STATUS "${GIT_COMMAND_STRING}")

@@ -5,7 +5,7 @@ liblzma
 libjpeg-turbo
 libpng
 tiff[lzw]
-libressl
+openssl
 benchmark
 gtest
 ceres

@@ -8,7 +8,8 @@ libiconv
 libjpeg-turbo
 libpng
 tiff[lzw]
-libressl
+openssl
+icu
 benchmark
 gtest
 ceres
@@ -21,7 +22,7 @@ fmt
 spdlog
 freetype
 shapelib
-gdal[tools,geos,expat,gif]
+gdal[tools,geos,expat,gif,png,netcdf]
 gsl
 harfbuzz
 hdf5[cpp]
@@ -36,4 +37,5 @@ sqlpp11
 mapnik[gdal]
 sqlpp11-connector-sqlite3
 sqlpp11-connector-postgresql
+tbb
 boost[iostreams,zlib,program-options,regex,filesystem,thread,system,date-time]

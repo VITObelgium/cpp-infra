@@ -1,5 +1,5 @@
 Source: qt5
-Version: 5.12.0-3
+Version: 5.12.1
 Description: Complete software development framework
 Build-Depends: zlib, freetype, harfbuzz, libjpeg-turbo, libpng, pcre2
 
@@ -18,3 +18,7 @@ Build-Depends: sqlite3
 
 Feature: tools
 Description: build the tools (qtlinguist, ...)
+
+Feature: ssl
+Description: enable ssl
+Build-Depends: openssl

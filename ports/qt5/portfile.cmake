@@ -2,15 +2,15 @@ include(vcpkg_common_functions)
 
 set(MAJOR 5)
 set(MINOR 12)
-set(REVISION 0)
+set(REVISION 1)
 set(VERSION ${MAJOR}.${MINOR}.${REVISION})
 set(RELEASE official)
 if (WIN32)
     set(TARBALL_EXTENSION zip)
-    set (SHASUM c954418c6391955f8ff15a6e1b0ad2d08d75f21399213bd019dc46a714c7e5a58d5c094d8ff96d5deb47e4d81ffe5348960c55818237037e49cbad36d03feed8)
+    set (SHASUM bf78a5bd055b94a0dfca55f134bbfb99b16fa3c08945c3e23c0ba0a34061cfc362d2f33f19846abdceac6c4ef20a95986420abea23692013ba8f8d631adfbc7d)
 else ()
     set(TARBALL_EXTENSION tar.xz)
-    set (SHASUM 0dd03d2645fb6dac5b58c8caf92b4a0a6900131f1ccfb02443a0df4702b5da0458f4c45e758d1b929ec709b0f4b36900df2fd60a058af9cc8c1a0748b6d57aae)
+    set (SHASUM 2b25f460d3ad0bab72645b0b30c6dab38f638f9f09640ff24812bafd9b9cfaea657abd303bbbf5689ea79d0779377d6f24a15b535f047afc7525b8cc4f1acd98)
 endif ()
 set(PACKAGE_NAME qt-everywhere-src-${VERSION})
 set(PACKAGE ${PACKAGE_NAME}.${TARBALL_EXTENSION})
@@ -33,10 +33,6 @@ if(NOT "qml" IN_LIST FEATURES)
     list(APPEND OPTIONAL_ARGS -skip qtquickcontrols -skip qtquickcontrols2 -skip qtdeclarative)
 endif ()
 
-# Extract source into architecture specific directory, because GDALs' build currently does not
-# support out of source builds.
-set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src-${TARGET_TRIPLET})
-message(STATUS "Qt source path ${SOURCE_PATH}")
 vcpkg_download_distfile(ARCHIVE
     URLS "http://download.qt.io/archive/qt/${MAJOR}.${MINOR}/${VERSION}/single/${PACKAGE}"
     FILENAME "${PACKAGE}"
@@ -59,7 +55,6 @@ vcpkg_extract_source_archive_ex(
         pcre2.patch
         freetype.patch
         harfbuzz.patch
-        qmlcachegen.patch # should be fixed in qt-5.12.1
  )
 
 if (MINGW AND NOT CMAKE_CROSSCOMPILING)
@@ -77,8 +72,6 @@ if (MINGW AND NOT CMAKE_CROSSCOMPILING)
         )
     endforeach()
 endif ()
-
- set(OSX_LEGACY_SDK OFF)
 
 # copy the g++-cluster compiler specification
 file(COPY ${CMAKE_CURRENT_LIST_DIR}/linux-g++-cluster DESTINATION ${SOURCE_PATH}/qtbase/mkspecs)
@@ -102,6 +95,18 @@ else ()
     list(APPEND OPTIONAL_ARGS -sql-sqlite -system-sqlite -no-sql-sqlite2 -no-sql-mysql -no-sql-psql -no-sql-db2 -no-sql-tds)
 endif()
 
+if("ssl" IN_LIST FEATURES)
+    list(APPEND OPTIONAL_ARGS -ssl)
+    if (VCPKG_LIBRARY_LINKAGE STREQUAL "static")
+        list(APPEND OPTIONAL_ARGS -openssl-linked)
+        if((VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME) AND NOT MINGW)
+            list(APPEND OPTIONAL_ARGS "OPENSSL_LIBS=${CURRENT_INSTALLED_DIR}/lib/libeay32.lib ${CURRENT_INSTALLED_DIR}/lib/ssleay32.lib Gdi32.lib Advapi32.lib User32.lib Ws2_32.lib")
+        endif ()
+    endif()
+else ()
+    list(APPEND OPTIONAL_ARGS -no-openssl)
+endif()
+
 set(QT_OPTIONS
     -I ${CURRENT_INSTALLED_DIR}/include
     -verbose
@@ -111,7 +116,6 @@ set(QT_OPTIONS
     -nomake tests
     -no-dbus
     -no-icu
-    -no-openssl
     -no-glib
     -system-zlib
     -no-cups
@@ -201,19 +205,11 @@ elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Linux")
     list(APPEND PLATFORM_OPTIONS -no-pch -c++std c++1z)
     #-device-option CROSS_COMPILE=${CROSS}
 elseif(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    if (OSX_LEGACY_SDK)
-        set(OSX_SDK_VERSION 10.13)
-        list(APPEND PLATFORM_OPTIONS -c++std c++14)
-    else ()
-        set(OSX_SDK_VERSION 10.14)
-        list(APPEND PLATFORM_OPTIONS -c++std c++14)
-    endif ()
+    list(APPEND PLATFORM_OPTIONS -c++std c++14 -no-pch)
 
-    list(APPEND PLATFORM_OPTIONS -no-pch -sdk macosx${OSX_SDK_VERSION})
-
-    vcpkg_replace_string(${SOURCE_PATH}/qtbase/mkspecs/macx-clang/qmake.conf
-        "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.11"
-        "QMAKE_MACOSX_DEPLOYMENT_TARGET = ${OSX_SDK_VERSION}"
+    vcpkg_replace_string(${SOURCE_PATH}/qtbase/mkspecs/common/macx.conf
+        "QMAKE_MACOSX_DEPLOYMENT_TARGET = 10.12"
+        "QMAKE_MACOSX_DEPLOYMENT_TARGET = ${CMAKE_OSX_DEPLOYMENT_TARGET}"
     )
 elseif (MINGW AND (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux" OR CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin"))
     set(PLATFORM -xplatform win32-g++)
@@ -301,18 +297,11 @@ vcpkg_execute_required_process(
     LOGNAME qt-build-${TARGET_TRIPLET}-release
 )
 
-if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME)
-    # fix the prl files
-    vcpkg_execute_required_process(
-        COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/fixprl.py
-        WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}
-        LOGNAME fix-prl
-    )
-endif ()
-
 if (EXISTS ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/qtbase/bin/qmake.exe)
     # qt-bug: file does not get installed
     file(COPY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/qtbase/bin/qmake.exe DESTINATION ${CURRENT_PACKAGES_DIR}/tools)
+else ()
+    MESSAGE (STATUS "Please remove this code if printed on windows: Fix no longer necessary")
 endif ()
 
 # Fix the cmake files
@@ -322,6 +311,10 @@ vcpkg_execute_required_process(
     WORKING_DIRECTORY ${CURRENT_PACKAGES_DIR}/share/cmake
     LOGNAME fix-cmake
 )
+
+if("location" IN_LIST FEATURES)
+    vcpkg_replace_string(${CURRENT_PACKAGES_DIR}/share/cmake/Qt5Location/Qt5LocationConfig.cmake "Qt5Location_*Plugin.cmake" "Qt5Location_*Factory*.cmake")
+endif()
 
 file(GLOB BIN_FILES ${CURRENT_PACKAGES_DIR}/bin/*)
 file(COPY ${BIN_FILES} DESTINATION ${CURRENT_PACKAGES_DIR}/tools)
@@ -342,6 +335,8 @@ file(REMOVE
     ${CURRENT_PACKAGES_DIR}/lib/Qt5Bootstrap.lib
     ${CURRENT_PACKAGES_DIR}/lib/Qt5Bootstrap.prl
 )
+
+file(INSTALL ${CMAKE_CURRENT_LIST_DIR}/FindQtPlugin.cmake DESTINATION ${CURRENT_PACKAGES_DIR}/share/cmake)
 
 # Handle copyright
 file(INSTALL ${SOURCE_PATH}/LICENSE.LGPLv3 DESTINATION  ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)

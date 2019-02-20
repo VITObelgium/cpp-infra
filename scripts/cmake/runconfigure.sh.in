@@ -18,8 +18,10 @@ export RANLIB=@CMAKE_RANLIB@
 
 export WANT_AUTOMAKE=latest
 export PKG_CONFIG_PATH=@CURRENT_INSTALLED_DIR@/lib/pkgconfig
+export PATH="@CURRENT_INSTALLED_DIR@/tools:$PATH"
 
 echo "CFLAGS: $CFLAGS"
 echo "CXXFLAGS: $CXXFLAGS"
+echo "PATH: $PATH"
 echo "Running configure: @SOURCE_PATH@/configure $*"
 exec @SOURCE_DIR@/configure $*
