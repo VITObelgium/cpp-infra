@@ -5,4 +5,4 @@ Build-Depends: zlib (linux)
 
 Feature: ssl
 Description: Build with ssl support
-Build-Depends: libressl
+Build-Depends: openssl

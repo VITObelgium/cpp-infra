@@ -1,0 +1,23 @@
+diff -Naur netcdfa/libdispatch/dwinpath.c netcdfb/libdispatch/dwinpath.c
+--- netcdfa/libdispatch/dwinpath.c	2018-11-19 20:43:47.000000000 +0100
++++ netcdfb/libdispatch/dwinpath.c	2019-02-19 10:38:33.238109000 +0100
+@@ -8,6 +8,7 @@
+ #include <stdio.h>
+ #include <string.h>
+ #include <assert.h>
++#include <errno.h>
+ #ifdef HAVE_FCNTL_H
+ #include <fcntl.h>
+ #endif
+diff -Naur netcdfa/libsrc/memio.c netcdfb/libsrc/memio.c
+--- netcdfa/libsrc/memio.c	2018-11-19 20:43:47.000000000 +0100
++++ netcdfb/libsrc/memio.c	2019-02-19 10:38:56.186140000 +0100
+@@ -17,7 +17,7 @@
+ #ifdef HAVE_FCNTL_H
+ #include <fcntl.h>
+ #endif
+-#ifdef _MSC_VER /* Microsoft Compilers */
++#if defined _MSC_VER || defined __MINGW32__ /* Microsoft Compilers */
+ #include <windows.h>
+ #include <winbase.h>
+ #include <io.h>

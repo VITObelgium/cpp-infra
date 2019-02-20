@@ -23,8 +23,8 @@ message(STATUS "Gdal data path: ${Gdal_DATA_PATH}")
 
 find_package(TIFF REQUIRED QUIET)
 find_package(ZLIB REQUIRED QUIET)
-find_package(PROJ4 REQUIRED QUIET)
-find_package(PNG REQUIRED QUIET)
+find_package(PROJ4 CONFIG REQUIRED QUIET)
+find_package(unofficial-iconv CONFIG REQUIRED QUIET)
 
 if (NOT EMSCRIPTEN)
     find_package(Threads)
@@ -57,7 +57,7 @@ if(Gdal_FOUND AND NOT TARGET Gdal::Gdal)
     endif()
 
     # required dependencies
-    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES TIFF::TIFF ${PROJ4_LIBRARIES} PNG::PNG ZLIB::ZLIB)
+    set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES TIFF::TIFF proj ZLIB::ZLIB unofficial::iconv::libcharset unofficial::iconv::libiconv)
 
     # optional dependencies
     if (@WITH_EXPAT@)
@@ -74,6 +74,22 @@ if(Gdal_FOUND AND NOT TARGET Gdal::Gdal)
     if (@WITH_GEOS@)
         find_package(Geos REQUIRED QUIET)
         set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES Geos::Geosc)
+    endif ()
+
+    if (@WITH_PNG@)
+        find_package(PNG REQUIRED QUIET)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES PNG::PNG)
+    endif ()
+
+    if (@WITH_JPEG@)
+        find_package(JPEG REQUIRED QUIET)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES JPEG::JPEG)
+    endif ()
+
+    if (@WITH_NETCDF@)
+        find_package(hdf5 CONFIG REQUIRED QUIET)
+        find_package(netCDF CONFIG REQUIRED QUIET)
+        set_property(TARGET Gdal::Gdal APPEND PROPERTY INTERFACE_LINK_LIBRARIES netcdf hdf5::hdf5-static hdf5::hdf5_hl-static)
     endif ()
 
     if (UNIX AND NOT EMSCRIPTEN)

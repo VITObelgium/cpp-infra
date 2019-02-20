@@ -25,12 +25,14 @@ set(SOURCE_PATH_DEBUG   ${CURRENT_BUILDTREES_DIR}/src-${TARGET_TRIPLET}-debug/${
 set(SOURCE_PATH_RELEASE ${CURRENT_BUILDTREES_DIR}/src-${TARGET_TRIPLET}-release/${PACKAGE_NAME})
 set(PREFIX_PATH ${CURRENT_INSTALLED_DIR})
 
+TEST_FEATURE("png" WITH_PNG)
 TEST_FEATURE("geos" WITH_GEOS)
 TEST_FEATURE("jpeg" WITH_JPEG)
 TEST_FEATURE("gif" WITH_GIF)
 TEST_FEATURE("sqlite" WITH_SQLITE)
 TEST_FEATURE("expat" WITH_EXPAT)
 TEST_FEATURE("pcraster" WITH_PCRASTER)
+TEST_FEATURE("netcdf" WITH_NETCDF)
 TEST_FEATURE("tools" WITH_TOOLS)
 
 if(NOT WITH_TOOLS)
@@ -114,11 +116,21 @@ if (UNIX OR MINGW)
         list(APPEND AUTOCONF_OPTIONS --without-pcraster)
     endif ()
 
-    #if("png" IN_LIST FEATURES)
+    if (WITH_NETCDF)
+        list(APPEND AUTOCONF_OPTIONS --with-hdf5=${PREFIX_PATH})
+        # use yes instead of PREFIX_PATH, that way nc-config will be used
+        # and the hdf5 dependency will be correctly picked up
+        list(APPEND AUTOCONF_OPTIONS --with-netcdf=yes)
+    else ()
+        list(APPEND AUTOCONF_OPTIONS --without-hdf5)
+        list(APPEND AUTOCONF_OPTIONS --without-netcdf)
+    endif ()
+
+    if("png" IN_LIST FEATURES)
         list(APPEND AUTOCONF_OPTIONS --with-png=${PREFIX_PATH})
-    #else ()
-    #    list(APPEND AUTOCONF_OPTIONS --without-png)
-    #endif()
+    else ()
+        list(APPEND AUTOCONF_OPTIONS --without-png)
+    endif()
 
     if (CMAKE_CXX_VISIBILITY_PRESET STREQUAL hidden)
         list(APPEND AUTOCONF_OPTIONS --with-hide-internal-symbols=yes)
@@ -176,7 +188,6 @@ if (UNIX OR MINGW)
             ${CONF_CACHE_OVERRIDES}
             ac_cv_header_lzma_h=yes
             ac_cv_lib_lzma_lzma_code=yes
-            am_cv_func_iconv=no
             --without-ld-shared
             --with-cpp14
             --without-libtool
@@ -190,13 +201,10 @@ if (UNIX OR MINGW)
             --without-grass
             --without-libgrass
             --without-cfitsio
-            --without-netcdf
-            --without-jpeg
             --without-ogdi
             --without-fme
             --without-freexl
             --without-hdf4
-            --without-hdf5
             --without-jasper
             --without-ecw
             --without-kakadu
@@ -220,6 +228,8 @@ if (UNIX OR MINGW)
             --without-python
             --without-webp
             --without-gnm
+            --without-zstd
+            --without-openjpeg
             ${AUTOCONF_OPTIONS}
         )
 
@@ -245,6 +255,9 @@ if (UNIX OR MINGW)
 
     vcpkg_fixup_pkgconfig_file()
 else ()
+
+# png is not optional for the windows build
+set (WITH_PNG TRUE)
 
 find_program(NMAKE nmake)
 if (NOT NMAKE)
@@ -380,6 +393,16 @@ file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/include" ZLIB_INCLUDE_DIR)
 file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/lib/zlib.lib" ZLIB_LIBRARY_REL)
 file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/debug/lib/zlibd.lib" ZLIB_LIBRARY_DBG)
 
+# Setup iconv libraries + include path
+file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/include" ICONV_INCLUDE_DIR)
+file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/lib/libiconv.lib" ICONV_LIBRARY_REL)
+file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/debug/lib/libiconvd.lib" ICONV_LIBRARY_DBG)
+
+# Setup netcdf libraries + include path
+file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/include" NETCDF_INCLUDE_DIR)
+file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/lib/netcdf.lib" NETCDF_LIBRARY_REL)
+file(TO_NATIVE_PATH "${CURRENT_INSTALLED_DIR}/debug/lib/netcdfd.lib" NETCDF_LIBRARY_DBG)
+
 set(NMAKE_OPTIONS
     GDAL_HOME=${NATIVE_PACKAGES_DIR}
     DATADIR=${NATIVE_DATA_DIR}
@@ -402,6 +425,8 @@ set(NMAKE_OPTIONS
     ZLIB_EXTERNAL_LIB=1
     ZLIB_INC=-I${ZLIB_INCLUDE_DIR}
     LZMA_CFLAGS=-I${LZMA_INCLUDE_DIR}
+    LIBICONV_INCLUDE=-I${ICONV_INCLUDE_DIR}
+    LIBICONV_CFLAGS=-DICONV_CONST=""
 )
 
 if(VCPKG_TARGET_ARCHITECTURE STREQUAL "x64")
@@ -444,6 +469,14 @@ if(WITH_EXPAT)
     list(APPEND NMAKE_OPTIONS_REL EXPAT_LIB=${EXPAT_LIBRARY_REL})
 endif()
 
+if(WITH_NETCDF)
+    list(APPEND NMAKE_OPTIONS
+        NETCDF_INC_DIR=${NETCDF_INCLUDE_DIR}
+        NETCDF_SETTING=yes       
+    )
+    list(APPEND NMAKE_OPTIONS_DBG NETCDF_LIB=${NETCDF_LIBRARY_DBG})
+    list(APPEND NMAKE_OPTIONS_REL NETCDF_LIB=${NETCDF_LIBRARY_REL})
+endif ()
 
 # if("jpeg" IN_LIST FEATURES)
 #     list(APPEND NMAKE_OPTIONS
@@ -458,17 +491,6 @@ endif()
 #     list(APPEND NMAKE_OPTIONS
 #         JPEG12_SUPPORTED=0
 #     )
-# endif()
-
-# if("gif" IN_LIST FEATURES)
-#     list(APPEND NMAKE_OPTIONS
-#         OPENJPEG_ENABLED=YES
-#         OPENJPEG_CFLAGS=-I${OPENJPEG_INCLUDE_DIR}
-#         OPENJPEG_VERSION=20100
-#     )
-
-#     list(APPEND NMAKE_OPTIONS_DBG OPENJPEG_LIB=${OPENJPEG_LIBRARY_DBG})
-#     list(APPEND NMAKE_OPTIONS_REL OPENJPEG_LIB=${OPENJPEG_LIBRARY_REL})
 # endif()
 
 if("sqlite" IN_LIST FEATURES)
@@ -489,6 +511,7 @@ set(NMAKE_OPTIONS_REL
     #LIBXML2_LIB=${XML2_LIBRARY_REL}
     ZLIB_LIB=${ZLIB_LIBRARY_REL}
     LZMA_LIBS=${LZMA_LIBRARY_REL}
+    LIBICONV_LIBRARY=${ICONV_LIBRARY_REL}
 )
 
 set(NMAKE_OPTIONS_DBG
@@ -503,6 +526,7 @@ set(NMAKE_OPTIONS_DBG
     #LIBXML2_LIB=${XML2_LIBRARY_DBG}
     ZLIB_LIB=${ZLIB_LIBRARY_DBG}
     LZMA_LIBS=${LZMA_LIBRARY_DBG}
+    LIBICONV_LIBRARY=${ICONV_LIBRARY_DBG}
     DEBUG=1
     WITH_PDB=1
     GDAL_PDB=${SOURCE_PATH_DEBUG}/gdal.pdb

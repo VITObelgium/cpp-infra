@@ -7,6 +7,12 @@
 #  vcpkg_fixup_pkgconfig_file()
 #
 function(vcpkg_fixup_pkgconfig_file)
+    if(VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME)
+        if (NOT MINGW)
+            return()
+        endif()
+    endif()
+
     cmake_parse_arguments(_vfpf "" "" "NAMES" ${ARGN})
 
     if(_vfpf_UNPARSED_ARGUMENTS)

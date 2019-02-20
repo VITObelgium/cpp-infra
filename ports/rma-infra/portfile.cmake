@@ -2,9 +2,9 @@ include(vcpkg_common_functions)
 vcpkg_from_git(
     URL https://git.vito.be/scm/marvin-geodynamix/infra.git
     OUT_SOURCE_PATH SOURCE_PATH
-    REF 0.9.1
+    REF 0.9.2
     HEAD_REF master
-    SHA512 11e13824b8110a9154f168a64163aa9e7e1e9866922413dc0fb5a7be858297054ae00790374e49fe1ebe0b7bac26030c527ebe64f2779d840ab680cd97b40ac9
+    SHA512 0
 )
 
 TEST_FEATURE("gdal" ENABLE_GDAL)

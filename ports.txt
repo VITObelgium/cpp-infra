@@ -6,7 +6,8 @@ libiconv
 libjpeg-turbo
 libpng
 tiff[lzw]
-libressl
+openssl
+icu
 benchmark
 gtest
 date

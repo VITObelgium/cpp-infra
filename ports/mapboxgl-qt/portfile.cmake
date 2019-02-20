@@ -1,56 +1,49 @@
 include(vcpkg_common_functions)
+
+if (EXISTS ${CURRENT_INSTALLED_DIR}/lib/libqmapboxgl.a AND 
+    EXISTS ${CURRENT_INSTALLED_DIR}/lib/libqmapboxgl.prl)
+    message(FATAL_ERROR "The qmapboxql library is already installed as part of qt")
+endif ()
+
 vcpkg_from_git(
-    URL https://github.com/mapbox/mapbox-gl-native.git
+    URL https://github.com/dirkvdb/mapbox-gl-native.git
     OUT_SOURCE_PATH SOURCE_PATH
-    REF b83030aa9bb1a8d9f14ae8160698c1ee4d5a4c72
+    REF vcpkg
     HEAD_REF master
-    SHA512 5a3b093bf2b811449af20d512e88086a09d605c5f6a9ee4ba92db4a763c3091201413b23b7f9cdc3e687d6650b33b990f9383e314c0d748159804b4e52f652cc
+    SHA512 0
+    RECURSE_SUBMODULES
 )
     
-vcpkg_apply_patches(
-    SOURCE_PATH ${SOURCE_PATH}
-    PATCHES
-        c++17-support.patch
-        use-vcpkg-deps.patch
-)
+TEST_FEATURE("qtplugin" WITH_QTPLUGIN)
+
+if((VCPKG_CMAKE_SYSTEM_NAME STREQUAL "WindowsStore" OR NOT DEFINED VCPKG_CMAKE_SYSTEM_NAME) AND NOT MINGW)
+    set(GENERATOR "Visual Studio 15 2017 Win64")
+    set(ADDITIONAL_ARGS -T LLVM-vs2017)
+else ()
+    set(GENERATOR "Ninja")
+endif()
+
+string(COMPARE EQUAL "static" "${VCPKG_LIBRARY_LINKAGE}" STATIC_QT)
 
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
-    PREFER_NINJA
+    GENERATOR ${GENERATOR}
     OPTIONS
         -DVCPKG_ALLOW_SYSTEM_LIBS=ON
         -DWITH_NODEJS=OFF
         -DMBGL_PLATFORM=qt
-		-DMASON_PLATFORM=$(MASON_PLATFORM)
-		-DMASON_PLATFORM_VERSION=$(MASON_PLATFORM_VERSION)
-		-DWITH_QT_DECODERS=OFF # use libjpeg-turbo and libpng from vcpkg
-		-DWITH_QT_I18N=OFF # use libicu from vcpkg
+        -DWITH_QT_DECODERS=OFF # use libjpeg-turbo and libpng from vcpkg
+        -DWITH_QT_I18N=OFF # use libicu from vcpkg
+        -DWITH_QT_GEOPLUGIN=${WITH_QTPLUGIN}
         -DWITH_COVERAGE=OFF
         -DWITH_ERROR=OFF
+        -DSTATIC_QT=${STATIC_QT}
+        ${ADDITIONAL_ARGS}
 )
 
-vcpkg_build_cmake(TARGET qmapboxgl)
+vcpkg_install_cmake()
 
-file(COPY ${SOURCE_PATH}/platform/qt/include DESTINATION ${CURRENT_PACKAGES_DIR})
-file(COPY ${SOURCE_PATH}/include/mbgl DESTINATION ${CURRENT_PACKAGES_DIR}/include)
-file(MAKE_DIRECTORY ${CURRENT_PACKAGES_DIR}/lib)
-file(MAKE_DIRECTORY ${CURRENT_PACKAGES_DIR}/debug/lib)
+file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 
-if (MSVC)
-    set(LIB_PREFIX "")
-    set(LIB_EXT "lib")
-else()
-    set(LIB_PREFIX "lib")
-    set(LIB_EXT "a")
-endif()
-
-set (MBGL_LIBS mbgl-core mbgl-filesource nunicode)
-foreach(MBGL_LIB IN LISTS MBGL_LIBS)
-    file(COPY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg/${LIB_PREFIX}${MBGL_LIB}d.${LIB_EXT} DESTINATION ${CURRENT_PACKAGES_DIR}/debug/lib)
-    file(COPY ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/${LIB_PREFIX}${MBGL_LIB}.${LIB_EXT} DESTINATION ${CURRENT_PACKAGES_DIR}/lib)
-endforeach()
-
-file(INSTALL ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-dbg/${LIB_PREFIX}qmapboxgld.${LIB_EXT} DESTINATION ${CURRENT_PACKAGES_DIR}/debug/lib RENAME ${LIB_PREFIX}qmapboxgl-vcpkgd.${LIB_EXT})
-file(INSTALL ${CURRENT_BUILDTREES_DIR}/${TARGET_TRIPLET}-rel/${LIB_PREFIX}qmapboxgl.${LIB_EXT} DESTINATION ${CURRENT_PACKAGES_DIR}/lib RENAME ${LIB_PREFIX}qmapboxgl-vcpkg.${LIB_EXT})
-
+file(INSTALL ${CMAKE_CURRENT_LIST_DIR}/FindMapboxGL.cmake DESTINATION ${CURRENT_PACKAGES_DIR}/share/cmake)
 file(INSTALL ${SOURCE_PATH}/LICENSE.md DESTINATION ${CURRENT_PACKAGES_DIR}/share/${PORT} RENAME copyright)
