@@ -454,6 +454,9 @@ private:
     std::vector<std::string_view> _result;
 };
 
+void ellipsize_in_place(std::string& str, int maxLength);
+[[nodiscard]] std::string ellipsize(std::string_view str, int maxLength);
+
 //class Splitter
 //{
 //public:
