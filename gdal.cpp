@@ -811,9 +811,11 @@ void RasterDataSet::write_geometadata(const GeoMetadata& meta)
     if (raster_count() > 0) {
         set_nodata_value(1, meta.nodata);
     }
-
-    set_geotransform(std::array<double, 6>{{meta.xll, meta.cellSize, 0.0, meta.yll + (meta.cellSize * meta.rows), 0.0, -meta.cellSize}});
-    set_projection(meta.projection);
+    const double cellSize = meta.cellSize != 0.0 ? meta.cellSize : 1.0;
+    set_geotransform(std::array<double, 6>{{meta.xll, cellSize, 0.0, meta.yll + (cellSize * meta.rows), 0.0, -cellSize}});
+    GeoMetadata meta31370(meta);
+    meta31370.set_projection_from_epsg(31370);
+    set_projection(meta.projection != "" ? meta.projection : meta31370.projection);
 }
 
 GeoMetadata RasterDataSet::geometadata() const
