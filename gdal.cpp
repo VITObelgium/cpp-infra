@@ -4,6 +4,7 @@
 #include "infra/filesystem.h"
 #include "infra/gdallog.h"
 #include "infra/string.h"
+#include "infra/log.h"
 
 #ifdef EMBED_GDAL_DATA
 #include "embedgdaldata.h"
@@ -816,6 +817,12 @@ void RasterDataSet::write_geometadata(const GeoMetadata& meta)
     GeoMetadata meta31370(meta);
     meta31370.set_projection_from_epsg(31370);
     set_projection(meta.projection != "" ? meta.projection : meta31370.projection);
+    if (meta.cellSize == 0.0) {
+        Log::warn("gdx.write : metadata.cellSize was missing, set to 1");
+    }
+    if (meta.projection == "") {
+        Log::warn("gdx.write : metadata.projection was missing, set to 31370");
+    }
 }
 
 GeoMetadata RasterDataSet::geometadata() const
