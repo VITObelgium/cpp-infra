@@ -399,6 +399,11 @@ void FieldDefinition::set_width(int width)
     _def->SetWidth(width);
 }
 
+int FieldDefinition::width()
+{
+    return _def->GetWidth();
+}
+
 FeatureDefinitionRef::FeatureDefinitionRef(OGRFeatureDefn* def)
 : _def(def)
 {
