@@ -87,4 +87,14 @@ auto find_in_map(MapType&& m, const typename std::decay_t<MapType>::key_type& ke
         return iter == m.end() ? nullptr : &(iter->second);
     }
 }
+
+/* Removes the constness of the iterator
+ * /param c a non-const reference to the container
+ * /param it a const iterator in the container
+ */
+template <typename Container, typename ConstIterator>
+typename Container::iterator remove_constness(Container& c, ConstIterator it)
+{
+    return c.erase(it, it);
+}
 }
