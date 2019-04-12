@@ -283,6 +283,8 @@ public:
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
 
     Layer layer(int index);
+    Layer layer(const std::string& name);
+
     Layer create_layer(const std::string& name, const std::vector<std::string>& driverOptions = {});
     Layer create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
 
