@@ -104,6 +104,19 @@ inline double distance(const Cell& lhs, const Cell& rhs)
 
 }
 
+namespace std {
+template <>
+struct hash<inf::Cell>
+{
+    size_t operator()(const inf::Cell& cell) const
+    {
+        size_t h1 = hash<int32_t>()(cell.r);
+        size_t h2 = hash<int32_t>()(cell.c);
+        return hash<long long>()((h1 << 32) ^ h2);
+    }
+};
+}
+
 namespace fmt {
 template <>
 struct formatter<inf::Cell>
