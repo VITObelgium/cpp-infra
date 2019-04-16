@@ -953,6 +953,12 @@ Layer VectorDataSet::layer(int index)
     return Layer(checkPointer(_ptr->GetLayer(index), "Invalid layer index"));
 }
 
+Layer VectorDataSet::layer(const std::string& name)
+{
+    assert(_ptr);
+    return Layer(checkPointer(_ptr->GetLayerByName(name.c_str()), "Invalid layer name"));
+}
+
 Layer VectorDataSet::create_layer(const std::string& name, const std::vector<std::string>& driverOptions)
 {
     return create_layer(name, Geometry::Type::Unknown, driverOptions);

@@ -292,6 +292,7 @@ public:
     FieldDefinition(FieldDefinition&&);
     FieldDefinition& operator=(FieldDefinition&&);
 
+    int width();
     void set_width(int width);
 };
 

@@ -473,6 +473,27 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
     return tokens;
 }
 
+void ellipsize_in_place(std::string& str, int maxLength)
+{
+    if (str.size() > maxLength) {
+        if (maxLength > 2) {
+            str.resize(maxLength);
+            str[maxLength - 3] = '.';
+            str[maxLength - 2] = '.';
+            str[maxLength - 1] = '.';
+        } else {
+            str.resize(maxLength);
+        }
+    }
+}
+
+std::string ellipsize(std::string_view str, int maxLength)
+{
+    std::string result(str);
+    ellipsize_in_place(result, maxLength);
+    return result;
+}
+
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt)
 {
     auto splitted = split_view(str, delimiter, opt);

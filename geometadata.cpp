@@ -46,7 +46,7 @@ bool GeoMetadata::operator==(const GeoMetadata& other) const noexcept
            std::fabs(yll - other.yll) < std::numeric_limits<double>::epsilon() &&
            std::fabs(cellSize - other.cellSize) < std::numeric_limits<double>::epsilon() &&
            nodataMatches &&
-           projection == other.projection;
+           projection_epsg() == other.projection_epsg();
 }
 
 bool GeoMetadata::operator!=(const GeoMetadata& other) const noexcept

@@ -1,4 +1,5 @@
 #include "infra/string.h"
+#include "infra/cast.h"
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -485,5 +486,18 @@ TEST(StringTest, SplitterVsSplitBehavior)
     static const char* line = "Line 2:\t\tv 1\tv 2\tv 3\tv 4\tv 5\tv 10";
 
     EXPECT_THAT(str::split_view(line, "\t"), ContainerEq(splitterVector(line, "\t")));
+}
+
+TEST(StringTest, Ellipsize)
+{
+    static const char* line = "What a long string";
+
+    EXPECT_THAT("What a ...", str::ellipsize(line, 10));
+    EXPECT_THAT("", str::ellipsize(line, 0));
+    EXPECT_THAT("A", str::ellipsize("AH", 1));
+    EXPECT_THAT("AH", str::ellipsize("AHA", 2));
+    EXPECT_THAT("AHA", str::ellipsize("AHA", 3));
+    EXPECT_THAT("...", str::ellipsize("AHA!", 3));
+    EXPECT_THAT(line, str::ellipsize(line, truncate<int>(std::strlen(line))));
 }
 }
