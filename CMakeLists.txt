@@ -98,6 +98,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/line.h
     include/infra/point.h
     include/infra/process.h
+    include/infra/progressinfo.h
     include/infra/scopeguard.h
     include/infra/signal.h
     include/infra/string.h
