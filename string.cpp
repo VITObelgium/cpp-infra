@@ -1,4 +1,5 @@
 #include "infra/string.h"
+#include "infra/cast.h"
 #include "infra/exception.h"
 
 #include <algorithm>
@@ -475,7 +476,7 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
 
 void ellipsize_in_place(std::string& str, int maxLength)
 {
-    if (str.size() > maxLength) {
+    if (truncate<int>(str.size()) > maxLength) {
         if (maxLength > 2) {
             str.resize(maxLength);
             str[maxLength - 3] = '.';

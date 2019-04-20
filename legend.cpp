@@ -1,4 +1,5 @@
 #include "infra/legend.h"
+#include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/legenddataanalyser.h"
 #include "infra/log.h"
@@ -65,8 +66,8 @@ Legend create_legend(std::vector<float> sampleData, int numberOfClasses, std::st
 void generate_bounds(double min, double max, LegendScaleType method, Legend& legend)
 {
     auto bounds = inf::calculate_classbounds(method, legend.numberOfClasses, min, max);
-    assert(bounds.size() == legend.numberOfClasses + 1);
-    assert(legend.numberOfClasses == legend.entries.size());
+    assert(truncate<int>(bounds.size()) == legend.numberOfClasses + 1);
+    assert(truncate<int>(legend.entries.size()) == legend.numberOfClasses);
     for (int i = 0; i < legend.numberOfClasses; ++i) {
         legend.entries[i].lowerBound = bounds[i];
         legend.entries[i].upperBound = bounds[i + 1];
