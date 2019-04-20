@@ -40,4 +40,37 @@ std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock
     return fmt::format(fmt::format("{{:{}}}", format), *tm);
 }
 
+class DurationRecorder
+{
+public:
+    DurationRecorder()
+    : _startTime(std::chrono::high_resolution_clock::now())
+    {
+    }
+
+    std::chrono::seconds elapsed_seconds() const
+    {
+        auto now = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<std::chrono::seconds>(now - _startTime);
+    }
+
+    std::string elapsed_time_string() const
+    {
+        using namespace std::chrono_literals;
+
+        auto duration = std::chrono::high_resolution_clock::now() - _startTime;
+
+        if (duration > 60s) {
+            auto minutes = std::chrono::duration_cast<std::chrono::minutes>(duration);
+            auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration - minutes);
+            return fmt::format("{} minutes {} seconds", minutes.count(), seconds.count());
+        } else {
+            return fmt::format("{} seconds", std::chrono::duration_cast<std::chrono::seconds>(duration).count());
+        }
+    }
+
+private:
+    std::chrono::time_point<std::chrono::high_resolution_clock> _startTime;
+};
+
 }
