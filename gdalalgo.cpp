@@ -139,7 +139,7 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
 {
     RasterizeOptionsWrapper gdalOptions(options);
 
-    std::vector<T> data(meta.rows * meta.cols);
+    std::vector<T> data(meta.rows * meta.cols, truncate<T>(meta.nodata.value_or(0.0)));
 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
     gdal::RasterDataSet memDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
