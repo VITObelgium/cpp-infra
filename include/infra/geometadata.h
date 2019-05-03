@@ -63,4 +63,6 @@ struct GeoMetadata
 
 std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta);
 std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta);
+
+GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, double nodata);
 }
