@@ -220,4 +220,12 @@ std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta)
 {
     return os << meta.to_string();
 }
+
+GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, double nodata)
+{
+    GeoMetadata result = meta;
+    result.nodata      = nodata;
+    return result;
+}
+
 }

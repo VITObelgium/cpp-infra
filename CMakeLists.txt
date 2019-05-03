@@ -149,7 +149,7 @@ endif ()
 
 target_compile_definitions(infra PUBLIC FMT_STRING_ALIAS=1)
 
-target_link_libraries(infra PUBLIC fmt::fmt date_interface)
+target_link_libraries(infra PUBLIC fmt::fmt date::date)
 
 if (HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
@@ -371,7 +371,7 @@ if (INFRA_UI_COMPONENTS)
         Qt5::Gui
         Qt5::Widgets
         Qt5::Core
-        date_interface
+        date::date
     )
 
     if (STATIC_QT AND MSVC)
