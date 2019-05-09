@@ -65,7 +65,9 @@ public:
             auto seconds = std::chrono::duration_cast<std::chrono::seconds>(duration - minutes);
             return fmt::format("{} minutes {} seconds", minutes.count(), seconds.count());
         } else {
-            return fmt::format("{} seconds", std::chrono::duration_cast<std::chrono::seconds>(duration).count());
+            auto seconds      = std::chrono::duration_cast<std::chrono::seconds>(duration);
+            auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration - seconds);
+            return fmt::format("{}.{:3d} seconds", seconds.count(), milliseconds.count());
         }
     }
 
