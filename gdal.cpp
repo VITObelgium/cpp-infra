@@ -401,7 +401,7 @@ void unregisterEmbeddedData()
 #endif
 }
 
-std::vector<const char*> create_string_array(const std::vector<std::string>& driverOptions)
+std::vector<const char*> create_string_array(gsl::span<const std::string> driverOptions)
 {
     std::vector<const char*> options(driverOptions.size());
     std::transform(driverOptions.begin(), driverOptions.end(), options.begin(), [](auto& str) {
@@ -460,7 +460,7 @@ RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t n
     return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
 }
 
-RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
+RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, gsl::span<const std::string> driverOptions)
 {
     auto options = create_string_array(driverOptions);
     return RasterDataSet(checkPointer(_driver.CreateCopy(

@@ -155,7 +155,7 @@ std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
 std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
 std::optional<int32_t> projection_to_epsg(const std::string& projection);
-std::vector<const char*> create_string_array(const std::vector<std::string>& driverOptions);
+std::vector<const char*> create_string_array(gsl::span<const std::string> driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
@@ -325,7 +325,7 @@ public:
     // Use for the memory driver, when there is no path
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType);
 
-    RasterDataSet create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {});
+    RasterDataSet create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, gsl::span<const std::string> driverOptions = {});
 
     RasterType type() const;
 
