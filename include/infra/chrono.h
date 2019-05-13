@@ -67,7 +67,7 @@ public:
         } else {
             auto seconds      = std::chrono::duration_cast<std::chrono::seconds>(duration);
             auto milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(duration - seconds);
-            return fmt::format("{}.{:3d} seconds", seconds.count(), milliseconds.count());
+            return fmt::format("{}.{:03d} seconds", seconds.count(), milliseconds.count());
         }
     }
 
