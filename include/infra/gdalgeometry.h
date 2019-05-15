@@ -333,7 +333,7 @@ public:
 
     Geometry geometry();
     Geometry geometry() const;
-
+    bool has_geometry() const noexcept;
     void set_geometry(const Geometry& geom);
 
     template <typename GeometryType>
