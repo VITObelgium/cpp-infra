@@ -389,6 +389,7 @@ FieldDefinition::FieldDefinition(FieldDefinition&& other)
 
 FieldDefinition& FieldDefinition::operator=(FieldDefinition&& other)
 {
+    delete get();
     _def       = other._def;
     other._def = nullptr;
     return *this;
@@ -468,7 +469,7 @@ Feature::~Feature()
 
 Feature& Feature::operator=(Feature&& other)
 {
-    //OGRFeature::DestroyFeature(_feature);
+    OGRFeature::DestroyFeature(_feature);
     _feature       = other._feature;
     other._feature = nullptr;
     return *this;
@@ -492,6 +493,11 @@ Geometry Feature::geometry()
 Geometry Feature::geometry() const
 {
     return const_cast<Feature*>(this)->geometry();
+}
+
+bool Feature::has_geometry() const noexcept
+{
+    return _feature->GetGeometryRef() != nullptr;
 }
 
 void Feature::set_geometry(const Geometry& geom)
