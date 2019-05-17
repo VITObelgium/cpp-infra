@@ -53,7 +53,10 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, gdal::Coordinate
     std::vector<QGeoPath> geoPaths;
 
     for (auto& feature : ds.layer(0)) {
-        //auto geometry = feature.geometry().simplify(10.0);
+        if (!feature.has_geometry()) {
+            continue;
+        }
+
         auto geometry = feature.geometry();
         geometry.transform(transformer);
         switch (geometry.type()) {
