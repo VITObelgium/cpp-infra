@@ -92,9 +92,9 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
     {"GeoJSON", VectorType::GeoJson},
 }};
 
-static std::string getExtenstion(const fs::path& filepath)
+static std::string get_extension_lowercase(const fs::path& filepath)
 {
-    return filepath.extension().string();
+    return str::lowercase(filepath.extension().string());
 }
 
 template <typename Unsigned, typename Signed>
@@ -1046,7 +1046,7 @@ void checkError(OGRErr err, const std::string& msg)
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath)
 {
-    auto ext = getExtenstion(filePath);
+    auto ext = get_extension_lowercase(filePath);
     if (ext == ".asc") {
         return RasterType::ArcAscii;
     } else if (ext == ".tiff" || ext == ".tif") {
@@ -1066,7 +1066,7 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
 
 VectorType guess_vectortype_from_filename(const fs::path& filePath)
 {
-    auto ext = getExtenstion(filePath);
+    auto ext = get_extension_lowercase(filePath);
     if (ext == ".csv") {
         return VectorType::Csv;
     } else if (ext == ".tab") {
