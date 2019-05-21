@@ -88,6 +88,20 @@ auto find_in_map(MapType&& m, const typename std::decay_t<MapType>::key_type& ke
     }
 }
 
+/* Search for an entry in the map that matches the predicate
+ * The entry is returned as a pointer (nullptr when not found)
+ * This funtion never throws
+ */
+template <typename MapType>
+auto find_in_map_optional(MapType&& m, const typename std::decay_t<MapType>::key_type& key) noexcept -> std::optional<typename std::decay_t<MapType>::mapped_type>
+{
+    if (auto iter = m.find(key); iter != m.end()) {
+        return iter->second;
+    }
+
+    return {};
+}
+
 /* Removes the constness of the iterator
  * /param c a non-const reference to the container
  * /param it a const iterator in the container
