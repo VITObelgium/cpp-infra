@@ -10,15 +10,17 @@ class Flags
 public:
     using value_type = std::underlying_type_t<EnumType>;
 
+    static constexpr Flags from_value(value_type v) noexcept
+    {
+        return Flags(v);
+    }
+
     constexpr Flags() = default;
 
     constexpr Flags(EnumType e)
     : _value(static_cast<value_type>(e))
     {
     }
-
-    constexpr Flags(const Flags& f) = default;
-    constexpr Flags(Flags&& f)      = default;
 
     constexpr Flags operator|(EnumType v) const noexcept
     {
@@ -51,13 +53,28 @@ public:
         return (static_cast<value_type>(v) & _value) != 0;
     }
 
+    constexpr void unset(EnumType v) noexcept
+    {
+        _value &= ~(static_cast<value_type>(v));
+    }
+
+    constexpr void set(EnumType v) noexcept
+    {
+        _value |= static_cast<value_type>(v);
+    }
+
+    constexpr explicit operator value_type() const noexcept
+    {
+        return _value;
+    }
+
 private:
+    constexpr Flags(value_type v)
+    : _value(static_cast<value_type>(v))
+    {
+    }
+
     value_type _value = value_type(0);
 };
 
-//template <typename EnumType, typename = std::enable_if<std::is_enum_v<EnumType>>>
-//constexpr Flags<EnumType> operator|(EnumType lhs, EnumType rhs)
-//{
-//    return Flags<EnumType>() | lhs | rhs;
-//}
 }
