@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/algo.h"
 #include "infra/cast.h"
 #include "uiinfra/clearableabstractitemmodel.h"
 
@@ -67,6 +68,14 @@ public:
     T* addChild(std::unique_ptr<T> child)
     {
         return static_cast<T*>(_children.emplace_back(std::move(child)).get());
+    }
+
+    template <typename T>
+    void removeChild(const T* child)
+    {
+        inf::remove_from_container(_children, [child](auto& ptr) {
+            return ptr.get() == child;
+        });
     }
 
     virtual QVariant data(int column, int role) const                 = 0;
