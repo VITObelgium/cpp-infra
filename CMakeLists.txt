@@ -340,6 +340,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/containerconversion.h
         include/uiinfra/cursorposprovider.h ui/cursorposprovider.cpp
         include/uiinfra/dateconversion.h
+        include/uiinfra/format.h
         include/uiinfra/multicombobox.h ui/multicombobox.cpp
         include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
         include/uiinfra/checkableitemproxymodel.h ui/checkableitemproxymodel.cpp
