@@ -3,6 +3,7 @@ find_package(GMock REQUIRED)
 
 add_executable(uiinfratest
     simpletreemodel.h
+    formattest.cpp
     fixeditemproxymodeltest.cpp
     main.cpp
 )
