@@ -42,10 +42,15 @@ public:
         return *this;
     }
 
-    constexpr Flags& operator|=(Flags& other) noexcept
+    constexpr Flags& operator|=(Flags other) noexcept
     {
         _value |= static_cast<value_type>(other._value);
         return *this;
+    }
+
+    constexpr bool operator==(Flags other) const noexcept
+    {
+        return _value == other._value;
     }
 
     constexpr bool is_set(EnumType v) const noexcept
