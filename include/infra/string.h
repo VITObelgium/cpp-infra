@@ -114,6 +114,13 @@ float to_float_value(std::string_view str);
 /*!
  * \brief string conversion to double
  * \param str string to parse
+ * \return the float value or 0.0 in case of a parsing error
+ */
+float to_float_value_zero_on_error(std::string_view str) noexcept;
+
+/*!
+ * \brief string conversion to double
+ * \param str string to parse
  * \return optional double that contains a value if the string contained a valid integer
  */
 std::optional<double> to_double(std::string_view str) noexcept;
@@ -125,6 +132,13 @@ std::optional<double> to_double(std::string_view str) noexcept;
  * \throw InvalidArgument if the input string does not contain a valid double
  */
 double to_double_value(std::string_view str);
+
+/*!
+ * \brief string conversion to double
+ * \param str string to parse
+ * \return the double value or 0.0 in case of a parsing error
+ */
+double to_double_value_zero_on_error(std::string_view str) noexcept;
 
 /*!
  * \brief templated version of the string to numeric functions

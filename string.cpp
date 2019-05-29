@@ -152,6 +152,11 @@ float to_float_value(std::string_view str)
     return *optval;
 }
 
+float to_float_value_zero_on_error(std::string_view str) noexcept
+{
+    return to_float(str).value_or(0.f);
+}
+
 std::optional<double> to_double(std::string_view str) noexcept
 {
     std::string s(str);
@@ -173,6 +178,11 @@ double to_double_value(std::string_view str)
     }
 
     return *optval;
+}
+
+double to_double_value_zero_on_error(std::string_view str) noexcept
+{
+    return to_double(str).value_or(0.0);
 }
 
 bool iequals(std::string_view str1, std::string_view str2)
