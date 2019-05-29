@@ -14,11 +14,21 @@ void FixedItemProxyModel::setFixedItems(const QStringList& items)
     _items = items;
 }
 
+int FixedItemProxyModel::fixedItemCount() const
+{
+    return _items.size();
+}
+
 void FixedItemProxyModel::setRootModelIndex(const QModelIndex& root)
 {
     beginResetModel();
     _rootIndex = root;
     endResetModel();
+}
+
+QModelIndex FixedItemProxyModel::rootModelIndex() const
+{
+    return _rootIndex;
 }
 
 int FixedItemProxyModel::rowCount(const QModelIndex& parent) const
