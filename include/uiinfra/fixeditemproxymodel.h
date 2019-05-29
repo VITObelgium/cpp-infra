@@ -16,8 +16,11 @@ public:
     FixedItemProxyModel(QObject* parent = nullptr);
 
     void setFixedItems(const QStringList& items);
+    int fixedItemCount() const;
+
     // The index of the source model that is the root of the items
     void setRootModelIndex(const QModelIndex& root);
+    QModelIndex rootModelIndex() const;
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const override;
     int columnCount(const QModelIndex& parent) const override;
