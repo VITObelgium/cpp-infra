@@ -101,6 +101,16 @@ private:
     std::FILE* ptr = nullptr;
 };
 
+class ScopedCurrentWorkingDirectory
+{
+public:
+    ScopedCurrentWorkingDirectory(const fs::path& cwd);
+    ~ScopedCurrentWorkingDirectory() noexcept;
+
+private:
+    fs::path _prevCwd;
+};
+
 }
 
 namespace fmt {
