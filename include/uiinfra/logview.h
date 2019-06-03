@@ -7,6 +7,7 @@ namespace Ui {
 class LogView;
 }
 
+QT_FORWARD_DECLARE_CLASS(QTimer)
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
 
 namespace uiinfra {
@@ -24,6 +25,9 @@ public:
     void resizeEvent(QResizeEvent* event) override;
 
 private:
+    void updateView();
+
     std::unique_ptr<Ui::LogView> _ui;
+    QTimer* _timer;
 };
 }
