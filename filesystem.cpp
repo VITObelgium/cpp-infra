@@ -130,4 +130,19 @@ void write_as_text(const fs::path& filename, std::string_view contents)
 
     fs.write(contents.data(), contents.size());
 }
+
+ScopedCurrentWorkingDirectory::ScopedCurrentWorkingDirectory(const fs::path& cwd)
+: _prevCwd(fs::current_path())
+{
+    fs::current_path(cwd);
+}
+
+ScopedCurrentWorkingDirectory::~ScopedCurrentWorkingDirectory() noexcept
+{
+    if (!_prevCwd.empty()) {
+        std::error_code ec;
+        fs::current_path(_prevCwd, ec);
+    }
+}
+
 }
