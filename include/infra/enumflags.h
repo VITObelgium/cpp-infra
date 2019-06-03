@@ -36,6 +36,20 @@ public:
         return f;
     }
 
+    constexpr Flags operator&(EnumType v) const noexcept
+    {
+        Flags f;
+        f._value = _value & static_cast<value_type>(v);
+        return f;
+    }
+
+    constexpr Flags operator&(Flags other) const noexcept
+    {
+        Flags f;
+        f._value = _value & static_cast<value_type>(other._value);
+        return f;
+    }
+
     constexpr Flags& operator|=(EnumType v) noexcept
     {
         _value |= static_cast<value_type>(v);
@@ -71,6 +85,11 @@ public:
     constexpr explicit operator value_type() const noexcept
     {
         return _value;
+    }
+
+    constexpr bool empty() const noexcept
+    {
+        return _value == 0;
     }
 
 private:
