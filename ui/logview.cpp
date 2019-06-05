@@ -40,6 +40,7 @@ void LogView::resizeEvent(QResizeEvent* event)
 
 void LogView::updateView()
 {
+    _timer->stop();
     if (_ui->tableView->isVisible()) {
         _ui->tableView->scrollToBottom();
     }
