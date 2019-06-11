@@ -2,7 +2,7 @@
 
 #include <qabstractproxymodel.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 /*! Proxy model that inserts fixed items before the source model
  * Only one level of the source model will be provided
@@ -13,6 +13,11 @@ class FixedItemProxyModel : public QAbstractProxyModel
     Q_OBJECT
 
 public:
+    enum Role
+    {
+        FixedItemRole = Qt::UserRole + 10000,
+    };
+
     FixedItemProxyModel(QObject* parent = nullptr);
 
     void setFixedItems(const QStringList& items);

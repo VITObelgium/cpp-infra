@@ -11,7 +11,7 @@ void PrintTo(const QString& str, ::std::ostream* os)
     *os << str.toStdString();
 }
 
-namespace uiinfra::test {
+namespace inf::ui::test {
 
 using namespace testing;
 
