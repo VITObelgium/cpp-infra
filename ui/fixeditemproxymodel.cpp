@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace uiinfra {
+namespace inf::ui {
 
 FixedItemProxyModel::FixedItemProxyModel(QObject* parent)
 : QAbstractProxyModel(parent)
@@ -72,7 +72,12 @@ Qt::ItemFlags FixedItemProxyModel::flags(const QModelIndex& proxyIndex) const
 QVariant FixedItemProxyModel::data(const QModelIndex& proxyIndex, int role) const
 {
     assert(!proxyIndex.parent().isValid());
-    if (proxyIndex.row() < _items.count()) {
+    bool isFixedItem = proxyIndex.row() < _items.count();
+    if (role == FixedItemRole) {
+        return isFixedItem;
+    }
+
+    if (isFixedItem) {
         if (role != Qt::DisplayRole) {
             return QVariant();
         }

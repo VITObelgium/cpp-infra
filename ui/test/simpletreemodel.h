@@ -4,7 +4,7 @@
 #include <qabstractitemmodel.h>
 #include <qvariant.h>
 
-namespace uiinfra::test {
+namespace inf::ui::test {
 
 class TreeItem
 {
