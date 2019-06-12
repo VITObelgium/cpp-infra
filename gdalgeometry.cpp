@@ -555,24 +555,24 @@ T Feature::field_as(int index) const
         int year, month, day, hour, minute, timezoneFlag;
         float second;
         if (_feature->GetFieldAsDateTime(index, &year, &month, &day, &hour, &minute, &second, &timezoneFlag) == FALSE) {
-            throw std::runtime_error("Failed to get field as date time");
+            throw RuntimeError("Failed to get field as time point {}", _feature->GetFieldAsString(index));
         }
 
         auto date      = date::year_month_day(date::year(year), date::month(month), date::day(day));
         auto timePoint = std::chrono::time_point_cast<std::chrono::milliseconds>(static_cast<date::sys_days>(date));
         timePoint += std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::milliseconds(inf::truncate<int>(second * 1000));
         return timePoint;
-	} else if constexpr (std::is_same_v<date_point, T>) {
-		int year, month, day, hour, minute, timezoneFlag;
+    } else if constexpr (std::is_same_v<date_point, T>) {
+        int year, month, day, hour, minute, timezoneFlag;
         float second;
         if (_feature->GetFieldAsDateTime(index, &year, &month, &day, &hour, &minute, &second, &timezoneFlag) == FALSE) {
-            throw std::runtime_error("Failed to get field as date time");
+            throw RuntimeError("Failed to get field as date point: {}", _feature->GetFieldAsString(index));
         }
 
-        auto date      = date::year_month_day(date::year(year), date::month(month), date::day(day));
+        auto date = date::year_month_day(date::year(year), date::month(month), date::day(day));
         return static_cast<date::sys_days>(date);
     } else {
-        throw std::invalid_argument("Invalid field type");
+        throw InvalidArgument("Invalid field type");
     }
 }
 
