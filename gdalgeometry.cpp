@@ -562,6 +562,15 @@ T Feature::field_as(int index) const
         auto timePoint = std::chrono::time_point_cast<std::chrono::milliseconds>(static_cast<date::sys_days>(date));
         timePoint += std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::milliseconds(inf::truncate<int>(second * 1000));
         return timePoint;
+	} else if constexpr (std::is_same_v<date_point, T>) {
+		int year, month, day, hour, minute, timezoneFlag;
+        float second;
+        if (_feature->GetFieldAsDateTime(index, &year, &month, &day, &hour, &minute, &second, &timezoneFlag) == FALSE) {
+            throw std::runtime_error("Failed to get field as date time");
+        }
+
+        auto date      = date::year_month_day(date::year(year), date::month(month), date::day(day));
+        return static_cast<date::sys_days>(date);
     } else {
         throw std::invalid_argument("Invalid field type");
     }
@@ -584,6 +593,8 @@ T Feature::field_as(std::string_view name) const
         return std::string_view(_feature->GetFieldAsString(name.data()));
     } else if constexpr (std::is_same_v<time_point, T>) {
         return field_as<T>(_feature->GetFieldIndex(name.data()));
+    } else if constexpr (std::is_same_v<date_point, T>) {
+        return field_as<T>(_feature->GetFieldIndex(name.data()));
     } else {
         throw std::invalid_argument("Invalid field type");
     }
@@ -597,6 +608,7 @@ template int64_t Feature::field_as<int64_t>(int index) const;
 template std::string Feature::field_as<std::string>(int index) const;
 template std::string_view Feature::field_as<std::string_view>(int index) const;
 template time_point Feature::field_as<time_point>(int index) const;
+template date_point Feature::field_as<date_point>(int index) const;
 
 template double Feature::field_as<double>(std::string_view index) const;
 template float Feature::field_as<float>(std::string_view index) const;
@@ -605,6 +617,7 @@ template int64_t Feature::field_as<int64_t>(std::string_view index) const;
 template std::string Feature::field_as<std::string>(std::string_view index) const;
 template std::string_view Feature::field_as<std::string_view>(std::string_view index) const;
 template time_point Feature::field_as<time_point>(std::string_view index) const;
+template date_point Feature::field_as<date_point>(std::string_view index) const;
 
 bool Feature::operator==(const Feature& other) const
 {
