@@ -51,6 +51,13 @@ void remove_from_container(Container& c, Predicate&& pred) noexcept
     c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
 }
 
+template <typename OutputContainer, typename InputContainer>
+void append_to_container(OutputContainer& output, const InputContainer& input) noexcept
+{
+    output.reserve(output.size() + input.size());
+    std::copy(input.begin(), input.end(), std::back_inserter(output));
+}
+
 template <typename Container, typename Predicate>
 const typename Container::value_type* find_in_container_optional(const Container& c, Predicate&& pred) noexcept
 {
