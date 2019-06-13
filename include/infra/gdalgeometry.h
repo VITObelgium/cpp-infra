@@ -352,6 +352,9 @@ public:
     T field_as(int index) const;
 
     template <typename T>
+    std::optional<T> opt_field_as(int index) const;
+
+    template <typename T>
     T field_as(std::string_view name) const;
 
     template <typename T>
