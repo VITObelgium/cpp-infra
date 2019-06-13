@@ -577,6 +577,18 @@ T Feature::field_as(int index) const
 }
 
 template <typename T>
+std::optional<T> Feature::opt_field_as(int index) const
+{
+    static_assert(!(std::is_same_v<T, std::string> || std::is_same_v<T, std::string_view>), "optional field should not be used for strings");
+
+    if (!_feature->IsFieldSetAndNotNull(index)) {
+        return {};
+    }
+
+    return field_as<T>(index);
+}
+
+template <typename T>
 T Feature::field_as(std::string_view name) const
 {
     if constexpr (std::is_same_v<double, T>) {
@@ -609,6 +621,13 @@ template std::string Feature::field_as<std::string>(int index) const;
 template std::string_view Feature::field_as<std::string_view>(int index) const;
 template time_point Feature::field_as<time_point>(int index) const;
 template date_point Feature::field_as<date_point>(int index) const;
+
+template std::optional<double> Feature::opt_field_as<double>(int index) const;
+template std::optional<float> Feature::opt_field_as<float>(int index) const;
+template std::optional<int32_t> Feature::opt_field_as<int32_t>(int index) const;
+template std::optional<int64_t> Feature::opt_field_as<int64_t>(int index) const;
+template std::optional<time_point> Feature::opt_field_as<time_point>(int index) const;
+template std::optional<date_point> Feature::opt_field_as<date_point>(int index) const;
 
 template double Feature::field_as<double>(std::string_view index) const;
 template float Feature::field_as<float>(std::string_view index) const;
