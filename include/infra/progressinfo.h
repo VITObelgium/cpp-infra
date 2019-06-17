@@ -9,18 +9,18 @@ class ProgressInfo
 public:
     ProgressInfo() = default;
 
-    ProgressInfo(int totalTicks, std::function<bool(int, int)> cb)
+    ProgressInfo(int64_t totalTicks, std::function<bool(int64_t, int64_t)> cb)
     : _ticks(totalTicks)
     , _cb(cb)
     {
     }
 
-    void set_callback(std::function<bool(int, int)> cb)
+    void set_callback(std::function<bool(int64_t, int64_t)> cb)
     {
         _cb = cb;
     }
 
-    void set_total_ticks(int ticks)
+    void set_total_ticks(int64_t ticks)
     {
         _ticks = ticks;
     }
@@ -51,10 +51,10 @@ private:
         }
     }
 
-    int _ticks                    = 0;
-    std::atomic<int> _currentTick = 0;
-    bool _cancel                  = false;
-    std::function<bool(int, int)> _cb;
+    int64_t _ticks                    = 0;
+    std::atomic<int64_t> _currentTick = 0;
+    bool _cancel                      = false;
+    std::function<bool(int64_t, int64_t)> _cb;
 };
 
 }

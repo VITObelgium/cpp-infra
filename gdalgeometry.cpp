@@ -89,6 +89,41 @@ void Geometry::transform(CoordinateTransformer& transformer)
     checkError(_geometry->transform(transformer.get()), "Failed to transform geometry");
 }
 
+Owner<Geometry> Geometry::buffer(double distance) const
+{
+    return Owner<Geometry>(checkPointer(_geometry->Buffer(distance), "Failed to buffer geometry"));
+}
+
+Owner<Geometry> Geometry::buffer(double distance, int numQuadSegments) const
+{
+    return Owner<Geometry>(checkPointer(_geometry->Buffer(distance, numQuadSegments), "Failed to buffer geometry"));
+}
+
+Owner<Geometry> Geometry::intersection(const Geometry& other) const
+{
+    return Owner<Geometry>(checkPointer(_geometry->Intersection(other.get()), "Failed to get geometry intersection"));
+}
+
+std::optional<double> Geometry::area() const
+{
+    if (auto* surface = _geometry->toSurface(); surface != nullptr) {
+        return surface->get_Area();
+    }
+
+    return {};
+}
+
+double Geometry::distance(const Point<double>& point) const
+{
+    OGRPoint p(point.x, point.y);
+    return _geometry->Distance(&p);
+}
+
+double Geometry::distance(const Geometry& other) const
+{
+    return _geometry->Distance(other.get());
+}
+
 template <typename WrappedType>
 GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* collection)
 : GeometryPtr<WrappedType>(collection)
@@ -235,6 +270,11 @@ bool LineIterator::operator==(const LineIterator& other) const
 bool LineIterator::operator!=(const LineIterator& other) const
 {
     return !(*this == other);
+}
+
+Owner<PointGeometry> PointGeometry::from_point(Point<double> p)
+{
+    return Owner<PointGeometry>(new OGRPoint(p.x, p.y));
 }
 
 PointGeometry::PointGeometry(OGRPoint* point)
@@ -718,6 +758,16 @@ void Layer::set_spatial_filter(Point<double> point)
 {
     OGRPoint p(point.x, point.y);
     _layer->SetSpatialFilter(&p);
+}
+
+void Layer::set_spatial_filter(Geometry& geometry)
+{
+    _layer->SetSpatialFilter(geometry.get());
+}
+
+void Layer::set_attribute_filter(const char* name)
+{
+    checkError(_layer->SetAttributeFilter(name), "Failed to set attribute filter");
 }
 
 void Layer::create_field(FieldDefinition& field)

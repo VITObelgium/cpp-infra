@@ -95,7 +95,7 @@ public:
     OGRGeometry* get() noexcept;
     const OGRGeometry* get() const noexcept;
 
-    operator bool() const noexcept;
+    explicit operator bool() const noexcept;
 
     Type type() const;
     std::string_view type_name() const;
@@ -119,6 +119,14 @@ public:
     Owner<Geometry> simplify_preserve_topology(double tolerance) const;
 
     void transform(CoordinateTransformer& transformer);
+    Owner<Geometry> buffer(double distance) const;
+    Owner<Geometry> buffer(double distance, int numQuadSegments) const;
+
+    Owner<Geometry> intersection(const Geometry& other) const;
+    std::optional<double> area() const;
+
+    double distance(const inf::Point<double>& other) const;
+    double distance(const Geometry& other) const;
 
 private:
     OGRGeometry* _geometry = nullptr;
@@ -176,6 +184,8 @@ public:
 class PointGeometry : public GeometryPtr<OGRPoint>
 {
 public:
+    static Owner<PointGeometry> from_point(Point<double> p);
+
     PointGeometry(OGRPoint* point);
 
     Point<double> point() const;
@@ -419,6 +429,9 @@ public:
 
     int field_index(std::string_view name) const;
     void set_spatial_filter(Point<double> point);
+    void set_spatial_filter(Geometry& geometry);
+
+    void set_attribute_filter(const char* name);
 
     void create_field(FieldDefinition& field);
     void create_feature(Feature& feature);
