@@ -315,9 +315,11 @@ public:
 
     int field_count() const;
     /*! obtain the index of the provided field name, returns -1 if not found */
-    int field_index(std::string_view name) const noexcept;
+    int field_index(const char* name) const noexcept;
+    int field_index(const std::string& name) const noexcept;
     /*! obtain the index of the provided field name, throws RuntimError if field not present */
-    int required_field_index(std::string_view name) const;
+    int required_field_index(const char* name) const;
+    int required_field_index(const std::string& name) const;
     FieldDefinitionRef field_definition(int index) const;
 
     OGRFeatureDefn* get() noexcept;
@@ -353,7 +355,8 @@ public:
     }
 
     int field_count() const;
-    int field_index(std::string_view name) const;
+    int field_index(const char* name) const;
+    int field_index(const std::string& name) const;
     FieldDefinitionRef field_definition(int index) const;
 
     Field field(int index) const noexcept;
@@ -427,11 +430,13 @@ public:
      */
     Feature feature(int64_t id) const;
 
-    int field_index(std::string_view name) const;
+    int field_index(const char* name) const;
+    int field_index(const std::string& name) const;
     void set_spatial_filter(Point<double> point);
     void set_spatial_filter(Geometry& geometry);
 
     void set_attribute_filter(const char* name);
+    void set_attribute_filter(const std::string& name);
 
     void create_field(FieldDefinition& field);
     void create_feature(Feature& feature);

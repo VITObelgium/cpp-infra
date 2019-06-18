@@ -461,19 +461,29 @@ int FeatureDefinitionRef::field_count() const
     return _def->GetFieldCount();
 }
 
-int FeatureDefinitionRef::field_index(std::string_view name) const noexcept
+int FeatureDefinitionRef::field_index(const char* name) const noexcept
 {
-    return _def->GetFieldIndex(name.data());
+    return _def->GetFieldIndex(name);
 }
 
-int FeatureDefinitionRef::required_field_index(std::string_view name) const
+int FeatureDefinitionRef::field_index(const std::string& name) const noexcept
 {
-    int index = _def->GetFieldIndex(name.data());
+    return field_index(name.c_str());
+}
+
+int FeatureDefinitionRef::required_field_index(const char* name) const
+{
+    int index = _def->GetFieldIndex(name);
     if (index < 0) {
         throw RuntimeError("Field not present: {}", name);
     }
 
     return index;
+}
+
+int FeatureDefinitionRef::required_field_index(const std::string& name) const
+{
+    return required_field_index(name.c_str());
 }
 
 FieldDefinitionRef FeatureDefinitionRef::field_definition(int index) const
@@ -550,9 +560,14 @@ int Feature::field_count() const
     return _feature->GetFieldCount();
 }
 
-int Feature::field_index(std::string_view name) const
+int Feature::field_index(const char* name) const
 {
-    return _feature->GetFieldIndex(name.data());
+    return _feature->GetFieldIndex(name);
+}
+
+int Feature::field_index(const std::string& name) const
+{
+    return field_index(name.c_str());
 }
 
 FieldDefinitionRef Feature::field_definition(int index) const
@@ -749,9 +764,14 @@ Feature Layer::feature(int64_t index) const
     return Feature(checkPointer(_layer->GetFeature(index), "Failed to get feature from layer"));
 }
 
-int Layer::field_index(std::string_view name) const
+int Layer::field_index(const char* name) const
 {
-    return _layer->FindFieldIndex(name.data(), 1 /*exact match*/);
+    return _layer->FindFieldIndex(name, 1 /*exact match*/);
+}
+
+int Layer::field_index(const std::string& name) const
+{
+    return field_index(name.c_str());
 }
 
 void Layer::set_spatial_filter(Point<double> point)
@@ -768,6 +788,11 @@ void Layer::set_spatial_filter(Geometry& geometry)
 void Layer::set_attribute_filter(const char* name)
 {
     checkError(_layer->SetAttributeFilter(name), "Failed to set attribute filter");
+}
+
+void Layer::set_attribute_filter(const std::string& name)
+{
+    set_attribute_filter(name.c_str());
 }
 
 void Layer::create_field(FieldDefinition& field)
