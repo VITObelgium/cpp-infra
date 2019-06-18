@@ -266,7 +266,7 @@ class FieldDefinitionRef
 public:
     FieldDefinitionRef() = default;
     FieldDefinitionRef(OGRFieldDefn* def);
-    std::string_view name() const;
+    const char* name() const;
     const std::type_info& type() const;
 
     OGRFieldDefn* get() noexcept;
