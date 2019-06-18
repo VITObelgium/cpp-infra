@@ -364,9 +364,9 @@ FieldDefinitionRef::FieldDefinitionRef(OGRFieldDefn* def)
     assert(def);
 }
 
-std::string_view FieldDefinitionRef::name() const
+const char* FieldDefinitionRef::name() const
 {
-    return std::string_view(_def->GetNameRef());
+    return _def->GetNameRef();
 }
 
 const std::type_info& FieldDefinitionRef::type() const
