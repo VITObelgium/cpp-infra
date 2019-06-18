@@ -14,6 +14,7 @@ private:
     const char complete_char                               = '=';
     const char incomplete_char                             = ' ';
     const std::chrono::steady_clock::time_point start_time = std::chrono::steady_clock::now();
+    int _progress                                          = -1;
 
 public:
     ProgressBar(unsigned int width, char complete, char incomplete)
@@ -26,11 +27,17 @@ public:
     {
     }
 
-    void display(float progress) const
+    void display(float progress)
     {
-        unsigned int pos = truncate<unsigned int>(bar_width * progress);
+        auto pos = truncate<unsigned int>(bar_width * progress);
 
         progress *= 100.f;
+        auto intProgress = truncate<int>(progress);
+        if (intProgress == _progress) {
+            return;
+        }
+
+        _progress = intProgress;
 
         std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
         auto time_elapsed                         = std::chrono::duration_cast<std::chrono::seconds>(now - start_time);
@@ -45,14 +52,15 @@ public:
             else
                 std::cout << incomplete_char;
         }
-        std::cout << "] " << truncate<int>(progress) << "% " << time_elapsed.count() << "s\r";
+        std::cout << "] " << _progress << "% " << time_elapsed.count() << "s\r";
         std::cout.flush();
     }
 
-    void done() const
+    void done()
     {
         display(1.f);
         std::cout << std::endl;
+        _progress = -1;
     }
 };
 
