@@ -13,7 +13,7 @@ inline QColor toQColor(const inf::Color& color)
 
 inline inf::Color fromQColor(const QColor& color)
 {
-    return inf::Color(color.red(), color.green(), color.blue(), color.alpha());
+    return inf::Color(uint8_t(color.red()), uint8_t(color.green()), uint8_t(color.blue()), uint8_t(color.alpha()));
 }
 
 }
