@@ -14,7 +14,7 @@ TEST(GdalGeometryTest, fieldDefinition)
     FieldDefinition def("Field", typeid(int));
 
     FieldDefinitionRef defRef(def);
-    EXPECT_EQ("Field", defRef.name());
+    EXPECT_STREQ("Field", defRef.name());
     EXPECT_EQ(typeid(int), defRef.type());
 }
 
