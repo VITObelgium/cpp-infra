@@ -4,7 +4,7 @@
 
 #include <qapplication.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 using namespace inf;
 

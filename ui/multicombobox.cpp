@@ -7,7 +7,7 @@
 #include <qlistwidget.h>
 #include <qstylepainter.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 MultiComboBox::MultiComboBox(QWidget* widget)
 : QComboBox(widget)

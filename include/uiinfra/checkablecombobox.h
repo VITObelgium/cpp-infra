@@ -5,7 +5,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QTableView)
 
-namespace uiinfra {
+namespace inf::ui {
 
 class MyQStyledItemDelegate : public QStyledItemDelegate
 {

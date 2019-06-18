@@ -2,7 +2,7 @@
 
 #include <qmdisubwindow.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class MdiSubWindow : public QMdiSubWindow
 {

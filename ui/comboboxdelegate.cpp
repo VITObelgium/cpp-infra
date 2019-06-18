@@ -3,7 +3,7 @@
 #include <QComboBox>
 #include <QModelIndex>
 
-namespace uiinfra {
+namespace inf::ui {
 
 ComboBoxDelegate::ComboBoxDelegate(QObject* parent)
 : QStyledItemDelegate(parent)

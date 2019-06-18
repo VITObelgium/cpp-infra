@@ -1,6 +1,6 @@
 #include "uiinfra/cursorposprovider.h"
 
-namespace uiinfra {
+namespace inf::ui {
 
 CursorPosProvider::CursorPosProvider(QObject* parent)
 : QObject(parent)

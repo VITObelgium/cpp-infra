@@ -2,7 +2,7 @@
 
 #include <qapplication.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 /* RAII class for changing the cursor shape in a scope
  */

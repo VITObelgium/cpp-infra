@@ -2,7 +2,7 @@
 
 #include <QAbstractItemModel>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class ClearableAbstractItemModel : public QAbstractItemModel
 {

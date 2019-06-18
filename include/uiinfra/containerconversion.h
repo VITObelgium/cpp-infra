@@ -4,7 +4,7 @@
 
 #include <qstringlist.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 template <typename Container>
 inline QStringList toQStringList(const Container& cont)

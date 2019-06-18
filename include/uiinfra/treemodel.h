@@ -9,7 +9,7 @@
 #include <qvariant.h>
 #include <vector>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class TreeNode
 {

@@ -2,7 +2,7 @@
 
 #include "infra/cast.h"
 
-namespace uiinfra {
+namespace inf::ui {
 
 using namespace inf;
 

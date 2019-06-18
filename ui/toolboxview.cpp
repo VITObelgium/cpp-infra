@@ -4,7 +4,7 @@
 #include <cassert>
 #include <qtoolbutton.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 static const char* s_idProperty = "itemid";
 

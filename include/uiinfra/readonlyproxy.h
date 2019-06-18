@@ -2,7 +2,7 @@
 
 #include "qidentityproxymodel.h"
 
-namespace uiinfra {
+namespace inf::ui {
 
 /* Proxy model that makes sure the model is read-only
  * Usefull when dealing with sqltablemodels that lock the database otherwise
