@@ -5,7 +5,7 @@
 QT_FORWARD_DECLARE_CLASS(QListWidget)
 QT_FORWARD_DECLARE_CLASS(QListWidgetItem)
 
-namespace uiinfra {
+namespace inf::ui {
 
 class MultiComboBox : public QComboBox
 {

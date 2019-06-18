@@ -5,7 +5,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QHeaderView)
 
-namespace uiinfra {
+namespace inf::ui {
 
 /*! Sets up a right click popup menu for the header that allows hiding sections
     section numbers in the fixedSections vector will not be included

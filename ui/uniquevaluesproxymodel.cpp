@@ -2,7 +2,7 @@
 
 #include <qdebug.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 UniqueValuesProxyModel::UniqueValuesProxyModel(QObject* parent)
 : QSortFilterProxyModel(parent)

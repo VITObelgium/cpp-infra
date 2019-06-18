@@ -11,7 +11,7 @@
 #include <unordered_map>
 #include <vector>
 
-namespace uiinfra {
+namespace inf::ui {
 
 struct PolygonData2
 {

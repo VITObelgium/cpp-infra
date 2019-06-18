@@ -6,7 +6,7 @@
 #include <qtableview.h>
 #include <qtreeview.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 void setSectionVisibilitySelector(QHeaderView* headerView, const std::vector<int>& fixedSections)
 {

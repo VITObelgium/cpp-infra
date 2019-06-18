@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace uiinfra {
+namespace inf::ui {
 
 CheckableItemProxyModel::CheckableItemProxyModel(QObject* parent)
 : QIdentityProxyModel(parent)

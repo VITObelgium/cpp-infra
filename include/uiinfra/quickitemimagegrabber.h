@@ -2,7 +2,7 @@
 
 #include <qquickitem.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class QuickItemImageGrabber : public QObject
 {

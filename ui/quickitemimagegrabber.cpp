@@ -4,7 +4,7 @@
 
 #include <qquickitemgrabresult.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 using namespace inf;
 

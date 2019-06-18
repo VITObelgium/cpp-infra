@@ -10,7 +10,7 @@ class LogView;
 QT_FORWARD_DECLARE_CLASS(QTimer)
 QT_FORWARD_DECLARE_CLASS(QAbstractItemModel)
 
-namespace uiinfra {
+namespace inf::ui {
 
 class LogView : public QWidget
 {

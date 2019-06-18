@@ -3,7 +3,7 @@
 #include <qhash.h>
 #include <qidentityproxymodel.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 /*! Proxy model that make sure sure items are user checkable
  * and display a checkbox

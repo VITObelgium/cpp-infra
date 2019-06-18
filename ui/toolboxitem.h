@@ -2,7 +2,7 @@
 
 #include "ui_toolboxitem.h"
 
-namespace uiinfra {
+namespace inf::ui {
 
 class ToolboxItem : public QWidget
 {

@@ -3,7 +3,7 @@
 #include <qlayout.h>
 #include <qsettings.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 MdiSubWindow::MdiSubWindow(QWidget* internalWidget, QWidget* parent)
 : QMdiSubWindow(parent)

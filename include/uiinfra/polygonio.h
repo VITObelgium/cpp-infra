@@ -13,7 +13,7 @@ class VectorDataSet;
 class CoordinateTransformer;
 }
 
-namespace uiinfra {
+namespace inf::ui {
 
 using OverlayMap = std::unordered_map<QString, std::vector<QGeoPath>>;
 

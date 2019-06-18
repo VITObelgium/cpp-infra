@@ -6,7 +6,7 @@
 #include <qgeolocation.h>
 #include <qgeorectangle.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 using namespace inf;
 

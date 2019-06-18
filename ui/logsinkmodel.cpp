@@ -3,7 +3,7 @@
 #include <qapplication.h>
 #include <qstyle.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 template <typename Mutex>
 LogSinkModel<Mutex>::LogSinkModel(QObject* parent)

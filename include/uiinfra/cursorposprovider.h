@@ -3,7 +3,7 @@
 #include <QPointF>
 #include <qobject.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class CursorPosProvider : public QObject
 {

@@ -2,7 +2,7 @@
 
 #include <qapplication.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 //! Application implementation that handles uncaught exceptions
 // and routes the qt logging to the infra logging

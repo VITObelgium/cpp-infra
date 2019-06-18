@@ -5,7 +5,7 @@
 #include <qtoolbox.h>
 #include <unordered_map>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class ToolboxView : public QToolBox
 {

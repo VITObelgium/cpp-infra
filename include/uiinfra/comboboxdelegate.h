@@ -7,7 +7,7 @@ class QModelIndex;
 class QWidget;
 class QVariant;
 
-namespace uiinfra {
+namespace inf::ui {
 
 class ComboBoxDelegate : public QStyledItemDelegate
 {

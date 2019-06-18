@@ -4,7 +4,7 @@
 #include <qevent.h>
 #include <qtimer.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 static auto s_maxUpdateInterval = std::chrono::milliseconds(200);
 

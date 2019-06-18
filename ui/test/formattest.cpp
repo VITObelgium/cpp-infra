@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-namespace uiinfra::test {
+namespace inf::ui::test {
 
 using namespace testing;
 

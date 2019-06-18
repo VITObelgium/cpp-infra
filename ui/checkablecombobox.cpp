@@ -9,7 +9,7 @@
 #include <qstylepainter.h>
 #include <qtableview.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 MyQStyledItemDelegate::MyQStyledItemDelegate(QObject* parent)
 : QStyledItemDelegate(parent)

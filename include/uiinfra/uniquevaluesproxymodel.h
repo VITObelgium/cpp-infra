@@ -2,7 +2,7 @@
 
 #include <qsortfilterproxymodel.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 //! The UniqueValuesProxyModel provides a filter model remove duplicate values from a source model.
 class UniqueValuesProxyModel : public QSortFilterProxyModel

@@ -3,7 +3,7 @@
 #include <qabstractitemmodel.h>
 #include <qcolor.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 class LegendItem : public QObject
 {

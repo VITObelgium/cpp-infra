@@ -1,6 +1,6 @@
 #include "toolboxitem.h"
 
-namespace uiinfra {
+namespace inf::ui {
 
 ToolboxItem::ToolboxItem(const QString& label, const QIcon& icon, QWidget* parent)
 : QWidget(parent)

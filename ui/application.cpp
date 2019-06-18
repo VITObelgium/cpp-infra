@@ -1,7 +1,7 @@
 #include "uiinfra/application.h"
 #include "infra/log.h"
 
-namespace uiinfra {
+namespace inf::ui {
 
 static const char* levelString(QtMsgType type)
 {
