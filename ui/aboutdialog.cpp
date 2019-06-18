@@ -4,7 +4,7 @@
 #include <qfile.h>
 #include <qtextstream.h>
 
-namespace uiinfra {
+namespace inf::ui {
 
 QString createOpenSourceUsageMessage(const std::vector<OpenSourceUsageInfo>& usages)
 {

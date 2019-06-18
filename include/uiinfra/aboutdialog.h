@@ -7,7 +7,7 @@ namespace Ui {
 class AboutDialog;
 }
 
-namespace uiinfra {
+namespace inf::ui {
 
 struct OpenSourceUsageInfo
 {
