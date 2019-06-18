@@ -33,7 +33,7 @@ TEST(GdalTest, fieldInfo)
     auto layer = ds.layer(0);
     EXPECT_EQ(9, layer.feature_count());
     EXPECT_EQ(1, layer.feature(0).field_count());
-    EXPECT_EQ("FID", layer.feature(0).field_definition(0).name());
+    EXPECT_STREQ("FID", layer.feature(0).field_definition(0).name());
     EXPECT_EQ(typeid(int64_t), layer.feature(0).field_definition(0).type());
 }
 
