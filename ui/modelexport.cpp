@@ -1,4 +1,5 @@
 #include "uiinfra/modelexport.h"
+#include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/log.h"
 #include "infra/string.h"
@@ -88,13 +89,13 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
     }
 
     for (int i = 0; i < model->rowCount(); ++i) {
-        const int row = i + rowOffset;
+        const auto row = truncate<lxw_row_t>(i + rowOffset);
         if (hasVerticalHeaders) {
             worksheet_write_string(ws, row, 0, model->headerData(i, Qt::Vertical).toString().toUtf8(), headerFormat);
         }
 
         for (int j = 0; j < model->columnCount(); ++j) {
-            const int col          = colOffset + j;
+            const auto col         = truncate<lxw_col_t>(colOffset + j);
             auto data              = model->index(i, j).data();
             lxw_format* cellFormat = nullptr;
             auto color             = model->index(i, j).data(Qt::TextColorRole);
