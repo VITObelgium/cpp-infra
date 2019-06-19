@@ -47,6 +47,12 @@ constexpr Point<T> operator+(const Point<T>& lhs, const Point<T>& rhs)
     return Point<T>(lhs.x + rhs.x, lhs.y + rhs.y);
 }
 
+template <typename TTo, typename TFrom>
+constexpr Point<TTo> point_cast(const Point<TFrom>& from)
+{
+    return Point<TTo>(static_cast<TTo>(from.x), static_cast<TTo>(from.y));
+}
+
 }
 
 namespace fmt {
