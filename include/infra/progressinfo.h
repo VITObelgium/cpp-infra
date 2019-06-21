@@ -20,12 +20,12 @@ public:
         _cb = cb;
     }
 
-    void set_total_ticks(int64_t ticks)
+    void set_total_ticks(int64_t ticks) noexcept
     {
         _ticks = ticks;
     }
 
-    void tick()
+    void tick() noexcept
     {
         ++_currentTick;
         signal_progress();
