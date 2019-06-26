@@ -1,5 +1,7 @@
 #pragma once
 
+#include "infra/log.h"
+
 #include <optional>
 #include <sqlpp11/sqlpp11.h>
 
@@ -9,6 +11,12 @@
 #endif
 
 namespace inf::db {
+
+enum class ConnectionDebug
+{
+    Yes,
+    No,
+};
 
 enum class AccessMode
 {
@@ -74,7 +82,34 @@ inline auto optional_field_value(const std::optional<int64_t>& opt)
     }
 }
 
+struct SerializerContext
+{
+    std::ostringstream _os;
+
+    SerializerContext() = default;
+    SerializerContext(const SerializerContext& rhs);
+
+    std::string str() const;
+    void reset();
+
+    template <typename T>
+    std::ostream& operator<<(T t)
+    {
+        return _os << t;
+    }
+
+    static std::string escape(std::string arg);
+};
+
+template <typename Query>
+void log_query(const Query& query)
+{
+    SerializerContext context;
+    Log::info(serialize(query, context).str());
+}
+
 #ifdef INFRA_DB_SQLITE_SUPPORT
-sqlpp::sqlite3::connection_config create_sqlite_connection_config(const fs::path& filename, inf::db::AccessMode access, bool debugQueries);
+sqlpp::sqlite3::connection_config create_sqlite_connection_config(const fs::path& filename, inf::db::AccessMode access, ConnectionDebug debug);
 #endif
+
 }
