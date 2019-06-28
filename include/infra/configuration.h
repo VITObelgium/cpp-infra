@@ -64,19 +64,19 @@ public:
 
                 if (p.name == param.name) {
                     if constexpr (std::is_same_v<ParameterType, int32_t>) {
-                        if (auto val = str::toInt32(p.value); val.has_value()) {
+                        if (auto val = str::to_int32(p.value); val.has_value()) {
                             _params[enum_value(param.id)] = val.value();
                         }
                     } else if constexpr (std::is_same_v<ParameterType, int64_t>) {
-                        if (auto val = str::toInt64(p.value); val.has_value()) {
+                        if (auto val = str::to_int64(p.value); val.has_value()) {
                             _params[enum_value(param.id)] = val.value();
                         }
                     } else if constexpr (std::is_same_v<ParameterType, double>) {
-                        if (auto val = str::toDouble(p.value); val.has_value()) {
+                        if (auto val = str::to_double(p.value); val.has_value()) {
                             _params[enum_value(param.id)] = val.value();
                         }
                     } else if constexpr (std::is_same_v<ParameterType, bool>) {
-                        if (auto val = str::toInt32(p.value); val.has_value()) {
+                        if (auto val = str::to_int32(p.value); val.has_value()) {
                             _params[enum_value(param.id)] = val.value() == 1;
                         }
                     } else if constexpr (std::is_same_v<ParameterType, std::string>) {
