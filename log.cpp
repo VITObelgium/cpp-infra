@@ -4,6 +4,7 @@
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/msvc_sink.h>
+#include <spdlog/sinks/rotating_file_sink.h>
 #include <spdlog/sinks/stdout_sinks.h>
 
 #ifdef _WIN32
@@ -15,13 +16,23 @@ namespace inf {
 std::shared_ptr<spdlog::logger> Log::_log;
 std::vector<spdlog::sink_ptr> Log::_sinks;
 
-void Log::add_file_sink(const std::string& filePath)
+void Log::add_file_sink(const fs::path& filePath)
 {
     if (_log) {
         throw std::runtime_error("Sinks need to be added before initialising the logging system");
     }
 
-    _sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath, true));
+    _sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath.u8string(), true));
+}
+
+void Log::add_rotating_file_sink(const fs::path& filePath, std::size_t maxFileSize)
+{
+    if (_log) {
+        throw std::runtime_error("Sinks need to be added before initialising the logging system");
+    }
+
+    constexpr std::size_t maxFileCount = 5;
+    _sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filePath.u8string(), maxFileSize, maxFileCount));
 }
 
 void Log::add_console_sink(Colored colored)
