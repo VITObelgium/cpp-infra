@@ -1,5 +1,7 @@
 #pragma once
 
+#include "infra/filesystem.h"
+
 #include <memory>
 #include <spdlog/spdlog.h>
 
@@ -51,7 +53,8 @@ public:
     static void initialize(const std::string& name);
     static void uninitialize();
 
-    static void add_file_sink(const std::string& filePath);
+    static void add_file_sink(const fs::path& filePath);
+    static void add_rotating_file_sink(const fs::path& filePath, std::size_t maxFileSize);
     static void add_console_sink(Colored option);
     static void add_custom_sink(const spdlog::sink_ptr& sink);
 
