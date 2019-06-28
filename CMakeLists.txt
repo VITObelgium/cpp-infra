@@ -114,6 +114,8 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/typetraits.h
     include/infra/typetraits-private.h
     include/infra/inireader.h
+	include/infra/configuration.h
+	include/infra/datatypes.h
 )
 
 add_library(infra
