@@ -58,7 +58,7 @@ public:
         });
 
         for (auto& p : db.get_config_parameters(_tableName)) {
-            typename ParameterDescription::visitParameters([this, &p](auto& param) {
+            ParameterDescription::visitParameters([this, &p](auto& param) {
                 using ParameterDef  = std::decay_t<decltype(param)>;
                 using ParameterType = typename ParameterDef::value_type;
 
@@ -93,7 +93,7 @@ public:
     {
         int index = 0;
         for (auto& paramVar : _params) {
-            typename ParameterDescription::visitParameters([this, index, &paramVar, &db](auto& param) {
+            ParameterDescription::visitParameters([this, index, &paramVar, &db](auto& param) {
                 using ParameterDef  = std::decay_t<decltype(param)>;
                 using ParameterType = typename ParameterDef::value_type;
 
