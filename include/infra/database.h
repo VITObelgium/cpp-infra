@@ -76,7 +76,7 @@ auto optional_record_value(ResultField&& value)
     return std::make_optional<ValueType>(value);
 }
 
-inline auto optional_field_value(const std::optional<double>& opt)
+inline auto optional_insert_value(const std::optional<double>& opt)
 {
     if (opt.has_value()) {
         return sqlpp::value_or_null(opt.value());
