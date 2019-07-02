@@ -35,7 +35,7 @@ MultiComboBox::~MultiComboBox()
 void MultiComboBox::setDisplayText(QString text)
 {
     _displayText        = text;
-    const int textWidth = fontMetrics().width(text);
+    const int textWidth = fontMetrics().horizontalAdvance(text);
     setMinimumWidth(textWidth + 50);
     updateGeometry();
     repaint();
@@ -96,7 +96,7 @@ void MultiComboBox::showPopup()
     int requiredWidth = 0;
     for (int i = 0; i < _listWidget->count(); ++i) {
         auto* item    = _listWidget->item(i);
-        requiredWidth = std::max(requiredWidth, fontMetrics().width(item->text()));
+        requiredWidth = std::max(requiredWidth, fontMetrics().horizontalAdvance(item->text()));
     }
 
     QRect rec2;

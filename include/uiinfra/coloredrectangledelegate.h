@@ -31,6 +31,6 @@ private:
 
     int _height = 20;
     std::optional<int> _width;
-    int _role = Qt::BackgroundColorRole;
+    int _role = Qt::BackgroundRole;
 };
 }

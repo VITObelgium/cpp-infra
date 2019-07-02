@@ -98,8 +98,8 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
             const auto col         = truncate<lxw_col_t>(colOffset + j);
             auto data              = model->index(i, j).data();
             lxw_format* cellFormat = nullptr;
-            auto color             = model->index(i, j).data(Qt::TextColorRole);
-            auto bgColor           = model->index(i, j).data(Qt::BackgroundColorRole);
+            auto color             = model->index(i, j).data(Qt::ForegroundRole);
+            auto bgColor           = model->index(i, j).data(Qt::BackgroundRole);
             if (color.isValid() || bgColor.isValid()) {
                 cellFormat = workbook_add_format(wb);
                 if (color.isValid()) {
