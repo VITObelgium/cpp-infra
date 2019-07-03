@@ -396,13 +396,14 @@ if (INFRA_UI_COMPONENTS)
         date::date_interface
     )
 
-    if (STATIC_QT AND MSVC)
+    if (STATIC_QT AND WIN32)
         get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
         if ("ssl" IN_LIST QT_NETWORK_FEATURES)
             message(STATUS "Qt network SSL enabled")
-            target_link_libraries(uiinfra PRIVATE
-                Crypt32.lib
-            )
+            target_link_libraries(uiinfra PRIVATE Crypt32.lib)
+            if (Qt5Network_VERSION VERSION_GREATER_EQUAL 5.13.0)
+                target_link_libraries(uiinfra PRIVATE Bcrypt.lib Secur32.lib Iphlpapi.lib)
+            endif ()
         endif ()
     endif ()
 
