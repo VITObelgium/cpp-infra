@@ -382,6 +382,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/application.h ui/application.cpp
         include/uiinfra/qstringhash.h
         include/uiinfra/tabletools.h ui/tabletools.cpp
+        include/uiinfra/doublespinboxwithinfinites.h ui/doublespinboxwithinfinites.cpp
 
         ui/toolboxitem.h ui/toolboxitem.cpp
         ui/qt5.natvis
