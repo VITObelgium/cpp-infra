@@ -40,19 +40,16 @@ template <typename ParameterDescription>
 class Configuration
 {
 public:
-    
     Configuration(const fs::path& db, std::string_view tableName)
     : _dbPath(db)
     , _tableName(tableName)
     {
     }
 
-    
-
     void read_from_disk(inf::db::AbstractDatabase& db)
     {
         // set default values
-        typename ParameterDescription::visitParameters([this](auto& param) {
+        ParameterDescription::visitParameters([this](auto& param) {
             using ParameterDef            = std::decay_t<decltype(param)>;
             _params[enum_value(param.id)] = typename ParameterDef::value_type(param.defaultValue);
         });
@@ -127,7 +124,6 @@ public:
             ++index;
         }
     }
-
 
     fs::path databasePath() const
     {
