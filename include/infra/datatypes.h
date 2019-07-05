@@ -30,7 +30,8 @@ struct ValueMapping
     {
     }
 
-    int64_t id;
+    std::optional<int64_t> id;        // if empty, this ValueMapping isn't present in the database yet
+    int64_t idRc;
     std::string key;                  // if not empty, string based mapping
     double lowerLimit = 0.0;          // if upperlimit empty, discrete mapping
     std::optional<double> upperLimit; // if not empty, range based mapping
