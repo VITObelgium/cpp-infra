@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/datatypes.h"
+#include "infra/exception.h"
 #include "infra/log.h"
 
 #include <optional>
@@ -76,6 +77,22 @@ auto optional_record_value(ResultField&& value)
     return std::make_optional<ValueType>(value);
 }
 
+template <typename ResultField>
+char character_record_value(ResultField&& value)
+{
+    static_assert(std::is_same_v<std::string, decltype(value.value())>, "TEXT record value required");
+
+    if (value.is_null() || value.value().empty()) {
+        return '\0';
+    }
+
+    if (value.value().size() > 1) {
+        throw RuntimeError("Record value is not a character: {}", value.value());
+    }
+
+    return value.value().front();
+}
+
 inline auto optional_insert_value(const std::optional<double>& opt)
 {
     if (opt.has_value()) {
@@ -85,12 +102,12 @@ inline auto optional_insert_value(const std::optional<double>& opt)
     }
 }
 
-inline auto optional_field_value(const std::optional<int64_t>& opt)
+inline auto optional_insert_value(const std::optional<int64_t>& opt)
 {
     if (opt.has_value()) {
         return sqlpp::value_or_null(opt.value());
     } else {
-        return sqlpp::value_or_null<sqlpp::integer>(sqlpp::null);
+        return sqlpp::value_or_null<sqlpp::integral>(sqlpp::null);
     }
 }
 
