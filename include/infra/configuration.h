@@ -95,7 +95,7 @@ public:
                 using ParameterType = typename ParameterDef::value_type;
 
                 if (index == enum_value(param.id)) {
-                    inf::ConfigParameter configParam;
+                    inf::db::ConfigParameter configParam;
                     configParam.name = param.name;
 
                     if constexpr (std::is_same_v<ParameterType, int32_t>) {

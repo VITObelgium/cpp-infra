@@ -1,6 +1,5 @@
 #pragma once
 
-#include "infra/datatypes.h"
 #include "infra/exception.h"
 #include "infra/log.h"
 
@@ -54,6 +53,13 @@ private:
     sqlpp::transaction_t<DbConnectionType> _transaction;
 };
 
+struct ConfigParameter
+{
+    std::string name;
+    std::string type;
+    std::string value;
+};
+
 class AbstractDatabase
 {
 public:
@@ -61,7 +67,7 @@ public:
     {
     }
 
-    virtual std::vector<inf::ConfigParameter> get_config_parameters(std::string_view tableName) = 0;
+    virtual std::vector<ConfigParameter> get_config_parameters(std::string_view tableName) = 0;
     virtual void set_config_parameter(std::string_view tableName, const ConfigParameter& param) = 0;
 };
 
