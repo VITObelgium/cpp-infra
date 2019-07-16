@@ -61,7 +61,7 @@ void append_to_container(OutputContainer& output, const InputContainer& input) n
 template <typename Container, typename Predicate>
 const typename Container::value_type* find_in_container_optional(const Container& c, Predicate&& pred) noexcept
 {
-    return asOptional(find_in_container(c, pred));
+    return as_optional(find_in_container(c, pred));
 }
 
 /* Search for an entry in the container that matches the predicate
