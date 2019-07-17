@@ -259,7 +259,14 @@ if (INFRA_GDAL)
                            DEPENDS ${Gdal_DATA_PATH}/gcs.csv ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
                            COMMENT "Generate embedded gdal data"
         )
+    elseif (Gdal_ProjDB_DATA_PATH)
+        add_custom_command(TARGET infra POST_BUILD
+			    	       COMMENT "Copying proj4 db to the build directory"
+                           COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>/data
+				           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Gdal_ProjDB_DATA_PATH} $<TARGET_FILE_DIR:infra>/data
+                           DEPENDS ${Gdal_ProjDB_DATA_PATH})
     endif ()
+    
 
     if (INFRA_LOGGING)
         list (APPEND INFRA_PUBLIC_HEADERS include/infra/gdallog.h)

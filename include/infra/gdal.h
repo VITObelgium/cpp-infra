@@ -30,6 +30,8 @@ class Registration
 {
 public:
     Registration();
+    // In case you need coordinate transformations, pass the path to the proj.db file
+    Registration(const fs::path& p);
     ~Registration();
 };
 
@@ -43,13 +45,16 @@ public:
 
 // Free function versions of the registration handling
 // Call this ones in each application that wishes to use gdal
-void registerGdal();
-void unregisterGdal();
+void register_gdal();
+// In case you need coordinate transformations, pass the path to the proj.db file
+void register_gdal(const fs::path& p);
+void unregister_gdal();
 
 // Call this on each thread that requires access to the proj.4 data
 // Not needed on the thread that did the gdal registration
-void registerEmbeddedData();
-void unregisterEmbeddedData();
+void register_embedded_data();
+void register_embedded_data(const fs::path& p);
+void unregister_embedded_data();
 
 class Layer;
 class RasterDriver;
@@ -71,6 +76,7 @@ enum class RasterType
     Png,
     PcRaster,
     Netcdf,
+    TileDB,
     Unknown,
 };
 
@@ -180,6 +186,9 @@ public:
     static RasterDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
     static RasterDataSet create(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
 
+    static RasterDataSet open_for_writing(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
+    static RasterDataSet open_for_writing(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
+
     RasterDataSet() = default;
     explicit RasterDataSet(GDALDataset* ptr) noexcept;
 
@@ -205,11 +214,15 @@ public:
     void set_projection(const std::string& proj);
 
     std::string metadata_item(const std::string& name, const std::string& domain = "");
+    std::string band_metadata_item(int bandNr, const std::string& name, const std::string& domain = "");
     std::unordered_map<std::string, std::string> metadata(const std::string& domain = "");
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
+    void set_band_metadata(int bandNr, const std::string& name, const std::string& value, const std::string& domain = "");
     std::vector<std::string> metadata_domains() const;
 
     RasterBand rasterband(int index) const;
+
+    RasterType type() const;
 
     const std::type_info& band_datatype(int index) const;
 
@@ -224,7 +237,7 @@ public:
     template <typename T>
     void write_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, const T* pData, int bufXSize, int bufYSize) const
     {
-        auto* bandPtr = _ptr->GetRasterBand(band);
+        auto* bandPtr = checkPointer(_ptr->GetRasterBand(band), "Failed to get raster band for writing");
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
                    "Failed to write raster data");
@@ -236,6 +249,8 @@ public:
     void write_geometadata(const GeoMetadata& meta);
     GeoMetadata geometadata() const;
     GeoMetadata geometadata(int bandNr) const;
+
+    void flush_cache();
 
     void add_band(GDALDataType type, const void* data);
 
@@ -257,6 +272,8 @@ public:
     RasterDriver driver();
 
 private:
+    RasterDriver driver() const;
+
     GDALDataset* _ptr = nullptr;
 };
 
@@ -308,18 +325,20 @@ public:
     explicit RasterDriver(GDALDriver& driver);
 
     template <typename T>
-    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename)
+    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, gsl::span<const std::string> driverOptions = {})
     {
-        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
+        auto options = create_string_array(driverOptions);
+        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, const_cast<char**>(options.data())), "Failed to create data set"));
     }
 
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType);
 
     // Use for the memory driver, when there is no path
     template <typename T>
-    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands)
+    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, gsl::span<const std::string> driverOptions = {})
     {
-        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, nullptr), "Failed to create data set"));
+        auto options = create_string_array(driverOptions);
+        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, const_cast<char**>(options.data())), "Failed to create data set"));
     }
 
     // Use for the memory driver, when there is no path
