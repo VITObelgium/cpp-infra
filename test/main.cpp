@@ -29,7 +29,8 @@ int main(int argc, char** argv)
 #endif
 
 #ifdef HAVE_GDAL
-    inf::gdal::Registration reg;
+    fs::path proj4DataPath = fs::u8path(argv[0]).parent_path() / "data";
+    inf::gdal::Registration reg(proj4DataPath);
 #endif
 
     InitGoogleTest(&argc, argv);

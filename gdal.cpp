@@ -1,4 +1,5 @@
 #include "infra/gdal.h"
+#include "gdal_version.h"
 #include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
@@ -62,6 +63,7 @@ static const std::unordered_map<RasterType, const char*>
         {RasterType::Png, "PNG"},
         {RasterType::PcRaster, "PCRaster"},
         {RasterType::Netcdf, "netCDF"},
+        {RasterType::TileDB, "TileDB"},
     }};
 
 static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLookup{{
@@ -72,6 +74,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
     {"PNG", RasterType::Png},
     {"PCRaster", RasterType::PcRaster},
     {"netCDF", RasterType::Netcdf},
+    {"TileDB", RasterType::TileDB},
 }};
 
 static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
@@ -336,12 +339,17 @@ std::optional<int32_t> projection_to_epsg(const std::string& projection)
 
 Registration::Registration()
 {
-    registerGdal();
+    register_gdal();
+}
+
+Registration::Registration(const fs::path& p)
+{
+    register_gdal(p);
 }
 
 Registration::~Registration()
 {
-    unregisterGdal();
+    unregister_gdal();
 }
 
 EmbeddedDataRegistration::EmbeddedDataRegistration()
@@ -358,11 +366,11 @@ EmbeddedDataRegistration::~EmbeddedDataRegistration()
 #endif
 }
 
-void registerGdal()
+void register_gdal()
 {
 #ifdef EMBED_GDAL_DATA
     create_embedded_data();
-    registerEmbeddedData();
+    register_embedded_data();
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -377,24 +385,47 @@ void registerGdal()
     set_log_handler();
 }
 
-void unregisterGdal()
+void register_gdal(const fs::path& p)
+{
+    register_embedded_data(p);
+    register_gdal();
+}
+
+void unregister_gdal()
 {
 #ifdef EMBED_GDAL_DATA
-    unregisterEmbeddedData();
+    unregister_embedded_data();
     destroy_embedded_data();
 #endif
 
     GDALDestroy();
 }
 
-void registerEmbeddedData()
+void register_embedded_data()
 {
 #ifdef EMBED_GDAL_DATA
     register_embedded_data_file_finder();
 #endif
 }
 
-void unregisterEmbeddedData()
+void register_embedded_data(const fs::path& p)
+{
+    register_embedded_data();
+
+#if GDAL_VERSION_MAJOR > 2
+    std::string path                 = p.u8string();
+    std::array<const char*, 2> paths = {
+        path.c_str(),
+        nullptr,
+    };
+
+    OSRSetPROJSearchPaths(paths.data());
+#else
+    (void)p;
+#endif
+}
+
+void unregister_embedded_data()
 {
 #ifdef EMBED_GDAL_DATA
     unregister_embedded_data_file_finder();
@@ -615,6 +646,32 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
                                       "Failed to open raster file"));
 }
 
+RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, const std::vector<std::string>& driverOpts)
+{
+    auto* dataSet = create_data_set(filePath, GDAL_OF_UPDATE | GDAL_OF_RASTER, nullptr, driverOpts);
+    if (!dataSet) {
+        throw RuntimeError("Failed to open raster file for writing '{}'", filePath);
+    }
+
+    return RasterDataSet(dataSet);
+}
+
+RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
+{
+    if (type == RasterType::Unknown) {
+        type = guess_rastertype_from_filename(filePath);
+        if (type == RasterType::Unknown) {
+            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath);
+        }
+    }
+
+    return RasterDataSet(checkPointer(create_data_set(filePath,
+                                                      GDAL_OF_UPDATE | GDAL_OF_RASTER,
+                                                      nullptr,
+                                                      driverOpts),
+                                      "Failed to open raster file for writing"));
+}
+
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
 : _ptr(ptr)
 {
@@ -701,6 +758,10 @@ void RasterDataSet::set_nodata_value(int bandNr, std::optional<double> value) co
 {
     assert(bandNr > 0);
 
+    if (driver().type() == RasterType::TileDB) {
+        return;
+    }
+
     auto* band = _ptr->GetRasterBand(bandNr);
     if (band == nullptr) {
         throw RuntimeError("Invalid dataset band number: {}", bandNr);
@@ -709,7 +770,14 @@ void RasterDataSet::set_nodata_value(int bandNr, std::optional<double> value) co
     if (value) {
         checkError(band->SetNoDataValue(*value), "Failed to set nodata value");
     } else {
-        checkError(band->DeleteNoDataValue(), "Failed to delete nodata value");
+        if (auto err = band->DeleteNoDataValue(); err != CE_None) {
+            if (err == CE_Failure && CPLGetLastErrorNo() == CPLE_NotSupported) {
+                // not supported by the driver
+                return;
+            }
+
+            checkError(err, "Failed to delete nodata value");
+        }
     }
 }
 
@@ -746,6 +814,19 @@ std::string RasterDataSet::metadata_item(const std::string& name, const std::str
     return result;
 }
 
+std::string RasterDataSet::band_metadata_item(int bandNr, const std::string& name, const std::string& domain)
+{
+    std::string result;
+
+    assert(bandNr > 0);
+    auto* band = checkPointer(_ptr->GetRasterBand(bandNr), "Failed to get raster band");
+    if (auto* value = band->GetMetadataItem(name.c_str(), domain.c_str()); value != nullptr) {
+        result.assign(value);
+    }
+
+    return result;
+}
+
 std::unordered_map<std::string, std::string> RasterDataSet::metadata(const std::string& domain)
 {
     std::unordered_map<std::string, std::string> result;
@@ -765,6 +846,13 @@ std::unordered_map<std::string, std::string> RasterDataSet::metadata(const std::
 void RasterDataSet::set_metadata(const std::string& name, const std::string& value, const std::string& domain)
 {
     checkError(_ptr->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set metadata");
+}
+
+void RasterDataSet::set_band_metadata(int bandNr, const std::string& name, const std::string& value, const std::string& domain)
+{
+    assert(bandNr > 0);
+    auto* band = checkPointer(_ptr->GetRasterBand(bandNr), "Failed to get raster band");
+    checkError(band->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set band metadata");
 }
 
 std::vector<std::string> RasterDataSet::metadata_domains() const
@@ -788,6 +876,11 @@ RasterBand RasterDataSet::rasterband(int bandNr) const
     return RasterBand(checkPointer(_ptr->GetRasterBand(bandNr), "Invalid band index"));
 }
 
+RasterType RasterDataSet::type() const
+{
+    return driver().type();
+}
+
 const std::type_info& RasterDataSet::band_datatype(int bandNr) const
 {
     assert(_ptr);
@@ -809,12 +902,13 @@ void RasterDataSet::write_rasterdata(int band, int xOff, int yOff, int xSize, in
 
 void RasterDataSet::write_geometadata(const GeoMetadata& meta)
 {
-    if (raster_count() > 0) {
-        set_nodata_value(1, meta.nodata);
-    }
     const double cellSize = meta.cellSize;
     set_geotransform(std::array<double, 6>{{meta.xll, cellSize, 0.0, meta.yll + (cellSize * meta.rows), 0.0, -cellSize}});
     set_projection(meta.projection);
+
+    if (raster_count() > 0) {
+        set_nodata_value(1, meta.nodata);
+    }
 }
 
 GeoMetadata RasterDataSet::geometadata() const
@@ -839,6 +933,11 @@ GeoMetadata RasterDataSet::geometadata(int bandNr) const
     return meta;
 }
 
+void RasterDataSet::flush_cache()
+{
+    _ptr->FlushCache();
+}
+
 void RasterDataSet::add_band(GDALDataType type, const void* data)
 {
     // convert the data pointer to a string
@@ -858,6 +957,11 @@ GDALDataset* RasterDataSet::get() const
 }
 
 RasterDriver RasterDataSet::driver()
+{
+    return RasterDriver(*_ptr->GetDriver());
+}
+
+RasterDriver RasterDataSet::driver() const
 {
     return RasterDriver(*_ptr->GetDriver());
 }
