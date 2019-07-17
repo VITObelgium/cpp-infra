@@ -2,6 +2,7 @@
 
 #include "infra/exception.h"
 #include "infra/log.h"
+#include "infra/cast.h"
 
 #include <optional>
 #include <sqlpp11/sqlpp11.h>
@@ -81,6 +82,18 @@ auto optional_record_value(ResultField&& value)
     }
 
     return std::make_optional<ValueType>(value);
+}
+
+template <typename ResultType, typename ResultField>
+auto optional_record_value_as(ResultField&& value)
+{
+    using ValueType = decltype(value.value());
+
+    if (value.is_null()) {
+        return std::optional<ResultType>();
+    }
+
+    return optional_cast<ResultType>(std::make_optional<ValueType>(value));
 }
 
 template <typename ResultField>
