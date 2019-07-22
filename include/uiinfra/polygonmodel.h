@@ -17,6 +17,7 @@ struct PolygonData
     double lineWidth = 2.0;
     QColor color     = Qt::black;
     std::vector<QGeoPath> geometry;
+    std::vector<int64_t> ids;
 };
 
 class PolygonModel : public QAbstractListModel
