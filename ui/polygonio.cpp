@@ -23,34 +23,38 @@ static void addLineToGeoPath(QGeoPath& path, const gdal::Line& line)
     }
 }
 
-static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& poly)
+static void addPolyToGeoPath(std::vector<GeoPathWithId>& geoPaths, gdal::Polygon& poly, int64_t id)
 {
     auto ring = poly.exteriorring();
     {
-        QGeoPath path;
+        GeoPathWithId pathWithId;
+        pathWithId.id = id;
         for (auto& point : ring) {
-            addPointToGeoPath(path, point);
+            addPointToGeoPath(pathWithId.path, point);
         }
-        if (!path.isEmpty()) {
-            geoPaths.emplace_back(std::move(path));
+        if (!pathWithId.path.isEmpty()) {
+            geoPaths.emplace_back(std::move(pathWithId));
         }
     }
 
     for (int i = 0; i < poly.interiorring_count(); ++i) {
-        QGeoPath path;
+        GeoPathWithId pathWithId;
+        pathWithId.id = id;
         ring = poly.interiorring(i);
         for (auto& point : ring) {
-            addPointToGeoPath(path, point);
+            addPointToGeoPath(pathWithId.path, point);
         }
-        if (!path.isEmpty()) {
-            geoPaths.emplace_back(std::move(path));
+        if (!pathWithId.path.isEmpty()) {
+            geoPaths.emplace_back(std::move(pathWithId));
         }
     }
 }
 
-std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, gdal::CoordinateTransformer& transformer)
+std::vector<GeoPathWithId> dataSetToGeoPathWithInt64Id(inf::gdal::VectorDataSet& ds, inf::gdal::CoordinateTransformer& transformer, const std::string& fieldNameContainingId)
 {
-    std::vector<QGeoPath> geoPaths;
+    std::vector<GeoPathWithId> geoPaths;
+
+    auto idIndex = fieldNameContainingId.size() ? ds.layer(0).field_index(fieldNameContainingId) : (int64_t) 0;
 
     for (auto& feature : ds.layer(0)) {
         if (!feature.has_geometry()) {
@@ -58,33 +62,37 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, gdal::Coordinate
         }
 
         auto geometry = feature.geometry();
+        auto id = fieldNameContainingId.size() ? feature.field_as<int64_t>(idIndex) :  (int64_t) 0;
+
         geometry.transform(transformer);
         switch (geometry.type()) {
         case gdal::Geometry::Type::Line: {
-            QGeoPath path;
-            addLineToGeoPath(path, geometry.as<gdal::Line>());
-            geoPaths.push_back(path);
+            GeoPathWithId pathWithId;
+            addLineToGeoPath(pathWithId.path, geometry.as<gdal::Line>());
+            pathWithId.id = id;
+            geoPaths.push_back(pathWithId);
             break;
         }
         case gdal::Geometry::Type::MultiLine: {
             auto multiLine = geometry.as<gdal::MultiLine>();
             for (int i = 0; i < multiLine.size(); ++i) {
-                QGeoPath path;
-                addLineToGeoPath(path, multiLine.line_at(i));
-                geoPaths.push_back(path);
+                GeoPathWithId pathWithId;
+                addLineToGeoPath(pathWithId.path, multiLine.line_at(i));
+                pathWithId.id = id;
+                geoPaths.push_back(pathWithId);
             }
             break;
         }
         case gdal::Geometry::Type::Polygon: {
             auto poly = geometry.as<gdal::Polygon>();
-            addPolyToGeoPath(geoPaths, poly);
+            addPolyToGeoPath(geoPaths, poly, id);
             break;
         }
         case gdal::Geometry::Type::MultiPolygon: {
             auto multiPoly = geometry.as<gdal::MultiPolygon>();
             for (int i = 0; i < multiPoly.size(); ++i) {
                 auto poly = multiPoly.polygon_at(i);
-                addPolyToGeoPath(geoPaths, poly);
+                addPolyToGeoPath(geoPaths, poly, id);
             }
             break;
         }
@@ -93,6 +101,15 @@ std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, gdal::Coordinate
         }
     }
 
+    return geoPaths;
+}
+
+std::vector<QGeoPath> dataSetToGeoPath(gdal::VectorDataSet& ds, gdal::CoordinateTransformer& transformer)
+{
+    auto geoPathsWithId = dataSetToGeoPathWithInt64Id(ds, transformer, "");
+    std::vector<QGeoPath> geoPaths;
+    for(const auto& geoPathWithId : geoPathsWithId)
+        geoPaths.push_back(geoPathWithId.path);
     return geoPaths;
 }
 
@@ -129,11 +146,11 @@ std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg, inf::Re
     return {};
 }
 
-OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg)
+OverlayMapWithId loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg, const std::string& fieldNameContainingId)
 {
     Log::debug("Load overlays");
 
-    OverlayMap data;
+    OverlayMapWithId data;
 
     gdal::CoordinateTransformer transformer(epsg, 4326);
     for (auto& [shpName, shpPath] : shapes) {
@@ -143,7 +160,7 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
         }
 
         try {
-            data.emplace(QString::fromStdString(shpName), dataSetToGeoPath(ds, transformer));
+            data.emplace(QString::fromStdString(shpName), dataSetToGeoPathWithInt64Id(ds, transformer, fieldNameContainingId));
         } catch (const std::exception& e) {
             Log::warn("Failed to add overlay {} ({})", shpPath.u8string(), e.what());
         }
@@ -152,5 +169,19 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
     Log::debug("Overlays loaded");
 
     return data;
+}
+
+OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shapes, int32_t epsg)
+{
+    auto overlayMapWithId = loadShapes(shapes, epsg, "");
+    OverlayMap overlayMap;
+    for(const auto& item : overlayMapWithId) {
+        std::vector<QGeoPath> geoPaths;
+        for(const auto& geoPath : item.second) {
+            geoPaths.push_back(geoPath.path);
+        }
+        overlayMap.emplace(item.first, geoPaths);
+    }
+    return overlayMap;
 }
 }
