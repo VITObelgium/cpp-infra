@@ -2,7 +2,6 @@
 
 namespace inf {
 
-
 QWidget* DoubleSpinBoxWithInfinites::ItemEditorCreator::createWidget(QWidget* parent) const
 {
     return new DoubleSpinBoxWithInfinites(parent);
@@ -31,44 +30,40 @@ void DoubleSpinBoxWithInfinites::fixup(QString& input) const
     }
 }
 
-
 QValidator::State DoubleSpinBoxWithInfinites::validate(QString& text, int& pos) const
 {
     if (QStringList({"i", "in", "-i", "-in"}).contains(text)) {
         return QValidator::Intermediate;
-    } else if(QStringList({"inf", "-inf"}).contains(text)) {
+    } else if (QStringList({"inf", "-inf"}).contains(text)) {
         return QValidator::Acceptable;
     } else {
         return QDoubleSpinBox::validate(text, pos);
     }
 }
 
-QString	DoubleSpinBoxWithInfinites::textFromValue(double value) const
+QString DoubleSpinBoxWithInfinites::textFromValue(double value) const
 {
-    if(value == std::numeric_limits<double>::infinity()) {
+    if (value == std::numeric_limits<double>::infinity()) {
         return "inf";
-    } else if(value == -std::numeric_limits<double>::infinity()) {
+    } else if (value == -std::numeric_limits<double>::infinity()) {
         return "-inf";
     } else {
         return QDoubleSpinBox::textFromValue(value);
     }
 }
 
-double DoubleSpinBoxWithInfinites::valueFromText(const QString &text) const
+double DoubleSpinBoxWithInfinites::valueFromText(const QString& text) const
 {
-    if(text == "inf") {
+    if (text == "inf") {
         return std::numeric_limits<double>::infinity();
-    } else if(text == "-inf") {
+    } else if (text == "-inf") {
         return -std::numeric_limits<double>::infinity();
     } else {
         QString textDotComma = text;
-        textDotComma = textDotComma.replace(QLatin1Char('.'), QLocale().decimalPoint());
-        textDotComma = textDotComma.replace(QLatin1Char(','), QLocale().decimalPoint());
+        textDotComma         = textDotComma.replace(QLatin1Char('.'), QLocale().decimalPoint());
+        textDotComma         = textDotComma.replace(QLatin1Char(','), QLocale().decimalPoint());
         return QDoubleSpinBox::valueFromText(textDotComma);
     }
 }
 
 }
-
-
-

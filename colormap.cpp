@@ -1,4 +1,7 @@
+
+#ifndef _USE_MATH_DEFINES
 #define _USE_MATH_DEFINES
+#endif
 
 #include "infra/colormap.h"
 #include "infra/exception.h"
