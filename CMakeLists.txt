@@ -116,7 +116,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/typetraits.h
     include/infra/typetraits-private.h
     include/infra/inireader.h
-	include/infra/configuration.h
+    include/infra/configuration.h
 )
 
 add_library(infra
@@ -228,6 +228,7 @@ if (INFRA_GDAL)
         include/infra/gdal.h
         include/infra/gdalalgo.h
         include/infra/gdalgeometry.h
+        include/infra/gdalio.h
         include/infra/geometadata.h
         include/infra/gdal-private.h
     )
@@ -236,6 +237,7 @@ if (INFRA_GDAL)
         gdal.cpp
         gdalalgo.cpp
         gdalgeometry.cpp
+        gdalio.cpp
         geometadata.cpp
     )
 
