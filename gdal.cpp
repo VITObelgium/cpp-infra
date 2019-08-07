@@ -1,5 +1,4 @@
 #include "infra/gdal.h"
-#include "gdal_version.h"
 #include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
@@ -14,6 +13,7 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <gdal_version.h>
 #include <ogrsf_frmts.h>
 #include <stdexcept>
 #include <unordered_map>

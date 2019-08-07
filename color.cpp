@@ -1,6 +1,6 @@
 #include "infra/color.h"
 
-#include "fmt/format.h"
+#include <fmt/format.h>
 
 namespace inf {
 
