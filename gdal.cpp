@@ -855,17 +855,19 @@ void RasterDataSet::set_band_metadata(int bandNr, const std::string& name, const
     checkError(band->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set band metadata");
 }
 
-std::vector<std::string> RasterDataSet::metadata_domains() const
+std::vector<std::string> RasterDataSet::metadata_domains() const noexcept
 {
     std::vector<std::string> result;
 
-    char** data = checkPointer(_ptr->GetMetadataDomainList(), "Failed to obtain metadata domains");
-    int index   = 0;
-    while (data[index] != nullptr) {
-        result.push_back(data[index++]);
-    }
+    char** data = _ptr->GetMetadataDomainList();
+    if (data) {
+        int index = 0;
+        while (data[index] != nullptr) {
+            result.push_back(data[index++]);
+        }
 
-    CSLDestroy(data);
+        CSLDestroy(data);
+    }
 
     return result;
 }
