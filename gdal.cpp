@@ -4,6 +4,7 @@
 #include "infra/filesystem.h"
 #include "infra/gdallog.h"
 #include "infra/log.h"
+#include "infra/scopeguard.h"
 #include "infra/string.h"
 
 #ifdef EMBED_GDAL_DATA
@@ -610,6 +611,19 @@ static GDALDataset* create_data_set(const fs::path& filePath,
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
     // which is not recognized by gdal
     std::string path = filePath.generic_u8string();
+#ifdef _WIN32
+    std::unique_ptr<ScopeGuard> utf8Guard;
+
+    // On windows gdal netcdf driver does not expect utf8 path names
+    if (str::ends_with(path, ".nc") || str::starts_with(path, "NETCDF:")) {
+        CPLSetThreadLocalConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
+        path = filePath.generic_string();
+
+        utf8Guard = std::make_unique<ScopeGuard>([]() {
+            CPLSetThreadLocalConfigOption("GDAL_FILENAME_IS_UTF8", "YES");
+        });
+    }
+#endif
 
     auto options = create_string_array(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
@@ -639,9 +653,14 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
         }
     }
 
+    std::array<const char*, 2> allowedDrivers{{
+        s_rasterDriverLookup.at(type),
+        nullptr,
+    }};
+
     return RasterDataSet(checkPointer(create_data_set(filePath,
                                                       GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                                      nullptr,
+                                                      allowedDrivers.data(),
                                                       driverOpts),
                                       "Failed to open raster file"));
 }
@@ -665,9 +684,14 @@ RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, RasterTy
         }
     }
 
+    std::array<const char*, 2> allowedDrivers{{
+        s_rasterDriverLookup.at(type),
+        nullptr,
+    }};
+
     return RasterDataSet(checkPointer(create_data_set(filePath,
                                                       GDAL_OF_UPDATE | GDAL_OF_RASTER,
-                                                      nullptr,
+                                                      allowedDrivers.data(),
                                                       driverOpts),
                                       "Failed to open raster file for writing"));
 }
