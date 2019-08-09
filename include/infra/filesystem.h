@@ -72,7 +72,7 @@ public:
     Handle() = default;
     Handle(const fs::path& p, const char* mode)
     {
-        ptr = std::fopen(p.string().c_str(), mode);
+        ptr = std::fopen(p.u8string().c_str(), mode);
     }
 
     ~Handle()
@@ -126,7 +126,7 @@ struct formatter<fs::path>
     template <typename FormatContext>
     auto format(const fs::path& p, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), "{}", p.string());
+        return format_to(ctx.begin(), "{}", p.u8string());
     }
 };
 }

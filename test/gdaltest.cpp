@@ -1,4 +1,4 @@
-#include "infra/gdal.h"
+﻿#include "infra/gdal.h"
 
 #include <fstream>
 #include <gtest/gtest.h>
@@ -102,4 +102,18 @@ TEST(GdalTest, createExcelFile)
     feat2.set_field("Column2", 2);
     layer.create_feature(feat2);
 }
+
+TEST(GdalTest, utf8Path)
+{
+    if (!gdal::RasterDriver::is_supported(gdal::RasterType::Netcdf)) {
+        return;
+    }
+
+    EXPECT_NO_THROW(gdal::RasterDataSet::create(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
+
+    auto ds          = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
+    auto subDatasets = ds.metadata("SUBDATASETS");
+    EXPECT_EQ(4u, subDatasets.size());
+}
+
 }
