@@ -1,8 +1,7 @@
 #pragma once
 
-#include "infra/exception.h"
-#include "infra/log.h"
 #include "infra/cast.h"
+#include "infra/exception.h"
 
 #include <optional>
 #include <sqlpp11/sqlpp11.h>
@@ -68,7 +67,7 @@ public:
     {
     }
 
-    virtual std::vector<ConfigParameter> get_config_parameters(std::string_view tableName) = 0;
+    virtual std::vector<ConfigParameter> get_config_parameters(std::string_view tableName)      = 0;
     virtual void set_config_parameter(std::string_view tableName, const ConfigParameter& param) = 0;
 };
 
@@ -130,6 +129,15 @@ inline auto optional_insert_value(const std::optional<int64_t>& opt)
     }
 }
 
+inline auto optional_insert_value(const std::optional<bool>& opt)
+{
+    if (opt.has_value()) {
+        return sqlpp::value_or_null(opt.value() ? 1 : 0);
+    } else {
+        return sqlpp::value_or_null<sqlpp::integer>(sqlpp::null);
+    }
+}
+
 struct SerializerContext
 {
     std::ostringstream _os;
@@ -150,10 +158,10 @@ struct SerializerContext
 };
 
 template <typename Query>
-void log_query(const Query& query)
+std::string query_to_string(const Query& query)
 {
     SerializerContext context;
-    Log::info(serialize(query, context).str());
+    return serialize(query, context).str();
 }
 
 #ifdef INFRA_DB_SQLITE_SUPPORT
