@@ -95,6 +95,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/generator.h
+    include/infra/interpolate.h
     include/infra/legend.h
     include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
