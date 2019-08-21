@@ -126,6 +126,7 @@ struct Cmap
     static const std::vector<Color> YlGnBu;
     static const std::vector<Color> YlOrBr;
     static const std::vector<Color> YlOrRd;
+    static const std::vector<Color> Turbo;
 
     // Qualitative maps
     static const std::vector<Color> Accent;
