@@ -1,7 +1,7 @@
 #pragma once
 
 #include <date/date.h>
-#include <fmt/time.h>
+#include <fmt/chrono.h>
 
 namespace inf::chrono {
 

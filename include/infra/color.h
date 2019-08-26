@@ -53,7 +53,7 @@ struct formatter<inf::Color>
     template <typename FormatContext>
     auto format(const inf::Color& color, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), "({}, {}, {}, {})", int(color.r), int(color.g), int(color.b), int(color.a));
+        return format_to(ctx.out(), "({}, {}, {}, {})", int(color.r), int(color.g), int(color.b), int(color.a));
     }
 };
 }
