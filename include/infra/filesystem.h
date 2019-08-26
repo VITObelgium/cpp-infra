@@ -126,7 +126,7 @@ struct formatter<fs::path>
     template <typename FormatContext>
     auto format(const fs::path& p, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), "{}", p.u8string());
+        return format_to(ctx.out(), "{}", p.u8string());
     }
 };
 }

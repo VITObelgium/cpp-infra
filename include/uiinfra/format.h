@@ -16,7 +16,7 @@ struct formatter<QString>
     template <typename FormatContext>
     auto format(const QString& qstr, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), qstr.toStdString());
+        return format_to(ctx.out(), qstr.toStdString());
     }
 };
 }

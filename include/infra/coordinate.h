@@ -69,7 +69,7 @@ struct formatter<inf::Coordinate>
     template <typename FormatContext>
     auto format(const inf::Coordinate& p, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), "(lat:{:.6f}, lng:{:.6f})", p.latitude, p.longitude);
+        return format_to(ctx.out(), "(lat:{:.6f}, lng:{:.6f})", p.latitude, p.longitude);
     }
 };
 }

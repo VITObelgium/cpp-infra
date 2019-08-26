@@ -69,9 +69,9 @@ struct formatter<inf::Point<T>>
     auto format(const inf::Point<T>& p, FormatContext& ctx)
     {
         if constexpr (std::is_floating_point_v<T>) {
-            return format_to(ctx.begin(), "({:.1f}, {:.1f})", p.x, p.y);
+            return format_to(ctx.out(), "({:.1f}, {:.1f})", p.x, p.y);
         } else {
-            return format_to(ctx.begin(), "({}, {})", p.x, p.y);
+            return format_to(ctx.out(), "({}, {})", p.x, p.y);
         }
     }
 };
