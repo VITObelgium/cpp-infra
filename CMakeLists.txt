@@ -220,7 +220,12 @@ if (INFRA_DATABASE)
 	if (INFRA_DATABASE_SQLITE)
 		target_link_libraries(infra PUBLIC Sqlpp11::Sqlite3)
 		target_compile_definitions(infra PUBLIC INFRA_DB_SQLITE_SUPPORT)
-	endif ()
+    endif ()
+    
+    if (INFRA_LOGGING)
+        list (APPEND INFRA_PUBLIC_HEADERS include/infra/databaselog.h)
+        target_sources(infra PRIVATE databaselog.cpp)
+    endif ()
 endif ()
 
 if (INFRA_GDAL)
