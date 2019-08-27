@@ -14,13 +14,12 @@ inline date::year_month_day to_year_month_day(time_point tp)
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
 }
 
-/*! Converts a time point to string in the standard date and time string (locale dependant) */
+/*! Converts a time point to string in the standard date and time string (locale dependent) */
 template <typename Clock, typename Duration>
 std::string to_string(std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
-    std::tm* tm      = std::localtime(&time);
-    return fmt::format("{:%c}", *tm);
+    return fmt::format("{:%c}", fmt::localtime(time));
 }
 
 /*! Converts a time point to string using the provided format specification
@@ -33,16 +32,14 @@ template <typename Clock, typename Duration>
 std::string to_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
-    std::tm* tm      = std::localtime(&time);
-    return fmt::format(fmt::format("{{:{}}}", format), *tm);
+    return fmt::format(fmt::format("{{:{}}}", format), fmt::localtime(time));
 }
 
 template <typename Clock, typename Duration>
 std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
-    std::tm* tm      = std::gmtime(&time);
-    return fmt::format(fmt::format("{{:{}}}", format), *tm);
+    return fmt::format(fmt::format("{{:{}}}", format), fmt::gmtime(time));
 }
 
 class DurationRecorder
