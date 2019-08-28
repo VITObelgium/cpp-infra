@@ -398,7 +398,7 @@ if (INFRA_UI_COMPONENTS)
     )
 
     set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
-    add_library(Infra::ui ALIAS uiinfra)
+    add_library(Infra::uiinfra ALIAS uiinfra)
 
     target_link_libraries(uiinfra PUBLIC
         Qt5::Network
