@@ -311,40 +311,6 @@ set_target_properties(infra PROPERTIES
 
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
 
-if (INFRA_INSTALL_DEVELOPMENT_FILES)
-    install(TARGETS infra EXPORT infra-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
-    )
-
-    install(EXPORT infra-targets
-        FILE InfraTargets.cmake
-        NAMESPACE Infra::
-        DESTINATION ${INSTALL_CONFIGDIR}
-    )
-endif ()
-
-if (INFRA_IS_TOPLEVEL)
-    write_basic_package_version_file("InfraConfigVersion.cmake"
-        VERSION ${Infra_VERSION}
-        COMPATIBILITY SameMajorVersion
-    )
-
-    configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/InfraConfig.cmake.in
-        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
-        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
-    )
-
-    if (INFRA_INSTALL_DEVELOPMENT_FILES)
-        install(FILES
-            ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
-            ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
-            DESTINATION ${INSTALL_CONFIGDIR}
-        )
-    endif ()
-endif ()
-
 if (INFRA_UI_COMPONENTS)
     find_package(Qt5Gui REQUIRED)
     find_package(Qt5Widgets REQUIRED)
@@ -366,44 +332,73 @@ if (INFRA_UI_COMPONENTS)
 
     qt5_wrap_ui(FORMS_HEADERS ${INFRA_UI_FILES})
 
-    add_library(uiinfra
-        include/uiinfra/aboutdialog.h ui/aboutdialog.cpp
+    set(UIINFRA_PUBLIC_HEADERS
+        include/uiinfra/aboutdialog.h
         include/uiinfra/clearableabstractitemmodel.h
         include/uiinfra/colorconversion.h
-        include/uiinfra/coloredrectangledelegate.h ui/coloredrectangledelegate.cpp
-        include/uiinfra/colorcombobox.h ui/colorcombobox.cpp
-        include/uiinfra/colormapcombobox.h ui/colormapcombobox.cpp
+        include/uiinfra/coloredrectangledelegate.h
+        include/uiinfra/colorcombobox.h
+        include/uiinfra/colormapcombobox.h
         include/uiinfra/containerconversion.h
-        include/uiinfra/cursorposprovider.h ui/cursorposprovider.cpp
+        include/uiinfra/cursorposprovider.h
         include/uiinfra/dateconversion.h
         include/uiinfra/format.h
-        include/uiinfra/multicombobox.h ui/multicombobox.cpp
-        include/uiinfra/checkablecombobox.h ui/checkablecombobox.cpp
-        include/uiinfra/checkableitemproxymodel.h ui/checkableitemproxymodel.cpp
-        include/uiinfra/comboboxdelegate.h ui/comboboxdelegate.cpp
-        include/uiinfra/delegatecombobox.h ui/delegatecombobox.cpp
+        include/uiinfra/multicombobox.h
+        include/uiinfra/checkablecombobox.h
+        include/uiinfra/checkableitemproxymodel.h
+        include/uiinfra/comboboxdelegate.h
+        include/uiinfra/delegatecombobox.h
         include/uiinfra/readonlyproxy.h
-        include/uiinfra/mdisubwindow.h ui/mdisubwindow.cpp
-        include/uiinfra/gradientdelegate.h ui/gradientdelegate.cpp
+        include/uiinfra/mdisubwindow.h
+        include/uiinfra/gradientdelegate.h
         include/uiinfra/scopedcursor.h
-        include/uiinfra/toolboxview.h ui/toolboxview.cpp
-        include/uiinfra/treemodel.h ui/treemodel.cpp
-        include/uiinfra/userinteraction.h ui/userinteraction.cpp
-        include/uiinfra/stringinputdialog.h ui/stringinputdialog.cpp
+        include/uiinfra/toolboxview.h
+        include/uiinfra/treemodel.h
+        include/uiinfra/userinteraction.h
+        include/uiinfra/stringinputdialog.h
         include/uiinfra/stringconversion.h
-        include/uiinfra/uniquevaluesproxymodel.h ui/uniquevaluesproxymodel.cpp
-        include/uiinfra/fixeditemproxymodel.h ui/fixeditemproxymodel.cpp
-        include/uiinfra/numericitemdelegates.h ui/numericitemdelegates.cpp
-        include/uiinfra/sectionvisibilityselection.h ui/sectionvisibilityselection.cpp
-        include/uiinfra/application.h ui/application.cpp
+        include/uiinfra/uniquevaluesproxymodel.h
+        include/uiinfra/fixeditemproxymodel.h
+        include/uiinfra/numericitemdelegates.h
+        include/uiinfra/sectionvisibilityselection.h
+        include/uiinfra/application.h
         include/uiinfra/qstringhash.h
-        include/uiinfra/tabletools.h ui/tabletools.cpp
-        include/uiinfra/doublespinboxwithinfinites.h ui/doublespinboxwithinfinites.cpp
+        include/uiinfra/tabletools.h
+        include/uiinfra/doublespinboxwithinfinites.h
+    )
 
-        ui/toolboxitem.h ui/toolboxitem.cpp
+    add_library(uiinfra
+        ${UIINFRA_PUBLIC_HEADERS}
+        ui/aboutdialog.cpp
+        ui/coloredrectangledelegate.cpp
+        ui/colorcombobox.cpp
+        ui/colormapcombobox.cpp
+        ui/cursorposprovider.cpp
+        ui/multicombobox.cpp
+        ui/checkablecombobox.cpp
+        ui/checkableitemproxymodel.cpp
+        ui/comboboxdelegate.cpp
+        ui/delegatecombobox.cpp
+        ui/mdisubwindow.cpp
+        ui/gradientdelegate.cpp
+        ui/toolboxview.cpp
+        ui/treemodel.cpp
+        ui/userinteraction.cpp
+        ui/stringinputdialog.cpp
+        ui/uniquevaluesproxymodel.cpp
+        ui/fixeditemproxymodel.cpp
+        ui/numericitemdelegates.cpp
+        ui/sectionvisibilityselection.cpp
+        ui/application.cpp
+        ui/tabletools.cpp
+        ui/doublespinboxwithinfinites.cpp
+        ui/toolboxitem.cpp
         ui/qt5.natvis
         ${FORMS_HEADERS}
     )
+
+    set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
+    add_library(Infra::ui ALIAS uiinfra)
 
     target_link_libraries(uiinfra PUBLIC
         Qt5::Network
@@ -483,7 +478,7 @@ if (INFRA_UI_COMPONENTS)
 
     target_include_directories(uiinfra
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>/include
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -492,6 +487,47 @@ if (INFRA_UI_COMPONENTS)
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
     endif ()
+
+    if (INFRA_INSTALL_DEVELOPMENT_FILES)
+    install(TARGETS uiinfra EXPORT infra-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
+    )
+endif ()
+
+if (INFRA_IS_TOPLEVEL)
+    write_basic_package_version_file("InfraConfigVersion.cmake"
+        VERSION ${Infra_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+
+    configure_package_config_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/InfraConfig.cmake.in
+        ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+        INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
+    )
+
+    if (INFRA_INSTALL_DEVELOPMENT_FILES)
+        install(FILES
+            ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
+            ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
+            DESTINATION ${INSTALL_CONFIGDIR}
+        )
+    endif ()
+endif ()
+
+if (INFRA_INSTALL_DEVELOPMENT_FILES)
+    install(TARGETS infra EXPORT infra-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
+    )
+
+    install(EXPORT infra-targets
+        FILE InfraTargets.cmake
+        NAMESPACE Infra::
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
 endif ()
 
 if (INFRA_ENABLE_TESTS)

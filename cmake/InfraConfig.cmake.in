@@ -27,6 +27,14 @@ if (@INFRA_NUMERIC@)
     find_dependency(Eigen3 CONFIG REQUIRED)
 endif ()
 
+if (@INFRA_UI_COMPONENTS@)
+    find_dependency(Qt5Gui REQUIRED)
+    find_dependency(Qt5Widgets REQUIRED)
+    find_dependency(Qt5Core REQUIRED)
+    find_dependency(Qt5Network REQUIRED)
+    find_dependency(date CONFIG REQUIRED)
+endif ()
+
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
 if(NOT TARGET Infra::Infra)
