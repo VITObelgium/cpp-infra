@@ -141,6 +141,7 @@ add_library(Infra::infra ALIAS infra)
 target_include_directories(infra
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
@@ -368,7 +369,6 @@ if (INFRA_UI_COMPONENTS)
     )
 
     add_library(uiinfra
-        ${UIINFRA_PUBLIC_HEADERS}
         ui/aboutdialog.cpp
         ui/coloredrectangledelegate.cpp
         ui/colorcombobox.cpp
@@ -451,34 +451,39 @@ if (INFRA_UI_COMPONENTS)
         )
 
         if (INFRA_GDAL)
-            target_sources(uiinfra PRIVATE
-                include/uiinfra/polygonio.h ui/polygonio.cpp
-            )
+            list (APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/polygonio.h)
+            target_sources(uiinfra PRIVATE ui/polygonio.cpp)
         endif ()
     endif ()
 
     if (INFRA_UI_COMPONENTS_XLSX_EXPORT)
         find_package(XlsxWriter REQUIRED)
-        target_sources(uiinfra PRIVATE
-            include/uiinfra/modelexport.h ui/modelexport.cpp
-        )
+        list (APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/modelexport.h)
+        target_sources(uiinfra PRIVATE ui/modelexport.cpp)
         target_link_libraries(uiinfra PRIVATE XslxWriter::XslxWriter)
     endif ()
 
     if (INFRA_LOGGING)
+        list (APPEND UIINFRA_PUBLIC_HEADERS
+            include/uiinfra/logview.h
+            include/uiinfra/logsinkmodel.h 
+        )
+
         target_sources(uiinfra PRIVATE
-            include/uiinfra/logview.h ui/logview.cpp
-            include/uiinfra/logsinkmodel.h ui/logsinkmodel.cpp
+            ui/logview.cpp
+            ui/logsinkmodel.cpp
         )
 
         target_compile_definitions(infra PUBLIC HAVE_INFRA_LOG)
     endif ()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
+    target_sources(uiinfra PRIVATE ${UIINFRA_PUBLIC_HEADERS})
 
     target_include_directories(uiinfra
     PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
