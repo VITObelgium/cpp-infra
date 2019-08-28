@@ -397,7 +397,6 @@ if (INFRA_UI_COMPONENTS)
         ${FORMS_HEADERS}
     )
 
-    set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
     add_library(Infra::uiinfra ALIAS uiinfra)
 
     target_link_libraries(uiinfra PUBLIC
@@ -479,6 +478,7 @@ if (INFRA_UI_COMPONENTS)
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
     target_sources(uiinfra PRIVATE ${UIINFRA_PUBLIC_HEADERS})
+    set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
 
     target_include_directories(uiinfra
     PUBLIC
