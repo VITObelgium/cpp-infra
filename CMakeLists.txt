@@ -136,7 +136,7 @@ add_library(infra
     inireader.cpp
 )
 
-add_library(Infra::Infra ALIAS infra)
+add_library(Infra::infra ALIAS infra)
 
 target_include_directories(infra
     PUBLIC
