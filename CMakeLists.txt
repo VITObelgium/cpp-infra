@@ -487,13 +487,6 @@ if (INFRA_UI_COMPONENTS)
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
     endif ()
-
-    if (INFRA_INSTALL_DEVELOPMENT_FILES)
-    install(TARGETS uiinfra EXPORT infra-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
-    )
 endif ()
 
 if (INFRA_IS_TOPLEVEL)
@@ -522,6 +515,14 @@ if (INFRA_INSTALL_DEVELOPMENT_FILES)
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
     )
+
+    if (INFRA_UI_COMPONENTS)
+        install(TARGETS uiinfra EXPORT infra-targets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
+        )   
+    endif ()
 
     install(EXPORT infra-targets
         FILE InfraTargets.cmake
