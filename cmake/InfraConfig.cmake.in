@@ -10,7 +10,6 @@ if (@HAVE_BOOST_FILESYSTEM@)
 endif ()
 
 if (@INFRA_GDAL@)
-    find_dependency(Gdal::Gdal REQUIRED)
     find_dependency(Gdal REQUIRED)
     find_dependency(Gsl REQUIRED)
     find_dependency(date CONFIG REQUIRED)
