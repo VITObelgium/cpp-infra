@@ -416,6 +416,11 @@ FieldDefinition::FieldDefinition(OGRFieldDefn* def)
 {
 }
 
+FieldDefinition::FieldDefinition(FieldDefinitionRef def)
+: FieldDefinitionRef(new OGRFieldDefn(def.get()))
+{
+}
+
 FieldDefinition::~FieldDefinition()
 {
     delete get();
@@ -575,6 +580,11 @@ FieldDefinitionRef Feature::field_definition(int index) const
     return FieldDefinitionRef(checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
 }
 
+FeatureDefinitionRef Feature::feature_definition() const
+{
+    return FeatureDefinitionRef(checkPointer(_feature->GetDefnRef(), "Failed to obtain feature definition"));
+}
+
 Field Feature::field(int index) const noexcept
 {
     auto& type = field_definition(index).type();
@@ -692,6 +702,14 @@ template std::string Feature::field_as<std::string>(std::string_view index) cons
 template std::string_view Feature::field_as<std::string_view>(std::string_view index) const;
 template time_point Feature::field_as<time_point>(std::string_view index) const;
 template date_point Feature::field_as<date_point>(std::string_view index) const;
+
+void Feature::set_field(int index, const Field& field)
+{
+    std::visit([this, index](const auto& val) {
+        set_field<std::decay_t<decltype(val)>>(index, val);
+    },
+               field);
+}
 
 bool Feature::operator==(const Feature& other) const
 {

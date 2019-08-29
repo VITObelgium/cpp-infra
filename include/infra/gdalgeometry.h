@@ -294,6 +294,8 @@ public:
     FieldDefinition(const char* name, const std::type_info& typeInfo);
     FieldDefinition(const std::string& name, const std::type_info& typeInfo);
     FieldDefinition(OGRFieldDefn* def);
+    //! Create a new field definition by cloning the reference
+    explicit FieldDefinition(FieldDefinitionRef def);
     ~FieldDefinition();
 
     FieldDefinition(const FieldDefinition&) = delete;
@@ -358,6 +360,7 @@ public:
     int field_index(const char* name) const;
     int field_index(const std::string& name) const;
     FieldDefinitionRef field_definition(int index) const;
+    FeatureDefinitionRef feature_definition() const;
 
     Field field(int index) const noexcept;
 
@@ -387,6 +390,26 @@ public:
     {
         _feature->SetField(index, value);
     }
+
+    template <>
+    void set_field<time_point>(int /*index*/, const time_point& /*value*/)
+    {
+        throw RuntimeError("Not implemented");
+    }
+
+    template <>
+    void set_field<date_point>(int /*index*/, const date_point& /*value*/)
+    {
+        throw RuntimeError("Not implemented");
+    }
+
+    template <>
+    void set_field<std::string_view>(int index, const std::string_view& value)
+    {
+        _feature->SetField(index, std::string(value).c_str());
+    }
+
+    void set_field(int index, const Field& field);
 
     bool operator==(const Feature& other) const;
 
