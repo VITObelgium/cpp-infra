@@ -44,7 +44,9 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item 
 cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
 
-if (NOT MSVC)
+if (MSVC)
+	set (CMAKE_REQUIRED_FLAGS /std:c++17)
+else ()
     set (CMAKE_REQUIRED_FLAGS -std=c++17)
 endif ()
 
