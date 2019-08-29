@@ -405,19 +405,19 @@ private:
 };
 
 template <>
-void Feature::set_field<time_point>(int /*index*/, const time_point& /*value*/)
+inline void Feature::set_field<time_point>(int /*index*/, const time_point& /*value*/)
 {
     throw RuntimeError("Not implemented");
 }
 
 template <>
-void Feature::set_field<date_point>(int /*index*/, const date_point& /*value*/)
+inline void Feature::set_field<date_point>(int /*index*/, const date_point& /*value*/)
 {
     throw RuntimeError("Not implemented");
 }
 
 template <>
-void Feature::set_field<std::string_view>(int index, const std::string_view& value)
+inline void Feature::set_field<std::string_view>(int index, const std::string_view& value)
 {
     _feature->SetField(index, std::string(value).c_str());
 }
