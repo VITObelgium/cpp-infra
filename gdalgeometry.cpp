@@ -608,6 +608,7 @@ Field Feature::field(int index) const noexcept
 
 std::optional<Field> Feature::opt_field(int index) const noexcept
 {
+    assert(index < field_count());
     if (!field_is_valid(index)) {
         return {};
     }
