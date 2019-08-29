@@ -396,24 +396,6 @@ public:
         _feature->SetField(index, value);
     }
 
-    template <>
-    void set_field<time_point>(int /*index*/, const time_point& /*value*/)
-    {
-        throw RuntimeError("Not implemented");
-    }
-
-    template <>
-    void set_field<date_point>(int /*index*/, const date_point& /*value*/)
-    {
-        throw RuntimeError("Not implemented");
-    }
-
-    template <>
-    void set_field<std::string_view>(int index, const std::string_view& value)
-    {
-        _feature->SetField(index, std::string(value).c_str());
-    }
-
     void set_field(int index, const Field& field);
 
     bool operator==(const Feature& other) const;
@@ -421,6 +403,24 @@ public:
 private:
     OGRFeature* _feature;
 };
+
+template <>
+void Feature::set_field<time_point>(int /*index*/, const time_point& /*value*/)
+{
+    throw RuntimeError("Not implemented");
+}
+
+template <>
+void Feature::set_field<date_point>(int /*index*/, const date_point& /*value*/)
+{
+    throw RuntimeError("Not implemented");
+}
+
+template <>
+void Feature::set_field<std::string_view>(int index, const std::string_view& value)
+{
+    _feature->SetField(index, std::string(value).c_str());
+}
 
 template <>
 inline void Feature::set_field<std::string>(int index, const std::string& value)
