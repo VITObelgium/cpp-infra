@@ -376,6 +376,8 @@ public:
     template <typename T>
     T field_as(std::string_view name) const;
 
+    void set_field_to_null(int index);
+
     template <typename T>
     void set_field(const std::string& name, const T& value)
     {
