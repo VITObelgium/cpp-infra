@@ -575,6 +575,11 @@ int Feature::field_index(const std::string& name) const
     return field_index(name.c_str());
 }
 
+bool Feature::field_is_valid(int index) const noexcept
+{
+    return _feature->IsFieldSetAndNotNull(index);
+}
+
 FieldDefinitionRef Feature::field_definition(int index) const
 {
     return FieldDefinitionRef(checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
@@ -599,6 +604,15 @@ Field Feature::field(int index) const noexcept
     }
 
     return Field();
+}
+
+std::optional<Field> Feature::opt_field(int index) const noexcept
+{
+    if (!field_is_valid(index)) {
+        return {};
+    }
+
+    return field(index);
 }
 
 template <typename T>
@@ -708,7 +722,7 @@ void Feature::set_field(int index, const Field& field)
     std::visit([this, index](const auto& val) {
         set_field<std::decay_t<decltype(val)>>(index, val);
     },
-               field);
+        field);
 }
 
 bool Feature::operator==(const Feature& other) const
