@@ -717,12 +717,17 @@ template std::string_view Feature::field_as<std::string_view>(std::string_view i
 template time_point Feature::field_as<time_point>(std::string_view index) const;
 template date_point Feature::field_as<date_point>(std::string_view index) const;
 
+void Feature::set_field_to_null(int index)
+{
+    _feature->SetFieldNull(index);
+}
+
 void Feature::set_field(int index, const Field& field)
 {
     std::visit([this, index](const auto& val) {
         set_field<std::decay_t<decltype(val)>>(index, val);
     },
-        field);
+               field);
 }
 
 bool Feature::operator==(const Feature& other) const
