@@ -359,10 +359,13 @@ public:
     int field_count() const;
     int field_index(const char* name) const;
     int field_index(const std::string& name) const;
+    bool field_is_valid(int index) const noexcept;
+
     FieldDefinitionRef field_definition(int index) const;
     FeatureDefinitionRef feature_definition() const;
 
     Field field(int index) const noexcept;
+    std::optional<Field> opt_field(int index) const noexcept;
 
     template <typename T>
     T field_as(int index) const;
