@@ -417,6 +417,12 @@ inline void Feature::set_field<date_point>(int /*index*/, const date_point& /*va
 }
 
 template <>
+inline void Feature::set_field<int64_t>(int index, const int64_t& value)
+{
+    _feature->SetField(index, GIntBig(value));
+}
+
+template <>
 inline void Feature::set_field<std::string_view>(int index, const std::string_view& value)
 {
     _feature->SetField(index, std::string(value).c_str());
