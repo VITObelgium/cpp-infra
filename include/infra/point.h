@@ -55,6 +55,19 @@ constexpr Point<TTo> point_cast(const Point<TFrom>& from)
 
 }
 
+namespace std {
+template <typename T>
+struct hash<inf::Point<T>>
+{
+    size_t operator()(const inf::Point<T>& point) const
+    {
+        size_t h1 = hash<T>()(point.x);
+        size_t h2 = hash<T>()(point.y);
+        return hash<long long>()((h1 << 32) ^ h2);
+    }
+};
+}
+
 namespace fmt {
 template <typename T>
 struct formatter<inf::Point<T>>
