@@ -887,6 +887,43 @@ const void* Layer::handle() const
     return OGRLayer::ToHandle(_layer);
 }
 
+void Layer::intersection(Layer& method, Layer& output)
+{
+    checkError(_layer->Intersection(method.get(), output.get(), nullptr, nullptr, nullptr), "Failed to get layer intersection");
+}
+
+void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& options)
+{
+    std::vector<std::string> optionsArray;
+
+    GDALProgressFunc progressFunc = nullptr;
+    void* progressArg             = nullptr;
+    if (options.progress.is_valid()) {
+        progressArg  = &options.progress;
+        progressFunc = [](double complete, const char* /*message*/, void* progressArg) -> int {
+            auto* cb = reinterpret_cast<ProgressInfo*>(progressArg);
+            cb->tick(truncate<float>(complete));
+            return cb->cancel_requested() ? FALSE : TRUE;
+        };
+    }
+
+    constexpr size_t optionCount = 7;
+    optionsArray.reserve(optionCount + options.additionalOptions.size());
+    optionsArray.push_back(fmt::format("SKIP_FAILURES={}", options.skipFailures ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("PROMOTE_TO_MULTI={}", options.promoteToMulti ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("INPUT_PREFIX={}", options.inputPrefix));
+    optionsArray.push_back(fmt::format("METHOD_PREFIX={}", options.methodPrefix));
+    optionsArray.push_back(fmt::format("USE_PREPARED_GEOMETRIES={}", options.usePreparedGeometries ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("PRETEST_CONTAINMENT={}", options.preTestContainment ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("KEEP_LOWER_DIMENSION_GEOMETRIES={}", options.keepLowerDimensionGeometries ? "YES" : "NO"));
+    for (auto& opt : options.additionalOptions) {
+        optionsArray.push_back(opt);
+    }
+
+    auto opts = create_string_array(optionsArray);
+    checkError(_layer->Intersection(method.get(), output.get(), const_cast<char**>(opts.data()), progressFunc, progressArg), "Failed to get layer intersection");
+}
+
 LayerIterator::LayerIterator()
 : _layer(nullptr)
 , _currentFeature(nullptr)
