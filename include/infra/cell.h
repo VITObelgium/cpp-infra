@@ -130,7 +130,7 @@ struct formatter<inf::Cell>
     template <typename FormatContext>
     auto format(const inf::Cell& cell, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), "[{}, {}]", cell.r, cell.c);
+        return format_to(ctx.out(), "[{}, {}]", cell.r, cell.c);
     }
 };
 }
