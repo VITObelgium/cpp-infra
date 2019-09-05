@@ -48,7 +48,7 @@ struct formatter<inf::Size>
     template <typename FormatContext>
     auto format(const inf::Size& s, FormatContext& ctx)
     {
-        return format_to(ctx.begin(), "({}x{})", s.width, s.height);
+        return format_to(ctx.out(), "({}x{})", s.width, s.height);
     }
 };
 }
