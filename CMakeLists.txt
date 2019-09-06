@@ -10,7 +10,7 @@ endif ()
 if (INFRA_IS_TOPLEVEL)
     cmake_minimum_required(VERSION 3.10)
     project(Infra
-        VERSION 0.9.5
+        VERSION 0.9.6
         LANGUAGES CXX
     )
     set(CMAKE_CXX_STANDARD 17)
