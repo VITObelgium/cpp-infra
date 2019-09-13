@@ -198,6 +198,16 @@ T to_numeric_value(std::string_view str)
 bool iequals(std::string_view str1, std::string_view str2);
 
 /*!
+ * \brief case insensitive string comparision
+ * \param str1 to compare
+ * \param str2 to compare
+ * \return 0 if the strings are considered equal
+           < 0 str1 is less than str2
+           > 0 str1 is greater than str2
+ */
+int icompare(std::string_view str1, std::string_view str2);
+
+/*!
  * \brief replace all occurences of the toSearch string with toReplace modifying aString
  * \param str in which the replacement will occur
  * \param toSearch the search string

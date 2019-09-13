@@ -200,6 +200,11 @@ bool iequals(std::string_view str1, std::string_view str2)
     return true;
 }
 
+int icompare(std::string_view str1, std::string_view str2)
+{
+    return lowercase(str1).compare(str2);
+}
+
 void replace_in_place(std::string& aString, std::string_view toSearch, std::string_view toReplace)
 {
     size_t startPos = 0;
