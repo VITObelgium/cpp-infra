@@ -40,4 +40,25 @@ sqlpp::sqlite3::connection_config create_sqlite_connection_config(const fs::path
     return config;
 }
 #endif
+
+#ifdef INFRA_DB_POSTGRES_SUPPORT
+std::shared_ptr<sqlpp::postgresql::connection_config> create_postgres_connection_config(const PostgresOptions& options, ConnectionDebug debug)
+{
+    auto config             = std::make_shared<sqlpp::postgresql::connection_config>();
+    config->host            = options.host;
+    config->user            = options.user;
+    config->password        = options.pass;
+    config->dbname          = options.databaseName;
+    config->port            = options.port;
+    config->connect_timeout = options.connectionTimeout;
+    config->debug           = debug == ConnectionDebug::Yes;
+
+#ifdef DEBUG_QUERIES
+    config->debug = true;
+#endif
+
+    return config;
+}
+
+#endif
 }

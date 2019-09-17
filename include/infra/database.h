@@ -11,6 +11,10 @@
 #include <sqlpp11/sqlite3/connection.h>
 #endif
 
+#ifdef INFRA_DB_POSTGRES_SUPPORT
+#include <sqlpp11/postgresql/postgresql.h>
+#endif
+
 namespace inf::db {
 
 enum class ConnectionDebug
@@ -166,6 +170,21 @@ std::string query_to_string(const Query& query)
 
 #ifdef INFRA_DB_SQLITE_SUPPORT
 sqlpp::sqlite3::connection_config create_sqlite_connection_config(const fs::path& filename, inf::db::AccessMode access, ConnectionDebug debug);
+#endif
+
+#ifdef INFRA_DB_POSTGRES_SUPPORT
+struct PostgresOptions
+{
+    std::string databaseName;
+    std::string user;
+    std::string pass;
+    std::string host;
+    std::string applicationName;
+    uint32_t port              = 5432;
+    uint32_t connectionTimeout = 0;
+};
+
+std::shared_ptr<sqlpp::postgresql::connection_config> create_postgres_connection_config(const PostgresOptions& options, ConnectionDebug debug);
 #endif
 
 }
