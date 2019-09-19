@@ -27,7 +27,8 @@ enum class AccessMode
 {
     ReadOnly,
     ReadWrite,
-    Create
+    Create,
+	Recreate
 };
 
 template <typename DbConnectionType>
