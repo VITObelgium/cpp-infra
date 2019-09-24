@@ -2,6 +2,7 @@
 
 #include <qapplication.h>
 #include <qstyle.h>
+#include <spdlog/details/pattern_formatter.h>
 
 namespace inf::ui {
 
@@ -21,7 +22,7 @@ void LogSinkModel<Mutex>::set_formatter_(std::unique_ptr<spdlog::formatter> /*si
 template <typename Mutex>
 void LogSinkModel<Mutex>::sink_it_(const spdlog::details::log_msg& msg)
 {
-    fmt::memory_buffer formatted;
+    spdlog::memory_buf_t formatted;
     this->formatter_->format(msg, formatted);
 
     std::lock_guard<Mutex> lock(_mutex);
