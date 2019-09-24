@@ -93,3 +93,8 @@ template class LogSinkModel<std::recursive_mutex>;
 template class LogSinkModel<spdlog::details::null_mutex>;
 
 }
+
+#ifdef SPDLOG_COMPILED_LIB
+#include <spdlog/sinks/base_sink-inl.h>
+template class spdlog::sinks::base_sink<std::recursive_mutex>;
+#endif
