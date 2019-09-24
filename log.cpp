@@ -98,6 +98,8 @@ void Log::set_level(Level level)
     auto spdLevel = spdlog::level::off;
 
     switch (level) {
+    case Level::Off:
+        break;
     case Level::Debug:
         spdLevel = spdlog::level::debug;
         break;

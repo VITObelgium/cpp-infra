@@ -36,6 +36,7 @@ class Log
 public:
     enum class Level
     {
+        Off,
         Debug,
         Info,
         Warning,
