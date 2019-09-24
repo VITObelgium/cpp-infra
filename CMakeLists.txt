@@ -199,7 +199,7 @@ if (INFRA_LOGGING)
     find_package(spdlog CONFIG REQUIRED)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
     target_sources(infra PRIVATE log.cpp)
-    target_link_libraries(infra PUBLIC spdlog::spdlog_header_only)
+    target_link_libraries(infra PUBLIC spdlog::spdlog)
     target_compile_definitions(infra PRIVATE INFRA_LOG_ENABLED)
 endif ()
 
