@@ -199,9 +199,8 @@ if (INFRA_LOGGING)
     find_package(spdlog CONFIG REQUIRED)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
     target_sources(infra PRIVATE log.cpp)
-    target_link_libraries(infra PUBLIC spdlog::spdlog)
-    # make sure spdlog does not use its internal version of fmt
-    target_compile_definitions(infra PUBLIC SPDLOG_FMT_EXTERNAL PRIVATE INFRA_LOG_ENABLED)
+    target_link_libraries(infra PUBLIC spdlog::spdlog_header_only)
+    target_compile_definitions(infra PRIVATE INFRA_LOG_ENABLED)
 endif ()
 
 if (INFRA_XML)
