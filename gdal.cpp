@@ -168,6 +168,13 @@ std::string SpatialReference::export_to_pretty_wkt() const
     return std::string(friendlyWkt);
 }
 
+std::string SpatialReference::export_to_wkt() const
+{
+    CplPointer<char> wkt;
+    checkError(_srs->exportToWkt(wkt.ptrAddress()), "Failed to export projection to WKT");
+    return std::string(wkt);
+}
+
 std::string SpatialReference::export_to_pretty_wkt_simplified() const
 {
     CplPointer<char> friendlyWkt;
@@ -856,11 +863,13 @@ std::unordered_map<std::string, std::string> RasterDataSet::metadata(const std::
     std::unordered_map<std::string, std::string> result;
 
     char** data = _ptr->GetMetadata(domain.c_str());
-    int index   = 0;
-    while (data[index] != nullptr) {
-        auto keyValue = str::split_view(data[index++], '=');
-        if (keyValue.size() == 2) {
-            result.emplace(keyValue[0], keyValue[1]);
+    if (data != nullptr) {
+        int index = 0;
+        while (data[index] != nullptr) {
+            auto keyValue = str::split_view(data[index++], '=');
+            if (keyValue.size() == 2) {
+                result.emplace(keyValue[0], keyValue[1]);
+            }
         }
     }
 

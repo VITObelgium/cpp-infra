@@ -111,6 +111,7 @@ public:
     void import_from_epsg(int32_t epsg);
     void import_from_wkt(const char* wkt);
 
+    std::string export_to_wkt() const;
     std::string export_to_pretty_wkt() const;
     std::string export_to_pretty_wkt_simplified() const;
 

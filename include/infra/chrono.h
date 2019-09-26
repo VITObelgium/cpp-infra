@@ -14,6 +14,11 @@ inline date::year_month_day to_year_month_day(time_point tp)
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
 }
 
+inline time_point to_system_time_point(date::year_month_day ymd)
+{
+    return static_cast<date::sys_days>(ymd);
+}
+
 /*! Converts a time point to string in the standard date and time string (locale dependent) */
 template <typename Clock, typename Duration>
 std::string to_string(std::chrono::time_point<Clock, Duration> tp)
