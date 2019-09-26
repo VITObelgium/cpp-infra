@@ -1,14 +1,14 @@
 #pragma once
 
-#include "infra/exception.h"
-#include "infra/point.h"
-#include "infra/geometadata.h"
 #include "infra/cast.h"
 #include "infra/colormap.h"
 #include "infra/enumutils.h"
+#include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/gdal.h"
 #include "infra/gdalalgo.h"
+#include "infra/geometadata.h"
+#include "infra/point.h"
 
 #include <fmt/format.h>
 #include <gsl/span>
@@ -257,7 +257,7 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
 {
     using namespace detail;
 
-    auto meta   = dataSet.geometadata();
+    auto meta   = dataSet.geometadata(bandNr);
     auto cutOut = intersect_metadata(meta, extent);
 
     bool cutOutSmallerThenExtent = (extent.rows * extent.cols) != (cutOut.rows * cutOut.cols);
@@ -293,7 +293,7 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
 template <typename T>
 GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, int bandNr, gsl::span<T> dstData)
 {
-    return data_from_dataset(dataSet, dataSet.geometadata(), bandNr, dstData);
+    return data_from_dataset(dataSet, dataSet.geometadata(bandNr), bandNr, dstData);
 }
 
 template <typename T>
