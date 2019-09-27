@@ -346,7 +346,7 @@ std::string join(const Container& items, std::string_view joinString)
         std::ostringstream ss;
         for (auto iter = items.cbegin(); iter != items.cend(); ++iter) {
             ss << *iter;
-            if (next(iter) != items.cend()) {
+            if (std::next(iter) != items.cend()) {
                 ss << joinString;
             }
         }
