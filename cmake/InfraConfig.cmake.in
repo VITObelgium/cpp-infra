@@ -23,6 +23,10 @@ if (@INFRA_XML@)
     find_dependency(pugixml REQUIRED)
 endif ()
 
+if (@INFRA_CHARSET@)
+    find_dependency(ICU COMPONENTS i18n data uc REQUIRED)
+endif ()
+
 if (@INFRA_NUMERIC@)
     find_dependency(Eigen3 CONFIG REQUIRED)
 endif ()
