@@ -16,14 +16,17 @@ if (INFRA_IS_TOPLEVEL)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_EXTENSIONS OFF)
 
-    # avoid windows specific warnings
-    add_definitions(
-        -D_CRT_SECURE_NO_WARNINGS
-        -D_SCL_SECURE_NO_WARNINGS
-        -D_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING
-        -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-        -D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
-    )
+    if (MSVC)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        # avoid windows specific warnings
+        add_definitions(
+            -D_CRT_SECURE_NO_WARNINGS
+            -D_SCL_SECURE_NO_WARNINGS
+            -D_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING
+            -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+            -D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
+        )
+    endif ()
 endif ()
 
 option(INFRA_LOGGING "Enable logging functionality" OFF)
