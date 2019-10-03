@@ -254,6 +254,7 @@ if (INFRA_GDAL)
         include/infra/gdalalgo.h
         include/infra/gdalgeometry.h
         include/infra/gdalio.h
+        include/infra/gdalcolortable.h
         include/infra/geometadata.h
         include/infra/gdal-private.h
     )
