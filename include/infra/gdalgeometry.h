@@ -357,6 +357,8 @@ public:
         get()->SetGeometryDirectly(geom.release());
     }
 
+    int64_t id() const;
+
     int field_count() const;
     int field_index(const char* name) const;
     int field_index(const std::string& name) const;
@@ -483,9 +485,11 @@ public:
     int field_index(const std::string& name) const;
     void set_spatial_filter(Point<double> point);
     void set_spatial_filter(Geometry& geometry);
+    void clear_spatial_filter();
 
     void set_attribute_filter(const char* name);
     void set_attribute_filter(const std::string& name);
+    void clear_attribute_filter();
 
     void create_field(FieldDefinition& field);
     void create_feature(Feature& feature);

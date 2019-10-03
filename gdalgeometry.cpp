@@ -560,6 +560,11 @@ void Feature::set_geometry(const Geometry& geom)
     checkError(_feature->SetGeometry(geom.get()), "Failed to set geometry");
 }
 
+int64_t Feature::id() const
+{
+    return _feature->GetFID();
+}
+
 int Feature::field_count() const
 {
     return _feature->GetFieldCount();
@@ -823,6 +828,11 @@ void Layer::set_spatial_filter(Geometry& geometry)
     _layer->SetSpatialFilter(geometry.get());
 }
 
+void Layer::clear_spatial_filter()
+{
+    _layer->SetSpatialFilter(nullptr);
+}
+
 void Layer::set_attribute_filter(const char* name)
 {
     checkError(_layer->SetAttributeFilter(name), "Failed to set attribute filter");
@@ -831,6 +841,11 @@ void Layer::set_attribute_filter(const char* name)
 void Layer::set_attribute_filter(const std::string& name)
 {
     set_attribute_filter(name.c_str());
+}
+
+void Layer::clear_attribute_filter()
+{
+    set_attribute_filter(nullptr);
 }
 
 void Layer::create_field(FieldDefinition& field)
