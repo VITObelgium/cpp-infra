@@ -77,6 +77,7 @@ enum class RasterType
     PcRaster,
     Netcdf,
     TileDB,
+    MBTiles,
     Unknown,
 };
 
