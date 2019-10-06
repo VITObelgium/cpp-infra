@@ -2,6 +2,8 @@
 
 #include "infra/cast.h"
 #include "infra/exception.h"
+#include "infra/filesystem.h"
+#include "infra/string.h"
 
 #include <optional>
 #include <sqlpp11/sqlpp11.h>
@@ -142,6 +144,16 @@ struct SerializerContext
 
     static std::string escape(std::string arg);
 };
+
+template <typename Connection>
+void execute_sql_file(Connection& conn, const fs::path& sqlPath)
+{
+    std::string fileContents = file::read_as_text(sqlPath);
+    auto lines               = str::split_view(fileContents, ';', str::SplitOpt::NoEmpty | str::SplitOpt::Trim);
+    for (auto& line : lines) {
+        conn.execute(std::string(line));
+    }
+}
 
 template <typename Query>
 std::string query_to_string(const Query& query)
