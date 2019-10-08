@@ -183,8 +183,6 @@ elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT CMAKE_HOST_WIN32)
             find_library(CPP_FS_LIB c++fs)
             if (CPP_FS_LIB)
                 target_link_libraries(infra PRIVATE ${CPP_FS_LIB})
-            else ()
-                message(FATAL_ERROR "c++fs library not found for clang")
             endif ()
         elseif (UNIX)
             # on linux libstdc++ is typically used
