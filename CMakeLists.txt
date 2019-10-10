@@ -104,7 +104,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/cpuinfo.h
     include/infra/enumutils.h
     include/infra/enumflags.h
-    include/infra/epsg.h
+    include/infra/crs.h
     include/infra/generator.h
     include/infra/interpolate.h
     include/infra/legend.h
