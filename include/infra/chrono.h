@@ -14,6 +14,7 @@ inline date::year_month_day to_year_month_day(time_point tp)
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
 }
 
+/*! Converts a year_month_day to a system timepoint (locale dependent) */
 inline time_point to_system_time_point(date::year_month_day ymd)
 {
     return static_cast<date::sys_days>(ymd);
@@ -39,6 +40,14 @@ std::string to_string(std::string_view format, std::chrono::time_point<Clock, Du
     std::time_t time = Clock::to_time_t(tp);
     return fmt::format(fmt::format("{{:{}}}", format), fmt::localtime(time));
 }
+
+/*! Converts a string to a time point using the provided format specification
+ * e.g.: "%Y-%m-%d"
+ * see https://en.cppreference.com/w/cpp/chrono/c/strftime for full format specification
+ * Uses the current locale and timezone so different inputs can produce the same value in case
+ * of daylight savings adjustments
+ */
+time_point system_time_point_from_string(std::string_view str, const char* format);
 
 template <typename Clock, typename Duration>
 std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)

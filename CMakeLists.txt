@@ -132,6 +132,7 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    chrono.cpp
     cpuinfo.cpp
     legend.cpp
     legenddataanalyser.cpp
@@ -204,6 +205,7 @@ if (INFRA_LOGGING)
     target_sources(infra PRIVATE log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
     target_compile_definitions(infra PRIVATE INFRA_LOG_ENABLED)
+    set_target_properties(spdlog::spdlog PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif ()
 
 if (INFRA_XML)
