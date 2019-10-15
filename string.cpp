@@ -216,6 +216,17 @@ void replace_in_place(std::string& aString, std::string_view toSearch, std::stri
     }
 }
 
+void replace_in_place(std::string& aString, char toSearch, char toReplace)
+{
+    const size_t lenght = aString.size();
+
+    for (int i = 0; i < lenght; ++i) {
+        if (aString[i] == toSearch) {
+            aString[i] = toReplace;
+        }
+    }
+}
+
 std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace)
 {
     std::string result(aString);
