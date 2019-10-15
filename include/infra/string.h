@@ -214,6 +214,7 @@ int icompare(std::string_view str1, std::string_view str2);
  * \param toReplace the replacement string
  */
 void replace_in_place(std::string& str, std::string_view toSearch, std::string_view toReplace);
+void replace_in_place(std::string& aString, char toSearch, char toReplace);
 
 /*!
  * \brief replace all occurences of the toSearch string with toReplace

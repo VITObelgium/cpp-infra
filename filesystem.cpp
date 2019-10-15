@@ -1,5 +1,6 @@
 #include "infra/filesystem.h"
 #include "infra/exception.h"
+#include "infra/string.h"
 
 #include <fstream>
 #include <istream>
@@ -95,6 +96,21 @@ fs::path combine_path(const fs::path& base, const fs::path& file)
 std::string read_as_text(const fs::path& filename)
 {
     return read_as_text(filename.string());
+}
+
+fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar)
+{
+    std::string pathStr = filename.u8string();
+    str::replace_in_place(pathStr, ':', replacementChar);
+    str::replace_in_place(pathStr, '?', replacementChar);
+    str::replace_in_place(pathStr, '*', replacementChar);
+    str::replace_in_place(pathStr, '"', replacementChar);
+    str::replace_in_place(pathStr, '<', replacementChar);
+    str::replace_in_place(pathStr, '>', replacementChar);
+    str::replace_in_place(pathStr, '/', replacementChar);
+    str::replace_in_place(pathStr, '|', replacementChar);
+    str::replace_in_place(pathStr, ':', replacementChar);
+    return fs::u8path(pathStr);
 }
 
 #endif

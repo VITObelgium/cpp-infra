@@ -59,6 +59,9 @@ fs::path combine_path(const fs::path& baseDir, const fs::path& file);
 
 std::string read_as_text(const fs::path& filename);
 
+/*! Check the provided path for illegal characters on the running platform */
+fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar);
+
 #endif
 
 std::string read_as_text(const char* filename);
