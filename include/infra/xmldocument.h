@@ -1,5 +1,7 @@
 #pragma once
 
+#include "infra/filesystem.h"
+
 #include <memory>
 #include <optional>
 #include <string>
@@ -154,7 +156,7 @@ private:
 class XmlDocument : public XmlNode
 {
 public:
-    static XmlDocument load_from_file(const std::string& filename);
+    static XmlDocument load_from_file(const fs::path& filename);
     static XmlDocument load_from_string(const char* data);
 
     XmlDocument();
