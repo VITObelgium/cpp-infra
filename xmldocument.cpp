@@ -232,9 +232,9 @@ XmlDocument::XmlDocument(const char* data, bool isPath)
     _pimpl->node = _pimplDoc->doc;
 }
 
-XmlDocument XmlDocument::load_from_file(const std::string& filename)
+XmlDocument XmlDocument::load_from_file(const fs::path& filename)
 {
-    return XmlDocument(filename.c_str(), true);
+    return XmlDocument(filename.u8string().c_str(), true);
 }
 
 XmlDocument XmlDocument::load_from_string(const char* data)
