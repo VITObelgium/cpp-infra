@@ -75,7 +75,8 @@ public:
     CsvReader& operator=(const CsvReader&) = delete;
     CsvReader& operator=(CsvReader&&) = default;
 
-    int32_t column_count();
+    int32_t column_count() const;
+    std::string_view column_name(int32_t index) const;
 
     CsvRowIterator begin() const;
     CsvRowIterator end() const;

@@ -8,9 +8,14 @@ CsvReader::CsvReader(const fs::path& filename)
 {
 }
 
-int32_t CsvReader::column_count()
+int32_t CsvReader::column_count() const
 {
     return _layer.layer_definition().field_count();
+}
+
+std::string_view CsvReader::column_name(int32_t index) const
+{
+    return _layer.layer_definition().field_definition(index).name();
 }
 
 CsvRowIterator CsvReader::begin() const
