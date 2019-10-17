@@ -79,4 +79,28 @@ TEST(CsvReaderTest, readCsvWesternEncoding)
 {
     verifyCsvData(TEST_DATA_DIR "/point_sources_western.csv");
 }
+
+TEST(CsvReaderTest, readCsvEmptyFields)
+{
+    auto filePath = fs::temp_directory_path() / "test.csv";
+
+    std::string csv = "int,double,string\n5,20.0,value\n,,";
+    file::write_as_text(filePath, csv);
+
+    {
+        CsvReader reader(filePath);
+
+        auto iter = reader.begin();
+        EXPECT_EQ(5, (*iter).get_int32(0).value());
+        EXPECT_DOUBLE_EQ(20.0, (*iter).get_double(1).value());
+        EXPECT_EQ("value", (*iter).get_string(2));
+
+        ++iter;
+        EXPECT_FALSE((*iter).get_int32(0).has_value());
+        EXPECT_FALSE((*iter).get_double(1).has_value());
+        EXPECT_TRUE((*iter).get_string(2).empty());
+    }
+
+    fs::remove(filePath);
+}
 }

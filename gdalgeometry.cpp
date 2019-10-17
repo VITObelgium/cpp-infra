@@ -670,7 +670,15 @@ std::optional<T> Feature::opt_field_as(int index) const
         return {};
     }
 
-    return field_as<T>(index);
+    T field = field_as<T>(index);
+    if constexpr (std::is_scalar_v<T>) {
+        if (field == 0 and field_as<std::string_view>(index).empty()) {
+            // it was en empty string that converts to 0 and we want it to be an empty optional
+            return {};
+        }
+    }
+
+    return field;
 }
 
 template <typename T>
