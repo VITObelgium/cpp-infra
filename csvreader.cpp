@@ -50,17 +50,21 @@ std::string CsvRow::get_string(int32_t index) const noexcept
 
 std::optional<int32_t> CsvRow::get_int32(int32_t index) const noexcept
 {
-    return _feature->field_as<int32_t>(index);
+    return _feature->opt_field_as<int32_t>(index);
 }
 
 std::optional<int64_t> CsvRow::get_int64(int32_t index) const noexcept
 {
-    return _feature->field_as<int64_t>(index);
+    return _feature->opt_field_as<int64_t>(index);
 }
 
 std::optional<double> CsvRow::get_double(int32_t index) const noexcept
 {
-    return CPLAtofM(_feature->field_as<std::string>(index).c_str());
+    auto val = _feature->field_as<std::string>(index);
+    if (val.empty()) {
+        return {};
+    }
+    return CPLAtofM(val.c_str());
 }
 
 bool CsvRow::operator==(const CsvRow& other) const
