@@ -38,6 +38,7 @@ endif ()
 if (INFRA_GDAL AND INFRA_CHARSET)
     target_sources(infratest PRIVATE
         csvreadertest.cpp
+        csvwritertest.cpp
     )
 endif ()
 
