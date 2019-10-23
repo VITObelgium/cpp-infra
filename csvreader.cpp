@@ -75,17 +75,24 @@ bool CsvRow::operator==(const CsvRow& other) const
 CsvRowIterator::CsvRowIterator(gdal::Layer layer, inf::CharacterSet charSet)
 : _iterator(std::move(layer))
 , _charset(charSet)
+, _currentRow(*_iterator, _charset)
 {
 }
 
-CsvRow CsvRowIterator::operator*()
+const CsvRow& CsvRowIterator::operator*()
 {
-    return CsvRow(*_iterator, _charset);
+    return _currentRow;
+}
+
+const CsvRow* CsvRowIterator::operator->()
+{
+    return &_currentRow;
 }
 
 CsvRowIterator& CsvRowIterator::operator++()
 {
     ++_iterator;
+    _currentRow = CsvRow(*_iterator, _charset);
     return *this;
 }
 

@@ -59,11 +59,13 @@ public:
     CsvRowIterator& operator=(CsvRowIterator&& other);
     bool operator==(const CsvRowIterator& other) const;
     bool operator!=(const CsvRowIterator& other) const;
-    CsvRow operator*();
+    const CsvRow& operator*();
+    const CsvRow* operator->();
 
 private:
     gdal::LayerIterator _iterator;
     inf::CharacterSet _charset = CharacterSet::Unknown;
+    CsvRow _currentRow;
 };
 
 class CsvReader
