@@ -105,6 +105,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/crs.h
+    include/infra/csvwriter.h
     include/infra/generator.h
     include/infra/interpolate.h
     include/infra/legend.h
@@ -134,6 +135,7 @@ set(INFRA_PUBLIC_HEADERS
 add_library(infra
     chrono.cpp
     cpuinfo.cpp
+    csvwriter.cpp
     legend.cpp
     legenddataanalyser.cpp
     process.cpp
