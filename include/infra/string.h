@@ -310,6 +310,7 @@ void trim_in_place(std::string& str);
  * str::join(std::vector<std::string>({"one", "two", "three"}), ", ") == "one, two, three"
  * \endcode
  */
+
 template <typename Container>
 std::string join(const Container& items, std::string_view joinString)
 {
@@ -358,6 +359,12 @@ std::string join(const Container& items, std::string_view joinString)
     }
 
     return result;
+}
+
+template <typename Container>
+std::string join(const Container& items, char joinCharacter)
+{
+    return join(items, std::string_view(&joinCharacter, 1));
 }
 
 /*!
