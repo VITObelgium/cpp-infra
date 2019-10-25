@@ -290,10 +290,46 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
     return dstMeta;
 }
 
+/* This version will read the full dataset and is used in cases where there is no geotransform info available
+ */
+template <typename T>
+GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, gsl::span<T> dstData)
+{
+    using namespace detail;
+
+    GeoMetadata meta;
+    meta.nodata = dataSet.nodata_value(bandNr);
+    meta.cols   = dataSet.x_size();
+    meta.rows   = dataSet.y_size();
+
+    if (dstData.size() != meta.rows * meta.cols) {
+        throw InvalidArgument("Invalid data buffer provided: incorrect size");
+    }
+
+    CutOut cutOut;
+    cutOut.rows = meta.rows;
+    cutOut.cols = meta.cols;
+
+    bool isByte = std::is_same_v<T, uint8_t>;
+    if (isByte && meta.nodata.has_value() && !inf::fits_in_type<T>(meta.nodata.value())) {
+        std::vector<float> tempData(meta.rows * meta.cols, static_cast<float>(meta.nodata.value_or(0)));
+        read_raster_data(bandNr, cutOut, dataSet, tempData.data(), meta.cols);
+        meta = cast_raster<float, T>(meta, tempData, dstData);
+    } else {
+        read_raster_data(bandNr, cutOut, dataSet, dstData.data(), meta.cols);
+    }
+
+    return meta;
+}
+
 template <typename T>
 GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, int bandNr, gsl::span<T> dstData)
 {
-    return data_from_dataset(dataSet, dataSet.geometadata(bandNr), bandNr, dstData);
+    if (!dataSet.has_valid_geotransform()) {
+        return data_from_dataset(dataSet, bandNr, dstData);
+    } else {
+        return data_from_dataset(dataSet, dataSet.geometadata(bandNr), bandNr, dstData);
+    }
 }
 
 template <typename T>

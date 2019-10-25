@@ -102,6 +102,7 @@ public:
     SpatialReference();
     SpatialReference(int32_t epsg);
     SpatialReference(const char* wkt);
+    SpatialReference(const std::string& wkt);
     ~SpatialReference() noexcept;
 
     SpatialReference(SpatialReference&&) = default;
@@ -204,6 +205,7 @@ public:
 
     int32_t x_size() const;
     int32_t y_size() const;
+    bool has_valid_geotransform() const;
     std::array<double, 6> geotransform() const;
     void set_geotransform(const std::array<double, 6>& trans);
 
