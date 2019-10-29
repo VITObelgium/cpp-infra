@@ -33,6 +33,16 @@ public:
         _ticks = ticks;
     }
 
+    int64_t total_ticks() const noexcept
+    {
+        return _ticks;
+    }
+
+    int64_t current_tick() const noexcept
+    {
+        return _currentTick;
+    }
+
     /*! Use in combination with set_total_ticks, progress will be calculated internally */
     void tick() noexcept
     {
