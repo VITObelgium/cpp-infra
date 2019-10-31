@@ -40,6 +40,7 @@ option(INFRA_DATABASE "Build the database utility classes" OFF)
 option(INFRA_DATABASE_SQLITE "Build the database sqlite utility classes" OFF)
 option(INFRA_DATABASE_POSTGRES "Build the database postgresql utility classes" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" OFF)
+option(INFRA_ENABLE_TEST_UTILS "Build the unit test utilities" ${INFRA_ENABLE_TESTS})
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
@@ -49,7 +50,7 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
 
 if (MSVC)
-	set (CMAKE_REQUIRED_FLAGS /std:c++17)
+    set (CMAKE_REQUIRED_FLAGS /std:c++17)
 else ()
     set (CMAKE_REQUIRED_FLAGS -std=c++17)
 endif ()
@@ -227,18 +228,18 @@ if (INFRA_CHARSET)
 endif ()
 
 if (INFRA_DATABASE)
-	find_package(Sqlpp11 REQUIRED)
+    find_package(Sqlpp11 REQUIRED)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/database.h)
     target_sources(infra PRIVATE database.cpp)
     target_link_libraries(infra PUBLIC Sqlpp11::Sqlpp11)
-	if (INFRA_DATABASE_SQLITE)
-		target_link_libraries(infra PUBLIC Sqlpp11::Sqlite3)
-		target_compile_definitions(infra PUBLIC INFRA_DB_SQLITE_SUPPORT)
+    if (INFRA_DATABASE_SQLITE)
+        target_link_libraries(infra PUBLIC Sqlpp11::Sqlite3)
+        target_compile_definitions(infra PUBLIC INFRA_DB_SQLITE_SUPPORT)
     endif ()
 
-	if (INFRA_DATABASE_POSTGRES)
-		target_link_libraries(infra PUBLIC Sqlpp11::Postgresql)
-		target_compile_definitions(infra PUBLIC INFRA_DB_POSTGRES_SUPPORT)
+    if (INFRA_DATABASE_POSTGRES)
+        target_link_libraries(infra PUBLIC Sqlpp11::Postgresql)
+        target_compile_definitions(infra PUBLIC INFRA_DB_POSTGRES_SUPPORT)
     endif ()
     
     if (INFRA_LOGGING)
@@ -291,9 +292,9 @@ if (INFRA_GDAL)
         )
     elseif (Gdal_ProjDB_DATA_PATH)
         add_custom_command(TARGET infra POST_BUILD
-			    	       COMMENT "Copying proj4 db to the build directory"
+                           COMMENT "Copying proj4 db to the build directory"
                            COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>/data
-				           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Gdal_ProjDB_DATA_PATH} $<TARGET_FILE_DIR:infra>/data
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Gdal_ProjDB_DATA_PATH} $<TARGET_FILE_DIR:infra>/data
                            DEPENDS ${Gdal_ProjDB_DATA_PATH})
     endif ()
     
@@ -560,6 +561,10 @@ if (INFRA_ENABLE_TESTS)
     if (INFRA_UI_COMPONENTS)
         add_subdirectory(ui/test)
     endif ()
+endif ()
+
+if (INFRA_ENABLE_TEST_UTILS)
+    add_subdirectory(testutil)
 endif ()
 
 if (INFRA_ENABLE_BENCHMARKS)
