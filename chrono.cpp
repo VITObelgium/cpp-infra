@@ -7,6 +7,18 @@ namespace inf::chrono {
 
 using namespace date;
 
+std::string to_string(date::local_seconds tp)
+{
+    return to_string("%Y_%m_%d_%H.%M", tp);
+}
+
+std::string to_string(std::string_view format, date::local_seconds tp)
+{
+    std::ostringstream dateStr;
+    dateStr << date::format(std::string(format).c_str(), tp);
+    return dateStr.str();
+}
+
 time_point system_time_point_from_string(std::string_view str1, const char* format)
 {
     time_point tp;
