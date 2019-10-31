@@ -38,6 +38,16 @@ public:
     void write_line(gsl::span<const std::string> names);
     void write_line(gsl::span<std::string_view> names);
 
+    template <typename T>
+    void write_line(gsl::span<const T> values)
+    {
+        for (auto& v : values) {
+            write_column_value(v);
+        }
+
+        new_line();
+    }
+
     // Write column by column, finish a line by calling new_line
     void write_empty_column();
     void write_column_value(std::string_view value);
