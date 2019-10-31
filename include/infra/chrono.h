@@ -20,6 +20,9 @@ inline time_point to_system_time_point(date::year_month_day ymd)
     return static_cast<date::sys_days>(ymd);
 }
 
+std::string to_string(date::local_seconds tp);
+std::string to_string(std::string_view format, date::local_seconds tp);
+
 /*! Converts a time point to string in the standard date and time string (locale dependent) */
 template <typename Clock, typename Duration>
 std::string to_string(std::chrono::time_point<Clock, Duration> tp)

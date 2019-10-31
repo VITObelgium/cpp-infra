@@ -36,21 +36,23 @@ TEST(CsvWriterTest, writeCsvWithHeader)
         csv.new_line();
     }
 
-    CsvReader csv(csvPath);
-    ASSERT_EQ(3, csv.column_count());
-    EXPECT_EQ("col1", csv.column_name(0));
-    EXPECT_EQ("col 2", csv.column_name(1));
-    EXPECT_EQ("col;3", csv.column_name(2));
+    {
+        CsvReader csv(csvPath);
+        ASSERT_EQ(3, csv.column_count());
+        EXPECT_EQ("col1", csv.column_name(0));
+        EXPECT_EQ("col 2", csv.column_name(1));
+        EXPECT_EQ("col;3", csv.column_name(2));
 
-    auto row = csv.begin();
-    EXPECT_EQ("value 1", row->get_string(0));
-    EXPECT_EQ("value 2", row->get_string(1));
-    EXPECT_EQ("value;3", row->get_string(2));
+        auto row = csv.begin();
+        EXPECT_EQ("value 1", row->get_string(0));
+        EXPECT_EQ("value 2", row->get_string(1));
+        EXPECT_EQ("value;3", row->get_string(2));
 
-    ++row;
-    EXPECT_EQ(123, row->get_int32(0));
-    EXPECT_EQ("123.12", row->get_string(1));
-    EXPECT_EQ("nan", row->get_string(2));
+        ++row;
+        EXPECT_EQ(123, row->get_int32(0));
+        EXPECT_EQ("123.12", row->get_string(1));
+        EXPECT_EQ("nan", row->get_string(2));
+    }
 
     fs::remove(csvPath);
 }
@@ -75,13 +77,15 @@ TEST(CsvWriterTest, writeCsvSeparatorIsDigitSeparator)
         csv.new_line();
     }
 
-    CsvReader csv(csvPath);
-    ASSERT_EQ(3, csv.column_count());
+    {
+        CsvReader csv(csvPath);
+        ASSERT_EQ(3, csv.column_count());
 
-    auto row = csv.begin();
-    EXPECT_EQ("123,1235", row->get_string(0));
-    EXPECT_EQ("-123,1200", row->get_string(1));
-    EXPECT_EQ("0,0000", row->get_string(2));
+        auto row = csv.begin();
+        EXPECT_EQ("123,1235", row->get_string(0));
+        EXPECT_EQ("-123,1200", row->get_string(1));
+        EXPECT_EQ("0,0000", row->get_string(2));
+    }
 
     fs::remove(csvPath);
 }
