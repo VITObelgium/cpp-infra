@@ -148,11 +148,17 @@ struct SerializerContext
 template <typename Connection>
 void execute_sql_file(Connection& conn, const fs::path& sqlPath)
 {
+    Transaction transaction(conn);
+
     std::string fileContents = file::read_as_text(sqlPath);
     auto lines               = str::split_view(fileContents, ';', str::SplitOpt::NoEmpty | str::SplitOpt::Trim);
     for (auto& line : lines) {
-        conn.execute(std::string(line));
+        if (!str::starts_with(line, "--")) {
+            conn.execute(std::string(line));
+        }
     }
+
+    transaction.commit();
 }
 
 template <typename Query>
