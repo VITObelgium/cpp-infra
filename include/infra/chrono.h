@@ -53,6 +53,13 @@ std::string to_string(std::string_view format, std::chrono::time_point<Clock, Du
 time_point system_time_point_from_string(std::string_view str, const char* format);
 
 template <typename Clock, typename Duration>
+std::string to_utc_string(std::chrono::time_point<Clock, Duration> tp)
+{
+    std::time_t time = Clock::to_time_t(tp);
+    return fmt::format("{:%c}", fmt::gmtime(time));
+}
+
+template <typename Clock, typename Duration>
 std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
