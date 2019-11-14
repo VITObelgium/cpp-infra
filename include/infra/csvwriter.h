@@ -4,9 +4,24 @@
 
 #include <fstream>
 #include <gsl/span>
+#include <locale>
 #include <optional>
 
 namespace inf {
+
+class no_grouping : public std::numpunct_byname<char>
+{
+    std::string do_grouping() const
+    {
+        return "";
+    }
+
+public:
+    no_grouping()
+    : numpunct_byname("")
+    {
+    }
+};
 
 class CsvWriter
 {
@@ -69,5 +84,4 @@ private:
     int _fieldOffset   = 0;
     bool _quoteNumbers = false;
 };
-
 }

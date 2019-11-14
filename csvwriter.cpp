@@ -22,7 +22,7 @@ static char locale_requires_number_quoting(const std::locale& loc, char separato
     }
 }
 
-static char thousands_separator(const std::locale& loc)
+static char decimal_point(const std::locale& loc)
 {
     if (std::has_facet<std::numpunct<char>>(loc)) {
         char numPunct = std::use_facet<std::numpunct<char>>(loc).decimal_point();
