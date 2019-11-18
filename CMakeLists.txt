@@ -108,6 +108,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/crs.h
     include/infra/csvwriter.h
     include/infra/generator.h
+    include/infra/hash.h
     include/infra/interpolate.h
     include/infra/legend.h
     include/infra/legenddataanalyser.h 
