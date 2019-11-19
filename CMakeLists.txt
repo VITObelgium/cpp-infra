@@ -93,7 +93,9 @@ find_package(date CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-set_target_properties(date::tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+if (TARGET date::tz)
+    set_target_properties(date::tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+endif ()
 
 set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
