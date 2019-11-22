@@ -517,6 +517,12 @@ private:
 class LayerIterator
 {
 public:
+    using difference_type   = ptrdiff_t;
+    using value_type        = Feature;
+    using reference         = value_type&;
+    using pointer           = value_type*;
+    using iterator_category = std::forward_iterator_tag;
+
     LayerIterator();
     LayerIterator(Layer layer);
     LayerIterator(const LayerIterator&) = delete;
