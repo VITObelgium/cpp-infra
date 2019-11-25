@@ -89,6 +89,7 @@ enum class VectorType
     ShapeFile,
     Xlsx,
     GeoJson,
+    GeoPackage,
     Unknown,
 };
 

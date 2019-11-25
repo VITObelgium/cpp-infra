@@ -87,6 +87,7 @@ static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
     {VectorType::ShapeFile, "ESRI Shapefile"},
     {VectorType::Xlsx, "XLSX"},
     {VectorType::GeoJson, "GeoJSON"},
+    {VectorType::GeoPackage, "GPKG"},
 }};
 
 static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLookup{{
@@ -96,6 +97,7 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
     {"ESRI Shapefile", VectorType::ShapeFile},
     {"XLSX", VectorType::Xlsx},
     {"GeoJSON", VectorType::GeoJson},
+    {"GPKG", VectorType::GeoPackage},
 }};
 
 static std::string get_extension_lowercase(const fs::path& filepath)
@@ -1232,6 +1234,8 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
         return VectorType::Xlsx;
     } else if (ext == ".json" || ext == ".geojson") {
         return VectorType::GeoJson;
+    } else if (ext == ".gpkg") {
+        return VectorType::GeoPackage;
     }
 
     return VectorType::Unknown;
@@ -1276,5 +1280,4 @@ MemoryFile::~MemoryFile()
 {
     VSIFCloseL(_ptr);
 }
-
 }
