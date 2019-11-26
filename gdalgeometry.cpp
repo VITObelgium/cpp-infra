@@ -187,6 +187,11 @@ Point<double> Line::endpoint()
     return Point<double>(point.getX(), point.getY());
 }
 
+double Line::length() const
+{
+    return get()->get_Length();
+}
+
 LineIterator::LineIterator(const Line& line)
 {
     if (line) {

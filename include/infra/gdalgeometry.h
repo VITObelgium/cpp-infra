@@ -180,6 +180,8 @@ public:
 
     Point<double> startpoint();
     Point<double> endpoint();
+
+    double length() const;
 };
 
 class PointGeometry : public GeometryPtr<OGRPoint>
