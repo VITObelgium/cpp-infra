@@ -27,6 +27,7 @@ public:
 
     void setUnit(std::string_view unit);
     void setPrecision(int decimals);
+    void setDisplayEpsg(int32_t epsg);
 
 protected:
     void setMetadata(const inf::GeoMetadata& meta);
@@ -39,6 +40,7 @@ private:
     std::string _unit;
     int _decimals = 6;
     std::unique_ptr<inf::gdal::CoordinateTransformer> _transformer;
+    std::unique_ptr<inf::gdal::CoordinateTransformer> _displayTransformer;
 };
 
 template <typename RasterType>
