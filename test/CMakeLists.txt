@@ -44,6 +44,7 @@ endif ()
 
 target_link_libraries(infratest
     infra
+	infratestutil
     GTest::GTest
     GMock::GMock
 )

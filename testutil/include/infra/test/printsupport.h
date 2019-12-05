@@ -1,17 +1,20 @@
 #pragma once
 
 #include "infra/cell.h"
+#include "infra/color.h"
 #include "infra/point.h"
 #include <optional>
 
 namespace inf {
 void PrintTo(const Cell& cell, std::ostream* os);
+void PrintTo(const Color& c, std::ostream* os);
 
 template <typename T>
 void PrintTo(const Point<T>& p, std::ostream* os)
 {
     *os << fmt::format("{}", p);
 }
+
 }
 
 namespace std {

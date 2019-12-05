@@ -14,6 +14,8 @@ struct Color
     {
     }
 
+    Color(std::string_view hexString);
+
     constexpr Color(uint8_t r_, uint8_t g_, uint8_t b_, uint8_t a_) noexcept
     : r(r_)
     , g(g_)
