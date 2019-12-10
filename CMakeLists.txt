@@ -252,7 +252,11 @@ if (INFRA_DATABASE)
 endif ()
 
 if (INFRA_GDAL)
-    find_package(Gdal REQUIRED)
+    find_package(GDAL CONFIG)
+    if (NOT TARGET GDAL::GDAL)
+        find_package(Gdal REQUIRED)
+    endif ()
+
     find_package(Gsl REQUIRED)
 
     list (APPEND INFRA_PUBLIC_HEADERS
@@ -312,7 +316,7 @@ if (INFRA_GDAL)
         target_sources(infra PRIVATE csvreader.cpp)
     endif ()
 
-    target_link_libraries(infra PUBLIC Gdal::Gdal Gsl::Gsl)
+    target_link_libraries(infra PUBLIC $<TARGET_NAME_IF_EXISTS:GDAL::GDAL> $<TARGET_NAME_IF_EXISTS:Gdal::Gdal> Gsl::Gsl)
 endif ()
 
 if (INFRA_NUMERIC)
