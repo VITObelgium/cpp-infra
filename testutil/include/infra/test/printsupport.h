@@ -4,6 +4,7 @@
 #include "infra/color.h"
 #include "infra/point.h"
 #include <optional>
+#include <ostream>
 
 namespace inf {
 void PrintTo(const Cell& cell, std::ostream* os);
