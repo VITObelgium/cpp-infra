@@ -2,173 +2,184 @@
 
 #include <memory>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <gtest/trompeloeil.hpp>
 
 namespace inf::test {
 
 using namespace testing;
 using namespace std::placeholders;
 
+using trompeloeil::_;
+
 template <typename ArgType>
 class ReceiverMock
 {
 public:
-    MOCK_METHOD0_T(onItem, void());
-    MOCK_METHOD1_T(onItem1, void(ArgType));
-    MOCK_METHOD2_T(onItem2, void(ArgType, ArgType));
-    MOCK_METHOD3_T(onItem3, void(ArgType, ArgType, ArgType));
+    MAKE_MOCK0(onItem, void());
+    MAKE_MOCK1(onItem1, void(ArgType));
+    MAKE_MOCK2(onItem2, void(ArgType, ArgType));
+    MAKE_MOCK3(onItem3, void(ArgType, ArgType, ArgType));
 };
 
 class SignalTest : public Test
 {
 protected:
-    ReceiverMock<const int&> m_Mock1;
-    ReceiverMock<const int&> m_Mock2;
+    ReceiverMock<const int&> _mock1;
+    ReceiverMock<const int&> _mock2;
 };
 
 TEST_F(SignalTest, ConnectDisconnect)
 {
     Signal<> sig;
-    EXPECT_CALL(m_Mock1, onItem()).Times(0);
-    EXPECT_CALL(m_Mock2, onItem()).Times(0);
 
-    sig();
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem());
+        FORBID_CALL(_mock2, onItem());
+        sig();
+    }
 
-    sig.connect(&m_Mock1, std::bind(&ReceiverMock<const int&>::onItem, &m_Mock1));
-    sig.connect(&m_Mock2, std::bind(&ReceiverMock<const int&>::onItem, &m_Mock2));
+    {
+        sig.connect(&_mock1, std::bind(&ReceiverMock<const int&>::onItem, &_mock1));
+        sig.connect(&_mock2, std::bind(&ReceiverMock<const int&>::onItem, &_mock2));
 
-    EXPECT_CALL(m_Mock1, onItem()).Times(1);
-    EXPECT_CALL(m_Mock2, onItem()).Times(1);
+        REQUIRE_CALL(_mock1, onItem()).TIMES(1);
+        REQUIRE_CALL(_mock2, onItem()).TIMES(1);
 
-    sig();
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+        sig();
+    }
 
-    EXPECT_CALL(m_Mock1, onItem()).Times(0);
-    EXPECT_CALL(m_Mock2, onItem()).Times(1);
+    {
+        FORBID_CALL(_mock1, onItem());
+        REQUIRE_CALL(_mock2, onItem()).TIMES(1);
 
-    sig.disconnect(&m_Mock1);
-    sig();
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+        sig.disconnect(&_mock1);
+        sig();
+    }
 
-    EXPECT_CALL(m_Mock1, onItem()).Times(0);
-    EXPECT_CALL(m_Mock2, onItem()).Times(0);
+    {
+        FORBID_CALL(_mock1, onItem());
+        FORBID_CALL(_mock2, onItem());
 
-    sig.disconnect(&m_Mock2);
-
-    sig();
+        sig.disconnect(&_mock2);
+        sig();
+    }
 }
 
 TEST_F(SignalTest, ConnectDisconnect1)
 {
     Signal<const int&> sig;
-    EXPECT_CALL(m_Mock1, onItem1(_)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem1(_)).Times(0);
 
-    sig(0);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem1(_));
+        FORBID_CALL(_mock2, onItem1(_));
 
-    sig.connect(&m_Mock1, std::bind(&ReceiverMock<const int&>::onItem1, &m_Mock1, _1));
-    sig.connect(&m_Mock2, std::bind(&ReceiverMock<const int&>::onItem1, &m_Mock2, _1));
+        sig(0);
+    }
 
-    EXPECT_CALL(m_Mock1, onItem1(1)).Times(1);
-    EXPECT_CALL(m_Mock2, onItem1(1)).Times(1);
+    {
+        sig.connect(&_mock1, std::bind(&ReceiverMock<const int&>::onItem1, &_mock1, _1));
+        sig.connect(&_mock2, std::bind(&ReceiverMock<const int&>::onItem1, &_mock2, _1));
 
-    sig(1);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+        REQUIRE_CALL(_mock1, onItem1(1)).TIMES(1);
+        REQUIRE_CALL(_mock2, onItem1(1)).TIMES(1);
 
-    EXPECT_CALL(m_Mock1, onItem1(_)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem1(2)).Times(1);
+        sig(1);
+    }
 
-    sig.disconnect(&m_Mock1);
-    sig(2);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem1(_));
+        REQUIRE_CALL(_mock2, onItem1(2)).TIMES(1);
 
-    EXPECT_CALL(m_Mock1, onItem1(_)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem1(_)).Times(0);
+        sig.disconnect(&_mock1);
+        sig(2);
+    }
 
-    sig.disconnect(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem1(_));
+        FORBID_CALL(_mock2, onItem1(_));
 
-    sig(2);
+        sig.disconnect(&_mock2);
+        sig(2);
+    }
 }
 
 TEST_F(SignalTest, ConnectDisconnect2)
 {
     Signal<const int&, const int&> sig;
-    EXPECT_CALL(m_Mock1, onItem2(_, _)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem2(_, _)).Times(0);
 
-    sig(0, 0);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem2(_, _));
+        FORBID_CALL(_mock2, onItem2(_, _));
 
-    sig.connect(&m_Mock1, std::bind(&ReceiverMock<const int&>::onItem2, &m_Mock1, _1, _2));
-    sig.connect(&m_Mock2, std::bind(&ReceiverMock<const int&>::onItem2, &m_Mock2, _1, _2));
+        sig(0, 0);
+    }
 
-    EXPECT_CALL(m_Mock1, onItem2(1, 5)).Times(1);
-    EXPECT_CALL(m_Mock2, onItem2(1, 5)).Times(1);
+    {
+        sig.connect(&_mock1, std::bind(&ReceiverMock<const int&>::onItem2, &_mock1, _1, _2));
+        sig.connect(&_mock2, std::bind(&ReceiverMock<const int&>::onItem2, &_mock2, _1, _2));
 
-    sig(1, 5);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+        REQUIRE_CALL(_mock1, onItem2(1, 5)).TIMES(1);
+        REQUIRE_CALL(_mock2, onItem2(1, 5)).TIMES(1);
 
-    EXPECT_CALL(m_Mock1, onItem2(_, _)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem2(2, 7)).Times(1);
+        sig(1, 5);
+    }
 
-    sig.disconnect(&m_Mock1);
-    sig(2, 7);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem2(_, _));
+        REQUIRE_CALL(_mock2, onItem2(2, 7)).TIMES(1);
 
-    EXPECT_CALL(m_Mock1, onItem2(_, _)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem2(_, _)).Times(0);
+        sig.disconnect(&_mock1);
+        sig(2, 7);
+    }
 
-    sig.disconnect(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem2(_, _));
+        FORBID_CALL(_mock2, onItem2(_, _));
 
-    sig(2, 7);
+        sig.disconnect(&_mock2);
+
+        sig(2, 7);
+    }
 }
 
 TEST_F(SignalTest, ConnectDisconnect3)
 {
     Signal<const int&, const int&, const int&> sig;
-    EXPECT_CALL(m_Mock1, onItem3(_, _, _)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem3(_, _, _)).Times(0);
 
-    sig(0, 0, 0);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem3(_, _, _));
+        FORBID_CALL(_mock2, onItem3(_, _, _));
 
-    sig.connect(&m_Mock1, std::bind(&ReceiverMock<const int&>::onItem3, &m_Mock1, _1, _2, _3));
-    sig.connect(&m_Mock2, std::bind(&ReceiverMock<const int&>::onItem3, &m_Mock2, _1, _2, _3));
+        sig(0, 0, 0);
+    }
 
-    EXPECT_CALL(m_Mock1, onItem3(1, 5, 9)).Times(1);
-    EXPECT_CALL(m_Mock2, onItem3(1, 5, 9)).Times(1);
+    {
+        sig.connect(&_mock1, std::bind(&ReceiverMock<const int&>::onItem3, &_mock1, _1, _2, _3));
+        sig.connect(&_mock2, std::bind(&ReceiverMock<const int&>::onItem3, &_mock2, _1, _2, _3));
 
-    sig(1, 5, 9);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+        REQUIRE_CALL(_mock1, onItem3(1, 5, 9)).TIMES(1);
+        //REQUIRE_CALL(_mock2, onItem3(1, 5, 9)).TIMES(1);
+        REQUIRE_CALL(_mock2, onItem3(1, 5, 9)).TIMES(1);
 
-    EXPECT_CALL(m_Mock1, onItem3(_, _, _)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem3(2, 7, 0)).Times(1);
+        sig(1, 5, 9);
+    }
 
-    sig.disconnect(&m_Mock1);
-    sig(2, 7, 0);
-    Mock::VerifyAndClearExpectations(&m_Mock1);
-    Mock::VerifyAndClearExpectations(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem3(_, _, _));
+        REQUIRE_CALL(_mock2, onItem3(2, 7, 0)).TIMES(1);
 
-    EXPECT_CALL(m_Mock1, onItem3(_, _, _)).Times(0);
-    EXPECT_CALL(m_Mock2, onItem3(_, _, _)).Times(0);
+        sig.disconnect(&_mock1);
+        sig(2, 7, 0);
+    }
 
-    sig.disconnect(&m_Mock2);
+    {
+        FORBID_CALL(_mock1, onItem3(_, _, _));
+        FORBID_CALL(_mock2, onItem3(_, _, _));
 
-    sig(2, 7, 0);
+        sig.disconnect(&_mock2);
+        sig(2, 7, 0);
+    }
 }
 
 TEST_F(SignalTest, ValueArgument)
@@ -179,7 +190,7 @@ TEST_F(SignalTest, ValueArgument)
     ReceiverMock<int32_t> mock;
 
     Signal<int32_t, int32_t> sig;
-    EXPECT_CALL(mock, onItem2(integer1, integer2)).Times(1);
+    REQUIRE_CALL(mock, onItem2(integer1, integer2)).TIMES(1);
 
     sig.connect(&mock, std::bind(&ReceiverMock<int32_t>::onItem2, &mock, _1, _2));
     sig(integer1, integer2);
@@ -192,7 +203,7 @@ TEST_F(SignalTest, PointerArgument)
     ReceiverMock<int32_t*> mock;
 
     Signal<int32_t*> sig;
-    EXPECT_CALL(mock, onItem1(&integer)).Times(1);
+    REQUIRE_CALL(mock, onItem1(&integer)).TIMES(1);
 
     sig.connect(&mock, std::bind(&ReceiverMock<int32_t*>::onItem1, &mock, _1));
     sig(&integer);
@@ -204,7 +215,7 @@ TEST_F(SignalTest, NonCopyableArgument)
     ReceiverMock<std::unique_ptr<int32_t>&> mock;
 
     Signal<std::unique_ptr<int32_t>&> sig;
-    EXPECT_CALL(mock, onItem1(_)).Times(1);
+    REQUIRE_CALL(mock, onItem1(_)).TIMES(1);
 
     sig.connect(&mock, std::bind(&ReceiverMock<std::unique_ptr<int32_t>&>::onItem1, &mock, _1));
     sig(ptr);

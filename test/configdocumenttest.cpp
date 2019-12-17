@@ -1,6 +1,5 @@
 #include "infra/xmldocument.h"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace inf::test {
