@@ -2,7 +2,6 @@
 
 #include <cmath>
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace inf::test {

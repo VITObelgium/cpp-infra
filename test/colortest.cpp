@@ -1,9 +1,8 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include "infra/color.h"
 #include "infra/exception.h"
 #include "infra/test/printsupport.h"
+
+#include <gtest/gtest.h>
 
 namespace inf::test {
 

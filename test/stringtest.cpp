@@ -1,7 +1,6 @@
 #include "infra/string.h"
 #include "infra/cast.h"
 
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
 namespace std {
@@ -268,13 +267,13 @@ TEST(StringOperationsTest, SplittedViewDelimiterString)
 {
     string testString = "A-B.C|D+E++";
     auto tokenized    = str::split_view(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
-    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E", ""}));
+    EXPECT_TRUE(tokenized == std::vector<std::string_view>({"A", "B", "C|D", "E", ""}));
     tokenized = str::split_view(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray);
-    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"A", "B", "C|D", "E", "", ""}));
+    EXPECT_TRUE(tokenized == std::vector<std::string_view>({"A", "B", "C|D", "E", "", ""}));
 
     testString = "- This, a sample string.";
     tokenized  = str::split_view(testString, " ,.-", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
-    EXPECT_THAT(tokenized, ContainerEq(std::vector<std::string_view>{"", "This", "a", "sample", "string", ""}));
+    EXPECT_TRUE(tokenized == std::vector<std::string_view>({"", "This", "a", "sample", "string", ""}));
 }
 
 TEST(StringTest, Trim)
@@ -414,18 +413,12 @@ TEST(StringTest, SplitterTest)
     static const char* line = "Line 1:\t1\t2\t3\t4\t5\t10";
 
     std::vector<std::string_view> result;
-
-    for (auto& value : str::Splitter(line, "\t")) {
-        result.push_back(value);
-    }
-
-    // TODO: does not compile under msvc
-    //auto splitter = str::Splitter(line, "\t");
-    //std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
-
-    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 1:", "1", "2", "3", "4", "5", "10"}));
-
     auto splitter = str::Splitter(line, "\t");
+    std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
+
+    EXPECT_TRUE(result == std::vector<std::string_view>({"Line 1:", "1", "2", "3", "4", "5", "10"}));
+
+    splitter = str::Splitter(line, "\t");
     EXPECT_EQ("Line 1:", *splitter.begin());
     EXPECT_EQ("Line 1:", *splitter.begin());
     EXPECT_NE(splitter.begin(), ++splitter.begin());
@@ -456,7 +449,7 @@ TEST(StringTest, SplitterTeststarts_withDelimeters)
         result.push_back(value);
     }
 
-    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"This", "a", "sample", "string"}));
+    EXPECT_TRUE(result == std::vector<std::string_view>({"This", "a", "sample", "string"}));
 }
 
 TEST(StringTest, SplitterTestEmptyElements)
@@ -468,7 +461,7 @@ TEST(StringTest, SplitterTestEmptyElements)
         result.push_back(value);
     }
 
-    EXPECT_THAT(result, ContainerEq(std::vector<std::string_view>{"Line 2:", "", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
+    EXPECT_TRUE(result == std::vector<std::string_view>({"Line 2:", "", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
 }
 
 std::vector<std::string_view> splitterVector(std::string_view input, std::string_view delimiter)
@@ -485,19 +478,19 @@ TEST(StringTest, SplitterVsSplitBehavior)
 {
     static const char* line = "Line 2:\t\tv 1\tv 2\tv 3\tv 4\tv 5\tv 10";
 
-    EXPECT_THAT(str::split_view(line, "\t"), ContainerEq(splitterVector(line, "\t")));
+    EXPECT_TRUE(str::split_view(line, "\t") == splitterVector(line, "\t"));
 }
 
 TEST(StringTest, Ellipsize)
 {
     static const char* line = "What a long string";
 
-    EXPECT_THAT("What a ...", str::ellipsize(line, 10));
-    EXPECT_THAT("", str::ellipsize(line, 0));
-    EXPECT_THAT("A", str::ellipsize("AH", 1));
-    EXPECT_THAT("AH", str::ellipsize("AHA", 2));
-    EXPECT_THAT("AHA", str::ellipsize("AHA", 3));
-    EXPECT_THAT("...", str::ellipsize("AHA!", 3));
-    EXPECT_THAT(line, str::ellipsize(line, truncate<int>(std::strlen(line))));
+    EXPECT_EQ("What a ...", str::ellipsize(line, 10));
+    EXPECT_EQ("", str::ellipsize(line, 0));
+    EXPECT_EQ("A", str::ellipsize("AH", 1));
+    EXPECT_EQ("AH", str::ellipsize("AHA", 2));
+    EXPECT_EQ("AHA", str::ellipsize("AHA", 3));
+    EXPECT_EQ("...", str::ellipsize("AHA!", 3));
+    EXPECT_EQ(line, str::ellipsize(line, truncate<int>(std::strlen(line))));
 }
 }

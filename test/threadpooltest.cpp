@@ -2,7 +2,6 @@
 
 #include <chrono>
 #include <future>
-#include <gmock/gmock.h>
 #include <gtest/gtest.h>
 #include <thread>
 

@@ -1,7 +1,6 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include "infra/colormap.h"
+
+#include <gtest/gtest.h>
 
 namespace inf {
 void PrintTo(const Color& color, std::ostream* os)

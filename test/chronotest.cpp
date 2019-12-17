@@ -1,7 +1,6 @@
-#include <gmock/gmock.h>
-#include <gtest/gtest.h>
-
 #include "infra/chrono.h"
+
+#include <gtest/gtest.h>
 
 namespace inf::test {
 

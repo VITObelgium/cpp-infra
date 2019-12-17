@@ -1,5 +1,5 @@
 find_package(GTest REQUIRED)
-find_package(GMock REQUIRED)
+find_package(trompeloeil CONFIG REQUIRED)
 
 add_executable(infratest
     casttest.cpp
@@ -46,7 +46,7 @@ target_link_libraries(infratest
     infra
 	infratestutil
     GTest::GTest
-    GMock::GMock
+    trompeloeil
 )
 
 target_compile_definitions(infratest PRIVATE -DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
