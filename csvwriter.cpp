@@ -22,16 +22,6 @@ static char locale_requires_number_quoting(const std::locale& loc, char separato
     }
 }
 
-static char decimal_point(const std::locale& loc)
-{
-    if (std::has_facet<std::numpunct<char>>(loc)) {
-        char numPunct = std::use_facet<std::numpunct<char>>(loc).decimal_point();
-        return numPunct;
-    } else {
-        return '.';
-    }
-}
-
 char CsvWriter::system_list_separator()
 {
 #ifdef _WIN32

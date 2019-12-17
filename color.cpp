@@ -24,7 +24,7 @@ Color::Color(std::string_view hexString)
         throw InvalidArgument("Empty color string");
     }
 
-    if (hexString[0] != '#' || hexString.size() != 7 && hexString.size() != 9) {
+    if (hexString[0] != '#' || (hexString.size() != 7 && hexString.size() != 9)) {
         throw InvalidArgument("Invalid color string: {}", hexString);
     }
 
