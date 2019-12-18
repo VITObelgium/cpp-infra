@@ -94,7 +94,7 @@ inline const std::type_info& resolveType(GDALDataType type)
         return typeid(double);
     case GDT_CInt16:
         return typeid(int16_t);
-        return typeid(std::complex<int16_t>);
+        //return typeid(std::complex<int16_t>);
     case GDT_CInt32:
         return typeid(std::complex<int32_t>);
     case GDT_CFloat32:
