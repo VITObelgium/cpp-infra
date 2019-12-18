@@ -9,6 +9,7 @@ add_executable(infratest
     inireadertest.cpp
     filesystemtest.cpp
     signaltest.cpp
+    legenddataanalysertest.cpp
     stringtest.cpp
     threadpooltest.cpp
     main.cpp

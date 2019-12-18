@@ -216,10 +216,51 @@ float LegendDataAnalyser::effectiveness() const
     return inf::truncate<float>(_varByClass);
 }
 
+static void assign_linear_class_bounds(int numClasses, double minValue, double maxValue, std::vector<double>& bounds)
+{
+    assert(bounds.size() == numClasses + 1);
+
+    double x = (maxValue - minValue) / numClasses;
+    for (int i = 1; i < numClasses; i++) {
+        bounds[i] = minValue + i * x;
+    }
+}
+
+static void assign_arithmetic_class_bounds(int numClasses, double minValue, double maxValue, std::vector<double>& bounds)
+{
+    double x = (maxValue - minValue) / (numClasses * (numClasses + 1.0) / 2.0);
+    for (int i = 1; i < numClasses; i++) {
+        bounds[i] = bounds[i - 1] + i * x;
+    }
+}
+
+static void assign_linear_class_bounds_no_outliers(int numClasses, double minValue, double maxValue, const std::vector<float>& sampleData, std::vector<double>& bounds)
+{
+    // Perform a linear division between the configured low and high percentile
+
+    constexpr double lowPercentile  = 0.05;
+    constexpr double highPercentile = 0.95;
+
+    assert(bounds.size() == numClasses + 1);
+    size_t startIndex = truncate<size_t>(sampleData.size() * lowPercentile);
+    size_t endIndex   = truncate<size_t>(sampleData.size() * highPercentile);
+
+    minValue = sampleData[startIndex];
+    maxValue = sampleData[endIndex];
+
+    bounds.front() = minValue;
+    bounds.back()  = maxValue;
+
+    double x = (maxValue - minValue) / numClasses;
+    for (int i = 1; i < numClasses; i++) {
+        bounds[i] = minValue + i * x;
+    }
+}
+
 std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClasses, double minValue, double maxValue)
 {
     if (minValue >= maxValue) {
-        throw InvalidArgument("Minimum class bound must be lower the maxim class bound ({} <-> {})", minValue, maxValue);
+        throw InvalidArgument("Minimum class bound must be lower the maximum class bound ({} <-> {})", minValue, maxValue);
     }
 
     std::vector<double> classBounds(numClasses + 1);
@@ -227,15 +268,9 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
     classBounds[numClasses] = maxValue;
 
     if (scaleType == LegendScaleType::Linear) { // Linear sequence
-        double x = (maxValue - minValue) / numClasses;
-        for (int i = 1; i < numClasses; i++) {
-            classBounds[i] = minValue + i * x;
-        }
+        assign_linear_class_bounds(numClasses, minValue, maxValue, classBounds);
     } else if (scaleType == LegendScaleType::Arithmetic) { // Arithmetic sequence
-        double x = (maxValue - minValue) / (numClasses * (numClasses + 1) / 2);
-        for (int i = 1; i < numClasses; i++) {
-            classBounds[i] = classBounds[i - 1] + i * x;
-        }
+        assign_arithmetic_class_bounds(numClasses, minValue, maxValue, classBounds);
     } else if (scaleType == LegendScaleType::Geometric) { // Geometric sequence
         if (minValue <= 0) {
             // calculate for minValue = 1 and then transpose back
@@ -304,9 +339,10 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
     case LegendScaleType::Quantiles:
     case LegendScaleType::StandardisedDescretisation:
     case LegendScaleType::MethodOfBertin:
+    case LegendScaleType::LinearNoOutliers:
         // Only these methods require the sample data
         if (sampleData.empty()) {
-            throw RuntimeError("Empty sample data provided");
+            throw RuntimeError("No sample data provided");
         }
         break;
     default:
@@ -320,7 +356,9 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
 
     int n = truncate<int>(sampleData.size());
 
-    if (scaleType == LegendScaleType::Quantiles) {
+    if (scaleType == LegendScaleType::LinearNoOutliers) {
+        assign_linear_class_bounds_no_outliers(numClasses, minValue, maxValue, sampleData, classBounds);
+    } else if (scaleType == LegendScaleType::Quantiles) {
         int iMin = 0, iMax = n - 1;
         while (iMin < n && sampleData[iMin] < minValue) {
             ++iMin;

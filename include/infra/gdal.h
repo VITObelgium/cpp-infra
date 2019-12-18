@@ -239,6 +239,20 @@ public:
                    "Failed to read raster data");
     }
 
+    /* 
+     * Convenience method that returns the full raster band as a vector
+     */
+    template <typename T>
+    std::vector<T> read_rasterdata(int band) const
+    {
+        const auto xSize = x_size();
+        const auto ySize = y_size();
+
+        std::vector<T> result(xSize * ySize);
+        read_rasterdata<T>(band, 0, 0, xSize, ySize, result.data(), xSize, ySize);
+        return result;
+    }
+
     template <typename T>
     void write_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, const T* pData, int bufXSize, int bufYSize) const
     {

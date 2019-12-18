@@ -45,6 +45,12 @@ bool container_contains_match(Container&& c, Predicate&& pred) noexcept
     return std::find_if(c.begin(), c.end(), pred) != c.end();
 }
 
+template <typename Container>
+void remove_value_from_container(Container& c, const typename Container::value_type& value) noexcept
+{
+    c.erase(std::remove(c.begin(), c.end(), value), c.end());
+}
+
 template <typename Container, typename Predicate>
 void remove_from_container(Container& c, Predicate&& pred) noexcept
 {
