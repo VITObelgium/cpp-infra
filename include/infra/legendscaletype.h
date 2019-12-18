@@ -5,6 +5,7 @@ namespace inf {
 enum class LegendScaleType
 {
     Linear,
+    LinearNoOutliers,
     Arithmetic,
     Geometric,
     OverGeometric,
@@ -12,7 +13,6 @@ enum class LegendScaleType
     Quantiles,
     StandardisedDescretisation,
     MethodOfBertin,
-    LinearNoOutliers,
 };
 
 }
