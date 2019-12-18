@@ -12,6 +12,7 @@ enum class LegendScaleType
     Quantiles,
     StandardisedDescretisation,
     MethodOfBertin,
+    LinearNoOutliers,
 };
 
 }
