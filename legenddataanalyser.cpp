@@ -248,9 +248,6 @@ static void assign_linear_class_bounds_no_outliers(int numClasses, double minVal
     minValue = sampleData[startIndex];
     maxValue = sampleData[endIndex];
 
-    bounds.front() = minValue;
-    bounds.back()  = maxValue;
-
     double x = (maxValue - minValue) / numClasses;
     for (int i = 1; i < numClasses; i++) {
         bounds[i] = minValue + i * x;
