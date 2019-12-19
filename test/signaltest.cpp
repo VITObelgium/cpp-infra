@@ -2,12 +2,11 @@
 
 #include <memory>
 
-#include <gtest/gtest.h>
-#include <gtest/trompeloeil.hpp>
+#include <doctest/doctest.h>
+#include <doctest/trompeloeil.hpp>
 
 namespace inf::test {
 
-using namespace testing;
 using namespace std::placeholders;
 
 using trompeloeil::_;
@@ -22,14 +21,14 @@ public:
     MAKE_MOCK3(onItem3, void(ArgType, ArgType, ArgType));
 };
 
-class SignalTest : public Test
+class SignalTest
 {
 protected:
     ReceiverMock<const int&> _mock1;
     ReceiverMock<const int&> _mock2;
 };
 
-TEST_F(SignalTest, ConnectDisconnect)
+TEST_CASE_FIXTURE(SignalTest, "ConnectDisconnect")
 {
     Signal<> sig;
 
@@ -66,7 +65,7 @@ TEST_F(SignalTest, ConnectDisconnect)
     }
 }
 
-TEST_F(SignalTest, ConnectDisconnect1)
+TEST_CASE_FIXTURE(SignalTest, "ConnectDisconnect1")
 {
     Signal<const int&> sig;
 
@@ -104,7 +103,7 @@ TEST_F(SignalTest, ConnectDisconnect1)
     }
 }
 
-TEST_F(SignalTest, ConnectDisconnect2)
+TEST_CASE_FIXTURE(SignalTest, "ConnectDisconnect2")
 {
     Signal<const int&, const int&> sig;
 
@@ -143,7 +142,7 @@ TEST_F(SignalTest, ConnectDisconnect2)
     }
 }
 
-TEST_F(SignalTest, ConnectDisconnect3)
+TEST_CASE_FIXTURE(SignalTest, "ConnectDisconnect3")
 {
     Signal<const int&, const int&, const int&> sig;
 
@@ -182,7 +181,7 @@ TEST_F(SignalTest, ConnectDisconnect3)
     }
 }
 
-TEST_F(SignalTest, ValueArgument)
+TEST_CASE_FIXTURE(SignalTest, "ValueArgument")
 {
     int32_t integer1 = 0;
     int32_t integer2 = 1;
@@ -196,7 +195,7 @@ TEST_F(SignalTest, ValueArgument)
     sig(integer1, integer2);
 }
 
-TEST_F(SignalTest, PointerArgument)
+TEST_CASE_FIXTURE(SignalTest, "PointerArgument")
 {
     int integer = 0;
 
@@ -209,7 +208,7 @@ TEST_F(SignalTest, PointerArgument)
     sig(&integer);
 }
 
-TEST_F(SignalTest, NonCopyableArgument)
+TEST_CASE_FIXTURE(SignalTest, "NonCopyableArgument")
 {
     std::unique_ptr<int32_t> ptr;
     ReceiverMock<std::unique_ptr<int32_t>&> mock;

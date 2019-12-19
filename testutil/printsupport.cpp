@@ -1,13 +1,17 @@
 #include "infra/test/printsupport.h"
 
 namespace inf {
-void PrintTo(const Cell& cell, std::ostream* os)
+
+std::ostream& operator<<(std::ostream& os, const Cell& cell)
 {
-    *os << fmt::format("{}", cell);
+    os << fmt::format("{}", cell);
+    return os;
 }
 
-void PrintTo(const Color& c, std::ostream* os)
+std::ostream& operator<<(std::ostream& os, const Color& color)
 {
-    *os << fmt::format("{}", c);
+    os << fmt::format("{}", color);
+    return os;
 }
+
 }

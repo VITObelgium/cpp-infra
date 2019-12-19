@@ -1,3 +1,7 @@
+#define DOCTEST_CONFIG_IMPLEMENT
+
+#include "infra/test/reporter.h"
+
 #ifdef HAVE_INFRA_LOG
 #include "infra/log.h"
 #endif
@@ -12,9 +16,9 @@
 #endif
 
 #include <cstdlib>
-#include <gtest/gtest.h>
+#include <doctest/doctest.h>
 
-using namespace testing;
+using namespace doctest;
 
 int main(int argc, char** argv)
 {
@@ -26,6 +30,7 @@ int main(int argc, char** argv)
 #ifdef HAVE_INFRA_LOG
     inf::Log::add_console_sink(inf::Log::Colored::On);
     inf::LogRegistration logReg("InfraTest");
+    inf::Log::set_level(inf::Log::Level::Info);
 #endif
 
 #ifdef HAVE_GDAL
@@ -33,6 +38,8 @@ int main(int argc, char** argv)
     inf::gdal::Registration reg(proj4DataPath);
 #endif
 
-    InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
+    doctest::Context context;
+    context.applyCommandLine(argc, argv);
+
+    return context.run();
 }

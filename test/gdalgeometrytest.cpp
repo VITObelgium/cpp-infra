@@ -1,12 +1,14 @@
 #include "infra/gdalgeometry.h"
 
+#include <doctest/doctest.h>
 #include <fstream>
-#include <gtest/gtest.h>
 #include <type_traits>
 
 namespace inf::gdal {
 
-TEST(GdalGeometryTest, fieldDefinition)
+using namespace std::string_literals;
+
+TEST_CASE("GdalGeometryTest.fieldDefinition")
 {
     static_assert(!std::is_assignable_v<FieldDefinition, FieldDefinitionRef>);
     static_assert(std::is_assignable_v<FieldDefinitionRef, FieldDefinition>);
@@ -14,34 +16,34 @@ TEST(GdalGeometryTest, fieldDefinition)
     FieldDefinition def("Field", typeid(int));
 
     FieldDefinitionRef defRef(def);
-    EXPECT_STREQ("Field", defRef.name());
-    EXPECT_EQ(typeid(int), defRef.type());
+    CHECK("Field"s == defRef.name());
+    CHECK(typeid(int) == defRef.type());
 }
 
-TEST(GdalGeometryTest, Ownership)
+TEST_CASE("GdalGeometryTest.Ownership")
 {
     auto polygon = createGeometry<Polygon>();
-    EXPECT_EQ(Geometry::Type::Polygon, polygon.type());
+    CHECK(Geometry::Type::Polygon == polygon.type());
 
     {
         Polygon polygonRef = polygon;
-        EXPECT_EQ(polygonRef.get(), polygon.get());
+        CHECK(polygonRef.get() == polygon.get());
     }
 
     // Reference destroyed, owning object should still be valid
-    EXPECT_EQ(Geometry::Type::Polygon, polygon.type());
+    CHECK(Geometry::Type::Polygon == polygon.type());
 }
 
-TEST(GdalGeometryTest, Slicing)
+TEST_CASE("GdalGeometryTest.Slicing")
 {
     auto polygon = createGeometry<Polygon>();
 
     // The Owner<Polygon> object gets sliced to a Geometry object
     Geometry geom = polygon;
-    EXPECT_EQ(Geometry::Type::Polygon, geom.type());
+    CHECK(Geometry::Type::Polygon == geom.type());
 
     // We can cast the geometry back to Polygon
     auto polygonRef = geom.as<Polygon>();
-    EXPECT_EQ(polygonRef.get(), polygon.get());
+    CHECK(polygonRef.get() == polygon.get());
 }
 }

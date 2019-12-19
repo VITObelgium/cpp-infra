@@ -1,7 +1,7 @@
 #include "infra/string.h"
 #include "infra/cast.h"
 
-#include <gtest/gtest.h>
+#include <doctest/doctest.h>
 
 namespace std {
 
@@ -21,290 +21,290 @@ using std::string_view;
 using std::vector;
 using std::wstring;
 
-using namespace testing;
+using namespace doctest;
 using namespace std::string_literals;
 
-TEST(StringTest, LowerCase)
+TEST_CASE("StringTest.LowerCase")
 {
     string testString = "TESTSTRING";
     str::lowercase_in_place(testString);
-    EXPECT_EQ("teststring", testString);
+    CHECK("teststring" == testString);
 
     testString = "teststring";
     str::lowercase_in_place(testString);
-    EXPECT_EQ("teststring", testString);
+    CHECK("teststring" == testString);
 
     testString = "~!@#$%^&*()_1234567890-";
     str::lowercase_in_place(testString);
-    EXPECT_EQ("~!@#$%^&*()_1234567890-", testString);
+    CHECK("~!@#$%^&*()_1234567890-" == testString);
 
     testString = "H_ell_O";
     str::lowercase_in_place(testString);
-    EXPECT_EQ("h_ell_o", testString);
+    CHECK("h_ell_o" == testString);
 
-    EXPECT_EQ(std::string("hello"), str::lowercase("HeLLo"));
+    CHECK(std::string("hello") == str::lowercase("HeLLo"));
 }
 
-TEST(StringTest, UpperCase)
+TEST_CASE("StringTest.UpperCase")
 {
     string testString = "teststring";
     str::uppercase_in_place(testString);
-    EXPECT_EQ("TESTSTRING", testString);
+    CHECK("TESTSTRING" == testString);
 
     testString = "teststring";
     str::uppercase_in_place(testString);
-    EXPECT_EQ("TESTSTRING", testString);
+    CHECK("TESTSTRING" == testString);
 
     testString = "~!@#$%^&*()_1234567890-";
     str::uppercase_in_place(testString);
-    EXPECT_EQ("~!@#$%^&*()_1234567890-", testString);
+    CHECK("~!@#$%^&*()_1234567890-" == testString);
 
     testString = "H_ell_O";
     str::uppercase_in_place(testString);
-    EXPECT_EQ("H_ELL_O", testString);
+    CHECK("H_ELL_O" == testString);
 
-    EXPECT_EQ(std::string("HELLO"), str::uppercase("HeLLo"));
+    CHECK(std::string("HELLO") == str::uppercase("HeLLo"));
 }
 
-TEST(StringTest, Iequals)
+TEST_CASE("StringTest.Iequals")
 {
-    EXPECT_TRUE(str::iequals("TEST", "test"));
-    EXPECT_TRUE(str::iequals("TEST", "TEST"));
-    EXPECT_TRUE(str::iequals("test", "test"));
-    EXPECT_TRUE(str::iequals("", ""));
+    CHECK(str::iequals("TEST", "test"));
+    CHECK(str::iequals("TEST", "TEST"));
+    CHECK(str::iequals("test", "test"));
+    CHECK(str::iequals("", ""));
 
-    EXPECT_FALSE(str::iequals("TEST", "TOST"));
-    EXPECT_FALSE(str::iequals("TEST", ""));
-    EXPECT_FALSE(str::iequals("", "TEST"));
+    CHECK_FALSE(str::iequals("TEST", "TOST"));
+    CHECK_FALSE(str::iequals("TEST", ""));
+    CHECK_FALSE(str::iequals("", "TEST"));
 }
 
-TEST(StringTest, Replace_in_place)
+TEST_CASE("StringTest.Replace_in_place")
 {
     string testString = "abcaabbabbab";
     str::replace_in_place(testString, "ab", "a");
-    EXPECT_EQ("acaababa", testString);
+    CHECK("acaababa" == testString);
     str::replace_in_place(testString, "a", "z");
-    EXPECT_EQ("zczzbzbz", testString);
+    CHECK("zczzbzbz" == testString);
 
     testString = "stringstringstring";
     str::replace_in_place(testString, "stringstring", "string");
-    EXPECT_EQ("stringstring", testString);
+    CHECK("stringstring" == testString);
 }
 
-TEST(StringTest, Replace)
+TEST_CASE("StringTest.Replace")
 {
     string testString = "abcaabbabbab";
-    EXPECT_EQ("acaababa", str::replace(testString, "ab", "a"));
-    EXPECT_EQ("zcazbzbz", str::replace(testString, "ab", "z"));
+    CHECK("acaababa" == str::replace(testString, "ab", "a"));
+    CHECK("zcazbzbz" == str::replace(testString, "ab", "z"));
 
     testString = "stringstringstring";
-    EXPECT_EQ("stringstring", str::replace(testString, "stringstring", "string"));
+    CHECK("stringstring" == str::replace(testString, "stringstring", "string"));
 }
 
-TEST(StringOperationsTest, Split)
+TEST_CASE("StringOperationsTest.Split")
 {
     string testString = "A-B-C";
     vector<string> tokenized;
     tokenized = str::split(testString, "-");
-    ASSERT_EQ(3u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ("B"s, tokenized[1]);
-    EXPECT_EQ("C"s, tokenized[2]);
+    REQUIRE(3u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK("B"s == tokenized[1]);
+    CHECK("C"s == tokenized[2]);
 
     testString = ";";
     tokenized  = str::split(testString, ";");
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ(""s, tokenized[0]);
-    EXPECT_EQ(""s, tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK(""s == tokenized[0]);
+    CHECK(""s == tokenized[1]);
 
     testString = ";";
     tokenized  = str::split(testString, ';');
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ(""s, tokenized[0]);
-    EXPECT_EQ(""s, tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK(""s == tokenized[0]);
+    CHECK(""s == tokenized[1]);
 
     testString = "A_*_B_*_C";
     tokenized  = str::split(testString, "_*_");
-    ASSERT_EQ(3u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ("B"s, tokenized[1]);
-    EXPECT_EQ("C"s, tokenized[2]);
+    REQUIRE(3u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK("B"s == tokenized[1]);
+    CHECK("C"s == tokenized[2]);
 
     testString = "A_*_B_*_C";
     tokenized  = str::split(testString, "_**_");
-    ASSERT_EQ(1u, tokenized.size());
-    EXPECT_EQ("A_*_B_*_C"s, tokenized[0]);
+    REQUIRE(1u == tokenized.size());
+    CHECK("A_*_B_*_C"s == tokenized[0]);
 
     testString = "A_*_B_*_C";
     tokenized  = str::split(testString, "_C");
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ("A_*_B_*"s, tokenized[0]);
-    EXPECT_EQ(""s, tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("A_*_B_*"s == tokenized[0]);
+    CHECK(""s == tokenized[1]);
 
     testString = "";
     tokenized  = str::split(testString, ";");
-    ASSERT_EQ(1u, tokenized.size());
-    EXPECT_EQ(""s, tokenized[0]);
+    REQUIRE(1u == tokenized.size());
+    CHECK(""s == tokenized[0]);
 
     testString = "string";
     tokenized  = str::split(testString, ";");
-    ASSERT_EQ(1u, tokenized.size());
-    EXPECT_EQ("string"s, tokenized[0]);
+    REQUIRE(1u == tokenized.size());
+    CHECK("string"s == tokenized[0]);
 
     testString = "";
     tokenized  = str::split(testString, ';');
-    ASSERT_EQ(1u, tokenized.size());
-    EXPECT_EQ(""s, tokenized[0]);
+    REQUIRE(1u == tokenized.size());
+    CHECK(""s == tokenized[0]);
 
     testString = "A,,C";
     tokenized  = str::split(testString, ",");
-    ASSERT_EQ(3u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ(""s, tokenized[1]);
-    EXPECT_EQ("C"s, tokenized[2]);
+    REQUIRE(3u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK(""s == tokenized[1]);
+    CHECK("C"s == tokenized[2]);
 }
 
-TEST(StringOperationsTest, SplitAndTrim)
+TEST_CASE("StringOperationsTest.SplitAndTrim")
 {
     string testString = "A - B - C";
     vector<string> tokenized;
     tokenized = str::split(testString, "-", str::SplitOpt::Trim);
-    ASSERT_EQ(3u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ("B"s, tokenized[1]);
-    EXPECT_EQ("C"s, tokenized[2]);
+    REQUIRE(3u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK("B"s == tokenized[1]);
+    CHECK("C"s == tokenized[2]);
 }
 
-TEST(StringOperationsTest, SplitNoEmpty)
+TEST_CASE("StringOperationsTest.SplitNoEmpty")
 {
     string testString = "A,,C";
     vector<string> tokenized;
     tokenized = str::split(testString, ",", str::SplitOpt::NoEmpty);
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ("C"s, tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK("C"s == tokenized[1]);
 }
 
-TEST(StringOperationsTest, SplitAndTrimNoEmpty)
+TEST_CASE("StringOperationsTest.SplitAndTrimNoEmpty")
 {
     string testString        = " A,  ,C  ";
     vector<string> tokenized = str::split(testString, ',', str::SplitOpt::Trim | str::SplitOpt::NoEmpty);
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ("C"s, tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK("C"s == tokenized[1]);
 
     testString = " A , , ,  C  ";
     tokenized  = str::split(testString, ", ", str::SplitOpt::Trim | str::SplitOpt::NoEmpty);
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ("A"s, tokenized[0]);
-    EXPECT_EQ("C"s, tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("A"s == tokenized[0]);
+    CHECK("C"s == tokenized[1]);
 }
 
-TEST(StringOperationsTest, SplittedView)
+TEST_CASE("StringOperationsTest.SplittedView")
 {
     string testString = "A-B-C";
     vector<string_view> tokenized;
     tokenized = str::split_view(testString, '-');
-    EXPECT_EQ(3u, tokenized.size());
-    EXPECT_EQ("A", tokenized[0]);
-    EXPECT_EQ("B", tokenized[1]);
-    EXPECT_EQ("C", tokenized[2]);
+    CHECK(3u == tokenized.size());
+    CHECK("A" == tokenized[0]);
+    CHECK("B" == tokenized[1]);
+    CHECK("C" == tokenized[2]);
 
     testString = ";";
     tokenized  = str::split_view(testString, ';');
-    EXPECT_EQ(2u, tokenized.size());
-    EXPECT_EQ("", tokenized[0]);
-    EXPECT_EQ("", tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("" == tokenized[0]);
+    CHECK("" == tokenized[1]);
 
     testString = ";";
     tokenized  = str::split_view(testString, ";");
-    ASSERT_EQ(2u, tokenized.size());
-    EXPECT_EQ("", tokenized[0]);
-    EXPECT_EQ("", tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("" == tokenized[0]);
+    CHECK("" == tokenized[1]);
 
     testString = ";;";
     tokenized  = str::split_view(testString, ';');
-    EXPECT_EQ(3u, tokenized.size());
-    EXPECT_EQ("", tokenized[0]);
-    EXPECT_EQ("", tokenized[1]);
-    EXPECT_EQ("", tokenized[2]);
+    REQUIRE(3u == tokenized.size());
+    CHECK("" == tokenized[0]);
+    CHECK("" == tokenized[1]);
+    CHECK("" == tokenized[2]);
 
     testString = "A_*_B_*_C";
     tokenized  = str::split_view(testString, "_*_");
-    EXPECT_EQ(3u, tokenized.size());
-    EXPECT_EQ("A", tokenized[0]);
-    EXPECT_EQ("B", tokenized[1]);
-    EXPECT_EQ("C", tokenized[2]);
+    REQUIRE(3u == tokenized.size());
+    CHECK("A" == tokenized[0]);
+    CHECK("B" == tokenized[1]);
+    CHECK("C" == tokenized[2]);
 
     testString = "A_*_B_*_C";
     tokenized  = str::split_view(testString, "_**_");
-    EXPECT_EQ(1u, tokenized.size());
-    EXPECT_EQ("A_*_B_*_C", tokenized[0]);
+    CHECK(1u == tokenized.size());
+    CHECK("A_*_B_*_C" == tokenized[0]);
 
     testString = "";
     tokenized  = str::split_view(testString, ',');
-    EXPECT_EQ(1u, tokenized.size());
-    EXPECT_EQ("", tokenized[0]);
+    REQUIRE(1u == tokenized.size());
+    CHECK("" == tokenized[0]);
 
     testString = "string";
     tokenized  = str::split_view(testString, ',');
-    EXPECT_EQ(1u, tokenized.size());
-    EXPECT_EQ("string", tokenized[0]);
+    CHECK(1u == tokenized.size());
+    CHECK("string" == tokenized[0]);
 
     testString = "";
     tokenized  = str::split_view(testString, ",");
-    EXPECT_EQ(1u, tokenized.size());
-    EXPECT_EQ("", tokenized[0]);
+    REQUIRE(1u == tokenized.size());
+    CHECK("" == tokenized[0]);
 
     testString = "Line1\nLine2";
     tokenized  = str::split_view(testString, "\r\n", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
-    EXPECT_EQ(2u, tokenized.size());
-    EXPECT_EQ("Line1", tokenized[0]);
-    EXPECT_EQ("Line2", tokenized[1]);
+    REQUIRE(2u == tokenized.size());
+    CHECK("Line1" == tokenized[0]);
+    CHECK("Line2" == tokenized[1]);
 }
 
-TEST(StringOperationsTest, SplittedViewDelimiterString)
+TEST_CASE("StringOperationsTest.SplittedViewDelimiterString")
 {
     string testString = "A-B.C|D+E++";
     auto tokenized    = str::split_view(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
-    EXPECT_TRUE(tokenized == std::vector<std::string_view>({"A", "B", "C|D", "E", ""}));
+    CHECK(tokenized == std::vector<std::string_view>({"A", "B", "C|D", "E", ""}));
     tokenized = str::split_view(testString, "-.+", str::SplitOpt::DelimiterIsCharacterArray);
-    EXPECT_TRUE(tokenized == std::vector<std::string_view>({"A", "B", "C|D", "E", "", ""}));
+    CHECK(tokenized == std::vector<std::string_view>({"A", "B", "C|D", "E", "", ""}));
 
     testString = "- This, a sample string.";
     tokenized  = str::split_view(testString, " ,.-", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
-    EXPECT_TRUE(tokenized == std::vector<std::string_view>({"", "This", "a", "sample", "string", ""}));
+    CHECK(tokenized == std::vector<std::string_view>({"", "This", "a", "sample", "string", ""}));
 }
 
-TEST(StringTest, Trim)
+TEST_CASE("StringTest.Trim")
 {
-    EXPECT_EQ("astring"s, str::trim("astring"));
-    EXPECT_EQ("a"s, str::trim("a "));
-    EXPECT_EQ("a"s, str::trim(" a"));
-    EXPECT_EQ("a a  a"s, str::trim("  a a  a "));
-    EXPECT_EQ("a \r\t\n a  a"s, str::trim("  \r \n\t\r\n a \r\t\n a  a \t\t\t"));
-    EXPECT_EQ("", str::trim(""));
-    EXPECT_EQ("", str::trim(" \r\n\t"));
+    CHECK("astring"s == str::trim("astring"));
+    CHECK("a"s == str::trim("a "));
+    CHECK("a"s == str::trim(" a"));
+    CHECK("a a  a"s == str::trim("  a a  a "));
+    CHECK("a \r\t\n a  a"s == str::trim("  \r \n\t\r\n a \r\t\n a  a \t\t\t"));
+    CHECK("" == str::trim(""));
+    CHECK("" == str::trim(" \r\n\t"));
 }
 
-TEST(StringTest, Trim_in_place)
+TEST_CASE("StringTest.Trim_in_place")
 {
     std::string str(" please trim me    .  ");
     str::trim_in_place(str);
-    EXPECT_EQ("please trim me    ."s, str);
+    CHECK("please trim me    ." == str);
 
     str = std::string("please trim me.");
     str::trim_in_place(str);
-    EXPECT_EQ("please trim me."s, str);
+    CHECK("please trim me."s == str);
 }
 
-TEST(StringTest, JoinStrings)
+TEST_CASE("StringTest.JoinStrings")
 {
-    EXPECT_EQ("one,two,three", str::join<std::vector<string>>({"one", "two", "three"}, ","));
-    EXPECT_EQ("one", str::join<std::vector<string>>({"one"}, ","));
+    CHECK("one,two,three" == str::join<std::vector<string>>({"one", "two", "three"}, ","));
+    CHECK("one" == str::join<std::vector<string>>({"one"}, ","));
 }
 
-TEST(StringTest, JoinStringViews)
+TEST_CASE("StringTest.JoinStringViews")
 {
     struct StringViewable
     {
@@ -319,7 +319,7 @@ TEST(StringTest, JoinStringViews)
     static_assert(can_cast_to_string_view_v<StringViewable>, "StringViewable should be convertible to string_view");
     static_assert(!is_streamable_v<StringViewable>, "StringViewable should not be streamable");
 
-    EXPECT_EQ("one,two,three", str::join<std::vector<StringViewable>>({{"one"}, {"two"}, {"three"}}, ","));
+    CHECK("one,two,three" == str::join<std::vector<StringViewable>>({{"one"}, {"two"}, {"three"}}, ","));
 }
 
 struct Streamable
@@ -332,83 +332,83 @@ std::ostream& operator<<(std::ostream& os, const Streamable& s)
     return os << s.value;
 }
 
-TEST(StringTest, JoinStreamables)
+TEST_CASE("StringTest.JoinStreamables")
 {
     static_assert(is_streamable_v<Streamable>, "Streamable should be streamable");
     static_assert(!can_cast_to_string_view_v<Streamable>, "Streamable should not be convertible to string_view");
 
-    EXPECT_EQ("1, 2, 3", str::join<std::vector<Streamable>>({{1}, {2}, {3}}, ", "));
-    EXPECT_EQ("one", str::join<std::vector<string>>({"one"}, ","));
+    CHECK("1, 2, 3" == str::join<std::vector<Streamable>>({{1}, {2}, {3}}, ", "));
+    CHECK("one" == str::join<std::vector<string>>({"one"}, ","));
 }
 
-TEST(StringTest, starts_with)
+TEST_CASE("StringTest.starts_with")
 {
-    EXPECT_TRUE(str::starts_with("TestOne", ""));
-    EXPECT_TRUE(str::starts_with("TestOne", "T"));
-    EXPECT_TRUE(str::starts_with("TestOne", "Te"));
-    EXPECT_TRUE(str::starts_with("TestOne", "TestOn"));
-    EXPECT_TRUE(str::starts_with("TestOne", "TestOne"));
+    CHECK(str::starts_with("TestOne", ""));
+    CHECK(str::starts_with("TestOne", "T"));
+    CHECK(str::starts_with("TestOne", "Te"));
+    CHECK(str::starts_with("TestOne", "TestOn"));
+    CHECK(str::starts_with("TestOne", "TestOne"));
 
-    EXPECT_TRUE(str::starts_with("TestOne", std::string("TestOn")));
-    EXPECT_TRUE(str::starts_with("TestOne", std::string("TestOne")));
+    CHECK(str::starts_with("TestOne", std::string("TestOn")));
+    CHECK(str::starts_with("TestOne", std::string("TestOne")));
 
-    EXPECT_FALSE(str::starts_with("TestOne", "es"));
-    EXPECT_FALSE(str::starts_with("TestOne", "t"));
+    CHECK_FALSE(str::starts_with("TestOne", "es"));
+    CHECK_FALSE(str::starts_with("TestOne", "t"));
 
-    EXPECT_FALSE(str::starts_with("", "."));
+    CHECK_FALSE(str::starts_with("", "."));
 }
 
-TEST(StringTest, starts_with_ignore_case)
+TEST_CASE("StringTest.starts_with_ignore_case")
 {
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", ""));
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", "t"));
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", "TE"));
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", "TeStOn"));
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", "tEsToNe"));
+    CHECK(str::starts_with_ignore_case("TestOne", ""));
+    CHECK(str::starts_with_ignore_case("TestOne", "t"));
+    CHECK(str::starts_with_ignore_case("TestOne", "TE"));
+    CHECK(str::starts_with_ignore_case("TestOne", "TeStOn"));
+    CHECK(str::starts_with_ignore_case("TestOne", "tEsToNe"));
 
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", std::string("teston")));
-    EXPECT_TRUE(str::starts_with_ignore_case("TestOne", std::string("TESTONE")));
+    CHECK(str::starts_with_ignore_case("TestOne", std::string("teston")));
+    CHECK(str::starts_with_ignore_case("TestOne", std::string("TESTONE")));
 
-    EXPECT_FALSE(str::starts_with_ignore_case("TestOne", "es"));
-    EXPECT_FALSE(str::starts_with_ignore_case("", "."));
+    CHECK_FALSE(str::starts_with_ignore_case("TestOne", "es"));
+    CHECK_FALSE(str::starts_with_ignore_case("", "."));
 }
 
-TEST(StringTest, ends_with)
+TEST_CASE("StringTest.ends_with")
 {
-    EXPECT_TRUE(str::ends_with("TestOne", ""));
-    EXPECT_TRUE(str::ends_with("TestOne", "e"));
-    EXPECT_TRUE(str::ends_with("TestOne", "ne"));
-    EXPECT_TRUE(str::ends_with("TestOne", "One"));
-    EXPECT_TRUE(str::ends_with("TestOne", "TestOne"));
+    CHECK(str::ends_with("TestOne", ""));
+    CHECK(str::ends_with("TestOne", "e"));
+    CHECK(str::ends_with("TestOne", "ne"));
+    CHECK(str::ends_with("TestOne", "One"));
+    CHECK(str::ends_with("TestOne", "TestOne"));
 
-    EXPECT_FALSE(str::ends_with("TestOne", "On"));
-    EXPECT_FALSE(str::ends_with("TestOne", "TestOn"));
-    EXPECT_FALSE(str::ends_with("TestOne", "TestOne."));
+    CHECK_FALSE(str::ends_with("TestOne", "On"));
+    CHECK_FALSE(str::ends_with("TestOne", "TestOn"));
+    CHECK_FALSE(str::ends_with("TestOne", "TestOne."));
 
-    EXPECT_FALSE(str::ends_with("", "."));
+    CHECK_FALSE(str::ends_with("", "."));
 }
 
-TEST(StringTest, ends_with_ignore_case)
+TEST_CASE("StringTest.ends_with_ignore_case")
 {
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", ""));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "e"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "E"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "ne"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "NE"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "One"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "oNe"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "TestOne"));
-    EXPECT_TRUE(str::ends_with_ignore_case("TestOne", "testone"));
+    CHECK(str::ends_with_ignore_case("TestOne", ""));
+    CHECK(str::ends_with_ignore_case("TestOne", "e"));
+    CHECK(str::ends_with_ignore_case("TestOne", "E"));
+    CHECK(str::ends_with_ignore_case("TestOne", "ne"));
+    CHECK(str::ends_with_ignore_case("TestOne", "NE"));
+    CHECK(str::ends_with_ignore_case("TestOne", "One"));
+    CHECK(str::ends_with_ignore_case("TestOne", "oNe"));
+    CHECK(str::ends_with_ignore_case("TestOne", "TestOne"));
+    CHECK(str::ends_with_ignore_case("TestOne", "testone"));
 
-    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "On"));
-    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "oN"));
-    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "TESTON"));
-    EXPECT_FALSE(str::ends_with_ignore_case("TestOne", "TestOne."));
+    CHECK_FALSE(str::ends_with_ignore_case("TestOne", "On"));
+    CHECK_FALSE(str::ends_with_ignore_case("TestOne", "oN"));
+    CHECK_FALSE(str::ends_with_ignore_case("TestOne", "TESTON"));
+    CHECK_FALSE(str::ends_with_ignore_case("TestOne", "TestOne."));
 
-    EXPECT_FALSE(str::ends_with_ignore_case("", "."));
+    CHECK_FALSE(str::ends_with_ignore_case("", "."));
 }
 
-TEST(StringTest, SplitterTest)
+TEST_CASE("StringTest.SplitterTest")
 {
     static const char* line = "Line 1:\t1\t2\t3\t4\t5\t10";
 
@@ -416,31 +416,31 @@ TEST(StringTest, SplitterTest)
     auto splitter = str::Splitter(line, "\t");
     std::copy(splitter.begin(), splitter.end(), std::back_inserter(result));
 
-    EXPECT_TRUE(result == std::vector<std::string_view>({"Line 1:", "1", "2", "3", "4", "5", "10"}));
+    CHECK(result == std::vector<std::string_view>({"Line 1:", "1", "2", "3", "4", "5", "10"}));
 
     splitter = str::Splitter(line, "\t");
-    EXPECT_EQ("Line 1:", *splitter.begin());
-    EXPECT_EQ("Line 1:", *splitter.begin());
-    EXPECT_NE(splitter.begin(), ++splitter.begin());
-    EXPECT_EQ(7, std::distance(splitter.begin(), splitter.end()));
+    CHECK("Line 1:" == *splitter.begin());
+    CHECK("Line 1:" == *splitter.begin());
+    CHECK(splitter.begin() != ++splitter.begin());
+    CHECK(std::distance(splitter.begin(), splitter.end()) == 7);
 }
 
-TEST(StringTest, SplitterTestOnlyDelimiters)
+TEST_CASE("StringTest.SplitterTestOnlyDelimiters")
 {
     static const char* line = "-.-.-";
     auto splitter           = str::Splitter(line, ".-", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
-    EXPECT_EQ(2, std::distance(splitter.begin(), splitter.end()));
+    CHECK(std::distance(splitter.begin(), splitter.end()) == 2);
 }
 
-TEST(StringTest, SplitterTestNoDelimiters)
+TEST_CASE("StringTest.SplitterTestNoDelimiters")
 {
     static const char* line = "Blablablablablabla";
     auto splitter           = str::Splitter(line, ".-", str::SplitOpt::DelimiterIsCharacterArray);
-    EXPECT_EQ(1, std::distance(splitter.begin(), splitter.end()));
-    EXPECT_EQ(line, *splitter.begin());
+    CHECK(std::distance(splitter.begin(), splitter.end()) == 1);
+    CHECK(line == *splitter.begin());
 }
 
-TEST(StringTest, SplitterTeststarts_withDelimeters)
+TEST_CASE("StringTest.SplitterTeststarts_withDelimeters")
 {
     static const char* line = "- This, a sample string.";
 
@@ -449,10 +449,10 @@ TEST(StringTest, SplitterTeststarts_withDelimeters)
         result.push_back(value);
     }
 
-    EXPECT_TRUE(result == std::vector<std::string_view>({"This", "a", "sample", "string"}));
+    CHECK(result == std::vector<std::string_view>({"This", "a", "sample", "string"}));
 }
 
-TEST(StringTest, SplitterTestEmptyElements)
+TEST_CASE("StringTest.SplitterTestEmptyElements")
 {
     static const char* line = "Line 2:\t\tv 1\tv 2\tv 3\tv 4\tv 5\tv 10";
 
@@ -461,7 +461,7 @@ TEST(StringTest, SplitterTestEmptyElements)
         result.push_back(value);
     }
 
-    EXPECT_TRUE(result == std::vector<std::string_view>({"Line 2:", "", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
+    CHECK(result == std::vector<std::string_view>({"Line 2:", "", "v 1", "v 2", "v 3", "v 4", "v 5", "v 10"}));
 }
 
 std::vector<std::string_view> splitterVector(std::string_view input, std::string_view delimiter)
@@ -474,23 +474,23 @@ std::vector<std::string_view> splitterVector(std::string_view input, std::string
     return result;
 }
 
-TEST(StringTest, SplitterVsSplitBehavior)
+TEST_CASE("StringTest.SplitterVsSplitBehavior")
 {
     static const char* line = "Line 2:\t\tv 1\tv 2\tv 3\tv 4\tv 5\tv 10";
 
-    EXPECT_TRUE(str::split_view(line, "\t") == splitterVector(line, "\t"));
+    CHECK(str::split_view(line, "\t") == splitterVector(line, "\t"));
 }
 
-TEST(StringTest, Ellipsize)
+TEST_CASE("StringTest.Ellipsize")
 {
     static const char* line = "What a long string";
 
-    EXPECT_EQ("What a ...", str::ellipsize(line, 10));
-    EXPECT_EQ("", str::ellipsize(line, 0));
-    EXPECT_EQ("A", str::ellipsize("AH", 1));
-    EXPECT_EQ("AH", str::ellipsize("AHA", 2));
-    EXPECT_EQ("AHA", str::ellipsize("AHA", 3));
-    EXPECT_EQ("...", str::ellipsize("AHA!", 3));
-    EXPECT_EQ(line, str::ellipsize(line, truncate<int>(std::strlen(line))));
+    CHECK("What a ..." == str::ellipsize(line, 10));
+    CHECK("" == str::ellipsize(line, 0));
+    CHECK("A" == str::ellipsize("AH", 1));
+    CHECK("AH" == str::ellipsize("AHA", 2));
+    CHECK("AHA" == str::ellipsize("AHA", 3));
+    CHECK("..." == str::ellipsize("AHA!", 3));
+    CHECK(line == str::ellipsize(line, truncate<int>(std::strlen(line))));
 }
 }

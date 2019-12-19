@@ -1,4 +1,3 @@
-find_package(GTest REQUIRED)
 find_package(trompeloeil CONFIG REQUIRED)
 
 add_executable(infratest
@@ -46,7 +45,6 @@ endif ()
 target_link_libraries(infratest
     infra
 	infratestutil
-    GTest::GTest
     trompeloeil
 )
 

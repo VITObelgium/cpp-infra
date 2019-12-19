@@ -1,10 +1,8 @@
 #include "infra/xmldocument.h"
 
-#include <gtest/gtest.h>
+#include <doctest/doctest.h>
 
 namespace inf::test {
-
-using namespace testing;
 
 static const char* s_xmlData = R"("
     <xml>
@@ -19,7 +17,7 @@ static const char* s_xmlData = R"("
     </xml>
 ")";
 
-class ConfigReaderTest : public Test
+class ConfigReaderTest
 {
 protected:
     ConfigReaderTest()
@@ -30,24 +28,24 @@ protected:
     XmlDocument doc;
 };
 
-TEST_F(ConfigReaderTest, readFromString)
+TEST_CASE_FIXTURE(ConfigReaderTest, "readFromString")
 {
-    EXPECT_EQ("5", doc.child("xml").child("node1").attribute("attr1"));
-    EXPECT_EQ("6", doc.child("xml").child("node1").child("subnode1").attribute("attr1"));
+    CHECK("5" == doc.child("xml").child("node1").attribute("attr1"));
+    CHECK("6" == doc.child("xml").child("node1").child("subnode1").attribute("attr1"));
 
-    EXPECT_EQ("5", doc.select_child("xml.node1").attribute("attr1"));
-    EXPECT_EQ("6", doc.select_child("xml.node1.subnode1").attribute("attr1"));
+    CHECK("5" == doc.select_child("xml.node1").attribute("attr1"));
+    CHECK("6" == doc.select_child("xml.node1.subnode1").attribute("attr1"));
 
     auto xmlNode = doc.child("xml");
-    EXPECT_EQ("5", xmlNode.select_child("node1").attribute("attr1"));
-    EXPECT_EQ("6", xmlNode.select_child("node1.subnode1").attribute("attr1"));
+    CHECK("5" == xmlNode.select_child("node1").attribute("attr1"));
+    CHECK("6" == xmlNode.select_child("node1.subnode1").attribute("attr1"));
 
-    EXPECT_EQ("\n            aValue\n        ", xmlNode.select_child("node2").value());
-    EXPECT_EQ("aValue", xmlNode.select_child("node2").trimmed_value());
-    EXPECT_EQ("some text", xmlNode.select_child("node3").value());
+    CHECK("\n            aValue\n        " == xmlNode.select_child("node2").value());
+    CHECK("aValue" == xmlNode.select_child("node2").trimmed_value());
+    CHECK("some text" == xmlNode.select_child("node3").value());
 }
 
-TEST_F(ConfigReaderTest, iterateChildren)
+TEST_CASE_FIXTURE(ConfigReaderTest, "iterateChildren")
 {
     auto xmlNode = doc.child("xml");
 
@@ -56,10 +54,10 @@ TEST_F(ConfigReaderTest, iterateChildren)
         childNames.push_back(std::string(child.name()));
     }
 
-    EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node1", "node2", "node3", "node3"}));
+    CHECK(childNames == std::vector<std::string>({"node1", "node2", "node3", "node3"}));
 }
 
-TEST_F(ConfigReaderTest, iterateNamedChildren)
+TEST_CASE_FIXTURE(ConfigReaderTest, "iterateNamedChildren")
 {
     auto xmlNode = doc.child("xml");
 
@@ -68,41 +66,41 @@ TEST_F(ConfigReaderTest, iterateNamedChildren)
         childNames.push_back(std::string(child.name()));
     }
 
-    EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node1"}));
+    CHECK(childNames == std::vector<std::string>({"node1"}));
 
     childNames.clear();
     for (const auto& child : xmlNode.children("node3")) {
         childNames.push_back(std::string(child.name()));
     }
 
-    EXPECT_THAT(childNames, ContainerEq(std::vector<std::string>{"node3", "node3"}));
+    CHECK(childNames == std::vector<std::string>({"node3", "node3"}));
 }
 
-TEST_F(ConfigReaderTest, rootNode)
+TEST_CASE_FIXTURE(ConfigReaderTest, "rootNode")
 {
-    EXPECT_EQ("xml", doc.root_node().name());
+    CHECK("xml" == doc.root_node().name());
 }
 
-TEST_F(ConfigReaderTest, rootChildren)
+TEST_CASE_FIXTURE(ConfigReaderTest, "rootChildren")
 {
     std::vector<std::string> names;
     for (auto& child : doc.children()) {
         names.emplace_back(child.name());
     }
 
-    EXPECT_THAT(names, ContainerEq(std::vector<std::string>{"xml"}));
+    CHECK(names == std::vector<std::string>({"xml"}));
 }
 
-TEST_F(ConfigReaderTest, nonExistingNodes)
+TEST_CASE_FIXTURE(ConfigReaderTest, "nonExistingNodes")
 {
     auto child = doc.child("lmx");
-    EXPECT_FALSE(child);
-    EXPECT_TRUE(child.name().empty());
-    EXPECT_TRUE(child.attribute("").empty());
+    CHECK_FALSE(child);
+    CHECK(child.name().empty());
+    CHECK(child.attribute("").empty());
 
     child = doc.child("lmx").child("notpresent").child("nope");
-    EXPECT_FALSE(child);
-    EXPECT_TRUE(child.name().empty());
-    EXPECT_TRUE(child.attribute("").empty());
+    CHECK_FALSE(child);
+    CHECK(child.name().empty());
+    CHECK(child.attribute("").empty());
 }
 }

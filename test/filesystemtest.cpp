@@ -1,42 +1,42 @@
 #include "infra/filesystem.h"
 
+#include <doctest/doctest.h>
 #include <fstream>
-#include <gtest/gtest.h>
 
 namespace inf {
 
 #ifdef INFRA_HAS_FILESYSTEM
 
-TEST(FilesystemTest, getFullPath)
+TEST_CASE("FilesystemTest.getFullPath")
 {
     auto pwd = fs::current_path();
     fs::create_directories("./test1/test");
     std::ofstream f1("test1/test/file.txt");
-    ASSERT_TRUE(f1.is_open());
+    REQUIRE(f1.is_open());
     f1.close();
 
     std::ofstream f2("./test1/test/file.db");
-    ASSERT_TRUE(f2.is_open());
+    REQUIRE(f2.is_open());
     f2.close();
 
     fs::path base(pwd / "test1/test/file.txt");
     fs::path rel("file.db");
 
     auto expected = (pwd / "test1/test/file.db").make_preferred();
-    EXPECT_EQ(expected.string(), file::combine_absolute_with_relative_path(base, rel).string());
+    CHECK(expected.string() == file::combine_absolute_with_relative_path(base, rel).string());
     fs::remove_all("./test1/test");
 }
 
-TEST(FilesystemTest, getFullPathBackslash)
+TEST_CASE("FilesystemTest.getFullPathBackslash")
 {
     auto pwd = fs::current_path();
     fs::create_directories("./test1/test");
     std::ofstream f1("./test1/test/file.txt");
-    ASSERT_TRUE(f1.is_open());
+    REQUIRE(f1.is_open());
     f1.close();
 
     std::ofstream f2("./test1/test/file.db");
-    ASSERT_TRUE(f2.is_open());
+    REQUIRE(f2.is_open());
     f2.close();
 
     fs::path base(pwd / "test1\\test\\file.txt");
@@ -45,7 +45,7 @@ TEST(FilesystemTest, getFullPathBackslash)
     rel.make_preferred();
 
     auto expected = (pwd / "test1/test/file.db").make_preferred();
-    EXPECT_EQ(expected.string(), file::combine_absolute_with_relative_path(base, rel).string()) << base << " " <<  base.make_preferred();
+    CHECK_MESSAGE(expected.string() == file::combine_absolute_with_relative_path(base, rel).string(), fmt::format("{} {}", base, base.make_preferred()));
     fs::remove_all("./test1/test");
 }
 
