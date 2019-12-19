@@ -3,14 +3,12 @@
 #include "infra/gdal.h"
 #include "infra/test/printsupport.h"
 
-#include <gtest/gtest.h>
+#include <doctest/doctest.h>
 #include <numeric>
 
 namespace inf::test {
 
-using namespace testing;
-
-TEST(LegendDataAnalyserTest, linear)
+TEST_CASE("LegendDataAnalyserTest.linear")
 {
     auto ds = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR) / "raster.tif");
 
@@ -29,11 +27,11 @@ TEST(LegendDataAnalyserTest, linear)
     analyser.calculate_classbounds(LegendScaleType::LinearNoOutliers, *minIter, *maxIter);
     auto boundsNoOutliers = analyser.classbounds();
 
-    EXPECT_EQ(5, bounds.size());
-    EXPECT_EQ(5, boundsNoOutliers.size());
+    CHECK(bounds.size() == 5);
+    CHECK(boundsNoOutliers.size() == 5);
 
-    EXPECT_TRUE(std::get<0>(boundsNoOutliers.front()) >= std::get<0>(bounds.front()));
-    EXPECT_TRUE(std::get<1>(boundsNoOutliers.back()) <= std::get<1>(bounds.back()));
+    CHECK(std::get<0>(boundsNoOutliers.front()) >= std::get<0>(bounds.front()));
+    CHECK(std::get<1>(boundsNoOutliers.back()) <= std::get<1>(bounds.back()));
 }
 
 }

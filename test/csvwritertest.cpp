@@ -1,13 +1,12 @@
 #include "infra/csvwriter.h"
 #include "infra/csvreader.h"
 
+#include <doctest/doctest.h>
 #include <fstream>
-#include <gtest/gtest.h>
 
 namespace inf::test {
 
 using namespace std::string_literals;
-using namespace testing;
 
 template <char Sep>
 struct digit_separator : std::numpunct<char>
@@ -18,7 +17,7 @@ struct digit_separator : std::numpunct<char>
     }
 };
 
-TEST(CsvWriterTest, writeCsvWithHeader)
+TEST_CASE("CsvWriterTest.writeCsvWithHeader")
 {
     auto csvPath = fs::temp_directory_path() / "test.csv";
 
@@ -38,26 +37,26 @@ TEST(CsvWriterTest, writeCsvWithHeader)
 
     {
         CsvReader csv(csvPath);
-        ASSERT_EQ(3, csv.column_count());
-        EXPECT_EQ("col1", csv.column_name(0));
-        EXPECT_EQ("col 2", csv.column_name(1));
-        EXPECT_EQ("col;3", csv.column_name(2));
+        REQUIRE(csv.column_count() == 3);
+        CHECK("col1" == csv.column_name(0));
+        CHECK("col 2" == csv.column_name(1));
+        CHECK("col;3" == csv.column_name(2));
 
         auto row = csv.begin();
-        EXPECT_EQ("value 1", row->get_string(0));
-        EXPECT_EQ("value 2", row->get_string(1));
-        EXPECT_EQ("value;3", row->get_string(2));
+        CHECK("value 1" == row->get_string(0));
+        CHECK("value 2" == row->get_string(1));
+        CHECK("value;3" == row->get_string(2));
 
         ++row;
-        EXPECT_EQ(123, row->get_int32(0));
-        EXPECT_EQ("123.12", row->get_string(1));
-        EXPECT_EQ("nan", row->get_string(2));
+        CHECK(123 == row->get_int32(0));
+        CHECK("123.12" == row->get_string(1));
+        CHECK("nan" == row->get_string(2));
     }
 
     fs::remove(csvPath);
 }
 
-TEST(CsvWriterTest, writeCsvSeparatorIsDigitSeparator)
+TEST_CASE("CsvWriterTest.writeCsvSeparatorIsDigitSeparator")
 {
     auto csvPath = fs::temp_directory_path() / "test.csv";
 
@@ -79,12 +78,12 @@ TEST(CsvWriterTest, writeCsvSeparatorIsDigitSeparator)
 
     {
         CsvReader csv(csvPath);
-        ASSERT_EQ(3, csv.column_count());
+        REQUIRE(csv.column_count() == 3);
 
         auto row = csv.begin();
-        EXPECT_EQ("123,1235", row->get_string(0));
-        EXPECT_EQ("-123,1200", row->get_string(1));
-        EXPECT_EQ("0,0000", row->get_string(2));
+        CHECK("123,1235" == row->get_string(0));
+        CHECK("-123,1200" == row->get_string(1));
+        CHECK("0,0000" == row->get_string(2));
     }
 
     fs::remove(csvPath);

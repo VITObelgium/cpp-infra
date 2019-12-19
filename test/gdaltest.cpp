@@ -1,65 +1,68 @@
 ﻿#include "infra/gdal.h"
 
+#include <doctest/doctest.h>
 #include <fstream>
-#include <gtest/gtest.h>
 
 namespace inf::test {
 
-TEST(GdalTest, iteratePoints)
+using namespace doctest;
+using namespace std::string_literals;
+
+TEST_CASE("GdalTest.iteratePoints")
 {
     auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
-    EXPECT_EQ(1, ds.layer_count());
+    CHECK(ds.layer_count() == 1);
 
     int count = 0;
     int index = 1;
     for (const auto& feature : ds.layer(0)) {
         auto geometry = feature.geometry();
-        EXPECT_EQ(gdal::Geometry::Type::Point, geometry.type());
+        CHECK(gdal::Geometry::Type::Point == geometry.type());
 
         auto point = geometry.as<gdal::PointGeometry>();
-        EXPECT_EQ(Point<double>(index, index + 1), point.point());
+        CHECK(Point<double>(index, index + 1) == point.point());
 
         index += 2;
         ++count;
     }
 
-    EXPECT_EQ(9, count);
+    CHECK(count == 9);
 }
 
-TEST(GdalTest, fieldInfo)
+TEST_CASE("GdalTest.fieldInfo")
 {
     auto ds    = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
     auto layer = ds.layer(0);
-    EXPECT_EQ(9, layer.feature_count());
-    EXPECT_EQ(1, layer.feature(0).field_count());
-    EXPECT_STREQ("FID", layer.feature(0).field_definition(0).name());
-    EXPECT_EQ(typeid(int64_t), layer.feature(0).field_definition(0).type());
+    CHECK(layer.feature_count() == 9);
+    CHECK(layer.feature(0).field_count() == 1);
+    CHECK("FID"s == layer.feature(0).field_definition(0).name());
+    CHECK(typeid(int64_t) == layer.feature(0).field_definition(0).type());
 }
 
-TEST(GdalTest, getField)
+TEST_CASE("GdalTest.getField")
 {
     auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     int index = 0;
     for (const auto& feature : ds.layer(0)) {
-        EXPECT_EQ(index, feature.field_as<int32_t>(1));
-        EXPECT_EQ(index, feature.field_as<int64_t>(1));
-        EXPECT_DOUBLE_EQ(double(index), feature.field_as<double>(1));
-        EXPECT_FLOAT_EQ(float(index), feature.field_as<float>(1));
-        EXPECT_EQ(std::to_string(index), feature.field_as<std::string_view>(1));
+        CHECK(index == feature.field_as<int32_t>(1));
+        CHECK(index == feature.field_as<int64_t>(1));
+        CHECK(double(index) == Approx(feature.field_as<double>(1)));
+        CHECK(float(index) == Approx(feature.field_as<float>(1)));
+        CHECK(std::to_string(index) == feature.field_as<std::string_view>(1));
 
-        EXPECT_EQ(index, feature.field_as<int32_t>("FID"));
-        EXPECT_EQ(index, feature.field_as<int64_t>("FID"));
-        EXPECT_DOUBLE_EQ(double(index), feature.field_as<double>("FID"));
-        EXPECT_FLOAT_EQ(float(index), feature.field_as<float>("FID"));
-        EXPECT_EQ(std::to_string(index), feature.field_as<std::string_view>("FID"));
+        CHECK(index == feature.field_as<int32_t>("FID"));
+        CHECK(index == feature.field_as<int64_t>("FID"));
+        CHECK(double(index) == Approx(feature.field_as<double>("FID")));
+        CHECK(float(index) == Approx(feature.field_as<float>("FID")));
+        CHECK(std::to_string(index) == feature.field_as<std::string_view>("FID"));
 
         ++index;
     }
 }
 
-TEST(GdalTest, convertPointProjected)
+TEST_CASE("GdalTest.convertPointProjected")
 {
     // Check conversion of bottom left corner of flanders map
 
@@ -67,11 +70,11 @@ TEST(GdalTest, convertPointProjected)
 
     // Bottom left coordinate
     auto point = gdal::convert_point_projected(31370, 4326, Point<double>(22000.000, 153000.000));
-    EXPECT_NEAR(2.55772472781224, point.x, 1e-8);
-    EXPECT_NEAR(50.6735631138308, point.y, 1e-8);
+    CHECK(2.55772472781224 == Approx(point.x).epsilon(1e-8));
+    CHECK(50.6735631138308 == Approx(point.y).epsilon(1e-8));
 }
 
-TEST(GdalTest, createExcelFile)
+TEST_CASE("GdalTest.createExcelFile")
 {
     if (!gdal::VectorDriver::is_supported(gdal::VectorType::Xlsx)) {
         return;
@@ -103,17 +106,17 @@ TEST(GdalTest, createExcelFile)
     layer.create_feature(feat2);
 }
 
-TEST(GdalTest, utf8Path)
+TEST_CASE("GdalTest.utf8Path")
 {
     if (!gdal::RasterDriver::is_supported(gdal::RasterType::Netcdf)) {
         return;
     }
 
-    EXPECT_NO_THROW(gdal::RasterDataSet::create(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
+    CHECK_NOTHROW(gdal::RasterDataSet::create(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
 
     auto ds          = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
     auto subDatasets = ds.metadata("SUBDATASETS");
-    EXPECT_EQ(4u, subDatasets.size());
+    CHECK(subDatasets.size() == 4u);
 }
 
 }

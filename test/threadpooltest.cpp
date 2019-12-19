@@ -1,28 +1,26 @@
 #include "infra/threadpool.h"
 
 #include <chrono>
+#include <doctest/doctest.h>
 #include <future>
-#include <gtest/gtest.h>
 #include <thread>
+#include <unordered_set>
 
 namespace inf::test {
 
 using namespace std;
-using namespace testing;
 
 constexpr int g_poolSize = 4;
 
-class ThreadPoolTest : public Test
+class ThreadPoolTest
 {
 protected:
-    ThreadPoolTest() = default;
-
-    void SetUp()
+    ThreadPoolTest()
     {
         tp.start(g_poolSize);
     }
 
-    void TearDown()
+    ~ThreadPoolTest()
     {
         tp.stop();
     }
@@ -30,19 +28,19 @@ protected:
     ThreadPool tp;
 };
 
-TEST_F(ThreadPoolTest, startTwice)
+TEST_CASE_FIXTURE(ThreadPoolTest, "startTwice")
 {
     // first start is in teardown
-    EXPECT_NO_THROW(tp.start(g_poolSize));
+    CHECK_NOTHROW(tp.start(g_poolSize));
 }
 
-TEST_F(ThreadPoolTest, stopTwice)
+TEST_CASE_FIXTURE(ThreadPoolTest, "stopTwice")
 {
     // second stop is in teardown
-    EXPECT_NO_THROW(tp.stop());
+    CHECK_NOTHROW(tp.stop());
 }
 
-TEST_F(ThreadPoolTest, RunJobs)
+TEST_CASE_FIXTURE(ThreadPoolTest, "RunJobs")
 {
     const uint32_t jobCount = g_poolSize * 100;
 
@@ -50,7 +48,7 @@ TEST_F(ThreadPoolTest, RunJobs)
     std::condition_variable cond;
 
     uint32_t count = 0;
-    std::set<std::thread::id> threadIds;
+    std::unordered_set<std::thread::id> threadIds;
 
     for (auto i = 0u; i < jobCount; ++i) {
         tp.add_job([&]() {
@@ -71,10 +69,10 @@ TEST_F(ThreadPoolTest, RunJobs)
     std::unique_lock<std::mutex> lock(mutex);
     cond.wait(lock, [&]() { return count == jobCount; });
 
-    EXPECT_EQ(g_poolSize, static_cast<uint32_t>(threadIds.size()));
+    CHECK(g_poolSize == static_cast<uint32_t>(threadIds.size()));
 }
 
-TEST_F(ThreadPoolTest, StopFinishJobs)
+TEST_CASE_FIXTURE(ThreadPoolTest, "StopFinishJobs")
 {
     const long jobCount = g_poolSize * 100;
 
@@ -89,10 +87,10 @@ TEST_F(ThreadPoolTest, StopFinishJobs)
     }
 
     tp.stop_finish_jobs();
-    EXPECT_EQ(jobCount, count);
+    CHECK(jobCount == count);
 }
 
-TEST_F(ThreadPoolTest, ErrorInjob)
+TEST_CASE_FIXTURE(ThreadPoolTest, "ErrorInjob")
 {
     std::promise<void> prom;
 
@@ -105,18 +103,18 @@ TEST_F(ThreadPoolTest, ErrorInjob)
     });
 
     auto fut = prom.get_future();
-    EXPECT_EQ(std::future_status::ready, fut.wait_for(std::chrono::seconds(3)));
-    EXPECT_THROW(fut.get(), std::runtime_error);
+    CHECK(std::future_status::ready == fut.wait_for(std::chrono::seconds(3)));
+    CHECK_THROWS_AS(fut.get(), std::runtime_error);
 
     tp.stop_finish_jobs();
 }
 
-TEST_F(ThreadPoolTest, StartStopFinishJobs)
+TEST_CASE_FIXTURE(ThreadPoolTest, "StartStopFinishJobs")
 {
-    EXPECT_NO_THROW(tp.stop_finish_jobs());
+    CHECK_NOTHROW(tp.stop_finish_jobs());
 }
 
-TEST_F(ThreadPoolTest, CallInitDestroyFunctions)
+TEST_CASE_FIXTURE(ThreadPoolTest, "CallInitDestroyFunctions")
 {
     tp.stop_finish_jobs();
 
@@ -133,7 +131,7 @@ TEST_F(ThreadPoolTest, CallInitDestroyFunctions)
 
     tp.start(g_poolSize);
     tp.stop_finish_jobs();
-    EXPECT_EQ(g_poolSize, startThreadCounter);
-    EXPECT_EQ(g_poolSize, stopThreadCounter);
+    CHECK(g_poolSize == startThreadCounter);
+    CHECK(g_poolSize == stopThreadCounter);
 }
 }
