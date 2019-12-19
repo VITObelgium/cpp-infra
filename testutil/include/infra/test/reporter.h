@@ -1,8 +1,8 @@
 #pragma once
 
-#include "infra/log.h"
-
 #include <doctest/doctest.h>
+#include <fmt/color.h>
+#include <fmt/format.h>
 
 namespace inf::test {
 
@@ -38,7 +38,7 @@ struct TestReporter : public IReporter
     void test_case_start(const TestCaseData& in) override
     {
         tc = &in;
-        Log::info("[RUN     ] {}", in.m_name);
+        fmt::print(fg(fmt::color::green), "[RUN     ] {}\n", in.m_name);
     }
 
     // called when a test case is reentered because of unfinished subcases
@@ -49,9 +49,9 @@ struct TestReporter : public IReporter
     void test_case_end(const CurrentTestCaseStats& in) override
     {
         if (in.failure_flags == TestCaseFailureReason::None) {
-            Log::info("[    DONE] {}s", in.seconds);
+            fmt::print(fg(fmt::color::green), "[    DONE] {}s\n", in.seconds);
         } else {
-            Log::error("[    FAIL] {}s", in.seconds);
+            fmt::print(fg(fmt::color::red), "[    FAIL] {}s\n", in.seconds);
         }
     }
 
@@ -61,7 +61,7 @@ struct TestReporter : public IReporter
 
     void subcase_start(const SubcaseSignature& in) override
     {
-        Log::info("  [{}]", in.m_name);
+        fmt::print(fg(fmt::color::green), "  [{}]\n", in.m_name);
     }
 
     void subcase_end() override

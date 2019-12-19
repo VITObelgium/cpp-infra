@@ -48,6 +48,6 @@ target_link_libraries(infratest
     trompeloeil
 )
 
-target_compile_definitions(infratest PRIVATE -DTEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
+target_compile_definitions(infratest PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
 
 add_test(NAME infratest COMMAND infratest)
