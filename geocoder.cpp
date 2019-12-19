@@ -3,6 +3,7 @@
 #include "infra/exception.h"
 #include "infra/gdal.h"
 #include "infra/gdalgeometry.h"
+#include "infra/scopeguard.h"
 
 #include <cpl_port.h>
 #include <ogr_geocoding.h>
@@ -30,6 +31,8 @@ Geocoder::Geocoder()
 Geocoder::Geocoder(const Options& options)
 : _pimpl(std::make_unique<Pimpl>())
 {
+    _allowUnsafeSsl = options.allowUnsafeSsl;
+
     std::vector<std::string> gcOptions;
     gcOptions.push_back(fmt::format("SERVICE={}", options.service));
 
@@ -72,8 +75,17 @@ Geocoder::~Geocoder()
     OGRGeocodeDestroySession(_pimpl->gc);
 }
 
+void Geocoder::allow_unsafe_ssl(bool enabled) noexcept
+{
+    _allowUnsafeSsl = enabled;
+}
+
 std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, std::string_view countryCode)
 {
+    if (_allowUnsafeSsl) {
+        CPLSetThreadLocalConfigOption("GDAL_HTTP_UNSAFESSL", "YES");
+    }
+
     std::vector<std::string> gcOptions;
     if (!countryCode.empty()) {
         gcOptions.push_back(fmt::format("COUNTRYCODES={}", countryCode));
@@ -82,18 +94,17 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
     auto stringArray = gdal::create_string_array(gcOptions);
     auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, const_cast<char**>(stringArray.data()));
     if (layerHandle) {
+        ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
+
         gdal::Layer layer(OGRLayer::FromHandle(layerHandle));
-        if (layer.feature_count() > 0) {
-            auto iter = begin(layer);
-            if (iter->has_geometry()) {
-                auto geom = iter->geometry();
+        for (auto& feature : layer) {
+            if (feature.has_geometry()) {
+                auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
                     return to_coordinate(geom.as<gdal::PointGeometry>().point());
                 }
             }
         }
-
-        OGRGeocodeFreeResult(layerHandle);
     }
 
     return {};
@@ -111,6 +122,8 @@ std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::stri
     auto stringArray = gdal::create_string_array(gcOptions);
     auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, const_cast<char**>(stringArray.data()));
     if (layerHandle) {
+        ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
+
         gdal::Layer layer(OGRLayer::FromHandle(layerHandle));
         for (auto& feature : layer) {
             if (feature.has_geometry()) {

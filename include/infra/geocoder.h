@@ -22,6 +22,7 @@ public:
         fs::path cacheFile;
         bool readCache      = true;
         bool writeCache     = true;
+        bool allowUnsafeSsl = false;
         std::string service = Osm;
         std::string email;       // optional, but recommended
         std::string key;         // api key, needed by Bing
@@ -33,6 +34,8 @@ public:
     Geocoder(const Options& options);
     ~Geocoder();
 
+    void allow_unsafe_ssl(bool enabled = true) noexcept;
+
     std::optional<Coordinate> geocode_single(const std::string& location, std::string_view countryCode = {});
     std::vector<Coordinate> geocode(const std::string& location, std::string_view countryCode = {});
 
@@ -40,6 +43,7 @@ private:
     void throw_on_invalid_handle() const;
 
     struct Pimpl;
+    bool _allowUnsafeSsl = false;
     std::unique_ptr<Pimpl> _pimpl;
 };
 

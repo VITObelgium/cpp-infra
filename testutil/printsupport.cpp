@@ -14,4 +14,10 @@ std::ostream& operator<<(std::ostream& os, const Color& color)
     return os;
 }
 
+std::ostream& operator<<(std::ostream& os, const Coordinate& coord)
+{
+    os << fmt::format("{}", coord);
+    return os;
+}
+
 }
