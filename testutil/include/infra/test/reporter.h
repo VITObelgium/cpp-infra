@@ -3,6 +3,7 @@
 #include <doctest/doctest.h>
 #include <fmt/color.h>
 #include <fmt/format.h>
+#include <mutex>
 
 namespace inf::test {
 
