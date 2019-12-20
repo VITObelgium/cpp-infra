@@ -1,5 +1,6 @@
 include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
+include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 include(GNUInstallDirs)
 
@@ -54,6 +55,8 @@ if (MSVC)
 else ()
     set (CMAKE_REQUIRED_FLAGS -std=c++17)
 endif ()
+
+check_include_file_cxx(charconv HAVE_CHARCONV)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -171,7 +174,12 @@ elseif (HAVE_BOOST_FILESYSTEM)
     target_compile_definitions(infra PUBLIC HAVE_BOOST_FILESYSTEM)
 endif ()
 
-target_compile_definitions(infra PUBLIC FMT_STRING_ALIAS=1)
+target_compile_definitions(infra
+PUBLIC
+    FMT_STRING_ALIAS=1
+PRIVATE
+    $<$<BOOL:HAVE_CHARCONV>:HAVE_CHARCONV>
+)
 
 target_link_libraries(infra PUBLIC fmt::fmt date::date)
 

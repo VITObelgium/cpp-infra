@@ -2,18 +2,22 @@
 #include "infra/exception.h"
 #include "infra/string.h"
 
+#ifdef HAVE_CHARCONV
 #include <charconv>
+#endif
 #include <fmt/format.h>
 
 namespace inf {
 
 static uint8_t parse_hex(std::string_view str)
 {
+#ifdef HAVE_CHARCONV
     uint8_t value;
     auto res = std::from_chars(str.data(), str.data() + str.size(), value, 16);
     if (res.ec == std::errc()) {
         return value;
     }
+#endif
 
     throw InvalidArgument("Invalid hex color value: {}", str);
 }
