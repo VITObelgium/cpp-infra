@@ -40,6 +40,14 @@ TEST_CASE("Geocoder.geocode_single")
         CHECK(coord->longitude == Approx(5.31576194045124));
     }
 
+    SUBCASE("valid result lommel no street number")
+    {
+        auto coord = gc.geocode_single("Kloosterstraat Lommel");
+        REQUIRE(coord.has_value());
+        CHECK(coord->latitude == Approx(51.2314736));
+        CHECK(coord->longitude == Approx(5.3246890716));
+    }
+
     SUBCASE("valid result with country restriction")
     {
         auto coord = gc.geocode_single("Boeretang 200 Mol", "be");
