@@ -17,15 +17,27 @@ TEST_CASE("Geocoder.geocode_single")
         return;
     }
 
-    Geocoder gc;
+    Geocoder::Options options;
+    options.readCache  = false;
+    options.writeCache = false;
+
+    Geocoder gc(options);
     gc.allow_unsafe_ssl(); // Coorporate proxy issues
 
-    SUBCASE("valid result")
+    SUBCASE("valid result boeretang")
     {
         auto coord = gc.geocode_single("Boeretang 200 Mol");
         REQUIRE(coord.has_value());
         CHECK(coord->latitude == Approx(51.219066));
         CHECK(coord->longitude == Approx(5.093644));
+    }
+
+    SUBCASE("valid result lommel")
+    {
+        auto coord = gc.geocode_single("Kloosterstraat 44 Lommel");
+        REQUIRE(coord.has_value());
+        CHECK(coord->latitude == Approx(51.2299701));
+        CHECK(coord->longitude == Approx(5.31576194045124));
     }
 
     SUBCASE("valid result with country restriction")
