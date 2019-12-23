@@ -104,7 +104,7 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
                     return to_coordinate(geom.as<gdal::PointGeometry>().point());
-                } else if (geom.type() == gdal::Geometry::Type::Polygon && !result.has_value()) {
+                } else if (!result.has_value()) {
                     result = geom.centroid_coordinate();
                 }
             }
@@ -134,15 +134,11 @@ std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::stri
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
                     result.push_back(to_coordinate(geom.as<gdal::PointGeometry>().point()));
-                } else if (geom.type() == gdal::Geometry::Type::Polygon) {
-                    if (auto coord = geom.centroid_coordinate(); coord.has_value()) {
-                        result.push_back(*coord);
-                    }
+                } else if (auto coord = geom.centroid_coordinate(); coord.has_value()) {
+                    result.push_back(*coord);
                 }
             }
         }
-
-        OGRGeocodeFreeResult(layerHandle);
     }
 
     return result;
@@ -154,5 +150,4 @@ void Geocoder::throw_on_invalid_handle() const
         throw RuntimeError("Failed to create geocoding session");
     }
 }
-
 }
