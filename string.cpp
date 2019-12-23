@@ -218,9 +218,9 @@ void replace_in_place(std::string& aString, std::string_view toSearch, std::stri
 
 void replace_in_place(std::string& aString, char toSearch, char toReplace)
 {
-    const size_t lenght = aString.size();
+    const size_t length = aString.size();
 
-    for (int i = 0; i < lenght; ++i) {
+    for (size_t i = 0; i < length; ++i) {
         if (aString[i] == toSearch) {
             aString[i] = toReplace;
         }
