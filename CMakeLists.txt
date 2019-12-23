@@ -56,7 +56,7 @@ else ()
     set (CMAKE_REQUIRED_FLAGS -std=c++17)
 endif ()
 
-check_include_file_cxx(charconv HAVE_CHARCONV)
+check_include_file_cxx(charconv HAVE_CHARCONV_HEADER)
 
 check_cxx_source_compiles("
 #include <filesystem>
@@ -178,7 +178,7 @@ target_compile_definitions(infra
 PUBLIC
     FMT_STRING_ALIAS=1
 PRIVATE
-    $<$<BOOL:HAVE_CHARCONV>:HAVE_CHARCONV>
+    $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
 target_link_libraries(infra PUBLIC fmt::fmt date::date)
