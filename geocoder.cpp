@@ -91,6 +91,8 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
         gcOptions.push_back(fmt::format("COUNTRYCODES={}", countryCode));
     }
 
+    std::optional<Coordinate> result;
+
     auto stringArray = gdal::create_string_array(gcOptions);
     auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, const_cast<char**>(stringArray.data()));
     if (layerHandle) {
@@ -102,12 +104,14 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
                     return to_coordinate(geom.as<gdal::PointGeometry>().point());
+                } else if (geom.type() == gdal::Geometry::Type::Polygon && !result.has_value()) {
+                    result = geom.centroid_coordinate();
                 }
             }
         }
     }
 
-    return {};
+    return result;
 }
 
 std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::string_view countryCode)
@@ -130,6 +134,10 @@ std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::stri
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
                     result.push_back(to_coordinate(geom.as<gdal::PointGeometry>().point()));
+                } else if (geom.type() == gdal::Geometry::Type::Polygon) {
+                    if (auto coord = geom.centroid_coordinate(); coord.has_value()) {
+                        result.push_back(*coord);
+                    }
                 }
             }
         }

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/coordinate.h"
 #include "infra/exception.h"
 #include "infra/point.h"
 #include "infra/progressinfo.h"
@@ -125,6 +126,8 @@ public:
 
     Owner<Geometry> intersection(const Geometry& other) const;
     std::optional<double> area() const;
+    std::optional<Point<double>> centroid() const;
+    std::optional<Coordinate> centroid_coordinate() const;
 
     double distance(const inf::Point<double>& other) const;
     double distance(const Geometry& other) const;

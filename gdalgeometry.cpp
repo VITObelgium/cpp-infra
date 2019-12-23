@@ -1,5 +1,6 @@
 #include "infra/gdalgeometry.h"
 #include "infra/cast.h"
+#include "infra/conversion.h"
 #include "infra/exception.h"
 #include "infra/gdal-private.h"
 #include "infra/gdal.h"
@@ -108,6 +109,26 @@ std::optional<double> Geometry::area() const
 {
     if (auto* surface = _geometry->toSurface(); surface != nullptr) {
         return surface->get_Area();
+    }
+
+    return {};
+}
+
+std::optional<Point<double>> Geometry::centroid() const
+{
+    std::optional<Point<double>> result;
+    OGRPoint point;
+    if (_geometry->Centroid(&point) == OGRERR_NONE) {
+        result = Point<double>(point.getX(), point.getY());
+    }
+
+    return result;
+}
+
+std::optional<Coordinate> Geometry::centroid_coordinate() const
+{
+    if (auto point = centroid(); point.has_value()) {
+        return to_coordinate(*point);
     }
 
     return {};
