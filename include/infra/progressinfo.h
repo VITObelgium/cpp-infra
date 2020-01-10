@@ -10,20 +10,64 @@ namespace inf {
 class ProgressInfo
 {
 public:
+    enum class StatusResult
+    {
+        Continue,
+        Abort,
+    };
+
+    class Status
+    {
+    public:
+        Status(int64_t current, int64_t total) noexcept
+        : _current(current)
+        , _total(total)
+        {
+        }
+
+        /*! returns the progress as a value between 0 and 1 */
+        float progress() const noexcept
+        {
+            return float(_current) / _total;
+        }
+
+        /*! returns the progress as a value between 0 and 100 */
+        int32_t progress_100() const noexcept
+        {
+            return truncate<int32_t>(_current * 100.f / _total);
+        }
+
+        int64_t current() const noexcept
+        {
+            return _current;
+        }
+
+        int64_t total() const noexcept
+        {
+            return _total;
+        }
+
+    private:
+        int64_t _current = 0;
+        int64_t _total   = 0;
+    };
+
+    using Callback = std::function<StatusResult(Status)>;
+
     ProgressInfo() = default;
 
-    explicit ProgressInfo(std::function<bool(int64_t, int64_t)> cb)
+    explicit ProgressInfo(Callback cb)
     : _cb(cb)
     {
     }
 
-    ProgressInfo(int64_t totalTicks, std::function<bool(int64_t, int64_t)> cb)
+    ProgressInfo(int64_t totalTicks, Callback cb)
     : _ticks(totalTicks)
     , _cb(cb)
     {
     }
 
-    void set_callback(std::function<bool(int64_t, int64_t)> cb)
+    void set_callback(Callback cb)
     {
         _cb = cb;
     }
@@ -79,21 +123,21 @@ private:
     void signal_progress()
     {
         if (_cb) {
-            _cancel = !_cb(_currentTick, _ticks);
+            _cancel = _cb(Status(_currentTick, _ticks)) == StatusResult::Abort;
         }
     }
 
     void signal_progress(float progress)
     {
         if (_cb) {
-            _cancel = !_cb(truncate<int64_t>(progress * 100.f), 100);
+            _cancel = _cb(Status(truncate<int64_t>(progress * 100.f), 100)) == StatusResult::Abort;
         }
     }
 
     int64_t _ticks                    = 0;
     std::atomic<int64_t> _currentTick = 0;
     bool _cancel                      = false;
-    std::function<bool(int64_t, int64_t)> _cb;
+    Callback _cb;
 };
 
 }
