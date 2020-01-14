@@ -2,6 +2,7 @@
 
 #include <date/date.h>
 #include <fmt/chrono.h>
+#include <optional>
 
 namespace inf::chrono {
 
@@ -50,7 +51,7 @@ std::string to_string(std::string_view format, std::chrono::time_point<Clock, Du
  * Uses the current locale and timezone so different inputs can produce the same value in case
  * of daylight savings adjustments
  */
-time_point system_time_point_from_string(std::string_view str, const char* format);
+std::optional<time_point> system_time_point_from_string(std::string_view str, const char* format);
 
 template <typename Clock, typename Duration>
 std::string to_utc_string(std::chrono::time_point<Clock, Duration> tp)
