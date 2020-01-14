@@ -10,3 +10,9 @@ target_include_directories(infratestutil PUBLIC
 )
 
 target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
+
+add_library(infratestutilmain
+    testmain.cpp
+)
+
+target_link_libraries(infratestutilmain PUBLIC infratestutil)
