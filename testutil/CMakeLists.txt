@@ -29,3 +29,11 @@ add_library(infratestutilmain
 add_library(Infra::testutilmain ALIAS infratestutilmain)
 
 target_link_libraries(infratestutilmain PUBLIC infratestutil)
+
+if (INFRA_INSTALL_DEVELOPMENT_FILES)
+    install(TARGETS infratestutil infratestutilmain EXPORT infra-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra/test
+    )
+endif ()

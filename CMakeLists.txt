@@ -577,14 +577,6 @@ if (INFRA_INSTALL_DEVELOPMENT_FILES)
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
     )
 
-    if (INFRA_ENABLE_TEST_UTILS)
-        install(TARGETS infratestutil infratestutilmain EXPORT infra-targets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra/test
-        )
-    endif ()
-
     if (INFRA_UI_COMPONENTS)
         install(TARGETS uiinfra EXPORT infra-targets
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
