@@ -456,9 +456,15 @@ if (INFRA_UI_COMPONENTS)
     endif ()
 
     if (INFRA_UI_COMPONENTS_QML)
+        find_package(Qt5Quick CONFIG REQUIRED)
+
         target_sources(uiinfra PRIVATE
             include/uiinfra/pixmapimage.h ui/pixmapimage.cpp
             include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
+        )
+
+        target_link_libraries(uiinfra PUBLIC
+            Qt5::Quick
         )
     endif ()
 
