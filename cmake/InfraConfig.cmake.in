@@ -43,7 +43,19 @@ if (@INFRA_UI_COMPONENTS@)
     find_dependency(Qt5Widgets REQUIRED)
     find_dependency(Qt5Core REQUIRED)
     find_dependency(Qt5Network REQUIRED)
-    find_dependency(date CONFIG REQUIRED QUIET)
+    find_dependency(date CONFIG REQUIRED)
+
+    if (@INFRA_UI_COMPONENTS_QML@)
+        find_dependency(Qt5Quick CONFIG REQUIRED)
+    endif ()
+
+    if (@INFRA_UI_COMPONENTS_LOCATION@)
+        find_dependency(Qt5Location CONFIG REQUIRED)
+    endif ()
+
+    if (@INFRA_UI_COMPONENTS_XLSX_EXPORT@)
+        find_dependency(XlsxWriter REQUIRED)
+    endif ()
 endif ()
 
 if (@INFRA_ENABLE_TEST_UTILS@)
