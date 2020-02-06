@@ -40,6 +40,27 @@ Legend create_numeric_legend(std::vector<float> sampleData, int numberOfClasses,
     return legend;
 }
 
+Legend create_categoric_legend(int64_t min, int64_t max, std::string_view cmapName)
+{
+    Legend legend;
+    legend.type            = Legend::Type::Categoric;
+    legend.numberOfClasses = (max - min) + 1;
+    legend.colorMapName    = cmapName;
+    legend.entries.resize(legend.numberOfClasses);
+    legend.cmap = ColorMap::create(cmapName);
+
+    const float colorOffset = legend.numberOfClasses == 1 ? 0.f : 1.f / (legend.numberOfClasses - 1.f);
+    float colorPos          = 0.f;
+    for (int i = min; i <= max; ++i) {
+        legend.entries[i].color      = legend.cmap.get_color(colorPos);
+        legend.entries[i].lowerBound = double(i);
+        legend.entries[i].upperBound = legend.entries[i].lowerBound;
+        colorPos += colorOffset;
+    }
+
+    return legend;
+}
+
 Legend create_legend(std::vector<float> sampleData, Legend::Type type, int numberOfClasses, std::string_view cmapName)
 {
     if (type == Legend::Type::Numeric) {
