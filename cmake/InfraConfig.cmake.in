@@ -46,6 +46,10 @@ if (@INFRA_UI_COMPONENTS@)
     find_dependency(date CONFIG REQUIRED QUIET)
 endif ()
 
+if (@INFRA_ENABLE_TEST_UTILS@)
+    find_dependency(doctest CONFIG REQUIRED)
+endif ()
+
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
 if(NOT TARGET Infra::Infra)
