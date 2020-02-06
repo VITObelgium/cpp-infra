@@ -64,8 +64,8 @@ endif ()
 
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
-if(NOT TARGET Infra::Infra)
+if(NOT TARGET Infra::infra)
     include("${Infra_CMAKE_DIR}/InfraTargets.cmake")
 endif()
 
-set(Infra_LIBRARIES Infra::Infra)
+set(Infra_LIBRARIES Infra::infra)
