@@ -14,7 +14,7 @@ set_target_properties(infratestutil PROPERTIES
     PUBLIC_HEADER "${INFRA_TESTUTIL_PUBLIC_HEADERS}"
 )
 
-add_library(Infra::testutil ALIAS infratestutil)
+add_library(Infra::infratestutil ALIAS infratestutil)
 
 target_include_directories(infratestutil PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
