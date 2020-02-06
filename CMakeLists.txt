@@ -463,6 +463,8 @@ if (INFRA_UI_COMPONENTS)
             include/uiinfra/quickitemimagegrabber.h ui/quickitemimagegrabber.cpp
         )
 
+        list (APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/pixmapimage.h include/uiinfra/quickitemimagegrabber.h)
+
         target_link_libraries(uiinfra PUBLIC
             Qt5::Quick
         )
@@ -481,11 +483,17 @@ if (INFRA_UI_COMPONENTS)
         target_sources(uiinfra PRIVATE
             ui/Legend.qml
             include/uiinfra/polygonmodel.h ui/polygonmodel.cpp
-            include/uiinfra/polygonmodel2.h ui/polygonmodel2.cpp
             include/uiinfra/legendmodel.h ui/legendmodel.cpp
             include/uiinfra/maplegendmodel.h ui/maplegendmodel.cpp
             include/uiinfra/rastervalueprovider.h ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
+        )
+
+        list (APPEND UIINFRA_PUBLIC_HEADERS
+            include/uiinfra/polygonmodel.h
+            include/uiinfra/legendmodel.h
+            include/uiinfra/maplegendmodel.h
+            include/uiinfra/rastervalueprovider.h
         )
 
         target_link_libraries(uiinfra PUBLIC
