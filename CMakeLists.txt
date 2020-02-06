@@ -551,28 +551,6 @@ if (INFRA_IS_TOPLEVEL)
     endif ()
 endif ()
 
-if (INFRA_INSTALL_DEVELOPMENT_FILES)
-    install(TARGETS infra EXPORT infra-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
-    )
-
-    if (INFRA_UI_COMPONENTS)
-        install(TARGETS uiinfra EXPORT infra-targets
-            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
-        )   
-    endif ()
-
-    install(EXPORT infra-targets
-        FILE InfraTargets.cmake
-        NAMESPACE Infra::
-        DESTINATION ${INSTALL_CONFIGDIR}
-    )
-endif ()
-
 if (INFRA_ENABLE_TESTS)
     add_subdirectory(test)
     if (INFRA_UI_COMPONENTS)
@@ -590,4 +568,34 @@ endif ()
 
 if (INFRA_ENABLE_DOCUMENTATION)
     add_subdirectory(docs)
+endif ()
+
+if (INFRA_INSTALL_DEVELOPMENT_FILES)
+    install(TARGETS infra EXPORT infra-targets
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
+    )
+
+    if (INFRA_ENABLE_TEST_UTILS)
+        install(TARGETS infratestutil infratestutilmain EXPORT infra-targets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra/test
+        )
+    endif ()
+
+    if (INFRA_UI_COMPONENTS)
+        install(TARGETS uiinfra EXPORT infra-targets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
+        )   
+    endif ()
+
+    install(EXPORT infra-targets
+        FILE InfraTargets.cmake
+        NAMESPACE Infra::
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
 endif ()
