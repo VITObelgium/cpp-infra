@@ -502,7 +502,7 @@ if (INFRA_UI_COMPONENTS)
         find_package(XlsxWriter REQUIRED)
         list (APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/modelexport.h)
         target_sources(uiinfra PRIVATE ui/modelexport.cpp)
-        target_link_libraries(uiinfra PRIVATE XslxWriter::XslxWriter)
+        target_link_libraries(uiinfra PRIVATE XlsxWriter::XlsxWriter)
     endif ()
 
     if (INFRA_LOGGING)
