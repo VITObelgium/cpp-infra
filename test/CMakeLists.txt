@@ -44,8 +44,8 @@ if (INFRA_GDAL AND INFRA_CHARSET)
 endif ()
 
 target_link_libraries(infratest
-    infra
-	infratestutil
+    Infra::infra
+	Infra::infratestutil
     trompeloeil
 )
 
