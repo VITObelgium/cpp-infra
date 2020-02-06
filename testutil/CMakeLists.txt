@@ -1,9 +1,20 @@
 find_package(doctest CONFIG REQUIRED)
 
-add_library(infratestutil
-    include/infra/test/printsupport.h printsupport.cpp
+set (INFRA_TESTUTIL_PUBLIC_HEADERS
+    include/infra/test/printsupport.h
     include/infra/test/reporter.h
 )
+
+add_library(infratestutil
+    ${INFRA_TESTUTIL_PUBLIC_HEADERS}
+     printsupport.cpp
+)
+
+set_target_properties(infratestutil PROPERTIES
+    PUBLIC_HEADER "${INFRA_TESTUTIL_PUBLIC_HEADERS}"
+)
+
+add_library(Infra::testutil ALIAS infratestutil)
 
 target_include_directories(infratestutil PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
@@ -14,5 +25,7 @@ target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
 add_library(infratestutilmain
     testmain.cpp
 )
+
+add_library(Infra::testutilmain ALIAS infratestutilmain)
 
 target_link_libraries(infratestutilmain PUBLIC infratestutil)
