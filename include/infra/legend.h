@@ -36,10 +36,21 @@ struct Legend
         Numeric,
     };
 
+    /*! Map the value to a color based on the legend entries
+     * If the value cannot be mapped the the color of the edge entries
+     * will be used depending on the the value
+     */
+    Color color_for_value(double value) const noexcept;
+
+    /*! Map the value to a color based on the legend entries
+     * If the value cannot be mapped the unmappable color will be returned
+     */
+    Color color_for_value(double value, const Color& unmappable) const noexcept;
+
     Type type           = Type::Categoric;
     int numberOfClasses = 5;
     std::vector<LegendEntry> entries;
-    inf::ColorMap cmap;
+    ColorMap cmap;
     std::string colorMapName;
     std::string title;
     bool zeroIsNodata = false;
