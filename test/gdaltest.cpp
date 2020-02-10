@@ -62,6 +62,44 @@ TEST_CASE("GdalTest.getField")
     }
 }
 
+TEST_CASE("GdalTest.inMemoryVector")
+{
+    auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
+    gdal::VectorDataSet ds(memDriver.create_dataset());
+    auto layer = ds.create_layer("wbv", gdal::Geometry::Type::Unknown);
+
+    auto nameField  = gdal::FieldDefinition::create<std::string>("name");
+    auto valueField = gdal::FieldDefinition::create<double>("value");
+    layer.create_field(nameField);
+    layer.create_field(valueField);
+
+    auto nameIndex  = layer.layer_definition().field_index(nameField.name());
+    auto valueIndex = layer.layer_definition().field_index(valueField.name());
+
+    {
+        gdal::Feature feat(layer.layer_definition());
+        feat.set_field<std::string>(nameIndex, "name1");
+        feat.set_field<double>(valueIndex, 4.0);
+        layer.create_feature(feat);
+    }
+
+    {
+        gdal::Feature feat(layer.layer_definition());
+        feat.set_field<std::string>(nameIndex, "name2");
+        layer.create_feature(feat);
+    }
+
+    for (auto& feature : ds.layer(0)) {
+        if (feature.field_as<std::string_view>(nameIndex) == "name1") {
+            CHECK(feature.field_as<double>(valueIndex) == 4.0);
+        } else if (feature.field_as<std::string_view>(nameIndex) == "name2") {
+            CHECK_FALSE(feature.field_is_valid(valueIndex));
+        } else {
+            FAIL("Unexpected field in layer");
+        }
+    }
+}
+
 TEST_CASE("GdalTest.convertPointProjected")
 {
     // Check conversion of bottom left corner of flanders map
