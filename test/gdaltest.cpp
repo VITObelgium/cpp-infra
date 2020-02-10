@@ -92,8 +92,10 @@ TEST_CASE("GdalTest.inMemoryVector")
     for (auto& feature : ds.layer(0)) {
         if (feature.field_as<std::string_view>(nameIndex) == "name1") {
             CHECK(feature.field_as<double>(valueIndex) == 4.0);
+            CHECK(feature.opt_field_as<double>(valueIndex) == 4.0);
         } else if (feature.field_as<std::string_view>(nameIndex) == "name2") {
             CHECK_FALSE(feature.field_is_valid(valueIndex));
+            CHECK_FALSE(feature.opt_field_as<double>(valueIndex).has_value());
         } else {
             FAIL("Unexpected field in layer");
         }
