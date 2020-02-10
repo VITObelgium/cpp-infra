@@ -44,14 +44,14 @@ Legend create_categoric_legend(int64_t min, int64_t max, std::string_view cmapNa
 {
     Legend legend;
     legend.type            = Legend::Type::Categoric;
-    legend.numberOfClasses = (max - min) + 1;
+    legend.numberOfClasses = truncate<int>((max - min) + 1);
     legend.colorMapName    = cmapName;
     legend.entries.resize(legend.numberOfClasses);
     legend.cmap = ColorMap::create(cmapName);
 
     const float colorOffset = legend.numberOfClasses == 1 ? 0.f : 1.f / (legend.numberOfClasses - 1.f);
     float colorPos          = 0.f;
-    for (int i = min; i <= max; ++i) {
+    for (int64_t i = min; i <= max; ++i) {
         legend.entries[i].color      = legend.cmap.get_color(colorPos);
         legend.entries[i].lowerBound = double(i);
         legend.entries[i].upperBound = legend.entries[i].lowerBound;
