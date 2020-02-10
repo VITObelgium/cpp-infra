@@ -10,6 +10,46 @@
 
 namespace inf {
 
+Color Legend::color_for_value(double value) const noexcept
+{
+    if (std::isnan(value)) {
+        return Color();
+    }
+
+    for (auto& entry : entries) {
+        if (value >= entry.lowerBound && value < entry.upperBound) {
+            return entry.color;
+        }
+    }
+
+    if (!entries.empty()) {
+        if (value < entries.front().lowerBound) {
+            return entries.front().color;
+        }
+
+        if (value >= entries.back().upperBound) {
+            return entries.back().color;
+        }
+    }
+
+    return Color();
+}
+
+Color Legend::color_for_value(double value, const Color& unmappable) const noexcept
+{
+    if (std::isnan(value)) {
+        return unmappable;
+    }
+
+    for (auto& entry : entries) {
+        if (value >= entry.lowerBound && value < entry.upperBound) {
+            return entry.color;
+        }
+    }
+
+    return unmappable;
+}
+
 Legend create_numeric_legend(double min, double max, int numberOfClasses, std::string_view cmapName, LegendScaleType method)
 {
     Legend legend;
