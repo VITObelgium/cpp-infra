@@ -767,7 +767,7 @@ void Feature::set_field(int index, const Field& field)
     std::visit([this, index](const auto& val) {
         set_field<std::decay_t<decltype(val)>>(index, val);
     },
-               field);
+        field);
 }
 
 bool Feature::operator==(const Feature& other) const
@@ -979,8 +979,8 @@ void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& opti
         optionsArray.push_back(opt);
     }
 
-    gdal::StringOptions opts(optionsArray);
-    checkError(_layer->Intersection(method.get(), output.get(), opts.get(), progressFunc, progressArg), "Failed to get layer intersection");
+    auto opts = create_string_list(optionsArray);
+    checkError(_layer->Intersection(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to get layer intersection");
 }
 
 LayerIterator::LayerIterator()

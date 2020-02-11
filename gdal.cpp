@@ -339,7 +339,7 @@ Point<double> projected_to_geographic(int32_t epsg, Point<double> point)
 
     auto poLatLong = utm.clone_geo_cs();
     auto trans     = checkPointer(OGRCreateCoordinateTransformation(utm.get(), poLatLong.get()),
-                              "Failed to create transformation");
+        "Failed to create transformation");
 
     if (!trans->Transform(1, &point.x, &point.y)) {
         throw RuntimeError("Failed to perform transformation");
@@ -371,6 +371,16 @@ std::optional<int32_t> projection_to_epsg(const std::string& projection)
 {
     SpatialReference spatialRef(projection.c_str());
     return str::to_int32(spatialRef.authority_code("PROJCS"));
+}
+
+CPLStringList create_string_list(gsl::span<const std::string> options)
+{
+    CPLStringList result;
+    for (auto& opt : options) {
+        result.AddString(opt.c_str());
+    }
+
+    return result;
 }
 
 Registration::Registration()
@@ -468,38 +478,6 @@ void unregister_embedded_data()
 #endif
 }
 
-StringOptions::StringOptions(gsl::span<const std::string> options)
-{
-    for (auto& opt : options) {
-        add(opt.c_str());
-    }
-}
-
-StringOptions::~StringOptions()
-{
-    CSLDestroy(_options);
-}
-
-void StringOptions::add(const char* value)
-{
-    _options = CSLAddString(_options, value);
-}
-
-void StringOptions::add(const std::string& value)
-{
-    add(value.c_str());
-}
-
-char** StringOptions::get()
-{
-    return _options;
-}
-
-StringOptions::ConstList StringOptions::get() const
-{
-    return _options;
-}
-
 bool RasterDriver::is_supported(RasterType type)
 {
     if (type == RasterType::Unknown) {
@@ -551,15 +529,15 @@ RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t n
 
 RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, gsl::span<const std::string> driverOptions)
 {
-    StringOptions options(driverOptions);
+    auto options = create_string_list(driverOptions);
     return RasterDataSet(checkPointer(_driver.CreateCopy(
                                           filename.u8string().c_str(),
                                           reference.get(),
                                           FALSE,
-                                          options.get(),
+                                          options.List(),
                                           nullptr,
                                           nullptr),
-                                      "Failed to create data set copy"));
+        "Failed to create data set copy"));
 }
 
 RasterType RasterDriver::type() const
@@ -624,15 +602,15 @@ VectorDataSet VectorDriver::create_dataset(const fs::path& filename)
 
 VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
 {
-    StringOptions options(driverOptions);
+    auto options = create_string_list(driverOptions);
     return VectorDataSet(checkPointer(_driver.CreateCopy(
                                           filename.u8string().c_str(),
                                           reference.get(),
                                           FALSE,
-                                          options.get(),
+                                          options.List(),
                                           nullptr,
                                           nullptr),
-                                      "Failed to create data set copy"));
+        "Failed to create data set copy"));
 }
 
 VectorType VectorDriver::type() const
@@ -660,9 +638,9 @@ const GDALRasterBand* RasterBand::get() const
 }
 
 static GDALDataset* create_data_set(const fs::path& filePath,
-                                    unsigned int openFlags,
-                                    const char* const* drivers,
-                                    const std::vector<std::string>& driverOpts)
+    unsigned int openFlags,
+    const char* const* drivers,
+    const std::vector<std::string>& driverOpts)
 {
     // use generic_u8string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
@@ -682,12 +660,12 @@ static GDALDataset* create_data_set(const fs::path& filePath,
     }
 #endif
 
-    gdal::StringOptions options(driverOpts);
+    auto options = create_string_list(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
         path.c_str(),
         openFlags,
         drivers,
-        options.get(),
+        options.List(),
         nullptr));
 }
 
@@ -716,10 +694,10 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
     }};
 
     return RasterDataSet(checkPointer(create_data_set(filePath,
-                                                      GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                                      allowedDrivers.data(),
-                                                      driverOpts),
-                                      "Failed to open raster file"));
+                                          GDAL_OF_READONLY | GDAL_OF_RASTER,
+                                          allowedDrivers.data(),
+                                          driverOpts),
+        "Failed to open raster file"));
 }
 
 RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, const std::vector<std::string>& driverOpts)
@@ -747,10 +725,10 @@ RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, RasterTy
     }};
 
     return RasterDataSet(checkPointer(create_data_set(filePath,
-                                                      GDAL_OF_UPDATE | GDAL_OF_RASTER,
-                                                      allowedDrivers.data(),
-                                                      driverOpts),
-                                      "Failed to open raster file for writing"));
+                                          GDAL_OF_UPDATE | GDAL_OF_RASTER,
+                                          allowedDrivers.data(),
+                                          driverOpts),
+        "Failed to open raster file for writing"));
 }
 
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
@@ -1185,21 +1163,21 @@ static OGRwkbGeometryType to_gdal_type(Geometry::Type type)
 Layer VectorDataSet::create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions)
 {
     assert(_ptr);
-    gdal::StringOptions options(driverOptions);
-    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), options.get()), "Layer creation failed"));
+    auto options = create_string_list(driverOptions);
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), options.List()), "Layer creation failed"));
 }
 
 Layer VectorDataSet::copy_layer(Layer srcLayer, const char* newLayerName, const std::vector<std::string>& driverOptions)
 {
-    gdal::StringOptions options(driverOptions);
-    return Layer(checkPointer(_ptr->CopyLayer(srcLayer.get(), newLayerName, options.get()), "Layer copy failed"));
+    auto options = create_string_list(driverOptions);
+    return Layer(checkPointer(_ptr->CopyLayer(srcLayer.get(), newLayerName, options.List()), "Layer copy failed"));
 }
 
 Layer VectorDataSet::create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions)
 {
     assert(_ptr);
-    gdal::StringOptions options(driverOptions);
-    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), spatialRef.get(), to_gdal_type(type), options.get()), "Layer creation failed"));
+    auto options = create_string_list(driverOptions);
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), spatialRef.get(), to_gdal_type(type), options.List()), "Layer creation failed"));
 }
 
 GDALDataset* VectorDataSet::get() const
@@ -1313,8 +1291,8 @@ void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<dou
 MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
-                            const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
-                            dataBuffer.size(), FALSE /*no ownership*/))
+      const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),
+      dataBuffer.size(), FALSE /*no ownership*/))
 {
 }
 

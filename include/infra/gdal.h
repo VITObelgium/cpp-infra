@@ -168,30 +168,12 @@ std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
 std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
 std::optional<int32_t> projection_to_epsg(const std::string& projection);
+CPLStringList create_string_list(gsl::span<const std::string> driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
 
 void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<double, 6>& geoTrans);
-
-class StringOptions
-{
-public:
-    using ConstList = const char* const*;
-
-    StringOptions() = default;
-    StringOptions(gsl::span<const std::string> options);
-    ~StringOptions() noexcept;
-
-    void add(const char* value);
-    void add(const std::string& value);
-
-    char** get();
-    ConstList get() const;
-
-private:
-    char** _options = nullptr;
-};
 
 class RasterBand
 {
@@ -257,7 +239,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         checkError(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-                   "Failed to read raster data");
+            "Failed to read raster data");
     }
 
     /* 
@@ -280,7 +262,7 @@ public:
         auto* bandPtr = checkPointer(_ptr->GetRasterBand(band), "Failed to get raster band for writing");
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         checkError(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-                   "Failed to write raster data");
+            "Failed to write raster data");
     }
 
     void read_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const;
@@ -368,8 +350,8 @@ public:
     template <typename T>
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, gsl::span<const std::string> driverOptions = {})
     {
-        gdal::StringOptions options(driverOptions);
-        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, options.get()), "Failed to create data set"));
+        auto options = create_string_list(driverOptions);
+        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, options.List()), "Failed to create data set"));
     }
 
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType);
@@ -378,8 +360,8 @@ public:
     template <typename T>
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, gsl::span<const std::string> driverOptions = {})
     {
-        gdal::StringOptions options(driverOptions);
-        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, options.get()), "Failed to create data set"));
+        auto options = create_string_list(driverOptions);
+        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, options.List()), "Failed to create data set"));
     }
 
     // Use for the memory driver, when there is no path
