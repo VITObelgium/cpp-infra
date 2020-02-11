@@ -39,11 +39,11 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAl
     }
 
     warpOptions->pTransformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
-                                                                                      nullptr,
-                                                                                      dstDataSet.get(),
-                                                                                      nullptr,
-                                                                                      FALSE, 0.0, 0),
-                                                      "Failed to create actual warping transformer");
+                                                          nullptr,
+                                                          dstDataSet.get(),
+                                                          nullptr,
+                                                          FALSE, 0.0, 0),
+        "Failed to create actual warping transformer");
 
     GDALWarpOperation operation;
     operation.Initialize(warpOptions);
@@ -83,11 +83,11 @@ GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
     // to destination georeferenced coordinates (not destination pixel line).
     // We do that by omitting the destination dataset handle (setting it to nullptr).
     auto* transformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
-                                                                              nullptr,
-                                                                              nullptr,
-                                                                              resultMeta.projection.c_str(),
-                                                                              FALSE, 0.0, 0),
-                                              "Failed to create warping transformer");
+                                                  nullptr,
+                                                  nullptr,
+                                                  resultMeta.projection.c_str(),
+                                                  FALSE, 0.0, 0),
+        "Failed to create warping transformer");
 
     // Get information about the output size of the warped image
     std::array<double, 6> dstGeoTransform;
@@ -116,9 +116,8 @@ public:
     RasterizeOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-
-        StringOptions optionValues(opts);
-        _options          = GDALRasterizeOptionsNew(optionValues.get(), nullptr);
+        auto optionValues = create_string_list(opts);
+        _options          = GDALRasterizeOptionsNew(optionValues.List(), nullptr);
     }
 
     ~RasterizeOptionsWrapper()
@@ -164,8 +163,8 @@ public:
     VectorTranslateOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        StringOptions optionValues(opts);
-        _options          = GDALVectorTranslateOptionsNew(optionValues.get(), nullptr);
+        auto optionValues = create_string_list(opts);
+        _options          = GDALVectorTranslateOptionsNew(optionValues.List(), nullptr);
     }
 
     ~VectorTranslateOptionsWrapper()
@@ -205,8 +204,8 @@ public:
     WarpOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        StringOptions optionValues(opts);
-        _options          = GDALWarpAppOptionsNew(optionValues.get(), nullptr);
+        auto optionValues = create_string_list(opts);
+        _options          = GDALWarpAppOptionsNew(optionValues.List(), nullptr);
     }
 
     ~WarpOptionsWrapper()
