@@ -106,7 +106,7 @@ public:
     SpatialReference(const std::string& wkt);
     ~SpatialReference() noexcept;
 
-    SpatialReference(SpatialReference&&) = default;
+    SpatialReference(SpatialReference&&);
 
     SpatialReference clone() const;
     SpatialReference clone_geo_cs() const;
@@ -132,7 +132,7 @@ public:
 private:
     SpatialReference(OGRSpatialReference* instance);
 
-    std::unique_ptr<OGRSpatialReference> _srs;
+    OGRSpatialReference* _srs = nullptr;
 };
 
 class CoordinateTransformer

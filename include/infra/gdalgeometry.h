@@ -28,6 +28,7 @@ using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
 class Layer;
+class SpatialReference;
 class CoordinateTransformer;
 
 template <typename GeometryType>
@@ -476,6 +477,7 @@ public:
     Layer& operator=(Layer&&) = default;
 
     std::optional<int32_t> epsg() const;
+    //! Make sure the spatial reference stays in scope while using the layer!
     void set_projection_from_epsg(int32_t epsg);
 
     void set_ignored_fields(const std::vector<std::string>& fieldnames);

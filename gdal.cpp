@@ -118,7 +118,7 @@ Unsigned signedToUnsigned(Signed value, const char* valueDesc)
 } // namespace
 
 SpatialReference::SpatialReference()
-: _srs(std::make_unique<OGRSpatialReference>())
+: _srs(new OGRSpatialReference())
 {
 }
 
@@ -139,15 +139,24 @@ SpatialReference::SpatialReference(const std::string& wkt)
 {
 }
 
+SpatialReference::SpatialReference(SpatialReference&& other)
+: _srs(other._srs)
+{
+    other._srs = nullptr;
+}
+
 SpatialReference::SpatialReference(OGRSpatialReference* instance)
 : _srs(instance)
 {
+    _srs->Reference();
 }
 
 SpatialReference::~SpatialReference() noexcept
 {
-    // don't simply let the unique_ptr call the destructor, it is deprecated
-    OGRSpatialReference::DestroySpatialReference(_srs.release());
+    if (_srs) {
+        // This does not actually delete if the reference count is still higher than 1
+        _srs->Release();
+    }
 }
 
 SpatialReference SpatialReference::clone() const
@@ -237,12 +246,12 @@ void SpatialReference::set_utm(int zone, bool north)
 
 OGRSpatialReference* SpatialReference::get() noexcept
 {
-    return _srs.get();
+    return _srs;
 }
 
 const OGRSpatialReference* SpatialReference::get() const noexcept
 {
-    return _srs.get();
+    return _srs;
 }
 
 CoordinateTransformer::CoordinateTransformer(SpatialReference source, SpatialReference dest)

@@ -821,7 +821,11 @@ std::optional<int32_t> Layer::epsg() const
 
 void Layer::set_projection_from_epsg(int32_t epsg)
 {
-    SpatialReference spatialRef(epsg);
+    SpatialReference srs(epsg);
+    const int geomCount = _layer->GetLayerDefn()->GetGeomFieldCount();
+    for (int i = 0; i < geomCount; ++i) {
+        _layer->GetLayerDefn()->GetGeomFieldDefn(i)->SetSpatialRef(srs.get());
+    }
 }
 
 void Layer::set_ignored_fields(const std::vector<std::string>& fieldnames)
