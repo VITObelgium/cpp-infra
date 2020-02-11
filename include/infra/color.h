@@ -9,8 +9,8 @@ struct Color
 {
     constexpr Color() = default;
 
-    constexpr Color(uint8_t r_, uint8_t g_, uint8_t b_) noexcept
-    : Color(r_, g_, b_, 255)
+    constexpr Color(uint8_t r, uint8_t g, uint8_t b) noexcept
+    : Color(r, g, b, 255)
     {
     }
 
@@ -40,6 +40,16 @@ struct Color
     uint8_t b = 0;
     uint8_t a = 0;
 };
+
+namespace color {
+static constexpr Color Black(0, 0, 0);
+static constexpr Color White(255, 255, 255);
+static constexpr Color Blue(0, 0, 255);
+static constexpr Color Green(0, 255, 0);
+static constexpr Color Red(255, 0, 0);
+static constexpr Color Transparent(0, 0, 0, 0);
+}
+
 }
 
 namespace fmt {
