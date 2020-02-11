@@ -300,6 +300,16 @@ void CoordinateTransformer::transform_in_place(Coordinate& coord) const
     }
 }
 
+std::string CoordinateTransformer::source_projection() const
+{
+    return _sourceSRS.export_to_wkt();
+}
+
+std::string CoordinateTransformer::target_projection() const
+{
+    return _targetSRS.export_to_wkt();
+}
+
 OGRCoordinateTransformation* CoordinateTransformer::get()
 {
     return _transformer.get();

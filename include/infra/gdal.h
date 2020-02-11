@@ -147,6 +147,9 @@ public:
     Coordinate transform(const Coordinate& coord) const;
     void transform_in_place(Coordinate& coord) const;
 
+    std::string source_projection() const;
+    std::string target_projection() const;
+
     OGRCoordinateTransformation* get();
 
 private:
