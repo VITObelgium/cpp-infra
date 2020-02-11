@@ -468,14 +468,36 @@ void unregister_embedded_data()
 #endif
 }
 
-std::vector<const char*> create_string_array(gsl::span<const std::string> driverOptions)
+StringOptions::StringOptions(gsl::span<const std::string> options)
 {
-    std::vector<const char*> options(driverOptions.size());
-    std::transform(driverOptions.begin(), driverOptions.end(), options.begin(), [](auto& str) {
-        return str.c_str();
-    });
-    options.push_back(nullptr);
-    return options;
+    for (auto& opt : options) {
+        add(opt.c_str());
+    }
+}
+
+StringOptions::~StringOptions()
+{
+    CSLDestroy(_options);
+}
+
+void StringOptions::add(const char* value)
+{
+    _options = CSLAddString(_options, value);
+}
+
+void StringOptions::add(const std::string& value)
+{
+    add(value.c_str());
+}
+
+char** StringOptions::get()
+{
+    return _options;
+}
+
+StringOptions::ConstList StringOptions::get() const
+{
+    return _options;
 }
 
 bool RasterDriver::is_supported(RasterType type)
@@ -529,12 +551,12 @@ RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t n
 
 RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, gsl::span<const std::string> driverOptions)
 {
-    auto options = create_string_array(driverOptions);
+    StringOptions options(driverOptions);
     return RasterDataSet(checkPointer(_driver.CreateCopy(
                                           filename.u8string().c_str(),
                                           reference.get(),
                                           FALSE,
-                                          options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
+                                          options.get(),
                                           nullptr,
                                           nullptr),
                                       "Failed to create data set copy"));
@@ -602,12 +624,12 @@ VectorDataSet VectorDriver::create_dataset(const fs::path& filename)
 
 VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
 {
-    auto options = create_string_array(driverOptions);
+    StringOptions options(driverOptions);
     return VectorDataSet(checkPointer(_driver.CreateCopy(
                                           filename.u8string().c_str(),
                                           reference.get(),
                                           FALSE,
-                                          options.size() == 1 ? nullptr : const_cast<char**>(options.data()),
+                                          options.get(),
                                           nullptr,
                                           nullptr),
                                       "Failed to create data set copy"));
@@ -660,12 +682,12 @@ static GDALDataset* create_data_set(const fs::path& filePath,
     }
 #endif
 
-    auto options = create_string_array(driverOpts);
+    gdal::StringOptions options(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
         path.c_str(),
         openFlags,
         drivers,
-        options.size() == 1 ? nullptr : options.data(),
+        options.get(),
         nullptr));
 }
 
@@ -1163,15 +1185,21 @@ static OGRwkbGeometryType to_gdal_type(Geometry::Type type)
 Layer VectorDataSet::create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions)
 {
     assert(_ptr);
-    auto options = create_string_array(driverOptions);
-    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), const_cast<char**>(options.data())), "Layer creation failed"));
+    gdal::StringOptions options(driverOptions);
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), nullptr, to_gdal_type(type), options.get()), "Layer creation failed"));
+}
+
+Layer VectorDataSet::copy_layer(Layer srcLayer, const char* newLayerName, const std::vector<std::string>& driverOptions)
+{
+    gdal::StringOptions options(driverOptions);
+    return Layer(checkPointer(_ptr->CopyLayer(srcLayer.get(), newLayerName, options.get()), "Layer copy failed"));
 }
 
 Layer VectorDataSet::create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions)
 {
     assert(_ptr);
-    auto options = create_string_array(driverOptions);
-    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), spatialRef.get(), to_gdal_type(type), const_cast<char**>(options.data())), "Layer creation failed"));
+    gdal::StringOptions options(driverOptions);
+    return Layer(checkPointer(_ptr->CreateLayer(name.c_str(), spatialRef.get(), to_gdal_type(type), options.get()), "Layer creation failed"));
 }
 
 GDALDataset* VectorDataSet::get() const

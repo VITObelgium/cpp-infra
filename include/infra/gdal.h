@@ -168,12 +168,30 @@ std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
 std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
 std::optional<int32_t> projection_to_epsg(const std::string& projection);
-std::vector<const char*> create_string_array(gsl::span<const std::string> driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
 
 void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<double, 6>& geoTrans);
+
+class StringOptions
+{
+public:
+    using ConstList = const char* const*;
+
+    StringOptions() = default;
+    StringOptions(gsl::span<const std::string> options);
+    ~StringOptions() noexcept;
+
+    void add(const char* value);
+    void add(const std::string& value);
+
+    char** get();
+    ConstList get() const;
+
+private:
+    char** _options = nullptr;
+};
 
 class RasterBand
 {
@@ -326,6 +344,7 @@ public:
 
     Layer create_layer(const std::string& name, const std::vector<std::string>& driverOptions = {});
     Layer create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
+    Layer copy_layer(Layer srcLayer, const char* newLayerName, const std::vector<std::string>& driverOptions = {});
 
     /*! Make sure to keep the spatial reference object alive while working with the dataset! */
     Layer create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
@@ -349,8 +368,8 @@ public:
     template <typename T>
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, gsl::span<const std::string> driverOptions = {})
     {
-        auto options = create_string_array(driverOptions);
-        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, const_cast<char**>(options.data())), "Failed to create data set"));
+        gdal::StringOptions options(driverOptions);
+        return RasterDataSet(checkPointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, options.get()), "Failed to create data set"));
     }
 
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType);
@@ -359,8 +378,8 @@ public:
     template <typename T>
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, gsl::span<const std::string> driverOptions = {})
     {
-        auto options = create_string_array(driverOptions);
-        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, const_cast<char**>(options.data())), "Failed to create data set"));
+        gdal::StringOptions options(driverOptions);
+        return RasterDataSet(checkPointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, options.get()), "Failed to create data set"));
     }
 
     // Use for the memory driver, when there is no path
