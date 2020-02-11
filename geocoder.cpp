@@ -33,39 +33,38 @@ Geocoder::Geocoder(const Options& options)
 {
     _allowUnsafeSsl = options.allowUnsafeSsl;
 
-    std::vector<std::string> gcOptions;
-    gcOptions.push_back(fmt::format("SERVICE={}", options.service));
+    gdal::StringOptions optionsArray;
+    optionsArray.add(fmt::format("SERVICE={}", options.service));
 
     if (!options.cacheFile.empty()) {
-        gcOptions.push_back(fmt::format("CACHE_FILE={}", options.cacheFile));
+        optionsArray.add(fmt::format("CACHE_FILE={}", options.cacheFile));
     }
 
     if (!options.readCache) {
-        gcOptions.push_back("READ_CACHE=FALSE");
+        optionsArray.add("READ_CACHE=FALSE");
     }
 
     if (!options.writeCache) {
-        gcOptions.push_back("WRITE_CACHE=FALSE");
+        optionsArray.add("WRITE_CACHE=FALSE");
     }
 
     if (!options.email.empty()) {
-        gcOptions.push_back(fmt::format("EMAIL={}", options.email));
+        optionsArray.add(fmt::format("EMAIL={}", options.email));
     }
 
     if (!options.key.empty()) {
-        gcOptions.push_back(fmt::format("KEY={}", options.key));
+        optionsArray.add(fmt::format("KEY={}", options.key));
     }
 
     if (!options.application.empty()) {
-        gcOptions.push_back(fmt::format("APPLICATION={}", options.application));
+        optionsArray.add(fmt::format("APPLICATION={}", options.application));
     }
 
     if (!options.language.empty()) {
-        gcOptions.push_back(fmt::format("LANGUAGE={}", options.language));
+        optionsArray.add(fmt::format("LANGUAGE={}", options.language));
     }
 
-    auto stringArray = gdal::create_string_array(gcOptions);
-    _pimpl->gc       = OGRGeocodeCreateSession(const_cast<char**>(stringArray.data()));
+    _pimpl->gc = OGRGeocodeCreateSession(optionsArray.get());
 
     throw_on_invalid_handle();
 }
@@ -86,15 +85,14 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
         CPLSetThreadLocalConfigOption("GDAL_HTTP_UNSAFESSL", "YES");
     }
 
-    std::vector<std::string> gcOptions;
+    gdal::StringOptions optionsArray;
     if (!countryCode.empty()) {
-        gcOptions.push_back(fmt::format("COUNTRYCODES={}", countryCode));
+        optionsArray.add(fmt::format("COUNTRYCODES={}", countryCode));
     }
 
     std::optional<Coordinate> result;
 
-    auto stringArray = gdal::create_string_array(gcOptions);
-    auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, const_cast<char**>(stringArray.data()));
+    auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, optionsArray.get());
     if (layerHandle) {
         ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
 
@@ -118,13 +116,13 @@ std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::stri
 {
     std::vector<Coordinate> result;
 
-    std::vector<std::string> gcOptions;
+    gdal::StringOptions optionsArray;
     if (!countryCode.empty()) {
-        gcOptions.push_back(fmt::format("COUNTRYCODES={}", countryCode));
+        optionsArray.add(fmt::format("COUNTRYCODES={}", countryCode));
     }
 
-    auto stringArray = gdal::create_string_array(gcOptions);
-    auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, const_cast<char**>(stringArray.data()));
+    
+    auto layerHandle = OGRGeocode(_pimpl->gc, location.c_str(), nullptr, optionsArray.get());
     if (layerHandle) {
         ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
 

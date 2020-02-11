@@ -116,8 +116,9 @@ public:
     RasterizeOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        auto optionValues = create_string_array(opts);
-        _options          = GDALRasterizeOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
+
+        StringOptions optionValues(opts);
+        _options          = GDALRasterizeOptionsNew(optionValues.get(), nullptr);
     }
 
     ~RasterizeOptionsWrapper()
@@ -163,8 +164,8 @@ public:
     VectorTranslateOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        auto optionValues = create_string_array(opts);
-        _options          = GDALVectorTranslateOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
+        StringOptions optionValues(opts);
+        _options          = GDALVectorTranslateOptionsNew(optionValues.get(), nullptr);
     }
 
     ~VectorTranslateOptionsWrapper()
@@ -204,8 +205,8 @@ public:
     WarpOptionsWrapper(const std::vector<std::string>& opts)
     : _options(nullptr)
     {
-        auto optionValues = create_string_array(opts);
-        _options          = GDALWarpAppOptionsNew(const_cast<char**>(optionValues.data()), nullptr);
+        StringOptions optionValues(opts);
+        _options          = GDALWarpAppOptionsNew(optionValues.get(), nullptr);
     }
 
     ~WarpOptionsWrapper()

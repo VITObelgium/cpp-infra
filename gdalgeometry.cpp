@@ -828,10 +828,16 @@ void Layer::set_projection_from_epsg(int32_t epsg)
     }
 }
 
-void Layer::set_ignored_fields(const std::vector<std::string>& fieldnames)
+void Layer::set_ignored_fields(const std::vector<std::string>& fieldNames)
 {
-    auto fields = create_string_array(fieldnames);
-    checkError(_layer->SetIgnoredFields(fields.data()), "Failed to ignore layer fields");
+    std::vector<const char*> fieldPtrs;
+    fieldPtrs.reserve(fieldNames.size());
+    for (auto& name : fieldNames) {
+        fieldPtrs.push_back(name.c_str());
+    }
+
+    const CPLStringList fields(fieldPtrs.data());
+    checkError(_layer->SetIgnoredFields(const_cast<const char**>(fields.List())), "Failed to ignore layer fields");
 }
 
 int64_t Layer::feature_count() const
@@ -973,8 +979,8 @@ void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& opti
         optionsArray.push_back(opt);
     }
 
-    auto opts = create_string_array(optionsArray);
-    checkError(_layer->Intersection(method.get(), output.get(), const_cast<char**>(opts.data()), progressFunc, progressArg), "Failed to get layer intersection");
+    gdal::StringOptions opts(optionsArray);
+    checkError(_layer->Intersection(method.get(), output.get(), opts.get(), progressFunc, progressArg), "Failed to get layer intersection");
 }
 
 LayerIterator::LayerIterator()
