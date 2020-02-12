@@ -478,6 +478,24 @@ void unregister_embedded_data()
 #endif
 }
 
+std::string get_memory_file_buffer(const fs::path& p, bool remove)
+{
+    std::string result;
+    vsi_l_offset length;
+    auto* data = VSIGetMemFileBuffer(p.u8string().c_str(), &length, remove ? TRUE : FALSE);
+    ScopeGuard guard([=] () {
+        if (remove) {
+            CPLFree(data);
+        }
+    });
+
+    if (data) {
+        result.assign(reinterpret_cast<char*>(data), length);
+    }
+
+    return result;
+}
+
 bool RasterDriver::is_supported(RasterType type)
 {
     if (type == RasterType::Unknown) {

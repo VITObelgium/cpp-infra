@@ -56,6 +56,8 @@ void register_embedded_data();
 void register_embedded_data(const fs::path& p);
 void unregister_embedded_data();
 
+std::string get_memory_file_buffer(const fs::path& p, bool remove);
+
 class Layer;
 class RasterDriver;
 class VectorDriver;
