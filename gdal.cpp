@@ -594,10 +594,10 @@ VectorDataSet VectorDriver::create_dataset()
     return create_dataset("");
 }
 
-VectorDataSet VectorDriver::create_dataset(const fs::path& filename)
-
+VectorDataSet VectorDriver::create_dataset(const fs::path& filename, const std::vector<std::string>& creationOptions)
 {
-    return VectorDataSet(checkPointer(_driver.Create(filename.u8string().c_str(), 0, 0, 0, GDT_Unknown, nullptr), "Failed to create vector data set"));
+    auto options = create_string_list(creationOptions);
+    return VectorDataSet(checkPointer(_driver.Create(filename.u8string().c_str(), 0, 0, 0, GDT_Unknown, options), "Failed to create vector data set"));
 }
 
 VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
