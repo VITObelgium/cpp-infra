@@ -767,7 +767,7 @@ void Feature::set_field(int index, const Field& field)
     std::visit([this, index](const auto& val) {
         set_field<std::decay_t<decltype(val)>>(index, val);
     },
-        field);
+               field);
 }
 
 bool Feature::operator==(const Feature& other) const
@@ -817,6 +817,14 @@ std::optional<int32_t> Layer::epsg() const
     }
 
     return std::optional<int32_t>();
+}
+
+void Layer::set_projection(SpatialReference& srs)
+{
+    const int geomCount = _layer->GetLayerDefn()->GetGeomFieldCount();
+    for (int i = 0; i < geomCount; ++i) {
+        _layer->GetLayerDefn()->GetGeomFieldDefn(i)->SetSpatialRef(srs.get());
+    }
 }
 
 void Layer::set_projection_from_epsg(int32_t epsg)

@@ -105,6 +105,10 @@ VectorDataSet polygonize(const RasterDataSet& ds)
     auto layer = memDataSet.create_layer("Polygons");
     FieldDefinition def("Value", typeid(int32_t));
     layer.create_field(def);
+    if (auto projection = ds.projection(); !projection.empty()) {
+        SpatialReference srs(projection);
+        layer.set_projection(srs);
+    }
 
     checkError(GDALPolygonize(ds.rasterband(1).get(), ds.rasterband(1).get(), layer.handle(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
     return memDataSet;
