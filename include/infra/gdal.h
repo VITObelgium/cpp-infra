@@ -386,7 +386,7 @@ public:
 
     // Use for the memory driver, when there is no path
     VectorDataSet create_dataset();
-    VectorDataSet create_dataset(const fs::path& filename);
+    VectorDataSet create_dataset(const fs::path& filename, const std::vector<std::string>& creationOptions = {});
     VectorDataSet create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions = {});
 
     VectorType type() const;
