@@ -51,9 +51,12 @@ void MdiSubWindow::onMdiWindowStateChange(Qt::WindowStates oldState, Qt::WindowS
     // other UI elements
 
     if (!(oldState & Qt::WindowMaximized) && (newState & Qt::WindowMaximized)) {
+        _defaultMargin = widget()->layout()->margin();
         setLayoutMargin(0);
     } else if ((oldState & Qt::WindowMaximized) && !(newState & Qt::WindowMaximized)) {
-        setLayoutMargin(5);
+        if (_defaultMargin.has_value()) {
+            setLayoutMargin(*_defaultMargin);
+        }
     }
 }
 
