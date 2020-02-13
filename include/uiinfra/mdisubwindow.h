@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <qmdisubwindow.h>
 
 namespace inf::ui {
@@ -19,5 +20,7 @@ private:
 
     void saveSettings();
     void restoreSettings();
+
+    std::optional<int> _defaultMargin;
 };
 }
