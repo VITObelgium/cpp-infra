@@ -17,12 +17,18 @@ Color Legend::color_for_value(double value) const noexcept
     }
 
     for (auto& entry : entries) {
-        if (value >= entry.lowerBound && value < entry.upperBound) {
-            return entry.color;
+        if (type == inf::Legend::Type::Categoric) {
+            if (std::floor(value) == entry.lowerBound) {
+                return entry.color;
+            }
+        } else if (type == inf::Legend::Type::Numeric) {
+            if (value >= entry.lowerBound && value < entry.upperBound) {
+                return entry.color;
+            }
         }
     }
 
-    if (!entries.empty()) {
+    if (type == inf::Legend::Type::Numeric && !entries.empty()) {
         if (value < entries.front().lowerBound) {
             return entries.front().color;
         }
@@ -42,8 +48,14 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
     }
 
     for (auto& entry : entries) {
-        if (value >= entry.lowerBound && value < entry.upperBound) {
-            return entry.color;
+        if (type == inf::Legend::Type::Categoric) {
+            if (std::floor(value) == entry.lowerBound) {
+                return entry.color;
+            }
+        } else if (type == inf::Legend::Type::Numeric) {
+            if (value >= entry.lowerBound && value < entry.upperBound) {
+                return entry.color;
+            }
         }
     }
 
