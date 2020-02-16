@@ -10,8 +10,10 @@
 #include <algorithm>
 #include <execution>
 #else
+#ifndef Q_MOC_RUN //QTBUG-80990
 #include <pstl/algorithm>
 #include <pstl/execution>
+#endif
 #ifdef _MSC_VER
 namespace std::execution {
 using namespace __pstl::execution;
