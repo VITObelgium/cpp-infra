@@ -11,7 +11,7 @@ endif ()
 if (INFRA_IS_TOPLEVEL)
     cmake_minimum_required(VERSION 3.15)
     project(Infra
-        VERSION 0.9.23
+        VERSION 0.9.24
         LANGUAGES CXX
     )
     set(CMAKE_CXX_STANDARD 17)
@@ -444,7 +444,7 @@ if (INFRA_UI_COMPONENTS)
         date::date
     )
 
-    if (STATIC_QT AND WIN32)
+    if (STATIC_QT AND WIN32 AND Qt5Network_VERSION VERSION_LESS 5.14.0)
         get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
         if ("ssl" IN_LIST QT_NETWORK_FEATURES)
             message(STATUS "Qt network SSL enabled")
