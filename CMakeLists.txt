@@ -18,7 +18,6 @@ if (INFRA_IS_TOPLEVEL)
     set(CMAKE_CXX_EXTENSIONS OFF)
 
     if (MSVC)
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         # avoid windows specific warnings
         add_definitions(
             -D_CRT_SECURE_NO_WARNINGS
