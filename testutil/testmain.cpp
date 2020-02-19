@@ -15,6 +15,7 @@
 #include <Windows.h>
 #endif
 
+#include <locale>
 #include <cstdlib>
 #include <doctest/doctest.h>
 
@@ -22,6 +23,8 @@ using namespace doctest;
 
 int main(int argc, char** argv)
 {
+    std::locale::global(std::locale::classic());
+
 #ifdef WIN32
     // make sure we can print utf8 characters in the windows console
     SetConsoleOutputCP(CP_UTF8);
@@ -36,6 +39,8 @@ int main(int argc, char** argv)
 #ifdef HAVE_GDAL
     fs::path proj4DataPath = fs::u8path(argv[0]).parent_path() / "data";
     inf::gdal::Registration reg(proj4DataPath);
+
+    CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");
 #endif
 
     doctest::Context context;
