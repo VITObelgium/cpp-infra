@@ -11,7 +11,6 @@ add_executable(infratest
     legenddataanalysertest.cpp
     stringtest.cpp
     threadpooltest.cpp
-    main.cpp
 )
 
 if (INFRA_XML)
@@ -46,6 +45,7 @@ endif ()
 target_link_libraries(infratest
     Infra::infra
 	Infra::infratestutil
+    Infra::infratestutilmain
     trompeloeil
 )
 

@@ -22,12 +22,9 @@ target_include_directories(infratestutil PUBLIC
 
 target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
 
-add_library(infratestutilmain
-    testmain.cpp
-)
-
-add_library(Infra::testutilmain ALIAS infratestutilmain)
-
+add_library(infratestutilmain testmain.cpp)
+add_library(Infra::infratestutilmain ALIAS infratestutilmain)
+target_compile_definitions(infratestutilmain PRIVATE $<$<BOOL:INFRA_GDAL>:HAVE_GDAL>)
 target_link_libraries(infratestutilmain PUBLIC infratestutil)
 
 if (INFRA_INSTALL_DEVELOPMENT_FILES)
