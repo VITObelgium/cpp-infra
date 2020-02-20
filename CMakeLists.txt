@@ -36,6 +36,7 @@ option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_CHARSET "Enable the character set utility classes" OFF)
+option(INFRA_PROCESS "Enable the process utility classes" OFF)
 option(INFRA_DATABASE "Build the database utility classes" OFF)
 option(INFRA_DATABASE_SQLITE "Build the database sqlite utility classes" OFF)
 option(INFRA_DATABASE_POSTGRES "Build the database postgresql utility classes" OFF)
@@ -119,7 +120,6 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/point.h
-    include/infra/process.h
     include/infra/progressinfo.h
     include/infra/scopeguard.h
     include/infra/signal.h
@@ -144,7 +144,6 @@ add_library(infra
     csvwriter.cpp
     legend.cpp
     legenddataanalyser.cpp
-    process.cpp
     string.cpp
     exception.cpp
     filesystem.cpp
@@ -235,6 +234,13 @@ if (INFRA_CHARSET)
     target_sources(infra PRIVATE charset.cpp)
     target_compile_definitions(infra PRIVATE U_USING_ICU_NAMESPACE U_STATIC_IMPLEMENTATION )
     target_link_libraries(infra PRIVATE ICU::i18n ICU::uc ICU::data)
+endif ()
+
+if (INFRA_PROCESS)
+    find_package(reprocxx CONFIG REQUIRED)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/process.h)
+    target_sources(infra PRIVATE process.cpp)
+    target_link_libraries(infra PRIVATE reprocxx)
 endif ()
 
 if (INFRA_DATABASE)
