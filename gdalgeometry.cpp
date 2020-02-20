@@ -838,13 +838,7 @@ void Layer::set_projection_from_epsg(int32_t epsg)
 
 void Layer::set_ignored_fields(const std::vector<std::string>& fieldNames)
 {
-    std::vector<const char*> fieldPtrs;
-    fieldPtrs.reserve(fieldNames.size());
-    for (auto& name : fieldNames) {
-        fieldPtrs.push_back(name.c_str());
-    }
-
-    const CPLStringList fields(fieldPtrs.data());
+    const auto fields = create_string_list(fieldNames);
     checkError(_layer->SetIgnoredFields(const_cast<const char**>(fields.List())), "Failed to ignore layer fields");
 }
 
