@@ -216,7 +216,7 @@ if (INFRA_LOGGING)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
     target_sources(infra PRIVATE log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
-    target_compile_definitions(infra PRIVATE INFRA_LOG_ENABLED PUBLIC SPDLOG_FMT_EXTERNAL)
+    target_compile_definitions(infra PRIVATE INFRA_LOG_ENABLED)
     set_target_properties(spdlog::spdlog PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif ()
 
