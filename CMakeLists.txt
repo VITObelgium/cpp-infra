@@ -359,7 +359,6 @@ if (INFRA_UI_COMPONENTS)
     find_package(Qt5Widgets REQUIRED)
     find_package(Qt5Core REQUIRED)
     find_package(Qt5Network REQUIRED)
-    find_package(date CONFIG REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 

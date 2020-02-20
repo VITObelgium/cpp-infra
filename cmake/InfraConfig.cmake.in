@@ -4,6 +4,7 @@ include(CMakeFindDependencyMacro)
 list(APPEND CMAKE_MODULE_PATH ${Infra_CMAKE_DIR})
 
 find_dependency(fmt CONFIG REQUIRED)
+find_dependency(date CONFIG REQUIRED)
 
 if (@HAVE_BOOST_FILESYSTEM@)
     find_dependency(Boost COMPONENTS filesystem)
@@ -15,7 +16,6 @@ if (@INFRA_GDAL@)
         find_dependency(Gdal REQUIRED)
     endif ()
     find_dependency(Gsl REQUIRED)
-    find_dependency(date CONFIG REQUIRED)
 endif ()
 
 if (@INFRA_LOGGING@)
@@ -47,7 +47,6 @@ if (@INFRA_UI_COMPONENTS@)
     find_dependency(Qt5Widgets REQUIRED)
     find_dependency(Qt5Core REQUIRED)
     find_dependency(Qt5Network REQUIRED)
-    find_dependency(date CONFIG REQUIRED)
 
     if (@INFRA_UI_COMPONENTS_QML@)
         find_dependency(Qt5Quick CONFIG REQUIRED)
