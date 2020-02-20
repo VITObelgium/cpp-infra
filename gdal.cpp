@@ -3,7 +3,6 @@
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/gdallog.h"
-#include "infra/log.h"
 #include "infra/scopeguard.h"
 #include "infra/string.h"
 
