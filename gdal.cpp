@@ -243,6 +243,16 @@ void SpatialReference::set_utm(int zone, bool north)
     _srs->SetUTM(zone, north ? TRUE : FALSE);
 }
 
+bool SpatialReference::is_geographic() const
+{
+    return _srs->IsGeographic();
+}
+
+bool SpatialReference::is_projected() const
+{
+    return _srs->IsProjected();
+}
+
 OGRSpatialReference* SpatialReference::get() noexcept
 {
     return _srs;

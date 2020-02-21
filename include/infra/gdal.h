@@ -128,6 +128,9 @@ public:
     void set_well_known_geog_cs(const char* geogCs);
     void set_utm(int zone, bool north = true);
 
+    bool is_geographic() const;
+    bool is_projected() const;
+
     OGRSpatialReference* get() noexcept;
     const OGRSpatialReference* get() const noexcept;
 
