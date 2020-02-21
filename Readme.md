@@ -15,11 +15,17 @@ Think of:
 This library tries to avoid reinventing the wheel over and over again when creating C++ projects. Most classes are wrappers around third party libraries (avoid reinventing the wheel remember) but guard us against third party API breakage and allows us to create the most convenient interface for our needs.
 
 ## Building
+#### Requirements
+- A C++17 compiler
+- fmt library (https://github.com/fmtlib/fmt)
+- date library (https://github.com/HowardHinnant/date)
+
 The library is built using CMake:
 ```
 cmake -G Ninja "/path/to/cpp-infra"
 ```
 
+#### Build options
 The following CMake options are available for toggling functionality:
 - `INFRA_LOGGING` Enable logging functionality (requires spdlog)
 - `INFRA_GDAL` Enable gdal wrapper (gdal without memory leaks) (required gdal)
