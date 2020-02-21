@@ -6,6 +6,7 @@
 
 #include <fmt/format.h>
 #include <fstream>
+#include <cassert>
 
 namespace inf {
 
