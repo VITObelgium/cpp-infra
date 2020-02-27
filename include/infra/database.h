@@ -145,20 +145,23 @@ struct SerializerContext
     static std::string escape(std::string arg);
 };
 
+//! sqlContents should contain ; seperated list of sql statements
 template <typename Connection>
-void execute_sql_file(Connection& conn, const fs::path& sqlPath)
+void execute_sql_statements(Connection& conn, std::string_view sqlContents)
 {
-    Transaction transaction(conn);
-
-    std::string fileContents = file::read_as_text(sqlPath);
-    auto lines               = str::split_view(fileContents, ';', str::SplitOpt::NoEmpty | str::SplitOpt::Trim);
+    auto lines = str::split_view(sqlContents, ';', str::SplitOpt::NoEmpty | str::SplitOpt::Trim);
     for (auto& line : lines) {
         if (!str::starts_with(line, "--")) {
             conn.execute(std::string(line));
         }
     }
+}
 
-    transaction.commit();
+template <typename Connection>
+void execute_sql_file(Connection& conn, const fs::path& sqlPath)
+{
+    std::string fileContents = file::read_as_text(sqlPath);
+    execute_sql_statements(conn, fileContents);
 }
 
 template <typename Query>
