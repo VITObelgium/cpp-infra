@@ -51,7 +51,7 @@ void LegendDataAnalyser::set_number_of_classes(int n)
 void LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double minValue, double maxValue)
 {
     try {
-        if (minValue >= maxValue) {
+        if (minValue >= maxValue && !_sampleData.empty()) {
             minValue = _sampleData[0];
             maxValue = _sampleData[_sampleData.size() - 1];
         }
