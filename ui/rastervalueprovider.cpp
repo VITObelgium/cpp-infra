@@ -80,7 +80,7 @@ void RasterValueProviderQObject::setPrecision(int decimals)
 
 void RasterValueProviderQObject::setDisplayEpsg(int32_t epsg)
 {
-    _displayTransformer = std::make_unique<gdal::CoordinateTransformer>(crs::epsg::WGS84Projected, epsg);
+    _displayTransformer = std::make_unique<gdal::CoordinateTransformer>(crs::epsg::WGS84, epsg);
 }
 
 void RasterValueProviderQObject::setMetadata(const inf::GeoMetadata& meta)
@@ -88,7 +88,7 @@ void RasterValueProviderQObject::setMetadata(const inf::GeoMetadata& meta)
     _metadata = meta;
 
     if (auto epsg = _metadata.projection_epsg(); epsg.has_value()) {
-        _transformer = std::make_unique<gdal::CoordinateTransformer>(crs::epsg::WGS84Projected, epsg.value());
+        _transformer = std::make_unique<gdal::CoordinateTransformer>(crs::epsg::WGS84, epsg.value());
     } else {
         _transformer.reset();
     }
