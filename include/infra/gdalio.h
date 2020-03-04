@@ -174,6 +174,10 @@ inline CutOut intersect_metadata(const GeoMetadata& srcMeta, const GeoMetadata& 
         throw InvalidArgument("Extents cellsize does not match {} <-> {}", srcMeta.cellSize, dstMeta.cellSize);
     }
 
+    if (srcMeta.cellSize == 0) {
+        throw InvalidArgument("Extents cellsize is zero");
+    }
+
     auto cellSize  = srcMeta.cellSize;
     auto srcBBox   = metadata_bounding_box(srcMeta);
     auto dstBBox   = metadata_bounding_box(dstMeta);
