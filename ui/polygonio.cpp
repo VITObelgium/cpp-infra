@@ -89,6 +89,8 @@ std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, inf::gdal::
             }
             break;
         }
+        case gdal::Geometry::Type::Point:
+            break;
         default:
             Log::warn("Unhandled type: {}", geometry.type_name());
         }
