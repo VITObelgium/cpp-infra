@@ -3,6 +3,7 @@
 #include <cinttypes>
 #include <fmt/core.h>
 #include <limits>
+#include <cmath>
 
 namespace inf {
 
