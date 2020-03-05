@@ -36,6 +36,15 @@ struct Point
 };
 
 template <typename T>
+double distance(const Point<T>& lhs, const Point<T>& rhs)
+{
+    auto x = rhs.x - lhs.x;
+    auto y = rhs.y - lhs.y;
+
+    return std::sqrt((x * x) + (y * y));
+}
+
+template <typename T>
 constexpr Point<T> operator-(const Point<T>& lhs, const Point<T>& rhs)
 {
     return Point<T>(lhs.x - rhs.x, lhs.y - rhs.y);
