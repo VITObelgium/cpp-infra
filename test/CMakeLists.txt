@@ -30,6 +30,7 @@ if (INFRA_GDAL)
         gdaltest.cpp
         gdalgeometrytest.cpp
         geocodertest.cpp
+        geometadatatest.cpp
     )
 
     target_compile_definitions(infratest PRIVATE HAVE_GDAL)

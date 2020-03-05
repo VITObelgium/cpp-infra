@@ -46,7 +46,7 @@ bool GeoMetadata::operator==(const GeoMetadata& other) const noexcept
            std::fabs(yll - other.yll) < std::numeric_limits<double>::epsilon() &&
            std::fabs(cellSize - other.cellSize) < std::numeric_limits<double>::epsilon() &&
            nodataMatches &&
-           projection_epsg() == other.projection_epsg();
+           projected_epsg() == other.projected_epsg();
 }
 
 bool GeoMetadata::operator!=(const GeoMetadata& other) const noexcept
@@ -178,7 +178,12 @@ std::string GeoMetadata::to_string() const
     return os.str();
 }
 
-std::optional<int32_t> GeoMetadata::projection_geo_epsg() const
+std::optional<int32_t> GeoMetadata::projection_geo_epsg() const noexcept
+{
+    return geographic_epsg();
+}
+
+std::optional<int32_t> GeoMetadata::geographic_epsg() const noexcept
 {
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
@@ -188,27 +193,33 @@ std::optional<int32_t> GeoMetadata::projection_geo_epsg() const
     return epsg;
 }
 
-std::optional<int32_t> GeoMetadata::projection_epsg() const
+std::optional<int32_t> GeoMetadata::projection_epsg() const noexcept
+{
+    return projected_epsg();
+}
+
+std::optional<int32_t> GeoMetadata::projected_epsg() const noexcept
 {
     std::optional<int32_t> epsg;
     if (!projection.empty()) {
-        try {
-            epsg = inf::gdal::projection_to_epsg(projection);
-        } catch (const std::exception&) {
-        }
+        epsg = inf::gdal::projection_to_epsg(projection);
     }
 
     return epsg;
 }
 
-std::string GeoMetadata::projection_frienly_name() const
+std::string GeoMetadata::projection_frienly_name() const noexcept
 {
-    return fmt::format("EPSG:{}", projection_epsg().value());
+    if (auto epsg = projected_epsg(); epsg.has_value()) {
+        return fmt::format("EPSG:{}", *epsg);
+    }
+
+    return std::string();
 }
 
 void GeoMetadata::set_projection_from_epsg(int32_t epsg)
 {
-    projection = inf::gdal::projection_from_epsg(epsg);
+    projection = gdal::projection_from_epsg(epsg);
 }
 
 std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta)

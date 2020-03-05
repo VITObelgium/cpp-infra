@@ -62,7 +62,7 @@ struct TestReporter : public IReporter
 
     void subcase_start(const SubcaseSignature& in) override
     {
-        fmt::print(fg(fmt::color::green), "  [{}]\n", in.m_name);
+        fmt::print(fg(fmt::color::green), "  [{}]\n", in.m_name.c_str());
     }
 
     void subcase_end() override

@@ -4,6 +4,7 @@ set(INPUT_FILES
     ${GDAL_DATA_PATH}/gdal_datum.csv
     ${GDAL_DATA_PATH}/gcs.csv
     ${GDAL_DATA_PATH}/pcs.csv
+    ${GDAL_DATA_PATH}/projop_wparm.csv
     ${GDAL_DATA_PATH}/ellipsoid.csv
     ${GDAL_DATA_PATH}/coordinate_axis.csv
 )

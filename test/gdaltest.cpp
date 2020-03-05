@@ -1,4 +1,6 @@
 ﻿#include "infra/gdal.h"
+#include "infra/crs.h"
+#include "infra/gdalio.h"
 
 #include <doctest/doctest.h>
 #include <fstream>
@@ -8,7 +10,7 @@ namespace inf::test {
 using namespace doctest;
 using namespace std::string_literals;
 
-TEST_CASE("GdalTest.iteratePoints")
+TEST_CASE("Gdal.iteratePoints")
 {
     auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
@@ -30,7 +32,7 @@ TEST_CASE("GdalTest.iteratePoints")
     CHECK(count == 9);
 }
 
-TEST_CASE("GdalTest.fieldInfo")
+TEST_CASE("Gdal.fieldInfo")
 {
     auto ds    = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
     auto layer = ds.layer(0);
@@ -40,7 +42,7 @@ TEST_CASE("GdalTest.fieldInfo")
     CHECK(typeid(int64_t) == layer.feature(0).field_definition(0).type());
 }
 
-TEST_CASE("GdalTest.getField")
+TEST_CASE("Gdal.getField")
 {
     auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
@@ -62,7 +64,7 @@ TEST_CASE("GdalTest.getField")
     }
 }
 
-TEST_CASE("GdalTest.inMemoryVector")
+TEST_CASE("Gdal.inMemoryVector")
 {
     auto memDriver = gdal::VectorDriver::create(gdal::VectorType::Memory);
     gdal::VectorDataSet ds(memDriver.create_dataset());
@@ -102,7 +104,7 @@ TEST_CASE("GdalTest.inMemoryVector")
     }
 }
 
-TEST_CASE("GdalTest.convertPointProjected")
+TEST_CASE("Gdal.convertPointProjected")
 {
     // Check conversion of bottom left corner of flanders map
 
@@ -114,7 +116,7 @@ TEST_CASE("GdalTest.convertPointProjected")
     CHECK(50.6735631138308 == Approx(point.y).epsilon(1e-8));
 }
 
-TEST_CASE("GdalTest.createExcelFile")
+TEST_CASE("Gdal.createExcelFile")
 {
     if (!gdal::VectorDriver::is_supported(gdal::VectorType::Xlsx)) {
         return;
@@ -146,7 +148,7 @@ TEST_CASE("GdalTest.createExcelFile")
     layer.create_feature(feat2);
 }
 
-TEST_CASE("GdalTest.utf8Path")
+TEST_CASE("Gdal.utf8Path")
 {
     if (!gdal::RasterDriver::is_supported(gdal::RasterType::Netcdf)) {
         return;
@@ -157,6 +159,27 @@ TEST_CASE("GdalTest.utf8Path")
     auto ds          = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
     auto subDatasets = ds.metadata("SUBDATASETS");
     CHECK(subDatasets.size() == 4u);
+}
+
+TEST_CASE("Gdal.spatialReference")
+{
+    {
+        auto meta = gdal::io::read_metadata(fs::u8path(TEST_DATA_DIR) / "epsg31370.tif");
+        gdal::SpatialReference srs(meta.projection);
+        CHECK(srs.is_projected());
+        CHECK_FALSE(srs.is_geographic());
+        CHECK(srs.epsg_cs() == crs::epsg::BelgianLambert72);
+        CHECK(srs.epsg_geog_cs() == crs::epsg::Belge72Geo);
+    }
+
+    {
+        auto meta = gdal::io::read_metadata(fs::u8path(TEST_DATA_DIR) / "epsg3857.tif");
+        gdal::SpatialReference srs(meta.projection);
+        CHECK(srs.is_projected());
+        CHECK_FALSE(srs.is_geographic());
+        CHECK(srs.epsg_cs() == crs::epsg::WGS84WebMercator);
+        CHECK(srs.epsg_geog_cs() == crs::epsg::WGS84);
+    }
 }
 
 }

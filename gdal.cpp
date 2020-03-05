@@ -199,30 +199,32 @@ std::string SpatialReference::export_to_pretty_wkt_simplified() const
     return std::string(friendlyWkt);
 }
 
-std::optional<int32_t> SpatialReference::epsg_cs() const
+std::optional<int32_t> SpatialReference::epsg_cs() const noexcept
 {
-    try {
-        return str::to_int32(authority_code("PROJCS"));
-    } catch (const std::exception&) {
-        return std::optional<int32_t>();
+    if (auto code = authority_code("PROJCS"); !code.empty()) {
+        return str::to_int32(code);
+    } else if (auto code = authority_code("LOCAL_CS"); !code.empty()) {
+        return str::to_int32(code);
     }
+
+    return {};
 }
 
-std::optional<int32_t> SpatialReference::epsg_geog_cs() const
+std::optional<int32_t> SpatialReference::epsg_geog_cs() const noexcept
 {
     auto epsg = _srs->GetEPSGGeogCS();
     if (epsg == -1) {
-        return std::optional<int32_t>();
+        return {};
     }
 
     return epsg;
 }
 
-std::string_view SpatialReference::authority_code(const char* key) const
+std::string_view SpatialReference::authority_code(const char* key) const noexcept
 {
     auto* code = _srs->GetAuthorityCode(key);
     if (code == nullptr) {
-        throw RuntimeError("Could not get authority code for '{}'", key);
+        return {};
     }
 
     return std::string_view(code);
@@ -370,16 +372,16 @@ std::string projection_from_epsg(int32_t epsg)
     return spatialRef.export_to_pretty_wkt();
 }
 
-std::optional<int32_t> projection_to_geo_epsg(const std::string& projection)
+std::optional<int32_t> projection_to_geo_epsg(const std::string& projection) noexcept
 {
     SpatialReference spatialRef(projection.c_str());
     return spatialRef.epsg_geog_cs();
 }
 
-std::optional<int32_t> projection_to_epsg(const std::string& projection)
+std::optional<int32_t> projection_to_epsg(const std::string& projection) noexcept
 {
     SpatialReference spatialRef(projection.c_str());
-    return str::to_int32(spatialRef.authority_code("PROJCS"));
+    return spatialRef.epsg_cs();
 }
 
 CPLStringList create_string_list(gsl::span<const std::string> options)
@@ -492,7 +494,7 @@ std::string get_memory_file_buffer(const fs::path& p, bool remove)
     std::string result;
     vsi_l_offset length;
     auto* data = VSIGetMemFileBuffer(p.u8string().c_str(), &length, remove ? TRUE : FALSE);
-    ScopeGuard guard([=] () {
+    ScopeGuard guard([=]() {
         if (remove) {
             CPLFree(data);
         }

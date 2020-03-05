@@ -120,9 +120,9 @@ public:
     std::string export_to_pretty_wkt() const;
     std::string export_to_pretty_wkt_simplified() const;
 
-    std::optional<int32_t> epsg_cs() const;
-    std::optional<int32_t> epsg_geog_cs() const;
-    std::string_view authority_code(const char* key) const;
+    std::optional<int32_t> epsg_cs() const noexcept;
+    std::optional<int32_t> epsg_geog_cs() const noexcept;
+    std::string_view authority_code(const char* key) const noexcept;
 
     void set_proj_cs(const char* projCs);
     void set_well_known_geog_cs(const char* geogCs);
@@ -171,8 +171,8 @@ Point<double> convert_point_projected(int32_t sourceEpsg, int32_t destEpsg, Poin
 Point<double> projected_to_geographic(int32_t epsg, Point<double>);
 std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
-std::optional<int32_t> projection_to_geo_epsg(const std::string& projection);
-std::optional<int32_t> projection_to_epsg(const std::string& projection);
+std::optional<int32_t> projection_to_geo_epsg(const std::string& projection) noexcept;
+std::optional<int32_t> projection_to_epsg(const std::string& projection) noexcept;
 CPLStringList create_string_list(gsl::span<const std::string> driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);

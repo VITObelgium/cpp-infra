@@ -87,7 +87,7 @@ void RasterValueProviderQObject::setMetadata(const inf::GeoMetadata& meta)
 {
     _metadata = meta;
 
-    if (auto epsg = _metadata.projection_epsg(); epsg.has_value()) {
+    if (auto epsg = _metadata.projected_epsg(); epsg.has_value()) {
         _transformer = std::make_unique<gdal::CoordinateTransformer>(crs::epsg::WGS84, epsg.value());
     } else {
         _transformer.reset();
