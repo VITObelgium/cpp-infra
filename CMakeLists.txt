@@ -241,6 +241,7 @@ if (INFRA_PROCESS)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/process.h)
     target_sources(infra PRIVATE process.cpp)
     target_link_libraries(infra PRIVATE reprocxx)
+    set_target_properties(reprocxx PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif ()
 
 if (INFRA_DATABASE)
@@ -332,6 +333,9 @@ if (INFRA_GDAL)
     endif ()
 
     target_link_libraries(infra PUBLIC $<TARGET_NAME_IF_EXISTS:GDAL::GDAL> $<TARGET_NAME_IF_EXISTS:Gdal::Gdal> Gsl::Gsl)
+    set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+    set_target_properties(GEOS::geos_c PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+    set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif ()
 
 if (INFRA_NUMERIC)
