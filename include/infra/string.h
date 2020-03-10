@@ -387,7 +387,7 @@ std::string join(const Container& items, std::string_view joinString, ToStringCb
     std::ostringstream ss;
     for (auto iter = begin(items); iter != end(items); ++iter) {
         ss << cb(*iter);
-        if (iter + 1 != end(items)) {
+        if (std::next(iter) != end(items)) {
             ss << joinString;
         }
     }
