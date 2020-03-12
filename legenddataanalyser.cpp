@@ -4,8 +4,8 @@
 #include "infra/exception.h"
 
 #include <algorithm>
-#include <cmath>
 #include <cassert>
+#include <cmath>
 
 namespace inf {
 
@@ -219,7 +219,7 @@ float LegendDataAnalyser::effectiveness() const
 
 static void assign_linear_class_bounds(int numClasses, double minValue, double maxValue, std::vector<double>& bounds)
 {
-    assert(bounds.size() == numClasses + 1);
+    assert(truncate<int>(bounds.size()) == numClasses + 1);
 
     double x = (maxValue - minValue) / numClasses;
     for (int i = 1; i < numClasses; i++) {
@@ -242,7 +242,7 @@ static void assign_linear_class_bounds_no_outliers(int numClasses, double minVal
     constexpr double lowPercentile  = 0.05;
     constexpr double highPercentile = 0.95;
 
-    assert(bounds.size() == numClasses + 1);
+    assert(truncate<int>(bounds.size()) == numClasses + 1);
     size_t startIndex = truncate<size_t>(sampleData.size() * lowPercentile);
     size_t endIndex   = truncate<size_t>(sampleData.size() * highPercentile);
 
