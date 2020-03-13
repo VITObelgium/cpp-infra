@@ -216,7 +216,7 @@ if (INFRA_LOGGING)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
     target_sources(infra PRIVATE log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
-    target_compile_definitions(infra PRIVATE INFRA_LOG_ENABLED)
+    target_compile_definitions(infra PUBLIC INFRA_LOG_ENABLED)
     set_target_properties(spdlog::spdlog PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif ()
 
@@ -538,8 +538,6 @@ if (INFRA_UI_COMPONENTS)
             ui/logview.cpp
             ui/logsinkmodel.cpp
         )
-
-        target_compile_definitions(infra PUBLIC HAVE_INFRA_LOG)
     endif ()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)

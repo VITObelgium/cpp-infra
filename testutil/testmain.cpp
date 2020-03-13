@@ -2,7 +2,7 @@
 
 #include "infra/test/reporter.h"
 
-#ifdef HAVE_INFRA_LOG
+#ifdef INFRA_LOG_ENABLED
 #include "infra/log.h"
 #endif
 
@@ -30,7 +30,7 @@ int main(int argc, char** argv)
     SetConsoleOutputCP(CP_UTF8);
 #endif
 
-#ifdef HAVE_INFRA_LOG
+#ifdef INFRA_LOG_ENABLED
     inf::Log::add_console_sink(inf::Log::Colored::On);
     inf::LogRegistration logReg("InfraTest");
     inf::Log::set_level(inf::Log::Level::Info);
