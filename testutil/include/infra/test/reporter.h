@@ -15,6 +15,7 @@ struct TestReporter : public IReporter
     std::ostream& stdout_stream;
     const ContextOptions& opt;
     const TestCaseData* tc;
+    int subcaseLevel = 0;
     std::mutex mutex;
 
     // constructor has to accept the ContextOptions by ref as a single argument
@@ -39,7 +40,8 @@ struct TestReporter : public IReporter
     void test_case_start(const TestCaseData& in) override
     {
         tc = &in;
-        fmt::print(fg(fmt::color::green), "[RUN     ] {}\n", in.m_name);
+        fmt::print(fg(fmt::color::light_green), "[RUN    ] ");
+        fmt::print("{}\n", in.m_name);
     }
 
     // called when a test case is reentered because of unfinished subcases
@@ -50,9 +52,9 @@ struct TestReporter : public IReporter
     void test_case_end(const CurrentTestCaseStats& in) override
     {
         if (in.failure_flags == TestCaseFailureReason::None) {
-            fmt::print(fg(fmt::color::green), "[    DONE] {}s\n", in.seconds);
+            fmt::print(fg(fmt::color::light_green), "[   DONE] {}s\n", in.seconds);
         } else {
-            fmt::print(fg(fmt::color::red), "[    FAIL] {}s\n", in.seconds);
+            fmt::print(fg(fmt::color::red), "[   FAIL] {}s\n", in.seconds);
         }
     }
 
@@ -62,11 +64,17 @@ struct TestReporter : public IReporter
 
     void subcase_start(const SubcaseSignature& in) override
     {
-        fmt::print(fg(fmt::color::green), "  [{}]\n", in.m_name.c_str());
+        ++subcaseLevel;
+
+        std::string line(subcaseLevel, '-');
+
+        fmt::print(fg(fmt::color::yellow), "[SUBCASE] ");
+        fmt::print("{} {}\n", line, in.m_name.c_str());
     }
 
     void subcase_end() override
     {
+        --subcaseLevel;
     }
 
     void log_assert(const AssertData& in) override
