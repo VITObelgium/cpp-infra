@@ -75,33 +75,44 @@ public:
     Handle() = default;
     Handle(const fs::path& p, const char* mode)
     {
-        ptr = std::fopen(p.u8string().c_str(), mode);
+        open(p, mode);
     }
 
     ~Handle()
     {
-        if (ptr) {
-            std::fclose(ptr);
+        if (_ptr) {
+            std::fclose(_ptr);
         }
+    }
+
+    void open(const fs::path& p, const char* mode)
+    {
+        _ptr = std::fopen(p.u8string().c_str(), mode);
+    }
+
+    void close()
+    {
+        std::fclose(_ptr);
+        _ptr = nullptr;
     }
 
     bool is_open() const
     {
-        return ptr != nullptr;
+        return _ptr != nullptr;
     }
 
     std::FILE* get()
     {
-        return ptr;
+        return _ptr;
     }
 
     operator std::FILE*()
     {
-        return ptr;
+        return _ptr;
     }
 
 private:
-    std::FILE* ptr = nullptr;
+    std::FILE* _ptr = nullptr;
 };
 
 class ScopedCurrentWorkingDirectory
