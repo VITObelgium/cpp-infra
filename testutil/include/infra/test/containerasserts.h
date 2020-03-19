@@ -130,5 +130,5 @@ bool container_eq(const std::unordered_map<TKey, TValue>& m1, const std::unorder
 }
 
 #define CHECK_CONTAINER_EQ(lhs, rhs) \
-    CHECK_MESSAGE(inf::test::container_eq((lhs), (rhs)), inf::test::print_container_diff(lhs, rhs, 0.0));
+    CHECK_MESSAGE(inf::test::container_eq((lhs), (rhs)), inf::test::print_container_diff((lhs), (rhs), 0.0));
 
