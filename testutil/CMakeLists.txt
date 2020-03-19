@@ -1,6 +1,7 @@
 find_package(doctest CONFIG REQUIRED)
 
 set (INFRA_TESTUTIL_PUBLIC_HEADERS
+    include/infra/test/containerasserts.h
     include/infra/test/printsupport.h
     include/infra/test/reporter.h
 )
