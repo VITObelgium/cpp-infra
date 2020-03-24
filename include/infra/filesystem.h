@@ -73,41 +73,41 @@ class Handle
 {
 public:
     Handle() = default;
-    Handle(const fs::path& p, const char* mode)
+    Handle(const fs::path& p, const char* mode) noexcept
     {
         open(p, mode);
     }
 
-    ~Handle()
+    ~Handle() noexcept
     {
-        if (_ptr) {
-            std::fclose(_ptr);
-        }
+        close();
     }
 
-    void open(const fs::path& p, const char* mode)
+    void open(const fs::path& p, const char* mode) noexcept
     {
         close();
         _ptr = std::fopen(p.u8string().c_str(), mode);
     }
 
-    void close()
+    void close() noexcept
     {
-        std::fclose(_ptr);
-        _ptr = nullptr;
+        if (_ptr) {
+            std::fclose(_ptr);
+            _ptr = nullptr;
+        }
     }
 
-    bool is_open() const
+    bool is_open() const noexcept
     {
         return _ptr != nullptr;
     }
 
-    std::FILE* get()
+    std::FILE* get() noexcept
     {
         return _ptr;
     }
 
-    operator std::FILE*()
+    operator std::FILE*() noexcept
     {
         return _ptr;
     }
