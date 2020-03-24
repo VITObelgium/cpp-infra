@@ -114,7 +114,9 @@ void WorkerThread::add_job(const std::function<void()>& job)
         _jobQueue.push_back(job);
     }
 
-    _thread->signal_job_available();
+    if (_thread) {
+        _thread->signal_job_available();
+    }
 }
 
 void WorkerThread::clear_jobs()

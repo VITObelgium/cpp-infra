@@ -1,6 +1,7 @@
 #include "infra/xmldocument.h"
 
 #include <doctest/doctest.h>
+#include <vector>
 
 namespace inf::test {
 

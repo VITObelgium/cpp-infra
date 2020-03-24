@@ -17,8 +17,8 @@ public:
     WorkerThread& operator=(const WorkerThread&) = delete;
 
     /* Pass a callback that will get executed at the start of the worker thread */
-    void start(std::function<void()> cb = {});
-    void stop(std::function<void()> cb = {});
+    void start(std::function<void()> cb = nullptr);
+    void stop(std::function<void()> cb = nullptr);
 
     void add_job(const std::function<void()>& job);
 

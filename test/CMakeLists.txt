@@ -11,6 +11,7 @@ add_executable(infratest
     legenddataanalysertest.cpp
     stringtest.cpp
     threadpooltest.cpp
+    workerthreadtest.cpp
 )
 
 if (INFRA_XML)
