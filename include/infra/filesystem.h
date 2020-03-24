@@ -87,6 +87,7 @@ public:
 
     void open(const fs::path& p, const char* mode)
     {
+        close();
         _ptr = std::fopen(p.u8string().c_str(), mode);
     }
 
