@@ -136,6 +136,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/typetraits-private.h
     include/infra/inireader.h
     include/infra/parallelstl.h
+    include/infra/workerthread.h
 )
 
 add_library(infra
@@ -151,6 +152,7 @@ add_library(infra
     colormap.cpp
     threadpool.cpp
     inireader.cpp
+    workerthread.cpp
 )
 
 add_library(Infra::infra ALIAS infra)
