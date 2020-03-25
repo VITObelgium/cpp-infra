@@ -86,7 +86,11 @@ public:
     void open(const fs::path& p, const char* mode) noexcept
     {
         close();
+#ifdef _WIN32
+        _ptr = _wfopen(p.c_str(), fs::u8path(mode).c_str());
+#else
         _ptr = std::fopen(p.u8string().c_str(), mode);
+#endif
     }
 
     void close() noexcept
