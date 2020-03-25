@@ -1,6 +1,8 @@
 #include "uiinfra/application.h"
 #include "infra/log.h"
 
+#include <qpalette.h>
+
 namespace inf::ui {
 
 static const char* levelString(QtMsgType type)
@@ -34,6 +36,13 @@ Application::Application(int& argc, char* argv[])
 : QApplication(argc, argv)
 {
     qInstallMessageHandler(loggedMessageOutput);
+
+#ifdef Q_OS_OSX
+    // workaround for QTBUG-75321 (https://bugreports.qt.io/browse/QTBUG-75321)
+    auto pal = palette();
+    pal.setColor(QPalette::ButtonText, pal.color(QPalette::WindowText));
+    setPalette(pal);
+#endif
 }
 
 bool Application::notify(QObject* receiver, QEvent* event)
