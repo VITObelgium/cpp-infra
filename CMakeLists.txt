@@ -334,7 +334,7 @@ if (INFRA_GDAL)
         target_sources(infra PRIVATE csvreader.cpp)
     endif ()
 
-    target_link_libraries(infra PUBLIC $<TARGET_NAME_IF_EXISTS:GDAL::GDAL> $<TARGET_NAME_IF_EXISTS:Gdal::Gdal> Gsl::Gsl)
+    target_link_libraries(infra PUBLIC GDAL::GDAL Gsl::Gsl)
     if (TARGET GEOS::geos)
         set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     endif ()
