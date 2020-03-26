@@ -33,6 +33,27 @@ auto find_in_container(Container&& c, Predicate&& pred) noexcept
     }
 }
 
+template <typename Container, typename Predicate>
+std::optional<typename Container::value_type> find_in_container_optional(const Container& c, Predicate&& pred) noexcept
+{
+    return as_optional(find_in_container(c, pred));
+}
+
+/* Search for an entry in the container that matches the predicate
+ * The entry is returned as a reference
+ * A RangeError exception is throw when there is no match
+ */
+template <typename Container, typename Predicate>
+const typename Container::value_type& find_in_container_required(const Container& c, Predicate&& pred)
+{
+    auto iter = std::find_if(c.begin(), c.end(), pred);
+    if (iter == c.end()) {
+        throw RangeError("No match found in the container");
+    }
+
+    return *iter;
+}
+
 template <typename Container>
 bool container_contains(const Container& c, const typename Container::value_type& value) noexcept
 {
@@ -62,27 +83,6 @@ void append_to_container(OutputContainer& output, const InputContainer& input) n
 {
     output.reserve(output.size() + input.size());
     std::copy(input.begin(), input.end(), std::back_inserter(output));
-}
-
-template <typename Container, typename Predicate>
-const typename Container::value_type* find_in_container_optional(const Container& c, Predicate&& pred) noexcept
-{
-    return as_optional(find_in_container(c, pred));
-}
-
-/* Search for an entry in the container that matches the predicate
- * The entry is returned as a reference
- * A RangeError exception is throw when there is no match
- */
-template <typename Container, typename Predicate>
-const typename Container::value_type& find_in_container_required(const Container& c, Predicate&& pred)
-{
-    auto iter = std::find_if(c.begin(), c.end(), pred);
-    if (iter == c.end()) {
-        throw RangeError("No match found in the container");
-    }
-
-    return *iter;
 }
 
 /* Search for an entry in the map that matches the predicate
