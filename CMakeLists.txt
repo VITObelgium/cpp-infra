@@ -270,7 +270,7 @@ endif ()
 if (INFRA_GDAL)
     find_package(GDAL CONFIG)
     if (NOT TARGET GDAL::GDAL)
-        find_package(Gdal REQUIRED)
+        find_package(GDAL REQUIRED)
     endif ()
 
     find_package(Gsl REQUIRED)
