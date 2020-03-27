@@ -102,6 +102,7 @@ void WorkerThread::start(std::function<void()> cb)
 void WorkerThread::stop(std::function<void()> cb)
 {
     if (_thread) {
+        _thread->set_stop_cb(cb);
         clear_jobs();
         _thread.reset();
     }
