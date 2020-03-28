@@ -42,33 +42,41 @@ if (@INFRA_DATABASE@)
     find_dependency(Sqlpp11 REQUIRED)
 endif ()
 
-if (@INFRA_UI_COMPONENTS@)
-    find_dependency(Qt5Gui REQUIRED)
-    find_dependency(Qt5Widgets REQUIRED)
-    find_dependency(Qt5Core REQUIRED)
-    find_dependency(Qt5Network REQUIRED)
-
-    if (@INFRA_UI_COMPONENTS_QML@)
-        find_dependency(Qt5Quick CONFIG REQUIRED)
-    endif ()
-
-    if (@INFRA_UI_COMPONENTS_LOCATION@)
-        find_dependency(Qt5Location CONFIG REQUIRED)
-    endif ()
-
-    if (@INFRA_UI_COMPONENTS_XLSX_EXPORT@)
-        find_dependency(XlsxWriter REQUIRED)
-    endif ()
-endif ()
-
 if (@INFRA_ENABLE_TEST_UTILS@)
     find_dependency(doctest CONFIG REQUIRED)
+endif ()
+
+if ("ui" IN_LIST Infra_FIND_COMPONENTS)
+    if (@INFRA_UI_COMPONENTS@)
+        find_dependency(Qt5Gui REQUIRED)
+        find_dependency(Qt5Widgets REQUIRED)
+        find_dependency(Qt5Core REQUIRED)
+        find_dependency(Qt5Network REQUIRED)
+
+        if (@INFRA_UI_COMPONENTS_QML@)
+            find_dependency(Qt5Quick CONFIG REQUIRED)
+        endif ()
+
+        if (@INFRA_UI_COMPONENTS_LOCATION@)
+            find_dependency(Qt5Location CONFIG REQUIRED)
+        endif ()
+
+        if (@INFRA_UI_COMPONENTS_XLSX_EXPORT@)
+            find_dependency(XlsxWriter REQUIRED)
+        endif ()
+    elseif (Infra_FIND_REQUIRED_ui)
+        message(FATAL_ERROR "Infra ui component requested but Infra was compiled without ui support")
+    endif ()
 endif ()
 
 list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
 if(NOT TARGET Infra::infra)
     include("${Infra_CMAKE_DIR}/InfraTargets.cmake")
+endif()
+
+if(NOT TARGET Infra::uiinfra AND "ui" IN_LIST Infra_FIND_COMPONENTS)
+    include("${Infra_CMAKE_DIR}/InfraUiTargets.cmake")
 endif()
 
 set(Infra_LIBRARIES Infra::infra)

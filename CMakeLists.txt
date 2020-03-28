@@ -600,23 +600,27 @@ if (INFRA_ENABLE_DOCUMENTATION)
 endif ()
 
 if (INFRA_INSTALL_DEVELOPMENT_FILES)
-    install(TARGETS infra EXPORT infra-targets
+    install(TARGETS infra EXPORT InfraTargets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
     )
+    
+    install(EXPORT InfraTargets
+        NAMESPACE Infra::
+        DESTINATION ${INSTALL_CONFIGDIR}
+    )
 
     if (INFRA_UI_COMPONENTS)
-        install(TARGETS uiinfra EXPORT infra-targets
+        install(TARGETS uiinfra EXPORT InfraUiTargets
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
         )   
-    endif ()
 
-    install(EXPORT infra-targets
-        FILE InfraTargets.cmake
-        NAMESPACE Infra::
-        DESTINATION ${INSTALL_CONFIGDIR}
-    )
+        install(EXPORT InfraUiTargets
+            NAMESPACE Infra::
+            DESTINATION ${INSTALL_CONFIGDIR}
+        )
+    endif ()
 endif ()
