@@ -42,9 +42,13 @@ if (@INFRA_DATABASE@)
     find_dependency(Sqlpp11 REQUIRED)
 endif ()
 
-if (@INFRA_ENABLE_TEST_UTILS@)
-    find_dependency(doctest CONFIG REQUIRED)
-endif ()
+if ("testutil" IN_LIST Infra_FIND_COMPONENTS)
+    if (@INFRA_ENABLE_TEST_UTILS@)
+        find_dependency(doctest CONFIG REQUIRED)
+    elseif (Infra_FIND_REQUIRED_testutils)
+        message(FATAL_ERROR "Infra testutil component requested but Infra was compiled without test support")
+    endif ()
+endif()
 
 if ("ui" IN_LIST Infra_FIND_COMPONENTS)
     if (@INFRA_UI_COMPONENTS@)
@@ -73,6 +77,10 @@ list(REMOVE_AT CMAKE_MODULE_PATH -1)
 
 if(NOT TARGET Infra::infra)
     include("${Infra_CMAKE_DIR}/InfraTargets.cmake")
+endif()
+
+if(NOT TARGET Infra::infratestutil AND "testutil" IN_LIST Infra_FIND_COMPONENTS)
+    include("${Infra_CMAKE_DIR}/InfraTestTargets.cmake")
 endif()
 
 if(NOT TARGET Infra::uiinfra AND "ui" IN_LIST Infra_FIND_COMPONENTS)

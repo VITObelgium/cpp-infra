@@ -11,7 +11,7 @@ endif ()
 if (INFRA_IS_TOPLEVEL)
     cmake_minimum_required(VERSION 3.15)
     project(Infra
-        VERSION 0.9.29
+        VERSION 0.9.30
         LANGUAGES CXX
     )
     set(CMAKE_CXX_STANDARD 17)
@@ -560,6 +560,25 @@ if (INFRA_UI_COMPONENTS)
     endif ()
 endif ()
 
+if (INFRA_ENABLE_TESTS)
+    add_subdirectory(test)
+    if (INFRA_UI_COMPONENTS)
+        add_subdirectory(ui/test)
+    endif ()
+endif ()
+
+if (INFRA_ENABLE_TEST_UTILS)
+    add_subdirectory(testutil)
+endif ()
+
+if (INFRA_ENABLE_BENCHMARKS)
+    add_subdirectory(benchmarks)
+endif ()
+
+if (INFRA_ENABLE_DOCUMENTATION)
+    add_subdirectory(docs)
+endif ()
+
 if (INFRA_IS_TOPLEVEL)
     write_basic_package_version_file("InfraConfigVersion.cmake"
         VERSION ${Infra_VERSION}
@@ -580,25 +599,6 @@ if (INFRA_IS_TOPLEVEL)
     endif ()
 endif ()
 
-if (INFRA_ENABLE_TESTS)
-    add_subdirectory(test)
-    if (INFRA_UI_COMPONENTS)
-        add_subdirectory(ui/test)
-    endif ()
-endif ()
-
-if (INFRA_ENABLE_TEST_UTILS)
-    add_subdirectory(testutil)
-endif ()
-
-if (INFRA_ENABLE_BENCHMARKS)
-    add_subdirectory(benchmarks)
-endif ()
-
-if (INFRA_ENABLE_DOCUMENTATION)
-    add_subdirectory(docs)
-endif ()
-
 if (INFRA_INSTALL_DEVELOPMENT_FILES)
     install(TARGETS infra EXPORT InfraTargets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
@@ -610,6 +610,19 @@ if (INFRA_INSTALL_DEVELOPMENT_FILES)
         NAMESPACE Infra::
         DESTINATION ${INSTALL_CONFIGDIR}
     )
+
+    if (INFRA_ENABLE_TEST_UTILS)
+        install(TARGETS infratestutil infratestutilmain EXPORT InfraTestTargets
+            LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+            PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra/test
+        )
+        
+        install(EXPORT InfraTestTargets
+            NAMESPACE Infra::
+            DESTINATION ${INSTALL_CONFIGDIR}
+        )
+    endif ()
 
     if (INFRA_UI_COMPONENTS)
         install(TARGETS uiinfra EXPORT InfraUiTargets

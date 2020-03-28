@@ -1,9 +1,9 @@
 find_package(doctest CONFIG REQUIRED)
 
 set (INFRA_TESTUTIL_PUBLIC_HEADERS
-    include/infra/test/containerasserts.h
-    include/infra/test/printsupport.h
-    include/infra/test/reporter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/containerasserts.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/printsupport.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/reporter.h
 )
 
 add_library(infratestutil
@@ -27,11 +27,3 @@ add_library(infratestutilmain testmain.cpp)
 add_library(Infra::infratestutilmain ALIAS infratestutilmain)
 target_compile_definitions(infratestutilmain PRIVATE $<$<BOOL:INFRA_GDAL>:HAVE_GDAL>)
 target_link_libraries(infratestutilmain PUBLIC infratestutil)
-
-if (INFRA_INSTALL_DEVELOPMENT_FILES)
-    install(TARGETS infratestutil infratestutilmain EXPORT infra-targets
-        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
-        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra/test
-    )
-endif ()
