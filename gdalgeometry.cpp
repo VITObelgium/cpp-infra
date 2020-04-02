@@ -12,6 +12,24 @@ namespace inf::gdal {
 
 using namespace std::string_literals;
 
+static Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
+{
+    switch (wkbFlatten(type)) {
+    case wkbPoint:
+        return Geometry::Type::Point;
+    case wkbLineString:
+        return Geometry::Type::Line;
+    case wkbPolygon:
+        return Geometry::Type::Polygon;
+    case wkbMultiPolygon:
+        return Geometry::Type::MultiPolygon;
+    case wkbMultiLineString:
+        return Geometry::Type::MultiLine;
+    default:
+        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(type));
+    }
+}
+
 Geometry::Geometry(OGRGeometry* instance)
 : _geometry(instance)
 {
@@ -34,20 +52,7 @@ Geometry::operator bool() const noexcept
 
 Geometry::Type Geometry::type() const
 {
-    switch (wkbFlatten(_geometry->getGeometryType())) {
-    case wkbPoint:
-        return Geometry::Type::Point;
-    case wkbLineString:
-        return Geometry::Type::Line;
-    case wkbPolygon:
-        return Geometry::Type::Polygon;
-    case wkbMultiPolygon:
-        return Geometry::Type::MultiPolygon;
-    case wkbMultiLineString:
-        return Geometry::Type::MultiLine;
-    default:
-        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(_geometry->getGeometryType()));
-    }
+    return geometry_type_from_gdal(_geometry->getGeometryType());
 }
 
 std::string_view Geometry::type_name() const
@@ -77,32 +82,32 @@ bool Geometry::is_simple() const
 
 Owner<Geometry> Geometry::simplify(double tolerance) const
 {
-    return Owner<Geometry>(checkPointer(_geometry->Simplify(tolerance), "Failed to simplify geometry"));
+    return Owner<Geometry>(check_pointer(_geometry->Simplify(tolerance), "Failed to simplify geometry"));
 }
 
 Owner<Geometry> Geometry::simplify_preserve_topology(double tolerance) const
 {
-    return Owner<Geometry>(checkPointer(_geometry->Simplify(tolerance), "Failed to simplify geometry preserving topology"));
+    return Owner<Geometry>(check_pointer(_geometry->Simplify(tolerance), "Failed to simplify geometry preserving topology"));
 }
 
 void Geometry::transform(CoordinateTransformer& transformer)
 {
-    checkError(_geometry->transform(transformer.get()), "Failed to transform geometry");
+    check_error(_geometry->transform(transformer.get()), "Failed to transform geometry");
 }
 
 Owner<Geometry> Geometry::buffer(double distance) const
 {
-    return Owner<Geometry>(checkPointer(_geometry->Buffer(distance), "Failed to buffer geometry"));
+    return Owner<Geometry>(check_pointer(_geometry->Buffer(distance), "Failed to buffer geometry"));
 }
 
 Owner<Geometry> Geometry::buffer(double distance, int numQuadSegments) const
 {
-    return Owner<Geometry>(checkPointer(_geometry->Buffer(distance, numQuadSegments), "Failed to buffer geometry"));
+    return Owner<Geometry>(check_pointer(_geometry->Buffer(distance, numQuadSegments), "Failed to buffer geometry"));
 }
 
 Owner<Geometry> Geometry::intersection(const Geometry& other) const
 {
-    return Owner<Geometry>(checkPointer(_geometry->Intersection(other.get()), "Failed to get geometry intersection"));
+    return Owner<Geometry>(check_pointer(_geometry->Intersection(other.get()), "Failed to get geometry intersection"));
 }
 
 std::optional<double> Geometry::area() const
@@ -174,7 +179,7 @@ int GeometryCollectionWrapper<WrappedType>::size() const
 template <typename WrappedType>
 Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
 {
-    return Geometry(checkPointer(this->get()->getGeometryRef(index), "No geometry present"));
+    return Geometry(check_pointer(this->get()->getGeometryRef(index), "No geometry present"));
 }
 
 Line::Line(OGRSimpleCurve* curve)
@@ -476,33 +481,47 @@ int FieldDefinition::width()
     return _def->GetWidth();
 }
 
-FeatureDefinitionRef::FeatureDefinitionRef(OGRFeatureDefn* def)
+FeatureDefinition::FeatureDefinition(const char* name)
+: _def(new OGRFeatureDefn(name))
+{
+      _def->Reference();
+}
+
+FeatureDefinition::FeatureDefinition(OGRFeatureDefn* def)
 : _def(def)
 {
     assert(def);
+    _def->Reference();
 }
 
-std::string_view FeatureDefinitionRef::name() const
+FeatureDefinition::~FeatureDefinition()
+{
+    if (_def) {
+        _def->Release();
+    }
+}
+
+std::string_view FeatureDefinition::name() const
 {
     return std::string_view(_def->GetName());
 }
 
-int FeatureDefinitionRef::field_count() const
+int FeatureDefinition::field_count() const
 {
     return _def->GetFieldCount();
 }
 
-int FeatureDefinitionRef::field_index(const char* name) const noexcept
+int FeatureDefinition::field_index(const char* name) const noexcept
 {
     return _def->GetFieldIndex(name);
 }
 
-int FeatureDefinitionRef::field_index(const std::string& name) const noexcept
+int FeatureDefinition::field_index(const std::string& name) const noexcept
 {
     return field_index(name.c_str());
 }
 
-int FeatureDefinitionRef::required_field_index(const char* name) const
+int FeatureDefinition::required_field_index(const char* name) const
 {
     int index = _def->GetFieldIndex(name);
     if (index < 0) {
@@ -512,22 +531,22 @@ int FeatureDefinitionRef::required_field_index(const char* name) const
     return index;
 }
 
-int FeatureDefinitionRef::required_field_index(const std::string& name) const
+int FeatureDefinition::required_field_index(const std::string& name) const
 {
     return required_field_index(name.c_str());
 }
 
-FieldDefinitionRef FeatureDefinitionRef::field_definition(int index) const
+FieldDefinitionRef FeatureDefinition::field_definition(int index) const
 {
-    return FieldDefinitionRef(checkPointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
+    return FieldDefinitionRef(check_pointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
 }
 
-OGRFeatureDefn* FeatureDefinitionRef::get() noexcept
+OGRFeatureDefn* FeatureDefinition::get() noexcept
 {
     return _def;
 }
 
-Feature::Feature(FeatureDefinitionRef featurDef)
+Feature::Feature(FeatureDefinition featurDef)
 : _feature(OGRFeature::CreateFeature(featurDef.get()))
 {
 }
@@ -568,7 +587,7 @@ const OGRFeature* Feature::get() const
 
 Geometry Feature::geometry()
 {
-    return Geometry(checkPointer(_feature->GetGeometryRef(), "No geometry present"));
+    return Geometry(check_pointer(_feature->GetGeometryRef(), "No geometry present"));
 }
 
 Geometry Feature::geometry() const
@@ -583,7 +602,7 @@ bool Feature::has_geometry() const noexcept
 
 void Feature::set_geometry(const Geometry& geom)
 {
-    checkError(_feature->SetGeometry(geom.get()), "Failed to set geometry");
+    check_error(_feature->SetGeometry(geom.get()), "Failed to set geometry");
 }
 
 int64_t Feature::id() const
@@ -613,12 +632,12 @@ bool Feature::field_is_valid(int index) const noexcept
 
 FieldDefinitionRef Feature::field_definition(int index) const
 {
-    return FieldDefinitionRef(checkPointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
+    return FieldDefinitionRef(check_pointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
 }
 
-FeatureDefinitionRef Feature::feature_definition() const
+FeatureDefinition Feature::feature_definition() const
 {
-    return FeatureDefinitionRef(checkPointer(_feature->GetDefnRef(), "Failed to obtain feature definition"));
+    return FeatureDefinition(check_pointer(_feature->GetDefnRef(), "Failed to obtain feature definition"));
 }
 
 Field Feature::field(int index) const noexcept
@@ -770,6 +789,23 @@ void Feature::set_field(int index, const Field& field)
                field);
 }
 
+void Feature::set_from(const Feature& other, FieldCopyMode mode)
+{
+    check_error(_feature->SetFrom(other.get(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature geometry and fields");
+}
+
+void Feature::set_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes)
+{
+    assert(fieldIndexes.size() == other.field_count());
+    check_error(_feature->SetFrom(other.get(), fieldIndexes.data(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature geometry and fields");
+}
+
+void Feature::set_fields_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes)
+{
+    assert(fieldIndexes.size() == other.field_count());
+    check_error(_feature->SetFieldsFrom(other.get(), fieldIndexes.data(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature fields");
+}
+
 bool Feature::operator==(const Feature& other) const
 {
     if (_feature && other._feature) {
@@ -839,7 +875,7 @@ void Layer::set_projection_from_epsg(int32_t epsg)
 void Layer::set_ignored_fields(const std::vector<std::string>& fieldNames)
 {
     const auto fields = create_string_list(fieldNames);
-    checkError(_layer->SetIgnoredFields(const_cast<const char**>(fields.List())), "Failed to ignore layer fields");
+    check_error(_layer->SetIgnoredFields(const_cast<const char**>(fields.List())), "Failed to ignore layer fields");
 }
 
 int64_t Layer::feature_count() const
@@ -850,7 +886,7 @@ int64_t Layer::feature_count() const
 Feature Layer::feature(int64_t index) const
 {
     assert(index != OGRNullFID);
-    return Feature(checkPointer(_layer->GetFeature(index), "Failed to get feature from layer"));
+    return Feature(check_pointer(_layer->GetFeature(index), "Failed to get feature from layer"));
 }
 
 int Layer::field_index(const char* name) const
@@ -881,7 +917,7 @@ void Layer::clear_spatial_filter()
 
 void Layer::set_attribute_filter(const char* name)
 {
-    checkError(_layer->SetAttributeFilter(name), "Failed to set attribute filter");
+    check_error(_layer->SetAttributeFilter(name), "Failed to set attribute filter");
 }
 
 void Layer::set_attribute_filter(const std::string& name)
@@ -896,17 +932,22 @@ void Layer::clear_attribute_filter()
 
 void Layer::create_field(FieldDefinition& field)
 {
-    checkError(_layer->CreateField(field.get()), "Failed to create layer field");
+    check_error(_layer->CreateField(field.get()), "Failed to create layer field");
 }
 
 void Layer::create_feature(Feature& feature)
 {
-    checkError(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
+    check_error(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
 }
 
-FeatureDefinitionRef Layer::layer_definition() const
+FeatureDefinition Layer::layer_definition() const
 {
-    return FeatureDefinitionRef(checkPointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
+    return FeatureDefinition(check_pointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
+}
+
+Geometry::Type Layer::geometry_type() const
+{
+    return geometry_type_from_gdal(_layer->GetGeomType());
 }
 
 const char* Layer::name() const
@@ -917,7 +958,7 @@ const char* Layer::name() const
 Rect<double> Layer::extent() const
 {
     OGREnvelope env;
-    checkError(_layer->GetExtent(&env, TRUE), "Failed to get layer extent");
+    check_error(_layer->GetExtent(&env, TRUE), "Failed to get layer extent");
 
     Rect<double> result;
     result.topLeft.x     = env.MinX;
@@ -950,7 +991,7 @@ const void* Layer::handle() const
 
 void Layer::intersection(Layer& method, Layer& output)
 {
-    checkError(_layer->Intersection(method.get(), output.get(), nullptr, nullptr, nullptr), "Failed to get layer intersection");
+    check_error(_layer->Intersection(method.get(), output.get(), nullptr, nullptr, nullptr), "Failed to get layer intersection");
 }
 
 void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& options)
@@ -982,7 +1023,7 @@ void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& opti
     }
 
     auto opts = create_string_list(optionsArray);
-    checkError(_layer->Intersection(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to get layer intersection");
+    check_error(_layer->Intersection(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to get layer intersection");
 }
 
 LayerIterator::LayerIterator()
@@ -1091,7 +1132,7 @@ FeatureDefinitionIterator::FeatureDefinitionIterator(int fieldCount)
 {
 }
 
-FeatureDefinitionIterator::FeatureDefinitionIterator(FeatureDefinitionRef featureDef)
+FeatureDefinitionIterator::FeatureDefinitionIterator(FeatureDefinition featureDef)
 : _featureDef(featureDef)
 , _fieldCount(featureDef.field_count())
 {

@@ -102,7 +102,7 @@ std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, inf::gdal::
 std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg)
 {
     gdal::CoordinateTransformer transformer(epsg, 4326);
-    auto ds = gdal::VectorDataSet::create(shapePath, gdal::VectorType::Unknown);
+    auto ds = gdal::VectorDataSet::open(shapePath, gdal::VectorType::Unknown);
     if (ds.layer_count() > 0) {
         try {
             return dataSetToGeoPath(ds, transformer);
@@ -117,7 +117,7 @@ std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg)
 std::vector<QGeoPath> loadShape(const fs::path& shapePath, int32_t epsg, inf::Rect<double>& extent)
 {
     gdal::CoordinateTransformer transformer(epsg, 4326);
-    auto ds = gdal::VectorDataSet::create(shapePath, gdal::VectorType::Unknown);
+    auto ds = gdal::VectorDataSet::open(shapePath, gdal::VectorType::Unknown);
     if (ds.layer_count() > 0) {
         try {
             extent = ds.layer(0).extent();
@@ -141,7 +141,7 @@ OverlayMap loadShapes(const std::vector<std::pair<std::string, fs::path>>& shape
     gdal::CoordinateTransformer transformer(epsg, 4326);
     for (auto& [shpName, shpPath] : shapes) {
         Log::debug("Load shape {} from {}", shpName, shpPath);
-        auto ds = gdal::VectorDataSet::create(shpPath, gdal::VectorType::Unknown);
+        auto ds = gdal::VectorDataSet::open(shpPath, gdal::VectorType::Unknown);
         if (ds.layer_count() == 0) {
             continue;
         }

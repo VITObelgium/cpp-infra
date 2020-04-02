@@ -12,7 +12,7 @@ using namespace std::string_literals;
 
 TEST_CASE("Gdal.iteratePoints")
 {
-    auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds = gdal::VectorDataSet::open(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     CHECK(ds.layer_count() == 1);
 
@@ -34,7 +34,7 @@ TEST_CASE("Gdal.iteratePoints")
 
 TEST_CASE("Gdal.fieldInfo")
 {
-    auto ds    = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds    = gdal::VectorDataSet::open(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
     auto layer = ds.layer(0);
     CHECK(layer.feature_count() == 9);
     CHECK(layer.feature(0).field_count() == 1);
@@ -44,7 +44,7 @@ TEST_CASE("Gdal.fieldInfo")
 
 TEST_CASE("Gdal.getField")
 {
-    auto ds = gdal::VectorDataSet::create(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
+    auto ds = gdal::VectorDataSet::open(TEST_DATA_DIR "/points.shp", gdal::VectorType::ShapeFile);
 
     int index = 0;
     for (const auto& feature : ds.layer(0)) {

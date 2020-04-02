@@ -10,6 +10,7 @@
 #include <ogr_feature.h>
 #include <ogr_spatialref.h>
 
+#include <gsl/span>
 #include <date/date.h>
 #include <optional>
 #include <variant>
@@ -122,8 +123,8 @@ public:
     Owner<Geometry> simplify_preserve_topology(double tolerance) const;
 
     void transform(CoordinateTransformer& transformer);
-    Owner<Geometry> buffer(double distance) const;
-    Owner<Geometry> buffer(double distance, int numQuadSegments) const;
+    [[nodiscard]] Owner<Geometry> buffer(double distance) const;
+    [[nodiscard]] Owner<Geometry> buffer(double distance, int numQuadSegments) const;
 
     Owner<Geometry> intersection(const Geometry& other) const;
     std::optional<double> area() const;
@@ -315,11 +316,13 @@ public:
     void set_width(int width);
 };
 
-class FeatureDefinitionRef
+class FeatureDefinition
 {
 public:
-    FeatureDefinitionRef() = default;
-    FeatureDefinitionRef(OGRFeatureDefn* def);
+    FeatureDefinition() = default;
+    FeatureDefinition(const char* name);
+    FeatureDefinition(OGRFeatureDefn* def);
+    ~FeatureDefinition();
     std::string_view name() const;
 
     int field_count() const;
@@ -340,7 +343,7 @@ private:
 class Feature
 {
 public:
-    Feature(FeatureDefinitionRef featurDef);
+    Feature(FeatureDefinition featurDef);
     explicit Feature(OGRFeature* feature);
     Feature(const Feature&) = delete;
     Feature(Feature&&);
@@ -371,7 +374,7 @@ public:
     bool field_is_valid(int index) const noexcept;
 
     FieldDefinitionRef field_definition(int index) const;
-    FeatureDefinitionRef feature_definition() const;
+    FeatureDefinition feature_definition() const;
 
     Field field(int index) const noexcept;
     std::optional<Field> opt_field(int index) const noexcept;
@@ -406,6 +409,16 @@ public:
     }
 
     void set_field(int index, const Field& field);
+
+    enum class FieldCopyMode
+    {
+        Strict, // the operation will fail if some of the input fields are not present in the output
+        Forgiving, // the operation will continue despite lacking output fields matching some of the source fields
+    };
+
+    void set_from(const Feature& other, FieldCopyMode mode);
+    void set_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes);
+    void set_fields_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes);
 
     bool operator==(const Feature& other) const;
 
@@ -502,7 +515,8 @@ public:
     void create_field(FieldDefinition& field);
     void create_feature(Feature& feature);
 
-    FeatureDefinitionRef layer_definition() const;
+    FeatureDefinition layer_definition() const;
+    Geometry::Type geometry_type() const;
 
     const char* name() const;
     Rect<double> extent() const;
@@ -610,7 +624,7 @@ class FeatureDefinitionIterator
 {
 public:
     FeatureDefinitionIterator(int fieldCount);
-    FeatureDefinitionIterator(FeatureDefinitionRef featureDef);
+    FeatureDefinitionIterator(FeatureDefinition featureDef);
     FeatureDefinitionIterator(const FeatureDefinitionIterator&) = delete;
     FeatureDefinitionIterator(FeatureDefinitionIterator&&)      = default;
 
@@ -624,19 +638,19 @@ public:
 private:
     void next();
 
-    FeatureDefinitionRef _featureDef;
+    FeatureDefinition _featureDef;
     int _fieldCount        = 0;
     int _currentFieldIndex = 0;
     FieldDefinitionRef _currentField;
 };
 
 // support for range based for loops
-inline FeatureDefinitionIterator begin(FeatureDefinitionRef featDef)
+inline FeatureDefinitionIterator begin(FeatureDefinition featDef)
 {
     return FeatureDefinitionIterator(featDef);
 }
 
-inline FeatureDefinitionIterator end(FeatureDefinitionRef featDef)
+inline FeatureDefinitionIterator end(FeatureDefinition featDef)
 {
     return FeatureDefinitionIterator(featDef.field_count());
 }

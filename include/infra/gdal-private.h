@@ -107,17 +107,15 @@ inline const std::type_info& resolveType(GDALDataType type)
     }
 }
 
-void throwLastError(const char* msg);
-void checkError(CPLErr err, const char* msg);
-void checkError(OGRErr err, const char* msg);
-void checkError(CPLErr err, const std::string& msg);
-void checkError(OGRErr err, const std::string& msg);
+void throw_last_error(std::string_view msg);
+void check_error(CPLErr err, std::string_view msg);
+void check_error(OGRErr err, std::string_view msg);
 
 template <typename T>
-T* checkPointer(T* instance, const char* msg)
+T* check_pointer(T* instance, std::string_view msg)
 {
     if (instance == nullptr) {
-        throwLastError(msg);
+        throw_last_error(msg);
     }
 
     return instance;

@@ -42,6 +42,16 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
 // convert a vector dataset
 VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::string>& options = {});
 
+struct BufferOptions
+{
+    double distance = 0.0;
+    int32_t numQuadSegments = 30;
+    bool includeFields; // copy over the fields in the resulting dataset
+};
+
+VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts);
+
+
 // convert a raster dataset
 template <typename T>
 std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options = {});

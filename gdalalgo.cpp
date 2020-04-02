@@ -3,6 +3,7 @@
 #include "infra/enumutils.h"
 #include "infra/exception.h"
 
+#include <cassert>
 #include <gdal_alg.h>
 #include <gdal_utils.h>
 
@@ -38,16 +39,16 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAl
         warpOptions->padfDstNoDataReal[0] = dstNodataValue.value();
     }
 
-    warpOptions->pTransformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
-                                                          nullptr,
-                                                          dstDataSet.get(),
-                                                          nullptr,
-                                                          FALSE, 0.0, 0),
-        "Failed to create actual warping transformer");
+    warpOptions->pTransformerArg = gdal::check_pointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
+                                                                                       nullptr,
+                                                                                       dstDataSet.get(),
+                                                                                       nullptr,
+                                                                                       FALSE, 0.0, 0),
+                                                       "Failed to create actual warping transformer");
 
     GDALWarpOperation operation;
     operation.Initialize(warpOptions);
-    checkError(operation.ChunkAndWarpImage(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
+    check_error(operation.ChunkAndWarpImage(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
 
     GDALDestroyGenImgProjTransformer(warpOptions->pTransformerArg);
     GDALDestroyWarpOptions(warpOptions);
@@ -82,16 +83,16 @@ GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
     // Create a transformer that maps from source pixel/line coordinates
     // to destination georeferenced coordinates (not destination pixel line).
     // We do that by omitting the destination dataset handle (setting it to nullptr).
-    auto* transformerArg = gdal::checkPointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
-                                                  nullptr,
-                                                  nullptr,
-                                                  resultMeta.projection.c_str(),
-                                                  FALSE, 0.0, 0),
-        "Failed to create warping transformer");
+    auto* transformerArg = gdal::check_pointer(GDALCreateGenImgProjTransformer(srcDataSet.get(),
+                                                                               nullptr,
+                                                                               nullptr,
+                                                                               resultMeta.projection.c_str(),
+                                                                               FALSE, 0.0, 0),
+                                               "Failed to create warping transformer");
 
     // Get information about the output size of the warped image
     std::array<double, 6> dstGeoTransform;
-    gdal::checkError(GDALSuggestedWarpOutput(srcDataSet.get(), GDALGenImgProjTransform, transformerArg, dstGeoTransform.data(), &resultMeta.cols, &resultMeta.rows), "Failed to suggest warp output size");
+    check_error(GDALSuggestedWarpOutput(srcDataSet.get(), GDALGenImgProjTransform, transformerArg, dstGeoTransform.data(), &resultMeta.cols, &resultMeta.rows), "Failed to suggest warp output size");
     GDALDestroyGenImgProjTransformer(transformerArg);
     fill_geometadata_from_geo_transform(resultMeta, dstGeoTransform);
 
@@ -110,7 +111,7 @@ VectorDataSet polygonize(const RasterDataSet& ds)
         layer.set_projection(srs);
     }
 
-    checkError(GDALPolygonize(ds.rasterband(1).get(), ds.rasterband(1).get(), layer.handle(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
+    check_error(GDALPolygonize(ds.rasterband(1).get(), ds.rasterband(1).get(), layer.handle(), 0, nullptr, nullptr, nullptr), "Failed to polygonize raster");
     return memDataSet;
 }
 
@@ -200,6 +201,41 @@ VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::s
     }
 
     return memDataSet;
+}
+
+VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)
+{
+    assert(opts.distance > 0.0);
+
+    auto memDriver = VectorDriver::create(VectorType::Memory);
+    auto memDs     = memDriver.create_dataset();
+
+    for (int i = 0; i < ds.layer_count(); ++i) {
+        auto srcLayer = ds.layer(i);
+        auto dstLayer = memDs.create_layer(srcLayer.name(), srcLayer.geometry_type());
+        // only copy the geometry
+        FeatureDefinition def("");
+        std::vector<int> fieldIndexes(srcLayer.layer_definition().field_count(), -1);
+
+        auto layerDef = srcLayer.layer_definition();
+
+        // TODO: create the proper field definitions
+        if (opts.includeFields) {
+            /*for (int i = 0; i < layerDef.field_count(); ++i) {
+                fieldIndexes.push_back();
+            }*/
+        }
+
+        for (auto& feature : ds.layer(i)) {
+            if (feature.has_geometry()) {
+                Feature feat(def);
+                feat.set_from(feature, Feature::FieldCopyMode::Strict, fieldIndexes);
+                dstLayer.create_feature(feat);
+            }
+        }
+    }
+
+    return memDs;
 }
 
 class WarpOptionsWrapper

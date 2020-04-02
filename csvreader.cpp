@@ -3,7 +3,7 @@
 namespace inf {
 CsvReader::CsvReader(const fs::path& filename)
 : _charset(detect_character_set(filename))
-, _dataset(gdal::VectorDataSet::create(filename, gdal::VectorType::Csv))
+, _dataset(gdal::VectorDataSet::open(filename, gdal::VectorType::Csv))
 , _layer(_dataset.layer(0))
 {
 }
