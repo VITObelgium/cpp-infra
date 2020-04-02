@@ -203,6 +203,18 @@ VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::s
     return memDataSet;
 }
 
+void translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options)
+{
+    VectorTranslateOptionsWrapper gdalOptions(options);
+
+    int errorCode              = CE_None;
+    GDALDatasetH srcDataSetPtr = ds.get();
+    GDALVectorTranslate(path.u8string().c_str(), nullptr, 1, &srcDataSetPtr, gdalOptions.get(), &errorCode);
+    if (errorCode != CE_None) {
+        throw RuntimeError("Failed to translate vector dataset to disk {}", errorCode);
+    }
+}
+
 VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)
 {
     assert(opts.distance > 0.0);
@@ -211,25 +223,37 @@ VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)
     auto memDs     = memDriver.create_dataset();
 
     for (int i = 0; i < ds.layer_count(); ++i) {
-        auto srcLayer = ds.layer(i);
-        auto dstLayer = memDs.create_layer(srcLayer.name(), srcLayer.geometry_type());
-        // only copy the geometry
-        FeatureDefinition def("");
-        std::vector<int> fieldIndexes(srcLayer.layer_definition().field_count(), -1);
+        auto srcLayer        = ds.layer(i);
+        auto dstGeometryType = opts.geometryType.value_or(srcLayer.geometry_type());
+        auto dstLayer        = memDs.create_layer(srcLayer.name(), dstGeometryType);
 
-        auto layerDef = srcLayer.layer_definition();
-
-        // TODO: create the proper field definitions
-        if (opts.includeFields) {
-            /*for (int i = 0; i < layerDef.field_count(); ++i) {
-                fieldIndexes.push_back();
-            }*/
+        // Take over the projection information
+        if (auto srs = srcLayer.projection(); srs.has_value()) {
+            dstLayer.set_projection(*srs);
         }
 
-        for (auto& feature : ds.layer(i)) {
+        // Setting all field indexes to -1 only copies the geometry
+        std::vector<int> fieldIndexes(srcLayer.layer_definition().field_count(), -1);
+
+        if (opts.includeFields) {
+            // Take over the field definitions
+            auto layerDef = srcLayer.layer_definition();
+            for (int i = 0; i < layerDef.field_count(); ++i) {
+                gdal::FieldDefinition defCopy(layerDef.field_definition(i));
+                dstLayer.create_field(defCopy);
+                fieldIndexes[i] = dstLayer.field_index(defCopy.name());
+            }
+        }
+
+        for (auto& feature : srcLayer) {
             if (feature.has_geometry()) {
-                Feature feat(def);
-                feat.set_from(feature, Feature::FieldCopyMode::Strict, fieldIndexes);
+                Feature feat(dstLayer.layer_definition());
+                
+                if (opts.includeFields) {
+                    feat.set_fields_from(feature, Feature::FieldCopyMode::Strict, fieldIndexes);
+                }
+
+                feat.set_geometry(feature.geometry().buffer(opts.distance, opts.numQuadSegments));
                 dstLayer.create_feature(feat);
             }
         }

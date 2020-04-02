@@ -41,12 +41,14 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
 
 // convert a vector dataset
 VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::string>& options = {});
+void translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options = {});
 
 struct BufferOptions
 {
     double distance = 0.0;
     int32_t numQuadSegments = 30;
     bool includeFields; // copy over the fields in the resulting dataset
+    std::optional<Geometry::Type> geometryType; //! override the type of the resulting geometry
 };
 
 VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts);

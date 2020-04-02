@@ -481,6 +481,14 @@ int FieldDefinition::width()
     return _def->GetWidth();
 }
 
+FeatureDefinition::FeatureDefinition(const FeatureDefinition& other)
+: _def(other._def)
+{
+    if (_def) {
+        _def->Reference();
+    }
+}
+
 FeatureDefinition::FeatureDefinition(const char* name)
 : _def(new OGRFeatureDefn(name))
 {
@@ -870,6 +878,15 @@ void Layer::set_projection_from_epsg(int32_t epsg)
     for (int i = 0; i < geomCount; ++i) {
         _layer->GetLayerDefn()->GetGeomFieldDefn(i)->SetSpatialRef(srs.get());
     }
+}
+
+std::optional<SpatialReference> Layer::projection() const
+{
+    if (auto* srs = _layer->GetSpatialRef(); srs != nullptr) {
+        return SpatialReference(srs);
+    }
+
+    return {};
 }
 
 void Layer::set_ignored_fields(const std::vector<std::string>& fieldNames)

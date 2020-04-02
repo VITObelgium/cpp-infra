@@ -1189,7 +1189,7 @@ static OGRwkbGeometryType to_gdal_type(Geometry::Type type)
     case Geometry::Type::Collection:
         return wkbGeometryCollection;
     case Geometry::Type::Line:
-        return wkbCurve;
+        return wkbLineString;
     case Geometry::Type::MultiLine:
         return wkbMultiLineString;
     case Geometry::Type::Polygon:

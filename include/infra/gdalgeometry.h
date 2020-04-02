@@ -320,6 +320,7 @@ class FeatureDefinition
 {
 public:
     FeatureDefinition() = default;
+    FeatureDefinition(const FeatureDefinition&);
     FeatureDefinition(const char* name);
     FeatureDefinition(OGRFeatureDefn* def);
     ~FeatureDefinition();
@@ -493,6 +494,8 @@ public:
     //! Make sure the spatial reference stays in scope while using the layer!
     void set_projection(SpatialReference& srs);
     void set_projection_from_epsg(int32_t epsg);
+
+    std::optional<SpatialReference> projection() const;
 
     void set_ignored_fields(const std::vector<std::string>& fieldnames);
 

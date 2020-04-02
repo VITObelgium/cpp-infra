@@ -106,6 +106,7 @@ public:
     SpatialReference(int32_t epsg);
     SpatialReference(const char* wkt);
     SpatialReference(const std::string& wkt);
+    SpatialReference(OGRSpatialReference* instance);
     ~SpatialReference() noexcept;
 
     SpatialReference(SpatialReference&&);
@@ -135,8 +136,6 @@ public:
     const OGRSpatialReference* get() const noexcept;
 
 private:
-    SpatialReference(OGRSpatialReference* instance);
-
     OGRSpatialReference* _srs = nullptr;
 };
 
