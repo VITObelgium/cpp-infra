@@ -238,10 +238,10 @@ VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)
         if (opts.includeFields) {
             // Take over the field definitions
             auto layerDef = srcLayer.layer_definition();
-            for (int i = 0; i < layerDef.field_count(); ++i) {
-                gdal::FieldDefinition defCopy(layerDef.field_definition(i));
+            for (int fieldIndex = 0; fieldIndex < layerDef.field_count(); ++fieldIndex) {
+                gdal::FieldDefinition defCopy(layerDef.field_definition(fieldIndex));
                 dstLayer.create_field(defCopy);
-                fieldIndexes[i] = dstLayer.field_index(defCopy.name());
+                fieldIndexes[fieldIndex] = dstLayer.field_index(defCopy.name());
             }
         }
 
