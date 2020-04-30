@@ -145,7 +145,7 @@ void write_raster_data(
     const std::unordered_map<std::string, std::string>& metadataValues,
     const GDALColorTable* ct = nullptr)
 {
-    write_raster_data<StorageType>(std::span(data(raster), size(raster)), meta, filename, driverOptions, metadataValues, ct);
+    write_raster_data<StorageType>(std::span<const typename RasterType::value_type>(data(raster), size(raster)), meta, filename, driverOptions, metadataValues, ct);
 }
 
 static BBox metadata_bounding_box(const GeoMetadata& meta)
@@ -400,7 +400,7 @@ void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path
         }
     }
 
-    write_raster_data(std::span(data(ras), size(ras)), meta, filename, storageType, driverOptions, metadataValues);
+    write_raster_data(std::span<const typename RasterType::value_type>(data(ras), size(ras)), meta, filename, storageType, driverOptions, metadataValues);
 }
 
 template <class RasterType>
