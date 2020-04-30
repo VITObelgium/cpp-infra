@@ -5,12 +5,12 @@
 #include "infra/point.h"
 #include "infra/progressinfo.h"
 #include "infra/rect.h"
+#include "infra/span.h"
 
 #include <gdal_priv.h>
 #include <ogr_feature.h>
 #include <ogr_spatialref.h>
 
-#include <gsl/span>
 #include <date/date.h>
 #include <optional>
 #include <variant>
@@ -413,13 +413,13 @@ public:
 
     enum class FieldCopyMode
     {
-        Strict, // the operation will fail if some of the input fields are not present in the output
+        Strict,    // the operation will fail if some of the input fields are not present in the output
         Forgiving, // the operation will continue despite lacking output fields matching some of the source fields
     };
 
     void set_from(const Feature& other, FieldCopyMode mode);
-    void set_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes);
-    void set_fields_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes);
+    void set_from(const Feature& other, FieldCopyMode mode, std::span<int32_t> fieldIndexes);
+    void set_fields_from(const Feature& other, FieldCopyMode mode, std::span<int32_t> fieldIndexes);
 
     bool operator==(const Feature& other) const;
 

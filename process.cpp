@@ -6,7 +6,7 @@
 
 namespace inf {
 
-int run_process(gsl::span<const std::string> command)
+int run_process(std::span<const std::string> command)
 {
     reproc::options options;
     options.redirect.parent = true;

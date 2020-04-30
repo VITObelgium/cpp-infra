@@ -492,7 +492,7 @@ FeatureDefinition::FeatureDefinition(const FeatureDefinition& other)
 FeatureDefinition::FeatureDefinition(const char* name)
 : _def(new OGRFeatureDefn(name))
 {
-      _def->Reference();
+    _def->Reference();
 }
 
 FeatureDefinition::FeatureDefinition(OGRFeatureDefn* def)
@@ -802,13 +802,13 @@ void Feature::set_from(const Feature& other, FieldCopyMode mode)
     check_error(_feature->SetFrom(other.get(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature geometry and fields");
 }
 
-void Feature::set_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes)
+void Feature::set_from(const Feature& other, FieldCopyMode mode, std::span<int32_t> fieldIndexes)
 {
     assert(fieldIndexes.size() == other.field_count());
     check_error(_feature->SetFrom(other.get(), fieldIndexes.data(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature geometry and fields");
 }
 
-void Feature::set_fields_from(const Feature& other, FieldCopyMode mode, gsl::span<int32_t> fieldIndexes)
+void Feature::set_fields_from(const Feature& other, FieldCopyMode mode, std::span<int32_t> fieldIndexes)
 {
     assert(fieldIndexes.size() == other.field_count());
     check_error(_feature->SetFieldsFrom(other.get(), fieldIndexes.data(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature fields");

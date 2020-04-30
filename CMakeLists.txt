@@ -131,6 +131,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/conversion.h
     include/infra/rect.h
     include/infra/size.h
+    include/infra/span.h
     include/infra/threadpool.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h

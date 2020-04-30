@@ -9,9 +9,9 @@
 #include "infra/gdalalgo.h"
 #include "infra/geometadata.h"
 #include "infra/point.h"
+#include "infra/span.h"
 
 #include <fmt/format.h>
-#include <gsl/span>
 #include <limits>
 #include <ogr_spatialref.h>
 #include <string>
@@ -56,11 +56,11 @@ void read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet
 
 template <typename RasterDataType>
 void write_raster_dataset(
-    gsl::span<const RasterDataType> data,
+    std::span<const RasterDataType> data,
     gdal::RasterDataSet& memDataSet,
     const GeoMetadata& meta,
     const fs::path& filename,
-    gsl::span<const std::string> driverOptions,
+    std::span<const std::string> driverOptions,
     const std::unordered_map<std::string, std::string>& metadataValues,
     const GDALColorTable* ct = nullptr)
 {
@@ -88,7 +88,7 @@ template <typename RasterDataType>
 void write_raster_to_dataset_band(
     inf::gdal::RasterDataSet& ds,
     int bandNr,
-    gsl::span<const RasterDataType> data,
+    std::span<const RasterDataType> data,
     const GeoMetadata& meta)
 {
     auto nod = ds.nodata_value(bandNr);
@@ -103,11 +103,11 @@ void write_raster_to_dataset_band(
 
 template <typename RasterDataType>
 void write_raster_data(
-    gsl::span<const RasterDataType> data,
+    std::span<const RasterDataType> data,
     const GeoMetadata& meta,
     const fs::path& filename,
     const std::type_info& storageType,
-    gsl::span<const std::string> driverOptions,
+    std::span<const std::string> driverOptions,
     const std::unordered_map<std::string, std::string>& metadataValues,
     const GDALColorTable* ct = nullptr)
 {
@@ -121,10 +121,10 @@ void write_raster_data(
 
 template <typename StorageType, typename RasterDataType>
 void write_raster_data(
-    gsl::span<const RasterDataType> data,
+    std::span<const RasterDataType> data,
     const GeoMetadata& meta,
     const fs::path& filename,
-    gsl::span<const std::string> driverOptions,
+    std::span<const std::string> driverOptions,
     const std::unordered_map<std::string, std::string>& metadataValues,
     const GDALColorTable* ct = nullptr)
 {
@@ -141,11 +141,11 @@ void write_raster_data(
     const RasterType& raster,
     const GeoMetadata& meta,
     const fs::path& filename,
-    gsl::span<const std::string> driverOptions,
+    std::span<const std::string> driverOptions,
     const std::unordered_map<std::string, std::string>& metadataValues,
     const GDALColorTable* ct = nullptr)
 {
-    write_raster_data<StorageType>(gsl::make_span(data(raster), size(raster)), meta, filename, driverOptions, metadataValues, ct);
+    write_raster_data<StorageType>(std::span(data(raster), size(raster)), meta, filename, driverOptions, metadataValues, ct);
 }
 
 static BBox metadata_bounding_box(const GeoMetadata& meta)
@@ -197,7 +197,7 @@ inline CutOut intersect_metadata(const GeoMetadata& srcMeta, const GeoMetadata& 
 }
 
 template <typename TSource, typename TDest>
-GeoMetadata cast_raster(const GeoMetadata& meta, gsl::span<const TSource> srcData, gsl::span<TDest> dstData)
+GeoMetadata cast_raster(const GeoMetadata& meta, std::span<const TSource> srcData, std::span<TDest> dstData)
 {
     using namespace detail;
     constexpr bool srcHasNaN = std::numeric_limits<TSource>::has_quiet_NaN;
@@ -233,7 +233,7 @@ GeoMetadata cast_raster(const GeoMetadata& meta, gsl::span<const TSource> srcDat
         if (resultMeta.nodata) {
             auto nodata = static_cast<TDest>(*resultMeta.nodata);
             // nan values need to be replaced with the nodata value
-            for (int32_t i = 0; i < srcData.size(); ++i) {
+            for (size_t i = 0; i < srcData.size(); ++i) {
                 if (std::isnan(srcData[i]) || srcData[i] == meta.nodata) {
                     dstData[i] = nodata;
                 } else {
@@ -246,7 +246,7 @@ GeoMetadata cast_raster(const GeoMetadata& meta, gsl::span<const TSource> srcDat
     }
 
     // No nodata conversions, regular copy
-    for (int32_t i = 0; i < srcData.size(); ++i) {
+    for (size_t i = 0; i < srcData.size(); ++i) {
         dstData[i] = static_cast<TDest>(srcData[i]);
     }
 
@@ -257,7 +257,7 @@ GeoMetadata cast_raster(const GeoMetadata& meta, gsl::span<const TSource> srcDat
  * Areas outside the extent of the raster on disk will be filled with nodata
  */
 template <typename T>
-GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetadata& extent, int bandNr, gsl::span<T> dstData)
+GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetadata& extent, int bandNr, std::span<T> dstData)
 {
     using namespace detail;
 
@@ -274,7 +274,7 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
         dstMeta.nodata = static_cast<double>(std::numeric_limits<T>::max());
     }
 
-    if (dstData.size() != dstMeta.rows * dstMeta.cols) {
+    if (truncate<int32_t>(dstData.size()) != dstMeta.rows * dstMeta.cols) {
         throw InvalidArgument("Invalid data buffer provided: incorrect size");
     }
 
@@ -297,7 +297,7 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
 /* This version will read the full dataset and is used in cases where there is no geotransform info available
  */
 template <typename T>
-GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, gsl::span<T> dstData)
+GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, std::span<T> dstData)
 {
     using namespace detail;
 
@@ -306,7 +306,7 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, gs
     meta.cols   = dataSet.x_size();
     meta.rows   = dataSet.y_size();
 
-    if (dstData.size() != meta.rows * meta.cols) {
+    if (truncate<int32_t>(dstData.size()) != meta.rows * meta.cols) {
         throw InvalidArgument("Invalid data buffer provided: incorrect size");
     }
 
@@ -327,7 +327,7 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, gs
 }
 
 template <typename T>
-GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, int bandNr, gsl::span<T> dstData)
+GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, int bandNr, std::span<T> dstData)
 {
     if (!dataSet.has_valid_geotransform()) {
         return data_from_dataset(dataSet, bandNr, dstData);
@@ -337,25 +337,25 @@ GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, int bandNr, gsl::span
 }
 
 template <typename T>
-GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, gsl::span<T> dstData)
+GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, std::span<T> dstData)
 {
     return read_raster_data<T>(dataSet, 1, dstData);
 }
 
 template <typename T>
-GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, const GeoMetadata& extent, int bandNr, gsl::span<T> dstData)
+GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, const GeoMetadata& extent, int bandNr, std::span<T> dstData)
 {
     return data_from_dataset(dataSet, extent, bandNr, dstData);
 }
 
 template <typename T>
-GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, const GeoMetadata& extent, gsl::span<T> dstData)
+GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, const GeoMetadata& extent, std::span<T> dstData)
 {
     return read_raster_data<T>(dataSet, extent, 1, dstData);
 }
 
 template <typename StorageType, class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, gsl::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
+void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
     inf::file::create_directory_if_not_exists(filename.parent_path());
@@ -384,7 +384,7 @@ void write_raster(const RasterType& ras, const GeoMetadata& meta, inf::gdal::Ras
 }
 
 template <class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, gsl::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
+void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
     inf::file::create_directory_if_not_exists(filename.parent_path());
@@ -400,23 +400,23 @@ void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path
         }
     }
 
-    write_raster_data(gsl::make_span(data(ras), size(ras)), meta, filename, storageType, driverOptions, metadataValues);
+    write_raster_data(std::span(data(ras), size(ras)), meta, filename, storageType, driverOptions, metadataValues);
 }
 
 template <class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, gsl::span<const std::string> driverOptions = {})
+void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {})
 {
     write_raster<typename RasterType::value_type>(ras, meta, filename, driverOptions);
 }
 
 template <class RasterType>
-void write_raster_with_metadata(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const std::unordered_map<std::string, std::string>& metadataValues, gsl::span<const std::string> driverOptions = {})
+void write_raster_with_metadata(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const std::unordered_map<std::string, std::string>& metadataValues, std::span<const std::string> driverOptions = {})
 {
     write_raster<typename RasterType::value_type>(ras, meta, filename, driverOptions, metadataValues);
 }
 
 template <class RasterType>
-void write_raster_color_mapped(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const inf::ColorMap& cm, gsl::span<const std::string> driverOptions = {})
+void write_raster_color_mapped(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const inf::ColorMap& cm, std::span<const std::string> driverOptions = {})
 {
     using namespace detail;
     using T = typename RasterType::value_type;
@@ -438,7 +438,7 @@ void write_raster_color_mapped(const RasterType& ras, const GeoMetadata& meta, c
 }
 
 template <typename T>
-inf::gdal::VectorDataSet polygonize(gsl::span<const T> rasterData, const GeoMetadata& meta)
+inf::gdal::VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
 {
     assert(meta.rows * meta.cols == rasterData.size());
 
@@ -452,7 +452,7 @@ inf::gdal::VectorDataSet polygonize(gsl::span<const T> rasterData, const GeoMeta
 }
 
 template <typename TInput, typename TOutput>
-void warp_raster(gsl::span<const TInput> inputData, const GeoMetadata& inputMeta, gsl::span<TOutput> outputData, GeoMetadata outputMeta, gdal::ResampleAlgorithm algo = gdal::ResampleAlgorithm::NearestNeighbour)
+void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta, std::span<TOutput> outputData, GeoMetadata outputMeta, gdal::ResampleAlgorithm algo = gdal::ResampleAlgorithm::NearestNeighbour)
 {
     if (inputMeta.projection.empty()) {
         throw RuntimeError("Warp input raster does not contain projection information");

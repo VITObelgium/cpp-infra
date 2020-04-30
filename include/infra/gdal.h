@@ -6,13 +6,13 @@
 #include "infra/gdalgeometry.h"
 #include "infra/geometadata.h"
 #include "infra/point.h"
+#include "infra/span.h"
 
 #include <algorithm>
 #include <array>
 #include <complex>
 #include <fmt/format.h>
 #include <gdal_priv.h>
-#include <gsl/span>
 #include <ogr_feature.h>
 #include <ogr_spatialref.h>
 
@@ -172,7 +172,7 @@ std::string projection_to_friendly_name(const std::string& projection);
 std::string projection_from_epsg(int32_t epsg);
 std::optional<int32_t> projection_to_geo_epsg(const std::string& projection) noexcept;
 std::optional<int32_t> projection_to_epsg(const std::string& projection) noexcept;
-CPLStringList create_string_list(gsl::span<const std::string> driverOptions);
+CPLStringList create_string_list(std::span<const std::string> driverOptions);
 
 RasterType guess_rastertype_from_filename(const fs::path& filePath);
 VectorType guess_vectortype_from_filename(const fs::path& filePath);
@@ -249,7 +249,7 @@ public:
     {
         auto* bandPtr = _ptr->GetRasterBand(band);
         check_error(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, TypeResolve<T>::value, pixelSize, lineSize),
-            "Failed to read raster data");
+                    "Failed to read raster data");
     }
 
     /* 
@@ -272,7 +272,7 @@ public:
         auto* bandPtr = check_pointer(_ptr->GetRasterBand(band), "Failed to get raster band for writing");
         auto* dataPtr = const_cast<void*>(static_cast<const void*>(pData));
         check_error(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, dataPtr, bufXSize, bufYSize, TypeResolve<T>::value, 0, 0),
-            "Failed to write raster data");
+                    "Failed to write raster data");
     }
 
     void read_rasterdata(int band, int xOff, int yOff, int x_size, int y_size, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const;
@@ -312,10 +312,8 @@ private:
 class VectorDataSet
 {
 public:
-    [[deprecated("use open")]]
-    static VectorDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOptions = {});
-    [[deprecated("use open")]]
-    static VectorDataSet create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
+    [[deprecated("use open")]] static VectorDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOptions = {});
+    [[deprecated("use open")]] static VectorDataSet create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
 
     static VectorDataSet open(const fs::path& filename, OpenMode mode = OpenMode::ReadOnly, const std::vector<std::string>& driverOptions = {});
     static VectorDataSet open(const fs::path& filename, VectorType type, OpenMode mode = OpenMode::ReadOnly, const std::vector<std::string>& driverOptions = {});
@@ -363,7 +361,7 @@ public:
     explicit RasterDriver(GDALDriver& driver);
 
     template <typename T>
-    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, gsl::span<const std::string> driverOptions = {})
+    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, std::span<const std::string> driverOptions = {})
     {
         auto options = create_string_list(driverOptions);
         return RasterDataSet(check_pointer(_driver.Create(filename.string().c_str(), cols, rows, numBands, TypeResolve<T>::value, options.List()), "Failed to create data set"));
@@ -373,7 +371,7 @@ public:
 
     // Use for the memory driver, when there is no path
     template <typename T>
-    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, gsl::span<const std::string> driverOptions = {})
+    RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, std::span<const std::string> driverOptions = {})
     {
         auto options = create_string_list(driverOptions);
         return RasterDataSet(check_pointer(_driver.Create("", cols, rows, numBands, TypeResolve<T>::value, options.List()), "Failed to create data set"));
@@ -382,7 +380,7 @@ public:
     // Use for the memory driver, when there is no path
     RasterDataSet create_dataset(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType);
 
-    RasterDataSet create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, gsl::span<const std::string> driverOptions = {});
+    RasterDataSet create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, std::span<const std::string> driverOptions = {});
 
     RasterType type() const;
 
@@ -415,7 +413,7 @@ FileType detect_file_type(const fs::path& path);
 class MemoryFile
 {
 public:
-    MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer);
+    MemoryFile(std::string path, std::span<const uint8_t> dataBuffer);
     ~MemoryFile();
 
     const std::string& path() const;

@@ -383,7 +383,7 @@ std::optional<int32_t> projection_to_epsg(const std::string& projection) noexcep
     return spatialRef.epsg_cs();
 }
 
-CPLStringList create_string_list(gsl::span<const std::string> options)
+CPLStringList create_string_list(std::span<const std::string> options)
 {
     CPLStringList result;
     for (auto& opt : options) {
@@ -555,7 +555,7 @@ RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t n
     return RasterDataSet(check_pointer(_driver.Create("", cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
 }
 
-RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, gsl::span<const std::string> driverOptions)
+RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, std::span<const std::string> driverOptions)
 {
     auto options = create_string_list(driverOptions);
     return RasterDataSet(check_pointer(_driver.CreateCopy(
@@ -1320,7 +1320,7 @@ void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<dou
     meta.yll = geoTrans[3] + geoTrans[4] * 0.0 + geoTrans[5] * meta.rows;
 }
 
-MemoryFile::MemoryFile(std::string path, gsl::span<const uint8_t> dataBuffer)
+MemoryFile::MemoryFile(std::string path, std::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
                             const_cast<GByte*>(reinterpret_cast<const GByte*>(dataBuffer.data())),

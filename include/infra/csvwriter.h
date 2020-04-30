@@ -1,9 +1,9 @@
 #pragma once
 
 #include "infra/filesystem.h"
+#include "infra/span.h"
 
 #include <fstream>
-#include <gsl/span>
 #include <locale>
 #include <optional>
 
@@ -48,13 +48,13 @@ public:
     CsvWriter(const fs::path& outputPath, Settings settings);
 
     // Write a complete line of strings in one go
-    void write_header(gsl::span<const std::string> names);
-    void write_header(gsl::span<std::string_view> names);
-    void write_line(gsl::span<const std::string> names);
-    void write_line(gsl::span<std::string_view> names);
+    void write_header(std::span<const std::string> names);
+    void write_header(std::span<std::string_view> names);
+    void write_line(std::span<const std::string> names);
+    void write_line(std::span<std::string_view> names);
 
     template <typename T>
-    void write_line(gsl::span<const T> values)
+    void write_line(std::span<const T> values)
     {
         for (auto& v : values) {
             write_column_value(v);

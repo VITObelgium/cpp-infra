@@ -1,10 +1,11 @@
 #pragma once
 
-#include <string_view>
+#include "infra/span.h"
+
 #include <string>
-#include <gsl/span>
+#include <string_view>
 
 namespace inf {
 
-int run_process(gsl::span<const std::string> command);
+int run_process(std::span<const std::string> command);
 }

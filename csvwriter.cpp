@@ -68,17 +68,17 @@ CsvWriter::CsvWriter(const fs::path& outputPath, Settings settings)
     _quoteNumbers = locale_requires_number_quoting(_settings.locale, _settings.separator);
 }
 
-void CsvWriter::write_header(gsl::span<const std::string> names)
+void CsvWriter::write_header(std::span<const std::string> names)
 {
     write_line(names);
 }
 
-void CsvWriter::write_header(gsl::span<std::string_view> names)
+void CsvWriter::write_header(std::span<std::string_view> names)
 {
     write_line(names);
 }
 
-void CsvWriter::write_line(gsl::span<const std::string> names)
+void CsvWriter::write_line(std::span<const std::string> names)
 {
     for (auto name : names) {
         write_column_value(name);
@@ -87,7 +87,7 @@ void CsvWriter::write_line(gsl::span<const std::string> names)
     new_line();
 }
 
-void CsvWriter::write_line(gsl::span<std::string_view> names)
+void CsvWriter::write_line(std::span<std::string_view> names)
 {
     for (auto name : names) {
         write_column_value(name);

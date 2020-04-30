@@ -10,12 +10,12 @@ using namespace std::string_view_literals;
 
 struct MemoryFiles
 {
-    const MemoryFile gcs            = MemoryFile("/vsimem/data/gcs.csv", gsl::span<const uint8_t>(data::gcs));
-    const MemoryFile pcs            = MemoryFile("/vsimem/data/pcs.csv", gsl::span<const uint8_t>(data::pcs));
-    const MemoryFile gdalDatum      = MemoryFile("/vsimem/data/gdal_datum.csv", gsl::span<const uint8_t>(data::gdal_datum));
-    const MemoryFile projopWparm    = MemoryFile("/vsimem/data/projop_wparm.csv", gsl::span<const uint8_t>(data::projop_wparm));
-    const MemoryFile ellipsoid      = MemoryFile("/vsimem/data/ellipsoid.csv", gsl::span<const uint8_t>(data::ellipsoid));
-    const MemoryFile coordinateAxis = MemoryFile("/vsimem/data/coordinate_axis.csv", gsl::span<const uint8_t>(data::coordinate_axis));
+    const MemoryFile gcs            = MemoryFile("/vsimem/data/gcs.csv", std::span<const uint8_t>(data::gcs));
+    const MemoryFile pcs            = MemoryFile("/vsimem/data/pcs.csv", std::span<const uint8_t>(data::pcs));
+    const MemoryFile gdalDatum      = MemoryFile("/vsimem/data/gdal_datum.csv", std::span<const uint8_t>(data::gdal_datum));
+    const MemoryFile projopWparm    = MemoryFile("/vsimem/data/projop_wparm.csv", std::span<const uint8_t>(data::projop_wparm));
+    const MemoryFile ellipsoid      = MemoryFile("/vsimem/data/ellipsoid.csv", std::span<const uint8_t>(data::ellipsoid));
+    const MemoryFile coordinateAxis = MemoryFile("/vsimem/data/coordinate_axis.csv", std::span<const uint8_t>(data::coordinate_axis));
 };
 
 static std::unique_ptr<MemoryFiles> s_memFiles;
