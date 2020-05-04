@@ -355,7 +355,7 @@ GeoMetadata read_raster_data(gdal::RasterDataSet& dataSet, const GeoMetadata& ex
 }
 
 template <typename StorageType, class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
+void write_raster_as(std::span<const RasterType> rasterData, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
     inf::file::create_directory_if_not_exists(filename.parent_path());
@@ -368,23 +368,23 @@ void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path
         }
     }
 
-    write_raster_data<StorageType>(ras, meta, filename, driverOptions, metadataValues);
+    write_raster_data<StorageType>(rasterData, meta, filename, driverOptions, metadataValues);
 }
 
 template <typename StorageType, class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, inf::gdal::RasterDataSet& ds, int bandNr)
+void write_raster_as(std::span<const RasterType> rasterData, const GeoMetadata& meta, inf::gdal::RasterDataSet& ds, int bandNr)
 {
-    detail::write_raster_to_dataset_band<StorageType>(ds, bandNr, ras, meta);
+    detail::write_raster_to_dataset_band<StorageType>(ds, bandNr, rasterData, meta);
 }
 
-template <class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, inf::gdal::RasterDataSet& ds, int bandNr)
+template <class T>
+void write_raster(std::span<const T> rasterData, const GeoMetadata& meta, inf::gdal::RasterDataSet& ds, int bandNr)
 {
-    detail::write_raster_to_dataset_band<typename RasterType::value_type>(ds, bandNr, ras, meta);
+    detail::write_raster_to_dataset_band<T>(ds, bandNr, rasterData, meta);
 }
 
-template <class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
+template <class T>
+void write_raster(std::span<const T> rasterData, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
     inf::file::create_directory_if_not_exists(filename.parent_path());
@@ -400,13 +400,13 @@ void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path
         }
     }
 
-    write_raster_data(std::span<const typename RasterType::value_type>(data(ras), size(ras)), meta, filename, storageType, driverOptions, metadataValues);
+    write_raster_data(rasterData, meta, filename, storageType, driverOptions, metadataValues);
 }
 
-template <class RasterType>
-void write_raster(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {})
+template <class T>
+void write_raster(std::span<const T> data, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {})
 {
-    write_raster<typename RasterType::value_type>(ras, meta, filename, driverOptions);
+    write_raster(data, meta, filename, typeid(T), driverOptions);
 }
 
 template <class RasterType>
