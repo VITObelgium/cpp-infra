@@ -409,18 +409,15 @@ void write_raster(std::span<const T> data, const GeoMetadata& meta, const fs::pa
     write_raster(data, meta, filename, typeid(T), driverOptions);
 }
 
-template <class RasterType>
-void write_raster_with_metadata(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const std::unordered_map<std::string, std::string>& metadataValues, std::span<const std::string> driverOptions = {})
+template <class T>
+void write_raster_with_metadata(std::span<const T> data, const GeoMetadata& meta, const fs::path& filename, const std::unordered_map<std::string, std::string>& metadataValues, std::span<const std::string> driverOptions = {})
 {
-    write_raster<typename RasterType::value_type>(ras, meta, filename, driverOptions, metadataValues);
+    write_raster_as<T>(data, meta, filename, driverOptions, metadataValues);
 }
 
-template <class RasterType>
-void write_raster_color_mapped(const RasterType& ras, const GeoMetadata& meta, const fs::path& filename, const inf::ColorMap& cm, std::span<const std::string> driverOptions = {})
+template <class T>
+void write_raster_color_mapped(std::span<const T> data, const GeoMetadata& meta, const fs::path& filename, const inf::ColorMap& cm, std::span<const std::string> driverOptions = {})
 {
-    using namespace detail;
-    using T = typename RasterType::value_type;
-
     GDALColorTable ct;
     for (int i = 0; i < 256; ++i) {
         auto color = cm.get_color(static_cast<uint8_t>(i));
@@ -434,7 +431,7 @@ void write_raster_color_mapped(const RasterType& ras, const GeoMetadata& meta, c
         ct.SetColorEntry(i, &entry);
     }
 
-    write_raster_data<T>(ras, meta, filename, driverOptions, {}, &ct);
+    detail::write_raster_data<T>(data, meta, filename, driverOptions, {}, &ct);
 }
 
 template <typename T>
