@@ -459,7 +459,7 @@ void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta
         throw RuntimeError("Warp output raster does not contain projection information");
     }
 
-    assert(outputData.size() == outputMeta.rows * outputMeta.cols);
+    assert(truncate<int32_t>(outputData.size()) == outputMeta.rows * outputMeta.cols);
     if (!outputMeta.nodata.has_value()) {
         if constexpr (std::numeric_limits<TOutput>::has_quiet_NaN) {
             outputMeta.nodata = std::numeric_limits<TOutput>::quiet_NaN();
