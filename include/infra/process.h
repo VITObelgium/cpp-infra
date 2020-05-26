@@ -17,8 +17,8 @@ struct ProcessRunOptions
 struct ProcessRunResult
 {
     int status;
-    std::string stdout;
-    std::string stderr;
+    std::string out;
+    std::string err;
 };
 
 /*!
