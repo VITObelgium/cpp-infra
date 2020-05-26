@@ -31,7 +31,7 @@ if (@INFRA_CHARSET@)
 endif ()
 
 if (@INFRA_PROCESS@)
-    find_dependency(reprocxx CONFIG REQUIRED)
+    find_dependency(reproc++ CONFIG REQUIRED)
 endif ()
 
 if (@INFRA_NUMERIC@)
