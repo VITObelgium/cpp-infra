@@ -11,6 +11,7 @@
 #include "infra/point.h"
 #include "infra/span.h"
 
+#include <cassert>
 #include <fmt/format.h>
 #include <limits>
 #include <ogr_spatialref.h>
@@ -437,7 +438,7 @@ void write_raster_color_mapped(std::span<const T> data, const GeoMetadata& meta,
 template <typename T>
 inf::gdal::VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
 {
-    assert(meta.rows * meta.cols == rasterData.size());
+    assert(meta.rows * meta.cols == truncate<int32_t>(rasterData.size()));
 
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
     gdal::RasterDataSet srcDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));

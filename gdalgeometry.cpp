@@ -804,13 +804,13 @@ void Feature::set_from(const Feature& other, FieldCopyMode mode)
 
 void Feature::set_from(const Feature& other, FieldCopyMode mode, std::span<int32_t> fieldIndexes)
 {
-    assert(fieldIndexes.size() == other.field_count());
+    assert(truncate<int>(fieldIndexes.size()) == other.field_count());
     check_error(_feature->SetFrom(other.get(), fieldIndexes.data(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature geometry and fields");
 }
 
 void Feature::set_fields_from(const Feature& other, FieldCopyMode mode, std::span<int32_t> fieldIndexes)
 {
-    assert(fieldIndexes.size() == other.field_count());
+    assert(truncate<int>(fieldIndexes.size()) == other.field_count());
     check_error(_feature->SetFieldsFrom(other.get(), fieldIndexes.data(), mode == FieldCopyMode::Forgiving ? TRUE : FALSE), "Failed to copy feature fields");
 }
 
