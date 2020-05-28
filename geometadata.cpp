@@ -147,7 +147,7 @@ void GeoMetadata::compute_rect_on_map_around(const int32_t row, const int32_t co
 
 Point<double> GeoMetadata::center() const
 {
-    return Point<double>(xll + ((rows * cellSize) / 2), yll + ((rows * cellSize) / 2));
+    return Point<double>(xll + ((cols * cellSize) / 2), yll + ((rows * cellSize) / 2));
 }
 
 Point<double> GeoMetadata::top_left() const
