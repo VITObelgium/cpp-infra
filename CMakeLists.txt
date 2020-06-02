@@ -119,6 +119,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
     include/infra/line.h
+    include/infra/math.h
     include/infra/point.h
     include/infra/progressinfo.h
     include/infra/scopeguard.h
