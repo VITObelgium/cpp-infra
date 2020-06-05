@@ -7,6 +7,7 @@ add_executable(infratest
     colormaptest.cpp
     inireadertest.cpp
     filesystemtest.cpp
+    mathtest.cpp
     signaltest.cpp
     legenddataanalysertest.cpp
     stringtest.cpp
