@@ -4,9 +4,9 @@
 #include "infra/legenddataanalyser.h"
 #include "infra/string.h"
 
+#include <cassert>
 #include <fmt/format.h>
 #include <fstream>
-#include <cassert>
 
 namespace inf {
 
@@ -57,6 +57,35 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
                 return entry.color;
             }
         }
+    }
+
+    return unmappable;
+}
+
+Color Legend::color_for_value(double value, const Color& unmappable, const Color& unmappableLow, const Color& unmappableHigh) const noexcept
+{
+    if (std::isnan(value) || entries.empty()) {
+        return unmappable;
+    }
+
+    for (auto& entry : entries) {
+        if (type == inf::Legend::Type::Categoric) {
+            if (std::floor(value) == entry.lowerBound) {
+                return entry.color;
+            }
+        } else if (type == inf::Legend::Type::Numeric) {
+            if (value >= entry.lowerBound && value < entry.upperBound) {
+                return entry.color;
+            }
+        }
+    }
+
+    if (value < entries.front().lowerBound) {
+        return unmappableLow;
+    }
+
+    if (value >= entries.back().upperBound) {
+        return unmappableHigh;
     }
 
     return unmappable;

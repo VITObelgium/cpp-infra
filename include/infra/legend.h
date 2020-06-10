@@ -37,15 +37,29 @@ struct Legend
     };
 
     /*! Map the value to a color based on the legend entries
-     * If the value cannot be mapped the the color of the edge entries
+     * If the value cannot be mapped the color of the edge entries
      * will be used depending on the the value
+     * /param value the value to map
      */
     Color color_for_value(double value) const noexcept;
 
     /*! Map the value to a color based on the legend entries
      * If the value cannot be mapped the unmappable color will be returned
+     * /param value the value to map
+     * /param unmappable the color that will be returned when the value is outside of the legend bands
+     * /return the mapped color
      */
     Color color_for_value(double value, const Color& unmappable) const noexcept;
+
+    /*! Map the value to a color based on the legend entries
+     * If the value cannot be mapped the unmappable low or high color will be returned
+     * /param value the value to map
+     * /param unmappable the color that will be returned when the value is nan or outside of the legend bands
+     * /param unmappableLow the color that will be returned when the value is outside of the legend bands and lower than the lowest legend band
+     * /param unmappableHigh the color that will be returned when the value is outside of the legend bands and higher than the highest legend band
+     * /return the mapped color
+     */
+    Color color_for_value(double value, const Color& unmappable, const Color& unmappableLow, const Color& unmappableHigh) const noexcept;
 
     Type type           = Type::Categoric;
     int numberOfClasses = 5;
