@@ -33,7 +33,7 @@ template <typename T>
 T percentile_sorted_input(double percentile, std::span<const T> values)
 {
     auto rank    = percentile / 100 * (values.size() + 1);
-    size_t index = std::lround(rank - 1.0);
+    size_t index = std::clamp<long long>(std::llround(rank - 1.0), 0, values.size() - 1);
     return values[index];
 }
 

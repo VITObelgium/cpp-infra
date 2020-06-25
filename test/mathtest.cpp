@@ -50,17 +50,25 @@ TEST_CASE("math::Percentiles floating point input")
         CHECK(math::percentile_sorted_input<double>(75.0, values) == 7.0);
     }
 
-    SUBCASE("Unsorted input")
+    SUBCASE("Sorted input")
     {
+        CHECK(math::percentile_sorted_input<double>(25.0, values) == 3.0);
+        CHECK(math::percentile_sorted_input<double>(50.0, values) == 6.0);
+        CHECK(math::percentile_sorted_input<double>(75.0, values) == 7.0);
+    }
+
+    SUBCASE("Single element")
+    {
+        values = {1.0};
+
         std::random_device rd;
         std::mt19937 g(rd());
 
-        std::shuffle(values.begin(), values.end(), g);
-        CHECK(math::percentile_in_place<double>(25.0, values) == 3.0);
-        std::shuffle(values.begin(), values.end(), g);
-        CHECK(math::percentile_in_place<double>(50.0, values) == 6.0);
-        std::shuffle(values.begin(), values.end(), g);
-        CHECK(math::percentile_in_place<double>(75.0, values) == 7.0);
+        CHECK(math::percentile_in_place<double>(0.0, values) == 1.0);
+        CHECK(math::percentile_in_place<double>(25.0, values) == 1.0);
+        CHECK(math::percentile_in_place<double>(50.0, values) == 1.0);
+        CHECK(math::percentile_in_place<double>(75.0, values) == 1.0);
+        CHECK(math::percentile_in_place<double>(100.0, values) == 1.0);
     }
 }
 
