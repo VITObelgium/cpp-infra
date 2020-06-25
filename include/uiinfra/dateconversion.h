@@ -26,3 +26,4 @@ inline inf::chrono::date_point datePointFromDate(const QDate& date)
                                    date::day(date.day()));
     return static_cast<date::sys_days>(ymd);
 }
+}
