@@ -10,10 +10,7 @@ using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
-inline date::year_month_day to_year_month_day(time_point tp)
-{
-    return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
-}
+date::year_month_day to_year_month_day(time_point tp);
 
 /*! Converts a year_month_day to a system timepoint (locale dependent) */
 inline time_point to_system_time_point(date::year_month_day ymd)

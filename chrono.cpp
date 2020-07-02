@@ -7,6 +7,11 @@ namespace inf::chrono {
 
 using namespace date;
 
+date::year_month_day to_year_month_day(time_point tp)
+{
+    return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
+}
+
 std::string to_string(date::local_seconds tp)
 {
     return to_string("%Y_%m_%d_%H.%M", tp);

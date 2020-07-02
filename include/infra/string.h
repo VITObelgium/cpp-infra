@@ -346,9 +346,9 @@ std::string join(const Container& items, std::string_view joinString)
     } else if constexpr (is_streamable_v<ValueType>) {
         // Join implementation for objects that have a streaming operator implemented
         std::ostringstream ss;
-        for (auto iter = items.cbegin(); iter != items.cend(); ++iter) {
+        for (auto iter = items.begin(); iter != items.end(); ++iter) {
             ss << *iter;
-            if (std::next(iter) != items.cend()) {
+            if (std::next(iter) != items.end()) {
                 ss << joinString;
             }
         }
