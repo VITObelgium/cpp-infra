@@ -276,6 +276,10 @@ if (INFRA_GDAL)
         find_package(GDAL REQUIRED)
     endif ()
 
+    if (${GDAL_VERSION_MAJOR} VERSION_GREATER_EQUAL 3 AND INFRA_EMBED_GDAL_DATA) 
+        message(FATAL_ERROR "Embedding gdal data is not supported for gdal versions >= 3")
+    endif ()
+
     list (APPEND INFRA_PUBLIC_HEADERS
         include/infra/gdal.h
         include/infra/gdalalgo.h
@@ -316,11 +320,14 @@ if (INFRA_GDAL)
                            DEPENDS ${Gdal_DATA_PATH}/gcs.csv ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
                            COMMENT "Generate embedded gdal data"
         )
-    elseif (Gdal_ProjDB_DATA_PATH)
+    elseif (${GDAL_VERSION_MAJOR} VERSION_GREATER_EQUAL 3)
         add_custom_command(TARGET infra POST_BUILD
                            COMMENT "Copying proj4 db to the build directory"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>/data
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different ${Gdal_ProjDB_DATA_PATH} $<TARGET_FILE_DIR:infra>/data
+                           COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>
+                           COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ4::proj>/../../share/proj/proj.db>
+                                $<$<CONFIG:Release>:$<TARGET_FILE_DIR:PROJ4::proj>/../share/proj/proj.db>
+                                $<TARGET_FILE_DIR:infra>
                            DEPENDS ${Gdal_ProjDB_DATA_PATH})
     endif ()
     
