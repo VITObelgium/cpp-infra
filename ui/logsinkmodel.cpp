@@ -2,7 +2,7 @@
 
 #include <qapplication.h>
 #include <qstyle.h>
-#include <spdlog/details/pattern_formatter.h>
+#include <spdlog/pattern_formatter.h>
 
 namespace inf::ui {
 
