@@ -111,9 +111,9 @@ TEST_CASE("Gdal.convertPointProjected")
     // 22000.000 153000.000 (x,y) lambert 72 EPSG:31370 should be converted to 2.55772472781224 50.6735631138308 (lat,long) EPSG:4326
 
     // Bottom left coordinate
-    auto point = gdal::convert_point_projected(31370, 4326, Point<double>(22000.000, 153000.000));
-    CHECK(2.55772472781224 == Approx(point.x).epsilon(1e-8));
-    CHECK(50.6735631138308 == Approx(point.y).epsilon(1e-8));
+    auto point = gdal::convert_point_projected(crs::epsg::BelgianLambert72, crs::epsg::WGS84, Point<double>(22000.000, 153000.000));
+    CHECK(2.55772472781224 == Approx(point.x).epsilon(1e-6));
+    CHECK(50.6735631138308 == Approx(point.y).epsilon(1e-6));
 }
 
 TEST_CASE("Gdal.createExcelFile")

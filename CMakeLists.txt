@@ -323,12 +323,11 @@ if (INFRA_GDAL)
     elseif (${GDAL_VERSION_MAJOR} VERSION_GREATER_EQUAL 3)
         add_custom_command(TARGET infra POST_BUILD
                            COMMENT "Copying proj4 db to the build directory"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>
+                           COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>/data
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ4::proj>/../../share/proj/proj.db>
                                 $<$<CONFIG:Release>:$<TARGET_FILE_DIR:PROJ4::proj>/../share/proj/proj.db>
-                                $<TARGET_FILE_DIR:infra>
-                           DEPENDS ${Gdal_ProjDB_DATA_PATH})
+                                $<TARGET_FILE_DIR:infra>/data)
     endif ()
     
 

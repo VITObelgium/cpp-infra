@@ -672,22 +672,8 @@ static GDALDataset* create_data_set(const fs::path& filePath,
     // use generic_u8string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
     // which is not recognized by gdal
-    std::string path = filePath.generic_u8string();
-#ifdef _WIN32
-    std::unique_ptr<ScopeGuard> utf8Guard;
-
-    // On windows gdal netcdf driver does not expect utf8 path names
-    if (str::ends_with(path, ".nc") || str::starts_with(path, "NETCDF:")) {
-        CPLSetThreadLocalConfigOption("GDAL_FILENAME_IS_UTF8", "NO");
-        path = filePath.generic_string();
-
-        utf8Guard = std::make_unique<ScopeGuard>([]() {
-            CPLSetThreadLocalConfigOption("GDAL_FILENAME_IS_UTF8", "YES");
-        });
-    }
-#endif
-
-    auto options = create_string_list(driverOpts);
+    const auto path = filePath.generic_u8string();
+    auto options    = create_string_list(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
         path.c_str(),
         openFlags,
