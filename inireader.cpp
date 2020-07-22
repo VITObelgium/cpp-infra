@@ -12,7 +12,7 @@ namespace inf {
 
 /* Typedef for prototype of handler function. */
 typedef int (*ini_handler)(void* user, const char* section,
-    const char* name, const char* value);
+                           const char* name, const char* value);
 
 /* Typedef for prototype of fgets-style reader function. */
 typedef char* (*ini_reader)(char* str, int num, void* stream);
@@ -105,7 +105,7 @@ inline static char* strncpy0(char* dest, const char* src, size_t size)
 /* Same as ini_parse(), but takes an ini_reader function pointer instead of
    filename. Used for implementing custom or string-based I/O. */
 inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler,
-    void* user)
+                            void* user)
 {
 /* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK
@@ -152,7 +152,7 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
             end = find_chars_or_comment(start + 1, "]");
             if (*end == ']') {
                 *end = '\0';
-                strncpy0(section, start + 1, sizeof(section));
+                strncpy0(section, start + 1, sizeof(section) - 1);
                 *prev_name = '\0';
             } else if (!error) {
                 /* No ']' found on section line */
@@ -173,7 +173,7 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
                 rstrip(value);
 
                 /* Valid name[=:]value pair found, call handler */
-                strncpy0(prev_name, name, sizeof(prev_name));
+                strncpy0(prev_name, name, sizeof(prev_name) - 1);
                 if (!handler(user, section, name, value) && !error)
                     error = lineno;
             } else if (!error) {
