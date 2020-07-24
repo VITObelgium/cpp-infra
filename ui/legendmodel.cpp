@@ -150,7 +150,7 @@ QVariant LegendModel::headerData(int section, Qt::Orientation orientation, int r
 Qt::ItemFlags LegendModel::flags(const QModelIndex& index) const
 {
     if (!index.isValid()) {
-        return nullptr;
+        return Qt::ItemFlags();
     }
 
     auto flags = QAbstractItemModel::flags(index);

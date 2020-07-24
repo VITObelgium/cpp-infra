@@ -106,7 +106,7 @@ bool TreeModel::setData(const QModelIndex& index, const QVariant& value, int rol
 Qt::ItemFlags TreeModel::flags(const QModelIndex& index) const
 {
     if (!index.isValid()) {
-        return nullptr;
+        return Qt::ItemFlags();
     }
 
     auto flags = QAbstractItemModel::flags(index);

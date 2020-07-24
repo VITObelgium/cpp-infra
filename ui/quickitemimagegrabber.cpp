@@ -23,7 +23,11 @@ void QuickItemImageGrabber::saveToImage(QQuickItem* item, const QString& path, Q
         auto result = item->grabToImage(size);
         if (result) {
             connect(result.get(), &QQuickItemGrabResult::ready, this, [result, path]() {
-                result->saveToFile(path);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 15, 0))
+                std::as_const(*result).saveToFile(path);
+#else
+                    result->saveToFile(path);
+#endif
             });
         }
     }
