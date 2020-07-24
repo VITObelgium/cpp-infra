@@ -95,7 +95,7 @@ public:
     Qt::ItemFlags flags(const QModelIndex& index) const override
     {
         if (!index.isValid())
-            return 0;
+            return Qt::ItemFlags();
 
         return QAbstractItemModel::flags(index);
     }
@@ -185,7 +185,7 @@ private:
 
             if (!lineData.isEmpty()) {
                 // Read the column data from the rest of the line.
-                QStringList columnStrings = lineData.split("\t", QString::SkipEmptyParts);
+                QStringList columnStrings = lineData.split("\t", Qt::SkipEmptyParts);
                 QList<QVariant> columnData;
                 for (int column = 0; column < columnStrings.count(); ++column)
                     columnData << columnStrings[column];
