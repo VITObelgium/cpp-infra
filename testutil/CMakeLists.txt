@@ -25,5 +25,5 @@ target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
 
 add_library(infratestutilmain testmain.cpp)
 add_library(Infra::infratestutilmain ALIAS infratestutilmain)
-target_compile_definitions(infratestutilmain PRIVATE $<$<BOOL:INFRA_GDAL>:HAVE_GDAL>)
+target_compile_definitions(infratestutilmain PRIVATE $<$<BOOL:${INFRA_GDAL}>:HAVE_GDAL>)
 target_link_libraries(infratestutilmain PUBLIC infratestutil)
