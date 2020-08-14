@@ -23,7 +23,6 @@ int run_process(std::span<const std::string> command, const ProcessRunOptions& o
 {
     reproc::options options;
     options.redirect.parent = true;
-    options.nonblocking     = opts.runType != ProcessRunOptions::RunType::WaitForCompletion;
 
     if (!opts.environmentVariables.empty()) {
         options.env.behavior = reproc::env::type::extend;
@@ -47,7 +46,6 @@ ProcessRunResult run_process_capture_output(std::span<const std::string> command
     ProcessRunResult result;
 
     reproc::options options;
-    options.nonblocking = opts.runType != ProcessRunOptions::RunType::WaitForCompletion;
 
     if (!opts.environmentVariables.empty()) {
         options.env.behavior = reproc::env::type::extend;
