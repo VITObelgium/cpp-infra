@@ -10,8 +10,15 @@ namespace inf {
 
 struct ProcessRunOptions
 {
+    enum class RunType
+    {
+        WaitForCompletion,
+        FireAndForget,
+    };
+
     std::vector<std::pair<std::string, std::string>> environmentVariables;
     std::string workingDirectory;
+    RunType runType = RunType::WaitForCompletion;
 };
 
 struct ProcessRunResult
