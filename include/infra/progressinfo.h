@@ -8,7 +8,100 @@
 
 namespace inf {
 
-class ProgressInfo
+namespace detail {
+
+template <typename T>
+class PayloadBase
+{
+public:
+    const T& payload() const noexcept
+    {
+        return _payload;
+    }
+
+    void set_payload(T payload)
+    {
+        _payload = std::move(payload);
+    }
+
+private:
+    template <typename T>
+    friend class ProgressTracker;
+
+    T _payload;
+};
+
+template <>
+class PayloadBase<void>
+{
+};
+}
+
+template <typename T>
+class ProgressStatus : public detail::PayloadBase<T>
+{
+public:
+    ProgressStatus(const ProgressStatus& other)
+    : detail::PayloadBase<T>(other)
+    , _current(other.current())
+    , _total(other.total())
+    {
+    }
+
+    ProgressStatus(int64_t current, int64_t total) noexcept
+    : _current(current)
+    , _total(total)
+    {
+    }
+
+    /*! returns the progress as a value between 0 and 1 */
+    float progress() const noexcept
+    {
+        return float(_current) / _total;
+    }
+
+    /*! returns the progress as a value between 0 and 100 */
+    int32_t progress_100() const noexcept
+    {
+        return truncate<int32_t>(_current * 100.f / _total);
+    }
+
+    int64_t current() const noexcept
+    {
+        return _current;
+    }
+
+    int64_t total() const noexcept
+    {
+        return _total;
+    }
+
+private:
+    void increment() noexcept
+    {
+        ++_current;
+    }
+
+    void reset() noexcept
+    {
+        reset(0);
+    }
+
+    void reset(int64_t total) noexcept
+    {
+        _current = 0;
+        _total   = total;
+    }
+
+    template <typename T>
+    friend class ProgressTracker;
+
+    std::atomic<int64_t> _current;
+    int64_t _total;
+};
+
+template <typename ProgressPayload = void>
+class ProgressTracker
 {
 public:
     enum class StatusResult
@@ -17,53 +110,18 @@ public:
         Abort,
     };
 
-    class Status
-    {
-    public:
-        Status(int64_t current, int64_t total) noexcept
-        : _current(current)
-        , _total(total)
-        {
-        }
-
-        /*! returns the progress as a value between 0 and 1 */
-        float progress() const noexcept
-        {
-            return float(_current) / _total;
-        }
-
-        /*! returns the progress as a value between 0 and 100 */
-        int32_t progress_100() const noexcept
-        {
-            return truncate<int32_t>(_current * 100.f / _total);
-        }
-
-        int64_t current() const noexcept
-        {
-            return _current;
-        }
-
-        int64_t total() const noexcept
-        {
-            return _total;
-        }
-
-    private:
-        int64_t _current = 0;
-        int64_t _total   = 0;
-    };
-
+    using Status   = ProgressStatus<ProgressPayload>;
     using Callback = std::function<StatusResult(Status)>;
 
-    ProgressInfo() = default;
+    ProgressTracker() = default;
 
-    explicit ProgressInfo(Callback cb)
+    explicit ProgressTracker(Callback cb)
     : _cb(cb)
     {
     }
 
-    ProgressInfo(int64_t totalTicks, Callback cb)
-    : _ticks(totalTicks)
+    ProgressTracker(int64_t totalTicks, Callback cb)
+    : _status(0, totalTicks)
     , _cb(cb)
     {
     }
@@ -73,25 +131,25 @@ public:
         _cb = cb;
     }
 
-    void set_total_ticks(int64_t ticks) noexcept
+    [[deprecated("Use reset to modify the total ticks")]] void set_total_ticks(int64_t ticks) noexcept
     {
-        _ticks = ticks;
+        reset(ticks);
     }
 
     int64_t total_ticks() const noexcept
     {
-        return _ticks;
+        return _status.total();
     }
 
     int64_t current_tick() const noexcept
     {
-        return _currentTick;
+        return _status.current();
     }
 
     /*! Use in combination with set_total_ticks, progress will be calculated internally */
     void tick() noexcept
     {
-        ++_currentTick;
+        _status.increment();
         signal_progress();
     }
 
@@ -125,9 +183,13 @@ public:
 
     void reset() noexcept
     {
-        _ticks       = 0;
-        _currentTick = 0;
-        _cancel      = false;
+        reset(0);
+    }
+
+    void reset(int64_t total) noexcept
+    {
+        _status.reset(total);
+        _cancel = false;
     }
 
     bool is_valid() const noexcept
@@ -135,11 +197,29 @@ public:
         return static_cast<bool>(_cb);
     }
 
+    Status& status() noexcept
+    {
+        return _status;
+    }
+
+    template <typename U = ProgressPayload>
+    typename std::enable_if_t<!std::is_void_v<U>, void> set_payload(const U& pl)
+    {
+        _status.set_payload(std::move(pl));
+        signal_progress();
+    }
+
+    template <typename U = ProgressPayload>
+    typename std::enable_if_t<!std::is_void_v<U>, U> payload() const noexcept
+    {
+        return _status.payload();
+    }
+
 private:
     void signal_progress() noexcept
     {
         if (_cb) {
-            _cancel = _cb(Status(_currentTick, _ticks)) == StatusResult::Abort;
+            _cancel = _cb(_status) == StatusResult::Abort;
         }
     }
 
@@ -157,10 +237,12 @@ private:
         }
     }
 
-    int64_t _ticks                    = 0;
-    std::atomic<int64_t> _currentTick = 0;
-    bool _cancel                      = false;
+    Status _status;
+    bool _cancel = false;
     Callback _cb;
 };
+
+using ProgressInfo        = ProgressTracker<void>;
+using MessageProgressInfo = ProgressTracker<std::string>;
 
 }
