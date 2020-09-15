@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/cast.h"
+#include "infra/exception.h"
 
 #include <atomic>
 #include <functional>
@@ -94,12 +95,27 @@ public:
         signal_progress();
     }
 
+    /*! Use in combination with set_total_ticks, progress will be calculated internally
+     * /throws CancelRequested when cancellation is requested 
+     **/
+    void tick_throw_on_cancel()
+    {
+        tick();
+        throw_on_cancel();
+    }
+
     /*! Provide the current progress explicitely without relying on a tick count
 	 * /progress value between 0.0 and 1.0
 	 */
     void tick(float progress) noexcept
     {
         signal_progress(progress);
+    }
+
+    void tick_throw_on_cancel(float progress) noexcept
+    {
+        signal_progress(progress);
+        throw_on_cancel();
     }
 
     bool cancel_requested() const noexcept
@@ -120,17 +136,24 @@ public:
     }
 
 private:
-    void signal_progress()
+    void signal_progress() noexcept
     {
         if (_cb) {
             _cancel = _cb(Status(_currentTick, _ticks)) == StatusResult::Abort;
         }
     }
 
-    void signal_progress(float progress)
+    void signal_progress(float progress) noexcept
     {
         if (_cb) {
             _cancel = _cb(Status(truncate<int64_t>(progress * 100.f), 100)) == StatusResult::Abort;
+        }
+    }
+
+    void throw_on_cancel() const
+    {
+        if (cancel_requested()) {
+            throw CancelRequested();
         }
     }
 

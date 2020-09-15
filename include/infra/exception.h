@@ -35,4 +35,5 @@ EXCEPTION(RuntimeError, std::runtime_error)
 EXCEPTION(InvalidArgument, std::invalid_argument)
 EXCEPTION(LicenseError, std::runtime_error)
 EXCEPTION(RangeError, std::out_of_range)
+EXCEPTION(CancelRequested, std::runtime_error)
 }
