@@ -25,7 +25,7 @@ public:
     }
 
 private:
-    template <typename T>
+    template <typename U>
     friend class ProgressTracker;
 
     T _payload;
@@ -93,7 +93,7 @@ private:
         _total   = total;
     }
 
-    template <typename T>
+    template <typename U>
     friend class ProgressTracker;
 
     std::atomic<int64_t> _current;
