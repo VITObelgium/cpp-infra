@@ -97,4 +97,14 @@ bool approx_equal(const T& lhs, const T& rhs, T epsilon = std::numeric_limits<T>
     return std::abs(lhs - rhs) <= epsilon;
 }
 
+template <typename T>
+bool approx_equal_opt(const std::optional<T>& lhs, const std::optional<T>& rhs, T epsilon = std::numeric_limits<T>::epsilon())
+{
+    if (lhs.has_value() && rhs.has_value()) {
+        return approx_equal(*lhs, *rhs, epsilon);
+    }
+
+    return lhs.has_value() == rhs.has_value();
+}
+
 }
