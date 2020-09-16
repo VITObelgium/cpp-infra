@@ -4,6 +4,7 @@
 #include "infra/span.h"
 
 #include <cmath>
+#include <limits>
 #include <numeric>
 #include <vector>
 
@@ -88,6 +89,12 @@ double standard_deviation(std::span<const T> values)
     }
 
     return std::sqrt(stdDev / values.size());
+}
+
+template <typename T>
+bool approx_equal(const T& lhs, const T& rhs, T epsilon = std::numeric_limits<T>::epsilon())
+{
+    return std::abs(lhs - rhs) <= epsilon;
 }
 
 }
