@@ -115,6 +115,32 @@ auto find_in_map_optional(MapType&& m, const typename std::decay_t<MapType>::key
     return {};
 }
 
+template <typename MapType>
+std::vector<typename MapType::key> map_keys_as_vector(const MapType& m)
+{
+    std::vector<typename MapType::key_type> result;
+    result.reserve(m.size());
+
+    for (auto iter : m) {
+        result.push_back(iter.first);
+    }
+
+    return result;
+}
+
+template <typename MapType>
+std::vector<typename MapType::mapped_type> map_values_as_vector(const MapType& m)
+{
+    std::vector<typename MapType::mapped_type> result;
+    result.reserve(m.size());
+
+    for (auto iter : m) {
+        result.push_back(iter.second);
+    }
+
+    return result;
+}
+
 /* Removes the constness of the iterator
  * /param c a non-const reference to the container
  * /param it a const iterator in the container
