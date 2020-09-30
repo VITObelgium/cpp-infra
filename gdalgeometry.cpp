@@ -329,6 +329,16 @@ Line MultiLine::line_at(int index)
     return geometry(index).as<Line>();
 }
 
+double MultiLine::length() const
+{
+    double length = 0.0;
+    for (int i = 0; i < size(); ++i) {
+        length += get()->getGeometryRef(i)->toLineString()->get_Length();
+    }
+
+    return length;
+}
+
 LinearRing::LinearRing(OGRLinearRing* ring)
 : Line(ring)
 {

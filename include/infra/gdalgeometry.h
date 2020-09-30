@@ -232,6 +232,7 @@ public:
     MultiLine(OGRMultiLineString* multiLine);
 
     Line line_at(int index);
+    double length() const;
 };
 
 class LinearRing : public Line
