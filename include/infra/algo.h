@@ -116,7 +116,7 @@ auto find_in_map_optional(MapType&& m, const typename std::decay_t<MapType>::key
 }
 
 template <typename MapType>
-std::vector<typename MapType::key> map_keys_as_vector(const MapType& m)
+std::vector<typename MapType::key_type> map_keys_as_vector(const MapType& m)
 {
     std::vector<typename MapType::key_type> result;
     result.reserve(m.size());
