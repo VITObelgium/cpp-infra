@@ -25,7 +25,7 @@ namespace inf::gdal {
 
 using namespace std::string_literals;
 
-// RAII wrapper for gdal registration
+// RAII wrapper for gdal registration (only instantiate this once in your application)
 class Registration
 {
 public:
@@ -46,13 +46,14 @@ public:
 // Free function versions of the registration handling
 // Call this ones in each application that wishes to use gdal
 void register_gdal();
-// In case you need coordinate transformations, pass the path to the proj.db file
+// In case you need coordinate transformations, pass the path to the proj.db file (gdal > 3.0)
 void register_gdal(const fs::path& p);
 void unregister_gdal();
 
 // Call this on each thread that requires access to the proj.4 data
 // Not needed on the thread that did the gdal registration
 void register_embedded_data();
+// In case you need coordinate transformations, pass the path to the proj.db file (gdal > 3.0)
 void register_embedded_data(const fs::path& p);
 void unregister_embedded_data();
 
