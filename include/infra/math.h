@@ -107,4 +107,20 @@ bool approx_equal_opt(const std::optional<T>& lhs, const std::optional<T>& rhs, 
     return lhs.has_value() == rhs.has_value();
 }
 
+template <typename T>
+inline T floor_to_neirest_multiple(T val, int32_t base) noexcept
+{
+    T mod = val % base;
+    val -= mod;
+    return val;
+}
+
+template <typename T>
+inline T ceil_to_neirest_multiple(T val, int32_t base) noexcept
+{
+    T mod = val % base;
+    val += base - mod;
+    return val;
+}
+
 }
