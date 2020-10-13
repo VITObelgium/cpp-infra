@@ -42,6 +42,10 @@ if (@INFRA_DATABASE@)
     find_dependency(Sqlpp11 REQUIRED)
 endif ()
 
+if (@INFRA_COMPRESSION_ZSTD@)
+    find_dependency(zstd CONFIG REQUIRED)
+endif ()
+
 if ("testutil" IN_LIST Infra_FIND_COMPONENTS)
     if (@INFRA_ENABLE_TEST_UTILS@)
         find_dependency(doctest CONFIG REQUIRED)
