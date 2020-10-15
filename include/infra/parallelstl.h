@@ -6,17 +6,33 @@
 // which depends on tbb, so that's fine
 // MSVC does not rely on the tbb so we use pstl manually in that case
 // and do not rely on the std implentation
-#if __has_include(<execution>) && !defined(_MSC_VER)
-#include <algorithm>
-#include <execution>
+
+#include <ciso646> // this allows us to check for libcpp
+
+#define INF_HAS_STD_EXECUTION 0
+
+#if __has_include(<execution>)
+    #if defined(_LIBCPP_VERSION) && defined(_LIBCPP_HAS_PARALLEL_ALGORITHMS)
+    #define INF_HAS_STD_EXECUTION 1
+    #endif
+
+    #if defined(__GLIBCXX__)
+    #define INF_HAS_STD_EXECUTION 1
+    #endif
+#endif
+
+#if INF_HAS_STD_EXECUTION
+    #include <algorithm>
+    #include <execution>
 #else
-#ifndef Q_MOC_RUN //QTBUG-80990
-#include <pstl/algorithm>
-#include <pstl/execution>
-#endif
-#ifdef _MSC_VER
-namespace std::execution {
-using namespace __pstl::execution;
-}
-#endif
+    #ifndef Q_MOC_RUN // QTBUG-80990
+    #include <pstl/algorithm>
+    #include <pstl/execution>
+
+    #ifdef _MSC_VER
+    namespace std::execution {
+        using namespace __pstl::execution;
+    }
+    #endif
+    #endif
 #endif
