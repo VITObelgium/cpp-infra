@@ -10,7 +10,7 @@ namespace inf::ui {
 template <class Clock, class Duration>
 QDate toDate(const std::chrono::time_point<Clock, Duration>& tp)
 {
-    date::year_month_day date(std::chrono::floor<date::days>(tp));
+    date::year_month_day date = inf::chrono::to_year_month_day(tp);
     return QDate(int(date.year()), static_cast<unsigned int>(date.month()), static_cast<unsigned int>(date.day()));
 }
 
