@@ -45,6 +45,14 @@ if (INFRA_GDAL AND INFRA_CHARSET)
     )
 endif ()
 
+if (INFRA_COMPRESSION)
+    target_sources(infratest PRIVATE
+        compressiontest.cpp
+    )
+
+    target_compile_definitions(infratest PRIVATE HAVE_GDAL)
+endif ()
+
 target_link_libraries(infratest
     Infra::infra
 	Infra::infratestutil

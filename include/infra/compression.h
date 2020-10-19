@@ -1,8 +1,11 @@
 #pragma once
 
+#include "infra/exception.h"
 #include "infra/span.h"
 
 #include <cassert>
+#include <cstdint>
+#include <vector>
 
 #ifdef INFRA_COMPRESSION_ZSTD_SUPPORT
 #include <zstd.h>
@@ -57,7 +60,7 @@ std::vector<uint8_t> compress(std::span<const T> data, CompressionLevel level)
     return result;
 }
 
-template <typename T>
+template <typename T = uint8_t>
 std::vector<T> decompress(std::span<const uint8_t> data)
 {
     /* Read the content size from the frame header. For simplicity we require
