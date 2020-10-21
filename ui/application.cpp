@@ -23,12 +23,12 @@ static const char* levelString(QtMsgType type)
     return "";
 }
 
-static void loggedMessageOutput(QtMsgType type, const QMessageLogContext& context, const QString& msg)
+static void loggedMessageOutput(QtMsgType /*type*/, const QMessageLogContext& context, const QString& msg)
 {
     if (context.file && context.line && context.function) {
-        inf::Log::debug("[Qt {}] {} ({}:{}.{})", levelString(type), msg.toStdString(), context.file, context.line, context.function);
+        inf::Log::debug("[Qt] {} ({}:{}.{})", msg.toStdString(), context.file, context.line, context.function);
     } else {
-        inf::Log::debug("[Qt {}] {}", levelString(type), msg.toStdString());
+        inf::Log::debug("[Qt] {}", msg.toStdString());
     }
 }
 
