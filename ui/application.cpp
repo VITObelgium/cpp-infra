@@ -5,24 +5,6 @@
 
 namespace inf::ui {
 
-static const char* levelString(QtMsgType type)
-{
-    switch (type) {
-    case QtDebugMsg:
-        return "Debug";
-    case QtInfoMsg:
-        return "Info";
-    case QtWarningMsg:
-        return "Warning";
-    case QtCriticalMsg:
-        return "Critical";
-    case QtFatalMsg:
-        return "Fatal";
-    }
-
-    return "";
-}
-
 static void loggedMessageOutput(QtMsgType /*type*/, const QMessageLogContext& context, const QString& msg)
 {
     if (context.file && context.line && context.function) {
