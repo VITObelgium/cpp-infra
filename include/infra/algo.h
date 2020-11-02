@@ -44,7 +44,7 @@ std::optional<typename Container::value_type> find_in_container_optional(const C
  * A RangeError exception is throw when there is no match
  */
 template <typename Container, typename Predicate>
-const typename Container::value_type& find_in_container_required(const Container& c, Predicate&& pred)
+auto& find_in_container_required(Container&& c, Predicate&& pred)
 {
     auto iter = std::find_if(c.begin(), c.end(), pred);
     if (iter == c.end()) {
