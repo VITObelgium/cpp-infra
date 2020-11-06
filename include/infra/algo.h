@@ -85,6 +85,12 @@ void append_to_container(OutputContainer& output, const InputContainer& input) n
     std::copy(input.begin(), input.end(), std::back_inserter(output));
 }
 
+template <typename OutputContainer, typename InputContainer>
+void insert_in_container(OutputContainer& output, const InputContainer& input) noexcept
+{
+    std::copy(input.begin(), input.end(), std::inserter(output, output.end()));
+}
+
 /* Search for an entry in the map that matches the predicate
  * The entry is returned as a pointer (nullptr when not found)
  * This funtion never throws
