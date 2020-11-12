@@ -125,6 +125,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/math.h
     include/infra/point.h
     include/infra/progressinfo.h
+    include/infra/range.h
     include/infra/scopeguard.h
     include/infra/signal.h
     include/infra/string.h
