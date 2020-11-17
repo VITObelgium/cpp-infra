@@ -41,6 +41,7 @@ template <typename T>
 class ProgressStatus : public detail::PayloadBase<T>
 {
 public:
+    ProgressStatus() = default;
     ProgressStatus(const ProgressStatus& other)
     : detail::PayloadBase<T>(other)
     , _current(other.current())
@@ -96,8 +97,8 @@ private:
     template <typename U>
     friend class ProgressTracker;
 
-    std::atomic<int64_t> _current;
-    int64_t _total;
+    std::atomic<int64_t> _current = 0;
+    int64_t _total                = 0;
 };
 
 template <typename ProgressPayload = void>
