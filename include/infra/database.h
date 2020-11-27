@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/cast.h"
+#include "infra/chrono.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/string.h"
@@ -123,6 +124,24 @@ inline auto optional_insert_value(const std::optional<bool>& opt)
         return sqlpp::value_or_null(opt.value() ? 1 : 0);
     } else {
         return sqlpp::value_or_null<sqlpp::integer>(sqlpp::null);
+    }
+}
+
+inline auto optional_insert_value(const std::optional<chrono::date_point>& opt)
+{
+    if (opt.has_value()) {
+        return sqlpp::value_or_null(opt.value());
+    } else {
+        return sqlpp::value_or_null<sqlpp::date>(sqlpp::null);
+    }
+}
+
+inline auto optional_insert_value(const std::optional<chrono::time_point>& opt)
+{
+    if (opt.has_value()) {
+        return sqlpp::value_or_null(opt.value());
+    } else {
+        return sqlpp::value_or_null<sqlpp::time_point>(sqlpp::null);
     }
 }
 
