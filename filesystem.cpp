@@ -145,6 +145,26 @@ void write_as_text(const fs::path& filename, std::string_view contents)
     }
 
     fs.write(contents.data(), contents.size());
+    if (fs.bad()) {
+        throw RuntimeError("IO error writing text file: {}", filename);
+    } else if (fs.fail()) {
+        throw RuntimeError("Error writing text file: {}", filename);
+    }
+}
+
+void append_text_to_file(const fs::path& file, std::string_view contents)
+{
+    std::ofstream fs(file, std::ios::app | std::ios::binary);
+    if (!fs.is_open()) {
+        throw RuntimeError("Failed to open file for appending: {}", file);
+    }
+
+    fs.write(contents.data(), contents.size());
+    if (fs.bad()) {
+        throw RuntimeError("IO error appending text to file: {}", file);
+    } else if (fs.fail()) {
+        throw RuntimeError("Error appending text to file: {}", file);
+    }
 }
 
 ScopedCurrentWorkingDirectory::ScopedCurrentWorkingDirectory(const fs::path& cwd)
@@ -160,5 +180,4 @@ ScopedCurrentWorkingDirectory::~ScopedCurrentWorkingDirectory() noexcept
         fs::current_path(_prevCwd, ec);
     }
 }
-
 }
