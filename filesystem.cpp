@@ -154,7 +154,7 @@ void write_as_text(const fs::path& filename, std::string_view contents)
 
 void append_text_to_file(const fs::path& file, std::string_view contents)
 {
-    std::ofstream fs(file, std::ios::app | std::ios::binary);
+    std::ofstream fs(file, std::ios::out | std::ios::app | std::ios::binary);
     if (!fs.is_open()) {
         throw RuntimeError("Failed to open file for appending: {}", file);
     }
