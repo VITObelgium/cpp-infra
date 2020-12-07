@@ -63,20 +63,10 @@ QSize GradientDelegate::sizeHint(const QStyleOptionViewItem& option, const QMode
 
 const QGradientStops* GradientDelegate::addGradient(const QString& cmapName) const
 {
-    try {
-        auto cmap = ColorMap::create(cmapName.toStdString());
-
-        QGradientStops stops;
-        stops.reserve(truncate<int>(cmap.size()));
-        for (size_t i = 0; i < cmap.size(); ++i) {
-            stops.push_back(QGradientStop(i / double(cmap.size() - 1), toQColor(cmap.get_color(truncate<uint8_t>(i)))));
-        }
-
-        return &(*_gradients.insert(cmapName, stops));
-    } catch (const std::exception&) {
-        // Unknown color map name...
-        return nullptr;
+    if (auto stops = gradientStopsFromColormap(cmapName.toStdString()); !stops.empty()) {
+        return &(*_gradients.insert(cmapName, std::move(stops)));
     }
-}
 
+    return nullptr;
+}
 }
