@@ -12,6 +12,11 @@ date_point today()
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(std::chrono::system_clock::now())));
 }
 
+date_point date_from_time_point(time_point tp)
+{
+    return std::chrono::floor<date::days>(tp);
+}
+
 date::year_month_day to_year_month_day(time_point tp)
 {
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
