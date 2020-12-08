@@ -64,6 +64,16 @@ public:
     const Color& get_color(float value) const noexcept;
     const Color& get_color(uint8_t value) const noexcept;
 
+    /*! Apply a fadein of the transparancy in the lowest color values
+     * /param fadeStop value between 0.0 and 1.0, determines where the colors become opaque
+     */
+    void apply_opacity_fade_in(float fadeStop);
+
+    /*! Apply a fadeout of the transparancy in the highest color values
+     * /param fadeStart value between 0.0 and 1.0, determines where the colors become less opaque
+     */
+    void apply_opacity_fade_out(float fadeStart);
+
     constexpr size_t size()
     {
         return _cmap.size();

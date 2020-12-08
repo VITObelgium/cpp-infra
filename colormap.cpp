@@ -4,6 +4,7 @@
 #endif
 
 #include "infra/colormap.h"
+#include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/string.h"
 
@@ -1683,6 +1684,28 @@ const Color& ColorMap::get_color(float value) const noexcept
 const Color& ColorMap::get_color(uint8_t value) const noexcept
 {
     return _cmap[value];
+}
+
+void ColorMap::apply_opacity_fade_in(float fadeStop)
+{
+    const auto endIndex         = truncate<size_t>(_cmap.size() * fadeStop);
+    float transparencyIncrement = 1.f / endIndex;
+    float alpha                 = 0.0;
+    for (size_t i = 0; i < endIndex; ++i) {
+        _cmap[i].a = truncate<uint8_t>(alpha * 255.f);
+        alpha += transparencyIncrement;
+    }
+}
+
+void ColorMap::apply_opacity_fade_out(float fadeStart)
+{
+    const auto startIndex       = truncate<size_t>(_cmap.size() * fadeStart);
+    float transparencyIncrement = 1.f / startIndex;
+    float alpha                 = 1.0;
+    for (size_t i = startIndex; i < _cmap.size(); ++i) {
+        _cmap[i].a = truncate<uint8_t>(alpha * 255.f);
+        alpha -= transparencyIncrement;
+    }
 }
 
 uint8_t ColorMap::process_band(float value, const std::vector<ColorDict::Entry>& dict) const noexcept
