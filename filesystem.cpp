@@ -139,7 +139,7 @@ std::string read_as_text(const std::istream& fileStream)
 
 void write_as_text(const fs::path& filename, std::string_view contents)
 {
-    std::ofstream fs(filename.u8string().c_str(), std::ios::trunc | std::ios::binary);
+    std::ofstream fs(filename, std::ios::trunc | std::ios::binary);
     if (!fs.is_open()) {
         throw RuntimeError("Failed to open file for writing: {}", filename);
     }
