@@ -63,10 +63,10 @@ public:
     static void set_pattern(std::string_view pattern);
 
     template <class... T>
-    static void debug(const char* format, const T&... arg)
+    static void debug(const char* format, T&&... args)
     {
         if (_log) {
-            _log->debug(format, arg...);
+            _log->debug(format, std::forward<T>(args)...);
         }
     }
 
@@ -85,18 +85,18 @@ public:
     }
 
     template <class... T>
-    static void debug(const LogSource& src, const char* format, const T&... arg)
+    static void debug(const LogSource& src, const char* format, T&&... args)
     {
         if (_log) {
-            _log->debug("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, arg...));
+            _log->debug("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
         }
     }
 
     template <class... T>
-    static void info(const char* format, const T&... arg)
+    static void info(const char* format, T&&... args)
     {
         if (_log) {
-            _log->info(format, arg...);
+            _log->info(format, std::forward<T>(args)...);
         }
     }
 
@@ -115,18 +115,18 @@ public:
     }
 
     template <class... T>
-    static void info(const LogSource& src, const char* format, const T&... arg)
+    static void info(const LogSource& src, const char* format, T&&... args)
     {
         if (_log) {
-            _log->info("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, arg...));
+            _log->info("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
         }
     }
 
     template <class... T>
-    static void warn(const char* format, const T&... arg)
+    static void warn(const char* format, T&&... args)
     {
         if (_log) {
-            _log->warn(format, arg...);
+            _log->warn(format, std::forward<T>(args)...);
         }
     }
 
@@ -145,18 +145,18 @@ public:
     }
 
     template <class... T>
-    static void warn(const LogSource& src, const char* format, const T&... arg)
+    static void warn(const LogSource& src, const char* format, T&&... args)
     {
         if (_log) {
-            _log->warn("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, arg...));
+            _log->warn("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
         }
     }
 
     template <class... T>
-    static void error(const char* format, const T&... arg)
+    static void error(const char* format, T&&... args)
     {
         if (_log) {
-            _log->error(format, arg...);
+            _log->error(format, std::forward<T>(args)...);
         }
     }
 
@@ -175,18 +175,18 @@ public:
     }
 
     template <class... T>
-    static void error(const LogSource& src, const char* format, const T&... arg)
+    static void error(const LogSource& src, const char* format, T&&... args)
     {
         if (_log) {
-            _log->error("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, arg...));
+            _log->error("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
         }
     }
 
     template <class... T>
-    static void critical(const char* format, const T&... arg)
+    static void critical(const char* format, T&&... args)
     {
         if (_log) {
-            _log->critical(format, arg...);
+            _log->critical(format, std::forward<T>(args)...);
         }
     }
 
@@ -205,10 +205,10 @@ public:
     }
 
     template <class... T>
-    static void critical(const LogSource& src, const char* format, const T&... arg)
+    static void critical(const LogSource& src, const char* format, T&&... args)
     {
         if (_log) {
-            _log->critical("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, arg...));
+            _log->critical("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
         }
     }
 
