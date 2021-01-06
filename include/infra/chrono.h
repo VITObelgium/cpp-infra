@@ -1,6 +1,7 @@
 #pragma once
 
 #include <date/date.h>
+#include <date/tz.h>
 #include <fmt/chrono.h>
 #include <optional>
 
@@ -68,6 +69,8 @@ std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock
     std::time_t time = Clock::to_time_t(tp);
     return fmt::format(fmt::format("{{:{}}}", format), fmt::gmtime(time));
 }
+
+std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice = nullptr);
 
 class DurationRecorder
 {

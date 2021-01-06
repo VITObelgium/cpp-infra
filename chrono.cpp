@@ -58,4 +58,42 @@ std::optional<time_point> system_time_point_from_string(std::string_view str1, c
     return tp;
 }
 
+std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)
+{
+    auto ymd = chrono::to_year_month_day(dt);
+    auto tod = chrono::time_of_day(dt); // Yields time_of_day type
+
+    auto tp = date::local_days{ymd} + tod.hours() + tod.minutes() + tod.seconds();
+    auto z  = date::current_zone();
+
+    std::optional<time_point> utcTime;
+    auto i = z->get_info(tp);
+    switch (i.result) {
+    case date::local_info::unique: {
+        date::zoned_time<std::chrono::seconds> zt = {z, tp}; //"Europe/Brussels"
+        auto utc                                  = zt.get_sys_time();
+
+        utcTime = std::optional<time_point>(utc);
+
+        break;
+    }
+    case date::local_info::ambiguous: {
+        if (choice) {
+            date::zoned_time<std::chrono::seconds> zt = {z, tp, *choice};
+            auto utc                                  = zt.get_sys_time();
+
+            utcTime = std::optional<time_point>(utc);
+        }
+
+        break;
+    }
+    case date::local_info::nonexistent:
+        break;
+    default:
+        break;
+    }
+
+    return utcTime;
+}
+
 }
