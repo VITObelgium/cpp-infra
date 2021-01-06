@@ -11,7 +11,10 @@ using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
 date_point today();
+time_point now();
+
 date_point date_from_time_point(time_point tp);
+date::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
 date::year_month_day to_year_month_day(time_point tp);
 
 /*! Converts a year_month_day to a system timepoint (locale dependent) */
