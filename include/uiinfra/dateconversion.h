@@ -17,7 +17,7 @@ QDate toDate(const std::chrono::time_point<Clock, Duration>& tp)
 template <class Clock, class Duration>
 QDateTime toDateTime(const std::chrono::time_point<Clock, Duration>& tp)
 {
-    auto time = date::make_time(tp - std::chrono::floor<date::days>(tp));
+    auto time = inf::chrono::time_of_day(tp);
     return QDateTime(toDate(tp), QTime(time.hours().count(), time.minutes().count(), time.seconds().count()));
 }
 
