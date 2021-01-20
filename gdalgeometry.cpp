@@ -95,6 +95,11 @@ void Geometry::transform(CoordinateTransformer& transformer)
     check_error(_geometry->transform(transformer.get()), "Failed to transform geometry");
 }
 
+void Geometry::transform_to(SpatialReference& srs)
+{
+    check_error(_geometry->transformTo(srs.get()), "Failed to transform geometry");
+}
+
 Owner<Geometry> Geometry::buffer(double distance) const
 {
     return Owner<Geometry>(check_pointer(_geometry->Buffer(distance), "Failed to buffer geometry"));

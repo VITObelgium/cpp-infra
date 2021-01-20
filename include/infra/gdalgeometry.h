@@ -123,6 +123,7 @@ public:
     Owner<Geometry> simplify_preserve_topology(double tolerance) const;
 
     void transform(CoordinateTransformer& transformer);
+    void transform_to(SpatialReference& srs);
     [[nodiscard]] Owner<Geometry> buffer(double distance) const;
     [[nodiscard]] Owner<Geometry> buffer(double distance, int numQuadSegments) const;
 
