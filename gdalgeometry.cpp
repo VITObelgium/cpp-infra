@@ -110,6 +110,17 @@ Owner<Geometry> Geometry::intersection(const Geometry& other) const
     return Owner<Geometry>(check_pointer(_geometry->Intersection(other.get()), "Failed to get geometry intersection"));
 }
 
+bool Geometry::intersects(const Point<double>& point) const
+{
+    OGRPoint p(point.x, point.y);
+    return intersects(PointGeometry(&p));
+}
+
+bool Geometry::intersects(const Geometry& geom) const
+{
+    return _geometry->Intersects(geom.get());
+}
+
 std::optional<double> Geometry::area() const
 {
     if (auto* surface = _geometry->toSurface(); surface != nullptr) {

@@ -127,6 +127,9 @@ public:
     [[nodiscard]] Owner<Geometry> buffer(double distance, int numQuadSegments) const;
 
     Owner<Geometry> intersection(const Geometry& other) const;
+    bool intersects(const Point<double>& p) const;
+    bool intersects(const Geometry& geom) const;
+
     std::optional<double> area() const;
     std::optional<Point<double>> centroid() const;
     std::optional<Coordinate> centroid_coordinate() const;
