@@ -197,6 +197,16 @@ inline CutOut intersect_metadata(const GeoMetadata& srcMeta, const GeoMetadata& 
 }
 }
 
+template <typename T>
+gdal::RasterDataSet create_memory_dataset(std::span<const T> rasterData, const GeoMetadata& meta)
+{
+    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
+    gdal::RasterDataSet srcDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
+    srcDataSet.add_band(rasterData.data());
+    srcDataSet.write_geometadata(meta);
+    return srcDataSet;
+}
+
 template <typename TSource, typename TDest>
 GeoMetadata cast_raster(const GeoMetadata& meta, std::span<const TSource> srcData, std::span<TDest> dstData)
 {
@@ -439,14 +449,7 @@ template <typename T>
 inf::gdal::VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
 {
     assert(meta.rows * meta.cols == truncate<int32_t>(rasterData.size()));
-
-    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet srcDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
-
-    srcDataSet.add_band(rasterData.data());
-    srcDataSet.write_geometadata(meta);
-
-    return inf::gdal::polygonize(srcDataSet);
+    return inf::gdal::polygonize(create_memory_dataset<T>(rasterData, meta));
 }
 
 template <typename TInput, typename TOutput>
@@ -469,16 +472,8 @@ void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta
         }
     }
 
-    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet srcDataSet(memDriver.create_dataset<TInput>(inputMeta.rows, inputMeta.cols, 0));
-    srcDataSet.add_band(inputData.data());
-    srcDataSet.write_geometadata(inputMeta);
-
-    gdal::RasterDataSet dstDataSet(memDriver.create_dataset<TOutput>(outputMeta.rows, outputMeta.cols, 0u, ""));
-    dstDataSet.add_band(outputData.data());
-    // Make sure the resulting data set has the proper projection information
-    dstDataSet.write_geometadata(outputMeta);
-
+    gdal::RasterDataSet srcDataSet = create_memory_dataset<TInput>(inputData, inputMeta);
+    gdal::RasterDataSet dstDataSet = create_memory_dataset<TOutput>(outputData, outputMeta);
     gdal::warp(srcDataSet, dstDataSet, algo);
 }
 
