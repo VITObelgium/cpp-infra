@@ -25,7 +25,15 @@ enum class ResampleAlgorithm
     ThirdQuantile    = GRA_Q3,               // Q3 (selects third quartile of all non-NODATA contributing pixels)
 };
 
+struct WarpOptions
+{
+    ResampleAlgorithm resampleAlgo = ResampleAlgorithm::NearestNeighbour;
+    Polygon* clipPolygon           = nullptr;
+    std::optional<double> clipBlendDistance;
+};
+
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo = ResampleAlgorithm::NearestNeighbour);
+void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options);
 
 /*! Returns the metadata of a raster when it would be warped, call this function before the
  *  call to warp_raster so you know the destination size and can allocate a buffer
@@ -45,14 +53,13 @@ void translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, con
 
 struct BufferOptions
 {
-    double distance = 0.0;
+    double distance         = 0.0;
     int32_t numQuadSegments = 30;
-    bool includeFields; // copy over the fields in the resulting dataset
+    bool includeFields;                         // copy over the fields in the resulting dataset
     std::optional<Geometry::Type> geometryType; //! override the type of the resulting geometry
 };
 
 VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts);
-
 
 // convert a raster dataset
 template <typename T>

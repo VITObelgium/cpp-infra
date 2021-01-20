@@ -11,6 +11,13 @@ namespace inf::gdal {
 
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo)
 {
+    WarpOptions options;
+    options.resampleAlgo = algo;
+    return warp(srcDataSet, dstDataSet, options);
+}
+
+void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options)
+{
     static const std::array<const char*, 2> optionStrings{{"NUM_THREADS=ALL_CPUS", nullptr}};
 
     auto warpOptions              = GDALCreateWarpOptions();
@@ -23,7 +30,15 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAl
     warpOptions->panDstBands      = reinterpret_cast<int*>(CPLMalloc(sizeof(int) * warpOptions->nBandCount));
     warpOptions->panDstBands[0]   = 1;
     warpOptions->pfnTransformer   = GDALGenImgProjTransform;
-    warpOptions->eResampleAlg     = GDALResampleAlg(enum_value(algo));
+    warpOptions->eResampleAlg     = GDALResampleAlg(enum_value(options.resampleAlgo));
+
+    if (options.clipPolygon != nullptr) {
+        warpOptions->hCutline = options.clipPolygon->get()->clone();
+    }
+
+    if (options.clipBlendDistance.has_value()) {
+        warpOptions->dfCutlineBlendDist = *options.clipBlendDistance;
+    }
 
     auto srcNodataValue = srcDataSet.nodata_value(1);
     if (srcNodataValue.has_value()) {
@@ -248,7 +263,7 @@ VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)
         for (auto& feature : srcLayer) {
             if (feature.has_geometry()) {
                 Feature feat(dstLayer.layer_definition());
-                
+
                 if (opts.includeFields) {
                     feat.set_fields_from(feature, Feature::FieldCopyMode::Strict, fieldIndexes);
                 }
