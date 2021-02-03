@@ -57,6 +57,7 @@ fs::path relative_to_absolute_path(const fs::path& relPath, const fs::path& base
  */
 fs::path combine_path(const fs::path& baseDir, const fs::path& file);
 
+std::vector<uint8_t> read(const fs::path& filename);
 std::string read_as_text(const fs::path& filename);
 
 /*! Check the provided path for illegal characters on the running platform */

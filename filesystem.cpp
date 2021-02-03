@@ -93,9 +93,25 @@ fs::path combine_path(const fs::path& base, const fs::path& file)
 #endif
 }
 
+std::vector<uint8_t> read(const fs::path& filename)
+{
+    std::ifstream fileStream(filename, std::ifstream::binary);
+    if (!fileStream.is_open()) {
+        throw RuntimeError("Failed to open file for reading: {}", filename);
+    }
+
+    fileStream.seekg(0, std::ios::end);
+    const auto fileSize = fileStream.tellg();
+    fileStream.seekg(0, std::ios::beg);
+
+    std::vector<uint8_t> result(fileSize, 0);
+    fileStream.read(reinterpret_cast<char*>(result.data()), result.size());
+    return result;
+}
+
 std::string read_as_text(const fs::path& filename)
 {
-    return read_as_text(filename.string());
+    return read_as_text(filename.u8string());
 }
 
 fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar)
