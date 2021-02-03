@@ -15,11 +15,12 @@
 #include <Windows.h>
 #endif
 
-#include <locale>
 #include <cstdlib>
 #include <doctest/doctest.h>
+#include <locale>
 
 using namespace doctest;
+using namespace std::string_view_literals;
 
 int main(int argc, char** argv)
 {
@@ -34,6 +35,13 @@ int main(int argc, char** argv)
     inf::Log::add_console_sink(inf::Log::Colored::On);
     inf::LogRegistration logReg("InfraTest");
     inf::Log::set_level(inf::Log::Level::Info);
+
+    for (int i = 0; i < argc; ++i) {
+        if ("-d"sv == argv[i]) {
+            inf::Log::set_level(inf::Log::Level::Debug);
+            break;
+        }
+    }
 #endif
 
 #ifdef HAVE_GDAL
