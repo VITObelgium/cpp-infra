@@ -14,7 +14,7 @@ namespace inf::gdal::io {
 
 const std::type_info& get_raster_type(const fs::path& fileName)
 {
-    auto& type = gdal::RasterDataSet::create(fileName).band_datatype(1);
+    auto& type = gdal::RasterDataSet::open(fileName).band_datatype(1);
     if (type == typeid(void)) {
         throw RuntimeError("Unsupported raster data type");
     }
@@ -24,7 +24,7 @@ const std::type_info& get_raster_type(const fs::path& fileName)
 
 GeoMetadata read_metadata(const fs::path& fileName)
 {
-    return gdal::RasterDataSet::create(fileName).geometadata();
+    return gdal::RasterDataSet::open(fileName).geometadata();
 }
 
 void detail::read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet, const std::type_info& typeInfo, void* data, int dataCols)

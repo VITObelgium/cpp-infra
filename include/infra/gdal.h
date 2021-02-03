@@ -81,6 +81,7 @@ enum class RasterType
     Netcdf,
     TileDB,
     MBTiles,
+    Grib,
     Unknown,
 };
 
@@ -201,8 +202,11 @@ enum class OpenMode
 class RasterDataSet
 {
 public:
-    static RasterDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
-    static RasterDataSet create(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
+    [[deprecated("use open")]] static RasterDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
+    [[deprecated("use open")]] static RasterDataSet create(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
+
+    static RasterDataSet open(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
+    static RasterDataSet open(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
 
     static RasterDataSet open_for_writing(const fs::path& filePath, const std::vector<std::string>& driverOpts = {});
     static RasterDataSet open_for_writing(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});

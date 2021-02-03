@@ -65,6 +65,7 @@ static const std::unordered_map<RasterType, const char*>
         {RasterType::Netcdf, "netCDF"},
         {RasterType::TileDB, "TileDB"},
         {RasterType::MBTiles, "MBTiles"},
+        {RasterType::Grib, "GRIB"},
     }};
 
 static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLookup{{
@@ -77,6 +78,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
     {"netCDF", RasterType::Netcdf},
     {"TileDB", RasterType::TileDB},
     {"MBTiles", RasterType::MBTiles},
+    {"GRIB", RasterType::Grib},
 }};
 
 static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
@@ -684,6 +686,16 @@ static GDALDataset* create_data_set(const fs::path& filePath,
 
 RasterDataSet RasterDataSet::create(const fs::path& filePath, const std::vector<std::string>& driverOpts)
 {
+    return open(filePath, driverOpts);
+}
+
+RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
+{
+    return open(filePath, type, driverOpts);
+}
+
+RasterDataSet RasterDataSet::open(const fs::path& filePath, const std::vector<std::string>& driverOpts)
+{
     auto* dataSet = create_data_set(filePath, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, driverOpts);
     if (!dataSet) {
         throw RuntimeError("Failed to open raster file '{}'", filePath);
@@ -692,7 +704,7 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, const std::vector<
     return RasterDataSet(dataSet);
 }
 
-RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
+RasterDataSet RasterDataSet::open(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
 {
     if (type == RasterType::Unknown) {
         type = guess_rastertype_from_filename(filePath);
@@ -1259,6 +1271,8 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
         return RasterType::Netcdf;
     } else if (ext == ".mbtiles") {
         return RasterType::MBTiles;
+    } else if (ext == ".grib") {
+        return RasterType::Grib;
     }
 
     return RasterType::Unknown;
