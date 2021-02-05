@@ -1320,6 +1320,11 @@ void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<dou
     meta.yll = geoTrans[3] + geoTrans[4] * 0.0 + geoTrans[5] * meta.rows;
 }
 
+MemoryFile::MemoryFile(const char* path, std::span<const uint8_t> dataBuffer)
+: MemoryFile(std::string(path), dataBuffer)
+{
+}
+
 MemoryFile::MemoryFile(std::string path, std::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
@@ -1328,9 +1333,22 @@ MemoryFile::MemoryFile(std::string path, std::span<const uint8_t> dataBuffer)
 {
 }
 
+MemoryFile::MemoryFile(const fs::path& path, std::span<const uint8_t> dataBuffer)
+: MemoryFile(path.u8string(), dataBuffer)
+{
+}
+
 const std::string& MemoryFile::path() const
 {
     return _path;
+}
+
+std::span<uint8_t> MemoryFile::data()
+{
+    vsi_l_offset dataSize = 0;
+    auto* data            = VSIGetMemFileBuffer(_path.c_str(), &dataSize, FALSE /*do not take ownership*/);
+
+    return std::span<uint8_t>(data, dataSize);
 }
 
 MemoryFile::~MemoryFile()

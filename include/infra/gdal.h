@@ -418,10 +418,13 @@ FileType detect_file_type(const fs::path& path);
 class MemoryFile
 {
 public:
+    MemoryFile(const char* path, std::span<const uint8_t> dataBuffer);
     MemoryFile(std::string path, std::span<const uint8_t> dataBuffer);
+    MemoryFile(const fs::path& path, std::span<const uint8_t> dataBuffer);
     ~MemoryFile();
 
     const std::string& path() const;
+    std::span<uint8_t> data();
 
 private:
     const std::string _path;
