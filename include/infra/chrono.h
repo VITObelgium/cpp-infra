@@ -11,6 +11,9 @@ using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
+using local_date_point = date::local_seconds;
+using local_time_point = date::local_days;
+
 date_point today();
 time_point now();
 
@@ -55,6 +58,7 @@ std::string to_string(std::string_view format, std::chrono::time_point<Clock, Du
  * of daylight savings adjustments
  */
 std::optional<time_point> system_time_point_from_string(std::string_view str, const char* format);
+std::optional<local_time_point> local_time_point_from_string(std::string_view str, const char* format);
 
 template <typename Clock, typename Duration>
 std::string to_utc_string(std::chrono::time_point<Clock, Duration> tp)

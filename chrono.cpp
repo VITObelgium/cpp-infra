@@ -45,9 +45,10 @@ std::string to_string(std::string_view format, date::local_seconds tp)
     return dateStr.str();
 }
 
-std::optional<time_point> system_time_point_from_string(std::string_view str1, const char* format)
+template <typename TimeType>
+std::optional<TimeType> time_point_from_string(std::string_view str1, const char* format)
 {
-    time_point tp;
+    TimeType tp;
     std::istringstream ss;
     ss.str(std::string(str1));
     ss >> date::parse(format, tp);
@@ -56,6 +57,16 @@ std::optional<time_point> system_time_point_from_string(std::string_view str1, c
     }
 
     return tp;
+}
+
+std::optional<time_point> system_time_point_from_string(std::string_view str1, const char* format)
+{
+    return time_point_from_string<time_point>(str1, format);
+}
+
+std::optional<local_time_point> local_time_point_from_string(std::string_view str1, const char* format)
+{
+    return time_point_from_string<local_time_point>(str1, format);
 }
 
 std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)
