@@ -27,7 +27,7 @@ inline double wind_speed_from_u_v(double u, double v)
 
 inline std::tuple<double, double> u_v_from_speed_and_direction(double speed, double direction)
 {
-    auto radDirection = math::deg_to_rad(direction);
+    const auto radDirection = math::deg_to_rad(direction);
 
     return {
         speed * (-std::sin(radDirection)),
