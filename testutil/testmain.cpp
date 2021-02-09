@@ -52,8 +52,10 @@ int main(int argc, char** argv)
     CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");
 #endif
 
+#ifdef USE_OS_TZDB
     // make sure the timezone data is found
     date::set_install((fs::u8path(argv[0]).parent_path() / "data" / "tzdata").u8string());
+#endif
 
     doctest::Context context;
     context.applyCommandLine(argc, argv);
