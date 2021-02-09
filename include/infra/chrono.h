@@ -11,15 +11,19 @@ using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
-using local_date_point = date::local_seconds;
-using local_time_point = date::local_days;
+using local_date_point = date::local_days;
+using local_time_point = date::local_time<std::chrono::milliseconds>;
 
 date_point today();
+local_date_point today_local();
 time_point now();
 
 date_point date_from_time_point(time_point tp);
+local_date_point date_from_time_point(local_time_point tp);
+
 date::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
 date::year_month_day to_year_month_day(time_point tp);
+date::year_month_day to_year_month_day(local_time_point tp);
 
 /*! Converts a year_month_day to a system timepoint (locale dependent) */
 inline time_point to_system_time_point(date::year_month_day ymd)
@@ -36,6 +40,13 @@ std::string to_string(std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
     return fmt::format("{:%c}", fmt::localtime(time));
+}
+
+inline std::string to_string(local_time_point tp)
+{
+    std::stringstream ss;
+    ss << tp;
+    return ss.str();
 }
 
 /*! Converts a time point to string using the provided format specification

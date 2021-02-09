@@ -28,4 +28,12 @@ inline inf::chrono::date_point datePointFromDate(const QDate& date)
                                    date::day(date.day()));
     return static_cast<date::sys_days>(ymd);
 }
+
+inline inf::chrono::local_date_point localDatePointFromDate(const QDate& date)
+{
+    const date::year_month_day ymd(date::year(date.year()),
+                                   date::month(date.month()),
+                                   date::day(date.day()));
+    return static_cast<date::local_days>(ymd);
+}
 }

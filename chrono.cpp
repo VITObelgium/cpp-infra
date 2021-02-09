@@ -12,12 +12,23 @@ date_point today()
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(std::chrono::system_clock::now())));
 }
 
+local_date_point today_local()
+{
+    const auto now = date::make_zoned(date::current_zone(), std::chrono::system_clock::now());
+    return std::chrono::floor<date::days>(now.get_local_time());
+}
+
 time_point now()
 {
     return std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 }
 
 date_point date_from_time_point(time_point tp)
+{
+    return std::chrono::floor<date::days>(tp);
+}
+
+local_date_point date_from_time_point(local_time_point tp)
 {
     return std::chrono::floor<date::days>(tp);
 }
@@ -31,6 +42,11 @@ date::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp)
 date::year_month_day to_year_month_day(time_point tp)
 {
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
+}
+
+date::year_month_day to_year_month_day(local_time_point tp)
+{
+    return date::year_month_day(date::local_days(std::chrono::floor<date::days>(tp)));
 }
 
 std::string to_string(date::local_seconds tp)

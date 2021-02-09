@@ -16,6 +16,7 @@
 #endif
 
 #include <cstdlib>
+#include <date/tz.h>
 #include <doctest/doctest.h>
 #include <locale>
 
@@ -50,6 +51,9 @@ int main(int argc, char** argv)
 
     CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");
 #endif
+
+    // make sure the timezone data is found
+    date::set_install((fs::u8path(argv[0]).parent_path() / "data" / "tzdata").u8string());
 
     doctest::Context context;
     context.applyCommandLine(argc, argv);
