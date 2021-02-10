@@ -154,9 +154,9 @@ TEST_CASE("Gdal.utf8Path")
         return;
     }
 
-    CHECK_NOTHROW(gdal::RasterDataSet::create(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
+    CHECK_NOTHROW(gdal::RasterDataSet::open(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
 
-    auto ds          = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
+    auto ds          = gdal::RasterDataSet::open(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
     auto subDatasets = ds.metadata("SUBDATASETS");
     CHECK(subDatasets.size() == 4u);
 }
