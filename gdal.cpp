@@ -207,6 +207,8 @@ std::optional<int32_t> SpatialReference::epsg_cs() const noexcept
         return str::to_int32(code);
     } else if (auto code = authority_code("LOCAL_CS"); !code.empty()) {
         return str::to_int32(code);
+    } else if (auto code = authority_code("GEOGCS"); !code.empty()) {
+        return str::to_int32(code);
     }
 
     return {};
