@@ -288,6 +288,7 @@ if (INFRA_GDAL)
     if (NOT TARGET GDAL::GDAL)
         find_package(GDAL REQUIRED)
         set(SYSTEM_GDAL ON)
+        set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     endif ()
 
     if ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND INFRA_EMBED_GDAL_DATA) 
