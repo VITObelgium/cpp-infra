@@ -12,16 +12,16 @@ static void gdalErrorHandler(CPLErr errClass, int /*err_no*/, const char* msg)
 {
     switch (errClass) {
     case CE_Debug:
-        Log::debug("GDAL {}", msg);
+        Log::debug("GDAL {}", std::string(msg));
         break;
     case CE_Warning:
-        Log::debug("GDAL {}", msg);
+        Log::debug("GDAL {}", std::string(msg));
         break;
     case CE_Failure:
-        Log::error("GDAL {}", msg);
+        Log::error("GDAL {}", std::string(msg));
         break;
     case CE_Fatal:
-        Log::critical("GDAL {}", msg);
+        Log::critical("GDAL {}", std::string(msg));
         break;
     default:
         break;
