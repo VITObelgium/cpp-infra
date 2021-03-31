@@ -25,13 +25,20 @@ namespace inf::gdal {
 
 using namespace std::string_literals;
 
+struct RegistrationConfig
+{
+    bool setLogHandler = true;
+
+    // In case you need coordinate transformations, pass the path to the proj.db file (gdal > 3.0)
+    fs::path projdbPath;
+};
+
 // RAII wrapper for gdal registration (only instantiate this once in your application)
 class Registration
 {
 public:
     Registration();
-    // In case you need coordinate transformations, pass the path to the proj.db file
-    Registration(const fs::path& p);
+    Registration(RegistrationConfig cfg);
     ~Registration();
 };
 
@@ -46,8 +53,7 @@ public:
 // Free function versions of the registration handling
 // Call this ones in each application that wishes to use gdal
 void register_gdal();
-// In case you need coordinate transformations, pass the path to the proj.db file (gdal > 3.0)
-void register_gdal(const fs::path& p);
+void register_gdal(RegistrationConfig cfg);
 void unregister_gdal();
 
 // Call this on each thread that requires access to the proj.4 data

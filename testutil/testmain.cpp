@@ -46,8 +46,9 @@ int main(int argc, char** argv)
 #endif
 
 #ifdef HAVE_GDAL
-    fs::path proj4DataPath = fs::u8path(argv[0]).parent_path() / "data";
-    inf::gdal::Registration reg(proj4DataPath);
+    inf::gdal::RegistrationConfig gdalCfg;
+    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path() / "data";
+    inf::gdal::Registration reg(gdalCfg);
 
     CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");
 #endif

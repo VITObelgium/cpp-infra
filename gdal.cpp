@@ -398,13 +398,13 @@ CPLStringList create_string_list(std::span<const std::string> options)
 }
 
 Registration::Registration()
+: Registration(RegistrationConfig())
 {
-    register_gdal();
 }
 
-Registration::Registration(const fs::path& p)
+Registration::Registration(RegistrationConfig cfg)
 {
-    register_gdal(p);
+    register_gdal(cfg);
 }
 
 Registration::~Registration()
@@ -428,9 +428,14 @@ EmbeddedDataRegistration::~EmbeddedDataRegistration()
 
 void register_gdal()
 {
+    register_gdal(RegistrationConfig());
+}
+
+void register_gdal(RegistrationConfig cfg)
+{
 #ifdef EMBED_GDAL_DATA
     create_embedded_data();
-    register_embedded_data();
+    register_embedded_data(cfg.projdbPath);
 #endif
 
 #ifdef __EMSCRIPTEN__
@@ -442,13 +447,9 @@ void register_gdal()
     GDALAllRegister();
 #endif
 
-    set_log_handler();
-}
-
-void register_gdal(const fs::path& p)
-{
-    register_embedded_data(p);
-    register_gdal();
+    if (cfg.setLogHandler) {
+        set_log_handler();
+    }
 }
 
 void unregister_gdal()
@@ -472,17 +473,17 @@ void register_embedded_data(const fs::path& p)
 {
     register_embedded_data();
 
+    if (!p.empty()) {
 #if GDAL_VERSION_MAJOR > 2
-    std::string path                 = p.u8string();
-    std::array<const char*, 2> paths = {
-        path.c_str(),
-        nullptr,
-    };
+        std::string path                 = p.u8string();
+        std::array<const char*, 2> paths = {
+            path.c_str(),
+            nullptr,
+        };
 
-    OSRSetPROJSearchPaths(paths.data());
-#else
-    (void)p;
+        OSRSetPROJSearchPaths(paths.data());
 #endif
+    }
 }
 
 void unregister_embedded_data()
