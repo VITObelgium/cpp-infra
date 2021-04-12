@@ -102,24 +102,6 @@ void write_raster_to_dataset_band(
     ds.write_rasterdata(bandNr, 0, 0, meta.cols, meta.rows, data.data(), meta.cols, meta.rows);
 }
 
-template <typename RasterDataType>
-void write_raster_data(
-    std::span<const RasterDataType> data,
-    const GeoMetadata& meta,
-    const fs::path& filename,
-    const std::type_info& storageType,
-    std::span<const std::string> driverOptions,
-    const std::unordered_map<std::string, std::string>& metadataValues,
-    const GDALColorTable* ct = nullptr)
-{
-    // To write a raster to disk we need a dataset that contains the data
-    // Create a memory dataset with 0 bands, then assign a band given the pointer of our vector
-    // Creating a dataset with 1 band would casuse unnecessary memory allocation
-    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet memDataSet(memDriver.create_dataset(meta.rows, meta.cols, 0, storageType));
-    write_raster_dataset(data, memDataSet, meta, filename, driverOptions, metadataValues, ct);
-}
-
 template <typename StorageType, typename RasterDataType>
 void write_raster_data(
     std::span<const RasterDataType> data,
@@ -134,7 +116,57 @@ void write_raster_data(
     // Creating a dataset with 1 band would casuse unnecessary memory allocation
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
     gdal::RasterDataSet memDataSet(memDriver.create_dataset<StorageType>(meta.rows, meta.cols, 0));
-    write_raster_dataset(data, memDataSet, meta, filename, driverOptions, metadataValues, ct);
+
+    if constexpr (std::is_same_v<StorageType, RasterDataType>) {
+        write_raster_dataset(data, memDataSet, meta, filename, driverOptions, metadataValues, ct);
+    } else {
+        // TODO: Investigate VRT driver to create a virtual dataset with different type without creating a copy
+        std::vector<StorageType> converted(data.size());
+        std::transform(data.begin(), data.end(), converted.begin(), [](RasterDataType d) { return static_cast<StorageType>(d); });
+        write_raster_dataset<StorageType>(converted, memDataSet, meta, filename, driverOptions, metadataValues, ct);
+    }
+}
+
+template <typename RasterDataType>
+void write_raster_data(
+    std::span<const RasterDataType> data,
+    const GeoMetadata& meta,
+    const fs::path& filename,
+    const std::type_info& storageType,
+    std::span<const std::string> driverOptions,
+    const std::unordered_map<std::string, std::string>& metadataValues,
+    const GDALColorTable* ct = nullptr)
+{
+    switch (resolveType(storageType)) {
+    case GDT_Byte:
+        write_raster_data<uint8_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_UInt16:
+        write_raster_data<uint16_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Int16:
+        write_raster_data<int16_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_UInt32:
+        write_raster_data<uint32_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Int32:
+        write_raster_data<int32_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Float32:
+        write_raster_data<float, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Float64:
+        write_raster_data<double, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_CInt16:
+    case GDT_CInt32:
+    case GDT_CFloat32:
+    case GDT_CFloat64:
+    case GDT_Unknown:
+    default:
+        throw InvalidArgument("Unsupported storage type");
+    }
 }
 
 template <typename StorageType, typename RasterType>
@@ -398,7 +430,7 @@ template <class T>
 void write_raster(std::span<const T> rasterData, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
-    inf::file::create_directory_if_not_exists(filename.parent_path());
+    file::create_directory_if_not_exists(filename.parent_path());
 
     if (storageType == typeid(uint8_t) ||
         storageType == typeid(uint16_t) ||
