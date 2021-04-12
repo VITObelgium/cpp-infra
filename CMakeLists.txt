@@ -115,6 +115,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumflags.h
     include/infra/crs.h
     include/infra/csvwriter.h
+    include/infra/demangle.h
     include/infra/generator.h
     include/infra/hash.h
     include/infra/interpolate.h
@@ -139,6 +140,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/size.h
     include/infra/span.h
     include/infra/threadpool.h
+    include/infra/typeinfo.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h
     include/infra/inireader.h
@@ -150,6 +152,7 @@ add_library(infra
     chrono.cpp
     cpuinfo.cpp
     csvwriter.cpp
+    demangle.cpp
     legend.cpp
     legenddataanalyser.cpp
     string.cpp
@@ -159,6 +162,7 @@ add_library(infra
     colormap.cpp
     threadpool.cpp
     inireader.cpp
+    typeinfo.cpp
     workerthread.cpp
 )
 

@@ -41,4 +41,4 @@ public:
 template <typename T>
 inline constexpr bool is_streamable_v = is_streamable<T>::value;
 
-} // namespace utils
+}
