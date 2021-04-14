@@ -218,16 +218,26 @@ VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::s
     return memDataSet;
 }
 
-void translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options)
+VectorDataSet translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options)
 {
     VectorTranslateOptionsWrapper gdalOptions(options);
 
+    if (path.has_parent_path()) {
+        fs::create_directories(path.parent_path());
+    }
+
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
-    GDALVectorTranslate(path.u8string().c_str(), nullptr, 1, &srcDataSetPtr, gdalOptions.get(), &errorCode);
+    VectorDataSet resultDs(GDALDataset::FromHandle(GDALVectorTranslate(path.u8string().c_str(), nullptr, 1, &srcDataSetPtr, gdalOptions.get(), &errorCode)));
     if (errorCode != CE_None) {
         throw RuntimeError("Failed to translate vector dataset to disk {}", errorCode);
     }
+
+    if (!resultDs.is_valid()) {
+        throw RuntimeError("Failed to translate vector dataset to disk");
+    }
+
+    return resultDs;
 }
 
 VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)

@@ -50,6 +50,21 @@ public:
         return _ptr;
     }
 
+    T* get()
+    {
+        return _ptr;
+    }
+
+    const T* get() const
+    {
+        return _ptr;
+    }
+
+    operator bool() const noexcept
+    {
+        return _ptr != nullptr;
+    }
+
 private:
     T* _ptr = nullptr;
 };
@@ -66,6 +81,7 @@ static const std::unordered_map<RasterType, const char*>
         {RasterType::TileDB, "TileDB"},
         {RasterType::MBTiles, "MBTiles"},
         {RasterType::Grib, "GRIB"},
+        {RasterType::Vrt, "VRT"},
     }};
 
 static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLookup{{
@@ -79,6 +95,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
     {"TileDB", RasterType::TileDB},
     {"MBTiles", RasterType::MBTiles},
     {"GRIB", RasterType::Grib},
+    {"VRT", RasterType::Vrt},
 }};
 
 static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
@@ -89,6 +106,7 @@ static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
     {VectorType::Xlsx, "XLSX"},
     {VectorType::GeoJson, "GeoJSON"},
     {VectorType::GeoPackage, "GPKG"},
+    {VectorType::Vrt, "OGR_VRT"},
 }};
 
 static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLookup{{
@@ -99,6 +117,7 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
     {"XLSX", VectorType::Xlsx},
     {"GeoJSON", VectorType::GeoJson},
     {"GPKG", VectorType::GeoPackage},
+    {"OGR_VRT", VectorType::Vrt},
 }};
 
 static std::string get_extension_lowercase(const fs::path& filepath)
@@ -687,6 +706,47 @@ static GDALDataset* create_data_set(const fs::path& filePath,
         nullptr));
 }
 
+static uint32_t open_mode_to_gdal_mode(OpenMode mode)
+{
+    return mode == OpenMode::ReadOnly ? GDAL_OF_READONLY : GDAL_OF_UPDATE;
+}
+
+static std::string open_mode_to_string(OpenMode mode)
+{
+    return mode == OpenMode::ReadOnly ? "reading" : "writing";
+}
+
+static RasterDataSet raster_open_impl(OpenMode mode, const fs::path& filePath, const std::vector<std::string>& driverOpts)
+{
+    auto* dataSet = create_data_set(filePath, open_mode_to_gdal_mode(mode) | GDAL_OF_RASTER, nullptr, driverOpts);
+    if (!dataSet) {
+        throw RuntimeError("Failed to open raster file '{}' for {}", filePath, open_mode_to_string(mode));
+    }
+
+    return RasterDataSet(dataSet);
+}
+
+static RasterDataSet raster_open_impl(OpenMode mode, const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
+{
+    if (type == RasterType::Unknown) {
+        type = guess_rastertype_from_filename(filePath);
+        if (type == RasterType::Unknown) {
+            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath);
+        }
+    }
+
+    std::array<const char*, 2> allowedDrivers{{
+        s_rasterDriverLookup.at(type),
+        nullptr,
+    }};
+
+    return RasterDataSet(check_pointer(create_data_set(filePath,
+                                                       open_mode_to_gdal_mode(mode) | GDAL_OF_RASTER,
+                                                       allowedDrivers.data(),
+                                                       driverOpts),
+                                       "Failed to open raster file"));
+}
+
 RasterDataSet RasterDataSet::create(const fs::path& filePath, const std::vector<std::string>& driverOpts)
 {
     return open(filePath, driverOpts);
@@ -699,64 +759,22 @@ RasterDataSet RasterDataSet::create(const fs::path& filePath, RasterType type, c
 
 RasterDataSet RasterDataSet::open(const fs::path& filePath, const std::vector<std::string>& driverOpts)
 {
-    auto* dataSet = create_data_set(filePath, GDAL_OF_READONLY | GDAL_OF_RASTER, nullptr, driverOpts);
-    if (!dataSet) {
-        throw RuntimeError("Failed to open raster file '{}'", filePath);
-    }
-
-    return RasterDataSet(dataSet);
+    return raster_open_impl(OpenMode::ReadOnly, filePath, driverOpts);
 }
 
 RasterDataSet RasterDataSet::open(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
 {
-    if (type == RasterType::Unknown) {
-        type = guess_rastertype_from_filename(filePath);
-        if (type == RasterType::Unknown) {
-            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath);
-        }
-    }
-
-    std::array<const char*, 2> allowedDrivers{{
-        s_rasterDriverLookup.at(type),
-        nullptr,
-    }};
-
-    return RasterDataSet(check_pointer(create_data_set(filePath,
-                                                       GDAL_OF_READONLY | GDAL_OF_RASTER,
-                                                       allowedDrivers.data(),
-                                                       driverOpts),
-                                       "Failed to open raster file"));
+    return raster_open_impl(OpenMode::ReadOnly, filePath, type, driverOpts);
 }
 
 RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, const std::vector<std::string>& driverOpts)
 {
-    auto* dataSet = create_data_set(filePath, GDAL_OF_UPDATE | GDAL_OF_RASTER, nullptr, driverOpts);
-    if (!dataSet) {
-        throw RuntimeError("Failed to open raster file for writing '{}'", filePath);
-    }
-
-    return RasterDataSet(dataSet);
+    return raster_open_impl(OpenMode::ReadWrite, filePath, driverOpts);
 }
 
 RasterDataSet RasterDataSet::open_for_writing(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts)
 {
-    if (type == RasterType::Unknown) {
-        type = guess_rastertype_from_filename(filePath);
-        if (type == RasterType::Unknown) {
-            throw RuntimeError("Failed to determine raster type for file ('{}')", filePath);
-        }
-    }
-
-    std::array<const char*, 2> allowedDrivers{{
-        s_rasterDriverLookup.at(type),
-        nullptr,
-    }};
-
-    return RasterDataSet(check_pointer(create_data_set(filePath,
-                                                       GDAL_OF_UPDATE | GDAL_OF_RASTER,
-                                                       allowedDrivers.data(),
-                                                       driverOpts),
-                                       "Failed to open raster file for writing"));
+    return raster_open_impl(OpenMode::ReadWrite, filePath, type, driverOpts);
 }
 
 RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
@@ -764,7 +782,7 @@ RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
 {
 }
 
-RasterDataSet::RasterDataSet(RasterDataSet&& rhs)
+RasterDataSet::RasterDataSet(RasterDataSet&& rhs) noexcept
 : _ptr(rhs._ptr)
 {
     rhs._ptr = nullptr;
@@ -1066,20 +1084,15 @@ RasterDriver RasterDataSet::driver() const
 
 VectorDataSet VectorDataSet::create(const fs::path& filePath, const std::vector<std::string>& driverOptions)
 {
-    return open(filePath, OpenMode::ReadOnly, driverOptions);
+    return open(filePath, driverOptions);
 }
 
 VectorDataSet VectorDataSet::create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions)
 {
-    return open(filePath, type, OpenMode::ReadOnly, driverOptions);
+    return open(filePath, type, driverOptions);
 }
 
-static uint32_t open_mode_to_gdal_mode(OpenMode mode)
-{
-    return mode == OpenMode::ReadOnly ? GDAL_OF_READONLY : GDAL_OF_UPDATE;
-}
-
-VectorDataSet VectorDataSet::open(const fs::path& filePath, OpenMode mode, const std::vector<std::string>& driverOptions)
+static VectorDataSet open_vector_impl(OpenMode mode, const fs::path& filePath, const std::vector<std::string>& driverOptions)
 {
     auto* dsPtr = create_data_set(filePath, open_mode_to_gdal_mode(mode) | GDAL_OF_VECTOR, nullptr, driverOptions);
     if (!dsPtr) {
@@ -1089,7 +1102,7 @@ VectorDataSet VectorDataSet::open(const fs::path& filePath, OpenMode mode, const
     return VectorDataSet(dsPtr);
 }
 
-VectorDataSet VectorDataSet::open(const fs::path& filePath, VectorType type, OpenMode mode, const std::vector<std::string>& driverOptions)
+static VectorDataSet open_vector_impl(OpenMode mode, const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions)
 {
     if (type == VectorType::Unknown) {
         type = guess_vectortype_from_filename(filePath);
@@ -1108,12 +1121,32 @@ VectorDataSet VectorDataSet::open(const fs::path& filePath, VectorType type, Ope
     return VectorDataSet(dsPtr);
 }
 
+VectorDataSet VectorDataSet::open(const fs::path& filePath, const std::vector<std::string>& driverOptions)
+{
+    return open_vector_impl(OpenMode::ReadOnly, filePath, driverOptions);
+}
+
+VectorDataSet VectorDataSet::open(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions)
+{
+    return open_vector_impl(OpenMode::ReadOnly, filePath, type, driverOptions);
+}
+
+VectorDataSet VectorDataSet::open_for_writing(const fs::path& filePath, const std::vector<std::string>& driverOptions)
+{
+    return open_vector_impl(OpenMode::ReadWrite, filePath, driverOptions);
+}
+
+VectorDataSet VectorDataSet::open_for_writing(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions)
+{
+    return open_vector_impl(OpenMode::ReadWrite, filePath, type, driverOptions);
+}
+
 VectorDataSet::VectorDataSet(GDALDataset* ptr) noexcept
 : _ptr(ptr)
 {
 }
 
-VectorDataSet::VectorDataSet(VectorDataSet&& rhs)
+VectorDataSet::VectorDataSet(VectorDataSet&& rhs) noexcept
 : _ptr(rhs._ptr)
 {
     rhs._ptr = nullptr;
@@ -1276,6 +1309,8 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
         return RasterType::MBTiles;
     } else if (ext == ".grib") {
         return RasterType::Grib;
+    } else if (ext == ".vrt") {
+        return RasterType::Vrt;
     }
 
     return RasterType::Unknown;
@@ -1296,6 +1331,8 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
         return VectorType::GeoJson;
     } else if (ext == ".gpkg") {
         return VectorType::GeoPackage;
+    } else if (ext == ".vrt") {
+        return VectorType::Vrt;
     }
 
     return VectorType::Unknown;
@@ -1328,6 +1365,11 @@ MemoryFile::MemoryFile(const char* path, std::span<const uint8_t> dataBuffer)
 {
 }
 
+MemoryFile::MemoryFile(const char* path, std::string_view dataBuffer)
+: MemoryFile(std::string(path), dataBuffer)
+{
+}
+
 MemoryFile::MemoryFile(std::string path, std::span<const uint8_t> dataBuffer)
 : _path(std::move(path))
 , _ptr(VSIFileFromMemBuffer(_path.c_str(),
@@ -1336,7 +1378,17 @@ MemoryFile::MemoryFile(std::string path, std::span<const uint8_t> dataBuffer)
 {
 }
 
+MemoryFile::MemoryFile(std::string path, std::string_view dataBuffer)
+: MemoryFile(path, std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(dataBuffer.data()), dataBuffer.size()))
+{
+}
+
 MemoryFile::MemoryFile(const fs::path& path, std::span<const uint8_t> dataBuffer)
+: MemoryFile(path.u8string(), dataBuffer)
+{
+}
+
+MemoryFile::MemoryFile(const fs::path& path, std::string_view dataBuffer)
 : MemoryFile(path.u8string(), dataBuffer)
 {
 }
@@ -1357,5 +1409,16 @@ std::span<uint8_t> MemoryFile::data()
 MemoryFile::~MemoryFile()
 {
     VSIFCloseL(_ptr);
+}
+
+std::string read_memory_file_as_text(const fs::path& path, MemoryReadMode mode)
+{
+    vsi_l_offset dataLength = 0;
+    CplPointer<GByte> dataPtr(VSIGetMemFileBuffer(path.generic_u8string().c_str(), &dataLength, mode == MemoryReadMode::StealContents ? TRUE : FALSE));
+    if (!dataPtr) {
+        throw RuntimeError("Invalid memory file: {}", path);
+    }
+
+    return std::string(reinterpret_cast<char*>(dataPtr.get()), dataLength);
 }
 }

@@ -49,7 +49,7 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
 
 // convert a vector dataset
 VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::string>& options = {});
-void translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options = {});
+VectorDataSet translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options = {});
 
 struct BufferOptions
 {

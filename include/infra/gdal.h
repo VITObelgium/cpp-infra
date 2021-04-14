@@ -88,6 +88,7 @@ enum class RasterType
     TileDB,
     MBTiles,
     Grib,
+    Vrt,
     Unknown,
 };
 
@@ -100,6 +101,7 @@ enum class VectorType
     Xlsx,
     GeoJson,
     GeoPackage,
+    Vrt,
     Unknown,
 };
 
@@ -220,7 +222,7 @@ public:
     RasterDataSet() = default;
     explicit RasterDataSet(GDALDataset* ptr) noexcept;
 
-    RasterDataSet(RasterDataSet&&);
+    RasterDataSet(RasterDataSet&&) noexcept;
     ~RasterDataSet() noexcept;
 
     RasterDataSet& operator=(RasterDataSet&&);
@@ -326,13 +328,16 @@ public:
     [[deprecated("use open")]] static VectorDataSet create(const fs::path& filePath, const std::vector<std::string>& driverOptions = {});
     [[deprecated("use open")]] static VectorDataSet create(const fs::path& filePath, VectorType type, const std::vector<std::string>& driverOptions = {});
 
-    static VectorDataSet open(const fs::path& filename, OpenMode mode = OpenMode::ReadOnly, const std::vector<std::string>& driverOptions = {});
-    static VectorDataSet open(const fs::path& filename, VectorType type, OpenMode mode = OpenMode::ReadOnly, const std::vector<std::string>& driverOptions = {});
+    static VectorDataSet open(const fs::path& filename, const std::vector<std::string>& driverOptions = {});
+    static VectorDataSet open(const fs::path& filename, VectorType type, const std::vector<std::string>& driverOptions = {});
+
+    static VectorDataSet open_for_writing(const fs::path& filename, const std::vector<std::string>& driverOptions = {});
+    static VectorDataSet open_for_writing(const fs::path& filename, VectorType type, const std::vector<std::string>& driverOptions = {});
 
     VectorDataSet() = default;
     explicit VectorDataSet(GDALDataset* ptr) noexcept;
 
-    VectorDataSet(VectorDataSet&&);
+    VectorDataSet(VectorDataSet&&) noexcept;
     ~VectorDataSet() noexcept;
 
     VectorDataSet& operator=(VectorDataSet&&);
@@ -425,8 +430,14 @@ class MemoryFile
 {
 public:
     MemoryFile(const char* path, std::span<const uint8_t> dataBuffer);
+    MemoryFile(const char* path, std::string_view dataBuffer);
+
     MemoryFile(std::string path, std::span<const uint8_t> dataBuffer);
+    MemoryFile(std::string path, std::string_view dataBuffer);
+
     MemoryFile(const fs::path& path, std::span<const uint8_t> dataBuffer);
+    MemoryFile(const fs::path& path, std::string_view dataBuffer);
+
     ~MemoryFile();
 
     const std::string& path() const;
@@ -436,5 +447,13 @@ private:
     const std::string _path;
     VSILFILE* _ptr;
 };
+
+enum MemoryReadMode
+{
+    LeaveIntact,
+    StealContents,
+};
+
+std::string read_memory_file_as_text(const fs::path& path, MemoryReadMode mode = MemoryReadMode::LeaveIntact);
 
 }

@@ -1069,6 +1069,11 @@ void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& opti
     check_error(_layer->Intersection(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to get layer intersection");
 }
 
+void Layer::set_metadata(const std::string& name, const std::string& value, const std::string& domain)
+{
+    check_error(_layer->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set layer metadata");
+}
+
 LayerIterator::LayerIterator()
 : _layer(nullptr)
 , _currentFeature(nullptr)

@@ -538,6 +538,8 @@ public:
     void intersection(Layer& method, Layer& output);
     void intersection(Layer& method, Layer& output, IntersectionOptions& options);
 
+    void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
+
 private:
     OGRLayer* _layer;
 };
