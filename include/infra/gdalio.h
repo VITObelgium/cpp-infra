@@ -54,6 +54,7 @@ void read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet
 }
 
 void read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet, const std::type_info& info, void* data, int dataCols);
+void create_output_directory_if_needed(const fs::path& p);
 
 template <typename RasterDataType>
 void write_raster_dataset(
@@ -410,7 +411,7 @@ template <typename StorageType, class RasterType>
 void write_raster_as(std::span<const RasterType> rasterData, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
-    inf::file::create_directory_if_not_exists(filename.parent_path());
+    create_output_directory_if_needed(filename);
 
     if constexpr (std::is_unsigned_v<StorageType>) {
         auto nodata         = meta.nodata;
@@ -439,7 +440,7 @@ template <class T>
 void write_raster(std::span<const T> rasterData, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
-    file::create_directory_if_not_exists(filename.parent_path());
+    create_output_directory_if_needed(filename);
 
     if (storageType == typeid(uint8_t) ||
         storageType == typeid(uint16_t) ||

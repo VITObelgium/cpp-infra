@@ -2,6 +2,7 @@
 #include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
+#include "infra/string.h"
 
 #include <array>
 #include <cassert>
@@ -54,5 +55,17 @@ void detail::read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet&
     data = dataPtr;
 
     dataSet.read_rasterdata(bandNr, std::max(0, cut.srcColOffset), std::max(0, cut.srcRowOffset), cut.cols, cut.rows, typeInfo, data, cut.cols, cut.rows, 0, truncate<int>(dataCols * typeSize));
+}
+
+void detail::create_output_directory_if_needed(const fs::path& p)
+{
+    if (str::starts_with(p.generic_u8string(), "/vsi")) {
+        // this is a gdal virtual filesystem path
+        return;
+    }
+
+    if (p.has_parent_path()) {
+        inf::file::create_directory_if_not_exists(p.parent_path());
+    }
 }
 }
