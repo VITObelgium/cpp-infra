@@ -571,12 +571,12 @@ RasterDriver::RasterDriver(GDALDriver& driver)
 
 RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType)
 {
-    return RasterDataSet(check_pointer(_driver.Create(filename.u8string().c_str(), cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
+    return RasterDataSet(check_pointer(_driver.Create(filename.u8string().c_str(), cols, rows, numBands, resolve_type(dataType), nullptr), "Failed to create data set"));
 }
 
 RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType)
 {
-    return RasterDataSet(check_pointer(_driver.Create("", cols, rows, numBands, resolveType(dataType), nullptr), "Failed to create data set"));
+    return RasterDataSet(check_pointer(_driver.Create("", cols, rows, numBands, resolve_type(dataType), nullptr), "Failed to create data set"));
 }
 
 RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, const fs::path& filename, std::span<const std::string> driverOptions)
@@ -1001,19 +1001,19 @@ const std::type_info& RasterDataSet::band_datatype(int bandNr) const
 {
     assert(_ptr);
     assert(bandNr > 0);
-    return resolveType(check_pointer(_ptr->GetRasterBand(bandNr), "Invalid band index")->GetRasterDataType());
+    return resolve_type(check_pointer(_ptr->GetRasterBand(bandNr), "Invalid band index")->GetRasterDataType());
 }
 
 void RasterDataSet::read_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize, int lineSize) const
 {
     auto* bandPtr = _ptr->GetRasterBand(band);
-    check_error(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, resolveType(type), pixelSize, lineSize), "Failed to read raster data");
+    check_error(bandPtr->RasterIO(GF_Read, xOff, yOff, xSize, ySize, pData, bufXSize, bufYSize, resolve_type(type), pixelSize, lineSize), "Failed to read raster data");
 }
 
 void RasterDataSet::write_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, const std::type_info& type, const void* pData, int bufXSize, int bufYSize) const
 {
     auto* bandPtr = _ptr->GetRasterBand(band);
-    check_error(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, const_cast<void*>(pData), bufXSize, bufYSize, resolveType(type), 0, 0), "Failed to write raster data");
+    check_error(bandPtr->RasterIO(GF_Write, xOff, yOff, xSize, ySize, const_cast<void*>(pData), bufXSize, bufYSize, resolve_type(type), 0, 0), "Failed to write raster data");
 }
 
 void RasterDataSet::write_geometadata(const GeoMetadata& meta)

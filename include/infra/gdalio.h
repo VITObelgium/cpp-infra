@@ -137,7 +137,7 @@ void write_raster_data(
     const std::unordered_map<std::string, std::string>& metadataValues,
     const GDALColorTable* ct = nullptr)
 {
-    switch (resolveType(storageType)) {
+    switch (resolve_type(storageType)) {
     case GDT_Byte:
         write_raster_data<uint8_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
         break;
@@ -332,13 +332,22 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
         dstMeta = cast_raster<float, T>(dstMeta, tempData, dstData);
     } else {
         read_raster_data(bandNr, cutOut, dataSet, dstData.data(), dstMeta.cols);
+
+        if (typeid(T()) != dataSet.band_datatype(bandNr)) {
+            // perform nodata sanity checks
+            if (auto nodata = dataSet.nodata_value(bandNr); nodata.has_value()) {
+                if (std::isfinite(*nodata) && !fits_in_type<T>(*nodata)) {
+                    // gdal performs a cast, so assign the nodata to the cast result
+                    dstMeta.nodata = double(static_cast<T>(*nodata));
+                }
+            }
+        }
     }
 
     return dstMeta;
 }
 
-/* This version will read the full dataset and is used in cases where there is no geotransform info available
- */
+/* This version will read the full dataset and is used in cases where there is no geotransform info available */
 template <typename T>
 GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, std::span<T> dstData)
 {
@@ -508,5 +517,4 @@ void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta
     gdal::RasterDataSet dstDataSet = create_memory_dataset<TOutput>(outputData, outputMeta);
     gdal::warp(srcDataSet, dstDataSet, algo);
 }
-
 }

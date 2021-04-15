@@ -54,7 +54,7 @@ struct TypeResolve<double>
     static constexpr GDALDataType value = GDT_Float64;
 };
 
-inline GDALDataType resolveType(const std::type_info& info)
+inline GDALDataType resolve_type(const std::type_info& info)
 {
     if (info == typeid(uint8_t)) {
         return TypeResolve<uint8_t>::value;
@@ -75,7 +75,7 @@ inline GDALDataType resolveType(const std::type_info& info)
     return GDT_Unknown;
 }
 
-inline const std::type_info& resolveType(GDALDataType type)
+inline const std::type_info& resolve_type(GDALDataType type)
 {
     switch (type) {
     case GDT_Byte:
