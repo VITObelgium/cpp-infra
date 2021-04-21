@@ -120,4 +120,16 @@ T* check_pointer(T* instance, std::string_view msg)
 
     return instance;
 }
+
+/* Overload that accepts a callback for creating the error message
+ * Use if you want to avoid constructing the error message if the pointer is ok */
+template <typename T, typename Callable>
+T* check_pointer_msg_cb(T* instance, Callable&& msgCb)
+{
+    if (instance == nullptr) {
+        throw_last_error(msgCb());
+    }
+
+    return instance;
+}
 }

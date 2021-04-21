@@ -740,11 +740,11 @@ static RasterDataSet raster_open_impl(OpenMode mode, const fs::path& filePath, R
         nullptr,
     }};
 
-    return RasterDataSet(check_pointer(create_data_set(filePath,
-                                                       open_mode_to_gdal_mode(mode) | GDAL_OF_RASTER,
-                                                       allowedDrivers.data(),
-                                                       driverOpts),
-                                       "Failed to open raster file"));
+    return RasterDataSet(check_pointer_msg_cb(create_data_set(filePath,
+                                                              open_mode_to_gdal_mode(mode) | GDAL_OF_RASTER,
+                                                              allowedDrivers.data(),
+                                                              driverOpts),
+                                              [&]() { return fmt::format("Failed to open raster file: {}", filePath); }));
 }
 
 RasterDataSet RasterDataSet::create(const fs::path& filePath, const std::vector<std::string>& driverOpts)
@@ -793,7 +793,7 @@ RasterDataSet::~RasterDataSet() noexcept
     GDALClose(reinterpret_cast<GDALDatasetH>(_ptr));
 }
 
-RasterDataSet& RasterDataSet::operator=(RasterDataSet&& rhs)
+RasterDataSet& RasterDataSet::operator=(RasterDataSet&& rhs) noexcept
 {
     if (_ptr) {
         GDALClose(reinterpret_cast<GDALDatasetH>(_ptr));
@@ -804,7 +804,7 @@ RasterDataSet& RasterDataSet::operator=(RasterDataSet&& rhs)
     return *this;
 }
 
-bool RasterDataSet::is_valid() const
+bool RasterDataSet::is_valid() const noexcept
 {
     return _ptr != nullptr;
 }

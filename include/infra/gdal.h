@@ -225,9 +225,9 @@ public:
     RasterDataSet(RasterDataSet&&) noexcept;
     ~RasterDataSet() noexcept;
 
-    RasterDataSet& operator=(RasterDataSet&&);
+    RasterDataSet& operator=(RasterDataSet&&) noexcept;
 
-    bool is_valid() const;
+    bool is_valid() const noexcept;
     int32_t raster_count() const;
 
     int32_t x_size() const;
