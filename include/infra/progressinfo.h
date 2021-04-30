@@ -207,7 +207,6 @@ public:
     typename std::enable_if_t<!std::is_void_v<U>, void> set_payload(const U& pl)
     {
         _status.set_payload(std::move(pl));
-        signal_progress();
     }
 
     template <typename U = ProgressPayload>
