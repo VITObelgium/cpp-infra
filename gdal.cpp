@@ -1393,6 +1393,28 @@ MemoryFile::MemoryFile(const fs::path& path, std::string_view dataBuffer)
 {
 }
 
+MemoryFile::MemoryFile(MemoryFile&& other) noexcept
+: _path(std::move(other._path))
+, _ptr(other._ptr)
+{
+    other._ptr = nullptr;
+}
+
+MemoryFile::~MemoryFile() noexcept
+{
+    close();
+}
+
+MemoryFile& MemoryFile::operator=(MemoryFile&& other) noexcept
+{
+    close();
+    _path      = std::move(other._path);
+    _ptr       = other._ptr;
+    other._ptr = nullptr;
+
+    return *this;
+}
+
 const std::string& MemoryFile::path() const
 {
     return _path;
@@ -1406,9 +1428,12 @@ std::span<uint8_t> MemoryFile::data()
     return std::span<uint8_t>(data, dataSize);
 }
 
-MemoryFile::~MemoryFile()
+void MemoryFile::close() noexcept
 {
-    VSIFCloseL(_ptr);
+    if (_ptr) {
+        VSIFCloseL(_ptr);
+        _ptr = nullptr;
+    }
 }
 
 std::string read_memory_file_as_text(const fs::path& path, MemoryReadMode mode)

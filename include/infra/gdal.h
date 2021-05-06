@@ -438,17 +438,25 @@ public:
     MemoryFile(const fs::path& path, std::span<const uint8_t> dataBuffer);
     MemoryFile(const fs::path& path, std::string_view dataBuffer);
 
-    ~MemoryFile();
+    MemoryFile(MemoryFile&&) noexcept;
+    MemoryFile(const MemoryFile&) = delete;
+
+    ~MemoryFile() noexcept;
+
+    MemoryFile& operator=(MemoryFile&&) noexcept;
+    MemoryFile& operator=(const MemoryFile&) = delete;
 
     const std::string& path() const;
     std::span<uint8_t> data();
 
 private:
-    const std::string _path;
+    void close() noexcept;
+
+    std::string _path;
     VSILFILE* _ptr;
 };
 
-enum MemoryReadMode
+enum class MemoryReadMode
 {
     LeaveIntact,
     StealContents,
