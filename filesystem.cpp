@@ -111,7 +111,12 @@ std::vector<uint8_t> read(const fs::path& filename)
 
 std::string read_as_text(const fs::path& filename)
 {
-    return read_as_text(filename.u8string());
+    std::ifstream fileStream(filename, std::ifstream::binary);
+    if (!fileStream.is_open()) { 
+        throw RuntimeError("Failed to open file for reading: {}", filename);
+    }
+
+    return read_as_text(fileStream);
 }
 
 fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar)
