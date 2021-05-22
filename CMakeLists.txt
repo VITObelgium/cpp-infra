@@ -96,6 +96,7 @@ endif ()
 
 find_package(date CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
+find_package(indicators CONFIG REQUIRED)
 find_package(Gsl)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -150,6 +151,7 @@ set(INFRA_PUBLIC_HEADERS
 
 add_library(infra
     chrono.cpp
+    cliprogressbar.cpp
     cpuinfo.cpp
     csvwriter.cpp
     demangle.cpp
@@ -165,6 +167,10 @@ add_library(infra
     typeinfo.cpp
     workerthread.cpp
 )
+
+if (MSVC)
+    set_source_files_properties(cliprogressbar.cpp PROPERTIES COMPILE_DEFINITIONS _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
+endif ()
 
 add_library(Infra::infra ALIAS infra)
 
@@ -192,7 +198,7 @@ PRIVATE
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
-target_link_libraries(infra PUBLIC fmt::fmt date::date $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
+target_link_libraries(infra PUBLIC fmt::fmt date::date indicators::indicators $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
 
 if (HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
