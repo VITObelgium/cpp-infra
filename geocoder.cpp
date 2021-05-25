@@ -56,6 +56,10 @@ Geocoder::Geocoder(const Options& options)
         optionsArray.AddString(fmt::format("KEY={}", options.key).c_str());
     }
 
+    if (!options.username.empty()) {
+        optionsArray.AddString(fmt::format("USERNAME={}", options.key).c_str());
+    }
+
     if (!options.application.empty()) {
         optionsArray.AddString(fmt::format("APPLICATION={}", options.application).c_str());
     }
