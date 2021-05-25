@@ -46,6 +46,7 @@ option(INFRA_ENABLE_TESTS "Build the unit tests" OFF)
 option(INFRA_ENABLE_TEST_UTILS "Build the unit test utilities" ${INFRA_ENABLE_TESTS})
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
+option(INFRA_CLI_PROGRESS "Build the cli progress utility classes" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 option(INFRA_INSTALL_DEVELOPMENT_FILES "Install the infra development files (headers/libs)" ${INFRA_IS_TOPLEVEL})
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
@@ -96,7 +97,6 @@ endif ()
 
 find_package(date CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
-find_package(indicators CONFIG REQUIRED)
 find_package(Gsl)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -109,7 +109,6 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/cast.h
     include/infra/cell.h
     include/infra/chrono.h
-    include/infra/cliprogressbar.h
     include/infra/coordinate.h
     include/infra/cpuinfo.h
     include/infra/enumutils.h
@@ -151,7 +150,6 @@ set(INFRA_PUBLIC_HEADERS
 
 add_library(infra
     chrono.cpp
-    cliprogressbar.cpp
     cpuinfo.cpp
     csvwriter.cpp
     demangle.cpp
@@ -198,7 +196,7 @@ PRIVATE
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
-target_link_libraries(infra PUBLIC fmt::fmt date::date indicators::indicators $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
+target_link_libraries(infra PUBLIC fmt::fmt date::date $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
 
 if (HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
@@ -245,6 +243,13 @@ if (INFRA_XML)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
     target_sources(infra PRIVATE xmldocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
+endif ()
+
+if (INFRA_CLI_PROGRESS)
+    find_package(indicators CONFIG REQUIRED)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/cliprogressbar.h)
+    target_sources(infra PRIVATE cliprogressbar.cpp)
+    target_link_libraries(infra PRIVATE indicators::indicators)
 endif ()
 
 if (INFRA_CHARSET)

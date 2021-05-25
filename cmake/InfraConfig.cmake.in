@@ -5,7 +5,6 @@ list(APPEND CMAKE_MODULE_PATH ${Infra_CMAKE_DIR})
 
 find_dependency(fmt CONFIG REQUIRED)
 find_dependency(date CONFIG REQUIRED)
-find_dependency(indicators CONFIG REQUIRED)
 
 if (@HAVE_BOOST_FILESYSTEM@)
     find_dependency(Boost COMPONENTS filesystem)
@@ -33,6 +32,10 @@ endif ()
 
 if (@INFRA_PROCESS@)
     find_dependency(reproc++ CONFIG REQUIRED)
+endif ()
+
+if (@INFRA_CLI_PROGRESS@)
+    find_dependency(indicators CONFIG REQUIRED)
 endif ()
 
 if (@INFRA_NUMERIC@)
