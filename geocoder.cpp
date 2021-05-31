@@ -19,6 +19,7 @@ std::string Geocoder::Bing     = "BING";
 struct Geocoder::Pimpl
 {
     OGRGeocodingSessionH gc;
+    std::string proxy;
 };
 
 Geocoder::Geocoder()
@@ -32,6 +33,7 @@ Geocoder::Geocoder(const Options& options)
 : _pimpl(std::make_unique<Pimpl>())
 {
     _allowUnsafeSsl = options.allowUnsafeSsl;
+    _pimpl->proxy   = options.proxyServer;
 
     CPLStringList optionsArray;
     optionsArray.AddString(fmt::format("SERVICE={}", options.service).c_str());
@@ -87,6 +89,10 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
 {
     if (_allowUnsafeSsl) {
         CPLSetThreadLocalConfigOption("GDAL_HTTP_UNSAFESSL", "YES");
+    }
+
+    if (!_pimpl->proxy.empty()) {
+        CPLSetThreadLocalConfigOption("GDAL_HTTP_PROXY", _pimpl->proxy.c_str());
     }
 
     CPLStringList optionsArray;

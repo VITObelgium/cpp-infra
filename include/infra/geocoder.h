@@ -23,6 +23,7 @@ public:
         bool readCache      = true;
         bool writeCache     = true;
         bool allowUnsafeSsl = false;
+        std::string proxyServer;
         std::string service = Osm;
         std::string email;       // optional, but recommended
         std::string key;         // api key, needed by Bing
