@@ -2,6 +2,7 @@
 #include "infra/cast.h"
 #include "infra/enumutils.h"
 #include "infra/exception.h"
+#include "infra/gdalio.h"
 
 #include <cassert>
 #include <gdal_alg.h>
@@ -222,9 +223,7 @@ VectorDataSet translate_vector_to_disk(const VectorDataSet& ds, const fs::path& 
 {
     VectorTranslateOptionsWrapper gdalOptions(options);
 
-    if (path.has_parent_path()) {
-        fs::create_directories(path.parent_path());
-    }
+    io::detail::create_output_directory_if_needed(path);
 
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
