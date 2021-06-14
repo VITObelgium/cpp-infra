@@ -9,8 +9,6 @@
 
 #include <ciso646> // this allows us to check for libcpp
 
-#define INF_HAS_STD_EXECUTION 0
-
 #if __has_include(<execution>)
     #if defined(_LIBCPP_VERSION) && defined(_LIBCPP_HAS_PARALLEL_ALGORITHMS)
     #define INF_HAS_STD_EXECUTION 1
@@ -19,6 +17,10 @@
     #if defined(__GLIBCXX__)
     #define INF_HAS_STD_EXECUTION 1
     #endif
+#endif
+
+#ifndef INF_HAS_STD_EXECUTION
+    #define INF_HAS_STD_EXECUTION 0
 #endif
 
 #if INF_HAS_STD_EXECUTION
