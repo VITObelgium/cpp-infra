@@ -61,6 +61,13 @@ std::string to_string(std::string_view format, date::local_seconds tp)
     return dateStr.str();
 }
 
+std::string to_string(local_time_point tp)
+{
+    std::stringstream ss;
+    ss << tp;
+    return ss.str();
+}
+
 template <typename TimeType>
 std::optional<TimeType> time_point_from_string(std::string_view str1, const char* format)
 {

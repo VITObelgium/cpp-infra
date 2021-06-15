@@ -42,12 +42,7 @@ std::string to_string(std::chrono::time_point<Clock, Duration> tp)
     return fmt::format("{:%c}", fmt::localtime(time));
 }
 
-inline std::string to_string(local_time_point tp)
-{
-    std::stringstream ss;
-    ss << tp;
-    return ss.str();
-}
+std::string to_string(local_time_point tp);
 
 /*! Converts a time point to string using the provided format specification
  * e.g.: "%Y-%m-%d"
