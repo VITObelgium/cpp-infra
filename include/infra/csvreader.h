@@ -4,6 +4,7 @@
 #include "infra/charset.h"
 #include "infra/gdal.h"
 #include "infra/typetraits.h"
+#include <string>
 
 namespace inf {
 
@@ -79,6 +80,7 @@ public:
 
     int32_t column_count() const;
     std::string_view column_name(int32_t index) const;
+    std::optional<int32_t> column_index(const std::string& name) const;
 
     CsvRowIterator begin() const;
     CsvRowIterator end() const;
