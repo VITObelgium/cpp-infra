@@ -7,24 +7,56 @@
 
 namespace inf {
 
-GeoMetadata::GeoMetadata(int32_t _rows, int32_t _cols)
-: GeoMetadata(_rows, _cols, 0.0, 0.0, 0.0, std::optional<double>())
+GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_)
+: GeoMetadata(rows_, cols_, 0.0, 0.0, 0.0, std::optional<double>())
 {
 }
 
-GeoMetadata::GeoMetadata(int32_t _rows, int32_t _cols, std::optional<double> _nodatavalue)
-: GeoMetadata(_rows, _cols, 0.0, 0.0, 0.0, _nodatavalue)
+GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, std::optional<double> nodatavalue_)
+: GeoMetadata(rows_, cols_, 0.0, 0.0, 0.0, nodatavalue_)
 {
 }
 
-GeoMetadata::GeoMetadata(int32_t _rows, int32_t _cols, double _xll, double _yll, double _cellsize, std::optional<double> _nodatavalue)
-: rows(_rows)
-, cols(_cols)
-, xll(_xll)
-, yll(_yll)
-, cellSize(_cellsize)
-, nodata(_nodatavalue)
+GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_, double cellsize_, std::optional<double> nodatavalue_)
+: GeoMetadata(rows_, cols_, xll_, yll_, CellSize(cellsize_, cellsize_), nodatavalue_)
 {
+}
+
+GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_, double cellsize_, std::optional<double> nodatavalue_, std::string_view projection_)
+: GeoMetadata(rows_, cols_, xll_, yll_, CellSize(cellsize_, cellsize_), nodatavalue_, projection_)
+{
+}
+
+GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_, CellSize cellsize_, std::optional<double> nodatavalue_)
+: GeoMetadata(rows_, cols_, xll_, yll_, cellsize_, nodatavalue_, {})
+{
+}
+
+GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_, CellSize cellsize_, std::optional<double> nodatavalue_, std::string_view projection_)
+: rows(rows_)
+, cols(cols_)
+, xll(xll_)
+, yll(yll_)
+, cellSize(cellsize_)
+, nodata(nodatavalue_)
+, projection(projection_)
+{
+}
+
+void GeoMetadata::set_cell_size(double size) noexcept
+{
+    cellSize.x = size;
+    cellSize.y = -size;
+}
+
+double GeoMetadata::cell_size_x() const noexcept
+{
+    return cellSize.x;
+}
+
+double GeoMetadata::cell_size_y() const noexcept
+{
+    return cellSize.y;
 }
 
 bool GeoMetadata::operator==(const GeoMetadata& other) const noexcept
@@ -44,7 +76,7 @@ bool GeoMetadata::operator==(const GeoMetadata& other) const noexcept
            cols == other.cols &&
            std::fabs(xll - other.xll) < std::numeric_limits<double>::epsilon() &&
            std::fabs(yll - other.yll) < std::numeric_limits<double>::epsilon() &&
-           std::fabs(cellSize - other.cellSize) < std::numeric_limits<double>::epsilon() &&
+           cellSize == other.cellSize &&
            nodataMatches &&
            projected_epsg() == other.projected_epsg();
 }
@@ -54,14 +86,14 @@ bool GeoMetadata::operator!=(const GeoMetadata& other) const noexcept
     return !(*this == other);
 }
 
-double GeoMetadata::convert_x_to_col_fraction(const double x) const
+double GeoMetadata::convert_x_to_col_fraction(double x) const
 {
-    return (x - xll) / cellSize;
+    return (x - xll) / cellSize.x;
 }
 
-double GeoMetadata::convert_y_to_row_fraction(const double y) const
+double GeoMetadata::convert_y_to_row_fraction(double y) const
 {
-    return rows - (y - yll) / cellSize;
+    return rows - (y - yll) / std::abs(cellSize.y);
 }
 
 int32_t GeoMetadata::convert_x_to_col(const double x) const
@@ -76,12 +108,12 @@ int32_t GeoMetadata::convert_y_to_row(const double y) const
 
 double GeoMetadata::convert_col_centre_to_x(const int32_t col) const
 {
-    return (col + 0.5) * cellSize + xll;
+    return xll + ((col + 0.5) * cellSize.x);
 }
 
 double GeoMetadata::convert_row_centre_to_y(const int32_t row) const
 {
-    return (rows - row - 0.5) * cellSize + yll;
+    return yll - ((rows - row - 0.5) * cellSize.y);
 }
 
 Point<double> GeoMetadata::convert_cell_centre_to_xy(const Cell& cell) const
@@ -91,12 +123,12 @@ Point<double> GeoMetadata::convert_cell_centre_to_xy(const Cell& cell) const
 
 double GeoMetadata::convert_col_ll_to_x(const int32_t col) const
 {
-    return (col * cellSize) + xll;
+    return xll + (col * cellSize.x);
 }
 
 double GeoMetadata::convert_row_ll_to_y(const int32_t row) const
 {
-    return (rows - 1 - row) * cellSize + yll;
+    return yll - ((rows - 1 - row) * cellSize.y);
 }
 
 Cell GeoMetadata::convert_xy_to_cell(const double x, const double y) const
@@ -145,19 +177,28 @@ void GeoMetadata::compute_rect_on_map_around(const int32_t row, const int32_t co
     }
 }
 
+Rect<double> GeoMetadata::bounding_box() const noexcept
+{
+    Rect<double> result;
+    auto width         = cellSize.x * cols;
+    result.topLeft     = Point<double>(xll, yll - (cellSize.y * rows));
+    result.bottomRight = Point<double>(result.topLeft.x + width, yll);
+    return result;
+}
+
 Point<double> GeoMetadata::center() const
 {
-    return Point<double>(xll + ((cols * cellSize) / 2), yll + ((rows * cellSize) / 2));
+    return Point<double>(xll + ((cols * cellSize.x) / 2), yll - ((rows * cellSize.y) / 2));
 }
 
 Point<double> GeoMetadata::top_left() const
 {
-    return Point<double>(xll, yll + (rows * cellSize));
+    return Point<double>(xll, yll - (rows * cellSize.y));
 }
 
 Point<double> GeoMetadata::bottom_right() const
 {
-    return Point<double>(xll + (cols * cellSize), yll);
+    return Point<double>(xll + (cols * cellSize.x), yll);
 }
 
 std::string GeoMetadata::to_string() const
@@ -165,7 +206,7 @@ std::string GeoMetadata::to_string() const
     std::ostringstream os;
     os << "Rows: " << rows << " Cols: " << cols
        << " Xll: " << xll << " Yll: " << yll
-       << " Cellsize: " << cellSize;
+       << " Cellsize: " << cellSize.x << ", " << cellSize.y;
 
     if (nodata) {
         os << " NoData: " << *nodata;
@@ -176,6 +217,16 @@ std::string GeoMetadata::to_string() const
     }
 
     return os.str();
+}
+
+double GeoMetadata::width() const noexcept
+{
+    return cols * cellSize.x;
+}
+
+double GeoMetadata::height() const noexcept
+{
+    return rows * std::abs(cellSize.y);
 }
 
 std::optional<int32_t> GeoMetadata::projection_geo_epsg() const noexcept
@@ -224,7 +275,7 @@ void GeoMetadata::set_projection_from_epsg(int32_t epsg)
 
 std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta)
 {
-    return {{meta.xll, meta.cellSize, 0.0, meta.yll + (meta.cellSize * meta.rows), 0.0, -meta.cellSize}};
+    return {{meta.xll, meta.cellSize.x, 0.0, meta.yll - (meta.cellSize.y * meta.rows), 0.0, meta.cellSize.y}};
 }
 
 std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta)

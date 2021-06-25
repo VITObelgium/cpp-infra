@@ -1018,8 +1018,7 @@ void RasterDataSet::write_rasterdata(int band, int xOff, int yOff, int xSize, in
 
 void RasterDataSet::write_geometadata(const GeoMetadata& meta)
 {
-    const double cellSize = meta.cellSize;
-    set_geotransform(std::array<double, 6>{{meta.xll, cellSize, 0.0, meta.yll + (cellSize * meta.rows), 0.0, -cellSize}});
+    set_geotransform(metadata_to_geo_transform(meta));
     set_projection(meta.projection);
 
     if (raster_count() > 0) {
@@ -1352,7 +1351,7 @@ FileType detect_file_type(const fs::path& path)
 void fill_geometadata_from_geo_transform(GeoMetadata& meta, const std::array<double, 6>& geoTrans)
 {
     if (geoTrans[2] == 0.0 && geoTrans[4] == 0.0) {
-        meta.cellSize = geoTrans[1];
+        meta.cellSize = GeoMetadata::CellSize(geoTrans[1], geoTrans[5]);
     }
 
     // transform the lower left coordinate (0.0, meta.rows)

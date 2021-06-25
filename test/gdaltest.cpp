@@ -182,4 +182,22 @@ TEST_CASE("Gdal.spatialReference")
     }
 }
 
+TEST_CASE("intersect metadata")
+{
+    const GeoMetadata meta1(3, 5, 1.0, -10.0, {4.0, -4.0}, {});
+    const GeoMetadata meta2(3, 4, -3.0, -6.0, {4.0, -4.0}, {});
+
+    CHECK(meta2.convert_row_centre_to_y(0) == 4.0);
+    CHECK(meta1.convert_y_to_row(4.0) == -1.0);
+
+    const auto cutout = gdal::io::detail::intersect_metadata(meta1, meta2);
+
+    CHECK(cutout.rows == 2);
+    CHECK(cutout.cols == 3);
+    CHECK(cutout.srcColOffset == -1.0);
+    CHECK(cutout.srcRowOffset == -1.0);
+    CHECK(cutout.dstColOffset == 1.0);
+    CHECK(cutout.dstRowOffset == 1.0);
+}
+
 }

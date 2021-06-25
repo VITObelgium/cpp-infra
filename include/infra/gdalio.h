@@ -182,49 +182,32 @@ void write_raster_data(
     write_raster_data<StorageType>(std::span<const typename RasterType::value_type>(data(raster), size(raster)), meta, filename, driverOptions, metadataValues, ct);
 }
 
-static BBox metadata_bounding_box(const GeoMetadata& meta)
-{
-    BBox result;
-    auto width         = meta.cellSize * meta.cols;
-    auto height        = meta.cellSize * meta.rows;
-    result.topLeft     = Point<double>(meta.xll, meta.yll + height);
-    result.bottomRight = Point<double>(result.topLeft.x + width, result.topLeft.y - height);
-    return result;
-}
-
-inline BBox intersect_bbox(const BBox& lhs, const BBox& rhs)
-{
-    auto topLeft     = Point<double>(std::max(lhs.topLeft.x, rhs.topLeft.x), std::min(lhs.topLeft.y, rhs.topLeft.y));
-    auto bottomRight = Point<double>(std::min(lhs.bottomRight.x, rhs.bottomRight.x), std::max(lhs.bottomRight.y, rhs.bottomRight.y));
-    return {topLeft, bottomRight};
-}
-
 inline CutOut intersect_metadata(const GeoMetadata& srcMeta, const GeoMetadata& dstMeta)
 {
     // srcMeta: the metadata of the raster that we are going to read as it is on disk
     // dstMeta: the metadata of the raster that will be returned to the user
 
-    if (srcMeta.cellSize != dstMeta.cellSize) {
+    if (srcMeta.cellSize.x != dstMeta.cellSize.x || srcMeta.cellSize.y != dstMeta.cellSize.y) {
         throw InvalidArgument("Extents cellsize does not match {} <-> {}", srcMeta.cellSize, dstMeta.cellSize);
     }
 
-    if (srcMeta.cellSize == 0) {
+    if (srcMeta.cellSize.x == 0) {
         throw InvalidArgument("Extents cellsize is zero");
     }
 
     auto cellSize  = srcMeta.cellSize;
-    auto srcBBox   = metadata_bounding_box(srcMeta);
-    auto dstBBox   = metadata_bounding_box(dstMeta);
-    auto intersect = intersect_bbox(srcBBox, dstBBox);
+    auto srcBBox   = srcMeta.bounding_box();
+    auto dstBBox   = dstMeta.bounding_box();
+    auto intersect = rectangle_intersection(srcBBox, dstBBox);
 
     CutOut result;
 
     result.srcColOffset = srcMeta.convert_x_to_col(dstMeta.convert_col_centre_to_x(0));
     result.srcRowOffset = srcMeta.convert_y_to_row(dstMeta.convert_row_centre_to_y(0));
-    result.rows         = static_cast<int>(std::round(intersect.height() / cellSize));
-    result.cols         = static_cast<int>(std::round(intersect.width() / cellSize));
-    result.dstColOffset = static_cast<int>(std::round((intersect.topLeft.x - dstBBox.topLeft.x) / cellSize));
-    result.dstRowOffset = static_cast<int>(std::round((dstBBox.topLeft.y - intersect.topLeft.y) / cellSize));
+    result.rows         = static_cast<int>(std::abs(std::round(intersect.height() / cellSize.y)));
+    result.cols         = static_cast<int>(std::round(intersect.width() / cellSize.x));
+    result.dstColOffset = static_cast<int>(std::round((intersect.topLeft.x - dstBBox.topLeft.x) / cellSize.x));
+    result.dstRowOffset = static_cast<int>(std::round((dstBBox.topLeft.y - intersect.topLeft.y) / std::abs(cellSize.y)));
 
     return result;
 }

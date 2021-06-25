@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cinttypes>
+#include <cmath>
 #include <fmt/core.h>
 #include <limits>
-#include <cmath>
 
 namespace inf {
 
@@ -11,7 +11,7 @@ namespace inf {
 template <typename T>
 struct Point
 {
-    constexpr Point() = default;
+    constexpr Point() noexcept = default;
     constexpr Point(T x_, T y_) noexcept
     : x(x_), y(y_)
     {
@@ -61,6 +61,13 @@ template <typename TTo, typename TFrom>
 constexpr Point<TTo> point_cast(const Point<TFrom>& from)
 {
     return Point<TTo>(static_cast<TTo>(from.x), static_cast<TTo>(from.y));
+}
+
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Point<T>& p)
+{
+    os << fmt::format("{}", p);
+    return os;
 }
 
 }
