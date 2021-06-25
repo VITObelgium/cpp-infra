@@ -37,6 +37,20 @@ struct GeoMetadata
             return x == rhs.x && y == rhs.y;
         }
 
+        CellSize& operator*=(double factor) noexcept
+        {
+            x *= factor;
+            y *= factor;
+            return *this;
+        }
+
+        CellSize& operator/=(double factor) noexcept
+        {
+            x /= factor;
+            y /= factor;
+            return *this;
+        }
+
         double x = std::numeric_limits<double>::quiet_NaN();
         double y = std::numeric_limits<double>::quiet_NaN();
     };
