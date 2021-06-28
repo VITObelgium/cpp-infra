@@ -18,12 +18,12 @@ GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, std::optional<double> nod
 }
 
 GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_, double cellsize_, std::optional<double> nodatavalue_)
-: GeoMetadata(rows_, cols_, xll_, yll_, CellSize(cellsize_, cellsize_), nodatavalue_)
+: GeoMetadata(rows_, cols_, xll_, yll_, CellSize(cellsize_, -cellsize_), nodatavalue_)
 {
 }
 
 GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_, double cellsize_, std::optional<double> nodatavalue_, std::string_view projection_)
-: GeoMetadata(rows_, cols_, xll_, yll_, CellSize(cellsize_, cellsize_), nodatavalue_, projection_)
+: GeoMetadata(rows_, cols_, xll_, yll_, CellSize(cellsize_, -cellsize_), nodatavalue_, projection_)
 {
 }
 
@@ -93,7 +93,7 @@ double GeoMetadata::convert_x_to_col_fraction(double x) const
 
 double GeoMetadata::convert_y_to_row_fraction(double y) const
 {
-    return rows - (y - yll) / std::abs(cellSize.y);
+    return (y - top_left().y) / cellSize.y;
 }
 
 int32_t GeoMetadata::convert_x_to_col(const double x) const

@@ -72,10 +72,15 @@ TEST_CASE("GeoMetadata")
         CHECK(meta.convert_col_ll_to_x(2) == 2.0);
         CHECK(meta.convert_row_ll_to_y(2) == -1.0);
 
+        CHECK(meta.convert_x_to_col_fraction(-1) == -1.0);
         CHECK(meta.convert_x_to_col_fraction(0) == 0.0);
-        CHECK(meta.convert_y_to_row_fraction(0) == 2.0);
         CHECK(meta.convert_x_to_col_fraction(2) == 2.0);
+        CHECK(meta.convert_x_to_col_fraction(3) == 3.0);
+
+        CHECK(meta.convert_y_to_row_fraction(-1) == 3.0);
+        CHECK(meta.convert_y_to_row_fraction(0) == 2.0);
         CHECK(meta.convert_y_to_row_fraction(2) == 0.0);
+        CHECK(meta.convert_y_to_row_fraction(3) == -1.0);
 
         CHECK(Point(0.0, 2.0) == meta.top_left());
         CHECK(Point(1.0, 1.0) == meta.center());
@@ -120,6 +125,33 @@ TEST_CASE("GeoMetadata")
         CHECK(Point(1.0, 3.0) == meta.top_left());
         CHECK(Point(2.0, 2.0) == meta.center());
         CHECK(Point(3.0, 1.0) == meta.bottom_right());
+    }
+
+    SUBCASE("intersect meta: epsg 4326")
+    {
+        const std::array<double, 6> trans{-30.000000763788108, 0.10000000169730690, 0.0, 29.999999619212282, 0.0, 0.049999998635984290};
+
+        GeoMetadata meta(840, 900);
+        gdal::fill_geometadata_from_geo_transform(meta, trans);
+
+        CHECK(meta.convert_col_centre_to_x(0) == Approx(trans[0] + (trans[1] / 2)));
+        CHECK(meta.convert_row_centre_to_y(0) == Approx(trans[3] + (trans[5] / 2)));
+
+        const auto col0X = meta.convert_col_centre_to_x(0);
+        const auto row0Y = meta.convert_row_centre_to_y(0);
+
+        CHECK(meta.convert_x_to_col(col0X) == 0);
+        CHECK(meta.convert_y_to_row(row0Y) == 0);
+
+        const auto cutout = gdal::io::detail::intersect_metadata(meta, meta);
+        CHECK(cutout.cols == 900);
+        CHECK(cutout.rows == 840);
+
+        CHECK(cutout.srcColOffset == 0);
+        CHECK(cutout.dstColOffset == 0);
+
+        CHECK(cutout.srcRowOffset == 0);
+        CHECK(cutout.dstRowOffset == 0);
     }
 }
 
