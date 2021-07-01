@@ -556,6 +556,7 @@ public:
     int field_index(const char* name) const;
     int field_index(const std::string& name) const;
     void set_spatial_filter(Point<double> point);
+    void set_spatial_filter(Point<double> topLeft, Point<double> bottomRight);
     void set_spatial_filter(Geometry& geometry);
     void clear_spatial_filter();
 

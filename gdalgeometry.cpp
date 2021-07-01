@@ -1084,6 +1084,11 @@ void Layer::set_spatial_filter(Point<double> point)
     _layer->SetSpatialFilter(&p);
 }
 
+void Layer::set_spatial_filter(Point<double> topLeft, Point<double> bottomRight)
+{
+    _layer->SetSpatialFilterRect(topLeft.x, bottomRight.y, bottomRight.x, topLeft.y);
+}
+
 void Layer::set_spatial_filter(Geometry& geometry)
 {
     _layer->SetSpatialFilter(geometry.get());

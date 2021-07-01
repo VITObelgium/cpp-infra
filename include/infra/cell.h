@@ -10,7 +10,7 @@ namespace inf {
 // Represents a point in the raster using r,c coordinates
 struct Cell
 {
-    constexpr Cell() = default;
+    constexpr Cell() noexcept = default;
     constexpr Cell(int32_t row, int32_t col)
     : r(row)
     , c(col)
