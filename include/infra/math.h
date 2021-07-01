@@ -7,10 +7,18 @@
 #include <limits>
 #include <numeric>
 #include <vector>
+#include <type_traits>
 
 namespace inf::math {
 
 static inline constexpr double pi = 3.14159265358979323846;
+
+template <typename T>
+constexpr T nan()
+{
+    static_assert(std::is_floating_point_v<T>, "nan should be called on floating point type");
+    return std::numeric_limits<T>::quiet_NaN();
+}
 
 template <typename T>
 constexpr T rad_to_deg(T rad)

@@ -43,6 +43,11 @@ GeoMetadata::GeoMetadata(int32_t rows_, int32_t cols_, double xll_, double yll_,
 {
 }
 
+bool GeoMetadata::is_north_up() const noexcept
+{
+    return cellSize.y < 0;
+}
+
 void GeoMetadata::set_cell_size(double size) noexcept
 {
     cellSize.x = size;
@@ -131,6 +136,11 @@ double GeoMetadata::convert_row_ll_to_y(const int32_t row) const
     return yll - ((rows - 1 - row) * cellSize.y);
 }
 
+Point<double> GeoMetadata::convert_cell_ll_to_xy(const Cell& cell) const
+{
+    return Point<double>(convert_col_ll_to_x(cell.c), convert_row_ll_to_y(cell.r));
+}
+
 Cell GeoMetadata::convert_xy_to_cell(const double x, const double y) const
 {
     return Cell(convert_y_to_row(y), convert_x_to_col(x));
@@ -183,6 +193,16 @@ Rect<double> GeoMetadata::bounding_box() const noexcept
     auto width         = cellSize.x * cols;
     result.topLeft     = Point<double>(xll, yll - (cellSize.y * rows));
     result.bottomRight = Point<double>(result.topLeft.x + width, yll);
+    return result;
+}
+
+Rect<double> GeoMetadata::bounding_box(const Cell& cell) const noexcept
+{
+    Point<double> ll = convert_cell_ll_to_xy(cell);
+
+    Rect<double> result;
+    result.topLeft     = Point(ll.x, ll.y - cellSize.y);
+    result.bottomRight = Point(result.topLeft.x + cellSize.x, ll.y);
     return result;
 }
 

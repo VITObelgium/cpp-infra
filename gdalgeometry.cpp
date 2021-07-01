@@ -12,6 +12,83 @@ namespace inf::gdal {
 
 using namespace std::string_literals;
 
+static int throw_if_not_supported(int result)
+{
+    if (result == CPLE_NotSupported) {
+        throw RuntimeError("Operation not supported");
+    }
+
+    return result;
+}
+
+Envelope::Envelope(double minX, double maxX, double minY, double maxY) noexcept
+{
+    _envelope.MinX = minX;
+    _envelope.MinY = minY;
+    _envelope.MaxX = maxX;
+    _envelope.MaxY = maxY;
+}
+
+Envelope::Envelope(Point<int64_t> topleft, Point<int64_t> bottomRight) noexcept
+: Envelope(double(topleft.x), double(bottomRight.x), double(bottomRight.y), double(topleft.y))
+{
+}
+
+Envelope::Envelope(Point<double> topleft, Point<double> bottomRight) noexcept
+: Envelope(topleft.x, bottomRight.x, bottomRight.y, topleft.y)
+{
+}
+
+OGREnvelope* Envelope::get() noexcept
+{
+    return &_envelope;
+}
+
+const OGREnvelope* Envelope::get() const noexcept
+{
+    return &_envelope;
+}
+
+Envelope::operator bool() const noexcept
+{
+    return _envelope.IsInit() != 0;
+}
+
+void Envelope::merge(const Envelope& other) noexcept
+{
+    _envelope.Merge(*other.get());
+}
+
+void Envelope::merge(double x, double y) noexcept
+{
+    _envelope.Merge(x, y);
+}
+
+void Envelope::intersect(const Envelope& other) noexcept
+{
+    _envelope.Intersect(*other.get());
+}
+
+bool Envelope::intersects(const Envelope& other) const noexcept
+{
+    return _envelope.Intersects(*other.get()) != 0;
+}
+
+bool Envelope::contains(const Envelope& other) const noexcept
+{
+    return _envelope.Contains(*other.get()) != 0;
+}
+
+Point<double> Envelope::top_left() const noexcept
+{
+    return Point<double>(_envelope.MinX, _envelope.MaxY);
+}
+
+Point<double> Envelope::bottom_right() const noexcept
+{
+    return Point<double>(_envelope.MaxX, _envelope.MinY);
+}
+
 static Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
 {
     switch (wkbFlatten(type)) {
@@ -75,6 +152,20 @@ void Geometry::clear()
     _geometry->empty();
 }
 
+bool Geometry::is_valid() const noexcept
+{
+    return _geometry->IsValid() == TRUE;
+}
+
+Owner<Geometry> Geometry::make_valid() const
+{
+#if GDAL_VERSION_MAJOR >= 3
+    return _geometry->MakeValid();
+#endif
+
+    throw RuntimeError("make_valid requires gdal 3 or newer");
+}
+
 bool Geometry::is_simple() const
 {
     return _geometry->IsSimple();
@@ -126,6 +217,26 @@ bool Geometry::intersects(const Geometry& geom) const
     return _geometry->Intersects(geom.get());
 }
 
+bool Geometry::contains(const Geometry& geom) const
+{
+    return throw_if_not_supported(_geometry->Contains(geom.get())) == TRUE;
+}
+
+bool Geometry::overlaps(const Geometry& geom) const
+{
+    return throw_if_not_supported(_geometry->Overlaps(geom.get()) == TRUE);
+}
+
+bool Geometry::within(const Geometry& geom) const
+{
+    return throw_if_not_supported(_geometry->Within(geom.get()) == TRUE);
+}
+
+bool Geometry::crosses(const Geometry& geom) const
+{
+    return throw_if_not_supported(_geometry->Crosses(geom.get()) == TRUE);
+}
+
 std::optional<double> Geometry::area() const
 {
     if (auto* surface = _geometry->toSurface(); surface != nullptr) {
@@ -164,6 +275,25 @@ double Geometry::distance(const Point<double>& point) const
 double Geometry::distance(const Geometry& other) const
 {
     return _geometry->Distance(other.get());
+}
+
+std::string Geometry::to_json() const
+{
+    std::string result;
+
+    CplPointer<char> json(_geometry->exportToJson());
+    if (json) {
+        result.assign(json);
+    }
+
+    return result;
+}
+
+Envelope Geometry::envelope() const
+{
+    Envelope env;
+    _geometry->getEnvelope(env.get());
+    return env;
 }
 
 template <typename WrappedType>
@@ -360,22 +490,28 @@ LinearRing::LinearRing(OGRLinearRing* ring)
 {
 }
 
+bool LinearRing::is_clockwise() const
+{
+    //assert(wkbFlatten(get()->getGeometryType()) == wkbLinearRing);
+    return get()->toLinearRing()->isClockwise() == TRUE;
+}
+
 Polygon::Polygon(OGRPolygon* poly)
 : GeometryPtr(poly)
 {
 }
 
-LinearRing Polygon::exteriorring()
+LinearRing Polygon::exterior_ring()
 {
     return LinearRing(get()->getExteriorRing());
 }
 
-LinearRing Polygon::interiorring(int index)
+LinearRing Polygon::interior_ring(int index)
 {
     return LinearRing(get()->getInteriorRing(index));
 }
 
-int Polygon::interiorring_count()
+int Polygon::interior_ring_count()
 {
     return get()->getNumInteriorRings();
 }

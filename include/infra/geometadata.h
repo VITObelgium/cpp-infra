@@ -65,6 +65,8 @@ struct GeoMetadata
     GeoMetadata(int32_t rows, int32_t cols, double xll, double yll, CellSize cellsize, std::optional<double> nodatavalue);
     GeoMetadata(int32_t rows, int32_t cols, double xll, double yll, CellSize cellsize, std::optional<double> nodatavalue, std::string_view projection);
 
+    bool is_north_up() const noexcept;
+
     void set_cell_size(double size) noexcept;
     double cell_size_x() const noexcept;
     double cell_size_y() const noexcept;
@@ -81,6 +83,7 @@ struct GeoMetadata
     Point<double> convert_cell_centre_to_xy(const Cell& cell) const;
     double convert_col_ll_to_x(int32_t col) const;
     double convert_row_ll_to_y(int32_t row) const;
+    Point<double> convert_cell_ll_to_xy(const Cell& cell) const;
     Cell convert_xy_to_cell(double x, double y) const;
     Cell convert_coordinate_to_cell(const Coordinate& coord) const;
 
@@ -90,6 +93,7 @@ struct GeoMetadata
     void compute_rect_on_map_around(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
 
     Rect<double> bounding_box() const noexcept;
+    Rect<double> bounding_box(const Cell& cell) const noexcept;
 
     template <typename T>
     Cell convert_point_to_cell(const Point<T> point) const

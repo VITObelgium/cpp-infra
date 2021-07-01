@@ -249,6 +249,7 @@ public:
     std::unordered_map<std::string, std::string> metadata(const std::string& domain = "");
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
     void set_band_metadata(int bandNr, const std::string& name, const std::string& value, const std::string& domain = "");
+    void set_band_description(int bandNr, const std::string& description);
     std::vector<std::string> metadata_domains() const noexcept;
 
     RasterBand rasterband(int index) const;

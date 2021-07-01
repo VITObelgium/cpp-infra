@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 
 #ifdef HAVE_GDAL
     inf::gdal::RegistrationConfig gdalCfg;
-    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path() / "data";
+    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path();
     inf::gdal::Registration reg(gdalCfg);
 
     CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");

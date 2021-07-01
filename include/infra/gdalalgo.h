@@ -23,6 +23,10 @@ enum class ResampleAlgorithm
     Median           = GRA_Med,              // Med (selects median of all non-NODATA contributing pixels)
     FirstQuantile    = GRA_Q1,               // Q1 (selects first quartile of all non-NODATA contributing pixels)
     ThirdQuantile    = GRA_Q3,               // Q3 (selects third quartile of all non-NODATA contributing pixels)
+#if GDAL_VERSION_NUM >= 3010000
+    Sum              = GRA_Sum,              // Weighted sum (weighed sum of all non-NODATA contributing pixels)
+    RootMeanSquare   = GRA_RMS,              // Root mean square (weighted root mean square (quadratic mean) of all non-NODATA contributing pixels) 
+#endif
 };
 
 struct WarpOptions

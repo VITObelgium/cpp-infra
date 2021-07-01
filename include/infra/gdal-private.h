@@ -132,4 +132,48 @@ T* check_pointer_msg_cb(T* instance, Callable&& msgCb)
 
     return instance;
 }
+
+template <typename T>
+class CplPointer
+{
+public:
+    CplPointer() = default;
+    CplPointer(T* ptr)
+    : _ptr(ptr)
+    {
+    }
+
+    ~CplPointer()
+    {
+        CPLFree(_ptr);
+    }
+
+    T** ptrAddress()
+    {
+        return &_ptr;
+    }
+
+    operator T*()
+    {
+        return _ptr;
+    }
+
+    T* get()
+    {
+        return _ptr;
+    }
+
+    const T* get() const
+    {
+        return _ptr;
+    }
+
+    operator bool() const noexcept
+    {
+        return _ptr != nullptr;
+    }
+
+private:
+    T* _ptr = nullptr;
+};
 }

@@ -25,50 +25,6 @@ using namespace std::string_literals;
 
 namespace {
 
-template <typename T>
-class CplPointer
-{
-public:
-    CplPointer() = default;
-    CplPointer(T* ptr)
-    : _ptr(ptr)
-    {
-    }
-
-    ~CplPointer()
-    {
-        CPLFree(_ptr);
-    }
-
-    T** ptrAddress()
-    {
-        return &_ptr;
-    }
-
-    operator T*()
-    {
-        return _ptr;
-    }
-
-    T* get()
-    {
-        return _ptr;
-    }
-
-    const T* get() const
-    {
-        return _ptr;
-    }
-
-    operator bool() const noexcept
-    {
-        return _ptr != nullptr;
-    }
-
-private:
-    T* _ptr = nullptr;
-};
-
 static const std::unordered_map<RasterType, const char*>
     s_rasterDriverLookup{{
         {RasterType::Memory, "MEM"},
@@ -454,8 +410,9 @@ void register_gdal(RegistrationConfig cfg)
 {
 #ifdef EMBED_GDAL_DATA
     create_embedded_data();
-    register_embedded_data(cfg.projdbPath);
 #endif
+    
+    register_embedded_data(cfg.projdbPath);
 
 #ifdef __EMSCRIPTEN__
     GDALRegister_MEM();
@@ -473,8 +430,9 @@ void register_gdal(RegistrationConfig cfg)
 
 void unregister_gdal()
 {
-#ifdef EMBED_GDAL_DATA
     unregister_embedded_data();
+
+#ifdef EMBED_GDAL_DATA
     destroy_embedded_data();
 #endif
 
@@ -967,6 +925,13 @@ void RasterDataSet::set_band_metadata(int bandNr, const std::string& name, const
     assert(bandNr > 0);
     auto* band = check_pointer(_ptr->GetRasterBand(bandNr), "Failed to get raster band");
     check_error(band->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set band metadata");
+}
+
+void RasterDataSet::set_band_description(int bandNr, const std::string& description)
+{
+    assert(bandNr > 0);
+    auto* band = check_pointer(_ptr->GetRasterBand(bandNr), "Failed to get raster band");
+    band->SetDescription(description.c_str());
 }
 
 std::vector<std::string> RasterDataSet::metadata_domains() const noexcept

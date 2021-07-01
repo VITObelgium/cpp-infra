@@ -80,6 +80,33 @@ private:
     bool _owned;
 };
 
+class Envelope
+{
+public:
+    Envelope() = default;
+    Envelope(double minX, double maxX, double minY, double maxY) noexcept;
+    Envelope(Point<int64_t> topleft, Point<int64_t> bottomRight) noexcept;
+    Envelope(Point<double> topleft, Point<double> bottomRight) noexcept;
+
+    OGREnvelope* get() noexcept;
+    const OGREnvelope* get() const noexcept;
+
+    explicit operator bool() const noexcept;
+
+    void merge(const Envelope& other) noexcept;
+    void merge(double x, double y) noexcept;
+    void intersect(const Envelope& other) noexcept;
+
+    bool intersects(const Envelope& other) const noexcept;
+    bool contains(const Envelope& other) const noexcept;
+
+    Point<double> top_left() const noexcept;
+    Point<double> bottom_right() const noexcept;
+
+private:
+    OGREnvelope _envelope;
+};
+
 class Geometry
 {
 public:
@@ -118,6 +145,9 @@ public:
     bool empty() const;
     void clear();
 
+    bool is_valid() const noexcept;
+    Owner<Geometry> make_valid() const;
+
     bool is_simple() const;
     Owner<Geometry> simplify(double tolerance) const;
     Owner<Geometry> simplify_preserve_topology(double tolerance) const;
@@ -131,12 +161,21 @@ public:
     bool intersects(const Point<double>& p) const;
     bool intersects(const Geometry& geom) const;
 
+    bool contains(const Geometry& geom) const;
+    bool overlaps(const Geometry& geom) const;
+    bool within(const Geometry& other) const;
+    bool crosses(const Geometry& other) const;
+
     std::optional<double> area() const;
     std::optional<Point<double>> centroid() const;
     std::optional<Coordinate> centroid_coordinate() const;
 
     double distance(const inf::Point<double>& other) const;
     double distance(const Geometry& other) const;
+
+    std::string to_json() const;
+
+    Envelope envelope() const;
 
 private:
     OGRGeometry* _geometry = nullptr;
@@ -243,6 +282,8 @@ class LinearRing : public Line
 {
 public:
     LinearRing(OGRLinearRing* ring);
+
+    bool is_clockwise() const;
 };
 
 class Polygon : public GeometryPtr<OGRPolygon>
@@ -250,9 +291,11 @@ class Polygon : public GeometryPtr<OGRPolygon>
 public:
     Polygon(OGRPolygon* poly);
 
-    LinearRing exteriorring();
-    LinearRing interiorring(int index);
-    int interiorring_count();
+    LinearRing exterior_ring();
+    LinearRing exterior_ring() const;
+    LinearRing interior_ring(int index);
+    LinearRing interior_ring(int index) const;
+    int interior_ring_count();
 
     GeometryPtr<OGRGeometry> linear_geometry();
     bool has_curve_geometry() const;
