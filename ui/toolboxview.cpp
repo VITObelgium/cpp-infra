@@ -64,6 +64,6 @@ void ToolboxView::onItemSelected()
 {
     auto* item = qobject_cast<ToolboxItem*>(sender());
     assert(item);
-    emit itemClicked(item->property("itemid").toInt());
+    Q_EMIT itemClicked(item->property("itemid").toInt());
 }
 }

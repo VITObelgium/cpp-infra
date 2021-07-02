@@ -23,7 +23,7 @@ public:
     void setSectionText(int sectionId, const QString& text);
     void setToolboxItemText(int itemId, const QString& text);
 
-signals:
+Q_SIGNALS:
     void itemClicked(int);
 
 private:

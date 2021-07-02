@@ -97,7 +97,7 @@ bool TreeModel::setData(const QModelIndex& index, const QVariant& value, int rol
 
     bool modified = static_cast<TreeNode*>(index.internalPointer())->setData(index.column(), value, role);
     if (modified) {
-        emit dataChanged(index, index, {role});
+        Q_EMIT dataChanged(index, index, {role});
     }
 
     return modified;

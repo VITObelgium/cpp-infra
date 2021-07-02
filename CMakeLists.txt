@@ -591,6 +591,8 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
+    target_compile_definitions(uiinfra PUBLIC QT_NO_KEYWORDS)
+
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
     endif ()

@@ -40,12 +40,11 @@ public:
     void setModelColumn(int colum);
     void setSourceModel(QAbstractItemModel* sourceModel) override;
 
-private slots:
+private:
     bool isDuplicate(int row) const;
     void buildMap();
     void sourceModelDataChanged(const QModelIndex& topLeft, const QModelIndex& bottomRight);
 
-private:
     bool _emptyValues;
     int _modelColumn;
     QMap<QString, QList<int>> _valueMap;

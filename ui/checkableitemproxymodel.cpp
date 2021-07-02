@@ -30,7 +30,7 @@ bool CheckableItemProxyModel::setData(const QModelIndex& index, const QVariant& 
 {
     if (role == Qt::CheckStateRole) {
         _checkStates[index] = value.value<Qt::CheckState>();
-        emit dataChanged(index, index, {Qt::CheckStateRole});
+        Q_EMIT dataChanged(index, index, {Qt::CheckStateRole});
         return true;
     }
 

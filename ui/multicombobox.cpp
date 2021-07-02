@@ -203,7 +203,7 @@ void MultiComboBox::scanItemSelect(QListWidgetItem* item)
         list[i]->setSelected(false);
     }
 
-    emit itemChanged();
+    Q_EMIT itemChanged();
 }
 
 void MultiComboBox::initStyleOption(QStyleOptionComboBox* option) const
