@@ -25,7 +25,7 @@ static void addLineToGeoPath(QGeoPath& path, const gdal::Line& line)
 
 static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& poly)
 {
-    auto ring = poly.exteriorring();
+    auto ring = poly.exterior_ring();
     {
         QGeoPath path;
         for (auto& point : ring) {
@@ -36,9 +36,9 @@ static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& pol
         }
     }
 
-    for (int i = 0; i < poly.interiorring_count(); ++i) {
+    for (int i = 0; i < poly.interior_ring_count(); ++i) {
         QGeoPath path;
-        ring = poly.interiorring(i);
+        ring = poly.interior_ring(i);
         for (auto& point : ring) {
             addPointToGeoPath(path, point);
         }
