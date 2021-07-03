@@ -4,11 +4,13 @@ set (INFRA_TESTUTIL_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/containerasserts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/printsupport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/reporter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/tempdir.h
 )
 
 add_library(infratestutil
     ${INFRA_TESTUTIL_PUBLIC_HEADERS}
      printsupport.cpp
+     tempdir.cpp
 )
 
 set_target_properties(infratestutil PROPERTIES
