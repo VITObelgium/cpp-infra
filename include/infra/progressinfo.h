@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <functional>
+#include <type_traits>
 
 namespace inf {
 
@@ -22,6 +23,13 @@ public:
     void set_payload(T payload)
     {
         _payload = std::move(payload);
+    }
+
+protected:
+    PayloadBase() = default;
+    PayloadBase(T payload)
+    : _payload(payload)
+    {
     }
 
 private:
@@ -51,6 +59,14 @@ public:
 
     ProgressStatus(int64_t current, int64_t total) noexcept
     : _current(current)
+    , _total(total)
+    {
+    }
+
+    template <typename TPayload, typename = typename std::enable_if<!std::is_void_v<TPayload>>>
+    ProgressStatus(int64_t current, int64_t total, TPayload payload) noexcept
+    : detail::PayloadBase<T>(payload)
+    , _current(current)
     , _total(total)
     {
     }
@@ -101,18 +117,18 @@ private:
     int64_t _total                = 0;
 };
 
+enum class ProgressStatusResult
+{
+    Continue,
+    Abort,
+};
+
 template <typename ProgressPayload = void>
 class ProgressTracker
 {
 public:
-    enum class StatusResult
-    {
-        Continue,
-        Abort,
-    };
-
     using Status   = ProgressStatus<ProgressPayload>;
-    using Callback = std::function<StatusResult(Status)>;
+    using Callback = std::function<ProgressStatusResult(Status)>;
 
     ProgressTracker() = default;
 
@@ -219,14 +235,14 @@ private:
     void signal_progress() noexcept
     {
         if (_cb) {
-            _cancel = _cb(_status) == StatusResult::Abort;
+            _cancel = _cb(_status) == ProgressStatusResult::Abort;
         }
     }
 
     void signal_progress(float progress) noexcept
     {
         if (_cb) {
-            _cancel = _cb(Status(truncate<int64_t>(progress * 100.f), 100)) == StatusResult::Abort;
+            _cancel = _cb(Status(truncate<int64_t>(progress * 100.f), 100)) == ProgressStatusResult::Abort;
         }
     }
 
