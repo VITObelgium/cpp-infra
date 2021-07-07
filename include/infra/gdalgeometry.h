@@ -2,6 +2,8 @@
 
 #include "infra/coordinate.h"
 #include "infra/exception.h"
+#include "infra/gdal-private.h"
+#include "infra/gdalspatialreference.h"
 #include "infra/point.h"
 #include "infra/progressinfo.h"
 #include "infra/rect.h"
@@ -28,7 +30,6 @@ using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
-class Layer;
 class SpatialReference;
 class CoordinateTransformer;
 

@@ -316,6 +316,7 @@ if (INFRA_GDAL)
         include/infra/gdalgeometry.h
         include/infra/gdalio.h
         include/infra/gdalcolortable.h
+        include/infra/gdalspatialreference.h
         include/infra/geocoder.h
         include/infra/geometadata.h
         include/infra/gdal-private.h
@@ -326,6 +327,8 @@ if (INFRA_GDAL)
         gdalalgo.cpp
         gdalgeometry.cpp
         gdalio.cpp
+        gdalspatialreference.cpp
+        gdal-private.cpp
         geocoder.cpp
         geometadata.cpp
     )

@@ -4,6 +4,8 @@
 #include <gdal_priv.h>
 #include <typeinfo>
 
+#include "infra/span.h"
+
 namespace inf::gdal {
 
 template <typename T>
@@ -110,6 +112,7 @@ inline const std::type_info& resolve_type(GDALDataType type)
 void throw_last_error(std::string_view msg);
 void check_error(CPLErr err, std::string_view msg);
 void check_error(OGRErr err, std::string_view msg);
+CPLStringList create_string_list(std::span<const std::string> driverOptions);
 
 template <typename T>
 T* check_pointer(T* instance, std::string_view msg)
