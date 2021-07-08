@@ -4,6 +4,7 @@
 #include "infra/point.h"
 
 #include <ogr_spatialref.h>
+#include <optional>
 #include <string>
 
 namespace inf::gdal {

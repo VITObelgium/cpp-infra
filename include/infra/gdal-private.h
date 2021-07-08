@@ -109,6 +109,7 @@ inline const std::type_info& resolve_type(GDALDataType type)
     }
 }
 
+int throw_if_not_supported(int result);
 void throw_last_error(std::string_view msg);
 void check_error(CPLErr err, std::string_view msg);
 void check_error(OGRErr err, std::string_view msg);
