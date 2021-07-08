@@ -33,8 +33,8 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
     warpOptions->pfnTransformer   = GDALGenImgProjTransform;
     warpOptions->eResampleAlg     = GDALResampleAlg(enum_value(options.resampleAlgo));
 
-    if (options.clipPolygon != nullptr) {
-        warpOptions->hCutline = options.clipPolygon->get()->clone();
+    if (options.clipPolygon.get() != nullptr) {
+        warpOptions->hCutline = options.clipPolygon.get()->clone();
     }
 
     if (options.clipBlendDistance.has_value()) {

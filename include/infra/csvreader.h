@@ -64,7 +64,7 @@ public:
     const CsvRow* operator->();
 
 private:
-    gdal::LayerIterator _iterator;
+    gdal::LayerIterator<gdal::Layer> _iterator;
     inf::CharacterSet _charset = CharacterSet::Unknown;
     CsvRow _currentRow;
 };

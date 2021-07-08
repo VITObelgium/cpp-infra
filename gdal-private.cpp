@@ -6,6 +6,15 @@ namespace inf::gdal {
 
 using namespace inf;
 
+int throw_if_not_supported(int result)
+{
+    if (result == CPLE_NotSupported) {
+        throw RuntimeError("Operation not supported");
+    }
+
+    return result;
+}
+
 void throw_last_error(std::string_view msg)
 {
     auto* errorMsg = CPLGetLastErrorMsg();

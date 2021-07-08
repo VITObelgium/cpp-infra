@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/conversion.h"
 #include "infra/coordinate.h"
 #include "infra/exception.h"
 #include "infra/gdal-private.h"
@@ -12,9 +13,11 @@
 #include <gdal_priv.h>
 #include <ogr_feature.h>
 #include <ogr_spatialref.h>
+#include <ogrsf_frmts.h>
 
 #include <date/date.h>
 #include <optional>
+#include <type_traits>
 #include <variant>
 
 class OGRSimpleCurve;
@@ -30,15 +33,27 @@ using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
-class SpatialReference;
-class CoordinateTransformer;
+namespace Geometry {
+enum class Type
+{
+    Point,
+    Collection,
+    Line,
+    MultiLine,
+    Polygon,
+    MultiPolygon,
+    LinearRing,
+    Unknown
+};
+}
+
+Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type);
 
 template <typename GeometryType>
 class Owner : public GeometryType
 {
 public:
-    template <typename OgrType>
-    Owner(OgrType* ptr)
+    Owner(typename GeometryType::wrapped_type* ptr)
     : GeometryType(ptr)
     , _owned(true)
     {
@@ -108,213 +123,622 @@ private:
     OGREnvelope _envelope;
 };
 
-class Geometry
+template <typename TWrapped>
+class GeometryWrapper
 {
 public:
-    enum class Type
+    using wrapped_type = TWrapped;
+    using bare_type    = std::remove_cv_t<wrapped_type>;
+
+    static_assert(std::is_base_of_v<OGRGeometry, bare_type>, "Geometry wrapper should be used with types derived from OGRGeometry");
+
+    GeometryWrapper(TWrapped* instance)
+    : _geometry(instance)
     {
-        Point,
-        Collection,
-        Line,
-        MultiLine,
-        Polygon,
-        MultiPolygon,
-        Unknown
-    };
+    }
 
-    Geometry(OGRGeometry* instance);
+    template <typename TWrapper, typename = std::enable_if_t<std::is_base_of_v<OGRGeometry, std::remove_cv_t<typename TWrapper::wrapped_type>>>>
+    GeometryWrapper(const Owner<TWrapper>& other)
+    : _geometry(other.get())
+    {
+    }
 
-    OGRGeometry* get() noexcept;
-    const OGRGeometry* get() const noexcept;
+    template <typename T, typename = std::enable_if_t<std::is_const_v<TWrapped> && !std::is_const_v<T>>>
+    GeometryWrapper(GeometryWrapper<T> other)
+    : _geometry(other.get())
+    {
+    }
 
-    explicit operator bool() const noexcept;
+    template <typename T>
+    GeometryWrapper& operator=(const Owner<GeometryWrapper<T>>& other)
+    {
+        _geometry = other.get();
+        return *this;
+    }
 
-    Type type() const;
-    std::string_view type_name() const;
+    TWrapped* get() noexcept
+    {
+        return _geometry;
+    }
+
+    std::add_const_t<TWrapped*> get() const noexcept
+    {
+        return _geometry;
+    }
+
+    explicit operator bool() const noexcept
+    {
+        return _geometry != nullptr;
+    }
+
+    Geometry::Type type() const
+    {
+        return geometry_type_from_gdal(_geometry->getGeometryType());
+    }
+
+    std::string_view type_name() const
+    {
+        return _geometry->getGeometryName();
+    }
 
     // The returned type does not have ownership of the geometry
     // the geometry instance has to stay alive
     template <typename T>
-    T as() const
+    T as()
     {
+        static_assert(!(std::is_const_v<wrapped_type> && !std::is_const_v<typename T::wrapped_type>), "Attempt to cast away geometry wrapper constness (use CRef type instead)");
+
         assert(_geometry);
-        return T(dynamic_cast<typename T::WrappedType*>(_geometry));
+        return T(dynamic_cast<typename T::wrapped_type*>(_geometry));
     }
 
-    Owner<Geometry> clone() const;
+    Owner<GeometryWrapper<bare_type>> clone()
+    {
+        return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(_geometry->clone()));
+    }
 
-    bool empty() const;
-    void clear();
+    template <bool is_const = std::is_const_v<wrapped_type>>
+    std::enable_if_t<!is_const, void> clear()
+    {
+        _geometry->empty();
+    }
 
-    bool is_valid() const noexcept;
-    Owner<Geometry> make_valid() const;
+    bool is_valid() const noexcept
+    {
+        return _geometry->IsValid() == TRUE;
+    }
 
-    bool is_simple() const;
-    Owner<Geometry> simplify(double tolerance) const;
-    Owner<Geometry> simplify_preserve_topology(double tolerance) const;
+    Owner<GeometryWrapper<TWrapped>> make_valid()
+    {
+#if GDAL_VERSION_MAJOR >= 3
+        return _geometry->MakeValid();
+#endif
 
-    void transform(CoordinateTransformer& transformer);
-    void transform_to(SpatialReference& srs);
-    [[nodiscard]] Owner<Geometry> buffer(double distance) const;
-    [[nodiscard]] Owner<Geometry> buffer(double distance, int numQuadSegments) const;
+        throw RuntimeError("make_valid requires gdal 3 or newer");
+    }
 
-    Owner<Geometry> intersection(const Geometry& other) const;
-    bool intersects(const Point<double>& p) const;
-    bool intersects(const Geometry& geom) const;
+    bool is_simple() const
+    {
+        return _geometry->IsSimple();
+    }
 
-    bool contains(const Geometry& geom) const;
-    bool overlaps(const Geometry& geom) const;
-    bool within(const Geometry& other) const;
-    bool crosses(const Geometry& other) const;
+    [[nodiscard]] Owner<GeometryWrapper<bare_type>> simplify(double tolerance) const
+    {
+        return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(check_pointer(_geometry->Simplify(tolerance), "Failed to simplify geometry")));
+    }
 
-    std::optional<double> area() const;
-    std::optional<Point<double>> centroid() const;
-    std::optional<Coordinate> centroid_coordinate() const;
+    [[nodiscard]] Owner<GeometryWrapper<bare_type>> simplify_preserve_topology(double tolerance) const
+    {
+        return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(check_pointer(_geometry->Simplify(tolerance), "Failed to simplify geometry preserving topology")));
+    }
 
-    double distance(const inf::Point<double>& other) const;
-    double distance(const Geometry& other) const;
+    template <bool is_const = std::is_const_v<wrapped_type>>
+    std::enable_if_t<!is_const, void> transform(CoordinateTransformer& transformer)
+    {
+        check_error(_geometry->transform(transformer.get()), "Failed to transform geometry");
+    }
 
-    std::string to_json() const;
+    template <bool is_const = std::is_const_v<wrapped_type>>
+    std::enable_if_t<!is_const, void> transform_to(SpatialReference& srs)
+    {
+        check_error(_geometry->transformTo(srs.get()), "Failed to transform geometry");
+    }
 
-    Envelope envelope() const;
+    [[nodiscard]] Owner<GeometryWrapper<bare_type>> buffer(double distance) const
+    {
+        return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(check_pointer(_geometry->Buffer(distance), "Failed to buffer geometry")));
+    }
+
+    [[nodiscard]] Owner<GeometryWrapper<bare_type>> buffer(double distance, int numQuadSegments) const
+    {
+        return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(check_pointer(_geometry->Buffer(distance, numQuadSegments), "Failed to buffer geometry")));
+    }
+
+    [[nodiscard]] Owner<GeometryWrapper<bare_type>> intersection(GeometryWrapper<const bare_type> other) const
+    {
+        return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(check_pointer(_geometry->Intersection(other.get()), "Failed to get geometry intersection")));
+    }
+
+    bool intersects(const Point<double>& point) const
+    {
+        OGRPoint p(point.x, point.y);
+        return _geometry->Intersects(&p);
+    }
+
+    bool intersects(GeometryWrapper<const bare_type> geom) const
+    {
+        return _geometry->Intersects(geom.get());
+    }
+
+    bool contains(const Point<double>& point) const
+    {
+        OGRPoint p(point.x, point.y);
+        return throw_if_not_supported(_geometry->Contains(&p)) == TRUE;
+    }
+
+    bool contains(GeometryWrapper<const bare_type> geom) const
+    {
+        return throw_if_not_supported(_geometry->Contains(geom.get())) == TRUE;
+    }
+
+    bool overlaps(GeometryWrapper<const bare_type> geom) const
+    {
+        return throw_if_not_supported(_geometry->Overlaps(geom.get()) == TRUE);
+    }
+
+    bool within(GeometryWrapper<const bare_type> geom) const
+    {
+        return throw_if_not_supported(_geometry->Within(geom.get()) == TRUE);
+    }
+
+    bool crosses(GeometryWrapper<const bare_type> geom) const
+    {
+        return throw_if_not_supported(_geometry->Crosses(geom.get()) == TRUE);
+    }
+
+    std::optional<double> area() const
+    {
+        if (auto* surface = _geometry->toSurface(); surface != nullptr) {
+            return surface->get_Area();
+        }
+
+        return {};
+    }
+
+    std::optional<Point<double>> centroid() const
+    {
+        std::optional<Point<double>> result;
+        OGRPoint point;
+        if (_geometry->Centroid(&point) == OGRERR_NONE) {
+            result = Point<double>(point.getX(), point.getY());
+        }
+
+        return result;
+    }
+
+    std::optional<Coordinate> centroid_coordinate() const
+    {
+        if (auto point = centroid(); point.has_value()) {
+            return to_coordinate(*point);
+        }
+
+        return {};
+    }
+
+    double distance(const inf::Point<double>& point) const
+    {
+        OGRPoint p(point.x, point.y);
+        return _geometry->Distance(&p);
+    }
+
+    double distance(GeometryWrapper<const bare_type> other) const
+    {
+        return _geometry->Distance(other.get());
+    }
+
+    std::string to_json() const
+    {
+        std::string result;
+
+        CplPointer<char> json(_geometry->exportToJson());
+        if (json) {
+            result.assign(json);
+        }
+
+        return result;
+    }
+
+    Envelope envelope() const
+    {
+        Envelope env;
+        _geometry->getEnvelope(env.get());
+        return env;
+    }
 
 private:
-    OGRGeometry* _geometry = nullptr;
+    wrapped_type* _geometry = nullptr;
 };
 
-template <typename OGRType>
-class GeometryPtr : public Geometry
+using GeometryRef  = GeometryWrapper<OGRGeometry>;
+using GeometryCRef = GeometryWrapper<const OGRGeometry>;
+
+template <typename WrappedType, typename WrappedCollectionType>
+class GeometryCollectionWrapper : public GeometryWrapper<WrappedType>
 {
 public:
-    using WrappedType = OGRType;
-
-    OGRType* get() noexcept
-    {
-        return static_cast<OGRType*>(Geometry::get());
-    }
-
-    const OGRType* get() const noexcept
-    {
-        return static_cast<const OGRType*>(Geometry::get());
-    }
-
-    GeometryPtr(OGRType* instance)
-    : Geometry(instance)
+    GeometryCollectionWrapper(WrappedType* collection)
+    : GeometryWrapper<WrappedType>(collection)
     {
     }
+
+    void add_geometry(GeometryWrapper<WrappedCollectionType> geometry)
+    {
+        // clones the geometry
+        this->get()->addGeometry(geometry.get());
+    }
+
+    void add_geometry(Owner<GeometryWrapper<WrappedCollectionType>> geometry)
+    {
+        // transfers ownership of the geometry to the collections
+        this->get()->addGeometryDirectly(geometry.release());
+    }
+
+    int size() const
+    {
+        return this->get()->getNumGeometries();
+    }
+
+    GeometryWrapper<WrappedCollectionType> geometry(int index)
+    {
+        if constexpr (std::is_const_v<WrappedType>) {
+            return GeometryWrapper<WrappedCollectionType>(static_cast<WrappedCollectionType*>(check_pointer(std::as_const(*this).get()->getGeometryRef(index), "No geometry present")));
+        } else {
+            return GeometryWrapper<WrappedCollectionType>(static_cast<WrappedCollectionType*>(check_pointer(this->get()->getGeometryRef(index), "No geometry present")));
+        }
+    }
 };
 
-template <typename WrappedType>
-class GeometryCollectionWrapper : public GeometryPtr<WrappedType>
+using GeometryCollectionRef  = GeometryCollectionWrapper<OGRGeometryCollection, OGRGeometry>;
+using GeometryCollectionCRef = GeometryCollectionWrapper<const OGRGeometryCollection, const OGRGeometry>;
+
+template <typename TWrapped>
+class LineWrapper : public GeometryWrapper<TWrapped>
 {
 public:
-    GeometryCollectionWrapper(WrappedType* collection);
+    LineWrapper(TWrapped* curve)
+    : GeometryWrapper<TWrapped>(curve)
+    {
+    }
 
-    void add_geometry(const Geometry& geometry);
-    void add_geometry(Owner<Geometry> geometry);
+    template <typename T, typename = std::enable_if_t<std::is_const_v<TWrapped> && !std::is_const_v<T>>>
+    LineWrapper(const LineWrapper<T>& other)
+    : GeometryWrapper<TWrapped>(other.get())
+    {
+    }
 
-    int size() const;
-    Geometry geometry(int index);
+    int point_count() const
+    {
+        return this->get()->getNumPoints();
+    }
+
+    Point<double> point_at(int index) const
+    {
+        OGRPoint p;
+        this->get()->getPoint(index, &p);
+        return Point<double>(p.getX(), p.getY());
+    }
+
+    Point<double> startpoint()
+    {
+        OGRPoint point;
+        this->get()->StartPoint(&point);
+        return Point<double>(point.getX(), point.getY());
+    }
+
+    Point<double> endpoint()
+    {
+        OGRPoint point;
+        this->get()->EndPoint(&point);
+        return Point<double>(point.getX(), point.getY());
+    }
+
+    double length() const
+    {
+        return this->get()->get_Length();
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, void> add_point(double x, double y)
+    {
+        this->get()->addPoint(x, y);
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, void> add_point(Point<double> point)
+    {
+        this->get()->addPoint(point.x, point.y);
+    }
 };
 
-using GeometryCollection = GeometryCollectionWrapper<OGRGeometryCollection>;
+using LineRef  = LineWrapper<OGRSimpleCurve>;
+using LineCRef = LineWrapper<const OGRSimpleCurve>;
 
-class Line : public GeometryPtr<OGRSimpleCurve>
+template <typename TWrapped>
+class PointWrapper : public GeometryWrapper<TWrapped>
 {
 public:
-    Line(OGRSimpleCurve* curve);
+    using bare_type = std::remove_cv_t<TWrapped>;
 
-    int point_count() const;
-    Point<double> point_at(int index) const;
+    static Owner<PointWrapper<bare_type>> from_point(Point<double> p)
+    {
+        return Owner<PointWrapper<bare_type>>(new OGRPoint(p.x, p.y));
+    }
 
-    Point<double> startpoint();
-    Point<double> endpoint();
+    PointWrapper(TWrapped* point)
+    : GeometryWrapper<TWrapped>(point)
+    {
+    }
 
-    double length() const;
+    template <typename T, typename = std::enable_if_t<std::is_const_v<TWrapped> && !std::is_const_v<T>>>
+    PointWrapper(const GeometryWrapper<T>& other)
+    : GeometryWrapper<TWrapped>(other.get())
+    {
+    }
+
+    Point<double> point() const
+    {
+        return Point<double>(this->get()->getX(), this->get()->getY());
+    }
 };
 
-class PointGeometry : public GeometryPtr<OGRPoint>
-{
-public:
-    static Owner<PointGeometry> from_point(Point<double> p);
+using PointRef  = PointWrapper<OGRPoint>;
+using PointCRef = PointWrapper<const OGRPoint>;
 
-    PointGeometry(OGRPoint* point);
-
-    Point<double> point() const;
-};
-
+template <typename TLine>
 class LineIterator
 {
 public:
     LineIterator() = default;
-    LineIterator(const Line& line);
+    LineIterator(LineWrapper<TLine> line)
+    {
+        if (line) {
+            _iter = line.get()->getPointIterator();
+            next();
+        }
+    }
+
     LineIterator(const LineIterator&) = delete;
     LineIterator(LineIterator&&)      = default;
-    ~LineIterator();
+    ~LineIterator()
+    {
+        OGRPointIterator::destroy(_iter);
+    }
 
-    LineIterator& operator++();
-    LineIterator& operator=(LineIterator&& other);
-    bool operator==(const LineIterator& other) const;
-    bool operator!=(const LineIterator& other) const;
-    const Point<double>& operator*();
-    const Point<double>* operator->();
+    LineIterator& operator++()
+    {
+        next();
+        return *this;
+    }
+
+    LineIterator& operator=(LineIterator&& other)
+    {
+        if (this != &other) {
+            if (_iter) {
+                OGRPointIterator::destroy(_iter);
+            }
+
+            _iter       = std::move(other._iter);
+            other._iter = nullptr;
+        }
+
+        return *this;
+    }
+
+    bool operator==(const LineIterator& other) const
+    {
+        return _iter == other._iter;
+    }
+
+    bool operator!=(const LineIterator& other) const
+    {
+        return !(*this == other);
+    }
+
+    const Point<double>& operator*()
+    {
+        return _point;
+    }
+
+    const Point<double>* operator->()
+    {
+        return &_point;
+    }
 
 private:
-    void next();
+    void next()
+    {
+        OGRPoint p;
+        if (!_iter->getNextPoint(&p)) {
+            OGRPointIterator::destroy(_iter);
+            _iter = nullptr;
+        } else {
+            _point.x = p.getX();
+            _point.y = p.getY();
+        }
+    }
 
     OGRPointIterator* _iter = nullptr;
     Point<double> _point;
 };
 
-LineIterator begin(const Line& line);
-LineIterator begin(Line&& line);
-LineIterator end(const Line&);
-
-class MultiLine : public GeometryCollectionWrapper<OGRMultiLineString>
+template <typename T>
+LineIterator<T> begin(LineWrapper<T> line)
 {
-public:
-    MultiLine(OGRMultiLineString* multiLine);
-
-    Line line_at(int index);
-    double length() const;
-};
-
-class LinearRing : public Line
-{
-public:
-    LinearRing(OGRLinearRing* ring);
-
-    bool is_clockwise() const;
-};
-
-class Polygon : public GeometryPtr<OGRPolygon>
-{
-public:
-    Polygon(OGRPolygon* poly);
-
-    LinearRing exterior_ring();
-    LinearRing exterior_ring() const;
-    LinearRing interior_ring(int index);
-    LinearRing interior_ring(int index) const;
-    int interior_ring_count();
-
-    GeometryPtr<OGRGeometry> linear_geometry();
-    bool has_curve_geometry() const;
-};
-
-class MultiPolygon : public GeometryCollectionWrapper<OGRMultiPolygon>
-{
-public:
-    MultiPolygon(OGRMultiPolygon* multiPoly);
-
-    Polygon polygon_at(int index);
-};
-
-template <typename GeometryType>
-Owner<GeometryType> createGeometry()
-{
-    return Owner<GeometryType>(new typename GeometryType::WrappedType());
+    return LineIterator<T>(line);
 }
+
+template <typename T>
+LineIterator<T> end(LineWrapper<T>)
+{
+    return LineIterator<T>();
+}
+
+template <typename TWrapped, typename TWrappedInner>
+class MultiLineWrapper : public GeometryCollectionWrapper<TWrapped, TWrappedInner>
+{
+public:
+    MultiLineWrapper(TWrapped* multiLine)
+    : GeometryCollectionWrapper<TWrapped, TWrappedInner>(multiLine)
+    {
+        assert(multiLine);
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<is_const, LineCRef> line_at(int index)
+    {
+        return this->geometry(index).template as<LineCRef>();
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, LineRef> line_at(int index)
+    {
+        return this->geometry(index).template as<LineRef>();
+    }
+
+    double length() const
+    {
+        double length = 0.0;
+        for (int i = 0; i < this->size(); ++i) {
+            length += this->get()->getGeometryRef(i)->get_Length();
+        }
+
+        return length;
+    }
+};
+
+using MultiLineRef  = MultiLineWrapper<OGRMultiLineString, OGRLineString>;
+using MultiLineCRef = MultiLineWrapper<const OGRMultiLineString, const OGRLineString>;
+
+template <typename TWrapped>
+class LinearRingWrapper : public LineWrapper<TWrapped>
+{
+public:
+    LinearRingWrapper(TWrapped* ring)
+    : LineWrapper<TWrapped>(ring)
+    {
+    }
+
+    LinearRingWrapper(const Owner<LinearRingWrapper<std::remove_const_t<TWrapped>>>& ring)
+    : LineWrapper<TWrapped>(ring.get())
+    {
+    }
+
+    bool is_clockwise() const
+    {
+        return this->get()->isClockwise() == TRUE;
+    }
+};
+
+using LinearRingRef  = LinearRingWrapper<OGRLinearRing>;
+using LinearRingCRef = LinearRingWrapper<const OGRLinearRing>;
+
+template <typename TWrapped>
+class PolygonWrapper : public GeometryWrapper<TWrapped>
+{
+public:
+    PolygonWrapper()
+    : PolygonWrapper(nullptr)
+    {
+    }
+
+    PolygonWrapper(TWrapped* poly)
+    : GeometryWrapper<TWrapped>(poly)
+    {
+    }
+
+    template <typename T, typename = std::enable_if_t<std::is_const_v<TWrapped> && !std::is_const_v<T>>>
+    PolygonWrapper(const PolygonWrapper<T>& other)
+    : GeometryWrapper<TWrapped>(other.get())
+    {
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<is_const, LinearRingCRef> exterior_ring()
+    {
+        return this->get()->getExteriorRing();
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, LinearRingRef> exterior_ring()
+    {
+        return this->get()->getExteriorRing();
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<is_const, LinearRingCRef> interior_ring(int index)
+    {
+        return this->get()->getInteriorRing(index);
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, LinearRingRef> interior_ring(int index)
+    {
+        return this->get()->getInteriorRing(index);
+    }
+
+    int interior_ring_count()
+    {
+        return this->get()->getNumInteriorRings();
+    }
+
+    Owner<GeometryWrapper<OGRGeometry>> linear_geometry()
+    {
+        return Owner<GeometryWrapper<OGRGeometry>>(this->get()->getLinearGeometry());
+    }
+
+    bool has_curve_geometry() const
+    {
+        return this->get()->hasCurveGeometry();
+    }
+
+    void add_ring(LinearRingRef ring)
+    {
+        this->get()->addRing(ring.get());
+    }
+
+    void add_ring(Owner<LinearRingRef> ring)
+    {
+        this->get()->addRingDirectly(ring.release());
+    }
+};
+
+using PolygonRef  = PolygonWrapper<OGRPolygon>;
+using PolygonCRef = PolygonWrapper<const OGRPolygon>;
+
+template <typename TWrapped, typename TWrappedInner>
+class MultiPolygonWrapper : public GeometryCollectionWrapper<TWrapped, TWrappedInner>
+{
+public:
+    MultiPolygonWrapper(TWrapped* multiPoly)
+    : GeometryCollectionWrapper<TWrapped, TWrappedInner>(multiPoly)
+    {
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, PolygonRef> polygon_at(int index)
+    {
+        return this->geometry(index).template as<PolygonRef>();
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<is_const, PolygonCRef> polygon_at(int index)
+    {
+        return this->geometry(index).template as<PolygonCRef>();
+    }
+};
+
+using MultiPolygonRef  = MultiPolygonWrapper<OGRMultiPolygon, OGRPolygon>;
+using MultiPolygonCRef = MultiPolygonWrapper<const OGRMultiPolygon, const OGRPolygon>;
 
 using Field = std::variant<int32_t, int64_t, double, std::string_view, time_point>;
 
@@ -405,14 +829,19 @@ public:
     OGRFeature* get();
     const OGRFeature* get() const;
 
-    Geometry geometry();
-    Geometry geometry() const;
+    GeometryRef geometry();
+    GeometryCRef geometry() const;
     bool has_geometry() const noexcept;
-    void set_geometry(const Geometry& geom);
+    template <typename GeometryType>
+    void set_geometry(GeometryWrapper<GeometryType> geom)
+    {
+        check_error(_feature->SetGeometry(geom.get()), "Failed to set geometry");
+    }
 
     template <typename GeometryType>
     void set_geometry(Owner<GeometryType> geom)
     {
+        static_assert(!std::is_const_v<typename GeometryType::wrapped_type>, "Set geometry cannot be used with const geometry as it transfers ownership");
         get()->SetGeometryDirectly(geom.release());
     }
 
@@ -558,7 +987,7 @@ public:
     int field_index(const std::string& name) const;
     void set_spatial_filter(Point<double> point);
     void set_spatial_filter(Point<double> topLeft, Point<double> bottomRight);
-    void set_spatial_filter(Geometry& geometry);
+    void set_spatial_filter(GeometryRef geometry);
     void clear_spatial_filter();
 
     void set_attribute_filter(const char* name);
@@ -591,48 +1020,105 @@ private:
 
 // Iteration is not thread safe!
 // Do not iterate simultaneously from different threads.
+template <typename TLayer>
 class LayerIterator
 {
 public:
     using difference_type   = ptrdiff_t;
-    using value_type        = Feature;
+    using value_type        = std::conditional_t<std::is_const_v<TLayer>, const Feature, Feature>;
     using reference         = value_type&;
     using pointer           = value_type*;
     using iterator_category = std::forward_iterator_tag;
 
-    LayerIterator();
-    LayerIterator(Layer layer);
-    LayerIterator(const LayerIterator&) = delete;
-    LayerIterator(LayerIterator&&)      = default;
+    LayerIterator()
+    : _layer(nullptr)
+    , _currentFeature(nullptr)
+    {
+    }
 
-    LayerIterator& operator++();
-    LayerIterator& operator=(LayerIterator&& other);
-    bool operator==(const LayerIterator& other) const;
-    bool operator!=(const LayerIterator& other) const;
-    const Feature& operator*();
-    const Feature* operator->();
+    LayerIterator(Layer layer)
+    : _layer(std::move(layer))
+    , _currentFeature(nullptr)
+    {
+        _layer.get()->ResetReading();
+        next();
+    }
+
+    reference operator*()
+    {
+        return _currentFeature;
+    }
+
+    pointer operator->()
+    {
+        return &_currentFeature;
+    }
+
+    LayerIterator& operator++()
+    {
+        next();
+        return *this;
+    }
+
+    LayerIterator& operator=(LayerIterator&& other)
+    {
+        if (this != &other) {
+            _layer          = std::move(other._layer);
+            _currentFeature = std::move(other._currentFeature);
+        }
+
+        return *this;
+    }
+
+    bool operator==(const LayerIterator& other) const
+    {
+        return _currentFeature == other._currentFeature;
+    }
+
+    bool operator!=(const LayerIterator& other) const
+    {
+        return !(*this == other);
+    }
 
 private:
-    void next();
+    void next()
+    {
+        _currentFeature = Feature(_layer.get()->GetNextFeature());
+    }
 
     Layer _layer;
     Feature _currentFeature;
 };
 
 // support for range based for loops
-inline LayerIterator begin(Layer& layer)
+inline LayerIterator<Layer> begin(Layer& layer)
 {
-    return LayerIterator(layer);
+    return LayerIterator<Layer>(layer);
 }
 
-inline LayerIterator begin(Layer&& layer)
+inline LayerIterator<const Layer> begin(const Layer& layer)
 {
-    return LayerIterator(layer);
+    return LayerIterator<const Layer>(layer);
 }
 
-inline LayerIterator end(const inf::gdal::Layer& /*layer*/)
+inline LayerIterator<Layer> begin(Layer&& layer)
 {
-    return LayerIterator();
+    return LayerIterator<Layer>(layer);
+}
+
+inline LayerIterator<Layer> end(Layer& /*layer*/)
+{
+    return LayerIterator<Layer>();
+}
+
+inline LayerIterator<const Layer> end(const Layer& /*layer*/)
+{
+    return LayerIterator<const Layer>();
+}
+
+inline LayerIterator<Layer> end(Layer&& layer)
+{
+    return LayerIterator<Layer>(layer);
 }
 
 class FeatureIterator
@@ -710,5 +1196,115 @@ inline FeatureDefinitionIterator end(FeatureDefinition featDef)
     return FeatureDefinitionIterator(featDef.field_count());
 }
 
-MultiLine forceToMultiLine(Geometry& geom);
+MultiLineRef force_to_multiLine(GeometryRef geom);
+
+namespace Geometry {
+template <Type type>
+struct OGRTypeResolve
+{
+    using geometry_type = OGRGeometry;
+};
+
+template <>
+struct OGRTypeResolve<Type::Point>
+{
+    using geometry_type = OGRPoint;
+};
+
+template <>
+struct OGRTypeResolve<Type::Collection>
+{
+    using geometry_type = OGRGeometryCollection;
+};
+
+template <>
+struct OGRTypeResolve<Type::Line>
+{
+    using geometry_type = OGRLineString;
+};
+
+template <>
+struct OGRTypeResolve<Type::MultiLine>
+{
+    using geometry_type = OGRMultiLineString;
+};
+
+template <>
+struct OGRTypeResolve<Type::LinearRing>
+{
+    using geometry_type = OGRLinearRing;
+};
+
+template <>
+struct OGRTypeResolve<Type::Polygon>
+{
+    using geometry_type = OGRPolygon;
+};
+
+template <>
+struct OGRTypeResolve<Type::MultiPolygon>
+{
+    using geometry_type = OGRMultiPolygon;
+};
+
+template <Type type>
+struct WrapperTypeResolve
+{
+    using wrapper_type = GeometryRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::Point>
+{
+    using wrapper_type = PointRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::Collection>
+{
+    using wrapper_type = GeometryCollectionRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::Line>
+{
+    using wrapper_type = LineRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::MultiLine>
+{
+    using wrapper_type = MultiLineRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::LinearRing>
+{
+    using wrapper_type = LinearRingRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::Polygon>
+{
+    using wrapper_type = PolygonRef;
+};
+
+template <>
+struct WrapperTypeResolve<Type::MultiPolygon>
+{
+    using wrapper_type = MultiPolygonRef;
+};
+
+template <Type type>
+using ogr_geometry_type_t = typename OGRTypeResolve<type>::geometry_type;
+
+template <Type type>
+using wrapped_type_t = typename WrapperTypeResolve<type>::wrapper_type;
+
+template <Type type>
+Owner<wrapped_type_t<type>> create()
+{
+    return Owner<wrapped_type_t<type>>(new ogr_geometry_type_t<type>());
+}
+}
 }

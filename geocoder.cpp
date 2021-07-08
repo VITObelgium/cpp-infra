@@ -107,11 +107,11 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
         ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
 
         gdal::Layer layer(OGRLayer::FromHandle(layerHandle));
-        for (auto& feature : layer) {
+        for (const auto& feature : layer) {
             if (feature.has_geometry()) {
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
-                    return to_coordinate(geom.as<gdal::PointGeometry>().point());
+                    return to_coordinate(geom.as<gdal::PointCRef>().point());
                 } else if (!result.has_value()) {
                     result = geom.centroid_coordinate();
                 }
@@ -136,11 +136,11 @@ std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::stri
         ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
 
         gdal::Layer layer(OGRLayer::FromHandle(layerHandle));
-        for (auto& feature : layer) {
+        for (const auto& feature : layer) {
             if (feature.has_geometry()) {
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
-                    result.push_back(to_coordinate(geom.as<gdal::PointGeometry>().point()));
+                    result.push_back(to_coordinate(geom.as<gdal::PointCRef>().point()));
                 } else if (auto coord = geom.centroid_coordinate(); coord.has_value()) {
                     result.push_back(*coord);
                 }

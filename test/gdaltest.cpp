@@ -1,4 +1,5 @@
 ﻿#include "infra/gdal.h"
+#include "infra/conversion.h"
 #include "infra/crs.h"
 #include "infra/gdalio.h"
 
@@ -22,7 +23,7 @@ TEST_CASE("Gdal.iteratePoints")
         auto geometry = feature.geometry();
         CHECK(gdal::Geometry::Type::Point == geometry.type());
 
-        auto point = geometry.as<gdal::PointGeometry>();
+        auto point = geometry.as<gdal::PointCRef>();
         CHECK(Point<double>(index, index + 1) == point.point());
 
         index += 2;
@@ -108,12 +109,15 @@ TEST_CASE("Gdal.convertPointProjected")
 {
     // Check conversion of bottom left corner of flanders map
 
-    // 22000.000 153000.000 (x,y) lambert 72 EPSG:31370 should be converted to 2.55772472781224 50.6735631138308 (lat,long) EPSG:4326
+    // 22000.000 153000.000 (x,y) lambert 72 EPSG:31370 should be converted to 2.55772472781224 50.6735631138308 (long,lat) EPSG:4326
 
     // Bottom left coordinate
     auto point = gdal::convert_point_projected(crs::epsg::BelgianLambert72, crs::epsg::WGS84, Point<double>(22000.000, 153000.000));
     CHECK(2.55772472781224 == Approx(point.x).epsilon(1e-6));
     CHECK(50.6735631138308 == Approx(point.y).epsilon(1e-6));
+
+    CHECK(2.55772472781224 == Approx(to_coordinate(point).longitude).epsilon(1e-6));
+    CHECK(50.6735631138308 == Approx(to_coordinate(point).latitude).epsilon(1e-6));
 }
 
 TEST_CASE("Gdal.createExcelFile")
