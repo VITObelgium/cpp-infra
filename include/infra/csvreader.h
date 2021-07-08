@@ -53,8 +53,6 @@ class CsvRowIterator
 public:
     CsvRowIterator() = default;
     CsvRowIterator(gdal::Layer layer, inf::CharacterSet charSet);
-    CsvRowIterator(const CsvRowIterator&) = delete;
-    CsvRowIterator(CsvRowIterator&&)      = default;
 
     CsvRowIterator& operator++();
     CsvRowIterator& operator=(CsvRowIterator&& other);
