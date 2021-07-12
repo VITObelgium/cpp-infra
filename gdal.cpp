@@ -1,5 +1,6 @@
 #include "infra/gdal.h"
 #include "infra/cast.h"
+#include "infra/environmentvariable.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/gdallog.h"
@@ -180,6 +181,8 @@ void register_embedded_data(const fs::path& p)
         };
 
         OSRSetPROJSearchPaths(paths.data());
+#else
+        env::set("PROJ_LIB", p.u8string());
 #endif
     }
 }
