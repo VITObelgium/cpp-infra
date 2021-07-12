@@ -13,7 +13,7 @@ namespace inf::db {
 static void sqliteErrorLogCallback(void*, int errCode, const char* msg)
 {
 #ifdef INFRA_LOG_ENABLED
-    Log::warn("SQLite database warning ({}) {}", errCode, msg);
+    Log::debug("SQLite database warning ({}) {}", errCode, msg);
 #endif
 }
 
