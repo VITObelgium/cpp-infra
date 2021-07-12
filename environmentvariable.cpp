@@ -1,6 +1,7 @@
 #include "infra/environmentvariable.h"
 
 #include <stdlib.h>
+#include <string>
 
 namespace inf::env {
 
