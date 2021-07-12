@@ -136,6 +136,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/color.h
     include/infra/colormap.h
     include/infra/conversion.h
+    include/infra/environmentvariable.h
     include/infra/rect.h
     include/infra/size.h
     include/infra/span.h
@@ -153,6 +154,7 @@ add_library(infra
     cpuinfo.cpp
     csvwriter.cpp
     demangle.cpp
+    environmentvariable.cpp
     legend.cpp
     legenddataanalyser.cpp
     string.cpp
