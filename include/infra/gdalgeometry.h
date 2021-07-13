@@ -607,12 +607,7 @@ public:
 
     double length() const
     {
-        double length = 0.0;
-        for (int i = 0; i < this->size(); ++i) {
-            length += this->get()->getGeometryRef(i)->get_Length();
-        }
-
-        return length;
+        return this->get()->get_Length();
     }
 };
 
