@@ -23,7 +23,7 @@ public:
     SpatialReference(OGRSpatialReference* instance);
     ~SpatialReference() noexcept;
 
-    SpatialReference(SpatialReference&&);
+    SpatialReference(SpatialReference&&) noexcept;
 
     SpatialReference clone() const;
     SpatialReference clone_geo_cs() const;

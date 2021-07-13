@@ -11,6 +11,9 @@ using namespace std::string_literals;
 SpatialReference::SpatialReference()
 : _srs(new OGRSpatialReference())
 {
+#if GDAL_VERSION_MAJOR >= 3
+    _srs->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+#endif
 }
 
 SpatialReference::SpatialReference(int32_t epsg)
@@ -30,7 +33,7 @@ SpatialReference::SpatialReference(const std::string& wkt)
 {
 }
 
-SpatialReference::SpatialReference(SpatialReference&& other)
+SpatialReference::SpatialReference(SpatialReference&& other) noexcept
 : _srs(other._srs)
 {
     other._srs = nullptr;
@@ -40,6 +43,9 @@ SpatialReference::SpatialReference(OGRSpatialReference* instance)
 : _srs(instance)
 {
     _srs->Reference();
+#if GDAL_VERSION_MAJOR >= 3
+    _srs->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+#endif
 }
 
 SpatialReference::~SpatialReference() noexcept
