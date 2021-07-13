@@ -49,8 +49,12 @@ if (INFRA_COMPRESSION)
     target_sources(infratest PRIVATE
         compressiontest.cpp
     )
+endif ()
 
-    target_compile_definitions(infratest PRIVATE HAVE_GDAL)
+if (INFRA_HASHING)
+    target_sources(infratest PRIVATE
+        hashtest.cpp
+    )
 endif ()
 
 target_link_libraries(infratest

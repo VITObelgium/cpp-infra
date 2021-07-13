@@ -30,6 +30,10 @@ if (@INFRA_CHARSET@)
     find_dependency(ICU COMPONENTS i18n data uc REQUIRED)
 endif ()
 
+if (@INFRA_HASHING@)
+    find_dependency(cryptopp CONFIG REQUIRED)
+endif ()
+
 if (@INFRA_PROCESS@)
     find_dependency(reproc++ CONFIG REQUIRED)
 endif ()
