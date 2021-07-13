@@ -5,10 +5,6 @@
 #include <memory>
 #include <string_view>
 
-namespace indicators {
-class ProgressBar;
-}
-
 namespace inf {
 
 class ProgressBar
@@ -26,7 +22,8 @@ public:
     void done() noexcept;
 
 private:
-    std::unique_ptr<indicators::ProgressBar> _bar;
+    struct Pimpl;
+    std::unique_ptr<Pimpl> _pimpl;
 };
 
 }
