@@ -73,7 +73,7 @@ void ProgressBar::set_progress(float progress) noexcept
         }
     }
 
-    show_console_cursor(!_pimpl->bar->is_completed());
+    show_console_cursor(_pimpl->bar->is_completed());
 }
 
 void ProgressBar::set_postfix_text(std::string_view text)
