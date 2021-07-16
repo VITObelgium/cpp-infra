@@ -3,7 +3,6 @@
 #include <cassert>
 #include <qapplication.h>
 #include <qboxlayout.h>
-#include <qdesktopwidget.h>
 #include <qevent.h>
 #include <qlistwidget.h>
 #include <qstylepainter.h>

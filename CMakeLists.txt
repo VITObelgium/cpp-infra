@@ -414,10 +414,10 @@ set_target_properties(infra PROPERTIES
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
 
 if (INFRA_UI_COMPONENTS)
-    find_package(Qt5Gui REQUIRED)
-    find_package(Qt5Widgets REQUIRED)
-    find_package(Qt5Core REQUIRED)
-    find_package(Qt5Network REQUIRED)
+    find_package(Qt6 COMPONENTS Core Gui Widgets Network OpenGL)
+    if (NOT Qt6_FOUND)
+        find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network OpenGL REQUIRED)
+    endif ()
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -430,8 +430,6 @@ if (INFRA_UI_COMPONENTS)
     if (INFRA_LOGGING)
         list(APPEND INFRA_UI_FILES ui/logview.ui)
     endif ()
-
-    qt5_wrap_ui(FORMS_HEADERS ${INFRA_UI_FILES})
 
     set(UIINFRA_PUBLIC_HEADERS
         include/uiinfra/aboutdialog.h
@@ -494,32 +492,25 @@ if (INFRA_UI_COMPONENTS)
         ui/doublespinboxwithinfinites.cpp
         ui/toolboxitem.cpp
         ui/qt5.natvis
-        ${FORMS_HEADERS}
+        ${INFRA_UI_FILES}
     )
 
     add_library(Infra::uiinfra ALIAS uiinfra)
 
     target_link_libraries(uiinfra PUBLIC
-        Qt5::Network
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Core
+        Qt::Network
+        Qt::Gui
+        Qt::Widgets
+        Qt::Core
         date::date
     )
 
-    if (STATIC_QT AND WIN32 AND Qt5Network_VERSION VERSION_LESS 5.14.0)
-        get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
-        if ("ssl" IN_LIST QT_NETWORK_FEATURES)
-            message(STATUS "Qt network SSL enabled")
-            target_link_libraries(uiinfra PRIVATE Crypt32.lib)
-            if (Qt5Network_VERSION VERSION_GREATER_EQUAL 5.13.0)
-                target_link_libraries(uiinfra PRIVATE Bcrypt.lib Secur32.lib Iphlpapi.lib)
-            endif ()
-        endif ()
-    endif ()
-
     if (INFRA_UI_COMPONENTS_QML)
-        find_package(Qt5Quick CONFIG REQUIRED)
+        if (Qt6_FOUND)
+            find_package(Qt6 COMPONENTS Quick)
+        else ()
+            find_package(Qt5 5.15 COMPONENTS Quick REQUIRED)
+        endif ()
 
         target_sources(uiinfra PRIVATE
             ui/pixmapimage.cpp
@@ -532,18 +523,21 @@ if (INFRA_UI_COMPONENTS)
         )
 
         target_link_libraries(uiinfra PUBLIC
-            Qt5::Quick
+            Qt::Quick
         )
     endif ()
 
     if (INFRA_UI_COMPONENTS_LOCATION)
-        find_package(Qt5Location CONFIG REQUIRED)
+        if (Qt6_FOUND)
+            find_package(Qt6 COMPONENTS Location QuickCompiler)
+        else ()
+            find_package(Qt5 5.15 COMPONENTS Location QuickCompiler REQUIRED)
+        endif ()
     
         if (NOT INFRA_GDAL)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
         endif ()
 
-        find_package(Qt5QuickCompiler REQUIRED)
         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
 
         target_sources(uiinfra PRIVATE
@@ -563,7 +557,7 @@ if (INFRA_UI_COMPONENTS)
         )
 
         target_link_libraries(uiinfra PUBLIC
-            Qt5::Location
+            Qt::Location
         )
 
         if (INFRA_GDAL)
@@ -592,6 +586,8 @@ if (INFRA_UI_COMPONENTS)
     endif ()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
+    set_target_properties(uiinfra PROPERTIES AUTORCC ON)
+    set_target_properties(uiinfra PROPERTIES AUTOUIC ON)
     target_sources(uiinfra PRIVATE ${UIINFRA_PUBLIC_HEADERS})
     set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
 
