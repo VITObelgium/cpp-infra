@@ -113,6 +113,11 @@ public:
         }
     }
 
+    void reset()
+    {
+         _startTime = std::chrono::high_resolution_clock::now();
+    }
+
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> _startTime;
 };
