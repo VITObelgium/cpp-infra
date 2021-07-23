@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <optional>
 #include <stdexcept>
+#include <vector>
 
 namespace inf {
 
