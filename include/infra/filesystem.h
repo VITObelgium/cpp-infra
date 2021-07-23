@@ -3,6 +3,7 @@
 #include <fmt/core.h>
 #include <iosfwd>
 #include <string_view>
+#include <vector>
 
 #include <cassert>
 #ifdef HAVE_FILESYSTEM_H
