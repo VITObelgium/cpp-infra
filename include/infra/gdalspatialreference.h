@@ -3,9 +3,11 @@
 #include "infra/coordinate.h"
 #include "infra/point.h"
 
+#include <memory>
 #include <ogr_spatialref.h>
 #include <optional>
 #include <string>
+
 
 namespace inf::gdal {
 
