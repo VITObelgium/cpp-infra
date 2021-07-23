@@ -3,11 +3,13 @@
 #include "infra/cast.h"
 #include "infra/span.h"
 
+#include <algorithm>
 #include <cmath>
 #include <limits>
 #include <numeric>
-#include <vector>
 #include <type_traits>
+#include <vector>
+
 
 namespace inf::math {
 
