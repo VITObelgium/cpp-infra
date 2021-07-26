@@ -317,7 +317,7 @@ if (INFRA_GDAL)
     endif ()
 
     if ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND INFRA_EMBED_GDAL_DATA) 
-        message(FATAL_ERROR "Embedding gdal data is not supported for gdal versions >= 3")
+        message(WARNING "Embedding gdal data is not supported for gdal versions >= 3")
     endif ()
 
     list (APPEND INFRA_PUBLIC_HEADERS
