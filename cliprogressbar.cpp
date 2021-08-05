@@ -34,7 +34,7 @@ static std::unique_ptr<ProgressBarType> create_progress_bar(int width)
         option::BarWidth(width),
         option::Start("["),
         option::End("]"),
-        option::FontStyles(std::vector<FontStyle>{{FontStyle::bold}}));
+        option::FontStyles(std::vector<FontStyle>({FontStyle::bold})));
 
     if constexpr (std::is_same_v<ProgressBarType, indicators::ProgressBar>) {
         bar->set_option(option::Fill("■"));
