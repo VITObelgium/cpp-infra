@@ -448,6 +448,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/comboboxdelegate.h
         include/uiinfra/delegatecombobox.h
         include/uiinfra/readonlyproxy.h
+        include/uiinfra/legendmodel.h
         include/uiinfra/mdisubwindow.h
         include/uiinfra/gradientdelegate.h
         include/uiinfra/scopedcursor.h
@@ -477,6 +478,7 @@ if (INFRA_UI_COMPONENTS)
         ui/checkableitemproxymodel.cpp
         ui/comboboxdelegate.cpp
         ui/delegatecombobox.cpp
+        ui/legendmodel.cpp
         ui/mdisubwindow.cpp
         ui/gradientdelegate.cpp
         ui/toolboxview.cpp
@@ -543,7 +545,6 @@ if (INFRA_UI_COMPONENTS)
         target_sources(uiinfra PRIVATE
             ui/Legend.qml
             ui/polygonmodel.cpp
-            ui/legendmodel.cpp
             ui/maplegendmodel.cpp
             ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
@@ -551,7 +552,6 @@ if (INFRA_UI_COMPONENTS)
 
         list (APPEND UIINFRA_PUBLIC_HEADERS
             include/uiinfra/polygonmodel.h
-            include/uiinfra/legendmodel.h
             include/uiinfra/maplegendmodel.h
             include/uiinfra/rastervalueprovider.h
         )
