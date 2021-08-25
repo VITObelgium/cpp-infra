@@ -45,7 +45,13 @@ FloatingPointItemDelegate::FloatingPointItemDelegate(char format, int decimals, 
 
 QString FloatingPointItemDelegate::displayText(const QVariant& value, const QLocale& locale) const
 {
-    if (value.type() == QVariant::Double) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    const bool isDouble = value.type() == QVariant::Double;
+#else
+    const bool isDouble = value.metaType().id() == QMetaType::Double;
+#endif
+
+    if (isDouble) {
         return locale.toString(value.toDouble(), _format, _decimals);
     } else {
         return value.toString();
