@@ -258,7 +258,7 @@ static void assign_linear_class_bounds_no_outliers(int numClasses, double minVal
 std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClasses, double minValue, double maxValue)
 {
     if (minValue >= maxValue) {
-        throw InvalidArgument("Minimum class bound must be lower the maximum class bound ({} <-> {})", minValue, maxValue);
+        throw InvalidArgument("Minimum class bound must be lower than the maximum class bound ({} <-> {})", minValue, maxValue);
     }
 
     std::vector<double> classBounds(numClasses + 1);

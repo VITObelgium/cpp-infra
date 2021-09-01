@@ -167,12 +167,19 @@ Legend create_legend(std::vector<float> sampleData, int numberOfClasses, std::st
 
 void generate_bounds(double min, double max, LegendScaleType method, Legend& legend)
 {
-    auto bounds = inf::calculate_classbounds(method, legend.numberOfClasses, min, max);
-    assert(truncate<int>(bounds.size()) == legend.numberOfClasses + 1);
-    assert(truncate<int>(legend.entries.size()) == legend.numberOfClasses);
-    for (int i = 0; i < legend.numberOfClasses; ++i) {
-        legend.entries[i].lowerBound = bounds[i];
-        legend.entries[i].upperBound = bounds[i + 1];
+    if (min == max) {
+        for (int i = 0; i < legend.numberOfClasses; ++i) {
+            legend.entries[i].lowerBound = min;
+            legend.entries[i].upperBound = min;
+        }
+    } else {
+        auto bounds = inf::calculate_classbounds(method, legend.numberOfClasses, min, max);
+        assert(truncate<int>(bounds.size()) == legend.numberOfClasses + 1);
+        assert(truncate<int>(legend.entries.size()) == legend.numberOfClasses);
+        for (int i = 0; i < legend.numberOfClasses; ++i) {
+            legend.entries[i].lowerBound = bounds[i];
+            legend.entries[i].upperBound = bounds[i + 1];
+        }
     }
 }
 
