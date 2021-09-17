@@ -35,6 +35,15 @@ bool create_directory_if_not_exists(const fs::path& path)
     return fs::create_directories(path);
 }
 
+bool create_directory_for_file(const fs::path& path)
+{
+    if (path.has_parent_path()) {
+        return fs::create_directories(path.parent_path());
+    }
+
+    return true;
+}
+
 fs::path combine_absolute_with_relative_path(const fs::path& base, const fs::path& file)
 {
     assert(base.has_parent_path());
@@ -112,7 +121,7 @@ std::vector<uint8_t> read(const fs::path& filename)
 std::string read_as_text(const fs::path& filename)
 {
     std::ifstream fileStream(filename, std::ifstream::binary);
-    if (!fileStream.is_open()) { 
+    if (!fileStream.is_open()) {
         throw RuntimeError("Failed to open file for reading: {}", filename);
     }
 

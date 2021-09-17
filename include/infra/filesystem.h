@@ -30,6 +30,12 @@ namespace inf::file {
  */
 bool create_directory_if_not_exists(const fs::path& path);
 
+/*! Given a filename, make sure the directory exists
+ * /param path should specify a file path, not a directory
+ * /return true if the directory was created, false otherwise
+ */
+bool create_directory_for_file(const fs::path& path);
+
 /*!Create a full absolute path based on the base path and a relative file path
  * /param base the full path of a file on disk (not a directory)
  * /param file relative filepath that will be combined with the base
