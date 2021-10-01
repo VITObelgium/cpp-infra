@@ -10,6 +10,12 @@ constexpr auto enum_value(EnumType e)
     return static_cast<typename std::underlying_type_t<EnumType>>(e);
 }
 
+template <typename EnumType>
+using enum_type = std::underlying_type<EnumType>;
+
+template <typename EnumType>
+using enum_type_t = std::underlying_type_t<EnumType>;
+
 // Calling this function only makes sense for enums that use the convention
 // of adding a last enum field with the name EnumCount and where the other
 // enum fields do not explicitely set their value
