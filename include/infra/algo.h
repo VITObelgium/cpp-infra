@@ -4,7 +4,9 @@
 
 #include <algorithm>
 #include <optional>
+#include <set>
 #include <stdexcept>
+#include <unordered_set>
 #include <vector>
 
 namespace inf {
@@ -146,6 +148,18 @@ std::vector<typename MapType::mapped_type> map_values_as_vector(const MapType& m
     }
 
     return result;
+}
+
+template <typename TContainer, typename TVal = typename TContainer::value_type>
+std::set<TVal> container_as_set(const TContainer& cont)
+{
+    return std::set<TVal>(cont.begin(), cont.end());
+}
+
+template <typename TContainer, typename TVal = typename TContainer::value_type>
+std::unordered_set<TVal> container_as_unordered_set(const TContainer& cont)
+{
+    return std::set<TVal>(cont.begin(), cont.end());
 }
 
 /* Removes the constness of the iterator
