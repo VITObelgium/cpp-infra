@@ -633,6 +633,20 @@ int Layer::field_index(const std::string& name) const
     return field_index(name.c_str());
 }
 
+int Layer::required_field_index(const char* name) const
+{
+    if (auto index = _layer->FindFieldIndex(name, 1 /*exact match*/); index >= 0) {
+        return index;
+    }
+
+    throw RuntimeError("Layer does not contain field with name '{}'", name);
+}
+
+int Layer::required_field_index(const std::string& name) const
+{
+    return required_field_index(name.c_str());
+}
+
 void Layer::set_spatial_filter(Point<double> point)
 {
     OGRPoint p(point.x, point.y);
