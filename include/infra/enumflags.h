@@ -67,6 +67,11 @@ public:
         return _value == other._value;
     }
 
+    constexpr bool operator!=(Flags other) const noexcept
+    {
+        return !(*this == other);
+    }
+
     constexpr bool is_set(EnumType v) const noexcept
     {
         return (static_cast<value_type>(v) & _value) != 0;
