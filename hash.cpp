@@ -36,6 +36,11 @@ std::array<uint8_t, 16> md5(std::span<const uint8_t> data)
     return digest;
 }
 
+std::array<uint8_t, 16> md5(std::string_view stringData)
+{
+    return md5(std::span<const uint8_t>(reinterpret_cast<const uint8_t*>(stringData.data()), stringData.size()));
+}
+
 std::array<uint8_t, 16> md5(const fs::path& filePath)
 {
     std::array<uint8_t, 16> digest;
@@ -76,6 +81,11 @@ std::array<uint8_t, 64> sha512(const fs::path& filePath)
 std::string md5_string(const fs::path& filePath)
 {
     return hash_string(md5(filePath));
+}
+
+std::string md5_string(std::string_view stringData)
+{
+    return hash_string(md5(stringData));
 }
 
 std::string md5_string(std::span<const uint8_t> data)
