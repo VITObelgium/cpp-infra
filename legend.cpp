@@ -132,11 +132,13 @@ Legend create_categoric_legend(int64_t min, int64_t max, std::string_view cmapNa
 
     const float colorOffset = legend.numberOfClasses == 1 ? 0.f : 1.f / (legend.numberOfClasses - 1.f);
     float colorPos          = 0.f;
+    size_t entryIndex       = 0;
     for (int64_t i = min; i <= max; ++i) {
-        legend.entries[i].color      = legend.cmap.get_color(colorPos);
-        legend.entries[i].lowerBound = double(i);
-        legend.entries[i].upperBound = legend.entries[i].lowerBound;
+        legend.entries[entryIndex].color      = legend.cmap.get_color(colorPos);
+        legend.entries[entryIndex].lowerBound = double(i);
+        legend.entries[entryIndex].upperBound = legend.entries[entryIndex].lowerBound;
         colorPos += colorOffset;
+        ++entryIndex;
     }
 
     return legend;
@@ -216,8 +218,14 @@ void generate_colors(std::string_view cmapName, Legend& legend)
 
 void generate_legend_names(Legend& legend, int decimals, std::string_view unit)
 {
-    for (auto& entry : legend.entries) {
-        entry.name = fmt::format("{:.{}f} ... {:.{}f} {}", entry.lowerBound, decimals, entry.upperBound, decimals, unit);
+    if (legend.type == Legend::Type::Numeric) {
+        for (auto& entry : legend.entries) {
+            entry.name = fmt::format("{:.{}f} ... {:.{}f} {}", entry.lowerBound, decimals, entry.upperBound, decimals, unit);
+        }
+    } else {
+        for (auto& entry : legend.entries) {
+            entry.name = fmt::format("{:.{}f} {}", entry.lowerBound, decimals, unit);
+        }
     }
 }
 
