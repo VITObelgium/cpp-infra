@@ -8,17 +8,7 @@ namespace inf::ui {
 
 bool askForConfirmation(const QString& title, const QString& message)
 {
-    QMessageBox mb(title, message,
-        QMessageBox::Question,
-        QMessageBox::Yes | QMessageBox::Default,
-        QMessageBox::No | QMessageBox::Escape,
-        QMessageBox::NoButton);
-
-    // TODO: should not be necessary ig the proper qt localization files are loaded
-    if (QLocale::system().language() == QLocale(QLocale::Dutch).language()) {
-        mb.setButtonText(QMessageBox::Yes, "Ja");
-        mb.setButtonText(QMessageBox::No, "Nee");
-    }
+    QMessageBox mb(QMessageBox::Question, title, message, QMessageBox::Yes | QMessageBox::No);
 
     return mb.exec() == QMessageBox::Yes;
 }
@@ -38,13 +28,13 @@ QString askForString(QWidget* parent, const QString& title, const QString& name)
 
 void displayMessage(const QString& title, const QString& message, QWidget* parent)
 {
-    QMessageBox mb(title, message, QMessageBox::Information, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton, parent);
+    QMessageBox mb(QMessageBox::Information, title, message, QMessageBox::Ok, parent);
     mb.exec();
 }
 
 void displayError(const QString& title, const QString& message)
 {
-    QMessageBox mb(title, message, QMessageBox::Critical, QMessageBox::Ok, QMessageBox::NoButton, QMessageBox::NoButton);
+    QMessageBox mb(QMessageBox::Critical, title, message, QMessageBox::Ok);
     mb.exec();
 }
 }
