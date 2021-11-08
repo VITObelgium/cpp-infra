@@ -2,6 +2,7 @@
 #include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/legenddataanalyser.h"
+#include "infra/math.h"
 #include "infra/string.h"
 
 #include <cassert>
@@ -18,7 +19,7 @@ Color Legend::color_for_value(double value) const noexcept
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (std::floor(value) == entry.lowerBound) {
+            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
@@ -49,7 +50,7 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (std::floor(value) == entry.lowerBound) {
+            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
@@ -70,7 +71,7 @@ Color Legend::color_for_value(double value, const Color& unmappable, const Color
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (std::floor(value) == entry.lowerBound) {
+            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
