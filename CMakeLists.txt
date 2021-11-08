@@ -443,6 +443,7 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/dateconversion.h
         include/uiinfra/format.h
         include/uiinfra/multicombobox.h
+        include/uiinfra/noscrollspinbox.h
         include/uiinfra/checkablecombobox.h
         include/uiinfra/checkableitemproxymodel.h
         include/uiinfra/comboboxdelegate.h
