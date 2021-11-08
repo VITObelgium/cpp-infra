@@ -5,6 +5,7 @@ add_executable(infratest
     colortest.cpp
 	chronotest.cpp
     colormaptest.cpp
+    interpolatetest.cpp
     inireadertest.cpp
     filesystemtest.cpp
     mathtest.cpp
