@@ -130,7 +130,7 @@ std::string read_as_text(const fs::path& filename)
 
 fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar)
 {
-    std::string pathStr = filename.u8string();
+    auto pathStr = filename.u8string();
     str::replace_in_place(pathStr, ':', replacementChar);
     str::replace_in_place(pathStr, '?', replacementChar);
     str::replace_in_place(pathStr, '*', replacementChar);
