@@ -161,7 +161,7 @@ struct SerializerContext
         return _os << t;
     }
 
-    static std::string escape(std::string arg);
+    // static std::string escape(std::string arg);
 };
 
 //! sqlContents should contain ; seperated list of sql statements
