@@ -70,6 +70,24 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
     GDALDestroyWarpOptions(warpOptions);
 }
 
+VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta)
+{
+    auto [xMin, yMax] = destMeta.top_left();
+    auto [xMax, yMin] = destMeta.bottom_right();
+
+    std::vector<std::string> options = {
+        "-t_srs"s,
+        destMeta.projection,
+        "-clipdst",
+        std::to_string(xMin),
+        std::to_string(yMin),
+        std::to_string(xMax),
+        std::to_string(yMax),
+    };
+
+    return translate_vector(srcDataSet, options);
+}
+
 GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
 {
     if (meta.projection.empty()) {
