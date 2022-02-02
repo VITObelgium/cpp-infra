@@ -5,6 +5,7 @@
 
 #include <atomic>
 #include <functional>
+#include <mutex>
 #include <type_traits>
 
 namespace inf {
@@ -14,17 +15,6 @@ namespace detail {
 template <typename T>
 class PayloadBase
 {
-public:
-    const T& payload() const noexcept
-    {
-        return _payload;
-    }
-
-    void set_payload(T payload)
-    {
-        _payload = std::move(payload);
-    }
-
 protected:
     PayloadBase() = default;
     PayloadBase(T payload)
@@ -32,16 +22,28 @@ protected:
     {
     }
 
+    void set_payload_impl(T payload)
+    {
+        _payload = std::move(payload);
+    }
+
+    T payload_impl() const noexcept
+    {
+        return _payload;
+    }
+
 private:
     template <typename U>
     friend class ProgressTracker;
-
     T _payload;
 };
 
 template <>
 class PayloadBase<void>
 {
+    void set_payload_impl()
+    {
+    }
 };
 }
 
@@ -93,6 +95,26 @@ public:
         return _total;
     }
 
+    template <typename TPayload, typename = typename std::enable_if<!std::is_void_v<TPayload>>>
+    void set_payload(const TPayload& payload)
+    {
+        std::scoped_lock lock(_mutex);
+        detail::PayloadBase<T>::set_payload_impl(payload);
+    }
+
+    template <typename TPayload = T, typename = typename std::enable_if<!std::is_void_v<TPayload>>>
+    TPayload payload() const noexcept
+    {
+        TPayload result;
+
+        {
+            std::scoped_lock lock(_mutex);
+            result = detail::PayloadBase<T>::payload_impl();
+        }
+
+        return result;
+    }
+
 private:
     void increment() noexcept
     {
@@ -115,6 +137,7 @@ private:
 
     std::atomic<int64_t> _current = 0;
     int64_t _total                = 0;
+    mutable std::mutex _mutex;
 };
 
 enum class ProgressStatusResult

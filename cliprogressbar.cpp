@@ -25,6 +25,7 @@ using ProgressBarType = indicators::BlockProgressBar;
 struct ProgressBar::Pimpl
 {
     int width = 0;
+    std::mutex mutex;
     std::unique_ptr<ProgressBarType> bar;
 };
 
@@ -61,6 +62,8 @@ void ProgressBar::display(float progress) noexcept
 
 void ProgressBar::set_progress(float progress) noexcept
 {
+    std::scoped_lock lock(_pimpl->mutex);
+
     if (_pimpl->bar->is_completed() && progress < 1.0) {
         _pimpl->bar = create_progress_bar(_pimpl->width);
     }
@@ -78,16 +81,19 @@ void ProgressBar::set_progress(float progress) noexcept
 
 void ProgressBar::set_postfix_text(std::string_view text)
 {
+    std::scoped_lock lock(_pimpl->mutex);
     _pimpl->bar->set_option(option::PostfixText(text));
 }
 
 void ProgressBar::set_postfix_text(std::string_view text, size_t current, size_t total)
 {
+    std::scoped_lock lock(_pimpl->mutex);
     _pimpl->bar->set_option(option::PostfixText(fmt::format("{} {}/{}", text, current, total)));
 }
 
 void ProgressBar::done() noexcept
 {
+    std::scoped_lock lock(_pimpl->mutex);
     if (_pimpl->bar->is_completed()) {
         return;
     }
