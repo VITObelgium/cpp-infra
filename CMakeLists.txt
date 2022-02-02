@@ -371,7 +371,7 @@ if (INFRA_GDAL)
                            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
                                 $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ::proj>/../../share/proj/proj.db>
-                                $<$<CONFIG:Release>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
+                                $<$<NOT:$<CONFIG:Debug>>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
                                 "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/")
     endif ()
     
