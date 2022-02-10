@@ -232,6 +232,17 @@ XmlDocument::XmlDocument(const char* data, bool isPath)
     _pimpl->node = _pimplDoc->doc;
 }
 
+XmlDocument::XmlDocument(std::string_view contents)
+: _pimplDoc(std::make_unique<Pimpl>())
+{
+    auto result = _pimplDoc->doc.load_buffer(contents.data(), contents.size());
+    if (!result) {
+        throw RuntimeError("Failed to load xml string ({})", result.description());
+    }
+
+    _pimpl->node = _pimplDoc->doc;
+}
+
 XmlDocument XmlDocument::load_from_file(const fs::path& filename)
 {
     return XmlDocument(filename.u8string().c_str(), true);
@@ -240,6 +251,11 @@ XmlDocument XmlDocument::load_from_file(const fs::path& filename)
 XmlDocument XmlDocument::load_from_string(const char* data)
 {
     return XmlDocument(data, false);
+}
+
+XmlDocument XmlDocument::load_from_string(std::string_view data)
+{
+    return XmlDocument(data);
 }
 
 XmlDocument::XmlDocument()              = default;
@@ -286,7 +302,7 @@ XmlNode& XmlNodeIterator::operator*()
         _pimpl->node._pimpl->node = *iter;
         return _pimpl->node;
     },
-        _pimpl->iter);
+                      _pimpl->iter);
 }
 
 const XmlNode& XmlNodeIterator::operator*() const
@@ -295,7 +311,7 @@ const XmlNode& XmlNodeIterator::operator*() const
         _pimpl->node._pimpl->node = *iter;
         return _pimpl->node;
     },
-        _pimpl->iter);
+                      _pimpl->iter);
 }
 
 } // namespace inf
