@@ -930,6 +930,30 @@ inline void Feature::set_field<std::string>(int index, const std::string& value)
     _feature->SetField(index, value.c_str());
 }
 
+template <>
+inline void Feature::set_field<std::string_view>(const char* name, const std::string_view& value)
+{
+    _feature->SetField(name, std::string(value).c_str());
+}
+
+template <>
+inline void Feature::set_field<std::string>(const char* name, const std::string& value)
+{
+    _feature->SetField(name, value.c_str());
+}
+
+template <>
+inline void Feature::set_field<std::string_view>(const std::string& name, const std::string_view& value)
+{
+    _feature->SetField(name.c_str(), std::string(value).c_str());
+}
+
+template <>
+inline void Feature::set_field<std::string>(const std::string& name, const std::string& value)
+{
+    _feature->SetField(name.c_str(), value.c_str());
+}
+
 struct IntersectionOptions
 {
     std::string inputPrefix;                   // Set a prefix for the field names that will be created from the fields of the input layer.
