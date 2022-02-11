@@ -62,7 +62,7 @@ target_link_libraries(infratest
     Infra::infra
 	Infra::infratestutil
     Infra::infratestutilmain
-    trompeloeil
+    trompeloeil::trompeloeil
 )
 
 target_compile_definitions(infratest PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")
