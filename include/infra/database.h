@@ -100,6 +100,33 @@ char character_record_value(ResultField&& value)
     return value.value().front();
 }
 
+inline auto tvin(int64_t val)
+{
+    if (val == 0) {
+        return sqlpp::value_or_null<sqlpp::integer>(sqlpp::null);
+    } else {
+        return sqlpp::value_or_null(val);
+    }
+}
+
+inline auto tvin(const std::string& val)
+{
+    if (val.empty()) {
+        return sqlpp::value_or_null<sqlpp::text>(sqlpp::null);
+    } else {
+        return sqlpp::value_or_null(val);
+    }
+}
+
+inline auto tvin(const std::string_view val)
+{
+    if (val.empty()) {
+        return sqlpp::value_or_null<sqlpp::text>(sqlpp::null);
+    } else {
+        return sqlpp::value_or_null(std::string(val));
+    }
+}
+
 inline auto optional_insert_value(const std::optional<double>& opt)
 {
     if (opt.has_value()) {
