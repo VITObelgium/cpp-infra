@@ -283,7 +283,7 @@ if (INFRA_DATABASE)
     endif ()
 
     if (INFRA_DATABASE_POSTGRES)
-        find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS postgresql)
+        find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS PostgreSQL)
         target_link_libraries(infra PUBLIC sqlpp11::postgresql)
         target_compile_definitions(infra PUBLIC INFRA_DB_POSTGRES_SUPPORT)
     endif ()
