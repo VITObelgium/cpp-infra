@@ -24,6 +24,26 @@ struct Rect
     {
         return topLeft.is_valid() && bottomRight.is_valid();
     }
+
+    Point<T> top_left() const noexcept
+    {
+        return topLeft;
+    }
+
+    Point<T> top_right() const noexcept
+    {
+        return Point(bottomRight.x, topLeft.y);
+    }
+
+    Point<T> bottom_left() const noexcept
+    {
+        return Point(topLeft.x, bottomRight.y);
+    }
+
+    Point<T> bottom_right() const noexcept
+    {
+        return bottomRight;
+    }
 };
 
 template <typename T>
