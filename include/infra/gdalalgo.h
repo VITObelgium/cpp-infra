@@ -39,11 +39,13 @@ struct WarpOptions
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo = ResampleAlgorithm::NearestNeighbour);
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options);
 
+VectorDataSet warp(const fs::path& vectorPath, const GeoMetadata& destMeta);
 VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta);
 
 /*! Returns the metadata of a raster when it would be warped, call this function before the
  *  call to warp_raster so you know the destination size and can allocate a buffer
  */
+GeoMetadata warp_metadata(const GeoMetadata& meta, const std::string& destProjection);
 GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs);
 
 // Create a vector dataset from a raster dataset

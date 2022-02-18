@@ -70,6 +70,11 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
     GDALDestroyWarpOptions(warpOptions);
 }
 
+VectorDataSet warp(const fs::path& vectorPath, const GeoMetadata& destMeta)
+{
+    return warp(gdal::VectorDataSet::open(vectorPath), destMeta);
+}
+
 VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta)
 {
     auto [xMin, yMax] = destMeta.top_left();
@@ -88,27 +93,15 @@ VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta)
     return translate_vector(srcDataSet, options);
 }
 
-GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
+GeoMetadata warp_metadata(const GeoMetadata& meta, const std::string& destProjection)
 {
     if (meta.projection.empty()) {
         throw RuntimeError("Metadata does not contain projection information");
     }
 
-    OGRSpatialReference destSpatialRef;
-    if (destSpatialRef.importFromEPSG(destCrs) != OGRERR_NONE) {
-        throw RuntimeError("Failed to set destination warp metadata projection");
-    }
-
-    char* destProjectionPtr = nullptr;
-    destSpatialRef.exportToWkt(&destProjectionPtr);
-    if (destProjectionPtr == nullptr) {
-        throw RuntimeError("Failed to create destination warp metadata projection wkt");
-    }
-
     GeoMetadata resultMeta;
     resultMeta.nodata     = meta.nodata;
-    resultMeta.projection = destProjectionPtr;
-    CPLFree(destProjectionPtr);
+    resultMeta.projection = destProjection;
 
     auto memDriver  = gdal::RasterDriver::create(gdal::RasterType::Memory);
     auto srcDataSet = memDriver.create_dataset<uint8_t>(meta.rows, meta.cols, 0);
@@ -131,6 +124,11 @@ GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
     fill_geometadata_from_geo_transform(resultMeta, dstGeoTransform);
 
     return resultMeta;
+}
+
+GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
+{
+    return warp_metadata(meta, gdal::SpatialReference(destCrs).export_to_pretty_wkt());
 }
 
 VectorDataSet polygonize(const RasterDataSet& ds)
