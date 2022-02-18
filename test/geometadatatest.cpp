@@ -153,6 +153,34 @@ TEST_CASE("GeoMetadata")
         CHECK(cutout.srcRowOffset == 0);
         CHECK(cutout.dstRowOffset == 0);
     }
+
+    SUBCASE("metadata intersects")
+    {
+        GeoMetadata meta(3, 3, 0.0, 0.0, 5.0, {});
+
+        CHECK(metadata_intersects(meta, GeoMetadata(3, 3, 10.0, 10.0, 5.0, {})));
+        CHECK(metadata_intersects(meta, GeoMetadata(3, 3, -10.0, -10.0, 5.0, {})));
+        CHECK(metadata_intersects(meta, GeoMetadata(3, 3, -10.0, 10.0, 5.0, {})));
+        CHECK(metadata_intersects(meta, GeoMetadata(3, 3, 10.0, -10.0, 5.0, {})));
+
+        CHECK(!metadata_intersects(meta, GeoMetadata(3, 3, 15.0, 15.0, 5.0, {})));
+        CHECK(!metadata_intersects(meta, GeoMetadata(3, 3, 0.0, 15.0, 5.0, {})));
+        CHECK(!metadata_intersects(meta, GeoMetadata(3, 3, 15.0, 0.0, 5.0, {})));
+        CHECK(!metadata_intersects(meta, GeoMetadata(3, 3, 0.0, -15.0, 5.0, {})));
+    }
+
+    SUBCASE("metadata intersects diffent but alligned cellsize")
+    {
+        GeoMetadata meta(3, 3, 0.0, 0.0, 10.0, {});
+
+        CHECK(metadata_intersects(meta, GeoMetadata(4, 4, 10.0, 10.0, 5.0, {})));
+        CHECK(!metadata_intersects(meta, GeoMetadata(4, 4, 30.0, 30.0, 5.0, {})));
+
+        CHECK_THROWS_AS(metadata_intersects(meta, GeoMetadata(4, 4, 11.0, 10.0, 5.0, {})), InvalidArgument);
+        CHECK_THROWS_AS(metadata_intersects(meta, GeoMetadata(4, 4, 10.0, 11.0, 5.0, {})), InvalidArgument);
+        CHECK_THROWS_AS(metadata_intersects(GeoMetadata(4, 4, 11.0, 10.0, 5.0, {}), meta), InvalidArgument);
+        CHECK_THROWS_AS(metadata_intersects(GeoMetadata(4, 4, 10.0, 11.0, 5.0, {}), meta), InvalidArgument);
+    }
 }
 
 }
