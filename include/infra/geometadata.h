@@ -37,6 +37,11 @@ struct GeoMetadata
             return x == rhs.x && y == rhs.y;
         }
 
+        bool operator!=(const CellSize& rhs) const noexcept
+        {
+            return !(*this == rhs);
+        }
+
         CellSize& operator*=(double factor) noexcept
         {
             x *= factor;
@@ -130,6 +135,10 @@ std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta);
 std::ostream& operator<<(std::ostream& os, const GeoMetadata& meta);
 
 GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, std::optional<double> nodata);
+
+bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2);
+bool metadata_is_aligned(const GeoMetadata& meta1, const GeoMetadata& meta2) noexcept;
+
 }
 
 namespace fmt {

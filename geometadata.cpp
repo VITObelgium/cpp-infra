@@ -310,4 +310,65 @@ GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, std::optional<
     return result;
 }
 
+bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2)
+{
+    if (meta1.projection != meta2.projection) {
+        throw RuntimeError("Cannot intersect metadata with different projections");
+    }
+
+    GeoMetadata result;
+    result.projection = meta1.projection;
+
+    if (meta1.cellSize.x != meta2.cellSize.x || meta1.cellSize.y != meta2.cellSize.y) {
+        if (!metadata_is_aligned(meta1, meta2)) {
+            throw InvalidArgument("Extents cellsize does not match {} <-> {}", meta1.cellSize, meta2.cellSize);
+        }
+    }
+
+    if (meta1.cellSize.x == 0) {
+        throw InvalidArgument("Extents cellsize is zero");
+    }
+
+    auto intersection = rectangle_intersection(meta1.bounding_box(), meta2.bounding_box());
+    return intersection.is_valid() && intersection.width() > 0 && intersection.height() > 0;
+}
+
+static bool is_aligned(double val1, double val2, double cellsize)
+{
+    auto diff = std::abs(val1 - val2);
+    return std::fmod(diff, cellsize) == 0.0;
+}
+
+bool metadata_is_aligned(const GeoMetadata& meta1, const GeoMetadata& meta2) noexcept
+{
+    auto cellSizeX1 = meta1.cell_size_x();
+    auto cellSizeX2 = meta2.cell_size_x();
+
+    auto cellSizeY1 = std::abs(meta1.cell_size_y());
+    auto cellSizeY2 = std::abs(meta2.cell_size_y());
+
+    if (cellSizeX1 != cellSizeX2) {
+        if (cellSizeX1 < cellSizeX2) {
+            std::swap(cellSizeX1, cellSizeX2);
+        }
+
+        if (std::fmod(cellSizeX1, cellSizeX2) != 0) {
+            return false;
+        }
+    }
+
+    if (cellSizeY1 != cellSizeY2) {
+        if (cellSizeY1 < cellSizeY2) {
+            std::swap(cellSizeY1, cellSizeY2);
+        }
+
+        if (std::fmod(cellSizeY1, cellSizeY2) != 0) {
+            return false;
+        }
+    }
+
+    return is_aligned(meta1.xll, meta2.xll, meta1.cell_size_x()) &&
+           is_aligned(meta1.yll, meta2.yll, std::abs(meta1.cell_size_y()));
+}
+
 }
