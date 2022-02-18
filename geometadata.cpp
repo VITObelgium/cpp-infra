@@ -310,14 +310,11 @@ GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, std::optional<
     return result;
 }
 
-bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2)
+static Rect<double> metadata_intersion_rectangle(const GeoMetadata& meta1, const GeoMetadata& meta2)
 {
     if (meta1.projection != meta2.projection) {
         throw RuntimeError("Cannot intersect metadata with different projections");
     }
-
-    GeoMetadata result;
-    result.projection = meta1.projection;
 
     if (meta1.cellSize.x != meta2.cellSize.x || meta1.cellSize.y != meta2.cellSize.y) {
         if (!metadata_is_aligned(meta1, meta2)) {
@@ -329,8 +326,34 @@ bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2)
         throw InvalidArgument("Extents cellsize is zero");
     }
 
-    auto intersection = rectangle_intersection(meta1.bounding_box(), meta2.bounding_box());
+    return rectangle_intersection(meta1.bounding_box(), meta2.bounding_box());
+}
+
+bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2)
+{
+    const auto intersection = metadata_intersion_rectangle(meta1, meta2);
     return intersection.is_valid() && intersection.width() > 0 && intersection.height() > 0;
+}
+
+GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& meta2)
+{
+    auto intersection = rectangle_intersection(meta1.bounding_box(), meta2.bounding_box());
+    GeoMetadata result;
+    result.projection = meta1.projection;
+    result.nodata     = meta1.nodata;
+    if (!result.nodata.has_value()) {
+        result.nodata = meta2.nodata;
+    }
+
+    if (intersection.is_valid() && intersection.width() > 0 && intersection.height() > 0) {
+        result.xll = intersection.bottom_left().x;
+        result.yll = intersection.bottom_left().y;
+        result.set_cell_size(meta1.cell_size_x());
+        result.rows = intersection.height() / std::abs(result.cell_size_y());
+        result.cols = intersection.width() / std::abs(result.cell_size_x());
+    }
+
+    return result;
 }
 
 static bool is_aligned(double val1, double val2, double cellsize)

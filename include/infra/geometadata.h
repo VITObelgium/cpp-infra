@@ -139,6 +139,8 @@ GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, std::optional<
 bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2);
 bool metadata_is_aligned(const GeoMetadata& meta1, const GeoMetadata& meta2) noexcept;
 
+GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& meta2);
+
 }
 
 namespace fmt {
