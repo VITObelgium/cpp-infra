@@ -349,8 +349,8 @@ GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& m
         result.xll = intersection.bottom_left().x;
         result.yll = intersection.bottom_left().y;
         result.set_cell_size(meta1.cell_size_x());
-        result.rows = intersection.height() / std::abs(result.cell_size_y());
-        result.cols = intersection.width() / std::abs(result.cell_size_x());
+        result.rows = truncate<int32_t>(intersection.height() / std::abs(result.cell_size_y()));
+        result.cols = truncate<int32_t>(intersection.width() / std::abs(result.cell_size_x()));
     }
 
     return result;
