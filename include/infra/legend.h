@@ -68,6 +68,9 @@ struct Legend
     std::string colorMapName;
     std::string title;
     bool zeroIsNodata = false;
+
+private:
+    bool is_unmappable(double value) const noexcept;
 };
 
 Legend create_numeric_legend(double min, double max, int numberOfClasses, std::string_view cmapName, LegendScaleType method);

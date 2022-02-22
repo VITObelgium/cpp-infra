@@ -13,7 +13,7 @@ namespace inf {
 
 Color Legend::color_for_value(double value) const noexcept
 {
-    if (std::isnan(value)) {
+    if (is_unmappable(value)) {
         return Color();
     }
 
@@ -44,7 +44,7 @@ Color Legend::color_for_value(double value) const noexcept
 
 Color Legend::color_for_value(double value, const Color& unmappable) const noexcept
 {
-    if (std::isnan(value)) {
+    if (is_unmappable(value)) {
         return unmappable;
     }
 
@@ -65,7 +65,7 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
 
 Color Legend::color_for_value(double value, const Color& unmappable, const Color& unmappableLow, const Color& unmappableHigh) const noexcept
 {
-    if (std::isnan(value) || entries.empty()) {
+    if (is_unmappable(value) || entries.empty()) {
         return unmappable;
     }
 
@@ -90,6 +90,11 @@ Color Legend::color_for_value(double value, const Color& unmappable, const Color
     }
 
     return unmappable;
+}
+
+bool Legend::is_unmappable(double value) const noexcept
+{
+    return std::isnan(value) || (zeroIsNodata && value == 0.0);
 }
 
 Legend create_numeric_legend(double min, double max, int numberOfClasses, std::string_view cmapName, LegendScaleType method)
