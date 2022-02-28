@@ -1,6 +1,10 @@
 //! String utility functions
 #pragma once
 
+#include "infra/enumflags.h"
+#include "infra/typetraits-private.h"
+#include "infra/typetraits.h"
+
 #include <algorithm>
 #include <iterator>
 #include <optional>
@@ -8,10 +12,6 @@
 #include <string>
 #include <string_view>
 #include <vector>
-
-#include "infra/enumflags.h"
-#include "infra/typetraits-private.h"
-#include "infra/typetraits.h"
 
 namespace inf::str {
 
@@ -56,6 +56,7 @@ int32_t to_int32_value(std::string_view str);
  * \param str string to parse
  * \return optional uint32_t that contains a value if the string contained a valid integer
  */
+
 std::optional<uint32_t> to_uint32(std::string_view str) noexcept;
 
 /*!
@@ -123,6 +124,7 @@ float to_float_value_zero_on_error(std::string_view str) noexcept;
  * \param str string to parse
  * \return optional double that contains a value if the string contained a valid integer
  */
+
 std::optional<double> to_double(std::string_view str) noexcept;
 
 /*!
@@ -196,6 +198,9 @@ T to_numeric_value(std::string_view str)
  * \return true if the strings are considered equal
  */
 bool iequals(std::string_view str1, std::string_view str2);
+#if __cplusplus > 201703L
+bool iequals(std::u8string_view str1, std::u8string_view str2);
+#endif
 
 /*!
  * \brief case insensitive string comparision
@@ -206,6 +211,9 @@ bool iequals(std::string_view str1, std::string_view str2);
            > 0 str1 is greater than str2
  */
 int icompare(std::string_view str1, std::string_view str2);
+#if __cplusplus > 201703L
+int icompare(std::u8string_view str1, std::u8string_view str2);
+#endif
 
 /*!
  * \brief replace all occurences of the toSearch string with toReplace modifying aString
@@ -213,8 +221,13 @@ int icompare(std::string_view str1, std::string_view str2);
  * \param toSearch the search string
  * \param toReplace the replacement string
  */
-void replace_in_place(std::string& str, std::string_view toSearch, std::string_view toReplace);
+void replace_in_place(std::string& aString, std::string_view toSearch, std::string_view toReplace);
 void replace_in_place(std::string& aString, char toSearch, char toReplace);
+
+#if __cplusplus > 201703L
+void replace_in_place(std::u8string& aString, std::u8string_view toSearch, std::u8string_view toReplace);
+void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplace);
+#endif
 
 /*!
  * \brief replace all occurences of the toSearch string with toReplace
@@ -223,7 +236,10 @@ void replace_in_place(std::string& aString, char toSearch, char toReplace);
  * \param toReplace the replacement string
  * \return resulting string with the replacements
  */
-[[nodiscard]] std::string replace(std::string_view str, std::string_view toSearch, std::string_view toReplace);
+[[nodiscard]] std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace);
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string replace(std::u8string_view aString, std::u8string_view toSearch, std::u8string_view toReplace);
+#endif
 
 /*!
  * \brief transform string to lowercase
@@ -231,6 +247,9 @@ void replace_in_place(std::string& aString, char toSearch, char toReplace);
  * \return lowercased input string
  */
 [[nodiscard]] std::string lowercase(std::string_view str);
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string lowercase(std::u8string_view str);
+#endif
 
 /*!
  * \brief transform string to uppercase
@@ -238,6 +257,9 @@ void replace_in_place(std::string& aString, char toSearch, char toReplace);
  * \return uppercased input string
  */
 [[nodiscard]] std::string uppercase(std::string_view str);
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string uppercase(std::u8string_view str);
+#endif
 
 /*!
  * \brief transform string to lowercase (in place version)
@@ -257,7 +279,10 @@ void uppercase_in_place(std::string& str);
  * \param search string
  * \return true is the input string starts with the search string
  */
-bool starts_with(std::string_view str, std::string_view search);
+bool starts_with(std::string_view aString, std::string_view search);
+#if __cplusplus > 201703L
+bool starts_with(std::u8string_view aString, std::u8string_view search);
+#endif
 
 /*!
  * \brief check if a string starts with the provided string ignoring casing
@@ -265,7 +290,10 @@ bool starts_with(std::string_view str, std::string_view search);
  * \param search string
  * \return true is the input string starts with the search string
  */
-bool starts_with_ignore_case(std::string_view str, std::string_view search);
+bool starts_with_ignore_case(std::string_view aString, std::string_view search);
+#if __cplusplus > 201703L
+bool starts_with_ignore_case(std::u8string_view aString, std::u8string_view search);
+#endif
 
 /*!
  * \brief check if a string ends with the provided string
@@ -273,7 +301,10 @@ bool starts_with_ignore_case(std::string_view str, std::string_view search);
  * \param search string
  * \return true is the input string ends with the search string
  */
-bool ends_with(std::string_view str, std::string_view search);
+bool ends_with(std::string_view aString, std::string_view search);
+#if __cplusplus > 201703L
+bool ends_with(std::u8string_view aString, std::u8string_view search);
+#endif
 
 /*!
  * \brief check if a string ends with the provided string ignoring casing
@@ -282,6 +313,9 @@ bool ends_with(std::string_view str, std::string_view search);
  * \return true is the input string ends with the search string
  */
 bool ends_with_ignore_case(std::string_view aString, std::string_view search);
+#if __cplusplus > 201703L
+bool ends_with_ignore_case(std::u8string_view aString, std::u8string_view search);
+#endif
 
 /*!
  * \brief create a trimmed view to a astring
@@ -290,6 +324,9 @@ bool ends_with_ignore_case(std::string_view aString, std::string_view search);
  * \note it is important that the lifetime of the returned view is shorter than that of the input string
  */
 [[nodiscard]] std::string_view trimmed_view(std::string_view str);
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string_view trimmed_view(std::u8string_view str);
+#endif
 
 /*!
  * \brief create a trimmed copy of a astring
@@ -297,28 +334,52 @@ bool ends_with_ignore_case(std::string_view aString, std::string_view search);
  * \return trimmed copy of the input string
  */
 [[nodiscard]] std::string trim(std::string_view str);
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string trim(std::u8string_view str);
+#endif
+
 void trim_in_place(std::string& str);
+#if __cplusplus > 201703L
+void trim_in_place(std::u8string& str);
+#endif
+
+/*! Split options that can be passed to splitting functions */
+enum class SplitOpt
+{
+    NoEmpty                    = 1 << 0, /**< Don't include empty substrings in the results */
+    Trim                       = 1 << 1, /**< Trim the substrings */
+    DelimiterIsCharacterArray  = 1 << 2, /**< Treat the delimiter as an array of characters, any occurence is used to split */
+    JoinAdjacentCharDelimeters = 1 << 3, /**< Adjacent character delimeters are joined together */
+};
+
+inline constexpr Flags<SplitOpt> operator|(SplitOpt lhs, SplitOpt rhs) noexcept
+{
+    return Flags<SplitOpt>() | lhs | rhs;
+}
+
+//! Use this combination of flags to get the same behavior as strtok
+static inline constexpr Flags<SplitOpt> StrTokFlags = SplitOpt::NoEmpty | SplitOpt::DelimiterIsCharacterArray | SplitOpt::JoinAdjacentCharDelimeters;
 
 /*!
  * \brief Join items in the container with the provided join string
  * \param items container containing the items to join (needs to be iterable)
  * \param joinString that will be placed between each item
  * \tparam Container the container type
- * \details The items in the container need to be convertible to std::string_view
+ * \details The items in the container need to be convertible to std::basic_string_view<CharT, Traits>
  *          using a static_cast or need to be streamable to an std::ostream
  * \code
- * str::join(std::vector<std::string>({"one", "two", "three"}), ", ") == "one, two, three"
+ * str::join(std::vector<std::basic_string_view<CharT, Traits>>({"one", "two", "three"}), ", ") == "one, two, three"
  * \endcode
  */
 
-template <typename Container>
-std::string join(const Container& items, std::string_view joinString)
+template <typename Container, typename CharT, typename Traits = std::char_traits<CharT>>
+std::basic_string<CharT, Traits> join(const Container& items, std::basic_string_view<CharT, Traits> joinString)
 {
     using ValueType = typename Container::value_type;
     static_assert(can_cast_to_string_view_v<ValueType> || is_streamable_v<ValueType>,
                   "Items to join should be streamable or convertible to string_view");
 
-    std::string result;
+    std::basic_string<CharT, Traits> result;
 
     if (items.empty()) {
         return result;
@@ -330,14 +391,14 @@ std::string join(const Container& items, std::string_view joinString)
 
         size_t inputSize = 0;
         for (auto& item : items) {
-            inputSize += static_cast<std::string_view>(item).size();
+            inputSize += static_cast<std::basic_string_view<CharT, Traits>>(item).size();
         }
 
         size_t resultSize = inputSize + ((items.size() - 1) * joinString.size());
         result.reserve(resultSize);
 
         for (auto& item : items) {
-            result += static_cast<std::string_view>(item);
+            result += static_cast<std::basic_string_view<CharT, Traits>>(item);
 
             if (result.size() < resultSize) {
                 result += joinString;
@@ -362,10 +423,32 @@ std::string join(const Container& items, std::string_view joinString)
 }
 
 template <typename Container>
+std::string join(const Container& items, std::string_view joinString)
+{
+    return join<Container, char>(items, joinString);
+}
+
+#if __cplusplus > 201703L
+template <typename Container>
+std::u8string join(const Container& items, std::u8string_view joinString)
+{
+    return join<Container, char8_t>(items, joinString);
+}
+#endif
+
+template <typename Container>
 std::string join(const Container& items, char joinCharacter)
 {
     return join(items, std::string_view(&joinCharacter, 1));
 }
+
+#if __cplusplus > 201703L
+template <typename Container>
+std::u8string join(const Container& items, char8_t joinCharacter)
+{
+    return join(items, std::u8string_view(&joinCharacter, 1));
+}
+#endif
 
 /*!
  * \brief Join items in the container with the provided join string with custom string conversion
@@ -381,8 +464,8 @@ std::string join(const Container& items, char joinCharacter)
  *  str::join({1, 2, 3}, ", ", str::toInt32Value) == "1, 2, 3"
  * \endcode
  */
-template <typename Container, typename ToStringCb>
-std::string join(const Container& items, std::string_view joinString, ToStringCb&& cb)
+template <typename Container, typename CharT, typename ToStringCb, typename Traits = std::char_traits<CharT>>
+std::basic_string<CharT, Traits> join(const Container& items, std::basic_string_view<CharT, Traits> joinString, ToStringCb&& cb)
 {
     std::ostringstream ss;
     for (auto iter = begin(items); iter != end(items); ++iter) {
@@ -395,22 +478,29 @@ std::string join(const Container& items, std::string_view joinString, ToStringCb
     return ss.str();
 }
 
-/*! Split options that can be passed to splitting functions */
-enum class SplitOpt
+template <typename Container, typename ToStringCb>
+std::string join(const Container& items, std::string_view joinString, ToStringCb&& cb)
 {
-    NoEmpty                    = 1 << 0, /**< Don't include empty substrings in the results */
-    Trim                       = 1 << 1, /**< Trim the substrings */
-    DelimiterIsCharacterArray  = 1 << 2, /**< Treat the delimiter as an array of characters, any occurence is used to split */
-    JoinAdjacentCharDelimeters = 1 << 3, /**< Adjacent character delimeters are joined together */
-};
-
-inline constexpr Flags<SplitOpt> operator|(SplitOpt lhs, SplitOpt rhs) noexcept
-{
-    return Flags<SplitOpt>() | lhs | rhs;
+    return join<char>(items, joinString, cb);
 }
 
-//! Use this combination of flags to get the same behavior as strtok
-static inline constexpr Flags<SplitOpt> StrTokFlags = SplitOpt::NoEmpty | SplitOpt::DelimiterIsCharacterArray | SplitOpt::JoinAdjacentCharDelimeters;
+#if __cplusplus > 201703L
+template <typename Container, typename ToStringCb>
+std::u8string join(const Container& items, std::u8string_view joinString, ToStringCb&& cb)
+{
+    return join<char8_t>(items, joinString, cb);
+}
+#endif
+
+std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#if __cplusplus > 201703L
+std::vector<std::u8string_view> split_view(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#endif
+
+std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#if __cplusplus > 201703L
+std::vector<std::u8string_view> split_view(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#endif
 
 /*! \brief Splits the passed strings into substrings using the delimeter character
  * \param str the string to split
@@ -419,14 +509,46 @@ static inline constexpr Flags<SplitOpt> StrTokFlags = SplitOpt::NoEmpty | SplitO
  * \details When splitting on a single character, use this overload as it is slightly more efficient then using a string delimiter
  */
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#if __cplusplus > 201703L
+std::vector<std::u8string> split(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#endif
+
 /*! Splits the passed strings into substrings using the delimeter character */
 std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#if __cplusplus > 201703L
+std::vector<std::u8string> split(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+#endif
 
-std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+template <typename ResultType, typename CharT, typename ConversionFunc, typename Traits = std::char_traits<CharT>>
+std::vector<ResultType> split_to(std::basic_string_view<CharT, Traits> str, char delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt)
+{
+    auto splitted = split_view(str, delimiter, opt);
+
+    std::vector<ResultType> result;
+    result.reserve(splitted.size());
+    for (auto& v : splitted) {
+        result.emplace_back(convFunc(v));
+    }
+
+    return result;
+}
 
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> split_to(std::string_view str, char delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
+{
+    return split_to<char>(str, delimiter, convFunc, opt);
+}
+
+#if __cplusplus > 201703L
+template <typename ResultType, typename ConversionFunc>
+std::vector<ResultType> split_to(std::u8string_view str, char8_t delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
+{
+    return split_to<char8_t>(str, delimiter, convFunc, opt);
+}
+#endif
+
+template <typename ResultType, typename CharT, typename ConversionFunc, typename Traits = std::char_traits<CharT>>
+std::vector<ResultType> split_to(std::basic_string_view<CharT, Traits> str, std::basic_string_view<CharT, Traits> delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt)
 {
     auto splitted = split_view(str, delimiter, opt);
 
@@ -442,16 +564,16 @@ std::vector<ResultType> split_to(std::string_view str, char delimiter, Conversio
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> split_to(std::string_view str, std::string_view delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    auto splitted = split_view(str, delimiter, opt);
-
-    std::vector<ResultType> result;
-    result.reserve(splitted.size());
-    for (auto& v : splitted) {
-        result.emplace_back(convFunc(v));
-    }
-
-    return result;
+    return split_to<char>(str, delimiter, convFunc, opt);
 }
+
+#if __cplusplus > 201703L
+template <typename ResultType, typename ConversionFunc>
+std::vector<ResultType> split_to(std::u8string_view str, std::u8string_view delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
+{
+    return split_to<char8_t>(str, delimiter, convFunc, opt);
+}
+#endif
 
 class Splitter
 {
@@ -459,15 +581,15 @@ public:
     using value_type      = std::string_view;
     using pointer         = const value_type*;
     using reference       = const value_type&;
-    using iterator        = std::vector<std::string_view>::iterator;
-    using difference_type = std::vector<std::string_view>::difference_type;
+    using iterator        = typename std::vector<value_type>::iterator;
+    using difference_type = typename std::vector<value_type>::difference_type;
 
     Splitter(std::string_view src, std::string_view sep, Flags<SplitOpt> opt = Flags<SplitOpt>()) noexcept
     : _result(str::split_view(src, sep, opt))
     {
     }
 
-    Splitter(std::string_view src, char sep, Flags<SplitOpt> opt = Flags<SplitOpt>()) noexcept
+    Splitter(value_type src, char sep, Flags<SplitOpt> opt = Flags<SplitOpt>()) noexcept
     : _result(str::split_view(src, sep, opt))
     {
     }
@@ -483,23 +605,28 @@ public:
     }
 
 private:
-    std::vector<std::string_view> _result;
+    std::vector<value_type> _result;
 };
 
 void ellipsize_in_place(std::string& str, int maxLength);
 [[nodiscard]] std::string ellipsize(std::string_view str, int maxLength);
 
-//class Splitter
-//{
-//public:
-//    static const char* WhiteSpaceSeparator;
+#if __cplusplus > 201703L
+void ellipsize_in_place(std::u8string& str, int maxLength);
+[[nodiscard]] std::ustring ellipsize(std::ustring_view str, int maxLength);
+#endif
 
-//    Splitter(std::string_view src, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
+// class Splitter
+//{
+// public:
+//     static const char* WhiteSpaceSeparator;
+
+//    Splitter(std::basic_string_view<CharT, Traits> src, std::basic_string_view<CharT, Traits> delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 
 //    class const_iterator
 //    {
 //    public:
-//        using value_type        = std::string_view;
+//        using value_type        = std::basic_string_view<CharT, Traits>;
 //        using pointer           = const value_type*;
 //        using reference         = const value_type&;
 //        using iterator_category = std::forward_iterator_tag;
@@ -518,18 +645,18 @@ void ellipsize_in_place(std::string& str, int maxLength);
 
 //    private:
 //        const Splitter* _splitter;
-//        std::string_view::size_type _pos;
-//        std::string_view _value;
+//        std::basic_string_view<CharT, Traits>::size_type _pos;
+//        std::basic_string_view<CharT, Traits> _value;
 //    };
 
 //    const_iterator begin() const noexcept;
 //    const_iterator end() const noexcept;
 
-//private:
-//    std::string_view next(std::string_view::size_type& pos) const noexcept;
+// private:
+//     std::basic_string_view<CharT, Traits> next(std::basic_string_view<CharT, Traits>::size_type& pos) const noexcept;
 
-//    std::string_view _src;
-//    std::string _delimiter;
+//    std::basic_string_view<CharT, Traits> _src;
+//    std::basic_string_view<CharT, Traits> _delimiter;
 //    Flags<SplitOpt> _splitopts;
 //};
 
