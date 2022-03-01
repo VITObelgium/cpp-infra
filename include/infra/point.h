@@ -89,14 +89,13 @@ namespace fmt {
 template <typename T>
 struct formatter<inf::Point<T>>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const inf::Point<T>& p, FormatContext& ctx)
+    auto format(const inf::Point<T>& p, FormatContext& ctx) const -> decltype(ctx.out())
     {
         if constexpr (std::is_floating_point_v<T>) {
             return format_to(ctx.out(), "({:.1f}, {:.1f})", p.x, p.y);

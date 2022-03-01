@@ -1,4 +1,5 @@
 #include "infra/hash.h"
+#include "infra/string.h"
 
 #ifdef INFRA_HASH_SUPPORT
 #include <cryptopp/cryptlib.h>
@@ -9,6 +10,7 @@
 #include <cryptopp/md5.h>
 #endif
 
+#include <array>
 #include <cassert>
 #include <sstream>
 
@@ -47,7 +49,7 @@ std::array<uint8_t, 16> md5(const fs::path& filePath)
 
     Weak::MD5 hash;
     auto sink = std::make_unique<HashFilter>(hash, new ArraySink(digest.data(), digest.size()));
-    FileSource src(filePath.u8string().c_str(), true /*pump all*/, sink.release());
+    FileSource src(str::from_u8(filePath.u8string()).c_str(), true /*pump all*/, sink.release());
 
     return digest;
 }
@@ -71,7 +73,7 @@ std::array<uint8_t, 64> sha512(const fs::path& filePath)
     SHA512 hash;
     assert(digest.size() == hash.DigestSize());
     auto sink = std::make_unique<HashFilter>(hash, new ArraySink(digest.data(), digest.size()));
-    FileSource src(filePath.u8string().c_str(), true /*pump all*/, sink.release());
+    FileSource src(str::from_u8(filePath.u8string()).c_str(), true /*pump all*/, sink.release());
 
     return digest;
 }

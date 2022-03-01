@@ -1,4 +1,5 @@
 #include "infra/log.h"
+#include "infra/string.h"
 
 #include <spdlog/details/log_msg.h>
 #include <spdlog/sinks/ansicolor_sink.h>
@@ -22,7 +23,7 @@ void Log::add_file_sink(const fs::path& filePath)
         throw std::runtime_error("Sinks need to be added before initialising the logging system");
     }
 
-    _sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(filePath.u8string(), true));
+    _sinks.push_back(std::make_shared<spdlog::sinks::basic_file_sink_mt>(str::from_u8(filePath.u8string()), true));
 }
 
 void Log::add_rotating_file_sink(const fs::path& filePath, std::size_t maxFileSize)
@@ -32,7 +33,7 @@ void Log::add_rotating_file_sink(const fs::path& filePath, std::size_t maxFileSi
     }
 
     constexpr std::size_t maxFileCount = 5;
-    _sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(filePath.u8string(), maxFileSize, maxFileCount));
+    _sinks.push_back(std::make_shared<spdlog::sinks::rotating_file_sink_mt>(str::from_u8(filePath.u8string()), maxFileSize, maxFileCount));
 }
 
 void Log::add_console_sink(Colored colored)

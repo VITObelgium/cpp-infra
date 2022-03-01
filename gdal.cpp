@@ -174,7 +174,7 @@ void register_embedded_data(const fs::path& p)
 
     if (!p.empty()) {
 #if GDAL_VERSION_MAJOR > 2
-        std::string path                 = p.u8string();
+        const std::string path           = str::from_u8(p.u8string());
         std::array<const char*, 2> paths = {
             path.c_str(),
             nullptr,
@@ -198,7 +198,7 @@ std::string get_memory_file_buffer(const fs::path& p, bool remove)
 {
     std::string result;
     vsi_l_offset length;
-    auto* data = VSIGetMemFileBuffer(p.u8string().c_str(), &length, remove ? TRUE : FALSE);
+    auto* data = VSIGetMemFileBuffer(str::from_u8(p.u8string()).c_str(), &length, remove ? TRUE : FALSE);
     ScopeGuard guard([=]() {
         if (remove) {
             CPLFree(data);
@@ -253,7 +253,7 @@ RasterDriver::RasterDriver(GDALDriver& driver)
 
 RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t numBands, const fs::path& filename, const std::type_info& dataType)
 {
-    return RasterDataSet(check_pointer(_driver.Create(filename.u8string().c_str(), cols, rows, numBands, resolve_type(dataType), nullptr), "Failed to create data set"));
+    return RasterDataSet(check_pointer(_driver.Create(str::from_u8(filename.u8string()).c_str(), cols, rows, numBands, resolve_type(dataType), nullptr), "Failed to create data set"));
 }
 
 RasterDataSet RasterDriver::create_dataset(int32_t rows, int32_t cols, int32_t numBands, const std::type_info& dataType)
@@ -265,7 +265,7 @@ RasterDataSet RasterDriver::create_dataset_copy(const RasterDataSet& reference, 
 {
     auto options = create_string_list(driverOptions);
     return RasterDataSet(check_pointer(_driver.CreateCopy(
-                                           filename.u8string().c_str(),
+                                           str::from_u8(filename.u8string()).c_str(),
                                            reference.get(),
                                            FALSE,
                                            options.List(),
@@ -330,14 +330,14 @@ VectorDataSet VectorDriver::create_dataset()
 VectorDataSet VectorDriver::create_dataset(const fs::path& filename, const std::vector<std::string>& creationOptions)
 {
     auto options = create_string_list(creationOptions);
-    return VectorDataSet(check_pointer(_driver.Create(filename.u8string().c_str(), 0, 0, 0, GDT_Unknown, options), "Failed to create vector data set"));
+    return VectorDataSet(check_pointer(_driver.Create(str::from_u8(filename.u8string()).c_str(), 0, 0, 0, GDT_Unknown, options), "Failed to create vector data set"));
 }
 
 VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
 {
     auto options = create_string_list(driverOptions);
     return VectorDataSet(check_pointer(_driver.CreateCopy(
-                                           filename.u8string().c_str(),
+                                           str::from_u8(filename.u8string()).c_str(),
                                            reference.get(),
                                            FALSE,
                                            options.List(),
@@ -378,7 +378,7 @@ static GDALDataset* create_data_set(const fs::path& filePath,
     // use generic_u8string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
     // which is not recognized by gdal
-    const auto path = filePath.generic_u8string();
+    const auto path = str::from_u8(filePath.generic_u8string());
     auto options    = create_string_list(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
         path.c_str(),
@@ -1048,12 +1048,12 @@ MemoryFile::MemoryFile(std::string path, std::string_view dataBuffer)
 }
 
 MemoryFile::MemoryFile(const fs::path& path, std::span<const uint8_t> dataBuffer)
-: MemoryFile(path.u8string(), dataBuffer)
+: MemoryFile(str::from_u8(path.u8string()), dataBuffer)
 {
 }
 
 MemoryFile::MemoryFile(const fs::path& path, std::string_view dataBuffer)
-: MemoryFile(path.u8string(), dataBuffer)
+: MemoryFile(str::from_u8(path.u8string()), dataBuffer)
 {
 }
 
@@ -1103,7 +1103,7 @@ void MemoryFile::close() noexcept
 std::string read_memory_file_as_text(const fs::path& path, MemoryReadMode mode)
 {
     vsi_l_offset dataLength = 0;
-    CplPointer<GByte> dataPtr(VSIGetMemFileBuffer(path.generic_u8string().c_str(), &dataLength, mode == MemoryReadMode::StealContents ? TRUE : FALSE));
+    CplPointer<GByte> dataPtr(VSIGetMemFileBuffer(str::from_u8(path.generic_u8string()).c_str(), &dataLength, mode == MemoryReadMode::StealContents ? TRUE : FALSE));
     if (!dataPtr) {
         throw RuntimeError("Invalid memory file: {}", path);
     }

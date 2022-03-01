@@ -59,7 +59,7 @@ void detail::read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet&
 
 void detail::create_output_directory_if_needed(const fs::path& p)
 {
-    if (str::starts_with(p.generic_u8string(), "/vsi")) {
+    if (str::starts_with(p.generic_string(), "/vsi")) {
         // this is a gdal virtual filesystem path
         return;
     }

@@ -96,7 +96,8 @@ public:
     {
         close();
 #ifdef _WIN32
-        _ptr = _wfopen(p.c_str(), fs::u8path(mode).c_str());
+        std::string_view modeStr(mode);
+        _ptr = _wfopen(p.c_str(), std::wstring(modeStr.begin(), modeStr.end()).c_str());
 #else
         _ptr = std::fopen(p.u8string().c_str(), mode);
 #endif
@@ -145,16 +146,19 @@ namespace fmt {
 template <>
 struct formatter<fs::path>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const fs::path& p, FormatContext& ctx)
+    auto format(const fs::path& p, FormatContext& ctx) const -> decltype(ctx.out())
     {
+#if __cplusplus > 201703L
+        return format_to(ctx.out(), "{}", p.string());
+#else
         return format_to(ctx.out(), "{}", p.u8string());
+#endif
     }
 };
 }

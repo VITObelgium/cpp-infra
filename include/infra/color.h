@@ -56,14 +56,13 @@ namespace fmt {
 template <>
 struct formatter<inf::Color>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const inf::Color& color, FormatContext& ctx)
+    auto format(const inf::Color& color, FormatContext& ctx) const -> decltype(ctx.out())
     {
         return format_to(ctx.out(), "({}, {}, {}, {})", int(color.r), int(color.g), int(color.b), int(color.a));
     }

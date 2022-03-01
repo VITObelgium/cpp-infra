@@ -60,7 +60,11 @@ int main(int argc, char** argv)
 
 #if USE_OS_TZDB == 0
     // make sure the timezone data is found
+#if __cplusplus > 201703L
+    date::set_install((fs::path(argv[0]).parent_path() / "data").string());
+#else
     date::set_install((fs::u8path(argv[0]).parent_path() / "data").u8string());
+#endif
 #endif
 
     doctest::Context context;

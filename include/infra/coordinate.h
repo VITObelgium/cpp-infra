@@ -61,13 +61,13 @@ template <>
 struct formatter<inf::Coordinate>
 {
     template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const inf::Coordinate& p, FormatContext& ctx)
+    auto format(const inf::Coordinate& p, FormatContext& ctx) const -> decltype(ctx.out())
     {
         return format_to(ctx.out(), "(lat:{:.6f}, lng:{:.6f})", p.latitude, p.longitude);
     }

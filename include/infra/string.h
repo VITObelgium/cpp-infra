@@ -575,6 +575,18 @@ std::vector<ResultType> split_to(std::u8string_view str, std::u8string_view deli
 }
 #endif
 
+#if __cplusplus > 201703L
+inline std::string from_u8(std::u8string_view str)
+{
+    return std::string(str.begin(), str.end());
+}
+#else
+inline std::string from_u8(std::string_view str)
+{
+    return std::string(str);
+}
+#endif
+
 class Splitter
 {
 public:
@@ -613,7 +625,7 @@ void ellipsize_in_place(std::string& str, int maxLength);
 
 #if __cplusplus > 201703L
 void ellipsize_in_place(std::u8string& str, int maxLength);
-[[nodiscard]] std::ustring ellipsize(std::ustring_view str, int maxLength);
+[[nodiscard]] std::u8string ellipsize(std::u8string_view str, int maxLength);
 #endif
 
 // class Splitter

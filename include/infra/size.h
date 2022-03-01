@@ -39,14 +39,13 @@ namespace fmt {
 template <>
 struct formatter<inf::Size>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const inf::Size& s, FormatContext& ctx)
+    auto format(const inf::Size& s, FormatContext& ctx) const -> decltype(ctx.out())
     {
         return format_to(ctx.out(), "({}x{})", s.width, s.height);
     }

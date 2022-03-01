@@ -14,9 +14,9 @@ class LogSource
 {
 public:
     /*!
-    * The logsource assumes the name of the log source is defined in static storage
-    * that outlives the log source instance so we use a string_view
-    */
+     * The logsource assumes the name of the log source is defined in static storage
+     * that outlives the log source instance so we use a string_view
+     */
     LogSource(std::string_view src) noexcept
     : _src(src)
     {
@@ -66,7 +66,7 @@ public:
     static void debug(const char* format, T&&... args)
     {
         if (_log) {
-            _log->debug(format, std::forward<T>(args)...);
+            _log->debug(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -96,7 +96,7 @@ public:
     static void info(const char* format, T&&... args)
     {
         if (_log) {
-            _log->info(format, std::forward<T>(args)...);
+            _log->info(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -126,7 +126,7 @@ public:
     static void warn(const char* format, T&&... args)
     {
         if (_log) {
-            _log->warn(format, std::forward<T>(args)...);
+            _log->warn(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -156,7 +156,7 @@ public:
     static void error(const char* format, T&&... args)
     {
         if (_log) {
-            _log->error(format, std::forward<T>(args)...);
+            _log->error(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -186,7 +186,7 @@ public:
     static void critical(const char* format, T&&... args)
     {
         if (_log) {
-            _log->critical(format, std::forward<T>(args)...);
+            _log->critical(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 

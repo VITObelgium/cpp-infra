@@ -3,6 +3,7 @@
 #include "infra/enumutils.h"
 #include "infra/exception.h"
 #include "infra/gdalio.h"
+#include "infra/string.h"
 
 #include <cassert>
 #include <gdal_alg.h>
@@ -243,7 +244,7 @@ VectorDataSet translate_vector_to_disk(const VectorDataSet& ds, const fs::path& 
 
     int errorCode              = CE_None;
     GDALDatasetH srcDataSetPtr = ds.get();
-    VectorDataSet resultDs(GDALDataset::FromHandle(GDALVectorTranslate(path.u8string().c_str(), nullptr, 1, &srcDataSetPtr, gdalOptions.get(), &errorCode)));
+    VectorDataSet resultDs(GDALDataset::FromHandle(GDALVectorTranslate(str::from_u8(path.u8string()).c_str(), nullptr, 1, &srcDataSetPtr, gdalOptions.get(), &errorCode)));
     if (errorCode != CE_None) {
         throw RuntimeError("Failed to translate vector dataset to disk {}", errorCode);
     }

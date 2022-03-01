@@ -195,13 +195,6 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
     return error;
 }
 
-/* Same as ini_parse(), but takes a FILE* instead of filename. This doesn't
-   close the file when it's finished -- the caller must do that. */
-static int ini_parse_file(FILE* file, ini_handler handler, void* user)
-{
-    return ini_parse_stream((ini_reader)fgets, file, handler, user);
-}
-
 /* Parse given INI-style file. May have [section]s, name=value pairs
    (whitespace stripped), and comments starting with ';' (semicolon). Section
    is "" if name=value pair parsed before any section heading. name:value
@@ -215,22 +208,16 @@ static int ini_parse_file(FILE* file, ini_handler handler, void* user)
    stop on first error), -1 on file open error, or -2 on memory allocation
    error (only when INI_USE_STACK is zero).
 */
-static int ini_parse(const char* filename, ini_handler handler, void* user)
+static int ini_parse_file(FILE* file, ini_handler handler, void* user)
 {
-    FILE* file;
-    int error;
-
-    file = fopen(filename, "r");
-    if (!file)
-        return -1;
-    error = ini_parse_file(file, handler, user);
-    fclose(file);
-    return error;
+    return ini_parse_stream((ini_reader)fgets, file, handler, user);
 }
 
 IniReader::IniReader(const fs::path& filename)
 {
-    auto error = ini_parse(filename.u8string().c_str(), valueHandler, this);
+    file::Handle file(filename, "r");
+
+    auto error = ini_parse_file(file, valueHandler, this);
     if (error != 0) {
         throw RuntimeError("Failed to parse ini file, error on line {} ({})", error, filename);
     }

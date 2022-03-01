@@ -76,7 +76,7 @@ int32_t to_int32_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_int32(str);
     if (!optval.has_value()) {
-        throw InvalidArgument("Failed to convert '{}' to int32", str);
+        throw InvalidArgument("Failed to convert '{}' to int32", std::string_view(str));
     }
 
     return *optval;
