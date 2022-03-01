@@ -93,6 +93,13 @@ struct GeoMetadata
     Cell convert_coordinate_to_cell(const Coordinate& coord) const;
 
     bool is_xy(double x, double y, int32_t row, int32_t col) const;
+
+    template <typename T>
+    bool is_on_map(const Point<T>& point) const
+    {
+        return is_on_map(convert_xy_to_cell(point.x, point.y));
+    }
+
     bool is_on_map(const Cell& cell) const;
     bool is_on_map(int32_t r, int32_t c) const;
     void compute_rect_on_map_around(int32_t row, int32_t col, int32_t radius, int32_t& r0, int32_t& c0, int32_t& r1, int32_t& c1) const;
