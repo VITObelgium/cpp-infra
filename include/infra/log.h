@@ -63,6 +63,32 @@ public:
     static void set_pattern(std::string_view pattern);
 
     template <class... T>
+    static void log(Level level, const char* format, T&&... args)
+    {
+        if (_log) {
+            switch (level) {
+            case Level::Debug:
+                _log->debug(format, std::forward<T>(args)...);
+                break;
+            case Level::Info:
+                _log->info(format, std::forward<T>(args)...);
+                break;
+            case Level::Warning:
+                _log->warn(format, std::forward<T>(args)...);
+                break;
+            case Level::Error:
+                _log->error(format, std::forward<T>(args)...);
+                break;
+            case Level::Critical:
+                _log->critical(format, std::forward<T>(args)...);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    template <class... T>
     static void debug(const char* format, T&&... args)
     {
         if (_log) {

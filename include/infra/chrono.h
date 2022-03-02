@@ -5,6 +5,10 @@
 #include <fmt/chrono.h>
 #include <optional>
 
+#ifdef INFRA_LOG_ENABLED
+#include "infra/log.h"
+#endif
+
 namespace inf::chrono {
 
 using days       = date::days;
@@ -115,11 +119,34 @@ public:
 
     void reset()
     {
-         _startTime = std::chrono::high_resolution_clock::now();
+        _startTime = std::chrono::high_resolution_clock::now();
     }
 
 private:
     std::chrono::time_point<std::chrono::high_resolution_clock> _startTime;
 };
+
+#ifdef INFRA_LOG_ENABLED
+class ScopedDurationLog
+{
+public:
+    ScopedDurationLog(std::string_view name, Log::Level level = Log::Level::Debug)
+    : _name(name)
+    , _level(level)
+    {
+        Log::log(_level, "{}", _name);
+    }
+
+    ~ScopedDurationLog() noexcept
+    {
+        Log::log(_level, "{} took {}", _name, _duration.elapsed_time_string());
+    }
+
+private:
+    std::string _name;
+    Log::Level _level;
+    DurationRecorder _duration;
+};
+#endif
 
 }
