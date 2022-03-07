@@ -161,6 +161,12 @@ std::vector<typename MapType::mapped_type> map_values_as_vector(const MapType& m
     return result;
 }
 
+template <typename TContainer, typename TVal = std::remove_const_t<typename TContainer::value_type>>
+std::vector<TVal> container_as_vector(const TContainer& cont)
+{
+    return std::vector<TVal>(cont.begin(), cont.end());
+}
+
 template <typename TContainer, typename TVal = typename TContainer::value_type>
 std::set<TVal> container_as_set(const TContainer& cont)
 {
@@ -182,4 +188,5 @@ typename Container::iterator remove_constness(Container& c, ConstIterator it)
 {
     return c.erase(it, it);
 }
+
 }
