@@ -464,7 +464,7 @@ std::u8string join(const Container& items, char8_t joinCharacter)
  *  str::join({1, 2, 3}, ", ", str::toInt32Value) == "1, 2, 3"
  * \endcode
  */
-template <typename Container, typename CharT, typename ToStringCb, typename Traits = std::char_traits<CharT>>
+template <typename Container, typename ToStringCb, typename CharT, typename Traits = std::char_traits<CharT>>
 std::basic_string<CharT, Traits> join(const Container& items, std::basic_string_view<CharT, Traits> joinString, ToStringCb&& cb)
 {
     std::ostringstream ss;
@@ -481,14 +481,14 @@ std::basic_string<CharT, Traits> join(const Container& items, std::basic_string_
 template <typename Container, typename ToStringCb>
 std::string join(const Container& items, std::string_view joinString, ToStringCb&& cb)
 {
-    return join<char>(items, joinString, cb);
+    return join<Container, ToStringCb, char>(items, joinString, std::forward<ToStringCb>(cb));
 }
 
 #if __cplusplus > 201703L
 template <typename Container, typename ToStringCb>
 std::u8string join(const Container& items, std::u8string_view joinString, ToStringCb&& cb)
 {
-    return join<char8_t>(items, joinString, cb);
+    return join<Container, ToStringCb, char8_t>(items, joinString, cb);
 }
 #endif
 
