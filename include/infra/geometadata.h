@@ -97,7 +97,7 @@ struct GeoMetadata
     template <typename T>
     bool is_on_map(const Point<T>& point) const
     {
-        return is_on_map(convert_xy_to_cell(point.x, point.y));
+        return is_on_map(convert_xy_to_cell(static_cast<double>(point.x), static_cast<double>(point.y)));
     }
 
     bool is_on_map(const Cell& cell) const;
@@ -110,7 +110,7 @@ struct GeoMetadata
     template <typename T>
     Cell convert_point_to_cell(const Point<T> point) const
     {
-        return Cell(convert_y_to_row(point.y), convert_x_to_col(point.x));
+        return Cell(convert_y_to_row(static_cast<double>(point.y)), convert_x_to_col(static_cast<double>(point.x)));
     }
 
     Point<double> center() const;
