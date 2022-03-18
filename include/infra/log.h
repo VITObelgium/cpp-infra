@@ -68,19 +68,19 @@ public:
         if (_log) {
             switch (level) {
             case Level::Debug:
-                _log->debug(format, std::forward<T>(args)...);
+                _log->debug(fmt::runtime(format), std::forward<T>(args)...);
                 break;
             case Level::Info:
-                _log->info(format, std::forward<T>(args)...);
+                _log->info(fmt::runtime(format), std::forward<T>(args)...);
                 break;
             case Level::Warning:
-                _log->warn(format, std::forward<T>(args)...);
+                _log->warn(fmt::runtime(format), std::forward<T>(args)...);
                 break;
             case Level::Error:
-                _log->error(format, std::forward<T>(args)...);
+                _log->error(fmt::runtime(format), std::forward<T>(args)...);
                 break;
             case Level::Critical:
-                _log->critical(format, std::forward<T>(args)...);
+                _log->critical(fmt::runtime(format), std::forward<T>(args)...);
                 break;
             default:
                 break;
