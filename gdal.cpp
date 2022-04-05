@@ -333,19 +333,6 @@ VectorDataSet VectorDriver::create_dataset(const fs::path& filename, const std::
     return VectorDataSet(check_pointer(_driver.Create(str::from_u8(filename.u8string()).c_str(), 0, 0, 0, GDT_Unknown, options), "Failed to create vector data set"));
 }
 
-VectorDataSet VectorDriver::create_dataset_copy(const VectorDataSet& reference, const fs::path& filename, const std::vector<std::string>& driverOptions)
-{
-    auto options = create_string_list(driverOptions);
-    return VectorDataSet(check_pointer(_driver.CreateCopy(
-                                           str::from_u8(filename.u8string()).c_str(),
-                                           reference.get(),
-                                           FALSE,
-                                           options.List(),
-                                           nullptr,
-                                           nullptr),
-                                       "Failed to create data set copy"));
-}
-
 VectorType VectorDriver::type() const
 {
     try {

@@ -71,9 +71,24 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
     GDALDestroyWarpOptions(warpOptions);
 }
 
-VectorDataSet warp(const fs::path& vectorPath, const GeoMetadata& destMeta)
+VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta)
 {
     return warp(gdal::VectorDataSet::open(vectorPath), destMeta);
+}
+
+VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection)
+{
+    return warp(gdal::VectorDataSet::open(vectorPath), projection);
+}
+
+VectorDataSet warp(const VectorDataSet& srcDataSet, const std::string& projection)
+{
+    std::vector<std::string> options = {
+        "-t_srs"s,
+        projection,
+    };
+
+    return translate_vector(srcDataSet, options);
 }
 
 VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta)
