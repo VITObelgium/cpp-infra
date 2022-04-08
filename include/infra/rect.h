@@ -44,6 +44,16 @@ struct Rect
     {
         return bottomRight;
     }
+
+    bool operator==(const Rect<T>& other) const noexcept
+    {
+        return topLeft == other.topLeft && bottomRight == other.bottomRight;
+    }
+
+    bool operator!=(const Rect<T>& other) const noexcept
+    {
+        return !(*this == other);
+    }
 };
 
 template <typename T>
