@@ -39,10 +39,10 @@ struct WarpOptions
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo = ResampleAlgorithm::NearestNeighbour);
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options);
 
-VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta);
-VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection);
-VectorDataSet warp(const VectorDataSet& srcDataSet, const std::string& projection);
-VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta);
+VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta, const std::vector<std::string>& options = {});
+VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection, const std::vector<std::string>& options = {});
+VectorDataSet warp(const VectorDataSet& srcDataSet, const std::string& projection, const std::vector<std::string>& options = {});
+VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta, const std::vector<std::string>& options = {});
 
 /*! Returns the metadata of a raster when it would be warped, call this function before the
  *  call to warp_raster so you know the destination size and can allocate a buffer

@@ -71,27 +71,29 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
     GDALDestroyWarpOptions(warpOptions);
 }
 
-VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta)
+VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta, const std::vector<std::string>& extraOptions)
 {
-    return warp(gdal::VectorDataSet::open(vectorPath), destMeta);
+    return warp(gdal::VectorDataSet::open(vectorPath), destMeta, extraOptions);
 }
 
-VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection)
+VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection, const std::vector<std::string>& extraOptions)
 {
-    return warp(gdal::VectorDataSet::open(vectorPath), projection);
+    return warp(gdal::VectorDataSet::open(vectorPath), projection, extraOptions);
 }
 
-VectorDataSet warp(const VectorDataSet& srcDataSet, const std::string& projection)
+VectorDataSet warp(const VectorDataSet& srcDataSet, const std::string& projection, const std::vector<std::string>& extraOptions)
 {
     std::vector<std::string> options = {
         "-t_srs"s,
         projection,
     };
 
+    std::copy(extraOptions.begin(), extraOptions.end(), std::back_inserter(options));
+
     return translate_vector(srcDataSet, options);
 }
 
-VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta)
+VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta, const std::vector<std::string>& extraOptions)
 {
     auto [xMin, yMax] = destMeta.top_left();
     auto [xMax, yMin] = destMeta.bottom_right();
@@ -105,6 +107,8 @@ VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta)
         std::to_string(xMax),
         std::to_string(yMax),
     };
+
+    std::copy(extraOptions.begin(), extraOptions.end(), std::back_inserter(options));
 
     return translate_vector(srcDataSet, options);
 }
