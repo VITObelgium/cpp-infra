@@ -961,8 +961,19 @@ struct IntersectionOptions
     bool skipFailures                 = false; // Set to true to go on, even when a feature could not be inserted or a GEOS call failed.
     bool promoteToMulti               = false; // Set to true to convert Polygons into MultiPolygons, or LineStrings to MultiLineStrings.
     bool usePreparedGeometries        = true;  // Set to false to not use prepared geometries to pretest intersection of features of method layer with features of this layer.
-    bool preTestContainment           = false; //Set to true to pretest the containment of features of method layer within the features of this layer.This will speed up the method significantly in some cases.Requires that the prepared geometries are in effect.
+    bool preTestContainment           = false; // Set to true to pretest the containment of features of method layer within the features of this layer.This will speed up the method significantly in some cases.Requires that the prepared geometries are in effect.
     bool keepLowerDimensionGeometries = true;  // Set to false to skip result features with lower dimension geometry that would otherwise be added
+
+    std::vector<std::string> additionalOptions;
+    ProgressInfo progress;
+};
+
+struct ClipOptions
+{
+    std::string inputPrefix;     // Set a prefix for the field names that will be created from the fields of the input layer.
+    std::string methodPrefix;    // Set a prefix for the field names that will be created from the fields of the method layer.
+    bool skipFailures   = false; // Set to true to go on, even when a feature could not be inserted or a GEOS call failed.
+    bool promoteToMulti = false; // Set to true to convert Polygons into MultiPolygons, or LineStrings to MultiLineStrings.
 
     std::vector<std::string> additionalOptions;
     ProgressInfo progress;
@@ -1032,6 +1043,9 @@ public:
 
     void intersection(Layer& method, Layer& output);
     void intersection(Layer& method, Layer& output, IntersectionOptions& options);
+
+    void clip(Layer& method, Layer& output);
+    void clip(Layer& method, Layer& output, ClipOptions& options);
 
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
 

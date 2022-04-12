@@ -779,6 +779,40 @@ void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& opti
     check_error(_layer->Intersection(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to get layer intersection");
 }
 
+void Layer::clip(Layer& method, Layer& output)
+{
+    check_error(_layer->Clip(method.get(), output.get(), nullptr, nullptr, nullptr), "Failed to clip layer");
+}
+
+void Layer::clip(Layer& method, Layer& output, ClipOptions& options)
+{
+    std::vector<std::string> optionsArray;
+
+    GDALProgressFunc progressFunc = nullptr;
+    void* progressArg             = nullptr;
+    if (options.progress.is_valid()) {
+        progressArg  = &options.progress;
+        progressFunc = [](double complete, const char* /*message*/, void* progressArg) -> int {
+            auto* cb = reinterpret_cast<ProgressInfo*>(progressArg);
+            cb->tick(truncate<float>(complete));
+            return cb->cancel_requested() ? FALSE : TRUE;
+        };
+    }
+
+    constexpr size_t optionCount = 4;
+    optionsArray.reserve(optionCount + options.additionalOptions.size());
+    optionsArray.push_back(fmt::format("SKIP_FAILURES={}", options.skipFailures ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("PROMOTE_TO_MULTI={}", options.promoteToMulti ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("INPUT_PREFIX={}", options.inputPrefix));
+    optionsArray.push_back(fmt::format("METHOD_PREFIX={}", options.methodPrefix));
+    for (auto& opt : options.additionalOptions) {
+        optionsArray.push_back(opt);
+    }
+
+    auto opts = create_string_list(optionsArray);
+    check_error(_layer->Clip(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to clip layer");
+}
+
 void Layer::set_metadata(const std::string& name, const std::string& value, const std::string& domain)
 {
     check_error(_layer->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set layer metadata");
