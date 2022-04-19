@@ -346,11 +346,12 @@ GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& m
     }
 
     if (intersection.is_valid() && intersection.width() > 0 && intersection.height() > 0) {
-        result.xll = intersection.bottom_left().x;
-        result.yll = intersection.bottom_left().y;
-        result.set_cell_size(meta1.cell_size_x());
-        result.rows = truncate<int32_t>(intersection.height() / std::abs(result.cell_size_y()));
-        result.cols = truncate<int32_t>(intersection.width() / std::abs(result.cell_size_x()));
+        result.xll      = intersection.bottom_left().x;
+        result.yll      = intersection.bottom_left().y;
+        result.cellSize = meta1.cellSize;
+
+        result.rows = truncate<int32_t>(std::round(intersection.height() / std::abs(result.cell_size_y())));
+        result.cols = truncate<int32_t>(std::round(intersection.width() / std::abs(result.cell_size_x())));
     }
 
     return result;
@@ -359,7 +360,7 @@ GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& m
 static bool is_aligned(double val1, double val2, double cellsize)
 {
     auto diff = std::abs(val1 - val2);
-    return std::fmod(diff, cellsize) == 0.0;
+    return std::remainder(diff, cellsize) < 1e-12;
 }
 
 bool metadata_is_aligned(const GeoMetadata& meta1, const GeoMetadata& meta2) noexcept
