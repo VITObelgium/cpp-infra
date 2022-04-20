@@ -216,6 +216,11 @@ Point<double> GeoMetadata::top_left() const
     return Point<double>(xll, yll - (rows * cellSize.y));
 }
 
+Point<double> GeoMetadata::top_left_center() const
+{
+    return Point<double>(xll + (cellSize.x / 2.0), yll - (rows * cellSize.y) + (cellSize.y / 2.0));
+}
+
 Point<double> GeoMetadata::bottom_right() const
 {
     return Point<double>(xll + (cols * cellSize.x), yll);
