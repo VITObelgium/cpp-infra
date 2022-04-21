@@ -53,6 +53,12 @@ template <typename GeometryType>
 class Owner : public GeometryType
 {
 public:
+    Owner() noexcept
+    : GeometryType(nullptr)
+    , _owned(false)
+    {
+    }
+
     Owner(typename GeometryType::wrapped_type* ptr)
     : GeometryType(ptr)
     , _owned(true)
@@ -84,6 +90,7 @@ public:
 
         _owned       = other._owned;
         other._owned = false;
+        return *this;
     }
 
     auto release()
@@ -996,7 +1003,8 @@ public:
     Layer(Layer&&);
     ~Layer();
 
-    Layer& operator=(Layer&&) = default;
+    Layer& operator=(Layer&&);
+    Layer& operator=(const Layer&);
 
     std::optional<int32_t> epsg() const;
     //! Make sure the spatial reference stays in scope while using the layer!
@@ -1050,7 +1058,7 @@ public:
     void set_metadata(const std::string& name, const std::string& value, const std::string& domain = "");
 
 private:
-    OGRLayer* _layer;
+    OGRLayer* _layer = nullptr;
 };
 
 // Iteration is not thread safe!

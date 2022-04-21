@@ -569,6 +569,20 @@ Layer::~Layer()
     }
 }
 
+Layer& Layer::operator=(Layer&& other)
+{
+    _layer = other._layer;
+    other._layer = nullptr;
+    return *this;
+}
+
+Layer& Layer::operator=(const Layer& other)
+{
+    _layer = other._layer;
+    _layer->Reference();
+    return *this;
+}
+
 std::optional<int32_t> Layer::epsg() const
 {
     if (auto* spatialRef = _layer->GetSpatialRef(); spatialRef != nullptr) {
