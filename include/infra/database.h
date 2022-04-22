@@ -61,6 +61,13 @@ private:
 };
 
 template <typename ResultField>
+bool bool_value(ResultField&& value)
+{
+    static_assert(std::is_same_v<int64_t, decltype(value.value())>);
+    return static_cast<int64_t>(value) == 1;
+}
+
+template <typename ResultField>
 auto optional_record_value(ResultField&& value)
 {
     using ValueType = decltype(value.value());
