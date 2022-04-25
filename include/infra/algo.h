@@ -58,6 +58,17 @@ auto& find_in_container_required(Container&& c, Predicate&& pred)
 }
 
 template <typename Container>
+auto& find_in_container_required(Container&& c, const typename std::decay_t<Container>::value_type& value)
+{
+    auto iter = std::find_if(c.begin(), c.end(), value);
+    if (iter == c.end()) {
+        throw RangeError("No match found in the container");
+    }
+
+    return *iter;
+}
+
+template <typename Container>
 bool container_contains(const Container& c, const typename Container::value_type& value) noexcept
 {
     return std::find(begin(c), end(c), value) != end(c);
