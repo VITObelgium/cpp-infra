@@ -536,14 +536,14 @@ std::vector<ResultType> split_to(std::basic_string_view<CharT, Traits> str, char
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> split_to(std::string_view str, char delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    return split_to<char>(str, delimiter, convFunc, opt);
+    return split_to<ResultType, char>(str, delimiter, convFunc, opt);
 }
 
 #if __cplusplus > 201703L
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> split_to(std::u8string_view str, char8_t delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
-    return split_to<char8_t>(str, delimiter, convFunc, opt);
+    return split_to<ResultType, char8_t>(str, delimiter, convFunc, opt);
 }
 #endif
 
