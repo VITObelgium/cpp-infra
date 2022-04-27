@@ -305,6 +305,10 @@ VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts)
             }
         }
 
+        if (!opts.attributeFilter.empty()) {
+            srcLayer.set_attribute_filter(opts.attributeFilter);
+        }
+
         for (auto& feature : srcLayer) {
             if (feature.has_geometry()) {
                 Feature feat(dstLayer.layer_definition());

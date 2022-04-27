@@ -65,7 +65,8 @@ struct BufferOptions
 {
     double distance         = 0.0;
     int32_t numQuadSegments = 30;
-    bool includeFields;                         // copy over the fields in the resulting dataset
+    bool includeFields;                         //! copy over the fields in the resulting dataset
+    std::string attributeFilter;                //! apply an attribute filter to the input layers;
     std::optional<Geometry::Type> geometryType; //! override the type of the resulting geometry
 };
 
