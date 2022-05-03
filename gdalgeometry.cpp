@@ -23,6 +23,8 @@ Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
         return Geometry::Type::MultiPolygon;
     case wkbMultiLineString:
         return Geometry::Type::MultiLine;
+    case wkbGeometryCollection:
+        return Geometry::Type::GeometryCollection;
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(type));
     }
@@ -571,7 +573,7 @@ Layer::~Layer()
 
 Layer& Layer::operator=(Layer&& other)
 {
-    _layer = other._layer;
+    _layer       = other._layer;
     other._layer = nullptr;
     return *this;
 }

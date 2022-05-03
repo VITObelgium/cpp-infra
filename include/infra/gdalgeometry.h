@@ -43,6 +43,7 @@ enum class Type
     Polygon,
     MultiPolygon,
     LinearRing,
+    GeometryCollection,
     Unknown
 };
 }
