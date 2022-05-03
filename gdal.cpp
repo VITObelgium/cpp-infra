@@ -181,9 +181,11 @@ void register_embedded_data(const fs::path& p)
         };
 
         OSRSetPROJSearchPaths(paths.data());
-#else
-        env::set("PROJ_LIB", p.u8string());
 #endif
+
+        // Also set the environment variable
+        // e.g. Spatialite library does not use gdal settings
+        env::set("PROJ_LIB", p.u8string());
     }
 }
 
