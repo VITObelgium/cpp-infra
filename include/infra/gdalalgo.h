@@ -4,6 +4,7 @@
 #include "infra/geometadata.h"
 
 #include <gdalwarper.h>
+#include <vector>
 
 namespace inf::gdal {
 
