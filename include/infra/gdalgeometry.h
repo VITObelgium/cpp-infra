@@ -1037,6 +1037,7 @@ public:
 
     void create_field(FieldDefinition& field);
     void create_feature(Feature& feature);
+    void set_feature(Feature& feature);
 
     FeatureDefinition layer_definition() const;
     Geometry::Type geometry_type() const;

@@ -709,6 +709,11 @@ void Layer::create_feature(Feature& feature)
     check_error(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
 }
 
+void Layer::set_feature(Feature& feature)
+{
+    check_error(_layer->SetFeature(feature.get()), "Failed to assign layer feature");
+}
+
 FeatureDefinition Layer::layer_definition() const
 {
     return FeatureDefinition(check_pointer(_layer->GetLayerDefn(), "Failed to obtain layer definition"));
