@@ -933,6 +933,24 @@ Layer VectorDataSet::create_layer(const std::string& name, SpatialReference& spa
     return Layer(check_pointer(_ptr->CreateLayer(name.c_str(), spatialRef.get(), to_gdal_type(type), options.List()), "Layer creation failed"));
 }
 
+void VectorDataSet::start_transaction()
+{
+    assert(_ptr);
+    check_error(_ptr->StartTransaction(), "Failed to start transaction");
+}
+
+void VectorDataSet::commit_transaction()
+{
+    assert(_ptr);
+    check_error(_ptr->CommitTransaction(), "Failed to start transaction");
+}
+
+void VectorDataSet::rollback_transaction()
+{
+    assert(_ptr);
+    check_error(_ptr->RollbackTransaction(), "Failed to start transaction");
+}
+
 GDALDataset* VectorDataSet::get() const
 {
     return _ptr;

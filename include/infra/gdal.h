@@ -281,11 +281,42 @@ public:
     /*! Make sure to keep the spatial reference object alive while working with the dataset! */
     Layer create_layer(const std::string& name, SpatialReference& spatialRef, Geometry::Type type, const std::vector<std::string>& driverOptions = {});
 
+    void start_transaction();
+    void commit_transaction();
+    void rollback_transaction();
+
     GDALDataset* get() const;
     VectorDriver driver();
 
 private:
     GDALDataset* _ptr = nullptr;
+};
+
+class DatasetTransaction
+{
+public:
+    DatasetTransaction(VectorDataSet& ds) noexcept
+    : _ds(ds)
+    {
+        _ds.start_transaction();
+    }
+
+    ~DatasetTransaction()
+    {
+        if (_rollbackNeeded) {
+            _ds.rollback_transaction();
+        }
+    }
+
+    void commit()
+    {
+        _ds.commit_transaction();
+        _rollbackNeeded = false;
+    }
+
+private:
+    VectorDataSet& _ds;
+    bool _rollbackNeeded = true;
 };
 
 class RasterDriver
