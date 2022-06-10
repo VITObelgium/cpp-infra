@@ -148,7 +148,7 @@ GeoMetadata warp_metadata(const GeoMetadata& meta, const std::string& destProjec
 
 GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs)
 {
-    return warp_metadata(meta, gdal::SpatialReference(destCrs).export_to_pretty_wkt());
+    return warp_metadata(meta, gdal::SpatialReference(destCrs).export_to_wkt());
 }
 
 VectorDataSet polygonize(const RasterDataSet& ds)
