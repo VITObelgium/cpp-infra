@@ -406,7 +406,7 @@ const ColorDict Cmap::wistia{
     },
 };
 
-const ColorDict Cmap::spectral{
+const ColorDict Cmap::nipySpectral{
     {
         {0.0f, 0.0f, 0.0f},
         {0.05f, 0.4667f, 0.4667f},
@@ -1631,7 +1631,7 @@ ColorMap ColorMap::create(std::string_view name)
         {"autumn", Cmap::autumn},
         {"winter", Cmap::winter},
         {"wistia", Cmap::wistia},
-        {"spectral", Cmap::spectral},
+        {"nipy_spectral", Cmap::nipySpectral},
         {"gist_earth", Cmap::gistEarth},
         {"gist_ncar", Cmap::gistNcar},
         {"gist_stern", Cmap::gistStern},

@@ -100,7 +100,7 @@ struct Cmap
     static const ColorDict autumn;
     static const ColorDict winter;
     static const ColorDict wistia;
-    static const ColorDict spectral;
+    static const ColorDict nipySpectral;
 
     static const ColorDict gistEarth;
     static const ColorDict gistNcar;
