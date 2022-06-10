@@ -32,6 +32,11 @@ struct Color
                a == other.a;
     }
 
+    constexpr bool operator!=(const Color& other) const noexcept
+    {
+        return !(*this == other);
+    }
+
     std::string to_hex_rgb() const noexcept;
     std::string to_hex_argb() const noexcept;
 
