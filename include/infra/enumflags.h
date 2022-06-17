@@ -22,6 +22,11 @@ public:
     {
     }
 
+    constexpr Flags(EnumType flag1, EnumType flag2)
+    : _value(static_cast<value_type>(flag1) | static_cast<value_type>(flag2))
+    {
+    }
+
     constexpr Flags operator|(EnumType v) const noexcept
     {
         Flags f;
