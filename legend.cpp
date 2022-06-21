@@ -42,6 +42,23 @@ Color Legend::color_for_value(double value) const noexcept
     return Color();
 }
 
+Color Legend::color_for_value(std::string_view value) const noexcept
+{
+    if (value.empty()) {
+        return Color();
+    }
+
+    for (auto& entry : entries) {
+        if (type == inf::Legend::Type::Categoric) {
+            if (entry.value == value) {
+                return entry.color;
+            }
+        }
+    }
+
+    return Color();
+}
+
 Color Legend::color_for_value(double value, const Color& unmappable) const noexcept
 {
     if (is_unmappable(value)) {
@@ -55,6 +72,23 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
             }
         } else if (type == inf::Legend::Type::Numeric) {
             if (value >= entry.lowerBound && value < entry.upperBound) {
+                return entry.color;
+            }
+        }
+    }
+
+    return unmappable;
+}
+
+Color Legend::color_for_value(std::string_view value, const Color& unmappable) const noexcept
+{
+    if (value.empty()) {
+        return unmappable;
+    }
+
+    for (auto& entry : entries) {
+        if (type == inf::Legend::Type::Categoric) {
+            if (entry.value == value) {
                 return entry.color;
             }
         }

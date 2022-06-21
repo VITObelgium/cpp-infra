@@ -18,11 +18,13 @@ struct LegendEntry
     double upperBound;
     inf::Color color;
     std::string name;
+    std::string value; // if value is present lower and upper bound values are ignored
 
     bool operator==(const LegendEntry& other) const
     {
         return color == other.color &&
                name == other.name &&
+               value == other.value &&
                std::abs(lowerBound - other.lowerBound) <= std::numeric_limits<double>::epsilon() &&
                std::abs(upperBound - other.upperBound) <= std::numeric_limits<double>::epsilon();
     }
@@ -42,6 +44,7 @@ struct Legend
      * /param value the value to map
      */
     Color color_for_value(double value) const noexcept;
+    Color color_for_value(std::string_view value) const noexcept;
 
     /*! Map the value to a color based on the legend entries
      * If the value cannot be mapped the unmappable color will be returned
@@ -50,6 +53,7 @@ struct Legend
      * /return the mapped color
      */
     Color color_for_value(double value, const Color& unmappable) const noexcept;
+    Color color_for_value(std::string_view value, const Color& unmappable) const noexcept;
 
     /*! Map the value to a color based on the legend entries
      * If the value cannot be mapped the unmappable low or high color will be returned
