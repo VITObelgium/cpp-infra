@@ -53,6 +53,8 @@ static constexpr Color Blue(0, 0, 255);
 static constexpr Color Green(0, 255, 0);
 static constexpr Color Red(255, 0, 0);
 static constexpr Color Transparent(0, 0, 0, 0);
+static constexpr Color DarkGrey(107, 110, 119);
+static constexpr Color LightGrey(170, 174, 177);
 }
 
 }
