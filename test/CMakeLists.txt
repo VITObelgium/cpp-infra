@@ -55,6 +55,7 @@ endif ()
 if (INFRA_HASHING)
     target_sources(infratest PRIVATE
         hashtest.cpp
+        cryptotest.cpp
     )
 endif ()
 

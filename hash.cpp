@@ -18,14 +18,21 @@ namespace inf::hash {
 
 using namespace CryptoPP;
 
-static std::string hash_string(std::span<const uint8_t> hash)
+#ifdef INFRA_HASH_SUPPORT
+std::string hex_encode(std::span<const uint8_t> data)
 {
-    std::string hashString;
-    ArraySource src(hash.data(), hash.size(), true, new HexEncoder(new StringSink(hashString), false /*lowercase*/));
-    return hashString;
+    std::string hexString;
+    ArraySource src(data.data(), data.size(), true, new HexEncoder(new StringSink(hexString), false /*lowercase*/));
+    return hexString;
 }
 
-#ifdef INFRA_HASH_SUPPORT
+std::vector<uint8_t> hex_decode(std::string_view hexStringData)
+{
+    std::vector<uint8_t> data;
+    StringSource ss(reinterpret_cast<const uint8_t*>(hexStringData.data()), hexStringData.size(), true, new HexDecoder(new VectorSink(data)));
+    return data;
+}
+
 std::array<uint8_t, 16> md5(std::span<const uint8_t> data)
 {
     std::array<uint8_t, 16> digest;
@@ -82,27 +89,27 @@ std::array<uint8_t, 64> sha512(const fs::path& filePath)
 
 std::string md5_string(const fs::path& filePath)
 {
-    return hash_string(md5(filePath));
+    return hex_encode(md5(filePath));
 }
 
 std::string md5_string(std::string_view stringData)
 {
-    return hash_string(md5(stringData));
+    return hex_encode(md5(stringData));
 }
 
 std::string md5_string(std::span<const uint8_t> data)
 {
-    return hash_string(md5(data));
+    return hex_encode(md5(data));
 }
 
 std::string sha512_string(const fs::path& filePath)
 {
-    return hash_string(sha512(filePath));
+    return hex_encode(sha512(filePath));
 }
 
 std::string sha512_string(std::span<const uint8_t> data)
 {
-    return hash_string(sha512(data));
+    return hex_encode(sha512(data));
 }
 
 }

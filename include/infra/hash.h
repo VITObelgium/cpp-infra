@@ -15,6 +15,9 @@ void hash_combine(std::size_t& seed, const T& v, const Rest&... rest)
 
 namespace hash {
 
+std::string hex_encode(std::span<const uint8_t> data);
+std::vector<uint8_t> hex_decode(std::string_view data);
+
 std::array<uint8_t, 16> md5(std::span<const uint8_t> data);
 std::array<uint8_t, 16> md5(std::string_view stringData);
 std::array<uint8_t, 16> md5(const fs::path& filePath);
