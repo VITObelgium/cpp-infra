@@ -38,6 +38,7 @@ static const std::unordered_map<RasterType, const char*>
         {RasterType::TileDB, "TileDB"},
         {RasterType::MBTiles, "MBTiles"},
         {RasterType::Grib, "GRIB"},
+        {RasterType::Postgis, "PostGISRaster"},
         {RasterType::Vrt, "VRT"},
     }};
 
@@ -52,6 +53,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
     {"TileDB", RasterType::TileDB},
     {"MBTiles", RasterType::MBTiles},
     {"GRIB", RasterType::Grib},
+    {"PostGISRaster", RasterType::Postgis},
     {"VRT", RasterType::Vrt},
 }};
 
@@ -63,6 +65,7 @@ static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
     {VectorType::Xlsx, "XLSX"},
     {VectorType::GeoJson, "GeoJSON"},
     {VectorType::GeoPackage, "GPKG"},
+    {VectorType::PostgreSQL, "PostgreSQL"},
     {VectorType::Vrt, "OGR_VRT"},
 }};
 
@@ -74,12 +77,13 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
     {"XLSX", VectorType::Xlsx},
     {"GeoJSON", VectorType::GeoJson},
     {"GPKG", VectorType::GeoPackage},
+    {"PostgreSQL", VectorType::PostgreSQL},
     {"OGR_VRT", VectorType::Vrt},
 }};
 
 static std::string get_extension_lowercase(const fs::path& filepath)
 {
-    return str::lowercase(filepath.extension().string());
+    return str::lowercase(filepath.extension().u8string());
 }
 
 template <typename Unsigned, typename Signed>
@@ -984,6 +988,11 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
         return RasterType::Vrt;
     }
 
+    auto path = filePath.u8string();
+    if (str::starts_with_ignore_case(path, "postgresql://") || str::starts_with_ignore_case(path, "pg:")) {
+        return RasterType::Postgis;
+    }
+
     return RasterType::Unknown;
 }
 
@@ -1004,6 +1013,11 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
         return VectorType::GeoPackage;
     } else if (ext == ".vrt") {
         return VectorType::Vrt;
+    }
+
+    auto path = filePath.u8string();
+    if (str::starts_with_ignore_case(path, "postgresql://") || str::starts_with_ignore_case(path, "pg:")) {
+        return VectorType::PostgreSQL;
     }
 
     return VectorType::Unknown;

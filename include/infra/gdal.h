@@ -87,6 +87,7 @@ enum class RasterType
     TileDB,
     MBTiles,
     Grib,
+    Postgis,
     Vrt,
     Unknown,
 };
@@ -100,6 +101,7 @@ enum class VectorType
     Xlsx,
     GeoJson,
     GeoPackage,
+    PostgreSQL,
     Vrt,
     Unknown,
 };
