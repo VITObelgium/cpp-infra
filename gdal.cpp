@@ -66,6 +66,7 @@ static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
     {VectorType::GeoJson, "GeoJSON"},
     {VectorType::GeoPackage, "GPKG"},
     {VectorType::PostgreSQL, "PostgreSQL"},
+    {VectorType::WFS, "WFS"},
     {VectorType::Vrt, "OGR_VRT"},
 }};
 
@@ -78,6 +79,7 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
     {"GeoJSON", VectorType::GeoJson},
     {"GPKG", VectorType::GeoPackage},
     {"PostgreSQL", VectorType::PostgreSQL},
+    {"WFS", VectorType::WFS},
     {"OGR_VRT", VectorType::Vrt},
 }};
 
@@ -1018,6 +1020,8 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
     auto path = filePath.u8string();
     if (str::starts_with_ignore_case(path, "postgresql://") || str::starts_with_ignore_case(path, "pg:")) {
         return VectorType::PostgreSQL;
+    } else if (str::starts_with_ignore_case(path, "wfs:")) {
+        return VectorType::WFS;
     }
 
     return VectorType::Unknown;

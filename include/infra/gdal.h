@@ -102,6 +102,7 @@ enum class VectorType
     GeoJson,
     GeoPackage,
     PostgreSQL,
+    WFS,
     Vrt,
     Unknown,
 };

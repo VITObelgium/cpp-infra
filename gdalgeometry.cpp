@@ -13,18 +13,24 @@ using namespace std::string_literals;
 Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
 {
     switch (wkbFlatten(type)) {
+    case wkbUnknown:
+        return Geometry::Type::Unknown;
     case wkbPoint:
         return Geometry::Type::Point;
     case wkbLineString:
         return Geometry::Type::Line;
     case wkbPolygon:
         return Geometry::Type::Polygon;
+    case wkbCurvePolygon:
+        return Geometry::Type::CurvePolygon;
     case wkbMultiPolygon:
         return Geometry::Type::MultiPolygon;
     case wkbMultiLineString:
         return Geometry::Type::MultiLine;
     case wkbGeometryCollection:
         return Geometry::Type::GeometryCollection;
+    case wkbMultiSurface:
+        return Geometry::Type::MultiSurface;
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(type));
     }
@@ -837,6 +843,29 @@ void Layer::clip(Layer& method, Layer& output, ClipOptions& options)
 void Layer::set_metadata(const std::string& name, const std::string& value, const std::string& domain)
 {
     check_error(_layer->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set layer metadata");
+}
+
+std::string Layer::metadata_item(const std::string& name, const std::string& domain)
+{
+    return check_pointer(_layer->GetMetadataItem(name.c_str(), domain.c_str()), "Failed to get layer metadata");
+}
+
+std::unordered_map<std::string, std::string> Layer::metadata(const std::string& domain)
+{
+    std::unordered_map<std::string, std::string> result;
+
+    char** data = _layer->GetMetadata(domain.c_str());
+    if (data != nullptr) {
+        int index = 0;
+        while (data[index] != nullptr) {
+            auto keyValue = str::split_view(data[index++], '=');
+            if (keyValue.size() == 2) {
+                result.emplace(keyValue[0], keyValue[1]);
+            }
+        }
+    }
+
+    return result;
 }
 
 FeatureIterator::FeatureIterator(int fieldCount)
