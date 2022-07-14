@@ -375,10 +375,12 @@ std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const 
 }
 
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<double>> rasterize<double>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
 template std::pair<GeoMetadata, std::vector<float>> translate<float>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<double>> translate<double>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int32_t>> translate<int32_t>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<uint8_t>> translate<uint8_t>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 }
