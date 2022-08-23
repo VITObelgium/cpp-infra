@@ -19,7 +19,7 @@ Color Legend::color_for_value(double value) const noexcept
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
+            if (math::approx_equal(value, entry.lowerBound, std::numeric_limits<double>::epsilon())) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
