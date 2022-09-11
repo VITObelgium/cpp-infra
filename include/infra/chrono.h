@@ -21,6 +21,7 @@ using local_time_point = date::local_time<std::chrono::milliseconds>;
 date_point today();
 local_date_point today_local();
 time_point now();
+local_time_point now_local();
 
 date_point date_from_time_point(time_point tp);
 local_date_point date_from_time_point(local_time_point tp);

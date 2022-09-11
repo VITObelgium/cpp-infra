@@ -23,6 +23,12 @@ time_point now()
     return std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 }
 
+local_time_point now_local()
+{
+    const auto now = date::make_zoned(date::current_zone(), std::chrono::system_clock::now());
+    return std::chrono::floor<std::chrono::milliseconds>(now.get_local_time());
+}
+
 date_point date_from_time_point(time_point tp)
 {
     return std::chrono::floor<date::days>(tp);
