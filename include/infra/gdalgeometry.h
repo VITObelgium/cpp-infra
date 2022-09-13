@@ -37,6 +37,7 @@ namespace Geometry {
 enum class Type
 {
     Point,
+    MultiPoint,
     Collection,
     Line,
     MultiLine,
@@ -46,6 +47,7 @@ enum class Type
     LinearRing,
     GeometryCollection,
     MultiSurface,
+    MultiCurve,
     Unknown
 };
 }
@@ -76,7 +78,7 @@ public:
     }
 
     // Don't allow copying
-    Owner(const Owner<GeometryType>&) = delete;
+    Owner(const Owner<GeometryType>&)            = delete;
     Owner& operator=(const Owner<GeometryType>&) = delete;
 
     // Allow moving
@@ -784,7 +786,7 @@ public:
     explicit FieldDefinition(FieldDefinitionRef def);
     ~FieldDefinition();
 
-    FieldDefinition(const FieldDefinition&) = delete;
+    FieldDefinition(const FieldDefinition&)            = delete;
     FieldDefinition& operator=(const FieldDefinition&) = delete;
 
     FieldDefinition(FieldDefinition&&);
@@ -829,7 +831,7 @@ public:
     ~Feature();
 
     Feature& operator=(const Feature&) = delete;
-    Feature& operator                  =(Feature&&);
+    Feature& operator=(Feature&&);
 
     OGRFeature* get();
     const OGRFeature* get() const;
