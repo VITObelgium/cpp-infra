@@ -126,6 +126,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/line.h
     include/infra/meteo.h
     include/infra/math.h
+    include/infra/naturalbreaks.h
     include/infra/point.h
     include/infra/progressinfo.h
     include/infra/range.h
