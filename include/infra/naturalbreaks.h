@@ -140,39 +140,37 @@ std::vector<T> jenks_break_values(std::span<T> values, const inf::ProgressInfo::
 #else
     for (size_t l = 2; l < length_array + 1; l++) {
 #endif
-            for (size_t l = r.begin(); l < r.end(); ++l) {
-                progress.tick_throw_on_cancel();
+            progress.tick_throw_on_cancel();
 
-                T sum         = 0.0;
-                T sum_squares = 0.0;
-                T w           = 0.0;
-                T variance    = 0.0;
+            T sum         = 0.0;
+            T sum_squares = 0.0;
+            T w           = 0.0;
+            T variance    = 0.0;
 
-                for (size_t m = 1; m < l + 1; m++) {
-                    size_t lower_class_limit = l - m + 1;
+            for (size_t m = 1; m < l + 1; m++) {
+                size_t lower_class_limit = l - m + 1;
 
-                    T val = values[lower_class_limit - 1];
+                T val = values[lower_class_limit - 1];
 
-                    w += 1.0;
-                    sum += val;
-                    sum_squares += val * val;
-                    variance  = sum_squares - (sum * sum) / w;
-                    size_t i4 = lower_class_limit - 1;
+                w += 1.0;
+                sum += val;
+                sum_squares += val * val;
+                variance  = sum_squares - (sum * sum) / w;
+                size_t i4 = lower_class_limit - 1;
 
-                    if (i4 != 0) {
-                        for (size_t j = 2; j < NumClasses + 1; ++j) {
-                            T temp_val = (variance + variance_combinations[i4 - 1][j - 2]);
-                            if (fabs(variance_combinations[l - 1][j - 1] - temp_val) < std::numeric_limits<T>::epsilon() || variance_combinations[l - 1][j - 1] > temp_val) {
-                                lower_class_limits[l - 1][j - 1]    = inf::truncate<int>(lower_class_limit);
-                                variance_combinations[l - 1][j - 1] = temp_val;
-                            }
+                if (i4 != 0) {
+                    for (size_t j = 2; j < NumClasses + 1; ++j) {
+                        T temp_val = (variance + variance_combinations[i4 - 1][j - 2]);
+                        if (fabs(variance_combinations[l - 1][j - 1] - temp_val) < std::numeric_limits<T>::epsilon() || variance_combinations[l - 1][j - 1] > temp_val) {
+                            lower_class_limits[l - 1][j - 1]    = inf::truncate<int>(lower_class_limit);
+                            variance_combinations[l - 1][j - 1] = temp_val;
                         }
                     }
                 }
-
-                lower_class_limits[l - 1][0]    = 1;
-                variance_combinations[l - 1][0] = variance;
             }
+
+            lower_class_limits[l - 1][0]    = 1;
+            variance_combinations[l - 1][0] = variance;
         }
 #ifdef INFRA_TBB
     });
