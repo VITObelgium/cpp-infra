@@ -101,6 +101,11 @@ public:
         return std::chrono::duration_cast<std::chrono::seconds>(now - _startTime);
     }
 
+    std::chrono::high_resolution_clock::duration elapsed_time() const
+    {
+        return std::chrono::high_resolution_clock::now() - _startTime;
+    }
+
     std::string elapsed_time_string() const
     {
         using namespace std::chrono_literals;
