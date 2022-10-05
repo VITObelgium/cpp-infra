@@ -442,7 +442,7 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
             classBounds[i] = value;
         }
     } else if (scaleType == LegendScaleType::NaturalBreaks) {
-        auto breaks = jenks_break_values(std::span<const float>(sampleData), numClasses, nullptr);
+        auto breaks = jenks_break_values(std::span<const float>(sampleData), truncate<uint8_t>(numClasses), nullptr);
         for (int i = 1; i < numClasses; i++) {
             classBounds[i] = breaks[i];
         }
