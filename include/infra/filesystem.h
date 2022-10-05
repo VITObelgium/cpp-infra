@@ -1,5 +1,6 @@
 #pragma once
 
+#include "infra/span.h"
 #include <fmt/core.h>
 #include <iosfwd>
 #include <string_view>
@@ -75,6 +76,7 @@ fs::path replace_illegal_path_characters(const fs::path& filename, char replacem
 std::string read_as_text(const char* filename);
 std::string read_as_text(const std::string& filename);
 std::string read_as_text(const std::istream& filestream);
+void write(const fs::path& filename, std::span<const uint8_t> contents);
 void write_as_text(const fs::path& filename, std::string_view contents);
 void append_text_to_file(const fs::path& file, std::string_view contents);
 
