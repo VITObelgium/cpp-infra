@@ -37,6 +37,7 @@ static const std::unordered_map<RasterType, const char*>
         {RasterType::Netcdf, "netCDF"},
         {RasterType::TileDB, "TileDB"},
         {RasterType::MBTiles, "MBTiles"},
+        {RasterType::GeoPackage, "GPKG"},
         {RasterType::Grib, "GRIB"},
         {RasterType::Postgis, "PostGISRaster"},
         {RasterType::Vrt, "VRT"},
@@ -52,6 +53,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
     {"netCDF", RasterType::Netcdf},
     {"TileDB", RasterType::TileDB},
     {"MBTiles", RasterType::MBTiles},
+    {"GPKG", RasterType::GeoPackage},
     {"GRIB", RasterType::Grib},
     {"PostGISRaster", RasterType::Postgis},
     {"VRT", RasterType::Vrt},
@@ -984,6 +986,8 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
         return RasterType::Netcdf;
     } else if (ext == ".mbtiles") {
         return RasterType::MBTiles;
+    } else if (ext == ".gpkg") {
+        return RasterType::GeoPackage;
     } else if (ext == ".grib") {
         return RasterType::Grib;
     } else if (ext == ".vrt") {

@@ -86,6 +86,7 @@ enum class RasterType
     Netcdf,
     TileDB,
     MBTiles,
+    GeoPackage,
     Grib,
     Postgis,
     Vrt,
