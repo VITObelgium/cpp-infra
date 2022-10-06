@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
 #include <cstdint>
@@ -7,7 +8,7 @@
 namespace inf {
 
 template <typename T>
-float linear_map_to_float(T value, T min, T max)
+constexpr float linear_map_to_float(T value, T min, T max) noexcept
 {
     assert(min < max);
 
@@ -16,7 +17,7 @@ float linear_map_to_float(T value, T min, T max)
 }
 
 template <typename T>
-uint8_t linear_map_to_byte(T value, T start, T end, uint8_t mapStart, uint8_t mapEnd)
+constexpr uint8_t linear_map_to_byte(T value, T start, T end, uint8_t mapStart, uint8_t mapEnd) noexcept
 {
     if (value < start || value > end) {
         return 0;
