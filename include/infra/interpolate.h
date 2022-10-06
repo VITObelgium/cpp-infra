@@ -10,6 +10,10 @@ namespace inf {
 template <typename T>
 constexpr float linear_map_to_float(T value, T min, T max) noexcept
 {
+    if constexpr (std::is_floating_point_v<T>) {
+        assert(!std::isnan(min));
+        assert(!std::isnan(max));
+    }
     assert(min < max);
 
     const auto rangeWidth = static_cast<float>(max - min);
