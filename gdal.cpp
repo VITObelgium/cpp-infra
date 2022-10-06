@@ -461,6 +461,11 @@ RasterDataSet::RasterDataSet(GDALDataset* ptr) noexcept
 {
 }
 
+RasterDataSet::RasterDataSet(GDALDatasetH ptr) noexcept
+: RasterDataSet(GDALDataset::FromHandle(ptr))
+{
+}
+
 RasterDataSet::RasterDataSet(RasterDataSet&& rhs) noexcept
 : _ptr(rhs._ptr)
 {

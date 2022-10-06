@@ -144,6 +144,7 @@ public:
     static RasterDataSet open_for_writing(const fs::path& filePath, RasterType type, const std::vector<std::string>& driverOpts = {});
 
     RasterDataSet() = default;
+    explicit RasterDataSet(GDALDatasetH ptr) noexcept;
     explicit RasterDataSet(GDALDataset* ptr) noexcept;
 
     RasterDataSet(RasterDataSet&&) noexcept;
