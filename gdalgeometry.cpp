@@ -601,6 +601,10 @@ std::optional<int32_t> Layer::epsg() const
         if (auto* epsg = _layer->GetSpatialRef()->GetAuthorityCode("PROJCS"); epsg != nullptr) {
             return str::to_int32(epsg);
         }
+
+        if (auto* epsg = spatialRef->GetAttrValue("PROJCS|GEOGCS|AUTHORITY", 1); epsg != nullptr) {
+            return str::to_int32(epsg);
+        }
     }
 
     return std::optional<int32_t>();
