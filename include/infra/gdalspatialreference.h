@@ -8,7 +8,6 @@
 #include <optional>
 #include <string>
 
-
 namespace inf::gdal {
 
 /*! Wrapper around the OGRSpatialReference class
@@ -24,6 +23,8 @@ public:
     SpatialReference(const std::string& wkt);
     SpatialReference(OGRSpatialReference* instance);
     ~SpatialReference() noexcept;
+
+    SpatialReference& operator=(SpatialReference&&);
 
     SpatialReference(SpatialReference&&) noexcept;
 

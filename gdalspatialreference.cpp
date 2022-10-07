@@ -56,6 +56,13 @@ SpatialReference::~SpatialReference() noexcept
     }
 }
 
+SpatialReference& SpatialReference::operator=(SpatialReference&& other)
+{
+    _srs       = other._srs;
+    other._srs = nullptr;
+    return *this;
+}
+
 SpatialReference SpatialReference::clone() const
 {
     return SpatialReference(_srs->Clone());
