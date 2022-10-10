@@ -16,6 +16,12 @@ constexpr float linear_map_to_float(T value, T min, T max) noexcept
     }
     assert(min < max);
 
+    if (value < min) {
+        return 0.f;
+    } else if (value > max) {
+        return 1.f;
+    }
+
     const auto rangeWidth = static_cast<float>(max - min);
     return static_cast<float>(value - min) / rangeWidth;
 }
