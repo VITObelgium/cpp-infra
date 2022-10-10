@@ -334,6 +334,7 @@ if (INFRA_GDAL)
     list (APPEND INFRA_PUBLIC_HEADERS
         include/infra/gdal.h
         include/infra/gdalalgo.h
+        include/infra/gdalresample.h
         include/infra/gdalgeometry.h
         include/infra/gdalio.h
         include/infra/gdalcolortable.h
@@ -348,6 +349,7 @@ if (INFRA_GDAL)
         gdalalgo.cpp
         gdalgeometry.cpp
         gdalio.cpp
+        gdalresample.cpp
         gdalspatialreference.cpp
         gdal-private.cpp
         geocoder.cpp

@@ -4,6 +4,7 @@
 #include "infra/filesystem.h"
 #include "infra/gdal-private.h"
 #include "infra/gdalgeometry.h"
+#include "infra/gdalresample.h"
 #include "infra/gdalspatialreference.h"
 #include "infra/geometadata.h"
 #include "infra/point.h"
