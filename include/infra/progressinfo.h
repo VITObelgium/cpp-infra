@@ -194,7 +194,7 @@ public:
     }
 
     /*! Use in combination with set_total_ticks, progress will be calculated internally
-     * /throws CancelRequested when cancellation is requested 
+     * /throws CancelRequested when cancellation is requested
      **/
     void tick_throw_on_cancel()
     {
@@ -203,8 +203,8 @@ public:
     }
 
     /*! Provide the current progress explicitely without relying on a tick count
-	 * /progress value between 0.0 and 1.0
-	 */
+     * /progress value between 0.0 and 1.0
+     */
     void tick(float progress) noexcept
     {
         signal_progress(progress);
@@ -265,7 +265,12 @@ private:
     void signal_progress(float progress) noexcept
     {
         if (_cb) {
-            _cancel = _cb(Status(truncate<int64_t>(progress * 100.f), 100)) == ProgressStatusResult::Abort;
+            const auto progress100 = truncate<int64_t>(progress * 100.f);
+            if constexpr (std::is_void_v<ProgressPayload>) {
+                _cancel = _cb(Status(progress100, 100)) == ProgressStatusResult::Abort;
+            } else {
+                _cancel = _cb(Status(progress100, 100, _status.payload())) == ProgressStatusResult::Abort;
+            }
         }
     }
 
