@@ -118,6 +118,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/crs.h
     include/infra/csvwriter.h
     include/infra/demangle.h
+    include/infra/format.h
     include/infra/generator.h
     include/infra/hash.h
     include/infra/interpolate.h
