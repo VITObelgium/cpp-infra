@@ -14,7 +14,11 @@ constexpr float linear_map_to_float(T value, T min, T max) noexcept
         assert(!std::isnan(min));
         assert(!std::isnan(max));
     }
-    assert(min < max);
+    assert(min <= max);
+
+    if (min == max) {
+        return 0.f;
+    }
 
     if (value < min) {
         return 0.f;
