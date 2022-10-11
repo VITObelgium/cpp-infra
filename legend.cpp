@@ -1,6 +1,7 @@
 #include "infra/legend.h"
 #include "infra/cast.h"
 #include "infra/exception.h"
+#include "infra/interpolate.h"
 #include "infra/legenddataanalyser.h"
 #include "infra/math.h"
 #include "infra/string.h"
@@ -15,6 +16,11 @@ Color Legend::color_for_value(double value) const noexcept
 {
     if (is_unmappable(value)) {
         return Color();
+    }
+
+    if (type == Type::Contiguous) {
+        assert(entries.size() == 1);
+        return cmap.get_color(linear_map_to_float(value, entries.front().lowerBound, entries.front().upperBound));
     }
 
     for (auto& entry : entries) {
@@ -48,8 +54,8 @@ Color Legend::color_for_value(std::string_view value) const noexcept
         return Color();
     }
 
-    for (auto& entry : entries) {
-        if (type == inf::Legend::Type::Categoric) {
+    if (type == inf::Legend::Type::Categoric) {
+        for (auto& entry : entries) {
             if (entry.value == value) {
                 return entry.color;
             }
@@ -63,6 +69,11 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
 {
     if (is_unmappable(value)) {
         return unmappable;
+    }
+
+    if (type == Type::Contiguous) {
+        assert(entries.size() == 1);
+        return cmap.get_color(linear_map_to_float(value, entries.front().lowerBound, entries.front().upperBound));
     }
 
     for (auto& entry : entries) {

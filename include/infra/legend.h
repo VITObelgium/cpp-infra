@@ -34,8 +34,9 @@ struct Legend
 {
     enum class Type
     {
-        Categoric, // Every legend entry represents a single value
-        Numeric,   // Every legend entry represents a value range
+        Categoric,  // Every legend entry represents a single value
+        Numeric,    // Every legend entry represents a value range
+        Contiguous, // Values are scaled contigously between a min and max value
     };
 
     /*! Map the value to a color based on the legend entries
