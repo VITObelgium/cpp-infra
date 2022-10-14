@@ -22,7 +22,7 @@
 
 namespace inf::gdal::io {
 
-GeoMetadata read_metadata(const fs::path& fileName);
+GeoMetadata read_metadata(const fs::path& fileName, const std::vector<std::string>& driverOpts = {});
 const std::type_info& get_raster_type(const fs::path& fileName);
 
 namespace detail {

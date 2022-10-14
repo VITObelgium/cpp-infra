@@ -23,9 +23,9 @@ const std::type_info& get_raster_type(const fs::path& fileName)
     return type;
 }
 
-GeoMetadata read_metadata(const fs::path& fileName)
+GeoMetadata read_metadata(const fs::path& fileName, const std::vector<std::string>& driverOpts)
 {
-    return gdal::RasterDataSet::open(fileName).geometadata();
+    return gdal::RasterDataSet::open(fileName, driverOpts).geometadata();
 }
 
 void detail::read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet, const std::type_info& typeInfo, void* data, int dataCols)
