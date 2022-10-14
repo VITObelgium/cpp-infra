@@ -29,10 +29,12 @@ std::string resample_algo_to_string(ResampleAlgorithm algo)
         return "FIRSTQUANTILE";
     case ResampleAlgorithm::ThirdQuantile:
         return "THIRDQUANTILE";
+#if GDAL_VERSION_NUM >= 3010000
     case ResampleAlgorithm::Sum:
         return "SUM";
     case ResampleAlgorithm::RootMeanSquare:
         return "RMS";
+#endif
     default:
         return "NONE";
     }
