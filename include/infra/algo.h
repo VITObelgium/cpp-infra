@@ -92,6 +92,13 @@ void remove_from_container(Container& c, Predicate&& pred) noexcept
     c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
 }
 
+template <typename OutputContainer, typename T = typename OutputContainer::value_type>
+void append_to_container(OutputContainer& output, std::initializer_list<T> values) noexcept
+{
+    output.reserve(output.size() + values.size());
+    std::copy(values.begin(), values.end(), std::back_inserter(output));
+}
+
 template <typename OutputContainer, typename InputContainer>
 void append_to_container(OutputContainer& output, const InputContainer& input) noexcept
 {
