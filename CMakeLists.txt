@@ -120,6 +120,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/demangle.h
     include/infra/format.h
     include/infra/generator.h
+    include/infra/geometadata.h
     include/infra/hash.h
     include/infra/interpolate.h
     include/infra/legend.h
@@ -159,6 +160,7 @@ add_library(infra
     csvwriter.cpp
     demangle.cpp
     environmentvariable.cpp
+    geometadata.cpp
     legend.cpp
     legenddataanalyser.cpp
     string.cpp
@@ -341,7 +343,6 @@ if (INFRA_GDAL)
         include/infra/gdalcolortable.h
         include/infra/gdalspatialreference.h
         include/infra/geocoder.h
-        include/infra/geometadata.h
         include/infra/gdal-private.h
     )
 
@@ -354,7 +355,6 @@ if (INFRA_GDAL)
         gdalspatialreference.cpp
         gdal-private.cpp
         geocoder.cpp
-        geometadata.cpp
     )
 
     if (INFRA_EMBED_GDAL_DATA)
@@ -398,6 +398,7 @@ if (INFRA_GDAL)
         target_sources(infra PRIVATE csvreader.cpp)
     endif ()
 
+    target_compile_definitions(infra PUBLIC INFRA_GDAL_ENABLED)
     target_link_libraries(infra PUBLIC GDAL::GDAL)
     if (TARGET GEOS::geos)
         set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)

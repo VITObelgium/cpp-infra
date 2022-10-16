@@ -1,5 +1,8 @@
 #include "infra/geometadata.h"
+
+#ifdef INFRA_GDAL_ENABLED
 #include "infra/gdal.h"
+#endif
 
 #include <cmath>
 #include <limits>
@@ -229,9 +232,7 @@ Point<double> GeoMetadata::bottom_right() const
 std::string GeoMetadata::to_string() const
 {
     std::ostringstream os;
-    os << "Rows: " << rows << " Cols: " << cols
-       << " Xll: " << xll << " Yll: " << yll
-       << " Cellsize: " << cellSize.x << ", " << cellSize.y;
+    os << fmt::format("Rows: {} Cols: {} Xll: {:.3f} Yll: {:.3f} Cellsize: {},{}", rows, cols, xll, yll, cellSize.x, cellSize.y);
 
     if (nodata) {
         os << " NoData: " << *nodata;
@@ -262,9 +263,12 @@ std::optional<int32_t> GeoMetadata::projection_geo_epsg() const noexcept
 std::optional<int32_t> GeoMetadata::geographic_epsg() const noexcept
 {
     std::optional<int32_t> epsg;
+
+#ifdef INFRA_GDAL_ENABLED
     if (!projection.empty()) {
         epsg = inf::gdal::projection_to_geo_epsg(projection);
     }
+#endif
 
     return epsg;
 }
@@ -277,9 +281,12 @@ std::optional<int32_t> GeoMetadata::projection_epsg() const noexcept
 std::optional<int32_t> GeoMetadata::projected_epsg() const noexcept
 {
     std::optional<int32_t> epsg;
+
+#ifdef INFRA_GDAL_ENABLED
     if (!projection.empty()) {
         epsg = inf::gdal::projection_to_epsg(projection);
     }
+#endif
 
     return epsg;
 }
@@ -295,7 +302,11 @@ std::string GeoMetadata::projection_frienly_name() const noexcept
 
 void GeoMetadata::set_projection_from_epsg(int32_t epsg)
 {
+#ifdef INFRA_GDAL_ENABLED
     projection = gdal::projection_from_epsg(epsg);
+#else
+    projection = fmt::format("EPSG:{}", epsg);
+#endif
 }
 
 std::array<double, 6> metadata_to_geo_transform(const GeoMetadata& meta)
@@ -399,5 +410,4 @@ bool metadata_is_aligned(const GeoMetadata& meta1, const GeoMetadata& meta2) noe
     return is_aligned(meta1.xll, meta2.xll, meta1.cell_size_x()) &&
            is_aligned(meta1.yll, meta2.yll, std::abs(meta1.cell_size_y()));
 }
-
 }
