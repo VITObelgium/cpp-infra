@@ -70,10 +70,52 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
 
     GDALWarpOperation operation;
     operation.Initialize(warpOptions);
-    check_error(operation.ChunkAndWarpImage(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
+    check_error(operation.ChunkAndWarpMulti(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
 
     GDALDestroyGenImgProjTransformer(warpOptions->pTransformerArg);
     GDALDestroyWarpOptions(warpOptions);
+}
+
+class GdalWarpAppOptionsWrapper
+{
+public:
+    GdalWarpAppOptionsWrapper() noexcept
+    : _opts(GDALWarpAppOptionsNew(nullptr, nullptr))
+    {
+    }
+
+    ~GdalWarpAppOptionsWrapper() noexcept
+    {
+        GDALWarpAppOptionsFree(_opts);
+    }
+
+    operator GDALWarpAppOptions*() noexcept
+    {
+        return _opts;
+    }
+
+    void set_option(const char* key, const char* value)
+    {
+        GDALWarpAppOptionsSetWarpOption(_opts, key, value);
+    }
+
+private:
+    GDALWarpAppOptions* _opts = nullptr;
+};
+
+void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::pair<std::string, std::string>>& options)
+{
+    GdalWarpAppOptionsWrapper warpOptions;
+    for (auto& [key, val] : options) {
+        warpOptions.set_option(key.c_str(), val.c_str());
+    }
+
+    int usageError = 0;
+    auto srcHandle = GDALDataset::ToHandle(srcDataSet.get());
+    GDALWarp(nullptr, GDALDataset::ToHandle(dstDataSet.get()), 1, &srcHandle, warpOptions, &usageError);
+    if (usageError) {
+        throw RuntimeError("Warp failed");
+    }
 }
 
 VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta, const std::vector<std::string>& extraOptions)
