@@ -1,4 +1,6 @@
 #include "infra/geometadata.h"
+#include "infra/cast.h"
+#include "infra/exception.h"
 
 #ifdef INFRA_GDAL_ENABLED
 #include "infra/gdal.h"
