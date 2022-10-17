@@ -132,6 +132,14 @@ enum class OpenMode
     ReadWrite,
 };
 
+struct RasterStats
+{
+    double min    = std::numeric_limits<double>::quiet_NaN();
+    double max    = std::numeric_limits<double>::quiet_NaN();
+    double mean   = std::numeric_limits<double>::quiet_NaN();
+    double stddev = std::numeric_limits<double>::quiet_NaN();
+};
+
 class RasterDataSet
 {
 public:
@@ -239,6 +247,8 @@ public:
         auto* band = _ptr->GetRasterBand(_ptr->GetRasterCount());
         band->SetColorInterpretation(colorInterp);
     }
+
+    RasterStats statistics(int bandNr, bool allowApproximation, bool force);
 
     GDALDataset* get() const;
     RasterDriver driver();

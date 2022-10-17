@@ -757,6 +757,18 @@ void RasterDataSet::add_band(GDALDataType type, const void* data)
     _ptr->AddBand(type, const_cast<char**>(options.data()));
 }
 
+RasterStats RasterDataSet::statistics(int bandNr, bool allowApproximation, bool force)
+{
+    auto* band = _ptr->GetRasterBand(bandNr);
+    if (band == nullptr) {
+        throw RuntimeError("Invalid dataset band number: {}", bandNr);
+    }
+
+    RasterStats stats;
+    check_error(band->GetStatistics(allowApproximation ? TRUE : FALSE, force ? TRUE : FALSE, &stats.min, &stats.max, &stats.mean, &stats.stddev), "Failed to obtain raster statistics");
+    return stats;
+}
+
 GDALDataset* RasterDataSet::get() const
 {
     return _ptr;
