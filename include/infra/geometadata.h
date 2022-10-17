@@ -116,6 +116,8 @@ struct GeoMetadata
     Point<double> center() const;
     Point<double> top_left() const;
     Point<double> bottom_right() const;
+    Point<double> top_right() const;
+    Point<double> bottom_left() const;
 
     Point<double> top_left_center() const;
 

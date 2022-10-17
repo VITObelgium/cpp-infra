@@ -229,6 +229,16 @@ Point<double> GeoMetadata::bottom_right() const
     return Point<double>(xll + (cols * cellSize.x), yll);
 }
 
+Point<double> GeoMetadata::top_right() const
+{
+    return Point<double>(xll + (cols * cellSize.x), yll - (rows * cellSize.y));
+}
+
+Point<double> GeoMetadata::bottom_left() const
+{
+    return Point<double>(xll, yll);
+}
+
 std::string GeoMetadata::to_string() const
 {
     std::ostringstream os;
