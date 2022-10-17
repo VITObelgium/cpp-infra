@@ -13,6 +13,7 @@ struct WarpOptions
     ResampleAlgorithm resampleAlgo = ResampleAlgorithm::NearestNeighbour;
     PolygonCRef clipPolygon;
     std::optional<double> clipBlendDistance;
+    std::vector<std::string> additionalOptions;
 };
 
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo = ResampleAlgorithm::NearestNeighbour);

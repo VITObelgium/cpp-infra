@@ -20,10 +20,15 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAl
 
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options)
 {
-    static const std::array<const char*, 2> optionStrings{{"NUM_THREADS=ALL_CPUS", nullptr}};
+    std::vector<std::string> strOptions = {
+        "NUM_THREADS=ALL_CPUS",
+    };
+
+    strOptions.reserve(strOptions.size() + options.additionalOptions.size());
+    std::copy(options.additionalOptions.begin(), options.additionalOptions.end(), std::back_inserter(strOptions));
 
     auto warpOptions              = GDALCreateWarpOptions();
-    warpOptions->papszWarpOptions = CSLDuplicate(const_cast<char**>(optionStrings.data()));
+    warpOptions->papszWarpOptions = CSLDuplicate(create_string_list(strOptions));
     warpOptions->hSrcDS           = srcDataSet.get();
     warpOptions->hDstDS           = dstDataSet.get();
     warpOptions->nBandCount       = 1;
