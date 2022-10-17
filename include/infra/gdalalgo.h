@@ -55,4 +55,9 @@ VectorDataSet buffer_vector(VectorDataSet& ds, const BufferOptions opts);
 template <typename T>
 std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options = {});
 
+gdal::RasterDataSet translate(const fs::path& path, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb = nullptr);
+gdal::RasterDataSet translate(const fs::path& path, const fs::path& outputPath, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb = nullptr);
+gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb = nullptr);
+gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const fs::path& outputPath, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb = nullptr);
+
 }

@@ -374,6 +374,75 @@ std::pair<GeoMetadata, std::vector<T>> translate(const RasterDataSet& ds, const 
     return std::make_pair(memDataSet.geometadata(), std::move(data));
 }
 
+class TranslateOptionsWrapper
+{
+public:
+    TranslateOptionsWrapper(const std::vector<std::string>& opts)
+    : _options(nullptr)
+    {
+        auto optionValues = gdal::create_string_list(opts);
+        _options          = GDALTranslateOptionsNew(const_cast<char**>(optionValues.List()), nullptr);
+    }
+
+    TranslateOptionsWrapper(const std::vector<std::string>& opts, ProgressInfo& progress)
+    : TranslateOptionsWrapper(opts)
+    {
+        if (progress.is_valid()) {
+            GDALProgressFunc progressFunc = [](double complete, const char* /*message*/, void* progressArg) -> int {
+                auto* cb = reinterpret_cast<ProgressInfo*>(progressArg);
+                cb->tick(truncate<float>(complete));
+                return cb->cancel_requested() ? FALSE : TRUE;
+            };
+
+            GDALTranslateOptionsSetProgress(_options, progressFunc, &progress);
+        }
+    }
+
+    ~TranslateOptionsWrapper()
+    {
+        GDALTranslateOptionsFree(_options);
+    }
+
+    GDALTranslateOptions* get()
+    {
+        return _options;
+    }
+
+private:
+    GDALTranslateOptions* _options;
+};
+
+gdal::RasterDataSet translate(const fs::path& inputPath, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb)
+{
+    return translate(inputPath, {}, options, progressCb);
+}
+
+gdal::RasterDataSet translate(const fs::path& inputPath, const fs::path& outputPath, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb)
+{
+    auto ds = gdal::RasterDataSet::open(inputPath);
+    return translate(ds, outputPath, options, progressCb);
+}
+
+gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb)
+{
+    return translate(ds, fs::path(), options, progressCb);
+}
+
+gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const fs::path& outputPath, const std::vector<std::string>& options, const ProgressInfo::Callback& progressCb)
+{
+    ProgressInfo progress(progressCb);
+    TranslateOptionsWrapper gdalOptions(options, progress);
+
+    int userError = 0;
+    auto resultDs = gdal::RasterDataSet(GDALTranslate(outputPath.empty() ? nullptr : outputPath.generic_u8string().c_str(), ds.get(), gdalOptions.get(), &userError));
+
+    if (userError) {
+        throw RuntimeError("Translate: invalid arguments");
+    }
+
+    return resultDs;
+}
+
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<double>> rasterize<double>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
