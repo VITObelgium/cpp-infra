@@ -84,6 +84,14 @@ public:
     {
     }
 
+    GdalWarpAppOptionsWrapper(const std::vector<std::string>& opts)
+    : _opts(GDALWarpAppOptionsNew(create_string_list(opts), nullptr))
+    {
+        if (!_opts) {
+            throw RuntimeError("Invalid warp arguments");
+        }
+    }
+
     ~GdalWarpAppOptionsWrapper() noexcept
     {
         GDALWarpAppOptionsFree(_opts);
@@ -103,11 +111,11 @@ private:
     GDALWarpAppOptions* _opts = nullptr;
 };
 
-void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::pair<std::string, std::string>>& options)
+void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions)
 {
-    GdalWarpAppOptionsWrapper warpOptions;
-    for (auto& [key, val] : options) {
-        warpOptions.set_option(key.c_str(), val.c_str());
+    GdalWarpAppOptionsWrapper warpOptions(options);
+    for (auto& [key, value] : keyValueOptions) {
+        warpOptions.set_option(key.c_str(), value.c_str());
     }
 
     int usageError = 0;

@@ -3,6 +3,7 @@
 #include "infra/gdal.h"
 #include "infra/gdalresample.h"
 #include "infra/geometadata.h"
+#include "infra/size.h"
 
 #include <vector>
 
@@ -20,7 +21,7 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAl
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options);
 
 // This version uses the same options as the command line tool
-void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::pair<std::string, std::string>>& options);
+void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions);
 
 VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta, const std::vector<std::string>& options = {});
 VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection, const std::vector<std::string>& options = {});
