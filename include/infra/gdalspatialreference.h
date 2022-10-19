@@ -47,7 +47,12 @@ public:
     void set_utm(int zone, bool north = true);
 
     bool is_geographic() const;
+    bool is_derived_geographic() const;
+    bool is_geocentric() const;
     bool is_projected() const;
+    bool is_local() const;
+
+    bool is_valid() const;
 
     OGRSpatialReference* get() noexcept;
     const OGRSpatialReference* get() const noexcept;

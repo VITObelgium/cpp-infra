@@ -157,9 +157,29 @@ bool SpatialReference::is_geographic() const
     return _srs->IsGeographic();
 }
 
+bool SpatialReference::is_derived_geographic() const
+{
+    return _srs->IsDerivedGeographic();
+}
+
+bool SpatialReference::is_geocentric() const
+{
+    return _srs->IsGeocentric();
+}
+
 bool SpatialReference::is_projected() const
 {
     return _srs->IsProjected();
+}
+
+bool SpatialReference::is_local() const
+{
+    return _srs->IsLocal();
+}
+
+bool SpatialReference::is_valid() const
+{
+    return _srs->Validate() == OGRERR_NONE;
 }
 
 OGRSpatialReference* SpatialReference::get() noexcept
