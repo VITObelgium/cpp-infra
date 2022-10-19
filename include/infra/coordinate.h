@@ -7,7 +7,7 @@
 
 namespace inf {
 
-// Represents a point in the raster using x,y coordinates
+// Represents a wgs84 point in the raster (lat, lon)
 struct Coordinate
 {
     constexpr Coordinate() = default;
@@ -27,13 +27,26 @@ struct Coordinate
         return !(*this == other);
     }
 
-    constexpr bool is_valid() const
+    bool is_valid() const noexcept
     {
-        return latitude != std::numeric_limits<double>::max() && longitude != std::numeric_limits<double>::max();
+        if (std::isnan(latitude) || std::isnan(longitude)) {
+            return false;
+        }
+
+        if (std::abs(latitude) > 90.0) {
+            // latitude must be between -90 and 90
+            return false;
+        }
+
+        if (!std::isfinite(longitude)) {
+            return false;
+        }
+
+        return true;
     }
 
-    double latitude  = std::numeric_limits<double>::max();
-    double longitude = std::numeric_limits<double>::max();
+    double latitude  = std::numeric_limits<double>::quiet_NaN();
+    double longitude = std::numeric_limits<double>::quiet_NaN();
 };
 
 inline double distance(const Coordinate& lhs, const Coordinate& rhs)
