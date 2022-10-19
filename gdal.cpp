@@ -367,6 +367,43 @@ const GDALRasterBand* RasterBand::get() const
     return _band;
 }
 
+const std::type_info& RasterBand::datatype() const
+{
+    return resolve_type(_band->GetRasterDataType());
+}
+
+inf::Size RasterBand::block_size()
+{
+    inf::Size result;
+
+    // Fail to compile if the inf::Size datasize type ever gets refactored
+    static_assert(std::is_same_v<int32_t, decltype(result.width)>);
+    static_assert(std::is_same_v<int32_t, decltype(result.height)>);
+
+    _band->GetBlockSize(&result.width, &result.height);
+    return result;
+}
+
+int32_t RasterBand::overview_count()
+{
+    return _band->GetOverviewCount();
+}
+
+RasterBand RasterBand::overview_dataset(int index)
+{
+    return RasterBand(check_pointer(_band->GetOverview(index), "Failed to obtain overview band"));
+}
+
+int32_t RasterBand::x_size()
+{
+    return _band->GetXSize();
+}
+
+int32_t RasterBand::y_size()
+{
+    return _band->GetYSize();
+}
+
 static GDALDataset* create_data_set(const fs::path& filePath,
                                     unsigned int openFlags,
                                     const char* const* drivers,
@@ -691,8 +728,7 @@ RasterType RasterDataSet::type() const
 const std::type_info& RasterDataSet::band_datatype(int bandNr) const
 {
     assert(_ptr);
-    assert(bandNr > 0);
-    return resolve_type(check_pointer(_ptr->GetRasterBand(bandNr), "Invalid band index")->GetRasterDataType());
+    return rasterband(bandNr).datatype();
 }
 
 void RasterDataSet::read_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, const std::type_info& type, void* pData, int bufXSize, int bufYSize, int pixelSize, int lineSize) const

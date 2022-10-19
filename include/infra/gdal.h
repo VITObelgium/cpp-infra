@@ -122,6 +122,14 @@ public:
     GDALRasterBand* get();
     const GDALRasterBand* get() const;
 
+    const std::type_info& datatype() const;
+    inf::Size block_size();
+    int32_t overview_count();
+    RasterBand overview_dataset(int index);
+
+    int32_t x_size();
+    int32_t y_size();
+
 private:
     GDALRasterBand* _band;
 };
@@ -186,11 +194,10 @@ public:
     void set_band_description(int bandNr, const std::string& description);
     std::vector<std::string> metadata_domains() const noexcept;
 
-    RasterBand rasterband(int index) const;
-
     RasterType type() const;
 
     const std::type_info& band_datatype(int index) const;
+    RasterBand rasterband(int index) const;
 
     template <typename T>
     void read_rasterdata(int band, int xOff, int yOff, int xSize, int ySize, T* pData, int bufXSize, int bufYSize, int pixelSize = 0, int lineSize = 0) const
