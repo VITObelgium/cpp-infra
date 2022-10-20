@@ -10,6 +10,14 @@ struct Rect
     Point<T> topLeft;
     Point<T> bottomRight;
 
+    Rect() noexcept = default;
+
+    Rect(Point<T> topLeft_, Point<T> bottomRight_) noexcept
+    : topLeft(topLeft_)
+    , bottomRight(bottomRight_)
+    {
+    }
+
     T width() const noexcept
     {
         return std::abs(bottomRight.x - topLeft.x);
@@ -18,6 +26,11 @@ struct Rect
     T height() const noexcept
     {
         return std::abs(bottomRight.y - topLeft.y);
+    }
+
+    bool empty() const noexcept
+    {
+        return width() == 0 || height() == 0;
     }
 
     bool is_valid() const noexcept
