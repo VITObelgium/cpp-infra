@@ -37,6 +37,7 @@ public:
     enum class Level
     {
         Off,
+        Trace,
         Debug,
         Info,
         Warning,
@@ -67,6 +68,9 @@ public:
     {
         if (_log) {
             switch (level) {
+            case Level::Trace:
+                _log->trace(fmt::runtime(format), std::forward<T>(args)...);
+                break;
             case Level::Debug:
                 _log->debug(fmt::runtime(format), std::forward<T>(args)...);
                 break;
@@ -85,6 +89,36 @@ public:
             default:
                 break;
             }
+        }
+    }
+
+    template <class... T>
+    static void trace(const char* format, T&&... args)
+    {
+        if (_log) {
+            _log->trace(fmt::runtime(format), std::forward<T>(args)...);
+        }
+    }
+
+    static void trace(const std::string& msg)
+    {
+        if (_log) {
+            _log->trace(msg);
+        }
+    }
+
+    static void trace(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->trace("[{}] {}", static_cast<std::string_view>(src), message);
+        }
+    }
+
+    template <class... T>
+    static void trace(const LogSource& src, const char* format, T&&... args)
+    {
+        if (_log) {
+            _log->trace("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
         }
     }
 
