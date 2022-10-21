@@ -97,13 +97,14 @@ public:
 
     std::chrono::seconds elapsed_seconds() const
     {
-        auto now = std::chrono::high_resolution_clock::now();
-        return std::chrono::duration_cast<std::chrono::seconds>(now - _startTime);
+        return elapsed_time<std::chrono::seconds>();
     }
 
-    std::chrono::high_resolution_clock::duration elapsed_time() const
+    template <typename Duration = std::chrono::high_resolution_clock::duration>
+    Duration elapsed_time() const
     {
-        return std::chrono::high_resolution_clock::now() - _startTime;
+        const auto now = std::chrono::high_resolution_clock::now();
+        return std::chrono::duration_cast<Duration>(now - _startTime);
     }
 
     std::string elapsed_time_string() const
