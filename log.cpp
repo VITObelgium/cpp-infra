@@ -101,6 +101,9 @@ void Log::set_level(Level level)
     switch (level) {
     case Level::Off:
         break;
+    case Level::Trace:
+        spdLevel = spdlog::level::trace;
+        break;
     case Level::Debug:
         spdLevel = spdlog::level::debug;
         break;
