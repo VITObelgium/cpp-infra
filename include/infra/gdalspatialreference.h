@@ -3,6 +3,7 @@
 #include "infra/coordinate.h"
 #include "infra/point.h"
 
+#include <gdal_version.h>
 #include <memory>
 #include <ogr_spatialref.h>
 #include <optional>
@@ -47,7 +48,10 @@ public:
     void set_utm(int zone, bool north = true);
 
     bool is_geographic() const;
+#if GDAL_VERSION_MAJOR >= 3
     bool is_derived_geographic() const;
+#endif
+
     bool is_geocentric() const;
     bool is_projected() const;
     bool is_local() const;

@@ -157,10 +157,12 @@ bool SpatialReference::is_geographic() const
     return _srs->IsGeographic();
 }
 
+#if GDAL_VERSION_MAJOR >= 3
 bool SpatialReference::is_derived_geographic() const
 {
     return _srs->IsDerivedGeographic();
 }
+#endif
 
 bool SpatialReference::is_geocentric() const
 {
