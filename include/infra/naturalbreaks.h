@@ -73,7 +73,7 @@ std::vector<T> jenks_break_values(std::span<const T> values, uint8_t numClasses,
                 size_t i4 = lower_class_limit - 1;
 
                 if (i4 != 0) {
-                    for (size_t j = 2; j < numClasses + 1; ++j) {
+                    for (uint8_t j = 2; j < numClasses + 1; ++j) {
                         T temp_val = (variance + variance_combinations[i4 - 1][j - 2]);
                         if (fabs(variance_combinations[l - 1][j - 1] - temp_val) < std::numeric_limits<T>::epsilon() || variance_combinations[l - 1][j - 1] > temp_val) {
                             lower_class_limits[l - 1][j - 1]    = inf::truncate<int>(lower_class_limit);
