@@ -70,7 +70,7 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOption
 
     GDALWarpOperation operation;
     operation.Initialize(warpOptions);
-    check_error(operation.ChunkAndWarpMulti(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
+    check_error(operation.ChunkAndWarpImage(0, 0, dstDataSet.x_size(), dstDataSet.y_size()), "Failed to warp raster");
 
     GDALDestroyGenImgProjTransformer(warpOptions->pTransformerArg);
     GDALDestroyWarpOptions(warpOptions);
