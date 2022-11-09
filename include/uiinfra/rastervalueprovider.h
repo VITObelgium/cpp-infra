@@ -26,8 +26,11 @@ public:
     Q_INVOKABLE QString rasterValueString(const QGeoCoordinate& coord) const noexcept;
 
     void setUnit(std::string_view unit);
-    void setPrecision(int decimals);
     void setDisplayEpsg(int32_t epsg);
+    //! Set the precision of the displayed values
+    void setPrecision(int decimals);
+    //! Set the precision of the displayed coordinates
+    void setCoordinatePrecision(double cellsize);
 
 protected:
     void setMetadata(const inf::GeoMetadata& meta);
@@ -38,7 +41,8 @@ private:
 
     inf::GeoMetadata _metadata;
     std::string _unit;
-    int _decimals = 6;
+    int _decimals      = 6;
+    int _decimalsCoord = 0;
     std::unique_ptr<inf::gdal::CoordinateTransformer> _transformer;
     std::unique_ptr<inf::gdal::CoordinateTransformer> _displayTransformer;
 };

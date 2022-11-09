@@ -5,6 +5,7 @@ add_executable(infratest
     colortest.cpp
 	chronotest.cpp
     colormaptest.cpp
+    interpolatetest.cpp
     inireadertest.cpp
     filesystemtest.cpp
     mathtest.cpp
@@ -49,15 +50,20 @@ if (INFRA_COMPRESSION)
     target_sources(infratest PRIVATE
         compressiontest.cpp
     )
+endif ()
 
-    target_compile_definitions(infratest PRIVATE HAVE_GDAL)
+if (INFRA_HASHING)
+    target_sources(infratest PRIVATE
+        hashtest.cpp
+        cryptotest.cpp
+    )
 endif ()
 
 target_link_libraries(infratest
     Infra::infra
 	Infra::infratestutil
     Infra::infratestutilmain
-    trompeloeil
+    trompeloeil::trompeloeil
 )
 
 target_compile_definitions(infratest PRIVATE TEST_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/data")

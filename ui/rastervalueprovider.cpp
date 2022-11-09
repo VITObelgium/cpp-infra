@@ -53,12 +53,12 @@ QString RasterValueProviderQObject::rasterValueString(const QGeoCoordinate& coor
         if (mapCoord.has_value()) {
             if (isOnMap) {
                 if (rasterValue.has_value()) {
-                    return QString("(X: %1, Y: %2) %3 %4").arg(int(mapCoord->x)).arg(int(mapCoord->y)).arg(*rasterValue, 0, 'f', _decimals).arg(_unit.c_str());
+                    return QString("(X: %1, Y: %2) %3 %4").arg(mapCoord->x, 0, 'f', _decimalsCoord).arg(mapCoord->y, 0, 'f', _decimalsCoord).arg(*rasterValue, 0, 'f', _decimals).arg(_unit.c_str());
                 } else {
-                    return QString("(X: %1, Y: %2) NODATA").arg(int(mapCoord->x)).arg(int(mapCoord->y));
+                    return QString("(X: %1, Y: %2) NODATA").arg(mapCoord->x, 0, 'f', _decimalsCoord).arg(mapCoord->y, 0, 'f', _decimalsCoord);
                 }
             } else {
-                return QString("(X: %1, Y: %2)").arg(int(mapCoord->x)).arg(int(mapCoord->y));
+                return QString("(X: %1, Y: %2)").arg(mapCoord->x, 0, 'f', _decimalsCoord).arg(mapCoord->y, 0, 'f', _decimalsCoord);
             }
         }
     } catch (const std::exception& e) {
@@ -81,6 +81,15 @@ void RasterValueProviderQObject::setPrecision(int decimals)
 void RasterValueProviderQObject::setDisplayEpsg(int32_t epsg)
 {
     _displayTransformer = std::make_unique<gdal::CoordinateTransformer>(crs::epsg::WGS84, epsg);
+}
+
+void RasterValueProviderQObject::setCoordinatePrecision(double cellsize)
+{
+    if (cellsize > 0.0 && cellsize < 1.0) {
+        _decimalsCoord = std::ceil(-std::log10(cellsize));
+    } else {
+        _decimalsCoord = 0;
+    }
 }
 
 void RasterValueProviderQObject::setMetadata(const inf::GeoMetadata& meta)

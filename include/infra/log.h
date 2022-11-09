@@ -14,9 +14,9 @@ class LogSource
 {
 public:
     /*!
-    * The logsource assumes the name of the log source is defined in static storage
-    * that outlives the log source instance so we use a string_view
-    */
+     * The logsource assumes the name of the log source is defined in static storage
+     * that outlives the log source instance so we use a string_view
+     */
     LogSource(std::string_view src) noexcept
     : _src(src)
     {
@@ -37,6 +37,7 @@ public:
     enum class Level
     {
         Off,
+        Trace,
         Debug,
         Info,
         Warning,
@@ -63,10 +64,69 @@ public:
     static void set_pattern(std::string_view pattern);
 
     template <class... T>
+    static void log(Level level, const char* format, T&&... args)
+    {
+        if (_log) {
+            switch (level) {
+            case Level::Trace:
+                _log->trace(fmt::runtime(format), std::forward<T>(args)...);
+                break;
+            case Level::Debug:
+                _log->debug(fmt::runtime(format), std::forward<T>(args)...);
+                break;
+            case Level::Info:
+                _log->info(fmt::runtime(format), std::forward<T>(args)...);
+                break;
+            case Level::Warning:
+                _log->warn(fmt::runtime(format), std::forward<T>(args)...);
+                break;
+            case Level::Error:
+                _log->error(fmt::runtime(format), std::forward<T>(args)...);
+                break;
+            case Level::Critical:
+                _log->critical(fmt::runtime(format), std::forward<T>(args)...);
+                break;
+            default:
+                break;
+            }
+        }
+    }
+
+    template <class... T>
+    static void trace(const char* format, T&&... args)
+    {
+        if (_log) {
+            _log->trace(fmt::runtime(format), std::forward<T>(args)...);
+        }
+    }
+
+    static void trace(const std::string& msg)
+    {
+        if (_log) {
+            _log->trace(msg);
+        }
+    }
+
+    static void trace(const LogSource& src, std::string_view message)
+    {
+        if (_log) {
+            _log->trace("[{}] {}", static_cast<std::string_view>(src), message);
+        }
+    }
+
+    template <class... T>
+    static void trace(const LogSource& src, const char* format, T&&... args)
+    {
+        if (_log) {
+            _log->trace("[{}] {}", static_cast<std::string_view>(src), fmt::format(format, std::forward<T>(args)...));
+        }
+    }
+
+    template <class... T>
     static void debug(const char* format, T&&... args)
     {
         if (_log) {
-            _log->debug(format, std::forward<T>(args)...);
+            _log->debug(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -96,7 +156,7 @@ public:
     static void info(const char* format, T&&... args)
     {
         if (_log) {
-            _log->info(format, std::forward<T>(args)...);
+            _log->info(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -126,7 +186,7 @@ public:
     static void warn(const char* format, T&&... args)
     {
         if (_log) {
-            _log->warn(format, std::forward<T>(args)...);
+            _log->warn(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -156,7 +216,7 @@ public:
     static void error(const char* format, T&&... args)
     {
         if (_log) {
-            _log->error(format, std::forward<T>(args)...);
+            _log->error(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 
@@ -186,7 +246,7 @@ public:
     static void critical(const char* format, T&&... args)
     {
         if (_log) {
-            _log->critical(format, std::forward<T>(args)...);
+            _log->critical(fmt::runtime(format), std::forward<T>(args)...);
         }
     }
 

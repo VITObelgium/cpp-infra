@@ -11,7 +11,7 @@ endif ()
 if (INFRA_IS_TOPLEVEL)
     cmake_minimum_required(VERSION 3.15)
     project(Infra
-        VERSION 0.9.51
+        VERSION 0.11.2
         LANGUAGES CXX
     )
     set(CMAKE_CXX_STANDARD 17)
@@ -34,18 +34,21 @@ option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
 cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
+option(INFRA_TBB "Enable the tbb functionality" OFF)
 option(INFRA_NUMERIC "Enable the numeric utility classes" OFF)
 option(INFRA_CHARSET "Enable the character set utility classes" OFF)
 option(INFRA_PROCESS "Enable the process utility classes" OFF)
 option(INFRA_DATABASE "Build the database utility classes" OFF)
 option(INFRA_DATABASE_SQLITE "Build the database sqlite utility classes" OFF)
 option(INFRA_DATABASE_POSTGRES "Build the database postgresql utility classes" OFF)
+option(INFRA_HASHING "Build with hashing support" OFF)
 option(INFRA_COMPRESSION "Build with compression support" OFF)
 option(INFRA_COMPRESSION_ZSTD "Enable zstd compression support" OFF)
 option(INFRA_ENABLE_TESTS "Build the unit tests" OFF)
 option(INFRA_ENABLE_TEST_UTILS "Build the unit test utilities" ${INFRA_ENABLE_TESTS})
 option(INFRA_ENABLE_BENCHMARKS "Build the micro benchmarks" OFF)
 option(INFRA_ENABLE_DOCUMENTATION "Build the documentation" OFF)
+option(INFRA_CLI_PROGRESS "Build the cli progress utility classes" OFF)
 option(INFRA_UI_COMPONENTS "Enable the generic qt ui components" OFF)
 option(INFRA_INSTALL_DEVELOPMENT_FILES "Install the infra development files (headers/libs)" ${INFRA_IS_TOPLEVEL})
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
@@ -99,8 +102,8 @@ find_package(fmt CONFIG REQUIRED)
 find_package(Gsl)
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-if (TARGET date::tz)
-    set_target_properties(date::tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+if (TARGET date::date-tz)
+    set_target_properties(date::date-tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif ()
 
 set(INFRA_PUBLIC_HEADERS
@@ -108,21 +111,25 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/cast.h
     include/infra/cell.h
     include/infra/chrono.h
-    include/infra/cliprogressbar.h
     include/infra/coordinate.h
     include/infra/cpuinfo.h
     include/infra/enumutils.h
     include/infra/enumflags.h
     include/infra/crs.h
     include/infra/csvwriter.h
+    include/infra/demangle.h
+    include/infra/format.h
     include/infra/generator.h
+    include/infra/geometadata.h
     include/infra/hash.h
     include/infra/interpolate.h
     include/infra/legend.h
     include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
     include/infra/line.h
+    include/infra/meteo.h
     include/infra/math.h
+    include/infra/naturalbreaks.h
     include/infra/point.h
     include/infra/progressinfo.h
     include/infra/range.h
@@ -134,10 +141,12 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/color.h
     include/infra/colormap.h
     include/infra/conversion.h
+    include/infra/environmentvariable.h
     include/infra/rect.h
     include/infra/size.h
     include/infra/span.h
     include/infra/threadpool.h
+    include/infra/typeinfo.h
     include/infra/typetraits.h
     include/infra/typetraits-private.h
     include/infra/inireader.h
@@ -149,6 +158,9 @@ add_library(infra
     chrono.cpp
     cpuinfo.cpp
     csvwriter.cpp
+    demangle.cpp
+    environmentvariable.cpp
+    geometadata.cpp
     legend.cpp
     legenddataanalyser.cpp
     string.cpp
@@ -158,8 +170,13 @@ add_library(infra
     colormap.cpp
     threadpool.cpp
     inireader.cpp
+    typeinfo.cpp
     workerthread.cpp
 )
+
+if (MSVC)
+    set_source_files_properties(cliprogressbar.cpp PROPERTIES COMPILE_DEFINITIONS _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
+endif ()
 
 add_library(Infra::infra ALIAS infra)
 
@@ -187,7 +204,7 @@ PRIVATE
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
-target_link_libraries(infra PUBLIC fmt::fmt date::date $<TARGET_NAME_IF_EXISTS:date::tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
+target_link_libraries(infra PUBLIC fmt::fmt date::date $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
 
 if (HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
@@ -236,6 +253,13 @@ if (INFRA_XML)
     target_link_libraries(infra PRIVATE pugixml)
 endif ()
 
+if (INFRA_CLI_PROGRESS)
+    find_package(indicators CONFIG REQUIRED)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/cliprogressbar.h)
+    target_sources(infra PRIVATE cliprogressbar.cpp)
+    target_link_libraries(infra PRIVATE indicators::indicators)
+endif ()
+
 if (INFRA_CHARSET)
     find_package(ICU COMPONENTS i18n data uc REQUIRED)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/charset.h)
@@ -253,17 +277,19 @@ if (INFRA_PROCESS)
 endif ()
 
 if (INFRA_DATABASE)
-    find_package(Sqlpp11 REQUIRED)
+    find_package(Sqlpp11 CONFIG REQUIRED)
     list (APPEND INFRA_PUBLIC_HEADERS include/infra/database.h)
     target_sources(infra PRIVATE database.cpp)
-    target_link_libraries(infra PUBLIC Sqlpp11::Sqlpp11)
+    target_link_libraries(infra PUBLIC sqlpp11::sqlpp11)
     if (INFRA_DATABASE_SQLITE)
-        target_link_libraries(infra PUBLIC Sqlpp11::Sqlite3)
+        find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS SQLite3)
+        target_link_libraries(infra PUBLIC sqlpp11::sqlite3 )
         target_compile_definitions(infra PUBLIC INFRA_DB_SQLITE_SUPPORT)
     endif ()
 
     if (INFRA_DATABASE_POSTGRES)
-        target_link_libraries(infra PUBLIC Sqlpp11::Postgresql)
+        find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS PostgreSQL)
+        target_link_libraries(infra PUBLIC sqlpp11::postgresql)
         target_compile_definitions(infra PUBLIC INFRA_DB_POSTGRES_SUPPORT)
     endif ()
     
@@ -271,6 +297,14 @@ if (INFRA_DATABASE)
         list (APPEND INFRA_PUBLIC_HEADERS include/infra/databaselog.h)
         target_sources(infra PRIVATE databaselog.cpp)
     endif ()
+endif ()
+
+if (INFRA_HASHING)
+    find_package(cryptopp CONFIG REQUIRED)
+    target_compile_definitions(infra PRIVATE INFRA_HASH_SUPPORT)
+    target_link_libraries(infra PRIVATE cryptopp-static)
+    list (APPEND INFRA_PUBLIC_HEADERS include/infra/crypto.h)
+    target_sources(infra PRIVATE hash.cpp crypto.cpp)
 endif ()
 
 if (INFRA_COMPRESSION)
@@ -282,25 +316,33 @@ if (INFRA_COMPRESSION)
     endif ()
 endif ()
 
+if (INFRA_TBB)
+    find_package(TBB CONFIG REQUIRED)
+    target_link_libraries(infra PRIVATE TBB::tbb)
+    target_compile_definitions(infra PRIVATE INFRA_TBB __TBB_NO_IMPLICIT_LINKAGE)
+endif ()
+
 if (INFRA_GDAL)
     find_package(GDAL CONFIG)
     if (NOT TARGET GDAL::GDAL)
         find_package(GDAL REQUIRED)
         set(SYSTEM_GDAL ON)
+        set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     endif ()
 
     if ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND INFRA_EMBED_GDAL_DATA) 
-        message(FATAL_ERROR "Embedding gdal data is not supported for gdal versions >= 3")
+        message(WARNING "Embedding gdal data is not supported for gdal versions >= 3")
     endif ()
 
     list (APPEND INFRA_PUBLIC_HEADERS
         include/infra/gdal.h
         include/infra/gdalalgo.h
+        include/infra/gdalresample.h
         include/infra/gdalgeometry.h
         include/infra/gdalio.h
         include/infra/gdalcolortable.h
+        include/infra/gdalspatialreference.h
         include/infra/geocoder.h
-        include/infra/geometadata.h
         include/infra/gdal-private.h
     )
 
@@ -309,8 +351,10 @@ if (INFRA_GDAL)
         gdalalgo.cpp
         gdalgeometry.cpp
         gdalio.cpp
+        gdalresample.cpp
+        gdalspatialreference.cpp
+        gdal-private.cpp
         geocoder.cpp
-        geometadata.cpp
     )
 
     if (INFRA_EMBED_GDAL_DATA)
@@ -335,12 +379,12 @@ if (INFRA_GDAL)
         )
     elseif ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND NOT SYSTEM_GDAL)
         add_custom_command(TARGET infra POST_BUILD
-                           COMMENT "Copying proj4 db to the build directory"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory $<TARGET_FILE_DIR:infra>/data
+                           COMMENT "Copying proj db to the build directory"
+                           COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
                            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ4::proj>/../../share/proj/proj.db>
-                                $<$<CONFIG:Release>:$<TARGET_FILE_DIR:PROJ4::proj>/../share/proj/proj.db>
-                                $<TARGET_FILE_DIR:infra>/data)
+                                $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ::proj>/../../share/proj/proj.db>
+                                $<$<NOT:$<CONFIG:Debug>>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
+                                "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/")
     endif ()
     
 
@@ -354,6 +398,7 @@ if (INFRA_GDAL)
         target_sources(infra PRIVATE csvreader.cpp)
     endif ()
 
+    target_compile_definitions(infra PUBLIC INFRA_GDAL_ENABLED)
     target_link_libraries(infra PUBLIC GDAL::GDAL)
     if (TARGET GEOS::geos)
         set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -385,10 +430,10 @@ set_target_properties(infra PROPERTIES
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
 
 if (INFRA_UI_COMPONENTS)
-    find_package(Qt5Gui REQUIRED)
-    find_package(Qt5Widgets REQUIRED)
-    find_package(Qt5Core REQUIRED)
-    find_package(Qt5Network REQUIRED)
+    find_package(Qt6 COMPONENTS Core Gui Widgets Network OpenGL QUIET)
+    if (NOT Qt6_FOUND)
+        find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network OpenGL REQUIRED)
+    endif ()
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -402,8 +447,6 @@ if (INFRA_UI_COMPONENTS)
         list(APPEND INFRA_UI_FILES ui/logview.ui)
     endif ()
 
-    qt5_wrap_ui(FORMS_HEADERS ${INFRA_UI_FILES})
-
     set(UIINFRA_PUBLIC_HEADERS
         include/uiinfra/aboutdialog.h
         include/uiinfra/clearableabstractitemmodel.h
@@ -416,11 +459,13 @@ if (INFRA_UI_COMPONENTS)
         include/uiinfra/dateconversion.h
         include/uiinfra/format.h
         include/uiinfra/multicombobox.h
+        include/uiinfra/noscrollspinbox.h
         include/uiinfra/checkablecombobox.h
         include/uiinfra/checkableitemproxymodel.h
         include/uiinfra/comboboxdelegate.h
         include/uiinfra/delegatecombobox.h
         include/uiinfra/readonlyproxy.h
+        include/uiinfra/legendmodel.h
         include/uiinfra/mdisubwindow.h
         include/uiinfra/gradientdelegate.h
         include/uiinfra/scopedcursor.h
@@ -450,6 +495,7 @@ if (INFRA_UI_COMPONENTS)
         ui/checkableitemproxymodel.cpp
         ui/comboboxdelegate.cpp
         ui/delegatecombobox.cpp
+        ui/legendmodel.cpp
         ui/mdisubwindow.cpp
         ui/gradientdelegate.cpp
         ui/toolboxview.cpp
@@ -465,32 +511,25 @@ if (INFRA_UI_COMPONENTS)
         ui/doublespinboxwithinfinites.cpp
         ui/toolboxitem.cpp
         ui/qt5.natvis
-        ${FORMS_HEADERS}
+        ${INFRA_UI_FILES}
     )
 
     add_library(Infra::uiinfra ALIAS uiinfra)
 
     target_link_libraries(uiinfra PUBLIC
-        Qt5::Network
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Core
+        Qt::Network
+        Qt::Gui
+        Qt::Widgets
+        Qt::Core
         date::date
     )
 
-    if (STATIC_QT AND WIN32 AND Qt5Network_VERSION VERSION_LESS 5.14.0)
-        get_target_property(QT_NETWORK_FEATURES Qt5::Network INTERFACE_QT_ENABLED_FEATURES)
-        if ("ssl" IN_LIST QT_NETWORK_FEATURES)
-            message(STATUS "Qt network SSL enabled")
-            target_link_libraries(uiinfra PRIVATE Crypt32.lib)
-            if (Qt5Network_VERSION VERSION_GREATER_EQUAL 5.13.0)
-                target_link_libraries(uiinfra PRIVATE Bcrypt.lib Secur32.lib Iphlpapi.lib)
-            endif ()
-        endif ()
-    endif ()
-
     if (INFRA_UI_COMPONENTS_QML)
-        find_package(Qt5Quick CONFIG REQUIRED)
+        if (Qt6_FOUND)
+            find_package(Qt6 COMPONENTS Quick)
+        else ()
+            find_package(Qt5 5.15 COMPONENTS Quick REQUIRED)
+        endif ()
 
         target_sources(uiinfra PRIVATE
             ui/pixmapimage.cpp
@@ -503,24 +542,26 @@ if (INFRA_UI_COMPONENTS)
         )
 
         target_link_libraries(uiinfra PUBLIC
-            Qt5::Quick
+            Qt::Quick
         )
     endif ()
 
     if (INFRA_UI_COMPONENTS_LOCATION)
-        find_package(Qt5Location CONFIG REQUIRED)
+        if (Qt6_FOUND)
+            find_package(Qt6 COMPONENTS Location QuickCompiler)
+        else ()
+            find_package(Qt5 5.15 COMPONENTS Location QuickCompiler REQUIRED)
+        endif ()
     
         if (NOT INFRA_GDAL)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
         endif ()
 
-        find_package(Qt5QuickCompiler REQUIRED)
         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
 
         target_sources(uiinfra PRIVATE
             ui/Legend.qml
             ui/polygonmodel.cpp
-            ui/legendmodel.cpp
             ui/maplegendmodel.cpp
             ui/rastervalueprovider.cpp
             ${INFRA_LOCATION_RESOURCES}
@@ -528,13 +569,12 @@ if (INFRA_UI_COMPONENTS)
 
         list (APPEND UIINFRA_PUBLIC_HEADERS
             include/uiinfra/polygonmodel.h
-            include/uiinfra/legendmodel.h
             include/uiinfra/maplegendmodel.h
             include/uiinfra/rastervalueprovider.h
         )
 
         target_link_libraries(uiinfra PUBLIC
-            Qt5::Location
+            Qt::Location
         )
 
         if (INFRA_GDAL)
@@ -563,6 +603,8 @@ if (INFRA_UI_COMPONENTS)
     endif ()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
+    set_target_properties(uiinfra PROPERTIES AUTORCC ON)
+    set_target_properties(uiinfra PROPERTIES AUTOUIC ON)
     target_sources(uiinfra PRIVATE ${UIINFRA_PUBLIC_HEADERS})
     set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
 
@@ -574,6 +616,8 @@ if (INFRA_UI_COMPONENTS)
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
+
+    target_compile_definitions(uiinfra PUBLIC QT_NO_KEYWORDS)
 
     if (INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)

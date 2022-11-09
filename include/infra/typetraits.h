@@ -20,4 +20,4 @@ inline constexpr bool dependent_false_v = dependent_false<T>::value;
 template <typename T>
 inline constexpr bool dependent_true_v = dependent_true<T>::value;
 
-} // namespace utils
+}

@@ -28,16 +28,16 @@ TEST_CASE("Geocoder.geocode_single")
     {
         auto coord = gc.geocode_single("Boeretang 200 Mol");
         REQUIRE(coord.has_value());
-        CHECK(coord->latitude == Approx(51.219066));
-        CHECK(coord->longitude == Approx(5.093644));
+        CHECK(coord->latitude == Approx(51.219066).epsilon(0.01));
+        CHECK(coord->longitude == Approx(5.093644).epsilon(0.01));
     }
 
     SUBCASE("valid result lommel")
     {
         auto coord = gc.geocode_single("Kloosterstraat 44 Lommel");
         REQUIRE(coord.has_value());
-        CHECK(coord->latitude == Approx(51.2299701));
-        CHECK(coord->longitude == Approx(5.31576194045124));
+        CHECK(coord->latitude == Approx(51.2299701).epsilon(0.01));
+        CHECK(coord->longitude == Approx(5.31576194045124).epsilon(0.01));
     }
 
     SUBCASE("valid result lommel no street number")
@@ -53,8 +53,8 @@ TEST_CASE("Geocoder.geocode_single")
     {
         auto coord = gc.geocode_single("Boeretang 200 Mol", "be");
         REQUIRE(coord.has_value());
-        CHECK(coord->latitude == Approx(51.219066));
-        CHECK(coord->longitude == Approx(5.093644));
+        CHECK(coord->latitude == Approx(51.219066).epsilon(0.01));
+        CHECK(coord->longitude == Approx(5.093644).epsilon(0.01));
     }
 
     SUBCASE("no match due to country restriction")

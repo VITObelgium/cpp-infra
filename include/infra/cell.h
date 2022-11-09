@@ -10,7 +10,7 @@ namespace inf {
 // Represents a point in the raster using r,c coordinates
 struct Cell
 {
-    constexpr Cell() = default;
+    constexpr Cell() noexcept = default;
     constexpr Cell(int32_t row, int32_t col)
     : r(row)
     , c(col)
@@ -110,9 +110,9 @@ struct hash<inf::Cell>
 {
     size_t operator()(const inf::Cell& cell) const
     {
-        size_t h1 = hash<int32_t>()(cell.r);
-        size_t h2 = hash<int32_t>()(cell.c);
-        return hash<long long>()((h1 << 32) ^ h2);
+        int64_t h1 = size_t(cell.r) << 32;
+        int64_t h2 = cell.c;
+        return hash<long long>()(h1 | h2);
     }
 };
 }

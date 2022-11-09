@@ -3,8 +3,8 @@
 #include <cassert>
 #include <qapplication.h>
 #include <qboxlayout.h>
-#include <qdesktopwidget.h>
 #include <qlistwidget.h>
+#include <qscreen.h>
 #include <qstylepainter.h>
 
 namespace inf::ui {
@@ -87,7 +87,7 @@ void MultiComboBox::showPopup()
     //QRect rec2(p , p + QPoint(rec.width(), rec.height()));
 
     // get the two possible list points and height
-    QRect screen    = QApplication::desktop()->screenGeometry(this);
+    QRect screen    = QApplication::primaryScreen()->geometry();
     QPoint above    = this->mapToGlobal(QPoint(0, 0));
     int aboveHeight = above.y() - screen.y();
     QPoint below    = this->mapToGlobal(QPoint(0, rec.height()));
@@ -203,7 +203,7 @@ void MultiComboBox::scanItemSelect(QListWidgetItem* item)
         list[i]->setSelected(false);
     }
 
-    emit itemChanged();
+    Q_EMIT itemChanged();
 }
 
 void MultiComboBox::initStyleOption(QStyleOptionComboBox* option) const

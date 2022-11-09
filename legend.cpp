@@ -1,7 +1,9 @@
 #include "infra/legend.h"
 #include "infra/cast.h"
 #include "infra/exception.h"
+#include "infra/interpolate.h"
 #include "infra/legenddataanalyser.h"
+#include "infra/math.h"
 #include "infra/string.h"
 
 #include <cassert>
@@ -12,13 +14,18 @@ namespace inf {
 
 Color Legend::color_for_value(double value) const noexcept
 {
-    if (std::isnan(value)) {
+    if (is_unmappable(value)) {
         return Color();
+    }
+
+    if (type == Type::Contiguous) {
+        assert(entries.size() == 1);
+        return cmap.get_color(linear_map_to_float(value, entries.front().lowerBound, entries.front().upperBound));
     }
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (std::floor(value) == entry.lowerBound) {
+            if (math::approx_equal(value, entry.lowerBound, std::numeric_limits<double>::epsilon())) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
@@ -41,15 +48,37 @@ Color Legend::color_for_value(double value) const noexcept
     return Color();
 }
 
+Color Legend::color_for_value(std::string_view value) const noexcept
+{
+    if (value.empty()) {
+        return Color();
+    }
+
+    if (type == inf::Legend::Type::Categoric) {
+        for (auto& entry : entries) {
+            if (entry.value == value) {
+                return entry.color;
+            }
+        }
+    }
+
+    return Color();
+}
+
 Color Legend::color_for_value(double value, const Color& unmappable) const noexcept
 {
-    if (std::isnan(value)) {
+    if (is_unmappable(value)) {
         return unmappable;
+    }
+
+    if (type == Type::Contiguous) {
+        assert(entries.size() == 1);
+        return cmap.get_color(linear_map_to_float(value, entries.front().lowerBound, entries.front().upperBound));
     }
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (std::floor(value) == entry.lowerBound) {
+            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
@@ -62,15 +91,32 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
     return unmappable;
 }
 
-Color Legend::color_for_value(double value, const Color& unmappable, const Color& unmappableLow, const Color& unmappableHigh) const noexcept
+Color Legend::color_for_value(std::string_view value, const Color& unmappable) const noexcept
 {
-    if (std::isnan(value) || entries.empty()) {
+    if (value.empty()) {
         return unmappable;
     }
 
     for (auto& entry : entries) {
         if (type == inf::Legend::Type::Categoric) {
-            if (std::floor(value) == entry.lowerBound) {
+            if (entry.value == value) {
+                return entry.color;
+            }
+        }
+    }
+
+    return unmappable;
+}
+
+Color Legend::color_for_value(double value, const Color& unmappable, const Color& unmappableLow, const Color& unmappableHigh) const noexcept
+{
+    if (is_unmappable(value) || entries.empty()) {
+        return unmappable;
+    }
+
+    for (auto& entry : entries) {
+        if (type == inf::Legend::Type::Categoric) {
+            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
                 return entry.color;
             }
         } else if (type == inf::Legend::Type::Numeric) {
@@ -89,6 +135,11 @@ Color Legend::color_for_value(double value, const Color& unmappable, const Color
     }
 
     return unmappable;
+}
+
+bool Legend::is_unmappable(double value) const noexcept
+{
+    return std::isnan(value) || (zeroIsNodata && value == 0.0);
 }
 
 Legend create_numeric_legend(double min, double max, int numberOfClasses, std::string_view cmapName, LegendScaleType method)
@@ -132,11 +183,13 @@ Legend create_categoric_legend(int64_t min, int64_t max, std::string_view cmapNa
 
     const float colorOffset = legend.numberOfClasses == 1 ? 0.f : 1.f / (legend.numberOfClasses - 1.f);
     float colorPos          = 0.f;
+    size_t entryIndex       = 0;
     for (int64_t i = min; i <= max; ++i) {
-        legend.entries[i].color      = legend.cmap.get_color(colorPos);
-        legend.entries[i].lowerBound = double(i);
-        legend.entries[i].upperBound = legend.entries[i].lowerBound;
+        legend.entries[entryIndex].color      = legend.cmap.get_color(colorPos);
+        legend.entries[entryIndex].lowerBound = double(i);
+        legend.entries[entryIndex].upperBound = legend.entries[entryIndex].lowerBound;
         colorPos += colorOffset;
+        ++entryIndex;
     }
 
     return legend;
@@ -167,12 +220,19 @@ Legend create_legend(std::vector<float> sampleData, int numberOfClasses, std::st
 
 void generate_bounds(double min, double max, LegendScaleType method, Legend& legend)
 {
-    auto bounds = inf::calculate_classbounds(method, legend.numberOfClasses, min, max);
-    assert(truncate<int>(bounds.size()) == legend.numberOfClasses + 1);
-    assert(truncate<int>(legend.entries.size()) == legend.numberOfClasses);
-    for (int i = 0; i < legend.numberOfClasses; ++i) {
-        legend.entries[i].lowerBound = bounds[i];
-        legend.entries[i].upperBound = bounds[i + 1];
+    if (min == max) {
+        for (int i = 0; i < legend.numberOfClasses; ++i) {
+            legend.entries[i].lowerBound = min;
+            legend.entries[i].upperBound = min;
+        }
+    } else {
+        auto bounds = inf::calculate_classbounds(method, legend.numberOfClasses, min, max);
+        assert(truncate<int>(bounds.size()) == legend.numberOfClasses + 1);
+        assert(truncate<int>(legend.entries.size()) == legend.numberOfClasses);
+        for (int i = 0; i < legend.numberOfClasses; ++i) {
+            legend.entries[i].lowerBound = bounds[i];
+            legend.entries[i].upperBound = bounds[i + 1];
+        }
     }
 }
 
@@ -209,8 +269,14 @@ void generate_colors(std::string_view cmapName, Legend& legend)
 
 void generate_legend_names(Legend& legend, int decimals, std::string_view unit)
 {
-    for (auto& entry : legend.entries) {
-        entry.name = fmt::format("{:.{}f} ... {:.{}f} {}", entry.lowerBound, decimals, entry.upperBound, decimals, unit);
+    if (legend.type == Legend::Type::Numeric) {
+        for (auto& entry : legend.entries) {
+            entry.name = fmt::format("{:.{}f} ... {:.{}f} {}", entry.lowerBound, decimals, entry.upperBound, decimals, unit);
+        }
+    } else {
+        for (auto& entry : legend.entries) {
+            entry.name = fmt::format("{:.{}f} {}", entry.lowerBound, decimals, unit);
+        }
     }
 }
 

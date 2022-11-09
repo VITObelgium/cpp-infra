@@ -18,6 +18,15 @@ std::string_view CsvReader::column_name(int32_t index) const
     return _layer.layer_definition().field_definition(index).name();
 }
 
+std::optional<int32_t> CsvReader::column_index(const std::string& name) const
+{
+    if (auto index = _layer.layer_definition().field_index(name); index >= 0) {
+        return index;
+    }
+
+    return {};
+}
+
 CsvRowIterator CsvReader::begin() const
 {
     return CsvRowIterator(_layer, _charset);

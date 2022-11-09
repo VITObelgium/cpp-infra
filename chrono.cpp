@@ -12,12 +12,29 @@ date_point today()
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(std::chrono::system_clock::now())));
 }
 
+local_date_point today_local()
+{
+    const auto now = date::make_zoned(date::current_zone(), std::chrono::system_clock::now());
+    return std::chrono::floor<date::days>(now.get_local_time());
+}
+
 time_point now()
 {
     return std::chrono::floor<std::chrono::seconds>(std::chrono::system_clock::now());
 }
 
+local_time_point now_local()
+{
+    const auto now = date::make_zoned(date::current_zone(), std::chrono::system_clock::now());
+    return std::chrono::floor<std::chrono::milliseconds>(now.get_local_time());
+}
+
 date_point date_from_time_point(time_point tp)
+{
+    return std::chrono::floor<date::days>(tp);
+}
+
+local_date_point date_from_time_point(local_time_point tp)
 {
     return std::chrono::floor<date::days>(tp);
 }
@@ -33,6 +50,11 @@ date::year_month_day to_year_month_day(time_point tp)
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(tp)));
 }
 
+date::year_month_day to_year_month_day(local_time_point tp)
+{
+    return date::year_month_day(date::local_days(std::chrono::floor<date::days>(tp)));
+}
+
 std::string to_string(date::local_seconds tp)
 {
     return to_string("%Y_%m_%d_%H.%M", tp);
@@ -45,9 +67,17 @@ std::string to_string(std::string_view format, date::local_seconds tp)
     return dateStr.str();
 }
 
-std::optional<time_point> system_time_point_from_string(std::string_view str1, const char* format)
+std::string to_string(local_time_point tp)
 {
-    time_point tp;
+    std::stringstream ss;
+    ss << tp;
+    return ss.str();
+}
+
+template <typename TimeType>
+std::optional<TimeType> time_point_from_string(std::string_view str1, const char* format)
+{
+    TimeType tp;
     std::istringstream ss;
     ss.str(std::string(str1));
     ss >> date::parse(format, tp);
@@ -56,6 +86,16 @@ std::optional<time_point> system_time_point_from_string(std::string_view str1, c
     }
 
     return tp;
+}
+
+std::optional<time_point> system_time_point_from_string(std::string_view str1, const char* format)
+{
+    return time_point_from_string<time_point>(str1, format);
+}
+
+std::optional<local_time_point> local_time_point_from_string(std::string_view str1, const char* format)
+{
+    return time_point_from_string<local_time_point>(str1, format);
 }
 
 std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)

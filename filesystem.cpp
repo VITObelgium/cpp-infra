@@ -35,6 +35,15 @@ bool create_directory_if_not_exists(const fs::path& path)
     return fs::create_directories(path);
 }
 
+bool create_directory_for_file(const fs::path& path)
+{
+    if (path.has_parent_path()) {
+        return fs::create_directories(path.parent_path());
+    }
+
+    return true;
+}
+
 fs::path combine_absolute_with_relative_path(const fs::path& base, const fs::path& file)
 {
     assert(base.has_parent_path());
@@ -98,14 +107,35 @@ fs::path combine_path(const fs::path& base, const fs::path& file)
 #endif
 }
 
+std::vector<uint8_t> read(const fs::path& filename)
+{
+    std::ifstream fileStream(filename, std::ifstream::binary);
+    if (!fileStream.is_open()) {
+        throw RuntimeError("Failed to open file for reading: {}", filename);
+    }
+
+    fileStream.seekg(0, std::ios::end);
+    const auto fileSize = fileStream.tellg();
+    fileStream.seekg(0, std::ios::beg);
+
+    std::vector<uint8_t> result(fileSize, 0);
+    fileStream.read(reinterpret_cast<char*>(result.data()), result.size());
+    return result;
+}
+
 std::string read_as_text(const fs::path& filename)
 {
-    return read_as_text(filename.string());
+    std::ifstream fileStream(filename, std::ifstream::binary);
+    if (!fileStream.is_open()) {
+        throw RuntimeError("Failed to open file for reading: {}", filename);
+    }
+
+    return read_as_text(fileStream);
 }
 
 fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar)
 {
-    std::string pathStr = filename.u8string();
+    auto pathStr = filename.u8string();
     str::replace_in_place(pathStr, ':', replacementChar);
     str::replace_in_place(pathStr, '?', replacementChar);
     str::replace_in_place(pathStr, '*', replacementChar);
@@ -115,7 +145,11 @@ fs::path replace_illegal_path_characters(const fs::path& filename, char replacem
     str::replace_in_place(pathStr, '/', replacementChar);
     str::replace_in_place(pathStr, '|', replacementChar);
     str::replace_in_place(pathStr, ':', replacementChar);
+#if __cplusplus > 201703L
+    return fs::path(pathStr);
+#else
     return fs::u8path(pathStr);
+#endif
 }
 
 #endif
@@ -142,8 +176,31 @@ std::string read_as_text(const std::istream& fileStream)
     return buffer.str();
 }
 
+void write(const fs::path& filename, std::span<const uint8_t> contents)
+{
+    if (filename.has_parent_path()) {
+        fs::create_directories(filename.parent_path());
+    }
+
+    std::ofstream fs(filename, std::ios::trunc | std::ios::binary);
+    if (!fs.is_open()) {
+        throw RuntimeError("Failed to open file for writing: {}", filename);
+    }
+
+    fs.write(reinterpret_cast<const char*>(contents.data()), contents.size());
+    if (fs.bad()) {
+        throw RuntimeError("IO error writing file: {}", filename);
+    } else if (fs.fail()) {
+        throw RuntimeError("Error writing file: {}", filename);
+    }
+}
+
 void write_as_text(const fs::path& filename, std::string_view contents)
 {
+    if (filename.has_parent_path()) {
+        fs::create_directories(filename.parent_path());
+    }
+
     std::ofstream fs(filename, std::ios::trunc | std::ios::binary);
     if (!fs.is_open()) {
         throw RuntimeError("Failed to open file for writing: {}", filename);

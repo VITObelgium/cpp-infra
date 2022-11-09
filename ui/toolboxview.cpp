@@ -45,6 +45,14 @@ void ToolboxView::setItemsVisible(bool visible)
     }
 }
 
+void ToolboxView::clear()
+{
+    while (count() > 0) {
+        std::unique_ptr<QWidget> wid(widget(0));
+        removeItem(0);
+    }
+}
+
 void ToolboxView::setSectionText(int sectionIndex, const QString& text)
 {
     setItemText(sectionIndex, text);
@@ -64,6 +72,6 @@ void ToolboxView::onItemSelected()
 {
     auto* item = qobject_cast<ToolboxItem*>(sender());
     assert(item);
-    emit itemClicked(item->property("itemid").toInt());
+    Q_EMIT itemClicked(item->property("itemid").toInt());
 }
 }

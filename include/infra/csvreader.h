@@ -4,6 +4,7 @@
 #include "infra/charset.h"
 #include "infra/gdal.h"
 #include "infra/typetraits.h"
+#include <string>
 
 namespace inf {
 
@@ -52,8 +53,6 @@ class CsvRowIterator
 public:
     CsvRowIterator() = default;
     CsvRowIterator(gdal::Layer layer, inf::CharacterSet charSet);
-    CsvRowIterator(const CsvRowIterator&) = delete;
-    CsvRowIterator(CsvRowIterator&&)      = default;
 
     CsvRowIterator& operator++();
     CsvRowIterator& operator=(CsvRowIterator&& other);
@@ -63,7 +62,7 @@ public:
     const CsvRow* operator->();
 
 private:
-    gdal::LayerIterator _iterator;
+    gdal::LayerIterator<gdal::Layer> _iterator;
     inf::CharacterSet _charset = CharacterSet::Unknown;
     CsvRow _currentRow;
 };
@@ -79,6 +78,7 @@ public:
 
     int32_t column_count() const;
     std::string_view column_name(int32_t index) const;
+    std::optional<int32_t> column_index(const std::string& name) const;
 
     CsvRowIterator begin() const;
     CsvRowIterator end() const;

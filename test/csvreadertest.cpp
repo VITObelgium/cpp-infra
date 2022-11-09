@@ -18,10 +18,10 @@ static void verifyCsvData(const fs::path& p)
 
         if (index == 1) {
             CHECK(row.get_int32(0) == 2015);
-            CHECK(row.get_column_as<std::string>(12).value() == u8"4-nonylphénol");
+            CHECK(row.get_column_as<std::string>(12).value() == "4-nonylphénol");
         } else {
             CHECK(row.get_int32(0) == 2016);
-            CHECK(row.get_column_as<std::string>(12).value() == u8"Anthracène");
+            CHECK(row.get_column_as<std::string>(12).value() == "Anthracène");
         }
 
         ++index;

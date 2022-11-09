@@ -22,6 +22,11 @@ public:
     {
     }
 
+    constexpr Flags(EnumType flag1, EnumType flag2)
+    : _value(static_cast<value_type>(flag1) | static_cast<value_type>(flag2))
+    {
+    }
+
     constexpr Flags operator|(EnumType v) const noexcept
     {
         Flags f;
@@ -65,6 +70,11 @@ public:
     constexpr bool operator==(Flags other) const noexcept
     {
         return _value == other._value;
+    }
+
+    constexpr bool operator!=(Flags other) const noexcept
+    {
+        return !(*this == other);
     }
 
     constexpr bool is_set(EnumType v) const noexcept

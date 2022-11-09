@@ -19,6 +19,7 @@ std::string Geocoder::Bing     = "BING";
 struct Geocoder::Pimpl
 {
     OGRGeocodingSessionH gc;
+    std::string proxy;
 };
 
 Geocoder::Geocoder()
@@ -32,6 +33,7 @@ Geocoder::Geocoder(const Options& options)
 : _pimpl(std::make_unique<Pimpl>())
 {
     _allowUnsafeSsl = options.allowUnsafeSsl;
+    _pimpl->proxy   = options.proxyServer;
 
     CPLStringList optionsArray;
     optionsArray.AddString(fmt::format("SERVICE={}", options.service).c_str());
@@ -54,6 +56,10 @@ Geocoder::Geocoder(const Options& options)
 
     if (!options.key.empty()) {
         optionsArray.AddString(fmt::format("KEY={}", options.key).c_str());
+    }
+
+    if (!options.username.empty()) {
+        optionsArray.AddString(fmt::format("USERNAME={}", options.key).c_str());
     }
 
     if (!options.application.empty()) {
@@ -85,6 +91,10 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
         CPLSetThreadLocalConfigOption("GDAL_HTTP_UNSAFESSL", "YES");
     }
 
+    if (!_pimpl->proxy.empty()) {
+        CPLSetThreadLocalConfigOption("GDAL_HTTP_PROXY", _pimpl->proxy.c_str());
+    }
+
     CPLStringList optionsArray;
     if (!countryCode.empty()) {
         optionsArray.AddString(fmt::format("COUNTRYCODES={}", countryCode).c_str());
@@ -97,11 +107,11 @@ std::optional<Coordinate> Geocoder::geocode_single(const std::string& location, 
         ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
 
         gdal::Layer layer(OGRLayer::FromHandle(layerHandle));
-        for (auto& feature : layer) {
+        for (const auto& feature : layer) {
             if (feature.has_geometry()) {
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
-                    return to_coordinate(geom.as<gdal::PointGeometry>().point());
+                    return to_coordinate(geom.as<gdal::PointCRef>().point());
                 } else if (!result.has_value()) {
                     result = geom.centroid_coordinate();
                 }
@@ -126,11 +136,11 @@ std::vector<Coordinate> Geocoder::geocode(const std::string& location, std::stri
         ScopeGuard freeResult([layerHandle]() { OGRGeocodeFreeResult(layerHandle); });
 
         gdal::Layer layer(OGRLayer::FromHandle(layerHandle));
-        for (auto& feature : layer) {
+        for (const auto& feature : layer) {
             if (feature.has_geometry()) {
                 auto geom = feature.geometry();
                 if (geom.type() == gdal::Geometry::Type::Point) {
-                    result.push_back(to_coordinate(geom.as<gdal::PointGeometry>().point()));
+                    result.push_back(to_coordinate(geom.as<gdal::PointCRef>().point()));
                 } else if (auto coord = geom.centroid_coordinate(); coord.has_value()) {
                     result.push_back(*coord);
                 }

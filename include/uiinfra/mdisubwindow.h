@@ -16,11 +16,14 @@ protected:
 
 private:
     void onMdiWindowStateChange(Qt::WindowStates oldState, Qt::WindowStates newState);
-    void setLayoutMargin(int margin);
+    void setLayoutMargin(int top, int left, int right, int bottom);
 
     void saveSettings();
     void restoreSettings();
 
-    std::optional<int> _defaultMargin;
+    std::optional<int> _defaultMarginTop;
+    std::optional<int> _defaultMarginLeft;
+    std::optional<int> _defaultMarginRight;
+    std::optional<int> _defaultMarginBottom;
 };
 }

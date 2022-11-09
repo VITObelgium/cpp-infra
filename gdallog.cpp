@@ -1,6 +1,8 @@
 #include "infra/gdallog.h"
 
 #ifdef INFRA_LOG_ENABLED
+#include "infra/cast.h"
+#include "infra/enumutils.h"
 #include "infra/log.h"
 
 #include <cpl_error.h>
@@ -28,10 +30,23 @@ static void gdalErrorHandler(CPLErr errClass, int /*err_no*/, const char* msg)
     }
 }
 
+static void gdalErrorHandlerLevelOverride(CPLErr /*errClass*/, int /*err_no*/, const char* msg)
+{
+    // read the log level from the pointer value
+    const auto logLevel = Log::Level(truncate<enum_type_t<Log::Level>>(reinterpret_cast<unsigned long long>(CPLGetErrorHandlerUserData())));
+    Log::log(logLevel, "GDAL {}", msg);
+}
+
 void set_log_handler()
 {
     CPLSetErrorHandler(&gdalErrorHandler);
 }
+
+void set_log_handler(Log::Level levelToUse)
+{
+    CPLSetErrorHandlerEx(&gdalErrorHandlerLevelOverride, reinterpret_cast<void*>(levelToUse));
+}
+
 }
 #else
 namespace inf::gdal {

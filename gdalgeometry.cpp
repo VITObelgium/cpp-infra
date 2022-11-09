@@ -6,382 +6,106 @@
 #include "infra/gdal.h"
 #include "infra/string.h"
 
-#include <ogrsf_frmts.h>
-
 namespace inf::gdal {
 
 using namespace std::string_literals;
 
-static Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
+Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
 {
     switch (wkbFlatten(type)) {
+    case wkbUnknown:
+        return Geometry::Type::Unknown;
     case wkbPoint:
         return Geometry::Type::Point;
+    case wkbMultiPoint:
+        return Geometry::Type::MultiPoint;
     case wkbLineString:
         return Geometry::Type::Line;
     case wkbPolygon:
         return Geometry::Type::Polygon;
+    case wkbCurvePolygon:
+        return Geometry::Type::CurvePolygon;
     case wkbMultiPolygon:
         return Geometry::Type::MultiPolygon;
     case wkbMultiLineString:
         return Geometry::Type::MultiLine;
+    case wkbGeometryCollection:
+        return Geometry::Type::GeometryCollection;
+    case wkbMultiSurface:
+        return Geometry::Type::MultiSurface;
+    case wkbMultiCurve:
+        return Geometry::Type::MultiCurve;
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(type));
     }
 }
 
-Geometry::Geometry(OGRGeometry* instance)
-: _geometry(instance)
+Envelope::Envelope(double minX, double maxX, double minY, double maxY) noexcept
+{
+    _envelope.MinX = minX;
+    _envelope.MinY = minY;
+    _envelope.MaxX = maxX;
+    _envelope.MaxY = maxY;
+}
+
+Envelope::Envelope(Point<int64_t> topleft, Point<int64_t> bottomRight) noexcept
+: Envelope(double(topleft.x), double(bottomRight.x), double(bottomRight.y), double(topleft.y))
 {
 }
 
-OGRGeometry* Geometry::get() noexcept
-{
-    return _geometry;
-}
-
-const OGRGeometry* Geometry::get() const noexcept
-{
-    return _geometry;
-}
-
-Geometry::operator bool() const noexcept
-{
-    return _geometry != nullptr;
-}
-
-Geometry::Type Geometry::type() const
-{
-    return geometry_type_from_gdal(_geometry->getGeometryType());
-}
-
-std::string_view Geometry::type_name() const
-{
-    return _geometry->getGeometryName();
-}
-
-Owner<Geometry> Geometry::clone() const
-{
-    return Owner<Geometry>(_geometry->clone());
-}
-
-bool Geometry::empty() const
-{
-    return !_geometry || _geometry->IsEmpty();
-}
-
-void Geometry::clear()
-{
-    _geometry->empty();
-}
-
-bool Geometry::is_simple() const
-{
-    return _geometry->IsSimple();
-}
-
-Owner<Geometry> Geometry::simplify(double tolerance) const
-{
-    return Owner<Geometry>(check_pointer(_geometry->Simplify(tolerance), "Failed to simplify geometry"));
-}
-
-Owner<Geometry> Geometry::simplify_preserve_topology(double tolerance) const
-{
-    return Owner<Geometry>(check_pointer(_geometry->Simplify(tolerance), "Failed to simplify geometry preserving topology"));
-}
-
-void Geometry::transform(CoordinateTransformer& transformer)
-{
-    check_error(_geometry->transform(transformer.get()), "Failed to transform geometry");
-}
-
-Owner<Geometry> Geometry::buffer(double distance) const
-{
-    return Owner<Geometry>(check_pointer(_geometry->Buffer(distance), "Failed to buffer geometry"));
-}
-
-Owner<Geometry> Geometry::buffer(double distance, int numQuadSegments) const
-{
-    return Owner<Geometry>(check_pointer(_geometry->Buffer(distance, numQuadSegments), "Failed to buffer geometry"));
-}
-
-Owner<Geometry> Geometry::intersection(const Geometry& other) const
-{
-    return Owner<Geometry>(check_pointer(_geometry->Intersection(other.get()), "Failed to get geometry intersection"));
-}
-
-std::optional<double> Geometry::area() const
-{
-    if (auto* surface = _geometry->toSurface(); surface != nullptr) {
-        return surface->get_Area();
-    }
-
-    return {};
-}
-
-std::optional<Point<double>> Geometry::centroid() const
-{
-    std::optional<Point<double>> result;
-    OGRPoint point;
-    if (_geometry->Centroid(&point) == OGRERR_NONE) {
-        result = Point<double>(point.getX(), point.getY());
-    }
-
-    return result;
-}
-
-std::optional<Coordinate> Geometry::centroid_coordinate() const
-{
-    if (auto point = centroid(); point.has_value()) {
-        return to_coordinate(*point);
-    }
-
-    return {};
-}
-
-double Geometry::distance(const Point<double>& point) const
-{
-    OGRPoint p(point.x, point.y);
-    return _geometry->Distance(&p);
-}
-
-double Geometry::distance(const Geometry& other) const
-{
-    return _geometry->Distance(other.get());
-}
-
-template <typename WrappedType>
-GeometryCollectionWrapper<WrappedType>::GeometryCollectionWrapper(WrappedType* collection)
-: GeometryPtr<WrappedType>(collection)
+Envelope::Envelope(Point<double> topleft, Point<double> bottomRight) noexcept
+: Envelope(topleft.x, bottomRight.x, bottomRight.y, topleft.y)
 {
 }
 
-template <typename WrappedType>
-void GeometryCollectionWrapper<WrappedType>::add_geometry(const Geometry& geometry)
+OGREnvelope* Envelope::get() noexcept
 {
-    // clones the geometry
-    this->get()->addGeometry(geometry.get());
+    return &_envelope;
 }
 
-template <typename WrappedType>
-void GeometryCollectionWrapper<WrappedType>::add_geometry(Owner<Geometry> geometry)
+const OGREnvelope* Envelope::get() const noexcept
 {
-    // transfers ownership of the geometry to the collections
-    this->get()->addGeometryDirectly(geometry.release());
+    return &_envelope;
 }
 
-template <typename WrappedType>
-int GeometryCollectionWrapper<WrappedType>::size() const
+Envelope::operator bool() const noexcept
 {
-    return this->get()->getNumGeometries();
+    return _envelope.IsInit() != 0;
 }
 
-template <typename WrappedType>
-Geometry GeometryCollectionWrapper<WrappedType>::geometry(int index)
+void Envelope::merge(const Envelope& other) noexcept
 {
-    return Geometry(check_pointer(this->get()->getGeometryRef(index), "No geometry present"));
+    _envelope.Merge(*other.get());
 }
 
-Line::Line(OGRSimpleCurve* curve)
-: GeometryPtr(curve)
+void Envelope::merge(double x, double y) noexcept
 {
+    _envelope.Merge(x, y);
 }
 
-int Line::point_count() const
+void Envelope::intersect(const Envelope& other) noexcept
 {
-    return get()->getNumPoints();
+    _envelope.Intersect(*other.get());
 }
 
-Point<double> Line::point_at(int index) const
+bool Envelope::intersects(const Envelope& other) const noexcept
 {
-    OGRPoint p;
-    get()->getPoint(index, &p);
-    return Point<double>(p.getX(), p.getY());
+    return _envelope.Intersects(*other.get()) != 0;
 }
 
-Point<double> Line::startpoint()
+bool Envelope::contains(const Envelope& other) const noexcept
 {
-    OGRPoint point;
-    get()->StartPoint(&point);
-    return Point<double>(point.getX(), point.getY());
+    return _envelope.Contains(*other.get()) != 0;
 }
 
-Point<double> Line::endpoint()
+Point<double> Envelope::top_left() const noexcept
 {
-    OGRPoint point;
-    get()->EndPoint(&point);
-    return Point<double>(point.getX(), point.getY());
+    return Point<double>(_envelope.MinX, _envelope.MaxY);
 }
 
-double Line::length() const
+Point<double> Envelope::bottom_right() const noexcept
 {
-    return get()->get_Length();
-}
-
-LineIterator::LineIterator(const Line& line)
-{
-    if (line) {
-        _iter = line.get()->getPointIterator();
-        next();
-    }
-}
-
-LineIterator::~LineIterator()
-{
-    OGRPointIterator::destroy(_iter);
-}
-
-LineIterator begin(const Line& line)
-{
-    return LineIterator(line);
-}
-
-LineIterator begin(Line&& line)
-{
-    return LineIterator(line);
-}
-
-LineIterator end(const Line&)
-{
-    return LineIterator();
-}
-
-MultiLine forceToMultiLine(Geometry& geom)
-{
-    return MultiLine(static_cast<OGRMultiLineString*>(OGRGeometryFactory::forceToMultiLineString(geom.get())));
-}
-
-void LineIterator::next()
-{
-    OGRPoint p;
-    if (!_iter->getNextPoint(&p)) {
-        OGRPointIterator::destroy(_iter);
-        _iter = nullptr;
-    } else {
-        _point.x = p.getX();
-        _point.y = p.getY();
-    }
-}
-
-const Point<double>& LineIterator::operator*()
-{
-    return _point;
-}
-
-const Point<double>* LineIterator::operator->()
-{
-    return &_point;
-}
-
-LineIterator& LineIterator::operator++()
-{
-    next();
-    return *this;
-}
-
-LineIterator& LineIterator::operator=(LineIterator&& other)
-{
-    if (this != &other) {
-        if (_iter) {
-            OGRPointIterator::destroy(_iter);
-        }
-
-        _iter       = std::move(other._iter);
-        other._iter = nullptr;
-    }
-
-    return *this;
-}
-
-bool LineIterator::operator==(const LineIterator& other) const
-{
-    return _iter == other._iter;
-}
-
-bool LineIterator::operator!=(const LineIterator& other) const
-{
-    return !(*this == other);
-}
-
-Owner<PointGeometry> PointGeometry::from_point(Point<double> p)
-{
-    return Owner<PointGeometry>(new OGRPoint(p.x, p.y));
-}
-
-PointGeometry::PointGeometry(OGRPoint* point)
-: GeometryPtr(point)
-{
-}
-
-Point<double> PointGeometry::point() const
-{
-    return Point<double>(get()->getX(), get()->getY());
-}
-
-MultiLine::MultiLine(OGRMultiLineString* multiLine)
-: GeometryCollectionWrapper(multiLine)
-{
-    assert(multiLine);
-}
-
-Line MultiLine::line_at(int index)
-{
-    return geometry(index).as<Line>();
-}
-
-double MultiLine::length() const
-{
-    double length = 0.0;
-    for (int i = 0; i < size(); ++i) {
-        length += get()->getGeometryRef(i)->toLineString()->get_Length();
-    }
-
-    return length;
-}
-
-LinearRing::LinearRing(OGRLinearRing* ring)
-: Line(ring)
-{
-}
-
-Polygon::Polygon(OGRPolygon* poly)
-: GeometryPtr(poly)
-{
-}
-
-LinearRing Polygon::exteriorring()
-{
-    return LinearRing(get()->getExteriorRing());
-}
-
-LinearRing Polygon::interiorring(int index)
-{
-    return LinearRing(get()->getInteriorRing(index));
-}
-
-int Polygon::interiorring_count()
-{
-    return get()->getNumInteriorRings();
-}
-
-GeometryPtr<OGRGeometry> Polygon::linear_geometry()
-{
-    return GeometryPtr<OGRGeometry>(get()->getLinearGeometry());
-}
-
-bool Polygon::has_curve_geometry() const
-{
-    return get()->hasCurveGeometry();
-}
-
-MultiPolygon::MultiPolygon(OGRMultiPolygon* multiLine)
-: GeometryCollectionWrapper(multiLine)
-{
-}
-
-Polygon MultiPolygon::polygon_at(int index)
-{
-    return geometry(index).as<Polygon>();
+    return Point<double>(_envelope.MaxX, _envelope.MinY);
 }
 
 static OGRFieldType field_type_from_type_info(const std::type_info& typeInfo)
@@ -603,12 +327,12 @@ const OGRFeature* Feature::get() const
     return _feature;
 }
 
-Geometry Feature::geometry()
+GeometryRef Feature::geometry()
 {
-    return Geometry(check_pointer(_feature->GetGeometryRef(), "No geometry present"));
+    return GeometryRef(check_pointer(_feature->GetGeometryRef(), "No geometry present"));
 }
 
-Geometry Feature::geometry() const
+GeometryCRef Feature::geometry() const
 {
     return const_cast<Feature*>(this)->geometry();
 }
@@ -616,11 +340,6 @@ Geometry Feature::geometry() const
 bool Feature::has_geometry() const noexcept
 {
     return _feature->GetGeometryRef() != nullptr;
-}
-
-void Feature::set_geometry(const Geometry& geom)
-{
-    check_error(_feature->SetGeometry(geom.get()), "Failed to set geometry");
 }
 
 int64_t Feature::id() const
@@ -862,10 +581,28 @@ Layer::~Layer()
     }
 }
 
+Layer& Layer::operator=(Layer&& other)
+{
+    _layer       = other._layer;
+    other._layer = nullptr;
+    return *this;
+}
+
+Layer& Layer::operator=(const Layer& other)
+{
+    _layer = other._layer;
+    _layer->Reference();
+    return *this;
+}
+
 std::optional<int32_t> Layer::epsg() const
 {
     if (auto* spatialRef = _layer->GetSpatialRef(); spatialRef != nullptr) {
         if (auto* epsg = _layer->GetSpatialRef()->GetAuthorityCode("PROJCS"); epsg != nullptr) {
+            return str::to_int32(epsg);
+        }
+
+        if (auto* epsg = spatialRef->GetAttrValue("PROJCS|GEOGCS|AUTHORITY", 1); epsg != nullptr) {
             return str::to_int32(epsg);
         }
     }
@@ -926,13 +663,32 @@ int Layer::field_index(const std::string& name) const
     return field_index(name.c_str());
 }
 
+int Layer::required_field_index(const char* name) const
+{
+    if (auto index = _layer->FindFieldIndex(name, 1 /*exact match*/); index >= 0) {
+        return index;
+    }
+
+    throw RuntimeError("Layer does not contain field with name '{}'", name);
+}
+
+int Layer::required_field_index(const std::string& name) const
+{
+    return required_field_index(name.c_str());
+}
+
 void Layer::set_spatial_filter(Point<double> point)
 {
     OGRPoint p(point.x, point.y);
     _layer->SetSpatialFilter(&p);
 }
 
-void Layer::set_spatial_filter(Geometry& geometry)
+void Layer::set_spatial_filter(Point<double> topLeft, Point<double> bottomRight)
+{
+    _layer->SetSpatialFilterRect(topLeft.x, bottomRight.y, bottomRight.x, topLeft.y);
+}
+
+void Layer::set_spatial_filter(GeometryRef geometry)
 {
     _layer->SetSpatialFilter(geometry.get());
 }
@@ -965,6 +721,11 @@ void Layer::create_field(FieldDefinition& field)
 void Layer::create_feature(Feature& feature)
 {
     check_error(_layer->CreateFeature(feature.get()), "Failed to create layer feature");
+}
+
+void Layer::set_feature(Feature& feature)
+{
+    check_error(_layer->SetFeature(feature.get()), "Failed to assign layer feature");
 }
 
 FeatureDefinition Layer::layer_definition() const
@@ -1053,59 +814,66 @@ void Layer::intersection(Layer& method, Layer& output, IntersectionOptions& opti
     check_error(_layer->Intersection(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to get layer intersection");
 }
 
-LayerIterator::LayerIterator()
-: _layer(nullptr)
-, _currentFeature(nullptr)
+void Layer::clip(Layer& method, Layer& output)
 {
+    check_error(_layer->Clip(method.get(), output.get(), nullptr, nullptr, nullptr), "Failed to clip layer");
 }
 
-LayerIterator::LayerIterator(Layer layer)
-: _layer(std::move(layer))
-, _currentFeature(nullptr)
+void Layer::clip(Layer& method, Layer& output, ClipOptions& options)
 {
-    _layer.get()->ResetReading();
-    next();
-}
+    std::vector<std::string> optionsArray;
 
-void LayerIterator::next()
-{
-    _currentFeature = Feature(_layer.get()->GetNextFeature());
-}
-
-const Feature& LayerIterator::operator*()
-{
-    return _currentFeature;
-}
-
-const Feature* LayerIterator::operator->()
-{
-    return &_currentFeature;
-}
-
-LayerIterator& LayerIterator::operator++()
-{
-    next();
-    return *this;
-}
-
-LayerIterator& LayerIterator::operator=(LayerIterator&& other)
-{
-    if (this != &other) {
-        _layer          = std::move(other._layer);
-        _currentFeature = std::move(other._currentFeature);
+    GDALProgressFunc progressFunc = nullptr;
+    void* progressArg             = nullptr;
+    if (options.progress.is_valid()) {
+        progressArg  = &options.progress;
+        progressFunc = [](double complete, const char* /*message*/, void* progressArg) -> int {
+            auto* cb = reinterpret_cast<ProgressInfo*>(progressArg);
+            cb->tick(truncate<float>(complete));
+            return cb->cancel_requested() ? FALSE : TRUE;
+        };
     }
 
-    return *this;
+    constexpr size_t optionCount = 4;
+    optionsArray.reserve(optionCount + options.additionalOptions.size());
+    optionsArray.push_back(fmt::format("SKIP_FAILURES={}", options.skipFailures ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("PROMOTE_TO_MULTI={}", options.promoteToMulti ? "YES" : "NO"));
+    optionsArray.push_back(fmt::format("INPUT_PREFIX={}", options.inputPrefix));
+    optionsArray.push_back(fmt::format("METHOD_PREFIX={}", options.methodPrefix));
+    for (auto& opt : options.additionalOptions) {
+        optionsArray.push_back(opt);
+    }
+
+    auto opts = create_string_list(optionsArray);
+    check_error(_layer->Clip(method.get(), output.get(), opts.List(), progressFunc, progressArg), "Failed to clip layer");
 }
 
-bool LayerIterator::operator==(const LayerIterator& other) const
+void Layer::set_metadata(const std::string& name, const std::string& value, const std::string& domain)
 {
-    return _currentFeature == other._currentFeature;
+    check_error(_layer->SetMetadataItem(name.c_str(), value.c_str(), domain.c_str()), "Failed to set layer metadata");
 }
 
-bool LayerIterator::operator!=(const LayerIterator& other) const
+std::string Layer::metadata_item(const std::string& name, const std::string& domain)
 {
-    return !(*this == other);
+    return check_pointer(_layer->GetMetadataItem(name.c_str(), domain.c_str()), "Failed to get layer metadata");
+}
+
+std::unordered_map<std::string, std::string> Layer::metadata(const std::string& domain)
+{
+    std::unordered_map<std::string, std::string> result;
+
+    char** data = _layer->GetMetadata(domain.c_str());
+    if (data != nullptr) {
+        int index = 0;
+        while (data[index] != nullptr) {
+            auto keyValue = str::split_view(data[index++], '=');
+            if (keyValue.size() == 2) {
+                result.emplace(keyValue[0], keyValue[1]);
+            }
+        }
+    }
+
+    return result;
 }
 
 FeatureIterator::FeatureIterator(int fieldCount)
@@ -1200,7 +968,4 @@ bool FeatureDefinitionIterator::operator!=(const FeatureDefinitionIterator& othe
     return !(*this == other);
 }
 
-template class GeometryCollectionWrapper<OGRMultiPolygon>;
-template class GeometryCollectionWrapper<OGRMultiLineString>;
-template class GeometryCollectionWrapper<OGRGeometryCollection>;
 }

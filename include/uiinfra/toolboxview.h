@@ -19,11 +19,13 @@ public:
     void addItemToSection(int sectionIndex, int itemId, const QString& itemName, QIcon icon);
     void setItemsVisible(bool visible);
 
+    void clear();
+
     //! Typically use on a language change event
     void setSectionText(int sectionId, const QString& text);
     void setToolboxItemText(int itemId, const QString& text);
 
-signals:
+Q_SIGNALS:
     void itemClicked(int);
 
 private:

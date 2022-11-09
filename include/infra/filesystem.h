@@ -1,8 +1,10 @@
 #pragma once
 
+#include "infra/span.h"
 #include <fmt/core.h>
 #include <iosfwd>
 #include <string_view>
+#include <vector>
 
 #include <cassert>
 #ifdef HAVE_FILESYSTEM_H
@@ -28,6 +30,12 @@ namespace inf::file {
  * /return true if the directory was created, false otherwise
  */
 bool create_directory_if_not_exists(const fs::path& path);
+
+/*! Given a filename, make sure the directory exists
+ * /param path should specify a file path, not a directory
+ * /return true if the directory was created, false otherwise
+ */
+bool create_directory_for_file(const fs::path& path);
 
 /*!Create a full absolute path based on the base path and a relative file path
  * /param base the full path of a file on disk (not a directory)
@@ -57,6 +65,7 @@ fs::path relative_to_absolute_path(const fs::path& relPath, const fs::path& base
  */
 fs::path combine_path(const fs::path& baseDir, const fs::path& file);
 
+std::vector<uint8_t> read(const fs::path& filename);
 std::string read_as_text(const fs::path& filename);
 
 /*! Check the provided path for illegal characters on the running platform */
@@ -67,6 +76,7 @@ fs::path replace_illegal_path_characters(const fs::path& filename, char replacem
 std::string read_as_text(const char* filename);
 std::string read_as_text(const std::string& filename);
 std::string read_as_text(const std::istream& filestream);
+void write(const fs::path& filename, std::span<const uint8_t> contents);
 void write_as_text(const fs::path& filename, std::string_view contents);
 void append_text_to_file(const fs::path& file, std::string_view contents);
 
@@ -88,7 +98,8 @@ public:
     {
         close();
 #ifdef _WIN32
-        _ptr = _wfopen(p.c_str(), fs::u8path(mode).c_str());
+        std::string_view modeStr(mode);
+        _ptr = _wfopen(p.c_str(), std::wstring(modeStr.begin(), modeStr.end()).c_str());
 #else
         _ptr = std::fopen(p.u8string().c_str(), mode);
 #endif
@@ -137,16 +148,19 @@ namespace fmt {
 template <>
 struct formatter<fs::path>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const fs::path& p, FormatContext& ctx)
+    auto format(const fs::path& p, FormatContext& ctx) const -> decltype(ctx.out())
     {
+#if __cplusplus > 201703L
+        return format_to(ctx.out(), "{}", p.string());
+#else
         return format_to(ctx.out(), "{}", p.u8string());
+#endif
     }
 };
 }

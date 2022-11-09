@@ -15,11 +15,13 @@
 #include <Windows.h>
 #endif
 
-#include <locale>
 #include <cstdlib>
+#include <date/tz.h>
 #include <doctest/doctest.h>
+#include <locale>
 
 using namespace doctest;
+using namespace std::string_view_literals;
 
 int main(int argc, char** argv)
 {
@@ -34,13 +36,35 @@ int main(int argc, char** argv)
     inf::Log::add_console_sink(inf::Log::Colored::On);
     inf::LogRegistration logReg("InfraTest");
     inf::Log::set_level(inf::Log::Level::Info);
+
+    for (int i = 0; i < argc; ++i) {
+        if ("-d"sv == argv[i]) {
+            inf::Log::set_level(inf::Log::Level::Debug);
+            break;
+        }
+    }
 #endif
 
 #ifdef HAVE_GDAL
-    fs::path proj4DataPath = fs::u8path(argv[0]).parent_path() / "data";
-    inf::gdal::Registration reg(proj4DataPath);
+    inf::gdal::RegistrationConfig gdalCfg;
+#ifdef INFRA_TESTUTIL_MAIN_PROJDB_PATH
+    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path() / INFRA_TESTUTIL_MAIN_PROJDB_PATH;
+#else
+    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path();
+#endif
+
+    inf::gdal::Registration reg(gdalCfg);
 
     CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");
+#endif
+
+#if USE_OS_TZDB == 0
+    // make sure the timezone data is found
+#if __cplusplus > 201703L
+    date::set_install((fs::path(argv[0]).parent_path() / "data").string());
+#else
+    date::set_install((fs::u8path(argv[0]).parent_path() / "data").u8string());
+#endif
 #endif
 
     doctest::Context context;

@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cinttypes>
+#include <cmath>
 #include <fmt/core.h>
 #include <limits>
-#include <cmath>
 
 namespace inf {
 
@@ -11,7 +11,7 @@ namespace inf {
 template <typename T>
 struct Point
 {
-    constexpr Point() = default;
+    constexpr Point() noexcept = default;
     constexpr Point(T x_, T y_) noexcept
     : x(x_), y(y_)
     {
@@ -63,6 +63,13 @@ constexpr Point<TTo> point_cast(const Point<TFrom>& from)
     return Point<TTo>(static_cast<TTo>(from.x), static_cast<TTo>(from.y));
 }
 
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const Point<T>& p)
+{
+    os << fmt::format("{}", p);
+    return os;
+}
+
 }
 
 namespace std {
@@ -82,14 +89,13 @@ namespace fmt {
 template <typename T>
 struct formatter<inf::Point<T>>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const inf::Point<T>& p, FormatContext& ctx)
+    auto format(const inf::Point<T>& p, FormatContext& ctx) const -> decltype(ctx.out())
     {
         if constexpr (std::is_floating_point_v<T>) {
             return format_to(ctx.out(), "({:.1f}, {:.1f})", p.x, p.y);

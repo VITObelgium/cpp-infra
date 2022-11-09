@@ -1,4 +1,5 @@
 ﻿#include "infra/gdal.h"
+#include "infra/conversion.h"
 #include "infra/crs.h"
 #include "infra/gdalio.h"
 
@@ -22,7 +23,7 @@ TEST_CASE("Gdal.iteratePoints")
         auto geometry = feature.geometry();
         CHECK(gdal::Geometry::Type::Point == geometry.type());
 
-        auto point = geometry.as<gdal::PointGeometry>();
+        auto point = geometry.as<gdal::PointCRef>();
         CHECK(Point<double>(index, index + 1) == point.point());
 
         index += 2;
@@ -108,12 +109,15 @@ TEST_CASE("Gdal.convertPointProjected")
 {
     // Check conversion of bottom left corner of flanders map
 
-    // 22000.000 153000.000 (x,y) lambert 72 EPSG:31370 should be converted to 2.55772472781224 50.6735631138308 (lat,long) EPSG:4326
+    // 22000.000 153000.000 (x,y) lambert 72 EPSG:31370 should be converted to 2.55772472781224 50.6735631138308 (long,lat) EPSG:4326
 
     // Bottom left coordinate
     auto point = gdal::convert_point_projected(crs::epsg::BelgianLambert72, crs::epsg::WGS84, Point<double>(22000.000, 153000.000));
     CHECK(2.55772472781224 == Approx(point.x).epsilon(1e-6));
     CHECK(50.6735631138308 == Approx(point.y).epsilon(1e-6));
+
+    CHECK(2.55772472781224 == Approx(to_coordinate(point).longitude).epsilon(1e-6));
+    CHECK(50.6735631138308 == Approx(to_coordinate(point).latitude).epsilon(1e-6));
 }
 
 TEST_CASE("Gdal.createExcelFile")
@@ -154,9 +158,9 @@ TEST_CASE("Gdal.utf8Path")
         return;
     }
 
-    CHECK_NOTHROW(gdal::RasterDataSet::create(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
+    CHECK_NOTHROW(gdal::RasterDataSet::open(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
 
-    auto ds          = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
+    auto ds          = gdal::RasterDataSet::open(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
     auto subDatasets = ds.metadata("SUBDATASETS");
     CHECK(subDatasets.size() == 4u);
 }
@@ -180,6 +184,24 @@ TEST_CASE("Gdal.spatialReference")
         CHECK(srs.epsg_cs() == crs::epsg::WGS84WebMercator);
         CHECK(srs.epsg_geog_cs() == crs::epsg::WGS84);
     }
+}
+
+TEST_CASE("intersect metadata")
+{
+    const GeoMetadata meta1(3, 5, 1.0, -10.0, {4.0, -4.0}, {});
+    const GeoMetadata meta2(3, 4, -3.0, -6.0, {4.0, -4.0}, {});
+
+    CHECK(meta2.convert_row_centre_to_y(0) == 4.0);
+    CHECK(meta1.convert_y_to_row(4.0) == -1.0);
+
+    const auto cutout = gdal::io::detail::intersect_metadata(meta1, meta2);
+
+    CHECK(cutout.rows == 2);
+    CHECK(cutout.cols == 3);
+    CHECK(cutout.srcColOffset == -1.0);
+    CHECK(cutout.srcRowOffset == -1.0);
+    CHECK(cutout.dstColOffset == 1.0);
+    CHECK(cutout.dstRowOffset == 1.0);
 }
 
 }

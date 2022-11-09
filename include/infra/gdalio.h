@@ -22,7 +22,7 @@
 
 namespace inf::gdal::io {
 
-GeoMetadata read_metadata(const fs::path& fileName);
+GeoMetadata read_metadata(const fs::path& fileName, const std::vector<std::string>& driverOpts = {});
 const std::type_info& get_raster_type(const fs::path& fileName);
 
 namespace detail {
@@ -54,6 +54,7 @@ void read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet
 }
 
 void read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet& dataSet, const std::type_info& info, void* data, int dataCols);
+void create_output_directory_if_needed(const fs::path& p);
 
 template <typename RasterDataType>
 void write_raster_dataset(
@@ -102,24 +103,6 @@ void write_raster_to_dataset_band(
     ds.write_rasterdata(bandNr, 0, 0, meta.cols, meta.rows, data.data(), meta.cols, meta.rows);
 }
 
-template <typename RasterDataType>
-void write_raster_data(
-    std::span<const RasterDataType> data,
-    const GeoMetadata& meta,
-    const fs::path& filename,
-    const std::type_info& storageType,
-    std::span<const std::string> driverOptions,
-    const std::unordered_map<std::string, std::string>& metadataValues,
-    const GDALColorTable* ct = nullptr)
-{
-    // To write a raster to disk we need a dataset that contains the data
-    // Create a memory dataset with 0 bands, then assign a band given the pointer of our vector
-    // Creating a dataset with 1 band would casuse unnecessary memory allocation
-    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet memDataSet(memDriver.create_dataset(meta.rows, meta.cols, 0, storageType));
-    write_raster_dataset(data, memDataSet, meta, filename, driverOptions, metadataValues, ct);
-}
-
 template <typename StorageType, typename RasterDataType>
 void write_raster_data(
     std::span<const RasterDataType> data,
@@ -134,7 +117,57 @@ void write_raster_data(
     // Creating a dataset with 1 band would casuse unnecessary memory allocation
     auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
     gdal::RasterDataSet memDataSet(memDriver.create_dataset<StorageType>(meta.rows, meta.cols, 0));
-    write_raster_dataset(data, memDataSet, meta, filename, driverOptions, metadataValues, ct);
+
+    if constexpr (std::is_same_v<StorageType, RasterDataType>) {
+        write_raster_dataset(data, memDataSet, meta, filename, driverOptions, metadataValues, ct);
+    } else {
+        // TODO: Investigate VRT driver to create a virtual dataset with different type without creating a copy
+        std::vector<StorageType> converted(data.size());
+        std::transform(data.begin(), data.end(), converted.begin(), [](RasterDataType d) { return static_cast<StorageType>(d); });
+        write_raster_dataset<StorageType>(converted, memDataSet, meta, filename, driverOptions, metadataValues, ct);
+    }
+}
+
+template <typename RasterDataType>
+void write_raster_data(
+    std::span<const RasterDataType> data,
+    const GeoMetadata& meta,
+    const fs::path& filename,
+    const std::type_info& storageType,
+    std::span<const std::string> driverOptions,
+    const std::unordered_map<std::string, std::string>& metadataValues,
+    const GDALColorTable* ct = nullptr)
+{
+    switch (resolve_type(storageType)) {
+    case GDT_Byte:
+        write_raster_data<uint8_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_UInt16:
+        write_raster_data<uint16_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Int16:
+        write_raster_data<int16_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_UInt32:
+        write_raster_data<uint32_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Int32:
+        write_raster_data<int32_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Float32:
+        write_raster_data<float, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Float64:
+        write_raster_data<double, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_CInt16:
+    case GDT_CInt32:
+    case GDT_CFloat32:
+    case GDT_CFloat64:
+    case GDT_Unknown:
+    default:
+        throw InvalidArgument("Unsupported storage type");
+    }
 }
 
 template <typename StorageType, typename RasterType>
@@ -149,52 +182,45 @@ void write_raster_data(
     write_raster_data<StorageType>(std::span<const typename RasterType::value_type>(data(raster), size(raster)), meta, filename, driverOptions, metadataValues, ct);
 }
 
-static BBox metadata_bounding_box(const GeoMetadata& meta)
-{
-    BBox result;
-    auto width         = meta.cellSize * meta.cols;
-    auto height        = meta.cellSize * meta.rows;
-    result.topLeft     = Point<double>(meta.xll, meta.yll + height);
-    result.bottomRight = Point<double>(result.topLeft.x + width, result.topLeft.y - height);
-    return result;
-}
-
-inline BBox intersect_bbox(const BBox& lhs, const BBox& rhs)
-{
-    auto topLeft     = Point<double>(std::max(lhs.topLeft.x, rhs.topLeft.x), std::min(lhs.topLeft.y, rhs.topLeft.y));
-    auto bottomRight = Point<double>(std::min(lhs.bottomRight.x, rhs.bottomRight.x), std::max(lhs.bottomRight.y, rhs.bottomRight.y));
-    return {topLeft, bottomRight};
-}
-
 inline CutOut intersect_metadata(const GeoMetadata& srcMeta, const GeoMetadata& dstMeta)
 {
     // srcMeta: the metadata of the raster that we are going to read as it is on disk
     // dstMeta: the metadata of the raster that will be returned to the user
 
-    if (srcMeta.cellSize != dstMeta.cellSize) {
+    if (srcMeta.cellSize.x != dstMeta.cellSize.x || srcMeta.cellSize.y != dstMeta.cellSize.y) {
         throw InvalidArgument("Extents cellsize does not match {} <-> {}", srcMeta.cellSize, dstMeta.cellSize);
     }
 
-    if (srcMeta.cellSize == 0) {
+    if (srcMeta.cellSize.x == 0) {
         throw InvalidArgument("Extents cellsize is zero");
     }
 
     auto cellSize  = srcMeta.cellSize;
-    auto srcBBox   = metadata_bounding_box(srcMeta);
-    auto dstBBox   = metadata_bounding_box(dstMeta);
-    auto intersect = intersect_bbox(srcBBox, dstBBox);
+    auto srcBBox   = srcMeta.bounding_box();
+    auto dstBBox   = dstMeta.bounding_box();
+    auto intersect = rectangle_intersection(srcBBox, dstBBox);
 
     CutOut result;
 
     result.srcColOffset = srcMeta.convert_x_to_col(dstMeta.convert_col_centre_to_x(0));
     result.srcRowOffset = srcMeta.convert_y_to_row(dstMeta.convert_row_centre_to_y(0));
-    result.rows         = static_cast<int>(std::round(intersect.height() / cellSize));
-    result.cols         = static_cast<int>(std::round(intersect.width() / cellSize));
-    result.dstColOffset = static_cast<int>(std::round((intersect.topLeft.x - dstBBox.topLeft.x) / cellSize));
-    result.dstRowOffset = static_cast<int>(std::round((dstBBox.topLeft.y - intersect.topLeft.y) / cellSize));
+    result.rows         = static_cast<int>(std::abs(std::round(intersect.height() / cellSize.y)));
+    result.cols         = static_cast<int>(std::round(intersect.width() / cellSize.x));
+    result.dstColOffset = static_cast<int>(std::round((intersect.topLeft.x - dstBBox.topLeft.x) / cellSize.x));
+    result.dstRowOffset = static_cast<int>(std::round((dstBBox.topLeft.y - intersect.topLeft.y) / std::abs(cellSize.y)));
 
     return result;
 }
+}
+
+template <typename T>
+gdal::RasterDataSet create_memory_dataset(std::span<const T> rasterData, const GeoMetadata& meta)
+{
+    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
+    gdal::RasterDataSet srcDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
+    srcDataSet.add_band(rasterData.data());
+    srcDataSet.write_geometadata(meta);
+    return srcDataSet;
 }
 
 template <typename TSource, typename TDest>
@@ -290,13 +316,22 @@ GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, const GeoMetad
         dstMeta = cast_raster<float, T>(dstMeta, tempData, dstData);
     } else {
         read_raster_data(bandNr, cutOut, dataSet, dstData.data(), dstMeta.cols);
+
+        if (typeid(T()) != dataSet.band_datatype(bandNr)) {
+            // perform nodata sanity checks
+            if (auto nodata = dataSet.nodata_value(bandNr); nodata.has_value()) {
+                if (std::isfinite(*nodata) && !fits_in_type<T>(*nodata)) {
+                    // gdal performs a cast, so assign the nodata to the cast result
+                    dstMeta.nodata = double(static_cast<T>(*nodata));
+                }
+            }
+        }
     }
 
     return dstMeta;
 }
 
-/* This version will read the full dataset and is used in cases where there is no geotransform info available
- */
+/* This version will read the full dataset and is used in cases where there is no geotransform info available */
 template <typename T>
 GeoMetadata data_from_dataset(const gdal::RasterDataSet& dataSet, int bandNr, std::span<T> dstData)
 {
@@ -359,7 +394,7 @@ template <typename StorageType, class RasterType>
 void write_raster_as(std::span<const RasterType> rasterData, const GeoMetadata& meta, const fs::path& filename, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
-    inf::file::create_directory_if_not_exists(filename.parent_path());
+    create_output_directory_if_needed(filename);
 
     if constexpr (std::is_unsigned_v<StorageType>) {
         auto nodata         = meta.nodata;
@@ -388,7 +423,7 @@ template <class T>
 void write_raster(std::span<const T> rasterData, const GeoMetadata& meta, const fs::path& filename, const std::type_info& storageType, std::span<const std::string> driverOptions = {}, const std::unordered_map<std::string, std::string>& metadataValues = {})
 {
     using namespace detail;
-    inf::file::create_directory_if_not_exists(filename.parent_path());
+    create_output_directory_if_needed(filename);
 
     if (storageType == typeid(uint8_t) ||
         storageType == typeid(uint16_t) ||
@@ -439,14 +474,7 @@ template <typename T>
 inf::gdal::VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
 {
     assert(meta.rows * meta.cols == truncate<int32_t>(rasterData.size()));
-
-    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet srcDataSet(memDriver.create_dataset<T>(meta.rows, meta.cols, 0));
-
-    srcDataSet.add_band(rasterData.data());
-    srcDataSet.write_geometadata(meta);
-
-    return inf::gdal::polygonize(srcDataSet);
+    return inf::gdal::polygonize(create_memory_dataset<T>(rasterData, meta));
 }
 
 template <typename TInput, typename TOutput>
@@ -469,17 +497,8 @@ void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta
         }
     }
 
-    auto memDriver = gdal::RasterDriver::create(gdal::RasterType::Memory);
-    gdal::RasterDataSet srcDataSet(memDriver.create_dataset<TInput>(inputMeta.rows, inputMeta.cols, 0));
-    srcDataSet.add_band(inputData.data());
-    srcDataSet.write_geometadata(inputMeta);
-
-    gdal::RasterDataSet dstDataSet(memDriver.create_dataset<TOutput>(outputMeta.rows, outputMeta.cols, 0u, ""));
-    dstDataSet.add_band(outputData.data());
-    // Make sure the resulting data set has the proper projection information
-    dstDataSet.write_geometadata(outputMeta);
-
+    gdal::RasterDataSet srcDataSet = create_memory_dataset<TInput>(inputData, inputMeta);
+    gdal::RasterDataSet dstDataSet = create_memory_dataset<TOutput>(outputData, outputMeta);
     gdal::warp(srcDataSet, dstDataSet, algo);
 }
-
 }

@@ -39,12 +39,14 @@ public:
     QString itemText(int row);
     QVariant itemData(int row);
 
-signals:
-    void itemChanged();
-
-public slots:
     void scanItemSelect(QListWidgetItem* item);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     void initStyleOption(QStyleOptionComboBox* option) const;
+#else
+    void initStyleOption(QStyleOptionComboBox* option) const override;
+#endif
+
+    Q_SIGNAL void itemChanged();
 
 protected:
     int _popupHeight;

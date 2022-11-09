@@ -13,6 +13,7 @@ enum class LegendScaleType
     Quantiles,
     StandardisedDescretisation,
     MethodOfBertin,
+    NaturalBreaks,
 };
 
 }

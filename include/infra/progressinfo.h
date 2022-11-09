@@ -5,6 +5,8 @@
 
 #include <atomic>
 #include <functional>
+#include <mutex>
+#include <type_traits>
 
 namespace inf {
 
@@ -13,27 +15,35 @@ namespace detail {
 template <typename T>
 class PayloadBase
 {
-public:
-    const T& payload() const noexcept
+protected:
+    PayloadBase() = default;
+    PayloadBase(T payload)
+    : _payload(payload)
     {
-        return _payload;
     }
 
-    void set_payload(T payload)
+    void set_payload_impl(T payload)
     {
         _payload = std::move(payload);
+    }
+
+    T payload_impl() const noexcept
+    {
+        return _payload;
     }
 
 private:
     template <typename U>
     friend class ProgressTracker;
-
     T _payload;
 };
 
 template <>
 class PayloadBase<void>
 {
+    void set_payload_impl()
+    {
+    }
 };
 }
 
@@ -51,6 +61,14 @@ public:
 
     ProgressStatus(int64_t current, int64_t total) noexcept
     : _current(current)
+    , _total(total)
+    {
+    }
+
+    template <typename TPayload, typename = typename std::enable_if<!std::is_void_v<TPayload>>>
+    ProgressStatus(int64_t current, int64_t total, TPayload payload) noexcept
+    : detail::PayloadBase<T>(payload)
+    , _current(current)
     , _total(total)
     {
     }
@@ -77,6 +95,26 @@ public:
         return _total;
     }
 
+    template <typename TPayload, typename = typename std::enable_if<!std::is_void_v<TPayload>>>
+    void set_payload(const TPayload& payload)
+    {
+        std::scoped_lock lock(_mutex);
+        detail::PayloadBase<T>::set_payload_impl(payload);
+    }
+
+    template <typename TPayload = T, typename = typename std::enable_if<!std::is_void_v<TPayload>>>
+    TPayload payload() const noexcept
+    {
+        TPayload result;
+
+        {
+            std::scoped_lock lock(_mutex);
+            result = detail::PayloadBase<T>::payload_impl();
+        }
+
+        return result;
+    }
+
 private:
     void increment() noexcept
     {
@@ -99,20 +137,21 @@ private:
 
     std::atomic<int64_t> _current = 0;
     int64_t _total                = 0;
+    mutable std::mutex _mutex;
+};
+
+enum class ProgressStatusResult
+{
+    Continue,
+    Abort,
 };
 
 template <typename ProgressPayload = void>
 class ProgressTracker
 {
 public:
-    enum class StatusResult
-    {
-        Continue,
-        Abort,
-    };
-
     using Status   = ProgressStatus<ProgressPayload>;
-    using Callback = std::function<StatusResult(Status)>;
+    using Callback = std::function<ProgressStatusResult(Status)>;
 
     ProgressTracker() = default;
 
@@ -155,7 +194,7 @@ public:
     }
 
     /*! Use in combination with set_total_ticks, progress will be calculated internally
-     * /throws CancelRequested when cancellation is requested 
+     * /throws CancelRequested when cancellation is requested
      **/
     void tick_throw_on_cancel()
     {
@@ -164,8 +203,8 @@ public:
     }
 
     /*! Provide the current progress explicitely without relying on a tick count
-	 * /progress value between 0.0 and 1.0
-	 */
+     * /progress value between 0.0 and 1.0
+     */
     void tick(float progress) noexcept
     {
         signal_progress(progress);
@@ -207,7 +246,6 @@ public:
     typename std::enable_if_t<!std::is_void_v<U>, void> set_payload(const U& pl)
     {
         _status.set_payload(std::move(pl));
-        signal_progress();
     }
 
     template <typename U = ProgressPayload>
@@ -220,14 +258,19 @@ private:
     void signal_progress() noexcept
     {
         if (_cb) {
-            _cancel = _cb(_status) == StatusResult::Abort;
+            _cancel = _cb(_status) == ProgressStatusResult::Abort;
         }
     }
 
     void signal_progress(float progress) noexcept
     {
         if (_cb) {
-            _cancel = _cb(Status(truncate<int64_t>(progress * 100.f), 100)) == StatusResult::Abort;
+            const auto progress100 = truncate<int64_t>(progress * 100.f);
+            if constexpr (std::is_void_v<ProgressPayload>) {
+                _cancel = _cb(Status(progress100, 100)) == ProgressStatusResult::Abort;
+            } else {
+                _cancel = _cb(Status(progress100, 100, _status.payload())) == ProgressStatusResult::Abort;
+            }
         }
     }
 

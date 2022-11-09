@@ -2,6 +2,7 @@
 
 #include "infra/cast.h"
 #include "infra/exception.h"
+#include "infra/naturalbreaks.h"
 
 #include <algorithm>
 #include <cassert>
@@ -15,31 +16,6 @@ LegendDataAnalyser::LegendDataAnalyser(std::vector<float> sampleData)
     // get and sort data
     if (!_sampleData.empty()) {
         std::sort(_sampleData.begin(), _sampleData.end());
-
-        // check if frequency sorting is better
-        size_t n                    = 1; // # distinct values
-        const size_t sqrtOfDataSize = truncate<size_t>(std::floor(_sampleData.size() + 0.5));
-        const size_t dataSize       = _sampleData.size();
-        for (size_t i = 1; n < sqrtOfDataSize && i < dataSize; ++i) {
-            if (_sampleData[i] != _sampleData[i - 1]) {
-                ++n;
-            }
-        }
-
-        if (n < sqrtOfDataSize) { // store data in frequency array
-            _freqValue.resize(n);
-            _freqValue[0] = _sampleData[0];
-            _freqNr.resize(n);
-            _freqNr[0] = 1;
-            for (size_t i = 1, j = 0; i < dataSize; ++i) {
-                if (_sampleData[i] != _sampleData[i - 1]) {
-                    ++j;
-                    _freqValue[j] = _sampleData[i];
-                    _freqNr[j]    = 1;
-                } else
-                    ++_freqNr[j];
-            }
-        }
     }
 }
 
@@ -258,7 +234,7 @@ static void assign_linear_class_bounds_no_outliers(int numClasses, double minVal
 std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClasses, double minValue, double maxValue)
 {
     if (minValue >= maxValue) {
-        throw InvalidArgument("Minimum class bound must be lower the maximum class bound ({} <-> {})", minValue, maxValue);
+        throw InvalidArgument("Minimum class bound must be lower than the maximum class bound ({} <-> {})", minValue, maxValue);
     }
 
     std::vector<double> classBounds(numClasses + 1);
@@ -338,6 +314,7 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
     case LegendScaleType::StandardisedDescretisation:
     case LegendScaleType::MethodOfBertin:
     case LegendScaleType::LinearNoOutliers:
+    case LegendScaleType::NaturalBreaks:
         // Only these methods require the sample data
         if (sampleData.empty()) {
             throw RuntimeError("No sample data provided");
@@ -463,6 +440,11 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
         for (; i < numClasses; i++) {
             value += xRight;
             classBounds[i] = value;
+        }
+    } else if (scaleType == LegendScaleType::NaturalBreaks) {
+        auto breaks = jenks_break_values(std::span<const float>(sampleData), truncate<uint8_t>(numClasses), nullptr);
+        for (int i = 1; i < numClasses; i++) {
+            classBounds[i] = breaks[i];
         }
     }
 

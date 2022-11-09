@@ -2,44 +2,60 @@
 #include "infra/cast.h"
 #include "infra/exception.h"
 
-#include <algorithm>
 #include <cassert>
 #include <cctype>
-#include <string>
-#include <string_view>
 
 namespace inf::str {
 
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool contains_valid_integer(std::basic_string_view<CharT, Traits> str)
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end = nullptr;
+    std::strtol(s.c_str(), &end, 10);
+    return (end != nullptr && *end == 0);
+}
+
 bool contains_valid_integer(std::string_view str)
 {
-    std::string s(str);
+    return contains_valid_integer<char>(str);
+}
 
-    char* end = nullptr;
-    std::strtol(s.c_str(), &end, 10);
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool contains_valid_float(std::basic_string_view<CharT, Traits> str)
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end = nullptr;
+    std::strtof(s.c_str(), &end);
     return (end != nullptr && *end == 0);
 }
 
 bool contains_valid_float(std::string_view str)
 {
-    std::string s(str);
+    return contains_valid_float<char>(str);
+}
 
-    char* end = nullptr;
-    std::strtof(s.c_str(), &end);
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool contains_valid_double(std::basic_string_view<CharT, Traits> str)
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end = nullptr;
+    std::strtod(s.c_str(), &end);
     return (end != nullptr && *end == 0);
 }
 
 bool contains_valid_double(std::string_view str)
 {
-    std::string s(str);
-
-    char* end = nullptr;
-    std::strtod(s.c_str(), &end);
-    return (end != nullptr && *end == 0);
+    return contains_valid_double<char>(str);
 }
 
-std::optional<int32_t> to_int32(std::string_view str) noexcept
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::optional<int32_t> to_int32(std::basic_string_view<CharT, Traits> str) noexcept
 {
-    std::string s(str);
+    std::basic_string<CharT, Traits> s(str);
 
     char* end   = nullptr;
     long result = std::strtol(s.c_str(), &end, 10);
@@ -50,21 +66,33 @@ std::optional<int32_t> to_int32(std::string_view str) noexcept
     return result;
 }
 
-int32_t to_int32_value(std::string_view str)
+std::optional<int32_t> to_int32(std::string_view str) noexcept
+{
+    return to_int32<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+int32_t to_int32_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_int32(str);
     if (!optval.has_value()) {
-        throw InvalidArgument("Failed to convert '{}' to int32", str);
+        throw InvalidArgument("Failed to convert '{}' to int32", std::string_view(str));
     }
 
     return *optval;
 }
 
-std::optional<uint32_t> to_uint32(std::string_view str) noexcept
+int32_t to_int32_value(std::string_view str)
 {
-    std::string s(str);
+    return to_int32_value<char>(str);
+}
 
-    char* end   = nullptr;
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::optional<uint32_t> to_uint32(std::basic_string_view<CharT, Traits> str) noexcept
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end  = nullptr;
     long result = std::strtoul(s.c_str(), &end, 10);
     if (end == s.c_str()) {
         return std::optional<uint32_t>();
@@ -73,7 +101,13 @@ std::optional<uint32_t> to_uint32(std::string_view str) noexcept
     return result;
 }
 
-uint32_t to_uint32_value(std::string_view str)
+std::optional<uint32_t> to_uint32(std::string_view str) noexcept
+{
+    return to_uint32<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+uint32_t to_uint32_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_uint32(str);
     if (!optval.has_value()) {
@@ -83,11 +117,17 @@ uint32_t to_uint32_value(std::string_view str)
     return *optval;
 }
 
-std::optional<int64_t> to_int64(std::string_view str) noexcept
+uint32_t to_uint32_value(std::string_view str)
 {
-    std::string s(str);
+    return to_uint32_value<char>(str);
+}
 
-    char* end      = nullptr;
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::optional<int64_t> to_int64(std::basic_string_view<CharT, Traits> str) noexcept
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end     = nullptr;
     int64_t result = std::strtoll(s.c_str(), &end, 10);
     if (end == s.c_str()) {
         return std::optional<int64_t>();
@@ -96,7 +136,13 @@ std::optional<int64_t> to_int64(std::string_view str) noexcept
     return result;
 }
 
-int64_t to_int64_value(std::string_view str)
+std::optional<int64_t> to_int64(std::string_view str) noexcept
+{
+    return to_int64<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+int64_t to_int64_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_int64(str);
     if (!optval.has_value()) {
@@ -106,11 +152,17 @@ int64_t to_int64_value(std::string_view str)
     return *optval;
 }
 
-std::optional<uint64_t> to_uint64(std::string_view str) noexcept
+int64_t to_int64_value(std::string_view str)
 {
-    std::string s(str);
+    return to_int64_value<char>(str);
+}
 
-    char* end      = nullptr;
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::optional<uint64_t> to_uint64(std::basic_string_view<CharT, Traits> str) noexcept
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end     = nullptr;
     int64_t result = std::strtoull(s.c_str(), &end, 10);
     if (end == s.c_str()) {
         return std::optional<uint64_t>();
@@ -119,21 +171,33 @@ std::optional<uint64_t> to_uint64(std::string_view str) noexcept
     return result;
 }
 
-uint64_t to_uint64_value(std::string_view str)
+std::optional<uint64_t> to_uint64(std::string_view str) noexcept
+{
+    return to_uint64<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+uint64_t to_uint64_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_uint64(str);
     if (!optval.has_value()) {
-        throw InvalidArgument("Failed to convert '{}' to int64", str);
+        throw InvalidArgument("Failed to convert '{}' to uint64", str);
     }
 
     return *optval;
 }
 
-std::optional<float> to_float(std::string_view str) noexcept
+uint64_t to_uint64_value(std::string_view str)
 {
-    std::string s(str);
+    return to_uint64_value<char>(str);
+}
 
-    char* end    = nullptr;
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::optional<float> to_float(std::basic_string_view<CharT, Traits> str) noexcept
+{
+    std::basic_string<CharT, Traits> s(str);
+
+    CharT* end   = nullptr;
     float result = std::strtof(s.c_str(), &end);
     if (end == s.c_str()) {
         return std::optional<float>();
@@ -142,7 +206,13 @@ std::optional<float> to_float(std::string_view str) noexcept
     return result;
 }
 
-float to_float_value(std::string_view str)
+std::optional<float> to_float(std::string_view str) noexcept
+{
+    return to_float<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+float to_float_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_float(str);
     if (!optval.has_value()) {
@@ -152,16 +222,22 @@ float to_float_value(std::string_view str)
     return *optval;
 }
 
+float to_float_value(std::string_view str)
+{
+    return to_float_value<char>(str);
+}
+
 float to_float_value_zero_on_error(std::string_view str) noexcept
 {
     return to_float(str).value_or(0.f);
 }
 
-std::optional<double> to_double(std::string_view str) noexcept
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::optional<double> to_double(std::basic_string_view<CharT, Traits> str) noexcept
 {
-    std::string s(str);
+    std::basic_string<CharT, Traits> s(str);
 
-    char* end     = nullptr;
+    CharT* end    = nullptr;
     double result = std::strtod(s.c_str(), &end);
     if (end == s.c_str()) {
         return std::optional<double>();
@@ -170,7 +246,13 @@ std::optional<double> to_double(std::string_view str) noexcept
     return result;
 }
 
-double to_double_value(std::string_view str)
+std::optional<double> to_double(std::string_view str) noexcept
+{
+    return to_double<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+double to_double_value(std::basic_string_view<CharT, Traits> str)
 {
     auto optval = to_double(str);
     if (!optval.has_value()) {
@@ -180,12 +262,18 @@ double to_double_value(std::string_view str)
     return *optval;
 }
 
+double to_double_value(std::string_view str)
+{
+    return to_double_value<char>(str);
+}
+
 double to_double_value_zero_on_error(std::string_view str) noexcept
 {
     return to_double(str).value_or(0.0);
 }
 
-bool iequals(std::string_view str1, std::string_view str2)
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool iequals(std::basic_string_view<CharT, Traits> str1, std::basic_string_view<CharT, Traits> str2)
 {
     if (str1.size() != str2.size()) {
         return false;
@@ -200,23 +288,62 @@ bool iequals(std::string_view str1, std::string_view str2)
     return true;
 }
 
-int icompare(std::string_view str1, std::string_view str2)
+bool iequals(std::string_view str1, std::string_view str2)
+{
+    return iequals<char>(str1, str2);
+}
+
+#if __cplusplus > 201703L
+bool iequals(std::u8string_view str1, std::u8string_view str2)
+{
+    return iequals<char8_t>(str1, str2);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+int icompare(std::basic_string_view<CharT, Traits> str1, std::basic_string_view<CharT, Traits> str2)
 {
     return lowercase(str1).compare(str2);
 }
 
-void replace_in_place(std::string& aString, std::string_view toSearch, std::string_view toReplace)
+int icompare(std::string_view str1, std::string_view str2)
+{
+    return icompare<char>(str1, str2);
+}
+
+#if __cplusplus > 201703L
+int icompare(std::u8string_view str1, std::u8string_view str2)
+{
+    return icompare<char8_t>(str1, str2);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void replace_in_place(std::basic_string<CharT, Traits>& aString, std::basic_string_view<CharT, Traits> toSearch, std::basic_string_view<CharT, Traits> toReplace)
 {
     size_t startPos = 0;
     size_t foundPos;
 
-    while (std::string::npos != (foundPos = aString.find(toSearch, startPos))) {
+    while (std::basic_string<CharT, Traits>::npos != (foundPos = aString.find(toSearch, startPos))) {
         aString.replace(foundPos, toSearch.length(), toReplace);
         startPos = foundPos + toReplace.size();
     }
 }
 
-void replace_in_place(std::string& aString, char toSearch, char toReplace)
+void replace_in_place(std::string& aString, std::string_view toSearch, std::string_view toReplace)
+{
+    return replace_in_place<char>(aString, toSearch, toReplace);
+}
+
+#if __cplusplus > 201703L
+void replace_in_place(std::u8string& aString, std::u8string_view toSearch, std::u8string_view toReplace)
+{
+    return replace_in_place<char8_t>(aString, toSearch, toReplace);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void replace_in_place(std::basic_string<CharT, Traits>& aString, char toSearch, char toReplace)
 {
     const size_t length = aString.size();
 
@@ -227,51 +354,128 @@ void replace_in_place(std::string& aString, char toSearch, char toReplace)
     }
 }
 
-std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace)
+void replace_in_place(std::string& aString, char toSearch, char toReplace)
 {
-    std::string result(aString);
+    return replace_in_place<char>(aString, toSearch, toReplace);
+}
+
+#if __cplusplus > 201703L
+void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplace)
+{
+    return replace_in_place<char8_t>(aString, toSearch, toReplace);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+[[nodiscard]] std::basic_string<CharT, Traits> replace(std::basic_string_view<CharT, Traits> aString, std::basic_string_view<CharT, Traits> toSearch, std::basic_string_view<CharT, Traits> toReplace)
+{
+    std::basic_string<CharT, Traits> result(aString);
     replace_in_place(result, toSearch, toReplace);
     return result;
 }
 
-std::string lowercase(std::string_view str)
+[[nodiscard]] std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace)
 {
-    std::string result(str.size(), '\0');
+    return replace<char>(aString, toSearch, toReplace);
+}
+
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string replace(std::u8string_view aString, std::u8string_view toSearch, std::u8string_view toReplace)
+{
+    return replace<char8_t>(aString, toSearch, toReplace);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+[[nodiscard]] std::basic_string<CharT, Traits> lowercase(std::basic_string_view<CharT, Traits> str)
+{
+    std::basic_string<CharT, Traits> result(str.size(), '\0');
     std::transform(str.begin(), str.end(), result.begin(), [](char c) {
         return static_cast<char>(::tolower(c));
     });
     return result;
 }
 
-std::string uppercase(std::string_view str)
+[[nodiscard]] std::string lowercase(std::string_view str)
 {
-    std::string result(str.size(), '\0');
+    return lowercase<char>(str);
+}
+
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string lowercase(std::u8string_view str)
+{
+    return lowercase<char8_t>(str);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+[[nodiscard]] std::basic_string<CharT, Traits> uppercase(std::basic_string_view<CharT, Traits> str)
+{
+    std::basic_string<CharT, Traits> result(str.size(), '\0');
     std::transform(str.begin(), str.end(), result.begin(), [](char c) {
-        return static_cast<char>(::toupper(c));
+        return static_cast<CharT>(::toupper(c));
     });
     return result;
+}
+
+[[nodiscard]] std::string uppercase(std::string_view str)
+{
+    return uppercase<char>(str);
+}
+
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string uppercase(std::u8string_view str)
+{
+    return uppercase<char8_t>(str);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void lowercase_in_place(std::basic_string<CharT, Traits>& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), [](CharT c) {
+        return static_cast<CharT>(::tolower(c));
+    });
 }
 
 void lowercase_in_place(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), [](char c) {
-        return static_cast<char>(::tolower(c));
+    return lowercase_in_place<char>(str);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void uppercase_in_place(std::basic_string<CharT, Traits>& str)
+{
+    std::transform(str.begin(), str.end(), str.begin(), [](CharT c) {
+        return static_cast<CharT>(::toupper(c));
     });
 }
 
 void uppercase_in_place(std::string& str)
 {
-    std::transform(str.begin(), str.end(), str.begin(), [](char c) {
-        return static_cast<char>(::toupper(c));
-    });
+    uppercase_in_place<char>(str);
 }
 
-bool starts_with(std::string_view aString, std::string_view search)
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool starts_with(std::basic_string_view<CharT, Traits> aString, std::basic_string_view<CharT, Traits> search)
 {
     return aString.compare(0, search.size(), search) == 0;
 }
 
-bool starts_with_ignore_case(std::string_view aString, std::string_view search)
+bool starts_with(std::string_view aString, std::string_view search)
+{
+    return starts_with<char>(aString, search);
+}
+
+#if __cplusplus > 201703L
+bool starts_with(std::u8string_view aString, std::u8string_view search)
+{
+    return starts_with<char8_t>(aString, search);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool starts_with_ignore_case(std::basic_string_view<CharT, Traits> aString, std::basic_string_view<CharT, Traits> search)
 {
     if (search.size() > aString.size()) {
         return false;
@@ -286,7 +490,20 @@ bool starts_with_ignore_case(std::string_view aString, std::string_view search)
     return true;
 }
 
-bool ends_with(std::string_view aString, std::string_view search)
+bool starts_with_ignore_case(std::string_view aString, std::string_view search)
+{
+    return starts_with_ignore_case<char>(aString, search);
+}
+
+#if __cplusplus > 201703L
+bool starts_with_ignore_case(std::u8string_view aString, std::u8string_view search)
+{
+    return starts_with_ignore_case<char8_t>(aString, search);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool ends_with(std::basic_string_view<CharT, Traits> aString, std::basic_string_view<CharT, Traits> search)
 {
     if (search.size() > aString.size()) {
         return false;
@@ -295,7 +512,13 @@ bool ends_with(std::string_view aString, std::string_view search)
     return aString.rfind(search) == (aString.size() - search.size());
 }
 
-bool ends_with_ignore_case(std::string_view aString, std::string_view search)
+bool ends_with(std::string_view aString, std::string_view search)
+{
+    return ends_with<char>(aString, search);
+}
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool ends_with_ignore_case(std::basic_string_view<CharT, Traits> aString, std::basic_string_view<CharT, Traits> search)
 {
     if (search.size() > aString.size()) {
         return false;
@@ -311,33 +534,84 @@ bool ends_with_ignore_case(std::string_view aString, std::string_view search)
     return true;
 }
 
-std::string_view trimmed_view(std::string_view str)
+bool ends_with_ignore_case(std::string_view aString, std::string_view search)
+{
+    return ends_with_ignore_case<char>(aString, search);
+}
+
+#if __cplusplus > 201703L
+bool ends_with_ignore_case(std::u8string_view aString, std::u8string_view search)
+{
+    return ends_with_ignore_case<char8_t>(aString, search);
+}
+#endif
+
+static const char* whitespaces(char)
+{
+    return " \t\r\n";
+}
+
+#if __cplusplus > 201703L
+static const char8_t* whitespaces(char8_t)
+{
+    return u8" \t\r\n";
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+[[nodiscard]] std::basic_string_view<CharT, Traits> trimmed_view(std::basic_string_view<CharT, Traits> str)
 {
     if (str.empty()) {
         return str;
     }
 
-    auto begin = str.find_first_not_of(" \t\r\n");
-    auto end   = str.find_last_not_of(" \t\r\n");
+    auto begin = str.find_first_not_of(whitespaces(CharT()));
+    auto end   = str.find_last_not_of(whitespaces(CharT()));
 
-    if (begin == std::string_view::npos && end == std::string_view::npos) {
-        return std::string_view();
+    if (begin == std::basic_string_view<CharT, Traits>::npos && end == std::basic_string_view<CharT, Traits>::npos) {
+        return {};
     }
 
-    assert(begin != std::string_view::npos);
-    assert(end != std::string_view::npos);
+    assert((begin != std::basic_string_view<CharT, Traits>::npos));
+    assert((end != std::basic_string_view<CharT, Traits>::npos));
     assert(begin <= end);
 
-    return std::string_view(&str[begin], (end + 1) - begin);
+    return std::basic_string_view<CharT, Traits>(&str[begin], (end + 1) - begin);
 }
 
-std::string trim(std::string_view str)
+[[nodiscard]] std::string_view trimmed_view(std::string_view str)
+{
+    return trimmed_view<char>(str);
+}
+
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string_view trimmed_view(std::u8string_view str)
+{
+    return trimmed_view<char8_t>(str);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+[[nodiscard]] std::basic_string<CharT, Traits> trim(std::basic_string_view<CharT, Traits> str)
 {
     auto trimmed = trimmed_view(str);
-    return std::string(trimmed.begin(), trimmed.end());
+    return std::basic_string<CharT, Traits>(trimmed.begin(), trimmed.end());
 }
 
-void trim_in_place(std::string& str)
+[[nodiscard]] std::string trim(std::string_view str)
+{
+    return trim<char>(str);
+}
+
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string trim(std::u8string_view str)
+{
+    return trim<char8_t>(str);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void trim_in_place(std::basic_string<CharT, Traits>& str)
 {
     auto trimmed = trimmed_view(str);
     if (trimmed.data() == str.data() && trimmed.size() == str.size()) {
@@ -348,7 +622,21 @@ void trim_in_place(std::string& str)
     str.assign(trimmed.begin(), trimmed.end());
 }
 
-static void apply_split_options(std::string_view sv, Flags<SplitOpt> opt, std::vector<std::string_view>& tokens)
+void trim_in_place(std::string& str)
+{
+    trim_in_place<char>(str);
+}
+
+#if __cplusplus > 201703L
+void trim_in_place(std::u8string& str)
+{
+    trim_in_place<char8_t>(str);
+}
+#endif
+
+namespace detail {
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void apply_split_options(std::basic_string_view<CharT, Traits> sv, Flags<SplitOpt> opt, std::vector<std::basic_string_view<CharT, Traits>>& tokens)
 {
     if (opt.is_set(SplitOpt::Trim)) {
         sv = trimmed_view(sv);
@@ -361,24 +649,29 @@ static void apply_split_options(std::string_view sv, Flags<SplitOpt> opt, std::v
     tokens.emplace_back(sv);
 }
 
-//static std::string_view applySplitOptions(std::string_view sv, Flags<SplitOpt> opt)
-//{
-//    if (opt.is_set(SplitOpt::Trim)) {
-//        return trimmed_view(sv);
-//    }
-//
-//    return sv;
-//}
-
-std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt)
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+bool is_delimiter(char character, std::basic_string_view<CharT, Traits> delimiter)
 {
-    std::vector<std::string_view> tokens;
+    for (auto& del : delimiter) {
+        if (del == character) {
+            return true;
+        }
+    }
 
-    size_t length     = 0;
-    const char* start = str.data();
+    return false;
+}
+}
+
+template <typename CharT>
+std::vector<std::basic_string_view<CharT>> split_view(std::basic_string_view<CharT> str, char delimiter, Flags<SplitOpt> opt)
+{
+    std::vector<std::basic_string_view<CharT>> tokens;
+
+    size_t length      = 0;
+    const CharT* start = str.data();
     for (size_t i = 0; i < str.size(); ++i) {
         if (str[i] == delimiter) {
-            apply_split_options(std::string_view(start, length), opt, tokens);
+            detail::apply_split_options(std::basic_string_view<CharT>(start, length), opt, tokens);
             length = 0;
 
             if (i + 1 < str.size()) {
@@ -390,38 +683,40 @@ std::vector<std::string_view> split_view(std::string_view str, char delimiter, F
     }
 
     if (length > 0) {
-        apply_split_options(std::string_view(start, length), opt, tokens);
+        detail::apply_split_options(std::basic_string_view<CharT>(start, length), opt, tokens);
     }
 
     if (*start == delimiter) {
-        apply_split_options(std::string_view(), opt, tokens);
+        detail::apply_split_options(std::basic_string_view<CharT>(), opt, tokens);
     }
 
     if (tokens.empty()) {
-        apply_split_options(str, opt, tokens);
+        detail::apply_split_options(str, opt, tokens);
     }
 
     return tokens;
 }
 
-static bool is_delimiter(char character, std::string_view delimiter)
+std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt)
 {
-    for (auto& del : delimiter) {
-        if (del == character) {
-            return true;
-        }
-    }
-
-    return false;
+    return split_view<char>(str, delimiter, opt);
 }
 
-std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
+#if __cplusplus > 201703L
+std::vector<std::u8string_view> split_view(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt)
 {
-    std::vector<std::string_view> tokens;
+    return split_view<char8_t>(str, delimiter, opt);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::vector<std::basic_string_view<CharT, Traits>> split_view(std::basic_string_view<CharT, Traits> str, std::basic_string_view<CharT, Traits> delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>())
+{
+    std::vector<std::basic_string_view<CharT, Traits>> tokens;
 
     size_t length      = 0;
     size_t matchLength = 0;
-    const char* start  = str.data();
+    const CharT* start = str.data();
 
     if (opt.is_set(SplitOpt::DelimiterIsCharacterArray)) {
         for (size_t i = 0; i < str.size(); ++i) {
@@ -430,11 +725,11 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
             }
 
             matchLength = 0;
-            if (is_delimiter(str[i], delimiter)) {
+            if (detail::is_delimiter(str[i], delimiter)) {
                 ++matchLength;
 
                 if (opt.is_set(SplitOpt::JoinAdjacentCharDelimeters)) {
-                    while (i + 1 < str.size() && is_delimiter(str[i + 1], delimiter)) {
+                    while (i + 1 < str.size() && detail::is_delimiter(str[i + 1], delimiter)) {
                         ++matchLength;
                         ++i;
                     }
@@ -442,9 +737,9 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
             }
 
             if (matchLength > 0) {
-                //if (matchLength != str.size()) {
-                // if matchlength == str size, we have only had delimeter data
-                apply_split_options(std::string_view(start, length), opt, tokens);
+                // if (matchLength != str.size()) {
+                //  if matchlength == str size, we have only had delimeter data
+                detail::apply_split_options(std::basic_string_view<CharT, Traits>(start, length), opt, tokens);
                 length = 0;
                 //}
             } else {
@@ -453,11 +748,11 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
         }
 
         if (length > 0) {
-            apply_split_options(std::string_view(start, length), opt, tokens);
+            detail::apply_split_options(std::basic_string_view<CharT, Traits>(start, length), opt, tokens);
         }
 
         if (matchLength > 0) {
-            apply_split_options(std::string_view(start, length), opt, tokens);
+            detail::apply_split_options(std::basic_string_view<CharT, Traits>(start, length), opt, tokens);
         }
     } else {
         for (size_t i = 0; i < str.size(); ++i) {
@@ -465,7 +760,7 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
                 ++matchLength;
 
                 if (matchLength == delimiter.size()) {
-                    apply_split_options(std::string_view(start, length), opt, tokens);
+                    detail::apply_split_options(std::basic_string_view<CharT, Traits>(start, length), opt, tokens);
                     length      = 0;
                     matchLength = 0;
 
@@ -483,26 +778,90 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
         }
 
         if (matchLength == delimiter.size()) {
-            apply_split_options(std::string_view(), opt, tokens);
+            detail::apply_split_options(std::basic_string_view<CharT, Traits>(), opt, tokens);
         } else if (length + matchLength > 0) {
-            apply_split_options(std::string_view(start, length), opt, tokens);
+            detail::apply_split_options(std::basic_string_view<CharT, Traits>(start, length), opt, tokens);
         }
 
         if (length == 0 && matchLength == 0) {
-            apply_split_options(std::string_view(), opt, tokens);
+            detail::apply_split_options(std::basic_string_view<CharT, Traits>(), opt, tokens);
         }
     }
 
     if (tokens.empty()) {
-        apply_split_options(std::string_view(start, length), opt, tokens);
+        detail::apply_split_options(std::basic_string_view<CharT, Traits>(start, length), opt, tokens);
     }
 
     return tokens;
 }
 
-void ellipsize_in_place(std::string& str, int maxLength)
+std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
 {
-    if (truncate<int>(str.size()) > maxLength) {
+    return split_view<char>(str, delimiter, opt);
+}
+
+#if __cplusplus > 201703L
+std::vector<std::u8string_view> split_view(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt)
+{
+    return split_view<char8_t>(str, delimiter, opt);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::vector<std::basic_string<CharT, Traits>> split(std::basic_string_view<CharT, Traits> str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>())
+{
+    auto splitted = split_view(str, delimiter, opt);
+
+    std::vector<std::basic_string<CharT, Traits>> tokens;
+    tokens.reserve(splitted.size());
+    for (auto& v : splitted) {
+        tokens.emplace_back(begin(v), end(v));
+    }
+
+    return tokens;
+}
+
+std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt)
+{
+    return split<char>(str, delimiter, opt);
+}
+
+#if __cplusplus > 201703L
+std::vector<std::u8string> split(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt)
+{
+    return split<char8_t>(str, delimiter, opt);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+std::vector<std::basic_string<CharT, Traits>> split(std::basic_string_view<CharT, Traits> str, std::basic_string_view<CharT, Traits> delimiter, Flags<SplitOpt> opt)
+{
+    auto splitted = split_view(str, delimiter, opt);
+
+    std::vector<std::basic_string<CharT, Traits>> tokens;
+    tokens.reserve(splitted.size());
+    for (auto& v : splitted) {
+        tokens.emplace_back(begin(v), end(v));
+    }
+    return tokens;
+}
+
+std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
+{
+    return split<char>(str, delimiter, opt);
+}
+
+#if __cplusplus > 201703L
+std::vector<std::u8string> split(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt)
+{
+    return split<char8_t>(str, delimiter, opt);
+}
+#endif
+
+template <typename CharT, typename Traits = std::char_traits<CharT>>
+void ellipsize_in_place(std::basic_string<CharT, Traits>& str, int maxLength)
+{
+    if (inf::truncate<int>(str.size()) > maxLength) {
         if (maxLength > 2) {
             str.resize(maxLength);
             str[maxLength - 3] = '.';
@@ -514,64 +873,68 @@ void ellipsize_in_place(std::string& str, int maxLength)
     }
 }
 
-std::string ellipsize(std::string_view str, int maxLength)
+void ellipsize_in_place(std::string& str, int maxLength)
+{
+    return ellipsize_in_place<char>(str, maxLength);
+}
+
+#if __cplusplus > 201703L
+void ellipsize_in_place(std::u8string& str, int maxLength)
+{
+    return ellipsize_in_place<char8_t>(str, maxLength);
+}
+#endif
+
+[[nodiscard]] std::string ellipsize(std::string_view str, int maxLength)
 {
     std::string result(str);
     ellipsize_in_place(result, maxLength);
     return result;
 }
 
-std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt)
+#if __cplusplus > 201703L
+[[nodiscard]] std::u8string ellipsize(std::u8string_view str, int maxLength)
 {
-    auto splitted = split_view(str, delimiter, opt);
-
-    std::vector<std::string> tokens;
-    tokens.reserve(splitted.size());
-    for (auto& v : splitted) {
-        tokens.emplace_back(begin(v), end(v));
-    }
-
-    return tokens;
+    std::u8string result(str);
+    ellipsize_in_place(result, maxLength);
+    return result;
 }
+#endif
 
-std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt)
-{
-    auto splitted = split_view(str, delimiter, opt);
+// static std::string_view applySplitOptions(std::string_view sv, Flags<SplitOpt> opt)
+//{
+//     if (opt.is_set(SplitOpt::Trim)) {
+//         return trimmed_view(sv);
+//     }
+//
+//     return sv;
+// }
 
-    std::vector<std::string> tokens;
-    tokens.reserve(splitted.size());
-    tokens.reserve(splitted.size());
-    for (auto& v : splitted) {
-        tokens.emplace_back(begin(v), end(v));
-    }
-    return tokens;
-}
-
-//Splitter::Splitter(std::string_view src, std::string_view delimiter, Flags<SplitOpt> opt)
+// Splitter::Splitter(std::string_view src, std::string_view delimiter, Flags<SplitOpt> opt)
 //: _src(src)
 //, _delimiter(delimiter)
 //, _splitopts(opt)
 //{
 //}
 
-//Splitter::const_iterator::const_iterator(const Splitter& sp) noexcept
+// Splitter::const_iterator::const_iterator(const Splitter& sp) noexcept
 //: _splitter(&sp)
 //, _pos(0)
 //{
 //    ++*this;
 //}
 
-//Splitter::const_iterator::const_iterator() noexcept
+// Splitter::const_iterator::const_iterator() noexcept
 //: _splitter(nullptr)
 //, _pos(std::string_view::npos)
 //{
 //}
 
-//Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
+// Splitter::const_iterator& Splitter::const_iterator::operator++() noexcept
 //{
-//    if (_pos != std::string_view::npos) {
-//        _value = _splitter->next(_pos);
-//    }
+//     if (_pos != std::string_view::npos) {
+//         _value = _splitter->next(_pos);
+//     }
 
 //    if (_pos == std::string_view::npos) {
 //        _splitter = nullptr;
@@ -580,42 +943,42 @@ std::vector<std::string> split(std::string_view str, std::string_view delimiter,
 //    return *this;
 //}
 
-//Splitter::const_iterator Splitter::const_iterator::operator++(int) noexcept
+// Splitter::const_iterator Splitter::const_iterator::operator++(int) noexcept
 //{
-//    Splitter::const_iterator result(*this);
-//    ++(*this);
-//    return result;
-//}
+//     Splitter::const_iterator result(*this);
+//     ++(*this);
+//     return result;
+// }
 
-//Splitter::const_iterator::reference Splitter::const_iterator::operator*() const noexcept
+// Splitter::const_iterator::reference Splitter::const_iterator::operator*() const noexcept
 //{
-//    return _value;
-//}
+//     return _value;
+// }
 
-//Splitter::const_iterator::pointer Splitter::const_iterator::operator->() const noexcept
+// Splitter::const_iterator::pointer Splitter::const_iterator::operator->() const noexcept
 //{
-//    return &_value;
-//}
+//     return &_value;
+// }
 
-//bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other) const noexcept
+// bool Splitter::const_iterator::operator!=(const Splitter::const_iterator& other) const noexcept
 //{
-//    std::cout << _splitter << " - " << other._splitter << " - " << _pos << " - " << other._pos << " - " << std::endl;
-//    return _splitter != other._splitter || _pos != other._pos;
-//}
+//     std::cout << _splitter << " - " << other._splitter << " - " << _pos << " - " << other._pos << " - " << std::endl;
+//     return _splitter != other._splitter || _pos != other._pos;
+// }
 
-//Splitter::const_iterator Splitter::begin() const noexcept
+// Splitter::const_iterator Splitter::begin() const noexcept
 //{
-//    return Splitter::const_iterator(*this);
-//}
+//     return Splitter::const_iterator(*this);
+// }
 
-//Splitter::const_iterator Splitter::end() const noexcept
+// Splitter::const_iterator Splitter::end() const noexcept
 //{
-//    return Splitter::const_iterator();
-//}
+//     return Splitter::const_iterator();
+// }
 
-//std::string_view Splitter::next(std::string_view::size_type& pos) const noexcept
+// std::string_view Splitter::next(std::string_view::size_type& pos) const noexcept
 //{
-//    std::cout << "Next: " << pos << std::endl;
+//     std::cout << "Next: " << pos << std::endl;
 
 //    size_t length      = 0;
 //    size_t matchLength = 0;

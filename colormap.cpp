@@ -382,7 +382,31 @@ const ColorDict Cmap::winter{
     {{0.0f, 1.0f, 1.0f}, {1.0f, 0.5f, 0.5f}},
 };
 
-const ColorDict Cmap::spectral{
+const ColorDict Cmap::wistia{
+    {
+        {0.0f, 0.8941176470588236f, 0.8941176470588236f},
+        {0.25f, 1.0f, 1.0f},
+        {0.5f, 1.0f, 1.0f},
+        {0.75f, 1.0f, 1.0f},
+        {1.0f, 0.9882352941176471f, 0.9882352941176471f},
+    },
+    {
+        {0.0f, 1.0f, 1.0f},
+        {0.25f, 0.9098039215686274f, 0.9098039215686274f},
+        {0.5f, 0.7411764705882353f, 0.7411764705882353f},
+        {0.75f, 0.6274509803921569f, 0.6274509803921569f},
+        {1.0f, 0.4980392156862745f, 0.4980392156862745f},
+    },
+    {
+        {0.0f, 0.47843137254901963f, 0.47843137254901963f},
+        {0.25f, 0.10196078431372549f, 0.10196078431372549f},
+        {0.5f, 0.0f, 0.0f},
+        {0.75f, 0.0f, 0.0f},
+        {1.0f, 0.0f, 0.0f},
+    },
+};
+
+const ColorDict Cmap::nipySpectral{
     {
         {0.0f, 0.0f, 0.0f},
         {0.05f, 0.4667f, 0.4667f},
@@ -1606,7 +1630,8 @@ ColorMap ColorMap::create(std::string_view name)
         {"summer", Cmap::summer},
         {"autumn", Cmap::autumn},
         {"winter", Cmap::winter},
-        {"spectral", Cmap::spectral},
+        {"wistia", Cmap::wistia},
+        {"nipy_spectral", Cmap::nipySpectral},
         {"gist_earth", Cmap::gistEarth},
         {"gist_ncar", Cmap::gistNcar},
         {"gist_stern", Cmap::gistStern},
@@ -1725,5 +1750,4 @@ uint8_t ColorMap::process_band(float value, const std::vector<ColorDict::Entry>&
 
     return 0;
 }
-
 }

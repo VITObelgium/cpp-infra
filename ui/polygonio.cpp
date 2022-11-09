@@ -16,19 +16,18 @@ static void addPointToGeoPath(QGeoPath& path, const inf::Point<double>& point)
     path.addCoordinate(QGeoCoordinate(point.y, point.x));
 }
 
-static void addLineToGeoPath(QGeoPath& path, const gdal::Line& line)
+static void addLineToGeoPath(QGeoPath& path, gdal::LineCRef line)
 {
     for (auto& point : line) {
         addPointToGeoPath(path, point);
     }
 }
 
-static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& poly)
+static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::PolygonCRef poly)
 {
-    auto ring = poly.exteriorring();
     {
         QGeoPath path;
-        for (auto& point : ring) {
+        for (auto& point : poly.exterior_ring()) {
             addPointToGeoPath(path, point);
         }
         if (!path.isEmpty()) {
@@ -36,10 +35,9 @@ static void addPolyToGeoPath(std::vector<QGeoPath>& geoPaths, gdal::Polygon& pol
         }
     }
 
-    for (int i = 0; i < poly.interiorring_count(); ++i) {
+    for (int i = 0; i < poly.interior_ring_count(); ++i) {
         QGeoPath path;
-        ring = poly.interiorring(i);
-        for (auto& point : ring) {
+        for (auto& point : poly.interior_ring(i)) {
             addPointToGeoPath(path, point);
         }
         if (!path.isEmpty()) {
@@ -63,12 +61,12 @@ std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, inf::gdal::
         switch (geometry.type()) {
         case gdal::Geometry::Type::Line: {
             QGeoPath path;
-            addLineToGeoPath(path, geometry.as<gdal::Line>());
+            addLineToGeoPath(path, geometry.as<gdal::LineCRef>());
             geoPaths.emplace_back(std::move(path));
             break;
         }
         case gdal::Geometry::Type::MultiLine: {
-            auto multiLine = geometry.as<gdal::MultiLine>();
+            auto multiLine = geometry.as<gdal::MultiLineCRef>();
             for (int i = 0; i < multiLine.size(); ++i) {
                 QGeoPath path;
                 addLineToGeoPath(path, multiLine.line_at(i));
@@ -77,12 +75,12 @@ std::vector<QGeoPath> dataSetToGeoPath(inf::gdal::VectorDataSet& ds, inf::gdal::
             break;
         }
         case gdal::Geometry::Type::Polygon: {
-            auto poly = geometry.as<gdal::Polygon>();
+            auto poly = geometry.as<gdal::PolygonCRef>();
             addPolyToGeoPath(geoPaths, poly);
             break;
         }
         case gdal::Geometry::Type::MultiPolygon: {
-            auto multiPoly = geometry.as<gdal::MultiPolygon>();
+            auto multiPoly = geometry.as<gdal::MultiPolygonCRef>();
             for (int i = 0; i < multiPoly.size(); ++i) {
                 auto poly = multiPoly.polygon_at(i);
                 addPolyToGeoPath(geoPaths, poly);

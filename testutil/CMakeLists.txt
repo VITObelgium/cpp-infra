@@ -4,11 +4,13 @@ set (INFRA_TESTUTIL_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/containerasserts.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/printsupport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/reporter.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/tempdir.h
 )
 
 add_library(infratestutil
     ${INFRA_TESTUTIL_PUBLIC_HEADERS}
      printsupport.cpp
+     tempdir.cpp
 )
 
 set_target_properties(infratestutil PROPERTIES
@@ -25,5 +27,9 @@ target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
 
 add_library(infratestutilmain testmain.cpp)
 add_library(Infra::infratestutilmain ALIAS infratestutilmain)
-target_compile_definitions(infratestutilmain PRIVATE $<$<BOOL:${INFRA_GDAL}>:HAVE_GDAL>)
+target_compile_definitions(infratestutilmain PRIVATE 
+    $<$<BOOL:${INFRA_GDAL}>:HAVE_GDAL>
+    $<$<BOOL:${INFRA_TESTUTIL_MAIN_PROJDB_PATH}>:INFRA_TESTUTIL_MAIN_PROJDB_PATH="${INFRA_TESTUTIL_MAIN_PROJDB_PATH}">
+)
+
 target_link_libraries(infratestutilmain PUBLIC infratestutil)

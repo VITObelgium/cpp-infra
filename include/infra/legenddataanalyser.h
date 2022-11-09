@@ -27,7 +27,6 @@ private:
     double convert_value(LegendScaleType scaleType, const double& value, const double& minValue) const;
 
     std::vector<float> _sampleData; // must be sorted small to large
-    std::vector<double> _freqValue; // distinct values
     std::vector<int> _freqNr;       // # of occurrences of the values
     int _nClasses;
     std::vector<double> _classBounds; // size: _nClasses + 1

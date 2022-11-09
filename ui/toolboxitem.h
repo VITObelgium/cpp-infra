@@ -14,8 +14,7 @@ public:
 
     void setText(const QString& text);
 
-signals:
-    void clicked();
+    Q_SIGNAL void clicked();
 
 private:
     Ui::ToolboxItem _ui;

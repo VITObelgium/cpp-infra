@@ -9,16 +9,18 @@
 
 #include <ciso646> // this allows us to check for libcpp
 
-#define INF_HAS_STD_EXECUTION 0
-
 #if __has_include(<execution>)
     #if defined(_LIBCPP_VERSION) && defined(_LIBCPP_HAS_PARALLEL_ALGORITHMS)
-    #define INF_HAS_STD_EXECUTION 1
+        #define INF_HAS_STD_EXECUTION 1
     #endif
 
     #if defined(__GLIBCXX__)
-    #define INF_HAS_STD_EXECUTION 1
+        #define INF_HAS_STD_EXECUTION 1
     #endif
+#endif
+
+#ifndef INF_HAS_STD_EXECUTION
+    #define INF_HAS_STD_EXECUTION 0
 #endif
 
 #if INF_HAS_STD_EXECUTION
@@ -26,13 +28,13 @@
     #include <execution>
 #else
     #ifndef Q_MOC_RUN // QTBUG-80990
-    #include <pstl/algorithm>
-    #include <pstl/execution>
+        #include <oneapi/dpl/execution>
+        #include <oneapi/dpl/algorithm>
 
-    #ifdef _MSC_VER
-    namespace std::execution {
-        using namespace __pstl::execution;
-    }
-    #endif
+        #ifdef _MSC_VER
+            namespace std::execution {
+            using namespace oneapi::dpl::execution;
+            }
+        #endif
     #endif
 #endif

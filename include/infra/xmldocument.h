@@ -158,6 +158,7 @@ class XmlDocument : public XmlNode
 public:
     static XmlDocument load_from_file(const fs::path& filename);
     static XmlDocument load_from_string(const char* data);
+    static XmlDocument load_from_string(std::string_view data);
 
     XmlDocument();
     XmlDocument(const XmlDocument&) = delete;
@@ -171,6 +172,7 @@ public:
 
 private:
     XmlDocument(const char* data, bool isPath);
+    XmlDocument(std::string_view contents);
 
     struct Pimpl;
     std::unique_ptr<Pimpl> _pimplDoc;

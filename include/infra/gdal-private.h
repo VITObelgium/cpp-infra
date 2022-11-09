@@ -4,6 +4,8 @@
 #include <gdal_priv.h>
 #include <typeinfo>
 
+#include "infra/span.h"
+
 namespace inf::gdal {
 
 template <typename T>
@@ -54,7 +56,7 @@ struct TypeResolve<double>
     static constexpr GDALDataType value = GDT_Float64;
 };
 
-inline GDALDataType resolveType(const std::type_info& info)
+inline GDALDataType resolve_type(const std::type_info& info)
 {
     if (info == typeid(uint8_t)) {
         return TypeResolve<uint8_t>::value;
@@ -75,7 +77,7 @@ inline GDALDataType resolveType(const std::type_info& info)
     return GDT_Unknown;
 }
 
-inline const std::type_info& resolveType(GDALDataType type)
+inline const std::type_info& resolve_type(GDALDataType type)
 {
     switch (type) {
     case GDT_Byte:
@@ -107,9 +109,11 @@ inline const std::type_info& resolveType(GDALDataType type)
     }
 }
 
+int throw_if_not_supported(int result);
 void throw_last_error(std::string_view msg);
 void check_error(CPLErr err, std::string_view msg);
 void check_error(OGRErr err, std::string_view msg);
+CPLStringList create_string_list(std::span<const std::string> driverOptions);
 
 template <typename T>
 T* check_pointer(T* instance, std::string_view msg)
@@ -120,4 +124,60 @@ T* check_pointer(T* instance, std::string_view msg)
 
     return instance;
 }
+
+/* Overload that accepts a callback for creating the error message
+ * Use if you want to avoid constructing the error message if the pointer is ok */
+template <typename T, typename Callable>
+T* check_pointer_msg_cb(T* instance, Callable&& msgCb)
+{
+    if (instance == nullptr) {
+        throw_last_error(msgCb());
+    }
+
+    return instance;
+}
+
+template <typename T>
+class CplPointer
+{
+public:
+    CplPointer() = default;
+    CplPointer(T* ptr)
+    : _ptr(ptr)
+    {
+    }
+
+    ~CplPointer()
+    {
+        CPLFree(_ptr);
+    }
+
+    T** ptrAddress()
+    {
+        return &_ptr;
+    }
+
+    operator T*()
+    {
+        return _ptr;
+    }
+
+    T* get()
+    {
+        return _ptr;
+    }
+
+    const T* get() const
+    {
+        return _ptr;
+    }
+
+    operator bool() const noexcept
+    {
+        return _ptr != nullptr;
+    }
+
+private:
+    T* _ptr = nullptr;
+};
 }

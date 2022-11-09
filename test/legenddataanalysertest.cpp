@@ -10,7 +10,7 @@ namespace inf::test {
 
 TEST_CASE("LegendDataAnalyserTest.linear")
 {
-    auto ds = gdal::RasterDataSet::create(fs::u8path(TEST_DATA_DIR) / "raster.tif");
+    auto ds = gdal::RasterDataSet::open(fs::u8path(TEST_DATA_DIR) / "raster.tif");
 
     auto data = ds.read_rasterdata<float>(1);
     if (auto nodata = ds.nodata_value(1); nodata.has_value()) {

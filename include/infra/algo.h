@@ -4,7 +4,10 @@
 
 #include <algorithm>
 #include <optional>
+#include <set>
 #include <stdexcept>
+#include <unordered_set>
+#include <vector>
 
 namespace inf {
 
@@ -55,6 +58,17 @@ auto& find_in_container_required(Container&& c, Predicate&& pred)
 }
 
 template <typename Container>
+auto& find_in_container_required(Container&& c, const typename std::decay_t<Container>::value_type& value)
+{
+    auto iter = std::find_if(c.begin(), c.end(), value);
+    if (iter == c.end()) {
+        throw RangeError("No match found in the container");
+    }
+
+    return *iter;
+}
+
+template <typename Container>
 bool container_contains(const Container& c, const typename Container::value_type& value) noexcept
 {
     return std::find(begin(c), end(c), value) != end(c);
@@ -76,6 +90,13 @@ template <typename Container, typename Predicate>
 void remove_from_container(Container& c, Predicate&& pred) noexcept
 {
     c.erase(std::remove_if(c.begin(), c.end(), pred), c.end());
+}
+
+template <typename OutputContainer, typename T = typename OutputContainer::value_type>
+void append_to_container(OutputContainer& output, std::initializer_list<T> values) noexcept
+{
+    output.reserve(output.size() + values.size());
+    std::copy(values.begin(), values.end(), std::back_inserter(output));
 }
 
 template <typename OutputContainer, typename InputContainer>
@@ -105,6 +126,17 @@ auto find_in_map(MapType&& m, const typename std::decay_t<MapType>::key_type& ke
     } else {
         return iter == m.end() ? nullptr : &(iter->second);
     }
+}
+
+template <typename MapType>
+auto find_in_map_required(MapType&& m, const typename std::decay_t<MapType>::key_type& key)
+{
+    auto iter = m.find(key);
+    if (iter == m.end()) {
+        throw RuntimeError("Key not found in map");
+    }
+
+    return iter->second;
 }
 
 /* Search for an entry in the map that matches the predicate
@@ -147,6 +179,24 @@ std::vector<typename MapType::mapped_type> map_values_as_vector(const MapType& m
     return result;
 }
 
+template <typename TContainer, typename TVal = std::remove_const_t<typename TContainer::value_type>>
+std::vector<TVal> container_as_vector(const TContainer& cont)
+{
+    return std::vector<TVal>(cont.begin(), cont.end());
+}
+
+template <typename TContainer, typename TVal = typename TContainer::value_type>
+std::set<TVal> container_as_set(const TContainer& cont)
+{
+    return std::set<TVal>(cont.begin(), cont.end());
+}
+
+template <typename TContainer, typename TVal = typename TContainer::value_type>
+std::unordered_set<TVal> container_as_unordered_set(const TContainer& cont)
+{
+    return std::set<TVal>(cont.begin(), cont.end());
+}
+
 /* Removes the constness of the iterator
  * /param c a non-const reference to the container
  * /param it a const iterator in the container
@@ -156,4 +206,5 @@ typename Container::iterator remove_constness(Container& c, ConstIterator it)
 {
     return c.erase(it, it);
 }
+
 }

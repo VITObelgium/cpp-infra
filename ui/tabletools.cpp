@@ -25,7 +25,14 @@ void itemSelectionToClipboard(const QItemSelectionModel* selectionModel, char do
     QString selected_text;
     for (auto& current : indexes) {
         QVariant data = model->data(current);
-        if (data.type() == QVariant::Double) {
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        const bool isDouble = data.type() == QVariant::Double;
+#else
+        const bool isDouble = data.metaType().id() == QMetaType::Double;
+#endif
+
+        if (isDouble) {
             // make sure to convert to string in the system locale, otherwise tools like excel
             // don't understand it
             rows[current.row()].append(QLocale().toString(data.toDouble(), doubleFormat, precision));

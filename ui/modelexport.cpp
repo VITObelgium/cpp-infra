@@ -40,18 +40,28 @@ public:
 };
 }
 
-bool exportModel(QWidget* parent, QAbstractItemModel* model, std::string_view name, Flags<ExportModelOptions> options)
+bool exportModel(QWidget* parent, const QAbstractItemModel* model, std::string_view name, Flags<ExportModelOptions> options)
+{
+    return exportModel(parent, model, QModelIndex(), name, options);
+}
+
+bool exportModel(QWidget* parent, const QAbstractItemModel* model, const QModelIndex& rootIndex, std::string_view name, Flags<ExportModelOptions> options)
 {
     auto filename = QFileDialog::getSaveFileName(parent, QApplication::tr("Export table"), QString::fromStdString(std::string(name)), QStringLiteral("Spreadsheet (*.xlsx)"));
     if (!filename.isEmpty()) {
-        exportModel(model, name, fs::path(filename.toStdString()), options);
+        exportModel(model, rootIndex, name, fs::u8path(filename.toStdString()), options);
         return true;
     }
 
     return false;
 }
 
-void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outputPath, Flags<ExportModelOptions> options)
+void exportModel(const QAbstractItemModel* model, std::string_view name, fs::path outputPath, Flags<ExportModelOptions> options)
+{
+    exportModel(model, QModelIndex(), name, outputPath, options);
+}
+
+void exportModel(const QAbstractItemModel* model, const QModelIndex& rootIndex, std::string_view name, fs::path outputPath, Flags<ExportModelOptions> options)
 {
     if (fs::exists(outputPath)) {
         fs::remove(outputPath);
@@ -95,11 +105,13 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
         }
 
         for (int j = 0; j < model->columnCount(); ++j) {
+            auto currentIndex = model->index(i, j, rootIndex);
+
             const auto col         = truncate<lxw_col_t>(colOffset + j);
-            auto data              = model->index(i, j).data();
+            auto data              = currentIndex.data();
             lxw_format* cellFormat = nullptr;
-            auto color             = model->index(i, j).data(Qt::ForegroundRole);
-            auto bgColor           = model->index(i, j).data(Qt::BackgroundRole);
+            auto color             = currentIndex.data(Qt::ForegroundRole);
+            auto bgColor           = currentIndex.data(Qt::BackgroundRole);
             if (color.isValid() || bgColor.isValid()) {
                 cellFormat = workbook_add_format(wb);
                 if (color.isValid()) {
@@ -111,7 +123,7 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
                 }
             }
 
-            auto fontVar = model->index(i, j).data(Qt::FontRole);
+            auto fontVar = currentIndex.data(Qt::FontRole);
             if (fontVar.isValid()) {
                 auto font = fontVar.value<QFont>();
                 if (font.bold() || font.italic()) {
@@ -130,6 +142,7 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
             }
 
             if (data.isValid()) {
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
                 switch (data.type()) {
                 case QVariant::Int:
                 case QVariant::UInt:
@@ -149,6 +162,27 @@ void exportModel(QAbstractItemModel* model, std::string_view name, fs::path outp
                     }
                     break;
                 }
+#else
+                switch (data.metaType().id()) {
+                case QMetaType::Int:
+                case QMetaType::UInt:
+                case QMetaType::LongLong:
+                case QMetaType::ULongLong:
+                case QMetaType::Double:
+                    worksheet_write_number(ws, row, col, data.toDouble(), cellFormat);
+                    break;
+                case QMetaType::QString:
+                    worksheet_write_string(ws, row, col, data.toString().toUtf8(), cellFormat);
+                    break;
+                default:
+                    if (data.canConvert(QMetaType(QMetaType::QString))) {
+                        if (data.convert(QMetaType(QMetaType::QString))) {
+                            worksheet_write_string(ws, row, col, data.toString().toUtf8(), cellFormat);
+                        }
+                    }
+                    break;
+                }
+#endif
             } else if (bgColor.isValid()) {
                 // empty cell with a background
                 worksheet_write_string(ws, row, col, "", cellFormat);

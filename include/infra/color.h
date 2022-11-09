@@ -32,6 +32,11 @@ struct Color
                a == other.a;
     }
 
+    constexpr bool operator!=(const Color& other) const noexcept
+    {
+        return !(*this == other);
+    }
+
     std::string to_hex_rgb() const noexcept;
     std::string to_hex_argb() const noexcept;
 
@@ -48,6 +53,8 @@ static constexpr Color Blue(0, 0, 255);
 static constexpr Color Green(0, 255, 0);
 static constexpr Color Red(255, 0, 0);
 static constexpr Color Transparent(0, 0, 0, 0);
+static constexpr Color DarkGrey(107, 110, 119);
+static constexpr Color LightGrey(170, 174, 177);
 }
 
 }
@@ -56,14 +63,13 @@ namespace fmt {
 template <>
 struct formatter<inf::Color>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
     {
         return ctx.begin();
     }
 
     template <typename FormatContext>
-    auto format(const inf::Color& color, FormatContext& ctx)
+    auto format(const inf::Color& color, FormatContext& ctx) const -> decltype(ctx.out())
     {
         return format_to(ctx.out(), "({}, {}, {}, {})", int(color.r), int(color.g), int(color.b), int(color.a));
     }

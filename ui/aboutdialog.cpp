@@ -33,8 +33,6 @@ AboutDialog::AboutDialog(QWidget* parent)
     _ui->acknowledgementsButton->setVisible(false);
     _ui->licenseEdit->hide();
     _ui->hideButton->hide();
-
-    setFixedSize(463, 204);
 }
 
 AboutDialog::~AboutDialog() = default;

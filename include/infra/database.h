@@ -61,6 +61,13 @@ private:
 };
 
 template <typename ResultField>
+bool bool_value(ResultField&& value)
+{
+    static_assert(std::is_same_v<int64_t, decltype(value.value())>);
+    return static_cast<int64_t>(value) == 1;
+}
+
+template <typename ResultField>
 auto optional_record_value(ResultField&& value)
 {
     using ValueType = decltype(value.value());
@@ -98,6 +105,33 @@ char character_record_value(ResultField&& value)
     }
 
     return value.value().front();
+}
+
+inline auto tvin(int64_t val)
+{
+    if (val == 0) {
+        return sqlpp::value_or_null<sqlpp::integer>(sqlpp::null);
+    } else {
+        return sqlpp::value_or_null(val);
+    }
+}
+
+inline auto tvin(const std::string& val)
+{
+    if (val.empty()) {
+        return sqlpp::value_or_null<sqlpp::text>(sqlpp::null);
+    } else {
+        return sqlpp::value_or_null(val);
+    }
+}
+
+inline auto tvin(const std::string_view val)
+{
+    if (val.empty()) {
+        return sqlpp::value_or_null<sqlpp::text>(sqlpp::null);
+    } else {
+        return sqlpp::value_or_null(std::string(val));
+    }
 }
 
 inline auto optional_insert_value(const std::optional<double>& opt)
@@ -161,7 +195,7 @@ struct SerializerContext
         return _os << t;
     }
 
-    static std::string escape(std::string arg);
+    // static std::string escape(std::string arg);
 };
 
 //! sqlContents should contain ; seperated list of sql statements

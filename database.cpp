@@ -17,10 +17,10 @@ void SerializerContext::reset()
     _os.str("");
 }
 
-std::string SerializerContext::escape(std::string arg)
-{
-    return sqlpp::serializer_context_t::escape(arg);
-}
+// std::string SerializerContext::escape(std::string arg)
+// {
+//     return sqlpp::serializer_context_t::escape(arg);
+// }
 
 #ifdef INFRA_DB_SQLITE_SUPPORT
 sqlpp::sqlite3::connection_config create_sqlite_connection_config(const fs::path& filename, inf::db::AccessMode access, ConnectionDebug debug)

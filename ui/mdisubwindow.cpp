@@ -39,7 +39,7 @@ void MdiSubWindow::restoreSettings()
     restoreGeometry(settings.value(QString("%1/geometry").arg(widget()->objectName())).toByteArray());
 
     if (windowState() & Qt::WindowMaximized) {
-        setLayoutMargin(0);
+        setLayoutMargin(0, 0, 0, 0);
     }
 
     repaint();
@@ -51,17 +51,22 @@ void MdiSubWindow::onMdiWindowStateChange(Qt::WindowStates oldState, Qt::WindowS
     // other UI elements
 
     if (!(oldState & Qt::WindowMaximized) && (newState & Qt::WindowMaximized)) {
-        _defaultMargin = widget()->layout()->margin();
-        setLayoutMargin(0);
+        int top, left, right, bottom;
+        widget()->layout()->getContentsMargins(&top, &left, &right, &bottom);
+        _defaultMarginTop    = top;
+        _defaultMarginLeft   = left;
+        _defaultMarginRight  = right;
+        _defaultMarginBottom = bottom;
+        setLayoutMargin(0, 0, 0, 0);
     } else if ((oldState & Qt::WindowMaximized) && !(newState & Qt::WindowMaximized)) {
-        if (_defaultMargin.has_value()) {
-            setLayoutMargin(*_defaultMargin);
+        if (_defaultMarginTop.has_value()) {
+            setLayoutMargin(*_defaultMarginTop, *_defaultMarginLeft, *_defaultMarginRight, *_defaultMarginBottom);
         }
     }
 }
 
-void MdiSubWindow::setLayoutMargin(int margin)
+void MdiSubWindow::setLayoutMargin(int top, int left, int right, int bottom)
 {
-    widget()->layout()->setMargin(margin);
+    widget()->layout()->setContentsMargins(top, left, right, bottom);
 }
 }
