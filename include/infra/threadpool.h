@@ -15,7 +15,7 @@ class ThreadPool
 public:
     ThreadPool();
     ~ThreadPool();
-    ThreadPool(const ThreadPool&) = delete;
+    ThreadPool(const ThreadPool&)            = delete;
     ThreadPool& operator=(const ThreadPool&) = delete;
 
     size_t thread_count() const;
@@ -25,7 +25,7 @@ public:
     /* Set a callback that will get exectuded at the end of each thread in the pool */
     void set_thread_destruction_cb(std::function<void()> cb);
 
-    void start(int numThreads);
+    void start(uint32_t numThreads);
     void stop();
     void stop_finish_jobs();
     void add_job(std::function<void()> job);

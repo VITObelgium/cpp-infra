@@ -93,7 +93,7 @@ void ThreadPool::set_thread_destruction_cb(std::function<void()> cb)
     _threadDestroyCb = cb;
 }
 
-void ThreadPool::start(int numThreads)
+void ThreadPool::start(uint32_t numThreads)
 {
     std::lock_guard<std::mutex> lock(_poolMutex);
 
@@ -101,7 +101,7 @@ void ThreadPool::start(int numThreads)
         return;
     }
 
-    for (auto i = 0; i < numThreads; ++i) {
+    for (uint32_t i = 0; i < numThreads; ++i) {
         _threads.push_back(std::make_unique<Task>(*this));
     }
 }
