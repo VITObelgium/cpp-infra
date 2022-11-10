@@ -218,6 +218,21 @@ Legend create_legend(std::vector<float> sampleData, int numberOfClasses, std::st
     return legend;
 }
 
+Legend create_contiguous_legend(std::string_view cmapName, double min, double max)
+{
+    Legend legend;
+
+    LegendEntry entry;
+    entry.lowerBound = min;
+    entry.upperBound = max;
+
+    legend.type = Legend::Type::Contiguous;
+    legend.cmap = ColorMap::create(cmapName);
+    legend.entries.push_back(entry);
+
+    return legend;
+}
+
 void generate_bounds(double min, double max, LegendScaleType method, Legend& legend)
 {
     if (min == max) {
