@@ -2,6 +2,7 @@
 #include "infra/string.h"
 
 #ifdef INFRA_HASH_SUPPORT
+#include <cryptopp/base64.h>
 #include <cryptopp/cryptlib.h>
 #include <cryptopp/files.h>
 #include <cryptopp/hex.h>
@@ -30,6 +31,20 @@ std::vector<uint8_t> hex_decode(std::string_view hexStringData)
 {
     std::vector<uint8_t> data;
     StringSource ss(reinterpret_cast<const uint8_t*>(hexStringData.data()), hexStringData.size(), true, new HexDecoder(new VectorSink(data)));
+    return data;
+}
+
+std::string base64_encode(std::span<const uint8_t> data)
+{
+    std::string hexString;
+    ArraySource src(data.data(), data.size(), true, new Base64Encoder(new StringSink(hexString), false /*lowercase*/));
+    return hexString;
+}
+
+std::vector<uint8_t> base64_decode(std::string_view hexStringData)
+{
+    std::vector<uint8_t> data;
+    StringSource ss(reinterpret_cast<const uint8_t*>(hexStringData.data()), hexStringData.size(), true, new Base64Decoder(new VectorSink(data)));
     return data;
 }
 
