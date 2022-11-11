@@ -674,6 +674,12 @@ std::vector<std::basic_string_view<CharT>> split_view(std::basic_string_view<Cha
             detail::apply_split_options(std::basic_string_view<CharT>(start, length), opt, tokens);
             length = 0;
 
+            if (opt.is_set(SplitOpt::JoinAdjacentCharDelimeters)) {
+                while (i + 1 < str.size() && str[i + 1] == delimiter) {
+                    ++i;
+                }
+            }
+
             if (i + 1 < str.size()) {
                 start = &str[i + 1];
             }

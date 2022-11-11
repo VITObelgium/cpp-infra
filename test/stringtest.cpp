@@ -261,6 +261,12 @@ TEST_CASE("StringOperationsTest.SplittedView")
     REQUIRE(2u == tokenized.size());
     CHECK("Line1" == tokenized[0]);
     CHECK("Line2" == tokenized[1]);
+
+    testString = "Line1   Line2";
+    tokenized  = str::split_view(testString, ' ', str::SplitOpt::JoinAdjacentCharDelimeters);
+    REQUIRE(2u == tokenized.size());
+    CHECK("Line1" == tokenized[0]);
+    CHECK("Line2" == tokenized[1]);
 }
 
 TEST_CASE("StringOperationsTest.SplittedViewDelimiterString")

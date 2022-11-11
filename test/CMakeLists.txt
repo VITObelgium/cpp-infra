@@ -10,7 +10,6 @@ add_executable(infratest
     filesystemtest.cpp
     mathtest.cpp
     signaltest.cpp
-    legenddataanalysertest.cpp
     stringtest.cpp
     threadpooltest.cpp
     workerthreadtest.cpp
@@ -34,6 +33,7 @@ if (INFRA_GDAL)
         gdalgeometrytest.cpp
         geocodertest.cpp
         geometadatatest.cpp
+        legenddataanalysertest.cpp
     )
 
     target_compile_definitions(infratest PRIVATE HAVE_GDAL)
