@@ -229,6 +229,7 @@ Legend create_contiguous_legend(std::string_view cmapName, double min, double ma
     legend.type = Legend::Type::Contiguous;
     legend.cmap = ColorMap::create(cmapName);
     legend.entries.push_back(entry);
+    legend.colorMapName = cmapName;
 
     return legend;
 }
