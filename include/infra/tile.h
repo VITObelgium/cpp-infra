@@ -6,8 +6,7 @@
 #include "infra/crs.h"
 #include "infra/geoconstants.h"
 #include "infra/geometadata.h"
-#include "infra/log.h"
-#include "infra/lonlatbbox.h"
+#include "infra/latlonbounds.h"
 #include "infra/math.h"
 #include "infra/rect.h"
 
@@ -124,10 +123,8 @@ public:
     }
 
     // bounds in degrees EPSG:4326
-    LonLatBBox bounds() const
+    LatLonBounds bounds() const
     {
-        LonLatBBox result;
-
         const auto z2 = std::pow(2, _z);
 
         const auto ulLonDeg = _x / z2 * 360.0 - 180.0;
@@ -136,10 +133,8 @@ public:
         const auto lrLonDeg = (_x + 1) / z2 * 360.0 - 180.0;
         const auto lrLatRad = std::atan(std::sinh(inf::math::pi * (1 - 2 * (_y + 1) / z2)));
 
-        result.topLeft     = inf::Coordinate(inf::math::rad_to_deg(ulLatRad), ulLonDeg);
-        result.bottomRight = inf::Coordinate(inf::math::rad_to_deg(lrLatRad), lrLonDeg);
-
-        return result;
+        return LatLonBounds::hull(inf::Coordinate(inf::math::rad_to_deg(ulLatRad), ulLonDeg),
+                                  inf::Coordinate(inf::math::rad_to_deg(lrLatRad), lrLonDeg));
     }
 
     std::array<Tile, 4> direct_children() const

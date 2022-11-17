@@ -135,7 +135,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
     include/infra/line.h
-    include/infra/lonlatbbox.h
+    include/infra/latlonbounds.h latlonbounds.cpp
     include/infra/math.h
     include/infra/meteo.h
     include/infra/naturalbreaks.h

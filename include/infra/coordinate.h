@@ -1,5 +1,7 @@
 #pragma once
 
+#include "infra/geoconstants.h"
+
 #include <cinttypes>
 #include <cmath>
 #include <fmt/core.h>
@@ -45,6 +47,35 @@ struct Coordinate
         return true;
     }
 
+    Coordinate wrapped() const
+    {
+        Coordinate coord(latitude, longitude);
+        coord.wrap();
+        return coord;
+    }
+
+    void wrap()
+    {
+        longitude = wrap(longitude, -constants::LONGITUDE_MAX, constants::LONGITUDE_MAX);
+    }
+
+private:
+    // Constrains n to the given range (including min, excluding max) via modular arithmetic.
+    template <typename T>
+    T wrap(T value, T min, T max)
+    {
+        if (value >= min && value < max) {
+            return value;
+        } else if (value == max) {
+            return min;
+        }
+
+        const T delta   = max - min;
+        const T wrapped = min + std::fmod(value - min, delta);
+        return value < min ? wrapped + delta : wrapped;
+    }
+
+public:
     double latitude  = std::numeric_limits<double>::quiet_NaN();
     double longitude = std::numeric_limits<double>::quiet_NaN();
 };
