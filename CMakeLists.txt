@@ -111,46 +111,49 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/cast.h
     include/infra/cell.h
     include/infra/chrono.h
+    include/infra/color.h
+    include/infra/colormap.h
+    include/infra/conversion.h
     include/infra/coordinate.h
     include/infra/cpuinfo.h
-    include/infra/enumutils.h
-    include/infra/enumflags.h
     include/infra/crs.h
     include/infra/csvwriter.h
     include/infra/demangle.h
+    include/infra/enumflags.h
+    include/infra/enumutils.h
+    include/infra/environmentvariable.h
+    include/infra/exception.h
+    include/infra/filesystem.h
     include/infra/format.h
     include/infra/generator.h
+    include/infra/geoconstants.h
     include/infra/geometadata.h
     include/infra/hash.h
+    include/infra/inireader.h
     include/infra/interpolate.h
     include/infra/legend.h
     include/infra/legenddataanalyser.h 
     include/infra/legendscaletype.h
     include/infra/line.h
-    include/infra/meteo.h
+    include/infra/lonlatbbox.h
     include/infra/math.h
+    include/infra/meteo.h
     include/infra/naturalbreaks.h
+    include/infra/parallelstl.h
     include/infra/point.h
     include/infra/progressinfo.h
     include/infra/range.h
+    include/infra/rect.h
     include/infra/scopeguard.h
     include/infra/signal.h
-    include/infra/string.h
-    include/infra/exception.h
-    include/infra/filesystem.h
-    include/infra/color.h
-    include/infra/colormap.h
-    include/infra/conversion.h
-    include/infra/environmentvariable.h
-    include/infra/rect.h
     include/infra/size.h
     include/infra/span.h
+    include/infra/string.h
     include/infra/threadpool.h
+    include/infra/tile.h
     include/infra/typeinfo.h
-    include/infra/typetraits.h
     include/infra/typetraits-private.h
-    include/infra/inireader.h
-    include/infra/parallelstl.h
+    include/infra/typetraits.h
     include/infra/workerthread.h
 )
 
