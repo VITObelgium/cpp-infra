@@ -8,6 +8,7 @@ add_executable(infratest
     interpolatetest.cpp
     inireadertest.cpp
     filesystemtest.cpp
+    filelocktest.cpp
     mathtest.cpp
     signaltest.cpp
     stringtest.cpp

@@ -88,10 +88,20 @@ public:
     {
         open(p, mode);
     }
+    Handle(Handle&& other) noexcept
+    {
+        std::swap(_ptr, other._ptr);
+    }
 
     ~Handle() noexcept
     {
         close();
+    }
+
+    Handle& operator=(Handle&& other) noexcept
+    {
+        close();
+        std::swap(_ptr, other._ptr);
     }
 
     void open(const fs::path& p, const char* mode) noexcept

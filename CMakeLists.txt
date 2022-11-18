@@ -123,6 +123,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/enumutils.h
     include/infra/environmentvariable.h
     include/infra/exception.h
+    include/infra/filelock.h
     include/infra/filesystem.h
     include/infra/format.h
     include/infra/generator.h
