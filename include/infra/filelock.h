@@ -69,13 +69,20 @@ public:
             throw RuntimeError("Failed to lock file: ec={}", GetLastError());
         }
 #else
-        struct ::flock lock;
+        ::flock lock;
         lock.l_type   = F_WRLCK;
         lock.l_whence = SEEK_SET;
         lock.l_start  = 0;
         lock.l_len    = 0;
 
-        return -1 != ::fcntl(fileno(_file.get()), F_SETLKW, &lock);
+        auto fd = fileno(_file.get());
+        if (fd == -1) {
+            throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
+        }
+
+        if (-1 == ::fcntl(fd, F_SETLKW, &lock)) {
+            throw RuntimeError("Failed to lock file: ec={} ({})", errno, strerror(errno));
+        }
 #endif
     }
 
@@ -112,11 +119,17 @@ public:
         lock.l_whence = SEEK_SET;
         lock.l_start  = 0;
         lock.l_len    = 0;
-        int ret       = ::fcntl(fileno(_file.get()), F_SETLK, &lock);
+
+        auto fd = fileno(_file.get());
+        if (fd == -1) {
+            throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
+        }
+
+        int ret = ::fcntl(fd, F_SETLK, &lock);
         if (ret == -1) {
             acquired = false;
             if (errno != EAGAIN && errno != EACCES) {
-                throw RuntimeError("Failed to try lock file: ec={}", errno);
+                throw RuntimeError("Failed to try lock file: ec={} ({})", errno, strerror(errno));
             }
         }
 #endif
@@ -143,7 +156,15 @@ public:
         lock.l_whence = SEEK_SET;
         lock.l_start  = 0;
         lock.l_len    = 0;
-        return -1 != ::fcntl(fileno(_file.get()), F_SETLK, &lock);
+
+        auto fd = fileno(_file.get());
+        if (fd == -1) {
+            throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
+        }
+
+        if (-1 == ::fcntl(fd, F_SETLK, &lock)) {
+            throw RuntimeError("Failed to try lock file: ec={} ({})", errno, strerror(errno));
+        }
 #endif
     }
 
