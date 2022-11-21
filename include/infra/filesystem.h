@@ -102,6 +102,7 @@ public:
     {
         close();
         std::swap(_ptr, other._ptr);
+        return *this;
     }
 
     void open(const fs::path& p, const char* mode) noexcept
