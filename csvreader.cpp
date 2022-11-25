@@ -50,7 +50,7 @@ bool CsvRow::column_is_empty(int32_t index) const noexcept
 
 std::string CsvRow::get_string(int32_t index) const noexcept
 {
-    if (_charSet == CharacterSet::Utf8) {
+    if (_charSet == CharacterSet::Utf8 || _charSet == CharacterSet::Unknown) {
         return std::string(_feature->field_as<std::string_view>(index));
     } else {
         return convert_to_utf8(_feature->field_as<std::string_view>(index));

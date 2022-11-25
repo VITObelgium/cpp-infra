@@ -110,6 +110,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
     include/infra/cast.h
     include/infra/cell.h
+    include/infra/charset.h
     include/infra/chrono.h
     include/infra/color.h
     include/infra/colormap.h
@@ -159,6 +160,7 @@ set(INFRA_PUBLIC_HEADERS
 )
 
 add_library(infra
+    charset.cpp
     chrono.cpp
     cpuinfo.cpp
     csvwriter.cpp
@@ -266,9 +268,7 @@ endif ()
 
 if (INFRA_CHARSET)
     find_package(ICU COMPONENTS i18n data uc REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/charset.h)
-    target_sources(infra PRIVATE charset.cpp)
-    target_compile_definitions(infra PRIVATE U_USING_ICU_NAMESPACE U_STATIC_IMPLEMENTATION )
+    target_compile_definitions(infra PRIVATE U_USING_ICU_NAMESPACE U_STATIC_IMPLEMENTATION INFRA_HAVE_CHARSET)
     target_link_libraries(infra PRIVATE ICU::i18n ICU::uc ICU::data)
 endif ()
 
@@ -348,9 +348,11 @@ if (INFRA_GDAL)
         include/infra/gdalspatialreference.h
         include/infra/geocoder.h
         include/infra/gdal-private.h
+        include/infra/csvreader.h
     )
 
     target_sources(infra PRIVATE
+        csvreader.cpp    
         gdal.cpp
         gdalalgo.cpp
         gdalgeometry.cpp
@@ -395,11 +397,6 @@ if (INFRA_GDAL)
     if (INFRA_LOGGING)
         list (APPEND INFRA_PUBLIC_HEADERS include/infra/gdallog.h)
         target_sources(infra PRIVATE gdallog.cpp)
-    endif ()
-
-    if (INFRA_CHARSET)
-        list (APPEND INFRA_PUBLIC_HEADERS include/infra/csvreader.h)
-        target_sources(infra PRIVATE csvreader.cpp)
     endif ()
 
     target_compile_definitions(infra PUBLIC INFRA_GDAL_ENABLED)
