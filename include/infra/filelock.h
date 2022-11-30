@@ -7,8 +7,8 @@
 #include <Windows.h>
 #include <io.h>
 #else
+#include <cstdio>
 #include <fcntl.h>
-#include <stdio.h>
 #endif
 
 namespace inf {
@@ -69,7 +69,7 @@ public:
             throw RuntimeError("Failed to lock file: ec={}", GetLastError());
         }
 #else
-        ::flock lock;
+        struct ::flock lock;
         lock.l_type   = F_WRLCK;
         lock.l_whence = SEEK_SET;
         lock.l_start  = 0;
