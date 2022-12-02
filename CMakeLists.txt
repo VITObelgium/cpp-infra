@@ -384,6 +384,7 @@ if (INFRA_GDAL)
                            COMMENT "Generate embedded gdal data"
         )
     elseif ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND NOT SYSTEM_GDAL)
+        find_package(PROJ CONFIG REQUIRED)
         add_custom_command(TARGET infra POST_BUILD
                            COMMENT "Copying proj db to the build directory"
                            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
