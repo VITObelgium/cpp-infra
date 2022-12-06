@@ -35,6 +35,8 @@ Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
         return Geometry::Type::MultiSurface;
     case wkbMultiCurve:
         return Geometry::Type::MultiCurve;
+    case wkbNone:
+        return Geometry::Type::None;
     default:
         throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(type));
     }
