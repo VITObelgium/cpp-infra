@@ -159,7 +159,7 @@ VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta,
         "-clipdst",
         fmt::format("{:f}", std::to_string(xMin)),
         fmt::format("{:f}", std::to_string(yMin)),
-        fmt::format("{:f}",  std::to_string(xMax)),
+        fmt::format("{:f}", std::to_string(xMax)),
         fmt::format("{:f}", std::to_string(yMax)),
     };
 
@@ -230,6 +230,10 @@ public:
     {
         auto optionValues = create_string_list(opts);
         _options          = GDALRasterizeOptionsNew(optionValues.List(), nullptr);
+
+        if (_options == nullptr && !opts.empty()) {
+            gdal::throw_last_error("Invalid rasterize options provided");
+        }
     }
 
     ~RasterizeOptionsWrapper()
