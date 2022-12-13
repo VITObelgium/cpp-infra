@@ -328,7 +328,7 @@ endif ()
 
     
 if (INFRA_GDAL)
-    find_package(GEOS CONFIG REQUIRED)
+    find_package(GEOS CONFIG)
     find_package(GDAL CONFIG)
 
     if (NOT TARGET GDAL::GDAL)
@@ -350,7 +350,6 @@ if (INFRA_GDAL)
         include/infra/gdalcolortable.h
         include/infra/gdalspatialreference.h
         include/infra/geocoder.h
-        include/infra/geometry.h
         include/infra/gdal-private.h
         include/infra/csvreader.h
     )
@@ -367,6 +366,15 @@ if (INFRA_GDAL)
         geocoder.cpp
         geometry.cpp
     )
+
+    if (TARGET GEOS::geos)
+        list (APPEND INFRA_PUBLIC_HEADERS include/infra/geometry.h)
+        target_sources(infra PRIVATE geometry.cpp)
+        target_link_libraries(infra PUBLIC GEOS::geos)
+
+        set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+        set_target_properties(GEOS::geos_c PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+    endif ()
 
     if (INFRA_EMBED_GDAL_DATA)
         if (NOT Gdal_DATA_PATH)
@@ -406,10 +414,9 @@ if (INFRA_GDAL)
     endif ()
 
     target_compile_definitions(infra PUBLIC INFRA_GDAL_ENABLED)
-    target_link_libraries(infra PUBLIC GDAL::GDAL GEOS::geos)
-    set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-    set_target_properties(GEOS::geos_c PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+    target_link_libraries(infra PUBLIC GDAL::GDAL)
     set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
+    
 endif ()
 
 if (INFRA_NUMERIC)
