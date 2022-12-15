@@ -520,7 +520,7 @@ if (INFRA_UI_COMPONENTS)
         ui/tabletools.cpp
         ui/doublespinboxwithinfinites.cpp
         ui/toolboxitem.cpp
-        ui/qt5.natvis
+        ui/qt6.natvis
         ${INFRA_UI_FILES}
     )
 
