@@ -27,6 +27,9 @@ public:
     FileLock(const fs::path& path)
     : _file(path, "w")
     {
+        if (_file.get() == nullptr) {
+            throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
+        }
     }
 
     //! Moves the ownership of "moved"'s file mapping object to *this.
