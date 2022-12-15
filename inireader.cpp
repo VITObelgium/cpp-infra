@@ -45,7 +45,7 @@ typedef char* (*ini_reader)(char* str, int num, void* stream);
 
 /* Maximum line length for any line in INI file. */
 #ifndef INI_MAX_LINE
-#define INI_MAX_LINE 2048
+#define INI_MAX_LINE 8192
 #endif
 
 #if !INI_USE_STACK
