@@ -1,4 +1,4 @@
-#include "infra/test/tempdir.h"
+#include "infra/tempdir.h"
 
 namespace inf {
 

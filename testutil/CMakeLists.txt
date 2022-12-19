@@ -10,7 +10,6 @@ set (INFRA_TESTUTIL_PUBLIC_HEADERS
 add_library(infratestutil
     ${INFRA_TESTUTIL_PUBLIC_HEADERS}
      printsupport.cpp
-     tempdir.cpp
 )
 
 set_target_properties(infratestutil PROPERTIES

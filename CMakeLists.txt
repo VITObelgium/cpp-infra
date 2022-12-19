@@ -151,6 +151,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/size.h
     include/infra/span.h
     include/infra/string.h
+    include/infra/tempdir.h
     include/infra/threadpool.h
     include/infra/tile.h
     include/infra/typeinfo.h
@@ -176,6 +177,7 @@ add_library(infra
     colormap.cpp
     threadpool.cpp
     inireader.cpp
+    tempdir.cpp
     typeinfo.cpp
     workerthread.cpp
 )
