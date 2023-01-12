@@ -161,8 +161,8 @@ Legend create_numeric_legend(std::vector<float> sampleData, int numberOfClasses,
 {
     Legend legend;
     legend.type            = Legend::Type::Numeric;
-    legend.numberOfClasses = numberOfClasses;
     legend.colorMapName    = cmapName;
+    legend.numberOfClasses = numberOfClasses;
     legend.entries.resize(numberOfClasses);
     legend.cmap = ColorMap::create(cmapName);
 
@@ -257,7 +257,9 @@ void generate_bounds(std::vector<float> sampleData, LegendScaleType scaleType, L
     LegendDataAnalyser dataAnalyser(std::move(sampleData));
     dataAnalyser.set_number_of_classes(legend.numberOfClasses);
     dataAnalyser.calculate_classbounds(scaleType);
-    auto bounds = dataAnalyser.classbounds();
+    auto bounds            = dataAnalyser.classbounds();
+    legend.numberOfClasses = truncate<int>(bounds.size());
+    legend.entries.resize(legend.numberOfClasses);
 
     size_t index = 0;
     for (auto& entry : legend.entries) {

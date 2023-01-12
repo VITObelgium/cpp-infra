@@ -32,6 +32,7 @@ void LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double
             maxValue = _sampleData[_sampleData.size() - 1];
         }
         _classBounds = inf::calculate_classbounds(scaleType, _nClasses, minValue, maxValue, _sampleData);
+        _nClasses    = truncate<int>(_classBounds.size() - 1);
     } catch (const std::exception&) {
         _classBounds.clear();
     }
@@ -328,6 +329,12 @@ std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClas
     std::vector<double> classBounds(numClasses + 1);
     classBounds[0]          = minValue;
     classBounds[numClasses] = maxValue;
+
+    if (minValue == maxValue) {
+        classBounds.resize(2);
+        classBounds[1] = maxValue;
+        return classBounds;
+    }
 
     int n = truncate<int>(sampleData.size());
 
