@@ -47,14 +47,14 @@ struct Coordinate
         return true;
     }
 
-    Coordinate wrapped() const
+    constexpr Coordinate wrapped() const
     {
         Coordinate coord(latitude, longitude);
         coord.wrap();
         return coord;
     }
 
-    void wrap()
+    constexpr void wrap()
     {
         longitude = wrap(longitude, -constants::LONGITUDE_MAX, constants::LONGITUDE_MAX);
     }
@@ -62,7 +62,7 @@ struct Coordinate
 private:
     // Constrains n to the given range (including min, excluding max) via modular arithmetic.
     template <typename T>
-    T wrap(T value, T min, T max)
+    constexpr T wrap(T value, T min, T max)
     {
         if (value >= min && value < max) {
             return value;

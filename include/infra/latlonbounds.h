@@ -11,13 +11,13 @@ class LatLonBounds
 {
 public:
     // Return a bounds covering the entire (unwrapped) world.
-    static LatLonBounds world()
+    static constexpr LatLonBounds world()
     {
         return {{-90, -180}, {90, 180}};
     }
 
     // Return the convex hull of two points; the smallest bounds that contains both.
-    static LatLonBounds hull(const Coordinate& a, const Coordinate& b)
+    static constexpr LatLonBounds hull(const Coordinate& a, const Coordinate& b)
     {
         LatLonBounds bounds(a, a);
         bounds.extend(b);
@@ -37,64 +37,64 @@ public:
     ///
     /// Note: this is different than LatLonBounds::world() since arbitrary unwrapped
     /// coordinates are also inside the bounds.
-    LatLonBounds()
+    constexpr LatLonBounds()
     : sw({-90, -180}), ne({90, 180}), bounded(false)
     {
     }
 
-    bool valid() const noexcept
+    constexpr bool valid() const noexcept
     {
         return (sw.latitude <= ne.latitude) && (sw.longitude <= ne.longitude);
     }
 
-    double south() const noexcept
+    constexpr double south() const noexcept
     {
         return sw.latitude;
     }
 
-    double west() const noexcept
+    constexpr double west() const noexcept
     {
         return sw.longitude;
     }
 
-    double north() const noexcept
+    constexpr double north() const noexcept
     {
         return ne.latitude;
     }
 
-    double east() const noexcept
+    constexpr double east() const noexcept
     {
         return ne.longitude;
     }
 
-    Coordinate southwest() const noexcept
+    constexpr Coordinate southwest() const noexcept
     {
         return sw;
     }
 
-    Coordinate northeast() const noexcept
+    constexpr Coordinate northeast() const noexcept
     {
         return ne;
     }
 
-    Coordinate southeast() const noexcept
+    constexpr Coordinate southeast() const noexcept
     {
         return {south(), east()};
     }
 
-    Coordinate northwest() const noexcept
+    constexpr Coordinate northwest() const noexcept
     {
         return {north(), west()};
     }
 
-    Coordinate center() const noexcept
+    constexpr Coordinate center() const noexcept
     {
         return {(sw.latitude + ne.latitude) / 2, (sw.longitude + ne.longitude) / 2};
     }
 
     Coordinate constrain(const Coordinate& p) const;
 
-    void extend(const Coordinate& point)
+    constexpr void extend(const Coordinate& point)
     {
         sw = Coordinate(std::min(point.latitude, sw.latitude),
                         std::min(point.longitude, sw.longitude));
@@ -102,19 +102,19 @@ public:
                         std::max(point.longitude, ne.longitude));
     }
 
-    void extend(const LatLonBounds& bounds)
+    constexpr void extend(const LatLonBounds& bounds)
     {
         extend(bounds.sw);
         extend(bounds.ne);
     }
 
-    bool isEmpty() const
+    constexpr bool isEmpty() const
     {
         return sw.latitude > ne.latitude ||
                sw.longitude > ne.longitude;
     }
 
-    bool crosses_antimeridian() const
+    constexpr bool crosses_antimeridian() const
     {
         return (sw.wrapped().longitude > ne.wrapped().longitude);
     }
@@ -129,7 +129,7 @@ private:
     Coordinate ne;
     bool bounded = true;
 
-    LatLonBounds(Coordinate sw_, Coordinate ne_)
+    constexpr LatLonBounds(Coordinate sw_, Coordinate ne_)
     : sw(sw_), ne(ne_)
     {
     }
