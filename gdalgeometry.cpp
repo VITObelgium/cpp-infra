@@ -878,6 +878,11 @@ std::unordered_map<std::string, std::string> Layer::metadata(const std::string& 
     return result;
 }
 
+bool Layer::test_capability(const char* name)
+{
+    return _layer->TestCapability(name) == TRUE;
+}
+
 FeatureIterator::FeatureIterator(int fieldCount)
 : _currentFieldIndex(fieldCount)
 {

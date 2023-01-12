@@ -1067,6 +1067,8 @@ public:
     std::string metadata_item(const std::string& name, const std::string& domain = "");
     std::unordered_map<std::string, std::string> metadata(const std::string& domain = "");
 
+    bool test_capability(const char* name);
+
 private:
     OGRLayer* _layer = nullptr;
 };
