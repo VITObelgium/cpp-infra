@@ -2,6 +2,7 @@
 
 #include <complex>
 #include <gdal_priv.h>
+#include <gdal_version.h>
 #include <typeinfo>
 
 #include "infra/span.h"
@@ -44,6 +45,20 @@ struct TypeResolve<int32_t>
     static constexpr GDALDataType value = GDT_Int32;
 };
 
+#if GDAL_VERSION_MAJOR > 2
+template <>
+struct TypeResolve<uint64_t>
+{
+    static constexpr GDALDataType value = GDT_UInt64;
+};
+
+template <>
+struct TypeResolve<int64_t>
+{
+    static constexpr GDALDataType value = GDT_Int64;
+};
+#endif
+
 template <>
 struct TypeResolve<float>
 {
@@ -74,6 +89,14 @@ inline GDALDataType resolve_type(const std::type_info& info)
         return TypeResolve<double>::value;
     }
 
+#if GDAL_VERSION_MAJOR > 2
+    if (info == typeid(uint64_t)) {
+        return TypeResolve<uint64_t>::value;
+    } else if (info == typeid(int64_t)) {
+        return TypeResolve<int64_t>::value;
+    }
+#endif
+
     return GDT_Unknown;
 }
 
@@ -96,7 +119,7 @@ inline const std::type_info& resolve_type(GDALDataType type)
         return typeid(double);
     case GDT_CInt16:
         return typeid(int16_t);
-        //return typeid(std::complex<int16_t>);
+        // return typeid(std::complex<int16_t>);
     case GDT_CInt32:
         return typeid(std::complex<int32_t>);
     case GDT_CFloat32:

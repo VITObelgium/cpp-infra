@@ -13,6 +13,7 @@
 
 #include <cassert>
 #include <fmt/format.h>
+#include <gdal_version.h>
 #include <limits>
 #include <ogr_spatialref.h>
 #include <string>
@@ -154,6 +155,14 @@ void write_raster_data(
     case GDT_Int32:
         write_raster_data<int32_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
         break;
+#if GDAL_VERSION_MAJOR > 2
+    case GDT_UInt64:
+        write_raster_data<uint64_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+    case GDT_Int64:
+        write_raster_data<int64_t, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
+        break;
+#endif
     case GDT_Float32:
         write_raster_data<float, RasterDataType>(data, meta, filename, driverOptions, metadataValues, ct);
         break;
