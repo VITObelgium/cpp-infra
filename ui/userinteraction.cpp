@@ -6,9 +6,9 @@
 
 namespace inf::ui {
 
-bool askForConfirmation(const QString& title, const QString& message)
+bool askForConfirmation(const QString& title, const QString& message, QWidget* parent)
 {
-    QMessageBox mb(QMessageBox::Question, title, message, QMessageBox::Yes | QMessageBox::No);
+    QMessageBox mb(QMessageBox::Question, title, message, QMessageBox::Yes | QMessageBox::No, parent);
 
     return mb.exec() == QMessageBox::Yes;
 }
@@ -18,7 +18,7 @@ int askQuestion(const QString& title, const QString& message, const QString& opt
     QMessageBox mb(QMessageBox::Question, title, message, QMessageBox::NoButton, parent);
     mb.addButton(option1, QMessageBox::AcceptRole);
     mb.addButton(option2, QMessageBox::RejectRole);
-    return mb.exec() + 1; //exec returns the 0 based index of the clicked button
+    return mb.exec() + 1; // exec returns the 0 based index of the clicked button
 }
 
 QString askForString(QWidget* parent, const QString& title, const QString& name)
