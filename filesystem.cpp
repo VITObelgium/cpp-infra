@@ -229,6 +229,14 @@ void append_text_to_file(const fs::path& file, std::string_view contents)
     }
 }
 
+void touch(const fs::path& filename)
+{
+    std::ofstream fs(filename, std::ios::app);
+    if (!fs.is_open()) {
+        throw RuntimeError("Failed to touch file: {}", filename);
+    }
+}
+
 ScopedCurrentWorkingDirectory::ScopedCurrentWorkingDirectory(const fs::path& cwd)
 : _prevCwd(fs::current_path())
 {

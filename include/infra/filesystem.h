@@ -79,6 +79,7 @@ std::string read_as_text(const std::istream& filestream);
 void write(const fs::path& filename, std::span<const uint8_t> contents);
 void write_as_text(const fs::path& filename, std::string_view contents);
 void append_text_to_file(const fs::path& file, std::string_view contents);
+void touch(const fs::path& file);
 
 class Handle
 {
