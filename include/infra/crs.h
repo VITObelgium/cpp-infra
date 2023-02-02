@@ -27,11 +27,12 @@ static inline constexpr int32_t BelgianLambert2008 = 3812;
 /*! Use this enum when you care about type safety in your interfaces */
 enum class Epsg : int32_t
 {
-    WGS84WebMercator = epsg::WGS84WebMercator,
-    WGS84            = epsg::WGS84,
-    BelgianLambert72 = epsg::BelgianLambert72,
-    Belge72Geo       = epsg::Belge72Geo,
-    ETRS89           = epsg::ETRS89,
+    WGS84WebMercator   = epsg::WGS84WebMercator,
+    WGS84              = epsg::WGS84,
+    BelgianLambert72   = epsg::BelgianLambert72,
+    Belge72Geo         = epsg::Belge72Geo,
+    ETRS89             = epsg::ETRS89,
+    BelgianLambert2008 = epsg::BelgianLambert2008,
 };
 
 // Convert longitude and latitude to web mercator x, y EPSG:4326
