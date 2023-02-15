@@ -157,10 +157,10 @@ VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta,
         "-t_srs"s,
         destMeta.projection,
         "-clipdst",
-        fmt::format("{:f}", std::to_string(xMin)),
-        fmt::format("{:f}", std::to_string(yMin)),
-        fmt::format("{:f}", std::to_string(xMax)),
-        fmt::format("{:f}", std::to_string(yMax)),
+        fmt::format("{:f}", xMin),
+        fmt::format("{:f}", yMin),
+        fmt::format("{:f}", xMax),
+        fmt::format("{:f}", yMax),
     };
 
     std::copy(extraOptions.begin(), extraOptions.end(), std::back_inserter(options));
