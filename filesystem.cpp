@@ -176,6 +176,11 @@ std::string read_as_text(const std::istream& fileStream)
     return buffer.str();
 }
 
+std::vector<std::string> read_lines(const fs::path& filename)
+{
+    return str::split(read_as_text(filename), "\r\n", str::SplitOpt::DelimiterIsCharacterArray | str::SplitOpt::JoinAdjacentCharDelimeters);
+}
+
 void write(const fs::path& filename, std::span<const uint8_t> contents)
 {
     if (filename.has_parent_path()) {
