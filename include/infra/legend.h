@@ -14,8 +14,8 @@ namespace inf {
 struct LegendEntry
 {
     // in case of a categoric map, lower and upperbound are equal
-    double lowerBound;
-    double upperBound;
+    double lowerBound = 0.0;
+    double upperBound = 0.0;
     inf::Color color;
     std::string name;
     std::string value; // if value is present lower and upper bound values are ignored
