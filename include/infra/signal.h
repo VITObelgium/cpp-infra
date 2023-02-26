@@ -58,7 +58,7 @@ public:
     {
         std::lock_guard<std::mutex> lock(_mutex);
         for (auto& sub : _subscribers) {
-            sub.callback(std::forward<CallArgs>(args)...);
+            sub.callback(args...);
         }
     }
 
