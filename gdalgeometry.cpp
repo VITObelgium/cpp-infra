@@ -419,6 +419,7 @@ T Feature::field_as(int index) const
     } else if constexpr (std::is_same_v<std::string, T>) {
         return std::string(_feature->GetFieldAsString(index));
     } else if constexpr (std::is_same_v<std::string_view, T>) {
+        assert(_feature->GetDefnRef()->GetFieldDefn(index)->GetType() == OFTString);
         return std::string_view(_feature->GetFieldAsString(index));
     } else if constexpr (std::is_same_v<time_point, T>) {
         int year, month, day, hour, minute, timezoneFlag;
