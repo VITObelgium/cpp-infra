@@ -366,7 +366,6 @@ if (INFRA_GDAL)
         gdalspatialreference.cpp
         gdal-private.cpp
         geocoder.cpp
-        geometry.cpp
     )
 
     if (TARGET GEOS::geos)
