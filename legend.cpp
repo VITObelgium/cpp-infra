@@ -114,14 +114,21 @@ Color Legend::color_for_value(double value, const Color& unmappable, const Color
         return unmappable;
     }
 
-    for (auto& entry : entries) {
-        if (type == inf::Legend::Type::Categoric) {
-            if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
-                return entry.color;
-            }
-        } else if (type == inf::Legend::Type::Numeric) {
-            if (value >= entry.lowerBound && value < entry.upperBound) {
-                return entry.color;
+    if (type == Type::Contiguous) {
+        assert(entries.size() == 1);
+        if (value >= entries.front().lowerBound && value <= entries.front().upperBound) {
+            return cmap.get_color(linear_map_to_float(value, entries.front().lowerBound, entries.front().upperBound));
+        }
+    } else {
+        for (auto& entry : entries) {
+            if (type == inf::Legend::Type::Categoric) {
+                if (math::approx_equal(value, entry.lowerBound, 1e-4)) {
+                    return entry.color;
+                }
+            } else if (type == inf::Legend::Type::Numeric) {
+                if (value >= entry.lowerBound && value < entry.upperBound) {
+                    return entry.color;
+                }
             }
         }
     }
