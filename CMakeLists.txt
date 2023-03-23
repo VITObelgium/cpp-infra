@@ -4,11 +4,11 @@ include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 include(GNUInstallDirs)
 
-if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    set (INFRA_IS_TOPLEVEL ON)
-endif ()
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    set(INFRA_IS_TOPLEVEL ON)
+endif()
 
-if (INFRA_IS_TOPLEVEL)
+if(INFRA_IS_TOPLEVEL)
     cmake_minimum_required(VERSION 3.15)
     project(Infra
         VERSION 0.11.2
@@ -17,7 +17,7 @@ if (INFRA_IS_TOPLEVEL)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_EXTENSIONS OFF)
 
-    if (MSVC)
+    if(MSVC OR (WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
         # avoid windows specific warnings
         add_definitions(
             -D_CRT_SECURE_NO_WARNINGS
@@ -26,8 +26,8 @@ if (INFRA_IS_TOPLEVEL)
             -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
             -D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
         )
-    endif ()
-endif ()
+    endif()
+endif()
 
 option(INFRA_LOGGING "Enable logging functionality" OFF)
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
@@ -55,11 +55,11 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item 
 cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
 
-if (MSVC)
-    set (CMAKE_REQUIRED_FLAGS /std:c++17)
-else ()
-    set (CMAKE_REQUIRED_FLAGS -std=c++17)
-endif ()
+if(MSVC)
+    set(CMAKE_REQUIRED_FLAGS /std:c++17)
+else()
+    set(CMAKE_REQUIRED_FLAGS -std=c++17)
+endif()
 
 check_include_file_cxx(charconv HAVE_CHARCONV_HEADER)
 
@@ -75,36 +75,39 @@ namespace fs = std::experimental::filesystem;
 int main() { return 0; }
 " HAVE_EXP_FILESYSTEM_H)
 
-if (EMSCRIPTEN)
+if(EMSCRIPTEN)
     # emscripten installs the headers but does not support the lib
-    set (HAVE_EXP_FILESYSTEM_H OFF)
-endif ()
+    set(HAVE_EXP_FILESYSTEM_H OFF)
+endif()
 
-if (NOT HAVE_FILESYSTEM_H AND NOT HAVE_EXP_FILESYSTEM_H)
+if(NOT HAVE_FILESYSTEM_H AND NOT HAVE_EXP_FILESYSTEM_H)
     find_package(Boost COMPONENTS filesystem)
-    if (TARGET Boost::filesystem)
-        set (HAVE_BOOST_FILESYSTEM ON)
-    endif ()
-endif ()
 
-if (HAVE_FILESYSTEM_H)
+    if(TARGET Boost::filesystem)
+        set(HAVE_BOOST_FILESYSTEM ON)
+    endif()
+endif()
+
+if(HAVE_FILESYSTEM_H)
     message(STATUS "Found std::filesystem")
-elseif (HAVE_EXP_FILESYSTEM_H)
+elseif(HAVE_EXP_FILESYSTEM_H)
     message(STATUS "Found std::experimental::filesystem")
-elseif (HAVE_BOOST_FILESYSTEM)
+elseif(HAVE_BOOST_FILESYSTEM)
     message(STATUS "Found boost::filesystem")
-else ()
+else()
     message(WARNING "no filesystem implementation found")
-endif ()
+endif()
 
 find_package(date CONFIG REQUIRED)
 find_package(fmt CONFIG REQUIRED)
-find_package(Gsl)
+find_package(Gsl CONFIG)
+
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-if (TARGET date::date-tz)
+
+if(TARGET date::date-tz)
     set_target_properties(date::date-tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-endif ()
+endif()
 
 set(INFRA_PUBLIC_HEADERS
     include/infra/algo.h
@@ -134,7 +137,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/inireader.h
     include/infra/interpolate.h
     include/infra/legend.h
-    include/infra/legenddataanalyser.h 
+    include/infra/legenddataanalyser.h
     include/infra/legendscaletype.h
     include/infra/line.h
     include/infra/latlonbounds.h latlonbounds.cpp
@@ -182,168 +185,172 @@ add_library(infra
     workerthread.cpp
 )
 
-if (MSVC)
+if(MSVC OR (WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
     set_source_files_properties(cliprogressbar.cpp PROPERTIES COMPILE_DEFINITIONS _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
-endif ()
+    set_source_files_properties(inireader.cpp PROPERTIES COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
+endif()
 
 add_library(Infra::infra ALIAS infra)
 
 target_include_directories(infra
     PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
     PRIVATE
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
-if (HAVE_FILESYSTEM_H)
+if(HAVE_FILESYSTEM_H)
     target_compile_definitions(infra PUBLIC HAVE_FILESYSTEM_H)
-elseif (HAVE_EXP_FILESYSTEM_H)
+elseif(HAVE_EXP_FILESYSTEM_H)
     target_compile_definitions(infra PUBLIC HAVE_EXP_FILESYSTEM_H)
-elseif (HAVE_BOOST_FILESYSTEM)
+elseif(HAVE_BOOST_FILESYSTEM)
     target_compile_definitions(infra PUBLIC HAVE_BOOST_FILESYSTEM)
-endif ()
+endif()
 
 target_compile_definitions(infra
-PUBLIC
+    PUBLIC
     FMT_STRING_ALIAS=1
-PRIVATE
+    PRIVATE
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
 target_link_libraries(infra PUBLIC fmt::fmt date::date $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
 
-if (HAVE_BOOST_FILESYSTEM)
+if(HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
-elseif (CMAKE_COMPILER_IS_GNUCXX)
-    if (HAVE_FILESYSTEM_H OR HAVE_EXP_FILESYSTEM_H)
+elseif(CMAKE_COMPILER_IS_GNUCXX)
+    if(HAVE_FILESYSTEM_H OR HAVE_EXP_FILESYSTEM_H)
         # in gcc >= 9.0 the filesystem library is inside libstdc++
-        if ("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9.0.0")
+        if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9.0.0")
             target_link_libraries(infra PRIVATE stdc++fs)
-        endif ()
-    endif ()
-elseif ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT CMAKE_HOST_WIN32)
-    if (HAVE_FILESYSTEM_H)
-        if (APPLE)
+        endif()
+    endif()
+elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT CMAKE_HOST_WIN32)
+    if(HAVE_FILESYSTEM_H)
+        if(APPLE)
             find_library(CPP_FS_LIB c++fs)
-            if (CPP_FS_LIB)
+
+            if(CPP_FS_LIB)
                 target_link_libraries(infra PRIVATE ${CPP_FS_LIB})
-            endif ()
-        elseif (UNIX)
+            endif()
+        elseif(UNIX)
             # on linux libstdc++ is typically used
             target_link_libraries(infra PRIVATE stdc++fs)
-        endif ()
-    elseif (HAVE_EXP_FILESYSTEM_H)
+        endif()
+    elseif(HAVE_EXP_FILESYSTEM_H)
         find_library(CPP_EXP_LIB c++experimental)
-        if (CPP_EXP_LIB)
-            target_link_libraries(infra PRIVATE ${CPP_EXP_LIB})
-        else ()
-            message(FATAL_ERROR "c++experimental library not found for clang")
-        endif ()
-    endif ()
-endif ()
 
-if (INFRA_LOGGING)
+        if(CPP_EXP_LIB)
+            target_link_libraries(infra PRIVATE ${CPP_EXP_LIB})
+        else()
+            message(FATAL_ERROR "c++experimental library not found for clang")
+        endif()
+    endif()
+endif()
+
+if(INFRA_LOGGING)
     find_package(spdlog CONFIG REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/log.h)
     target_sources(infra PRIVATE log.cpp)
     target_link_libraries(infra PUBLIC spdlog::spdlog)
     target_compile_definitions(infra PUBLIC INFRA_LOG_ENABLED)
     set_target_properties(spdlog::spdlog PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-endif ()
+endif()
 
-if (INFRA_XML)
+if(INFRA_XML)
     find_package(pugixml CONFIG REQUIRED)
     set_target_properties(pugixml PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/xmldocument.h)
     target_sources(infra PRIVATE xmldocument.cpp)
     target_link_libraries(infra PRIVATE pugixml)
-endif ()
+endif()
 
-if (INFRA_CLI_PROGRESS)
+if(INFRA_CLI_PROGRESS)
     find_package(indicators CONFIG REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/cliprogressbar.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/cliprogressbar.h)
     target_sources(infra PRIVATE cliprogressbar.cpp)
     target_link_libraries(infra PRIVATE indicators::indicators)
-endif ()
+endif()
 
-if (INFRA_CHARSET)
+if(INFRA_CHARSET)
     find_package(ICU COMPONENTS i18n data uc REQUIRED)
     target_compile_definitions(infra PRIVATE U_USING_ICU_NAMESPACE U_STATIC_IMPLEMENTATION INFRA_HAVE_CHARSET)
     target_link_libraries(infra PRIVATE ICU::i18n ICU::uc ICU::data)
-endif ()
+endif()
 
-if (INFRA_PROCESS)
+if(INFRA_PROCESS)
     find_package(reproc++ CONFIG REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/process.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/process.h)
     target_sources(infra PRIVATE process.cpp)
     target_link_libraries(infra PRIVATE reproc++)
     set_target_properties(reproc++ PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-endif ()
+endif()
 
-if (INFRA_DATABASE)
+if(INFRA_DATABASE)
     find_package(Sqlpp11 CONFIG REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/database.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/database.h)
     target_sources(infra PRIVATE database.cpp)
     target_link_libraries(infra PUBLIC sqlpp11::sqlpp11)
-    if (INFRA_DATABASE_SQLITE)
-        find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS SQLite3)
-        target_link_libraries(infra PUBLIC sqlpp11::sqlite3 )
-        target_compile_definitions(infra PUBLIC INFRA_DB_SQLITE_SUPPORT)
-    endif ()
 
-    if (INFRA_DATABASE_POSTGRES)
+    if(INFRA_DATABASE_SQLITE)
+        find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS SQLite3)
+        target_link_libraries(infra PUBLIC sqlpp11::sqlite3)
+        target_compile_definitions(infra PUBLIC INFRA_DB_SQLITE_SUPPORT)
+    endif()
+
+    if(INFRA_DATABASE_POSTGRES)
         find_package(Sqlpp11 CONFIG REQUIRED COMPONENTS PostgreSQL)
         target_link_libraries(infra PUBLIC sqlpp11::postgresql)
         target_compile_definitions(infra PUBLIC INFRA_DB_POSTGRES_SUPPORT)
-    endif ()
-    
-    if (INFRA_LOGGING)
-        list (APPEND INFRA_PUBLIC_HEADERS include/infra/databaselog.h)
-        target_sources(infra PRIVATE databaselog.cpp)
-    endif ()
-endif ()
+    endif()
 
-if (INFRA_HASHING)
+    if(INFRA_LOGGING)
+        list(APPEND INFRA_PUBLIC_HEADERS include/infra/databaselog.h)
+        target_sources(infra PRIVATE databaselog.cpp)
+    endif()
+endif()
+
+if(INFRA_HASHING)
     find_package(cryptopp CONFIG REQUIRED)
     target_compile_definitions(infra PRIVATE INFRA_HASH_SUPPORT)
     target_link_libraries(infra PRIVATE cryptopp-static)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/crypto.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/crypto.h)
     target_sources(infra PRIVATE hash.cpp crypto.cpp)
-endif ()
+endif()
 
-if (INFRA_COMPRESSION)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/compression.h)
-    if (INFRA_COMPRESSION_ZSTD)
+if(INFRA_COMPRESSION)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/compression.h)
+
+    if(INFRA_COMPRESSION_ZSTD)
         find_package(zstd CONFIG REQUIRED)
         target_link_libraries(infra PUBLIC libzstd)
         target_compile_definitions(infra PUBLIC INFRA_COMPRESSION_ZSTD_SUPPORT ZSTD_STATIC_LINKING_ONLY)
-    endif ()
-endif ()
+    endif()
+endif()
 
-if (INFRA_TBB)
+if(INFRA_TBB)
     find_package(TBB CONFIG REQUIRED)
     target_link_libraries(infra PRIVATE TBB::tbb)
     target_compile_definitions(infra PRIVATE INFRA_TBB __TBB_NO_IMPLICIT_LINKAGE)
-endif ()
+endif()
 
-    
-if (INFRA_GDAL)
+if(INFRA_GDAL)
     find_package(GEOS CONFIG)
     find_package(GDAL CONFIG)
 
-    if (NOT TARGET GDAL::GDAL)
+    if(NOT TARGET GDAL::GDAL)
         find_package(GDAL REQUIRED)
         set(SYSTEM_GDAL ON)
         set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-    endif ()
+    endif()
 
-    if ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND INFRA_EMBED_GDAL_DATA) 
+    if("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND INFRA_EMBED_GDAL_DATA)
         message(WARNING "Embedding gdal data is not supported for gdal versions >= 3")
-    endif ()
+    endif()
 
-    list (APPEND INFRA_PUBLIC_HEADERS
+    list(APPEND INFRA_PUBLIC_HEADERS
         include/infra/gdal.h
         include/infra/gdalalgo.h
         include/infra/gdalresample.h
@@ -357,7 +364,7 @@ if (INFRA_GDAL)
     )
 
     target_sources(infra PRIVATE
-        csvreader.cpp    
+        csvreader.cpp
         gdal.cpp
         gdalalgo.cpp
         gdalgeometry.cpp
@@ -368,19 +375,19 @@ if (INFRA_GDAL)
         geocoder.cpp
     )
 
-    if (TARGET GEOS::geos)
-        list (APPEND INFRA_PUBLIC_HEADERS include/infra/geometry.h)
+    if(TARGET GEOS::geos)
+        list(APPEND INFRA_PUBLIC_HEADERS include/infra/geometry.h)
         target_sources(infra PRIVATE geometry.cpp)
         target_link_libraries(infra PUBLIC GEOS::geos)
 
         set_target_properties(GEOS::geos PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
         set_target_properties(GEOS::geos_c PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-    endif ()
+    endif()
 
-    if (INFRA_EMBED_GDAL_DATA)
-        if (NOT Gdal_DATA_PATH)
+    if(INFRA_EMBED_GDAL_DATA)
+        if(NOT Gdal_DATA_PATH)
             message(FATAL_ERROR "Gdal data path location not set for embedding data")
-        endif ()
+        endif()
 
         target_sources(infra PRIVATE
             embedgdaldata.h
@@ -393,45 +400,43 @@ if (INFRA_GDAL)
         target_compile_definitions(infra PRIVATE EMBED_GDAL_DATA)
 
         add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.h ${CMAKE_CURRENT_BINARY_DIR}/gdal_data.cpp
-                           COMMAND ${CMAKE_COMMAND} ARGS -DGDAL_DATA_PATH=${Gdal_DATA_PATH} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/gdal_data -P ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
-                           DEPENDS ${Gdal_DATA_PATH}/gcs.csv ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
-                           COMMENT "Generate embedded gdal data"
+            COMMAND ${CMAKE_COMMAND} ARGS -DGDAL_DATA_PATH=${Gdal_DATA_PATH} -DOUTPUT_FILE=${CMAKE_CURRENT_BINARY_DIR}/gdal_data -P ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
+            DEPENDS ${Gdal_DATA_PATH}/gcs.csv ${CMAKE_CURRENT_SOURCE_DIR}/embedgdaldata.cmake
+            COMMENT "Generate embedded gdal data"
         )
-    elseif ("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND NOT SYSTEM_GDAL)
+    elseif("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND NOT SYSTEM_GDAL)
         find_package(PROJ CONFIG REQUIRED)
         add_custom_command(TARGET infra POST_BUILD
-                           COMMENT "Copying proj db to the build directory"
-                           COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
-                           COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                                $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ::proj>/../../share/proj/proj.db>
-                                $<$<NOT:$<CONFIG:Debug>>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
-                                "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/")
-    endif ()
-    
+            COMMENT "Copying proj db to the build directory"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ::proj>/../../share/proj/proj.db>
+            $<$<NOT:$<CONFIG:Debug>>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
+            "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/")
+    endif()
 
-    if (INFRA_LOGGING)
-        list (APPEND INFRA_PUBLIC_HEADERS include/infra/gdallog.h)
+    if(INFRA_LOGGING)
+        list(APPEND INFRA_PUBLIC_HEADERS include/infra/gdallog.h)
         target_sources(infra PRIVATE gdallog.cpp)
-    endif ()
+    endif()
 
     target_compile_definitions(infra PUBLIC INFRA_GDAL_ENABLED)
     target_link_libraries(infra PUBLIC GDAL::GDAL)
     set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
-    
-endif ()
+endif()
 
-if (INFRA_NUMERIC)
+if(INFRA_NUMERIC)
     find_package(Eigen3 CONFIG REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/polyfit.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/polyfit.h)
     target_link_libraries(infra PUBLIC Eigen3::Eigen)
-endif ()
+endif()
 
-if (INFRA_LICENSE_MANAGER)
+if(INFRA_LICENSE_MANAGER)
     find_package(Rlm CONFIG REQUIRED)
-    list (APPEND INFRA_PUBLIC_HEADERS include/infra/licensemanager.h)
+    list(APPEND INFRA_PUBLIC_HEADERS include/infra/licensemanager.h)
     target_sources(infra PRIVATE licensemanager.cpp)
     target_link_libraries(infra PRIVATE Rlm::Rlm)
-endif ()
+endif()
 
 target_sources(infra PRIVATE ${INFRA_PUBLIC_HEADERS})
 set_target_properties(infra PROPERTIES
@@ -440,11 +445,12 @@ set_target_properties(infra PROPERTIES
 
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
 
-if (INFRA_UI_COMPONENTS)
+if(INFRA_UI_COMPONENTS)
     find_package(Qt6 COMPONENTS Core Gui Widgets Network OpenGL QUIET)
-    if (NOT Qt6_FOUND)
+
+    if(NOT Qt6_FOUND)
         find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network OpenGL REQUIRED)
-    endif ()
+    endif()
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -454,9 +460,10 @@ if (INFRA_UI_COMPONENTS)
         ui/comboxtableview.ui
         ui/stringinputdialog.ui
     )
-    if (INFRA_LOGGING)
+
+    if(INFRA_LOGGING)
         list(APPEND INFRA_UI_FILES ui/logview.ui)
-    endif ()
+    endif()
 
     set(UIINFRA_PUBLIC_HEADERS
         include/uiinfra/aboutdialog.h
@@ -535,19 +542,19 @@ if (INFRA_UI_COMPONENTS)
         date::date
     )
 
-    if (INFRA_UI_COMPONENTS_QML)
-        if (Qt6_FOUND)
+    if(INFRA_UI_COMPONENTS_QML)
+        if(Qt6_FOUND)
             find_package(Qt6 COMPONENTS Quick)
-        else ()
+        else()
             find_package(Qt5 5.15 COMPONENTS Quick REQUIRED)
-        endif ()
+        endif()
 
         target_sources(uiinfra PRIVATE
             ui/pixmapimage.cpp
             ui/quickitemimagegrabber.cpp
         )
 
-        list (APPEND UIINFRA_PUBLIC_HEADERS
+        list(APPEND UIINFRA_PUBLIC_HEADERS
             include/uiinfra/pixmapimage.h
             include/uiinfra/quickitemimagegrabber.h
         )
@@ -555,18 +562,18 @@ if (INFRA_UI_COMPONENTS)
         target_link_libraries(uiinfra PUBLIC
             Qt::Quick
         )
-    endif ()
+    endif()
 
-    if (INFRA_UI_COMPONENTS_LOCATION)
-        if (Qt6_FOUND)
+    if(INFRA_UI_COMPONENTS_LOCATION)
+        if(Qt6_FOUND)
             find_package(Qt6 COMPONENTS Location QuickCompiler)
-        else ()
+        else()
             find_package(Qt5 5.15 COMPONENTS Location QuickCompiler REQUIRED)
-        endif ()
-    
-        if (NOT INFRA_GDAL)
+        endif()
+
+        if(NOT INFRA_GDAL)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")
-        endif ()
+        endif()
 
         qtquick_compiler_add_resources(INFRA_LOCATION_RESOURCES ui/qmlcontrols.qrc)
 
@@ -578,7 +585,7 @@ if (INFRA_UI_COMPONENTS)
             ${INFRA_LOCATION_RESOURCES}
         )
 
-        list (APPEND UIINFRA_PUBLIC_HEADERS
+        list(APPEND UIINFRA_PUBLIC_HEADERS
             include/uiinfra/polygonmodel.h
             include/uiinfra/maplegendmodel.h
             include/uiinfra/rastervalueprovider.h
@@ -588,30 +595,30 @@ if (INFRA_UI_COMPONENTS)
             Qt::Location
         )
 
-        if (INFRA_GDAL)
-            list (APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/polygonio.h)
+        if(INFRA_GDAL)
+            list(APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/polygonio.h)
             target_sources(uiinfra PRIVATE ui/polygonio.cpp)
-        endif ()
-    endif ()
+        endif()
+    endif()
 
-    if (INFRA_UI_COMPONENTS_XLSX_EXPORT)
+    if(INFRA_UI_COMPONENTS_XLSX_EXPORT)
         find_package(XlsxWriter REQUIRED)
-        list (APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/modelexport.h)
+        list(APPEND UIINFRA_PUBLIC_HEADERS include/uiinfra/modelexport.h)
         target_sources(uiinfra PRIVATE ui/modelexport.cpp)
         target_link_libraries(uiinfra PRIVATE XlsxWriter::XlsxWriter)
-    endif ()
+    endif()
 
-    if (INFRA_LOGGING)
-        list (APPEND UIINFRA_PUBLIC_HEADERS
+    if(INFRA_LOGGING)
+        list(APPEND UIINFRA_PUBLIC_HEADERS
             include/uiinfra/logview.h
-            include/uiinfra/logsinkmodel.h 
+            include/uiinfra/logsinkmodel.h
         )
 
         target_sources(uiinfra PRIVATE
             ui/logview.cpp
             ui/logsinkmodel.cpp
         )
-    endif ()
+    endif()
 
     set_target_properties(uiinfra PROPERTIES AUTOMOC ON)
     set_target_properties(uiinfra PROPERTIES AUTORCC ON)
@@ -620,41 +627,42 @@ if (INFRA_UI_COMPONENTS)
     set_target_properties(uiinfra PROPERTIES PUBLIC_HEADER "${UIINFRA_PUBLIC_HEADERS}")
 
     target_include_directories(uiinfra
-    PUBLIC
+        PUBLIC
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
-    PRIVATE
+        PRIVATE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/ui>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
     )
 
     target_compile_definitions(uiinfra PUBLIC QT_NO_KEYWORDS)
 
-    if (INFRA_LOGGING)
+    if(INFRA_LOGGING)
         target_link_libraries(uiinfra PUBLIC infra)
-    endif ()
-endif ()
+    endif()
+endif()
 
-if (INFRA_ENABLE_TESTS)
+if(INFRA_ENABLE_TESTS)
     add_subdirectory(test)
-    if (INFRA_UI_COMPONENTS)
+
+    if(INFRA_UI_COMPONENTS)
         add_subdirectory(ui/test)
-    endif ()
-endif ()
+    endif()
+endif()
 
-if (INFRA_ENABLE_TEST_UTILS)
+if(INFRA_ENABLE_TEST_UTILS)
     add_subdirectory(testutil)
-endif ()
+endif()
 
-if (INFRA_ENABLE_BENCHMARKS)
+if(INFRA_ENABLE_BENCHMARKS)
     add_subdirectory(benchmarks)
-endif ()
+endif()
 
-if (INFRA_ENABLE_DOCUMENTATION)
+if(INFRA_ENABLE_DOCUMENTATION)
     add_subdirectory(docs)
-endif ()
+endif()
 
-if (INFRA_IS_TOPLEVEL)
+if(INFRA_IS_TOPLEVEL)
     write_basic_package_version_file("InfraConfigVersion.cmake"
         VERSION ${Infra_VERSION}
         COMPATIBILITY SameMajorVersion
@@ -665,50 +673,50 @@ if (INFRA_IS_TOPLEVEL)
         INSTALL_DESTINATION ${INSTALL_CONFIGDIR}
     )
 
-    if (INFRA_INSTALL_DEVELOPMENT_FILES)
+    if(INFRA_INSTALL_DEVELOPMENT_FILES)
         install(FILES
             ${CMAKE_CURRENT_BINARY_DIR}/InfraConfig.cmake
             ${CMAKE_CURRENT_BINARY_DIR}/InfraConfigVersion.cmake
             DESTINATION ${INSTALL_CONFIGDIR}
         )
-    endif ()
-endif ()
+    endif()
+endif()
 
-if (INFRA_INSTALL_DEVELOPMENT_FILES)
+if(INFRA_INSTALL_DEVELOPMENT_FILES)
     install(TARGETS infra EXPORT InfraTargets
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra
     )
-    
+
     install(EXPORT InfraTargets
         NAMESPACE Infra::
         DESTINATION ${INSTALL_CONFIGDIR}
     )
 
-    if (INFRA_ENABLE_TEST_UTILS)
+    if(INFRA_ENABLE_TEST_UTILS)
         install(TARGETS infratestutil infratestutilmain EXPORT InfraTestTargets
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/infra/test
         )
-        
+
         install(EXPORT InfraTestTargets
             NAMESPACE Infra::
             DESTINATION ${INSTALL_CONFIGDIR}
         )
-    endif ()
+    endif()
 
-    if (INFRA_UI_COMPONENTS)
+    if(INFRA_UI_COMPONENTS)
         install(TARGETS uiinfra EXPORT InfraUiTargets
             LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
             ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
             PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/uiinfra
-        )   
+        )
 
         install(EXPORT InfraUiTargets
             NAMESPACE Infra::
             DESTINATION ${INSTALL_CONFIGDIR}
         )
-    endif ()
-endif ()
+    endif()
+endif()
