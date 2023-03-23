@@ -112,7 +112,7 @@ public:
         close();
 #ifdef _WIN32
         std::string_view modeStr(mode);
-        _ptr = _wfopen(p.c_str(), std::wstring(modeStr.begin(), modeStr.end()).c_str());
+        _wfopen_s(&_ptr, p.c_str(), std::wstring(modeStr.begin(), modeStr.end()).c_str());
 #else
         _ptr = std::fopen(p.u8string().c_str(), mode);
 #endif
