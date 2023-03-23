@@ -17,10 +17,10 @@ class IniReader
 {
 public:
     IniReader(const fs::path& filename);
-    IniReader(const IniReader&) = default;
-    IniReader(IniReader&&)      = default;
+    IniReader(const IniReader&)            = default;
+    IniReader(IniReader&&)                 = default;
     IniReader& operator=(const IniReader&) = default;
-    IniReader& operator=(IniReader&&) = default;
+    IniReader& operator=(IniReader&&)      = default;
 
     // Return the list of sections found in ini file
     std::vector<std::string> sections() const;
@@ -53,8 +53,7 @@ public:
         }
     }
 
-    std::optional<std::string_view>
-    get_string(std::string_view section, std::string_view name) const noexcept;
+    std::optional<std::string_view> get_string(std::string_view section, std::string_view name) const noexcept;
     std::optional<int32_t> get_int32(std::string_view section, std::string_view name) const noexcept;
     std::optional<uint32_t> get_uint32(std::string_view section, std::string_view name) const noexcept;
     std::optional<int64_t> get_int64(std::string_view section, std::string_view name) const noexcept;
