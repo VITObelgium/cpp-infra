@@ -216,6 +216,9 @@ static int ini_parse_file(FILE* file, ini_handler handler, void* user)
 IniReader::IniReader(const fs::path& filename)
 {
     file::Handle file(filename, "r");
+    if (!file.is_open()) {
+        throw RuntimeError("Failed to open ini file '{}'", filename);
+    }
 
     auto error = ini_parse_file(file, valueHandler, this);
     if (error != 0) {
