@@ -38,7 +38,7 @@ Geometry::Type geometry_type_from_gdal(OGRwkbGeometryType type)
     case wkbNone:
         return Geometry::Type::None;
     default:
-        throw RuntimeError("Unsupported geometry type ({})", wkbFlatten(type));
+        throw RuntimeError("Unsupported geometry type ({})", static_cast<std::underlying_type_t<OGRwkbGeometryType>>(wkbFlatten(type)));
     }
 }
 
