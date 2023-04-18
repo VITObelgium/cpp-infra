@@ -1,5 +1,6 @@
 #include "infra/workerthread.h"
 
+#include <cassert>
 #include <thread>
 
 namespace inf {
@@ -53,14 +54,14 @@ public:
                 _condition.wait(lock, [this]() { return _worker.has_jobs() || _stop; });
             }
 
-            if (_stop) {
+            if (!_worker.has_jobs()) {
                 break;
             }
 
             lock.unlock();
 
             auto job = _worker.next_job();
-            while (job && !_stop) {
+            while (job) {
                 try {
                     job();
                 } catch (...) {
@@ -101,11 +102,18 @@ void WorkerThread::start(std::function<void()> cb)
 
 void WorkerThread::stop(std::function<void()> cb)
 {
+    clear_jobs();
+    stop_finish_jobs(cb);
+}
+
+void WorkerThread::stop_finish_jobs(std::function<void()> cb)
+{
     if (_thread) {
         _thread->set_stop_cb(cb);
-        clear_jobs();
         _thread.reset();
     }
+
+    assert(_jobQueue.empty());
 }
 
 void WorkerThread::add_job(const std::function<void()>& job)
