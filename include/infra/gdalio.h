@@ -196,7 +196,7 @@ inline CutOut intersect_metadata(const GeoMetadata& srcMeta, const GeoMetadata& 
     // srcMeta: the metadata of the raster that we are going to read as it is on disk
     // dstMeta: the metadata of the raster that will be returned to the user
 
-    if (srcMeta.cellSize.x != dstMeta.cellSize.x || srcMeta.cellSize.y != dstMeta.cellSize.y) {
+    if (!math::approx_equal(srcMeta.cellSize.x, dstMeta.cellSize.x, 1e-10) || !math::approx_equal(srcMeta.cellSize.y, dstMeta.cellSize.y, 1e-10)) {
         throw InvalidArgument("Extents cellsize does not match {} <-> {}", srcMeta.cellSize, dstMeta.cellSize);
     }
 
