@@ -1,11 +1,12 @@
 #pragma once
 
+#include "infra/math.h"
 #include "infra/string.h"
 
 #include <cmath>
-#include <string>
 #include <doctest/doctest.h>
 #include <fmt/format.h>
+#include <string>
 #include <unordered_map>
 
 namespace inf::test {
@@ -99,6 +100,21 @@ bool container_eq(const Container1& c1, const Container2& c2)
     });
 }
 
+template <typename Container1, typename Container2>
+bool container_near(const Container1& c1, const Container2& c2, double epsilon)
+{
+    REQUIRE_MESSAGE(size(c1) == size(c2), fmt::format("Container sizes do not match: {} vs {}", size(c1), size(c2)));
+
+    return std::equal(begin(c1), end(c1), begin(c2), [epsilon](auto a, auto b) -> bool {
+        if constexpr (std::is_floating_point_v<decltype(a)>) {
+            if (std::isnan(a)) { return std::isnan(b); }
+            if (std::isnan(b)) { return false; }
+        }
+
+        return math::approx_equal(a, b, epsilon);
+    });
+}
+
 template <typename TKey, typename TValue>
 bool container_eq(const std::unordered_map<TKey, TValue>& m1, const std::unordered_map<TKey, TValue>& m2)
 {
@@ -132,3 +148,5 @@ bool container_eq(const std::unordered_map<TKey, TValue>& m1, const std::unorder
 #define CHECK_CONTAINER_EQ(lhs, rhs) \
     CHECK_MESSAGE(inf::test::container_eq((lhs), (rhs)), inf::test::print_container_diff((lhs), (rhs), 0.0));
 
+#define CHECK_CONTAINER_NEAR(lhs, rhs, eps) \
+    CHECK_MESSAGE(inf::test::container_near((lhs), (rhs), (eps)), inf::test::print_container_diff((lhs), (rhs), 0.0));
