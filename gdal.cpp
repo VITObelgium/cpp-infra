@@ -343,6 +343,11 @@ VectorDataSet VectorDriver::create_dataset(const fs::path& filename, const std::
     return VectorDataSet(check_pointer(_driver.Create(str::from_u8(filename.u8string()).c_str(), 0, 0, 0, GDT_Unknown, options), "Failed to create vector data set"));
 }
 
+void VectorDriver::delete_dataset(const fs::path& filename)
+{
+    _driver.Delete(str::from_u8(filename.u8string()).c_str());
+}
+
 VectorType VectorDriver::type() const
 {
     try {
