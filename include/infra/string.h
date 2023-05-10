@@ -275,7 +275,7 @@ void uppercase_in_place(std::string& str);
 
 /*!
  * \brief check if a string starts with the provided string
- * \param str input string
+ * \param aString input string
  * \param search string
  * \return true is the input string starts with the search string
  */
