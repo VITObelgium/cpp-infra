@@ -20,6 +20,13 @@ TEST_CASE("Interpolate")
         CHECK(linear_map_to_byte(100.f, 0.f, 100.f, 1, 4) == 4);
     }
 
+    SUBCASE("To byte range 255")
+    {
+        CHECK(linear_map_to_byte(0.f, 0.f, 1.f, 0, 255) == 0);
+        CHECK(linear_map_to_byte(0.5f, 0.f, 1.f, 0, 255) == 128);
+        CHECK(linear_map_to_byte(1.f, 0.f, 1.f, 0, 255) == 255);
+    }
+
     SUBCASE("To byte range")
     {
         CHECK(linear_map_to_byte(1.f, 1.f, 4.f, 1, 4) == 1);

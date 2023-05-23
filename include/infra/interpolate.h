@@ -45,7 +45,7 @@ constexpr uint8_t linear_map_to_byte(T value, T start, T end, uint8_t mapStart, 
     const auto pos        = static_cast<float>(value - start) / static_cast<float>(rangeWidth);
 
     const auto mapWidth = (mapEnd - mapStart) + 1;
-    const auto mapped   = static_cast<uint8_t>(mapStart + (mapWidth * pos));
-    return std::clamp(mapped, mapStart, mapEnd);
+    const auto mapped   = std::clamp(mapStart + (mapWidth * pos), 0.f, float(std::numeric_limits<uint8_t>::max()));
+    return std::clamp(static_cast<uint8_t>(mapped), mapStart, mapEnd);
 }
 }
