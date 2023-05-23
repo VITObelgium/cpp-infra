@@ -181,6 +181,7 @@ add_library(infra
     threadpool.cpp
     inireader.cpp
     tempdir.cpp
+    tile.cpp
     typeinfo.cpp
     workerthread.cpp
 )

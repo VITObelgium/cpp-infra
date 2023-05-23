@@ -194,12 +194,8 @@ private:
 inline std::optional<uint32_t> tile_index(const Tile& tile, const inf::GeoMetadata& meta) noexcept
 {
     std::optional<uint32_t> result;
-    // if (meta.cols % TILE_SIZE == 0) {
-    //   assert(meta.cols % TILE_SIZE == 0);
 
-    // inf::Log::info("Upper left: {}", tile.upper_left());
     auto upperLeft = crs::lat_lon_to_web_mercator(tile.center());
-    // inf::Log::info("Upper left: {}", upperLeft);
 
     if (meta.is_on_map(upperLeft)) {
         const auto tilesPerRow = inf::truncate<uint32_t>(meta.cols / TILE_SIZE);
@@ -209,9 +205,10 @@ inline std::optional<uint32_t> tile_index(const Tile& tile, const inf::GeoMetada
         cell.c /= TILE_SIZE;
         result = cell.r * tilesPerRow + cell.c;
     }
-    //}
 
     return result;
 }
 
-} // namespace tileserver
+GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent);
+
+}
