@@ -256,6 +256,7 @@ public:
     }
 
     RasterStats statistics(int bandNr, bool allowApproximation, bool force);
+    void build_overviews(ResampleAlgorithm resample, std::span<const int32_t> levels);
 
     GDALDataset* get() const;
     RasterDriver driver();

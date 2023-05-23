@@ -810,6 +810,11 @@ RasterStats RasterDataSet::statistics(int bandNr, bool allowApproximation, bool 
     return stats;
 }
 
+void RasterDataSet::build_overviews(ResampleAlgorithm resample, std::span<const int32_t> levels)
+{
+    check_error(_ptr->BuildOverviews(resample_algo_to_string(resample).c_str(), truncate<int32_t>(levels.size()), levels.data(), 0, nullptr, GDALDummyProgress, nullptr), "Failed to build raster overviews");
+}
+
 GDALDataset* RasterDataSet::get() const
 {
     return _ptr;
