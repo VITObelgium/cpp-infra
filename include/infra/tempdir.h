@@ -9,6 +9,7 @@ namespace inf {
 class TempDir
 {
 public:
+    TempDir();
     TempDir(std::string_view name);
     ~TempDir() noexcept;
 

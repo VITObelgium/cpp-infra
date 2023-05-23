@@ -2,10 +2,19 @@
 
 namespace inf {
 
+TempDir::TempDir()
+: TempDir(std::string_view())
+{
+}
+
 TempDir::TempDir(std::string_view name)
 {
     const auto timestamp = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    _path                = fs::temp_directory_path() / std::to_string(timestamp) / name;
+    _path                = fs::temp_directory_path() / std::to_string(timestamp);
+
+    if (!name.empty()) {
+        _path /= fs::u8path(name);
+    }
 
     if (fs::exists(_path)) {
         fs::remove_all(_path);
