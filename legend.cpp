@@ -14,7 +14,7 @@ namespace inf {
 
 Color Legend::color_for_value(double value) const noexcept
 {
-    if (is_unmappable(value)) {
+    if (is_unmappable(value) || entries.empty()) {
         return Color();
     }
 
@@ -35,7 +35,7 @@ Color Legend::color_for_value(double value) const noexcept
         }
     }
 
-    if (type == inf::Legend::Type::Numeric && !entries.empty()) {
+    if (type == inf::Legend::Type::Numeric) {
         if (value < entries.front().lowerBound) {
             return entries.front().color;
         }
@@ -67,7 +67,7 @@ Color Legend::color_for_value(std::string_view value) const noexcept
 
 Color Legend::color_for_value(double value, const Color& unmappable) const noexcept
 {
-    if (is_unmappable(value)) {
+    if (is_unmappable(value) || entries.empty()) {
         return unmappable;
     }
 
@@ -86,6 +86,10 @@ Color Legend::color_for_value(double value, const Color& unmappable) const noexc
                 return entry.color;
             }
         }
+    }
+
+    if (value == entries.back().upperBound) {
+        return entries.back().color;
     }
 
     return unmappable;
@@ -137,7 +141,9 @@ Color Legend::color_for_value(double value, const Color& unmappable, const Color
         return unmappableLow;
     }
 
-    if (value >= entries.back().upperBound) {
+    if (value == entries.back().upperBound) {
+        return entries.back().color;
+    } else if (value >= entries.back().upperBound) {
         return unmappableHigh;
     }
 
