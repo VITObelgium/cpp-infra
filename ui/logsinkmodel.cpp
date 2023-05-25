@@ -16,7 +16,7 @@ LogSinkModel<Mutex>::LogSinkModel(QObject* parent)
 template <typename Mutex>
 void LogSinkModel<Mutex>::set_formatter_(std::unique_ptr<spdlog::formatter> /*sink_formatter*/)
 {
-    // Don't use globally configured formmatter (contains eol in messages, messes up the text layout)
+    // Don't use globally configured formatter (contains eol in messages, messes up the text layout)
 }
 
 template <typename Mutex>
