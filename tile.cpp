@@ -1,11 +1,14 @@
 #include "infra/tile.h"
 
+#ifdef HAVE_GDAL
 #include "infra/gdalalgo.h"
+#endif
 
 namespace inf {
 
 GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
 {
+#ifdef HAVE_GDAL
     static constexpr const int32_t zoomLevel = 10;
 
     if (extent.projection.empty()) {
@@ -30,6 +33,9 @@ GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
     result.set_cell_size(cellSize);
     result.set_projection_from_epsg(crs::epsg::WGS84WebMercator);
     return result;
+#else
+    throw RuntimeError("create_xyz_tile_aligned_extent: infra not compiled with gdal support");
+#endif
 }
 
 }
