@@ -20,6 +20,11 @@ QString StringInputDialog::value() const
     return _ui->editBox->text();
 }
 
+void StringInputDialog::setValue(const QString& value)
+{
+    return _ui->editBox->setText(value);
+}
+
 void StringInputDialog::setLabel(const QString& label)
 {
     _ui->label->setText(label);

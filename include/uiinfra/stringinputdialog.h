@@ -18,6 +18,7 @@ public:
     ~StringInputDialog();
 
     QString value() const;
+    void setValue(const QString& value);
 
     void setLabel(const QString& label);
 

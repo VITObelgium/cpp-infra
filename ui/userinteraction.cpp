@@ -21,11 +21,12 @@ int askQuestion(const QString& title, const QString& message, const QString& opt
     return mb.exec() + 1; // exec returns the 0 based index of the clicked button
 }
 
-QString askForString(QWidget* parent, const QString& title, const QString& name)
+QString askForString(QWidget* parent, const QString& title, const QString& name, const QString& initialValue)
 {
     StringInputDialog dlg(parent);
     dlg.setWindowTitle(title);
     dlg.setLabel(name);
+    dlg.setValue(initialValue);
 
     if (dlg.exec() == QDialog::Accepted) {
         return dlg.value();
