@@ -1,6 +1,7 @@
 #pragma once
 
 #include "infra/gdal.h"
+#include "infra/gdalio.h"
 #include "infra/gdalresample.h"
 #include "infra/geometadata.h"
 #include "infra/size.h"
@@ -19,6 +20,23 @@ struct WarpOptions
 
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, ResampleAlgorithm algo = ResampleAlgorithm::NearestNeighbour);
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, WarpOptions& options);
+
+template <typename T>
+void warp_to_disk(const RasterDataSet& srcDataSet, const GeoMetadata& destMeta, const fs::path& output, WarpOptions& options, const std::vector<std::string>& driverOptions = {})
+{
+    auto meta = destMeta;
+    if (!meta.nodata.has_value()) {
+        meta.nodata = std::numeric_limits<T>::max();
+    }
+
+    auto fillValue = static_cast<T>(*meta.nodata);
+
+    std::vector<T> result(meta.cols * meta.rows, fillValue);
+    gdal::RasterDataSet dstDataSet = io::create_memory_dataset<T>(result, meta);
+    warp(srcDataSet, dstDataSet, options);
+
+    gdal::io::write_raster(std::span<const T>(result), meta, output, driverOptions);
+}
 
 // This version uses the same options as the command line tool
 void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions);

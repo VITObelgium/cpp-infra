@@ -32,6 +32,7 @@ GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
     result.cols = truncate<int32_t>(std::ceil((bottomRightTile.bottomRight.x - topLeftTile.topLeft.x) / cellSize));
     result.set_cell_size(cellSize);
     result.set_projection_from_epsg(crs::epsg::WGS84WebMercator);
+    result.nodata = extent.nodata;
     return result;
 #else
     throw RuntimeError("create_xyz_tile_aligned_extent: infra not compiled with gdal support");
