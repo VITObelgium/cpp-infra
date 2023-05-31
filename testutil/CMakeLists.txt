@@ -27,7 +27,6 @@ target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
 add_library(infratestutilmain testmain.cpp)
 add_library(Infra::infratestutilmain ALIAS infratestutilmain)
 target_compile_definitions(infratestutilmain PRIVATE 
-    $<$<BOOL:${INFRA_GDAL}>:HAVE_GDAL>
     $<$<BOOL:${INFRA_TESTUTIL_MAIN_PROJDB_PATH}>:INFRA_TESTUTIL_MAIN_PROJDB_PATH="${INFRA_TESTUTIL_MAIN_PROJDB_PATH}">
 )
 

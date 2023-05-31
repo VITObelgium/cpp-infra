@@ -1,6 +1,6 @@
 #include "infra/tile.h"
 
-#ifdef HAVE_GDAL
+#ifdef INFRA_GDAL_ENABLED
 #include "infra/gdalalgo.h"
 #endif
 
@@ -8,7 +8,7 @@ namespace inf {
 
 GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
 {
-#ifdef HAVE_GDAL
+#ifdef INFRA_GDAL_ENABLED
     static constexpr const int32_t zoomLevel = 10;
 
     if (extent.projection.empty()) {

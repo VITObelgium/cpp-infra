@@ -6,7 +6,7 @@
 #include "infra/log.h"
 #endif
 
-#ifdef HAVE_GDAL
+#ifdef INFRA_GDAL_ENABLED
 #include "infra/gdal.h"
 #endif
 
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
     }
 #endif
 
-#ifdef HAVE_GDAL
+#ifdef INFRA_GDAL_ENABLED
     inf::gdal::RegistrationConfig gdalCfg;
 #ifdef INFRA_TESTUTIL_MAIN_PROJDB_PATH
     gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path() / INFRA_TESTUTIL_MAIN_PROJDB_PATH;
