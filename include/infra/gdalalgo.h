@@ -35,7 +35,7 @@ void warp_to_disk(const RasterDataSet& srcDataSet, const GeoMetadata& destMeta, 
     gdal::RasterDataSet dstDataSet = io::create_memory_dataset<T>(result, meta);
     warp(srcDataSet, dstDataSet, options);
 
-    gdal::io::write_raster(std::span<const T>(result), meta, output, driverOptions);
+    io::write_raster(std::span<const T>(result), meta, output, driverOptions);
 }
 
 // This version uses the same options as the command line tool
@@ -46,6 +46,31 @@ VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& project
 VectorDataSet warp(const VectorDataSet& srcDataSet, const std::string& projection, const std::vector<std::string>& options = {});
 VectorDataSet warp(const VectorDataSet& srcDataSet, const GeoMetadata& destMeta, const std::vector<std::string>& options = {});
 
+template <typename TInput, typename TOutput>
+void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta, std::span<TOutput> outputData, GeoMetadata outputMeta, gdal::ResampleAlgorithm algo = gdal::ResampleAlgorithm::NearestNeighbour)
+{
+    if (inputMeta.projection.empty()) {
+        throw RuntimeError("Warp input raster does not contain projection information");
+    }
+
+    if (outputMeta.projection.empty()) {
+        throw RuntimeError("Warp output raster does not contain projection information");
+    }
+
+    assert(truncate<int32_t>(outputData.size()) == outputMeta.rows * outputMeta.cols);
+    if (!outputMeta.nodata.has_value()) {
+        if constexpr (std::numeric_limits<TOutput>::has_quiet_NaN) {
+            outputMeta.nodata = std::numeric_limits<TOutput>::quiet_NaN();
+        } else {
+            outputMeta.nodata = std::numeric_limits<TOutput>::max();
+        }
+    }
+
+    RasterDataSet srcDataSet = io::create_memory_dataset<TInput>(inputData, inputMeta);
+    RasterDataSet dstDataSet = io::create_memory_dataset<TOutput>(outputData, outputMeta);
+    warp(srcDataSet, dstDataSet, algo);
+}
+
 /*! Returns the metadata of a raster when it would be warped, call this function before the
  *  call to warp_raster so you know the destination size and can allocate a buffer
  */
@@ -54,6 +79,13 @@ GeoMetadata warp_metadata(const GeoMetadata& meta, int32_t destCrs);
 
 // Create a vector dataset from a raster dataset
 VectorDataSet polygonize(const RasterDataSet& ds);
+
+template <typename T>
+VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
+{
+    assert(meta.rows * meta.cols == truncate<int32_t>(rasterData.size()));
+    return polygonize(io::create_memory_dataset<T>(rasterData, meta));
+}
 
 // Create a raster dataset from a vector dataset
 template <typename T>

@@ -6,7 +6,6 @@
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/gdal.h"
-#include "infra/gdalalgo.h"
 #include "infra/geometadata.h"
 #include "infra/point.h"
 #include "infra/span.h"
@@ -479,35 +478,4 @@ void write_raster_color_mapped(std::span<const T> data, const GeoMetadata& meta,
     detail::write_raster_data<T>(data, meta, filename, driverOptions, {}, &ct);
 }
 
-template <typename T>
-inf::gdal::VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
-{
-    assert(meta.rows * meta.cols == truncate<int32_t>(rasterData.size()));
-    return inf::gdal::polygonize(create_memory_dataset<T>(rasterData, meta));
-}
-
-template <typename TInput, typename TOutput>
-void warp_raster(std::span<const TInput> inputData, const GeoMetadata& inputMeta, std::span<TOutput> outputData, GeoMetadata outputMeta, gdal::ResampleAlgorithm algo = gdal::ResampleAlgorithm::NearestNeighbour)
-{
-    if (inputMeta.projection.empty()) {
-        throw RuntimeError("Warp input raster does not contain projection information");
-    }
-
-    if (outputMeta.projection.empty()) {
-        throw RuntimeError("Warp output raster does not contain projection information");
-    }
-
-    assert(truncate<int32_t>(outputData.size()) == outputMeta.rows * outputMeta.cols);
-    if (!outputMeta.nodata.has_value()) {
-        if constexpr (std::numeric_limits<TOutput>::has_quiet_NaN) {
-            outputMeta.nodata = std::numeric_limits<TOutput>::quiet_NaN();
-        } else {
-            outputMeta.nodata = std::numeric_limits<TOutput>::max();
-        }
-    }
-
-    gdal::RasterDataSet srcDataSet = create_memory_dataset<TInput>(inputData, inputMeta);
-    gdal::RasterDataSet dstDataSet = create_memory_dataset<TOutput>(outputData, outputMeta);
-    gdal::warp(srcDataSet, dstDataSet, algo);
-}
 }
