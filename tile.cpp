@@ -6,16 +6,45 @@
 
 namespace inf {
 
+static double pixel_size_at_zoom_level(uint32_t zoomLevel) noexcept
+{
+    const auto tilesPerRow   = std::pow(2, zoomLevel);
+    const auto metersPerTile = constants::EARTH_CIRCUMFERENCE_M / tilesPerRow;
+
+    return metersPerTile / TILE_SIZE;
+}
+
+static uint32_t zoom_level_for_pixel_size(double pixelSize, bool preferHigher) noexcept
+{
+    uint32_t zoomLevel = 20;
+    while (zoomLevel > 0) {
+        auto zoomLevelpixelSize = pixel_size_at_zoom_level(zoomLevel);
+        if (pixelSize <= zoomLevelpixelSize) {
+            if (pixelSize != zoomLevelpixelSize && preferHigher) {
+                // Prefer the higher zoom level
+                ++zoomLevel;
+            }
+            break;
+        }
+
+        --zoomLevel;
+    }
+
+    return zoomLevel;
+}
+
 GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
 {
 #ifdef INFRA_GDAL_ENABLED
-    static constexpr const int32_t zoomLevel = 10;
 
     if (extent.projection.empty()) {
         throw RuntimeError("No projection information present in extent");
     }
 
-    auto wgs84meta = gdal::warp_metadata(extent, crs::epsg::WGS84WebMercator);
+    bool preferHigher = extent.rows * extent.cols < (5000 * 5000);
+
+    auto wgs84meta     = gdal::warp_metadata(extent, crs::epsg::WGS84WebMercator);
+    uint32_t zoomLevel = zoom_level_for_pixel_size(extent.cell_size_x(), preferHigher);
 
     auto topLeft     = crs::web_mercator_to_lat_lon(wgs84meta.top_left());
     auto bottomRight = crs::web_mercator_to_lat_lon(wgs84meta.bottom_right());
