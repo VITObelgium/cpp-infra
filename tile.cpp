@@ -64,6 +64,7 @@ GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
     result.nodata = extent.nodata;
     return result;
 #else
+    (void)extent;
     throw RuntimeError("create_xyz_tile_aligned_extent: infra not compiled with gdal support");
 #endif
 }

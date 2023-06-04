@@ -61,8 +61,7 @@ struct Coordinate
 
 private:
     // Constrains n to the given range (including min, excluding max) via modular arithmetic.
-    template <typename T>
-    constexpr T wrap(T value, T min, T max)
+    constexpr double wrap(double value, double min, double max)
     {
         if (value >= min && value < max) {
             return value;
@@ -70,8 +69,8 @@ private:
             return min;
         }
 
-        const T delta   = max - min;
-        const T wrapped = min + std::fmod(value - min, delta);
+        const double delta   = max - min;
+        const double wrapped = min + std::fmod(value - min, delta);
         return value < min ? wrapped + delta : wrapped;
     }
 
