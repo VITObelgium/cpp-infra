@@ -25,7 +25,7 @@ public:
     //! Opens a file lock. Throws interprocess_exception if the file does not
     //! exist or there are no operating system resources.
     FileLock(const fs::path& path)
-    : _file(path, "w")
+    : _file(path, "r")
     {
         if (_file.get() == nullptr) {
             throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
