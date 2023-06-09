@@ -20,7 +20,11 @@ struct Rect
 
     T width() const noexcept
     {
-        return std::abs(bottomRight.x - topLeft.x);
+        if (bottomRight.x > topLeft.x) {
+            return bottomRight.x - topLeft.x;
+        }
+
+        return 0;
     }
 
     T height() const noexcept
@@ -68,6 +72,15 @@ struct Rect
         return !(*this == other);
     }
 };
+
+template <typename T>
+bool rectangles_intersect(const Rect<T>& lhs, const Rect<T>& rhs) noexcept
+{
+    return (lhs.topLeft.x < rhs.bottomRight.x &&
+            lhs.bottomRight.x > rhs.topLeft.x &&
+            lhs.topLeft.y > rhs.bottomRight.y &&
+            lhs.bottomRight.y < rhs.topLeft.y);
+}
 
 template <typename T>
 Rect<T> rectangle_intersection(const Rect<T>& lhs, const Rect<T>& rhs) noexcept

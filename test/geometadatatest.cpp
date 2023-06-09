@@ -169,7 +169,21 @@ TEST_CASE("GeoMetadata")
         CHECK(!metadata_intersects(meta, GeoMetadata(3, 3, 0.0, -15.0, 5.0, {})));
     }
 
-    SUBCASE("metadata intersects diffent but alligned cellsize")
+    SUBCASE("metadata intersects only y overlap")
+    {
+        GeoMetadata meta1(133, 121, 461144.59164446819, 6609204.0877060490, 76.437028285176211, {});
+        GeoMetadata meta2(195, 122, 475361.87890551100, 6607216.7249706341, 76.437028285176211, {});
+        CHECK(!metadata_intersects(meta1, meta2));
+    }
+
+    SUBCASE("metadata intersects only x overlap")
+    {
+        GeoMetadata meta1(133, 121, 461144.59164446819, 6609204.0877060490, 76.437028285176211, {});
+        GeoMetadata meta2(195, 122, 461144.59164446819, 6807216.7249706341, 76.437028285176211, {});
+        CHECK(!metadata_intersects(meta1, meta2));
+    }
+
+    SUBCASE("metadata intersects different but alligned cellsize")
     {
         GeoMetadata meta(3, 3, 0.0, 0.0, 10.0, {});
 

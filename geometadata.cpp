@@ -338,7 +338,7 @@ GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, std::optional<
     return result;
 }
 
-static Rect<double> metadata_intersion_rectangle(const GeoMetadata& meta1, const GeoMetadata& meta2)
+static Rect<double> metadata_intersection_rectangle(const GeoMetadata& meta1, const GeoMetadata& meta2)
 {
     if (meta1.projection != meta2.projection) {
         throw RuntimeError("Cannot intersect metadata with different projections");
@@ -359,8 +359,21 @@ static Rect<double> metadata_intersion_rectangle(const GeoMetadata& meta1, const
 
 bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2)
 {
-    const auto intersection = metadata_intersion_rectangle(meta1, meta2);
-    return intersection.is_valid() && intersection.width() > 0 && intersection.height() > 0;
+    if (meta1.projection != meta2.projection) {
+        throw RuntimeError("Cannot intersect metadata with different projections");
+    }
+
+    if (meta1.cellSize.x != meta2.cellSize.x || meta1.cellSize.y != meta2.cellSize.y) {
+        if (!metadata_is_aligned(meta1, meta2)) {
+            throw InvalidArgument("Extents cellsize does not match {} <-> {}", meta1.cellSize, meta2.cellSize);
+        }
+    }
+
+    if (meta1.cellSize.x == 0) {
+        throw InvalidArgument("Extents cellsize is zero");
+    }
+
+    return rectangles_intersect(meta1.bounding_box(), meta2.bounding_box());
 }
 
 GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& meta2)
