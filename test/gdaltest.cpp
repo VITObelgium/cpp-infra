@@ -49,17 +49,17 @@ TEST_CASE("Gdal.getField")
 
     int index = 0;
     for (const auto& feature : ds.layer(0)) {
-        CHECK(index == feature.field_as<int32_t>(1));
-        CHECK(index == feature.field_as<int64_t>(1));
-        CHECK(double(index) == Approx(feature.field_as<double>(1)));
-        CHECK(float(index) == Approx(feature.field_as<float>(1)));
-        CHECK(std::to_string(index) == feature.field_as<std::string_view>(1));
+        CHECK(index == feature.field_as<int32_t>(0));
+        CHECK(index == feature.field_as<int64_t>(0));
+        CHECK(double(index) == Approx(feature.field_as<double>(0)));
+        REQUIRE(float(index) == Approx(feature.field_as<float>(0)));
+        CHECK(std::to_string(index) == feature.field_as<std::string>(0));
 
         CHECK(index == feature.field_as<int32_t>("FID"));
         CHECK(index == feature.field_as<int64_t>("FID"));
         CHECK(double(index) == Approx(feature.field_as<double>("FID")));
         CHECK(float(index) == Approx(feature.field_as<float>("FID")));
-        CHECK(std::to_string(index) == feature.field_as<std::string_view>("FID"));
+        CHECK(std::to_string(index) == feature.field_as<std::string>("FID"));
 
         ++index;
     }
