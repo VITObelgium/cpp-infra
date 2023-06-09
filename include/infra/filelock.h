@@ -28,7 +28,11 @@ public:
     : _file(path, "r")
     {
         if (_file.get() == nullptr) {
-            throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
+            file::touch(path);
+            _file = file::Handle(path, "r");
+            if (_file.get() == nullptr) {
+                throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
+            }
         }
     }
 
