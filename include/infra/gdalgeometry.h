@@ -206,7 +206,7 @@ public:
         return T(dynamic_cast<typename T::wrapped_type*>(_geometry));
     }
 
-    Owner<GeometryWrapper<bare_type>> clone()
+    Owner<GeometryWrapper<bare_type>> clone() const
     {
         return Owner<GeometryWrapper<bare_type>>(static_cast<bare_type*>(_geometry->clone()));
     }
@@ -497,6 +497,16 @@ public:
     PointWrapper(const GeometryWrapper<T>& other)
     : GeometryWrapper<TWrapped>(other.get())
     {
+    }
+
+    double x() const noexcept
+    {
+        return this->get()->getX();
+    }
+
+    double y() const noexcept
+    {
+        return this->get()->getY();
     }
 
     Point<double> point() const
