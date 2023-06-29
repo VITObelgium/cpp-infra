@@ -19,17 +19,23 @@ namespace inf {
 //! process so just use file locks to synchronize threads from different processes.
 class FileLock
 {
+#ifdef _WIN32
+    static inline const char* OpenMode = "r";
+#else
+    static inline const char* OpenMode = "w";
+#endif
+
 public:
     FileLock() noexcept = default;
 
     //! Opens a file lock. Throws interprocess_exception if the file does not
     //! exist or there are no operating system resources.
     FileLock(const fs::path& path)
-    : _file(path, "r")
+    : _file(path, OpenMode)
     {
         if (_file.get() == nullptr) {
             file::touch(path);
-            _file = file::Handle(path, "r");
+            _file = file::Handle(path, OpenMode);
             if (_file.get() == nullptr) {
                 throw RuntimeError("Failed to obtain file handle: ec={} ({})", errno, strerror(errno));
             }
@@ -64,6 +70,11 @@ public:
     //! Note: A program may deadlock if the thread that has ownership calls
     //!    this function. If the implementation can detect the deadlock,
     //!    an exception could be thrown.
+    int fd_is_valid(int fd)
+    {
+        return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
+    }
+
     void lock()
     {
 #ifdef _WIN32

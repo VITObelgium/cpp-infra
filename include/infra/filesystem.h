@@ -92,7 +92,8 @@ public:
     }
     Handle(Handle&& other) noexcept
     {
-        std::swap(_ptr, other._ptr);
+        _ptr       = other._ptr;
+        other._ptr = nullptr;
     }
 
     ~Handle() noexcept
@@ -103,7 +104,8 @@ public:
     Handle& operator=(Handle&& other) noexcept
     {
         close();
-        std::swap(_ptr, other._ptr);
+        _ptr       = other._ptr;
+        other._ptr = nullptr;
         return *this;
     }
 
