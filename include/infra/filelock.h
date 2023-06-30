@@ -70,11 +70,6 @@ public:
     //! Note: A program may deadlock if the thread that has ownership calls
     //!    this function. If the implementation can detect the deadlock,
     //!    an exception could be thrown.
-    int fd_is_valid(int fd)
-    {
-        return fcntl(fd, F_GETFD) != -1 || errno != EBADF;
-    }
-
     void lock()
     {
 #ifdef _WIN32
