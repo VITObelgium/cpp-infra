@@ -1,7 +1,9 @@
 #pragma once
 
 #include "infra/span.h"
+#include "infra/string.h"
 #include <fmt/core.h>
+#include <fmt/std.h>
 #include <iosfwd>
 #include <string_view>
 #include <vector>
@@ -70,6 +72,34 @@ std::string read_as_text(const fs::path& filename);
 
 /*! Check the provided path for illegal characters on the running platform */
 fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar);
+
+inline fs::path u8path(std::string_view pathStr)
+{
+#if __cplusplus > 201703L
+    return fs::path(std::u8string_view(reinterpret_cast<const char8_t*>(pathStr.data()), pathStr.size()));
+#else
+    return fs::u8path(pathStr);
+#endif
+}
+
+inline std::string u8string(const fs::path& path)
+{
+#if __cplusplus > 201703L
+    return str::from_u8(path.u8string());
+#else
+    return path.u8string();
+#endif
+}
+
+inline std::string generic_u8string(const fs::path& path)
+{
+#if __cplusplus > 201703L
+    auto u8path = path.generic_u8string();
+    return std::string(reinterpret_cast<const char*>(u8path.data()), u8path.size());
+#else
+    return path.generic_u8string();
+#endif
+}
 
 #endif
 
@@ -157,25 +187,4 @@ private:
     fs::path _prevCwd;
 };
 
-}
-
-namespace fmt {
-template <>
-struct formatter<fs::path>
-{
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
-    {
-        return ctx.begin();
-    }
-
-    template <typename FormatContext>
-    auto format(const fs::path& p, FormatContext& ctx) const -> decltype(ctx.out())
-    {
-#if __cplusplus > 201703L
-        return format_to(ctx.out(), "{}", p.string());
-#else
-        return format_to(ctx.out(), "{}", p.u8string());
-#endif
-    }
-};
 }

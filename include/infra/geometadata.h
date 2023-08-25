@@ -154,20 +154,16 @@ GeoMetadata metadata_intersection(const GeoMetadata& meta1, const GeoMetadata& m
 
 }
 
-namespace fmt {
 template <>
-struct formatter<inf::GeoMetadata::CellSize>
+struct fmt::formatter<inf::GeoMetadata::CellSize>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::GeoMetadata::CellSize& s, FormatContext& ctx)
+    auto format(const inf::GeoMetadata::CellSize& s, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), "({}x{})", s.x, s.y);
+        return fmt::format_to(ctx.out(), "({}x{})", s.x, s.y);
     }
 };
-}

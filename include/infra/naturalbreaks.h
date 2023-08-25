@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <limits>
 #include <vector>
+#include <algorithm>
 
 #ifdef INFRA_TBB
 #include <tbb/parallel_for.h>

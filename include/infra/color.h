@@ -59,19 +59,16 @@ static constexpr Color LightGrey(170, 174, 177);
 
 }
 
-namespace fmt {
 template <>
-struct formatter<inf::Color>
+struct fmt::formatter<inf::Color>
 {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::Color& color, FormatContext& ctx) const -> decltype(ctx.out())
+    auto format(const inf::Color& color, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), "({}, {}, {}, {})", int(color.r), int(color.g), int(color.b), int(color.a));
+        return fmt::format_to(ctx.out(), "({}, {}, {}, {})", int(color.r), int(color.g), int(color.b), int(color.a));
     }
 };
-}

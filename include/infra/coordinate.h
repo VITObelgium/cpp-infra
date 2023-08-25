@@ -99,20 +99,16 @@ constexpr Coordinate operator+(const Coordinate& lhs, const Coordinate& rhs)
 
 }
 
-namespace fmt {
 template <>
-struct formatter<inf::Coordinate>
+struct fmt::formatter<inf::Coordinate>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx) -> decltype(ctx.begin())
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::Coordinate& p, FormatContext& ctx) const -> decltype(ctx.out())
+    auto format(inf::Coordinate p, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), "(lat:{:.6f}, lng:{:.6f})", p.latitude, p.longitude);
+        return fmt::format_to(ctx.out(), "(lat:{:.6f}, lng:{:.6f})", p.latitude, p.longitude);
     }
 };
-}

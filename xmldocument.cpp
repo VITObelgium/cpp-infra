@@ -1,6 +1,7 @@
 #include "infra/xmldocument.h"
 #include "infra/exception.h"
 #include "infra/string.h"
+#include "infra/filesystem.h"
 
 #include <pugixml.hpp>
 #include <variant>
@@ -245,7 +246,7 @@ XmlDocument::XmlDocument(std::string_view contents)
 
 XmlDocument XmlDocument::load_from_file(const fs::path& filename)
 {
-    return XmlDocument(filename.u8string().c_str(), true);
+    return XmlDocument(file::u8string(filename).c_str(), true);
 }
 
 XmlDocument XmlDocument::load_from_string(const char* data)

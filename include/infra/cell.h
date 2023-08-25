@@ -117,20 +117,16 @@ struct hash<inf::Cell>
 };
 }
 
-namespace fmt {
 template <>
-struct formatter<inf::Cell>
+struct fmt::formatter<inf::Cell>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::Cell& cell, FormatContext& ctx)
+    auto format(const inf::Cell& cell, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), "[{}, {}]", cell.r, cell.c);
+        return fmt::format_to(ctx.out(), "[{}, {}]", cell.r, cell.c);
     }
 };
-}

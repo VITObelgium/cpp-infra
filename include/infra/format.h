@@ -3,21 +3,15 @@
 #include <fmt/core.h>
 #include <optional>
 
-namespace inf {
-
-}
-
-namespace fmt {
 template <typename T>
-struct formatter<std::optional<T>>
+struct fmt::formatter<std::optional<T>>
 {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const std::optional<T>& val, FormatContext& ctx) const -> decltype(ctx.out())
+    auto format(const std::optional<T>& val, format_context& ctx) const -> format_context::iterator
     {
         if (val.has_value()) {
             return format_to(ctx.out(), "{}", *val);
@@ -26,4 +20,4 @@ struct formatter<std::optional<T>>
         }
     }
 };
-}
+

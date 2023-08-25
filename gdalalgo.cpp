@@ -493,7 +493,7 @@ gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const fs::path& out
     TranslateOptionsWrapper gdalOptions(options, progress);
 
     int userError = 0;
-    auto resultDs = gdal::RasterDataSet(GDALTranslate(outputPath.empty() ? nullptr : outputPath.generic_u8string().c_str(), ds.get(), gdalOptions.get(), &userError));
+    auto resultDs = gdal::RasterDataSet(GDALTranslate(outputPath.empty() ? nullptr : file::generic_u8string(outputPath).c_str(), ds.get(), gdalOptions.get(), &userError));
 
     if (userError) {
         throw RuntimeError("Translate: invalid arguments");

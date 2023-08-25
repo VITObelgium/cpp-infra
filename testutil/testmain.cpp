@@ -48,9 +48,9 @@ int main(int argc, char** argv)
 #ifdef INFRA_GDAL_ENABLED
     inf::gdal::RegistrationConfig gdalCfg;
 #ifdef INFRA_TESTUTIL_MAIN_PROJDB_PATH
-    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path() / INFRA_TESTUTIL_MAIN_PROJDB_PATH;
+    gdalCfg.projdbPath = inf::file::u8path(argv[0]).parent_path() / INFRA_TESTUTIL_MAIN_PROJDB_PATH;
 #else
-    gdalCfg.projdbPath = fs::u8path(argv[0]).parent_path();
+    gdalCfg.projdbPath = inf::file::u8path(argv[0]).parent_path();
 #endif
 
     inf::gdal::Registration reg(gdalCfg);

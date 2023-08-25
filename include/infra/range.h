@@ -43,20 +43,17 @@ struct Range
 
 }
 
-namespace fmt {
 template <typename T>
-struct formatter<inf::Range<T>>
+struct fmt::formatter<inf::Range<T>>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::Range<T>& s, FormatContext& ctx)
+    auto format(const inf::Range<T>& s, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), "[{},{}]", s.begin, s.end);
+        return fmt::format_to(ctx.out(), "[{},{}]", s.begin, s.end);
     }
 };
-}
+

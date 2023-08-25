@@ -87,7 +87,7 @@ static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLooku
 
 static std::string get_extension_lowercase(const fs::path& filepath)
 {
-    return str::lowercase(filepath.extension().u8string());
+    return str::lowercase(file::u8string(filepath.extension()));
 }
 
 template <typename Unsigned, typename Signed>
@@ -182,7 +182,7 @@ void register_embedded_data(const fs::path& p)
 
     if (!p.empty()) {
 #if GDAL_VERSION_MAJOR > 2
-        const std::string path           = str::from_u8(p.u8string());
+        const std::string path           = file::u8string(p);
         std::array<const char*, 2> paths = {
             path.c_str(),
             nullptr,
@@ -193,7 +193,7 @@ void register_embedded_data(const fs::path& p)
 
         // Also set the environment variable
         // e.g. Spatialite library does not use gdal settings
-        env::set("PROJ_LIB", p.u8string());
+        env::set("PROJ_LIB", file::u8string(p));
     }
 }
 
@@ -1057,7 +1057,7 @@ RasterType guess_rastertype_from_filename(const fs::path& filePath)
         return RasterType::Vrt;
     }
 
-    auto path = filePath.u8string();
+    auto path = file::u8string(filePath);
     if (str::starts_with_ignore_case(path, "postgresql://") || str::starts_with_ignore_case(path, "pg:")) {
         return RasterType::Postgis;
     }
@@ -1084,7 +1084,7 @@ VectorType guess_vectortype_from_filename(const fs::path& filePath)
         return VectorType::Vrt;
     }
 
-    auto path = filePath.u8string();
+    auto path = file::u8string(filePath);
     if (str::starts_with_ignore_case(path, "postgresql://") || str::starts_with_ignore_case(path, "pg:")) {
         return VectorType::PostgreSQL;
     } else if (str::starts_with_ignore_case(path, "wfs:")) {
