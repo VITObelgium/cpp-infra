@@ -49,7 +49,7 @@ bool exportModel(QWidget* parent, const QAbstractItemModel* model, const QModelI
 {
     auto filename = QFileDialog::getSaveFileName(parent, QApplication::tr("Export table"), QString::fromStdString(std::string(name)), QStringLiteral("Spreadsheet (*.xlsx)"));
     if (!filename.isEmpty()) {
-        exportModel(model, rootIndex, name, fs::u8path(filename.toStdString()), options);
+        exportModel(model, rootIndex, name, file::u8path(filename.toStdString()), options);
         return true;
     }
 

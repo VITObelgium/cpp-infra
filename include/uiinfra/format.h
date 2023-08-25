@@ -3,20 +3,17 @@
 #include <fmt/core.h>
 #include <qstring.h>
 
-namespace fmt {
 template <>
-struct formatter<QString>
+struct fmt::formatter<QString>
 {
-    template <typename ParseContext>
-    constexpr auto parse(ParseContext& ctx)
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const QString& qstr, FormatContext& ctx)
+    auto format(const QString& qstr, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), qstr.toStdString());
+        return fmt::format_to(ctx.out(), qstr.toStdString());
     }
 };
-}
+

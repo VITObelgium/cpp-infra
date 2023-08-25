@@ -158,9 +158,9 @@ TEST_CASE("Gdal.utf8Path")
         return;
     }
 
-    CHECK_NOTHROW(gdal::RasterDataSet::open(fs::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
+    CHECK_NOTHROW(gdal::RasterDataSet::open(file::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
 
-    auto ds          = gdal::RasterDataSet::open(fs::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
+    auto ds          = gdal::RasterDataSet::open(file::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
     auto subDatasets = ds.metadata("SUBDATASETS");
     CHECK(subDatasets.size() == 4u);
 }
@@ -168,7 +168,7 @@ TEST_CASE("Gdal.utf8Path")
 TEST_CASE("Gdal.spatialReference")
 {
     {
-        auto meta = gdal::io::read_metadata(fs::u8path(TEST_DATA_DIR) / "epsg31370.tif");
+        auto meta = gdal::io::read_metadata(file::u8path(TEST_DATA_DIR) / "epsg31370.tif");
         gdal::SpatialReference srs(meta.projection);
         CHECK(srs.is_projected());
         CHECK_FALSE(srs.is_geographic());
@@ -177,7 +177,7 @@ TEST_CASE("Gdal.spatialReference")
     }
 
     {
-        auto meta = gdal::io::read_metadata(fs::u8path(TEST_DATA_DIR) / "epsg3857.tif");
+        auto meta = gdal::io::read_metadata(file::u8path(TEST_DATA_DIR) / "epsg3857.tif");
         gdal::SpatialReference srs(meta.projection);
         CHECK(srs.is_projected());
         CHECK_FALSE(srs.is_geographic());

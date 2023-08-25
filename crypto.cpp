@@ -1,6 +1,7 @@
 #include "infra/crypto.h"
 #include "infra/exception.h"
 #include "infra/hash.h"
+#include "infra/enumutils.h"
 
 #include <array>
 #include <cryptopp/blowfish.h>
@@ -15,7 +16,7 @@ using namespace CryptoPP;
 void throw_on_invalid_key_length(std::string_view key)
 {
     if (key.size() < Blowfish::MIN_KEYLENGTH || key.size() > Blowfish::MAX_KEYLENGTH) {
-        throw RuntimeError("Invalid encryption key size, lengt must be in range [{}-{}]", Blowfish::MIN_KEYLENGTH, Blowfish::MAX_KEYLENGTH);
+        throw RuntimeError("Invalid encryption key size, lengt must be in range [{}-{}]", enum_value(Blowfish::MIN_KEYLENGTH), enum_value(Blowfish::MAX_KEYLENGTH));
     }
 }
 

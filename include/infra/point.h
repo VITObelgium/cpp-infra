@@ -85,23 +85,21 @@ struct hash<inf::Point<T>>
 };
 }
 
-namespace fmt {
 template <typename T>
-struct formatter<inf::Point<T>>
+struct fmt::formatter<inf::Point<T>>
 {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::Point<T>& p, FormatContext& ctx) const -> decltype(ctx.out())
+    auto format(const inf::Point<T>& p, format_context& ctx) const -> format_context::iterator
     {
         if constexpr (std::is_floating_point_v<T>) {
-            return format_to(ctx.out(), "({:.1f}, {:.1f})", p.x, p.y);
+            return fmt::format_to(ctx.out(), "({:.1f}, {:.1f})", p.x, p.y);
         } else {
-            return format_to(ctx.out(), "({}, {})", p.x, p.y);
+            return fmt::format_to(ctx.out(), "({}, {})", p.x, p.y);
         }
     }
 };
-}
+

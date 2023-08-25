@@ -15,7 +15,7 @@ TEST_CASE("GeoMetadata")
 {
     SUBCASE("projectioninfoProjected 31370")
     {
-        auto meta = gdal::io::read_metadata(fs::u8path(TEST_DATA_DIR) / "epsg31370.tif");
+        auto meta = gdal::io::read_metadata(file::u8path(TEST_DATA_DIR) / "epsg31370.tif");
         REQUIRE_FALSE(meta.projection.empty());
         REQUIRE(meta.projected_epsg().has_value());
         CHECK(meta.projected_epsg() == crs::epsg::BelgianLambert72);
@@ -25,7 +25,7 @@ TEST_CASE("GeoMetadata")
 
     SUBCASE("projectioninfoProjected 3857")
     {
-        auto meta = gdal::io::read_metadata(fs::u8path(TEST_DATA_DIR) / "epsg3857.tif");
+        auto meta = gdal::io::read_metadata(file::u8path(TEST_DATA_DIR) / "epsg3857.tif");
         REQUIRE_FALSE(meta.projection.empty());
         REQUIRE(meta.projected_epsg().has_value());
         CHECK(meta.projected_epsg() == crs::epsg::WGS84WebMercator);

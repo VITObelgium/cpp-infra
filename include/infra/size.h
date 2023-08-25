@@ -35,19 +35,17 @@ struct Size
 
 }
 
-namespace fmt {
 template <>
-struct formatter<inf::Size>
+struct fmt::formatter<inf::Size>
 {
-    constexpr auto parse(format_parse_context& ctx) -> decltype(ctx.begin())
+    FMT_CONSTEXPR20 auto parse(format_parse_context& ctx) -> format_parse_context::iterator
     {
         return ctx.begin();
     }
 
-    template <typename FormatContext>
-    auto format(const inf::Size& s, FormatContext& ctx) const -> decltype(ctx.out())
+    auto format(const inf::Size& s, format_context& ctx) const -> format_context::iterator
     {
-        return format_to(ctx.out(), "({}x{})", s.width, s.height);
+        return fmt::format_to(ctx.out(), "({}x{})", s.width, s.height);
     }
 };
-}
+
