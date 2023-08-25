@@ -55,12 +55,6 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item 
 cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
 
-if(MSVC)
-    set(CMAKE_REQUIRED_FLAGS /std:c++17)
-else()
-    set(CMAKE_REQUIRED_FLAGS -std=c++17)
-endif()
-
 check_include_file_cxx(charconv HAVE_CHARCONV_HEADER)
 
 check_cxx_source_compiles("
@@ -200,6 +194,10 @@ target_include_directories(infra
     PRIVATE
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+)
+
+target_compile_options(infra
+    PUBLIC $<$<CXX_COMPILER_ID:MSVC>:/Zc:__cplusplus>
 )
 
 if(HAVE_FILESYSTEM_H)

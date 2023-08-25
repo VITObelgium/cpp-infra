@@ -340,10 +340,11 @@ void replace_in_place(std::u8string& aString, std::u8string_view toSearch, std::
 {
     return replace_in_place<char8_t>(aString, toSearch, toReplace);
 }
+
 #endif
 
 template <typename CharT, typename Traits = std::char_traits<CharT>>
-void replace_in_place(std::basic_string<CharT, Traits>& aString, char toSearch, char toReplace)
+void replace_in_place(std::basic_string<CharT, Traits>& aString, CharT toSearch, CharT toReplace)
 {
     const size_t length = aString.size();
 

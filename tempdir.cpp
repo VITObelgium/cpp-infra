@@ -13,7 +13,7 @@ TempDir::TempDir(std::string_view name)
     _path                = fs::temp_directory_path() / std::to_string(timestamp);
 
     if (!name.empty()) {
-        _path /= fs::u8path(name);
+        _path /= file::u8path(name);
     }
 
     if (fs::exists(_path)) {
