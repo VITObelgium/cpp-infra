@@ -13,7 +13,6 @@ struct fmt::formatter<QString>
 
     auto format(const QString& qstr, format_context& ctx) const -> format_context::iterator
     {
-        return fmt::format_to(ctx.out(), qstr.toStdString());
+        return fmt::format_to(ctx.out(), "{}", qstr.toStdString());
     }
 };
-

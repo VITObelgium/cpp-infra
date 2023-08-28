@@ -148,7 +148,7 @@ fs::path replace_illegal_path_characters(const fs::path& filename, char replacem
 #if __cplusplus > 201703L
     return fs::path(pathStr);
 #else
-    return fs::u8path(pathStr);
+    return file::u8path(pathStr);
 #endif
 }
 

@@ -82,7 +82,7 @@ template <typename Clock, typename Duration>
 std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
-    return fmt::format(fmt::format("{{:{}}}", format), fmt::gmtime(time));
+    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::gmtime(time));
 }
 
 std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice = nullptr);

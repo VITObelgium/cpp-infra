@@ -580,6 +580,11 @@ inline std::string from_u8(std::u8string_view str)
 {
     return std::string(str.begin(), str.end());
 }
+
+inline std::u8string to_u8(std::string_view str)
+{
+    return std::u8string(reinterpret_cast<const char8_t*>(str.data()), str.size());
+}
 #else
 inline std::string from_u8(std::string_view str)
 {

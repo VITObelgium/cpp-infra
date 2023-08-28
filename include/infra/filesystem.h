@@ -76,9 +76,9 @@ fs::path replace_illegal_path_characters(const fs::path& filename, char replacem
 inline fs::path u8path(std::string_view pathStr)
 {
 #if __cplusplus > 201703L
-    return fs::path(std::u8string_view(reinterpret_cast<const char8_t*>(pathStr.data()), pathStr.size()));
+    return fs::path(str::to_u8(pathStr));
 #else
-    return fs::u8path(pathStr);
+    return file::u8path(pathStr);
 #endif
 }
 
@@ -94,8 +94,7 @@ inline std::string u8string(const fs::path& path)
 inline std::string generic_u8string(const fs::path& path)
 {
 #if __cplusplus > 201703L
-    auto u8path = path.generic_u8string();
-    return std::string(reinterpret_cast<const char*>(u8path.data()), u8path.size());
+    return str::from_u8(path.generic_u8string());
 #else
     return path.generic_u8string();
 #endif

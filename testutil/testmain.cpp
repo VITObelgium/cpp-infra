@@ -63,7 +63,7 @@ int main(int argc, char** argv)
 #if __cplusplus > 201703L
     date::set_install((fs::path(argv[0]).parent_path() / "data").string());
 #else
-    date::set_install((fs::u8path(argv[0]).parent_path() / "data").u8string());
+    date::set_install((file::u8path(argv[0]).parent_path() / "data").u8string());
 #endif
 #endif
 
