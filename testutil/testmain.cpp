@@ -16,7 +16,9 @@
 #endif
 
 #include <cstdlib>
+#if __cplusplus <= 201703L
 #include <date/tz.h>
+#endif
 #include <doctest/doctest.h>
 #include <locale>
 
@@ -58,13 +60,9 @@ int main(int argc, char** argv)
     CPLSetConfigOption("GDAL_DISABLE_READDIR_ON_OPEN ", "TRUE");
 #endif
 
-#if USE_OS_TZDB == 0
+#if __cplusplus <= 201703L && USE_OS_TZDB == 0
     // make sure the timezone data is found
-#if __cplusplus > 201703L
-    date::set_install((fs::path(argv[0]).parent_path() / "data").string());
-#else
     date::set_install((file::u8path(argv[0]).parent_path() / "data").u8string());
-#endif
 #endif
 
     doctest::Context context;

@@ -1,7 +1,11 @@
 #pragma once
 
+#if __cplusplus <= 201703L
 #include <date/date.h>
 #include <date/tz.h>
+#endif
+
+#include <chrono>
 #include <fmt/chrono.h>
 #include <optional>
 
@@ -11,12 +15,21 @@
 
 namespace inf::chrono {
 
+#if __cplusplus > 201703L
+using days       = std::chrono::days;
+using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
+using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
+
+using local_date_point = std::chrono::local_days;
+using local_time_point = std::chrono::local_time<std::chrono::milliseconds>;
+#else
 using days       = date::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
 using local_date_point = date::local_days;
 using local_time_point = date::local_time<std::chrono::milliseconds>;
+#endif
 
 date_point today();
 local_date_point today_local();
@@ -26,6 +39,20 @@ local_time_point now_local();
 date_point date_from_time_point(time_point tp);
 local_date_point date_from_time_point(local_time_point tp);
 
+#if __cplusplus > 201703L
+std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
+std::chrono::year_month_day to_year_month_day(time_point tp);
+std::chrono::year_month_day to_year_month_day(local_time_point tp);
+
+/*! Converts a year_month_day to a system timepoint (locale dependent) */
+inline time_point to_system_time_point(std::chrono::year_month_day ymd)
+{
+    return static_cast<std::chrono::sys_days>(ymd);
+}
+
+std::string to_string(std::chrono::local_seconds tp);
+std::string to_string(std::string_view format, std::chrono::local_seconds tp);
+#else
 date::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
 date::year_month_day to_year_month_day(time_point tp);
 date::year_month_day to_year_month_day(local_time_point tp);
@@ -38,6 +65,7 @@ inline time_point to_system_time_point(date::year_month_day ymd)
 
 std::string to_string(date::local_seconds tp);
 std::string to_string(std::string_view format, date::local_seconds tp);
+#endif
 
 /*! Converts a time point to string in the standard date and time string (locale dependent) */
 template <typename Clock, typename Duration>
@@ -59,7 +87,7 @@ template <typename Clock, typename Duration>
 std::string to_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
     std::time_t time = Clock::to_time_t(tp);
-    return fmt::format(fmt::format("{{:{}}}", format), fmt::localtime(time));
+    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::localtime(time));
 }
 
 /*! Converts a string to a time point using the provided format specification
@@ -85,7 +113,11 @@ std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock
     return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::gmtime(time));
 }
 
+#if __cplusplus > 201703L
+std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* choice = nullptr);
+#else
 std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice = nullptr);
+#endif
 
 class DurationRecorder
 {

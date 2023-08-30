@@ -408,6 +408,10 @@ std::optional<Field> Feature::opt_field(int index) const noexcept
 template <typename T>
 T Feature::field_as(int index) const
 {
+#if __cplusplus > 201703L
+    namespace date = std::chrono;
+#endif
+
     if constexpr (std::is_same_v<double, T>) {
         return _feature->GetFieldAsDouble(index);
     } else if constexpr (std::is_same_v<float, T>) {
@@ -429,7 +433,7 @@ T Feature::field_as(int index) const
         }
 
         auto date      = date::year_month_day(date::year(year), date::month(month), date::day(day));
-        auto timePoint = std::chrono::time_point_cast<std::chrono::milliseconds>(static_cast<date::sys_days>(date));
+        auto timePoint = std::chrono::time_point_cast<std::chrono::milliseconds>(static_cast<gdal::sys_days>(date));
         timePoint += std::chrono::hours(hour) + std::chrono::minutes(minute) + std::chrono::milliseconds(inf::truncate<int>(second * 1000));
         return timePoint;
     } else if constexpr (std::is_same_v<date_point, T>) {

@@ -15,7 +15,10 @@
 #include <ogr_spatialref.h>
 #include <ogrsf_frmts.h>
 
+#include <chrono>
+#if __cplusplus <= 201703L
 #include <date/date.h>
+#endif
 #include <optional>
 #include <type_traits>
 #include <unordered_map>
@@ -30,7 +33,13 @@ class OGRLinearRing;
 
 namespace inf::gdal {
 
-using days       = date::days;
+#if __cplusplus > 201703L
+using days     = std::chrono::days;
+using sys_days = std::chrono::sys_days;
+#else
+using days     = date::days;
+using sys_days = std::chrono::sys_days;
+#endif
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
