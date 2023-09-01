@@ -79,7 +79,21 @@ void CsvWriter::write_header(std::span<std::string_view> names)
     write_line(names);
 }
 
+void CsvWriter::write_header(std::initializer_list<std::string_view> names)
+{
+    write_line(names);
+}
+
 void CsvWriter::write_line(std::span<const std::string> names)
+{
+    for (auto name : names) {
+        write_column_value(name);
+    }
+
+    new_line();
+}
+
+void CsvWriter::write_line(std::initializer_list<std::string_view> names)
 {
     for (auto name : names) {
         write_column_value(name);

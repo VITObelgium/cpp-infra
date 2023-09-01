@@ -4,11 +4,11 @@
 #include "infra/span.h"
 
 #include <fstream>
+#include <initializer_list>
 #include <locale>
 #include <optional>
 
 namespace inf {
-
 class no_grouping : public std::numpunct_byname<char>
 {
     std::string do_grouping() const
@@ -50,8 +50,10 @@ public:
     // Write a complete line of strings in one go
     void write_header(std::span<const std::string> names);
     void write_header(std::span<std::string_view> names);
+    void write_header(std::initializer_list<std::string_view> names);
     void write_line(std::span<const std::string> names);
     void write_line(std::span<std::string_view> names);
+    void write_line(std::initializer_list<std::string_view> names);
 
     template <typename T>
     void write_line(std::span<const T> values)
