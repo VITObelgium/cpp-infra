@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
 #if __cplusplus <= 201703L && USE_OS_TZDB == 0
     // make sure the timezone data is found
-    date::set_install((file::u8path(argv[0]).parent_path() / "data").u8string());
+    date::set_install((inf::file::u8path(argv[0]).parent_path() / "data").u8string());
 #endif
 
     doctest::Context context;

@@ -97,7 +97,7 @@ message(STATUS "C++ standard: C++${CMAKE_CXX_STANDARD}")
 find_package(fmt CONFIG REQUIRED)
 if (CMAKE_CXX_STANDARD LESS 20)
     find_package(date CONFIG REQUIRED)
-    find_package(Gsl CONFIG REQUIRED)
+    find_package(Microsoft.GSL CONFIG REQUIRED)
 
     if(TARGET date::date-tz)
         set_target_properties(date::date-tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -219,7 +219,7 @@ target_compile_definitions(infra
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
-target_link_libraries(infra PUBLIC fmt::fmt $<TARGET_NAME_IF_EXISTS:date::date> $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Gsl::Gsl>)
+target_link_libraries(infra PUBLIC fmt::fmt $<TARGET_NAME_IF_EXISTS:date::date> $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Microsoft.GSL::GSL>)
 
 if(HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)

@@ -78,7 +78,7 @@ inline fs::path u8path(std::string_view pathStr)
 #if __cplusplus > 201703L
     return fs::path(str::to_u8(pathStr));
 #else
-    return file::u8path(pathStr);
+    return fs::u8path(pathStr);
 #endif
 }
 

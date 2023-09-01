@@ -38,7 +38,7 @@ using days     = std::chrono::days;
 using sys_days = std::chrono::sys_days;
 #else
 using days     = date::days;
-using sys_days = std::chrono::sys_days;
+using sys_days = date::sys_days;
 #endif
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
