@@ -542,7 +542,7 @@ if(INFRA_UI_COMPONENTS)
         Qt::Gui
         Qt::Widgets
         Qt::Core
-        date::date
+        $<TARGET_NAME_IF_EXISTS:date::date>
     )
 
     if(INFRA_UI_COMPONENTS_QML)
