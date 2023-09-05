@@ -8,7 +8,6 @@
 #include "infra/gdalgeometry.h"
 
 #include <geos/geom/Coordinate.h>
-#include <geos/geom/DefaultCoordinateSequenceFactory.h>
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/LineString.h>
@@ -33,15 +32,14 @@ using namespace inf;
 
 std::unique_ptr<geos::geom::LinearRing> gdal_linear_ring_to_geos(const geos::geom::GeometryFactory& factory, gdal::LinearRingCRef ring)
 {
-    std::vector<geos::geom::Coordinate> coords;
-    coords.reserve(ring.point_count());
+    auto coords = std::make_unique<geos::geom::CoordinateSequence>(geos::geom::CoordinateSequence::XY(ring.point_count()));
 
     for (int i = 0; i < ring.point_count(); ++i) {
         const auto point = ring.point_at(i);
-        coords.emplace_back(point.x, point.y);
+        coords->setAt(geos::geom::Coordinate(point.x, point.y), i);
     }
 
-    return factory.createLinearRing(geos::geom::DefaultCoordinateSequenceFactory::instance()->create(std::move(coords)));
+    return factory.createLinearRing(std::move(coords));
 }
 
 static geos::geom::Polygon::Ptr gdal_polygon_to_geos(const geos::geom::GeometryFactory& factory, gdal::PolygonCRef poly)
@@ -90,12 +88,12 @@ geos::geom::MultiPolygon::Ptr gdal_to_geos(inf::gdal::GeometryCRef geom)
 
 static std::unique_ptr<geos::geom::LinearRing> create_linear_ring(const geos::geom::GeometryFactory& factory, inf::Point<double> p1, inf::Point<double> p2)
 {
-    return factory.createLinearRing(geos::geom::DefaultCoordinateSequenceFactory::instance()->create({
-        {p1.x, p1.y},
-        {p2.x, p1.y},
-        {p2.x, p2.y},
-        {p1.x, p2.y},
-        {p1.x, p1.y},
+    return factory.createLinearRing(geos::geom::CoordinateSequence({
+        geos::geom::Coordinate(p1.x, p1.y),
+        geos::geom::Coordinate(p2.x, p1.y),
+        geos::geom::Coordinate(p2.x, p2.y),
+        geos::geom::Coordinate(p1.x, p2.y),
+        geos::geom::Coordinate(p1.x, p1.y),
     }));
 }
 
@@ -125,13 +123,13 @@ std::string to_geojson(const geos::geom::Geometry& geom)
 std::string to_geojson(const geos::geom::Envelope& env)
 {
     auto geomFactory = geos::geom::GeometryFactory::create();
-    geos::geom::CoordinateArraySequence coords(std::vector<geos::geom::Coordinate>({
-        {env.getMinX(), env.getMaxY()},
-        {env.getMaxX(), env.getMaxY()},
-        {env.getMaxX(), env.getMinY()},
-        {env.getMinX(), env.getMinY()},
-        {env.getMinX(), env.getMaxY()},
-    }));
+    geos::geom::CoordinateSequence coords({
+        geos::geom::Coordinate(env.getMinX(), env.getMaxY()),
+        geos::geom::Coordinate(env.getMaxX(), env.getMaxY()),
+        geos::geom::Coordinate(env.getMaxX(), env.getMinY()),
+        geos::geom::Coordinate(env.getMinX(), env.getMinY()),
+        geos::geom::Coordinate(env.getMinX(), env.getMaxY()),
+    });
 
     const auto poly = geomFactory->createPolygon(geomFactory->createLinearRing(coords), {});
     return to_geojson(*poly);
@@ -143,13 +141,13 @@ std::string to_geojson(const inf::GeoMetadata& meta)
     auto bottomRight = meta.bottom_right();
 
     auto geomFactory = geos::geom::GeometryFactory::create();
-    geos::geom::CoordinateArraySequence coords(std::vector<geos::geom::Coordinate>({
-        {topLeft.x, topLeft.y},
-        {bottomRight.x, topLeft.y},
-        {bottomRight.x, bottomRight.y},
-        {topLeft.x, bottomRight.y},
-        {topLeft.x, topLeft.y},
-    }));
+    geos::geom::CoordinateSequence coords({
+        geos::geom::Coordinate(topLeft.x, topLeft.y),
+        geos::geom::Coordinate(bottomRight.x, topLeft.y),
+        geos::geom::Coordinate(bottomRight.x, bottomRight.y),
+        geos::geom::Coordinate(topLeft.x, bottomRight.y),
+        geos::geom::Coordinate(topLeft.x, topLeft.y),
+    });
 
     const auto poly = geomFactory->createPolygon(geomFactory->createLinearRing(coords), {});
     return to_geojson(*poly);
