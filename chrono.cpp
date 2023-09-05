@@ -6,8 +6,6 @@
 namespace inf::chrono {
 
 #if __cplusplus > 201703L
-#include <format>
-
 namespace date = std::chrono;
 #else
 using namespace date;
@@ -69,16 +67,12 @@ std::string to_string(std::chrono::local_seconds tp)
 
 std::string to_string(std::string_view format, std::chrono::local_seconds tp)
 {
-    std::ostringstream dateStr;
-    dateStr << std::vformat(std::format("{{:{}}}", format), std::make_format_args(tp));
-    return dateStr.str();
+    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
 }
 
 std::string to_string(local_time_point tp)
 {
-    std::stringstream ss;
-    ss << tp;
-    return ss.str();
+    return fmt::format("{:%F}", tp);
 }
 #else
 date::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp)
