@@ -338,25 +338,6 @@ GeoMetadata copy_metadata_replace_nodata(const GeoMetadata& meta, std::optional<
     return result;
 }
 
-static Rect<double> metadata_intersection_rectangle(const GeoMetadata& meta1, const GeoMetadata& meta2)
-{
-    if (meta1.projection != meta2.projection) {
-        throw RuntimeError("Cannot intersect metadata with different projections");
-    }
-
-    if (meta1.cellSize.x != meta2.cellSize.x || meta1.cellSize.y != meta2.cellSize.y) {
-        if (!metadata_is_aligned(meta1, meta2)) {
-            throw InvalidArgument("Extents cellsize does not match {} <-> {}", meta1.cellSize, meta2.cellSize);
-        }
-    }
-
-    if (meta1.cellSize.x == 0) {
-        throw InvalidArgument("Extents cellsize is zero");
-    }
-
-    return rectangle_intersection(meta1.bounding_box(), meta2.bounding_box());
-}
-
 bool metadata_intersects(const GeoMetadata& meta1, const GeoMetadata& meta2)
 {
     if (meta1.projection != meta2.projection) {
