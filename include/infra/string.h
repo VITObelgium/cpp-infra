@@ -6,6 +6,7 @@
 #include "infra/typetraits.h"
 
 #include <algorithm>
+#include <cstdint>
 #include <iterator>
 #include <optional>
 #include <sstream>
