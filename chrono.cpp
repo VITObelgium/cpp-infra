@@ -3,6 +3,8 @@
 
 #include <sstream>
 
+#include <fmt/chrono.h>
+
 namespace inf::chrono {
 
 #if __cplusplus > 201703L
