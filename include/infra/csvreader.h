@@ -71,14 +71,15 @@ class CsvReader
 {
 public:
     CsvReader(const fs::path& filename);
-    CsvReader(const CsvReader&) = delete;
-    CsvReader(CsvReader&&)      = default;
+    CsvReader(const CsvReader&)            = delete;
+    CsvReader(CsvReader&&)                 = default;
     CsvReader& operator=(const CsvReader&) = delete;
-    CsvReader& operator=(CsvReader&&) = default;
+    CsvReader& operator=(CsvReader&&)      = default;
 
     int32_t column_count() const;
     std::string_view column_name(int32_t index) const;
-    std::optional<int32_t> column_index(const std::string& name) const;
+    std::optional<int32_t> column_index(const std::string& name) const noexcept;
+    int32_t required_column_index(const std::string& name) const;
 
     CsvRowIterator begin() const;
     CsvRowIterator end() const;
