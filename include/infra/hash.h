@@ -13,6 +13,25 @@ void hash_combine(std::size_t& seed, const T& v, const Rest&... rest)
     (hash_combine(seed, rest), ...);
 }
 
+struct StringHash
+{
+    using is_transparent = void;
+    [[nodiscard]] size_t operator()(const char* txt) const
+    {
+        return std::hash<std::string_view>()(txt);
+    }
+
+    [[nodiscard]] size_t operator()(std::string_view txt) const
+    {
+        return std::hash<std::string_view>()(txt);
+    }
+
+    [[nodiscard]] size_t operator()(const std::string& txt) const
+    {
+        return std::hash<std::string>()(txt);
+    }
+};
+
 namespace hash {
 
 std::string hex_encode(std::span<const uint8_t> data);
