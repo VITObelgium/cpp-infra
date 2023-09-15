@@ -89,7 +89,7 @@ elseif(HAVE_EXP_FILESYSTEM_H)
 elseif(HAVE_BOOST_FILESYSTEM)
     message(STATUS "Found boost::filesystem")
 else()
-    message(WARNING "no filesystem implementation found")
+    message(FATAL_ERROR "no filesystem implementation found")
 endif()
 
 message(STATUS "C++ standard: C++${CMAKE_CXX_STANDARD}")
