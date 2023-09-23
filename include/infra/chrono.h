@@ -1,6 +1,6 @@
 #pragma once
 
-#if __cplusplus <= 201703L
+#ifndef HAVE_CPP20_CHRONO
 #include <date/date.h>
 #include <date/tz.h>
 #endif
@@ -15,7 +15,7 @@
 
 namespace inf::chrono {
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
 using days       = std::chrono::days;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
@@ -39,7 +39,7 @@ local_time_point now_local();
 date_point date_from_time_point(time_point tp);
 local_date_point date_from_time_point(local_time_point tp);
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
 std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
 std::chrono::year_month_day to_year_month_day(time_point tp);
 std::chrono::year_month_day to_year_month_day(local_time_point tp);
@@ -113,7 +113,7 @@ std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock
     return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::gmtime(time));
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
 std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* choice = nullptr);
 #else
 std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice = nullptr);

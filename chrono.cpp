@@ -7,7 +7,7 @@
 
 namespace inf::chrono {
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
 namespace date = std::chrono;
 #else
 using namespace date;
@@ -45,7 +45,7 @@ local_date_point date_from_time_point(local_time_point tp)
     return std::chrono::floor<date::days>(tp);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
 std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp)
 {
     auto dp = std::chrono::floor<std::chrono::days>(tp);

@@ -17,7 +17,7 @@ if(INFRA_IS_TOPLEVEL)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_EXTENSIONS OFF)
 
-    if(MSVC OR (WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
+    if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
         # avoid windows specific warnings
         add_definitions(
             -D_CRT_SECURE_NO_WARNINGS
@@ -94,15 +94,32 @@ endif()
 
 message(STATUS "C++ standard: C++${CMAKE_CXX_STANDARD}")
 
-find_package(fmt CONFIG REQUIRED)
-if (CMAKE_CXX_STANDARD LESS 20)
+check_cxx_source_compiles("
+#include <chrono>
+using days = std::chrono::days;
+int main() { std::chrono::current_zone(); return 0; }
+" HAVE_CPP20_CHRONO)
+
+if(NOT HAVE_CPP20_CHRONO)
     find_package(date CONFIG REQUIRED)
+    message(STATUS "no C++20 chrono support")
+else()
+    message(STATUS "C++20 chrono support")
+endif()
+
+find_package(fmt CONFIG REQUIRED)
+
+if(CMAKE_CXX_STANDARD LESS 20)
     find_package(Microsoft.GSL CONFIG REQUIRED)
+endif()
+
+if(NOT HAVE_CPP20_CHRONO)
+    find_package(date CONFIG REQUIRED)
 
     if(TARGET date::date-tz)
         set_target_properties(date::date-tz PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
     endif()
-endif ()
+endif()
 
 # make sure we use release versions of fmt lib when building relwithdebinfo
 set_target_properties(fmt::fmt PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
@@ -184,7 +201,7 @@ add_library(infra
     workerthread.cpp
 )
 
-if(MSVC OR (WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
+if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
     set_source_files_properties(cliprogressbar.cpp PROPERTIES COMPILE_DEFINITIONS _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING)
     set_source_files_properties(inireader.cpp PROPERTIES COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
@@ -215,6 +232,7 @@ endif()
 target_compile_definitions(infra
     PUBLIC
     FMT_STRING_ALIAS=1
+    $<$<BOOL:${HAVE_CPP20_CHRONO}>:HAVE_CPP20_CHRONO>
     PRIVATE
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
