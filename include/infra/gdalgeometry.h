@@ -19,6 +19,7 @@
 #if __cplusplus <= 201703L
 #include <date/date.h>
 #endif
+#include <cassert>
 #include <optional>
 #include <type_traits>
 #include <unordered_map>
