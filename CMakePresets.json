@@ -87,6 +87,18 @@
       ],
       "displayName": "Mac x64",
       "description": "Vcpkg build for x64 on mac"
+    },
+    {
+      "name": "arm64-linux",
+      "inherits": [
+        "vcpkg-base",
+        "triplet-arm64-linux"
+      ],
+      "displayName": "arm64 Linux Docker",
+      "description": "Vcpkg build for arm64 on macOS",
+      "cacheVariables": {
+        "VCPKG_INSTALLED_DIR": "/usr/vcpkgs-arm64-linux"
+      }
     }
   ],
   "buildPresets": [
@@ -132,6 +144,24 @@
       "configuration": "Release",
       "inherits": [
         "build-mac-only"
+      ]
+    },
+    {
+      "name": "Debug docker arm64",
+      "displayName": "Debug",
+      "configurePreset": "arm64-linux",
+      "configuration": "Debug",
+      "inherits": [
+        "build-linux-only"
+      ]
+    },
+    {
+      "name": "Release docker arm64",
+      "displayName": "Release",
+      "configurePreset": "arm64-linux",
+      "configuration": "Release",
+      "inherits": [
+        "build-linux-only"
       ]
     }
   ],
