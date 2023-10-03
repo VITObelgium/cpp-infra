@@ -91,6 +91,7 @@ if __name__ == "__main__":
             run_tests_after_build=args.run_tests,
             test_arguments=args.test_args,
             build_config=args.build_config,
+            install_root=f"vcpkgs-{triplet}",
         )
     except KeyboardInterrupt:
         print("\nInterrupted")
