@@ -46,6 +46,17 @@ jobs:
             ~/AppData/Local/vcpkg/archives
           key: ${{ runner.os }}-${{ matrix.cfg.triplet }}-${{ hashFiles('vcpkg.json', '.git/modules/deps/vcpkg/shallow') }}
       - name: Bootstrap the ports
+        id: bootstrap
         run: python bootstrap.py --triplet ${{ matrix.cfg.triplet }} --clean-after-build
       - name: Build the code
         run: python build.py --triplet ${{ matrix.cfg.triplet }} --run-tests
+      - name: Archive build logs
+        if: ${{ failure() && steps.bootstrap.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-logs
+          path: |
+            deps/vcpkg/buildtrees/**/config*.log
+            deps/vcpkg/buildtrees/**/build*.log
+            deps/vcpkg/buildtrees/**/install*.log
+            deps/vcpkg/buildtrees/**/package*.log
