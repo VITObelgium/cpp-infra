@@ -69,11 +69,13 @@ void ProgressBar::set_progress(float progress) noexcept
     }
 
     if (!_pimpl->bar->is_completed()) {
-        if constexpr (std::is_same_v<ProgressBarType, indicators::BlockProgressBar>) {
-            _pimpl->bar->set_progress(progress * 100.f);
-        } else if constexpr (std::is_same_v<ProgressBarType, indicators::ProgressBar>) {
-            _pimpl->bar->set_progress(static_cast<size_t>(progress * 100.f));
-        }
+#ifdef WIN32
+        static_assert(std::is_same_v<ProgressBarType, indicators::ProgressBar>, "Progressbar type mismatch");
+        _pimpl->bar->set_progress(static_cast<size_t>(progress * 100.f));
+#else
+        static_assert(std::is_same_v<ProgressBarType, indicators::BlockProgressBar>, "Progressbar type mismatch");
+        _pimpl->bar->set_progress(progress * 100.f);
+#endif
     }
 
     show_console_cursor(_pimpl->bar->is_completed());
