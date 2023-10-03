@@ -44,4 +44,4 @@ jobs:
       - name: Bootstrap the ports
         run: python bootstrap.py --triplet ${{ matrix.cfg.triplet }} --clean-after-build
       - name: Build the code
-        run: python build.py --triplet ${{ matrix.cfg.triplet }} --no-avx2 --python-path '${{ steps.setup-python.outputs.python-path }}' --run-tests
+        run: python build.py --triplet ${{ matrix.cfg.triplet }} --run-tests
