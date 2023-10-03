@@ -429,7 +429,7 @@ T Feature::field_as(int index) const
         int year, month, day, hour, minute, timezoneFlag;
         float second;
         if (_feature->GetFieldAsDateTime(index, &year, &month, &day, &hour, &minute, &second, &timezoneFlag) == FALSE) {
-            throw RuntimeError("Failed to get field as time point {}", _feature->GetFieldAsString(index));
+            throw RuntimeError("Failed to get field as time point '{}'", _feature->GetFieldAsString(index));
         }
 
         auto date      = date::year_month_day(date::year(year), date::month(month), date::day(day));
@@ -676,7 +676,7 @@ int Layer::required_field_index(const char* name) const
         return index;
     }
 
-    throw RuntimeError("Layer does not contain field with name '{}'", name);
+    throw RuntimeError("Layer {} does not contain field with name '{}'", _layer->GetName(), name);
 }
 
 int Layer::required_field_index(const std::string& name) const
