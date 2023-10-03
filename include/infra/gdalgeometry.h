@@ -24,6 +24,7 @@
 #include <type_traits>
 #include <unordered_map>
 #include <variant>
+#include <utility>
 
 class OGRSimpleCurve;
 class OGRFieldDefn;

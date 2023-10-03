@@ -40,7 +40,7 @@ if __name__ == "__main__":
         args = parser.parse_args()
 
         build_ui = "ON" if args.ui_enabled else "OFF"
-        cxx_standard = "17" if (args.cpp20_enabled) else "17"
+        cxx_standard = "20" if (args.cpp20_enabled) else "17"
         sys_platform = sysconfig.get_platform()
 
         triplet = args.triplet
