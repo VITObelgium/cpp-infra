@@ -1,0 +1,47 @@
+name: Vcpkg build
+
+on: [push]
+
+jobs:
+  build:
+    name: ${{ matrix.cfg.os }}
+    runs-on: ${{ matrix.cfg.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        cfg:
+          - { os: ubuntu-latest, triplet: x64-linux }
+          - { os: windows-2022, triplet: x64-windows-static-vs2022 }
+          - { os: macos-latest, triplet: x64-osx }
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+      - name: Install linux dependencies
+        if: ${{ matrix.cfg.os == 'ubuntu-latest' }}
+        run: sudo apt-get install nasm openssl ninja-build
+      - name: Install osx dependencies
+        if: ${{ matrix.cfg.os == 'macos-latest' }}
+        run: brew install nasm ninja
+      - name: Cache vcpkg binary
+        id: cache-vcpkg-bin
+        uses: actions/cache@v3
+        with:
+          path: |
+            deps/vcpkg/vcpkg
+            deps/vcpkg/vcpkg.exe
+          key: ${{ runner.os }}-${{ hashFiles('deps/vcpkg/bootstrap.cmake') }}
+      - name: Cache vcpkg packages
+        id: cache-vcpkg
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/vcpkg
+            ~/AppData/Local/vcpkg/archives
+          key: ${{ runner.os }}-${{ matrix.cfg.triplet }}-${{ hashFiles('vcpkg.json', '.git/modules/deps/vcpkg/shallow') }}
+      - name: Bootstrap the ports
+        run: python bootstrap.py --triplet ${{ matrix.cfg.triplet }} --clean-after-build
+      - name: Build the code
+        run: python build.py --triplet ${{ matrix.cfg.triplet }} --no-avx2 --python-path '${{ steps.setup-python.outputs.python-path }}' --run-tests

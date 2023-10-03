@@ -1,0 +1,107 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "infra",
+  "version": "0.11.2",
+  "dependencies": [
+    "fmt"
+  ],
+  "features": {
+    "log": {
+      "description": "logging support",
+      "dependencies": [
+        "spdlog"
+      ]
+    },
+    "testing": {
+      "description": "unit test support",
+      "dependencies": [
+        "doctest",
+        "trompeloeil"
+      ]
+    },
+    "cliprogress": {
+      "description": "progress support",
+      "dependencies": [
+        "indicators"
+      ]
+    },
+    "process": {
+      "description": "process support",
+      "dependencies": [
+        "reproc"
+      ]
+    },
+    "hashing": {
+      "description": "hashing support",
+      "dependencies": [
+        "cryptopp"
+      ]
+    },
+    "xml": {
+      "description": "xml support",
+      "dependencies": [
+        "pugixml"
+      ]
+    },
+    "tbb": {
+      "description": "threading building blocks support",
+      "dependencies": [
+        "tbb"
+      ]
+    },
+    "numeric": {
+      "description": "numeric support",
+      "dependencies": [
+        "eigen3"
+      ]
+    },
+    "charset": {
+      "description": "charset conversion/detection support",
+      "dependencies": [
+        "icu"
+      ]
+    },
+    "compression": {
+      "description": "compression support",
+      "dependencies": [
+        "zstd"
+      ]
+    },
+    "gdal": {
+      "description": "gdal support",
+      "dependencies": [
+        {
+          "name": "gdal",
+          "features": [
+            "geos"
+          ]
+        }
+      ]
+    },
+    "db": {
+      "description": "database support",
+      "dependencies": [
+        {
+          "name": "sqlpp11",
+          "features": [
+            "sqlite",
+            "postgresql"
+          ]
+        }
+      ]
+    },
+    "cpp17": {
+      "description": "C++17 build",
+      "dependencies": [
+        "date",
+        "gsl"
+      ]
+    },
+    "ui": {
+      "description": "ui support",
+      "dependencies": [
+        "qt6"
+      ]
+    }
+  }
+}

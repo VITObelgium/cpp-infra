@@ -2,21 +2,32 @@ include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
-include(GNUInstallDirs)
 
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    set(INFRA_IS_TOPLEVEL ON)
-endif()
+string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" INFRA_IS_TOPLEVEL)
 
 if(INFRA_IS_TOPLEVEL)
-    cmake_minimum_required(VERSION 3.15)
+    cmake_minimum_required(VERSION 3.21)
+
+    if(NOT CMAKE_CXX_STANDARD)
+        set(CMAKE_CXX_STANDARD 17)
+    endif()
+
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
     project(Infra
         VERSION 0.11.2
         LANGUAGES CXX
     )
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_EXTENSIONS OFF)
 
+    include(GNUInstallDirs)
+    set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+    set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
+    message(STATUS "Toplevel infra build C++${CMAKE_CXX_STANDARD}")
+    set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
+
+    # set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
     if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
         # avoid windows specific warnings
         add_definitions(
@@ -347,7 +358,7 @@ if(INFRA_COMPRESSION)
 
     if(INFRA_COMPRESSION_ZSTD)
         find_package(zstd CONFIG REQUIRED)
-        target_link_libraries(infra PUBLIC libzstd)
+        target_link_libraries(infra PUBLIC $<IF:$<TARGET_EXISTS:zstd::libzstd_shared>,zstd::libzstd_shared,zstd::libzstd_static>)
         target_compile_definitions(infra PUBLIC INFRA_COMPRESSION_ZSTD_SUPPORT ZSTD_STATIC_LINKING_ONLY)
     endif()
 endif()
