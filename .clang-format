@@ -1,7 +1,6 @@
 ---
 # BasedOnStyle:  LLVM
 AccessModifierOffset: -4
-ConstructorInitializerIndentWidth: 0
 AlignAfterOpenBracket: Align
 AlignEscapedNewlines: Left
 AlignOperands: true
@@ -64,10 +63,6 @@ IndentWidth: 4
 TabWidth: 4
 UseTab: Never
 IndentFunctionDeclarationAfterType: false
-SpacesInParentheses: false
-SpacesInAngles: false
-SpaceInEmptyParentheses: false
-SpacesInCStyleCastParentheses: false
 SpaceAfterControlStatementKeyword: true
 SpaceBeforeAssignmentOperators: true
 SortIncludes: true
