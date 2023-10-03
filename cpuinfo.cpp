@@ -12,7 +12,7 @@ static int check_4th_gen_intel_core_features()
 
 #else /* non-Intel compiler */
 
-#if defined (__arm__) || defined (__arm64__)
+#if defined (__arm__) || defined (__arm64__) || defined(__aarch64__)
 static int check_4th_gen_intel_core_features()
 {
     return 0;
