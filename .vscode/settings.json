@@ -11,5 +11,6 @@
     "editor.formatOnSave": true,
     "cmake.configureOnOpen": true,
     "git.ignoreLimitWarning": true,
-    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json"
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+    "rust-analyzer.hover.actions.debug.enable": false
 }

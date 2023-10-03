@@ -72,10 +72,11 @@
         "vcpkg-base",
         "triplet-arm64-osx"
       ],
-      "displayName": "macOS arm64",
+      "displayName": "Mac arm64",
       "description": "Vcpkg build for arm64 on macOS",
       "cacheVariables": {
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-arm64-osx"
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-arm64-osx",
+        "VCPKG_ALLOW_SYSTEM_LIBS": "ON"
       }
     },
     {
@@ -84,25 +85,54 @@
         "vcpkg-base",
         "triplet-x64-osx"
       ],
-      "displayName": "OSX x64",
+      "displayName": "Mac x64",
       "description": "Vcpkg build for x64 on mac"
     }
   ],
   "buildPresets": [
     {
-      "name": "Debug",
+      "name": "Debug Win",
+      "displayName": "Debug",
       "configurePreset": "msvc",
-      "configuration": "Debug"
+      "configuration": "Debug",
+      "inherits": [
+        "build-win-only"
+      ]
     },
     {
-      "name": "Release",
+      "name": "Release Win",
+      "displayName": "Release",
       "configurePreset": "msvc",
-      "configuration": "Release"
+      "configuration": "Release",
+      "inherits": [
+        "build-win-only"
+      ]
     },
     {
       "name": "ASAN",
       "configurePreset": "msvc-asan",
-      "configuration": "Debug"
+      "configuration": "Debug",
+      "inherits": [
+        "build-win-only"
+      ]
+    },
+    {
+      "name": "Debug arm OSX",
+      "displayName": "Debug",
+      "configurePreset": "arm64-osx",
+      "configuration": "Debug",
+      "inherits": [
+        "build-mac-only"
+      ]
+    },
+    {
+      "name": "Release arm OSX",
+      "displayName": "Release",
+      "configurePreset": "arm64-osx",
+      "configuration": "Release",
+      "inherits": [
+        "build-mac-only"
+      ]
     }
   ],
   "testPresets": [
