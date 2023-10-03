@@ -21,10 +21,10 @@ jobs:
           submodules: true
       - name: Install linux dependencies
         if: ${{ matrix.cfg.os == 'ubuntu-latest' }}
-        run: sudo apt-get install nasm openssl ninja-build
+        run: sudo apt-get install nasm openssl ninja-build autoconf-archive
       - name: Install osx dependencies
         if: ${{ matrix.cfg.os == 'macos-latest' }}
-        run: brew install nasm ninja
+        run: brew install nasm ninja autoconf-archive
       - name: Cache vcpkg binary
         id: cache-vcpkg-bin
         uses: actions/cache@v3
