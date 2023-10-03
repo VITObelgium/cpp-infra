@@ -19,15 +19,24 @@ if __name__ == "__main__":
             help="build with C++20 support",
         )
 
+        parser.add_argument(
+            "-p",
+            "--prompt",
+            dest="prompt",
+            action="store_true",
+            help="prompt for triplet selection",
+        )
+
         args = parser.parse_args()
 
         platform = sysconfig.get_platform()
         triplet = args.triplet
-        if platform == "win-amd64":
+        if platform == "win-amd64" and not args.prompt:
             triplet = "x64-windows-static-vs2022"
         elif platform == "mingw":
             triplet = "x64-mingw"
-        elif not triplet:
+
+        if not triplet:
             triplet = vcpkg.prompt_for_triplet()
 
         extras = []
@@ -60,6 +69,7 @@ if __name__ == "__main__":
                 triplet=triplet,
                 additional_ports=extras,
                 build_root=build_root,
+                install_root=f"vcpkgs-{triplet}",
                 packages_root=packages_root,
                 additional_features=features,
             )

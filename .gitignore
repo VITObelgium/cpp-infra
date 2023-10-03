@@ -3,3 +3,4 @@ compile_commands.json
 .DS_Store
 vcpkg_installed
 build
+vcpkgs-*
