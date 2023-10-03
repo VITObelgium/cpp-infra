@@ -3,43 +3,6 @@ include(CMakePackageConfigHelpers)
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 
-string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" INFRA_IS_TOPLEVEL)
-
-if(INFRA_IS_TOPLEVEL)
-    cmake_minimum_required(VERSION 3.21)
-
-    if(NOT CMAKE_CXX_STANDARD)
-        set(CMAKE_CXX_STANDARD 17)
-    endif()
-
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
-
-    project(Infra
-        VERSION 0.11.2
-        LANGUAGES CXX
-    )
-
-    include(GNUInstallDirs)
-    set (LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-    set (EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
-
-    message(STATUS "Toplevel infra build C++${CMAKE_CXX_STANDARD}")
-    set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
-
-    # set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
-    if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
-        # avoid windows specific warnings
-        add_definitions(
-            -D_CRT_SECURE_NO_WARNINGS
-            -D_SCL_SECURE_NO_WARNINGS
-            -D_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING
-            -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-            -D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
-        )
-    endif()
-endif()
-
 option(INFRA_LOGGING "Enable logging functionality" OFF)
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
 cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
@@ -65,6 +28,47 @@ option(INFRA_INSTALL_DEVELOPMENT_FILES "Install the infra development files (hea
 cmake_dependent_option(INFRA_UI_COMPONENTS_XLSX_EXPORT "Enable exporing qt item models to excel" OFF "INFRA_UI_COMPONENTS" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_QML "Qml ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL" OFF)
 cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui components" OFF "INFRA_UI_COMPONENTS;INFRA_GDAL;INFRA_UI_COMPONENTS_QML" OFF)
+
+string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" INFRA_IS_TOPLEVEL)
+
+if(INFRA_IS_TOPLEVEL)
+    cmake_minimum_required(VERSION 3.21)
+
+    if(NOT CMAKE_CXX_STANDARD)
+        set(CMAKE_CXX_STANDARD 17)
+    endif()
+
+    if(INFRA_ENABLE_TESTS)
+        enable_testing()
+    endif()
+
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
+
+    project(Infra
+        VERSION 0.11.2
+        LANGUAGES CXX
+    )
+
+    include(GNUInstallDirs)
+    set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+    set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
+
+    message(STATUS "Toplevel infra build C++${CMAKE_CXX_STANDARD}")
+    set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
+
+    # set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
+    if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
+        # avoid windows specific warnings
+        add_definitions(
+            -D_CRT_SECURE_NO_WARNINGS
+            -D_SCL_SECURE_NO_WARNINGS
+            -D_SILENCE_CXX17_NEGATORS_DEPRECATION_WARNING
+            -D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+            -D_SILENCE_CXX17_OLD_ALLOCATOR_MEMBERS_DEPRECATION_WARNING
+        )
+    endif()
+endif()
 
 check_include_file_cxx(charconv HAVE_CHARCONV_HEADER)
 

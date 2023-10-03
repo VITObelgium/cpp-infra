@@ -28,7 +28,7 @@ jobs:
         run: sudo apt-get install nasm openssl ninja-build autoconf-archive
       - name: Install osx dependencies
         if: ${{ matrix.cfg.os == 'macos-latest' }}
-        run: brew install nasm ninja automake autoconf libtool autoconf-archive
+        run: brew install nasm ninja automake autoconf autoconf-archive
       - name: Cache vcpkg binary
         id: cache-vcpkg-bin
         uses: actions/cache@v3
