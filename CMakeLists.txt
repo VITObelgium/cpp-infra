@@ -199,6 +199,7 @@ add_library(infra
     tile.cpp
     typeinfo.cpp
     workerthread.cpp
+    chrono.natvis
 )
 
 if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))

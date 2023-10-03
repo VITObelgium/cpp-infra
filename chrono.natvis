@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+    <Type Name="std::chrono::time_point&lt;std::chrono::system_clock,std::chrono::duration&lt;__int64,std::ratio&lt;1,10000000&gt; &gt; &gt;">
+        <DisplayString>
+            year: {
+            1969 +
+            4 * (((_MyDur._MyRep / (24 * 60 * 60 * 10000000ull)) + 365) / (365 * 3 + 366)) +
+            (((_MyDur._MyRep / (24 * 60 * 60 * 10000000ull)) + 365) % (365 * 3 + 366) &lt;= (3 * 365) ? (((_MyDur._MyRep / (24 * 60 * 60 * 10000000ull)) + 365) % (365 * 3 + 366)) / 365 : 3)
+            } DoY: {
+            ((_MyDur._MyRep / (24 * 60 * 60 * 10000000ull)) + 365) % (365 * 3 + 366) &lt;= (3 * 365) ? (((_MyDur._MyRep / (24 * 60 * 60 * 10000000ull)) + 365) % (365 * 3 + 366)) % 365 : (((_MyDur._MyRep / (24 * 60 * 60 * 10000000ull)) + 365) % (365 * 3 + 366)) - 365 * 3
+            } {
+            (_MyDur._MyRep % (24 * 60 * 60 * 10000000ull))/(10 * 60 * 60 * 10000000ull)}{(_MyDur._MyRep % (4 * 60 * 60 * 10000000ull))/(60 * 60 * 10000000ull)}:{(_MyDur._MyRep % (60 * 60 * 10000000ull))/(10 * 60 * 10000000ull)}{(_MyDur._MyRep % (10 * 60 * 10000000ull)) / (60 * 10000000ull)}:{(_MyDur._MyRep % (60 * 10000000ull)) / (10 * 10000000ull)}{(_MyDur._MyRep % (10 * 10000000ull)) / 10000000ull}.{(_MyDur._MyRep % 10000000) / 1000000}{(_MyDur._MyRep % 1000000) / 100000}{(_MyDur._MyRep % 100000) / 10000}{(_MyDur._MyRep % 10000) / 1000}{(_MyDur._MyRep % 1000) / 100}{(_MyDur._MyRep % 100) / 10}{_MyDur._MyRep % 10
+            } hh:mm:ss
+        </DisplayString>
+        <Expand/>
+    </Type>
+    <Type Name="std::chrono::time_point&lt;std::chrono::system_clock,std::chrono::duration&lt;__int64,std::ratio&lt;1,1000&gt; &gt; &gt;">
+        <DisplayString>
+            year: {
+            1969 +
+            4 * (((_MyDur._MyRep / (24 * 60 * 60 * 1000ull)) + 365) / (365 * 3 + 366)) +
+            (((_MyDur._MyRep / (24 * 60 * 60 * 1000ull)) + 365) % (365 * 3 + 366) &lt;= (3 * 365) ? (((_MyDur._MyRep / (24 * 60 * 60 * 1000ull)) + 365) % (365 * 3 + 366)) / 365 : 3)
+            } DoY: {
+            ((_MyDur._MyRep / (24 * 60 * 60 * 1000ull)) + 365) % (365 * 3 + 366) &lt;= (3 * 365) ? (((_MyDur._MyRep / (24 * 60 * 60 * 1000ull)) + 365) % (365 * 3 + 366)) % 365 : (((_MyDur._MyRep / (24 * 60 * 60 * 1000ull)) + 365) % (365 * 3 + 366)) - 365 * 3
+            } {
+            (_MyDur._MyRep % (24 * 60 * 60 * 1000ull))/(10 * 60 * 60 * 1000ull)}{(_MyDur._MyRep % (4 * 60 * 60 * 1000ull))/(60 * 60 * 1000ull)}:{(_MyDur._MyRep % (60 * 60 * 1000ull))/(10 * 60 * 1000ull)}{(_MyDur._MyRep % (10 * 60 * 1000ull)) / (60 * 1000ull)}:{(_MyDur._MyRep % (60 * 1000ull)) / (10 * 1000ull)}{(_MyDur._MyRep % (10 * 1000ull)) / 1000ull}.{(_MyDur._MyRep % 1000) / 100}{(_MyDur._MyRep % 100) / 10
+            } hh:mm:ss
+        </DisplayString>
+        <Expand/>
+    </Type>
+</AutoVisualizer>
