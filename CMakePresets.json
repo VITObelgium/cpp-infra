@@ -1,0 +1,191 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 21,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "multi",
+      "generator": "Ninja Multi-Config",
+      "hidden": true
+    },
+    {
+      "name": "vcpkg-base",
+      "inherits": "multi",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build/vcpkg",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_APPLOCAL_DEPS": "OFF",
+        "VCPKG_MANIFEST_MODE": "OFF",
+        "INFRA_LOGGING": "ON",
+        "INFRA_GDAL": "ON",
+        "INFRA_XML": "ON",
+        "INFRA_TBB": "ON",
+        "INFRA_NUMERIC": "OFF",
+        "INFRA_CHARSET": "ON",
+        "INFRA_PROCESS": "ON",
+        "INFRA_DATABASE": "ON",
+        "INFRA_DATABASE_SQLITE": "ON",
+        "INFRA_DATABASE_POSTGRES": "ON",
+        "INFRA_HASHING": "ON",
+        "INFRA_COMPRESSION": "ON",
+        "INFRA_COMPRESSION_ZSTD": "ON",
+        "INFRA_ENABLE_TESTS": "ON",
+        "INFRA_CLI_PROGRESS": "ON"
+      }
+    },
+    {
+      "name": "osx-base",
+      "inherits": "vcpkg-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "11.3",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/triplets/toolchain-osx-appleclang.cmake",
+        "VCPKG_CXX_FLAGS": "-fvisibility=hidden -fvisibility-inlines-hidden",
+        "VCPKG_ALLOW_SYSTEM_LIBS": "ON",
+        "BUILD_FORTRAN": "OFF",
+        "BUILD_PYTHON_BINDINGS": "OFF"
+      }
+    },
+    {
+      "name": "windows-base",
+      "inherits": "vcpkg-base",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/scripts/toolchains/windows.cmake",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_C_FLAGS": "/arch:AVX2",
+        "VCPKG_CXX_FLAGS": "/arch:AVX2",
+        "VCPKG_Fortran_FLAGS": "/arch:AVX2"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "windows-msvc",
+      "inherits": "windows-base",
+      "displayName": "Windows x64 (MSVC)",
+      "binaryDir": "${sourceDir}/build/vcpkg-msvc",
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "host=x64",
+        "strategy": "external"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ]
+        }
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "cl.exe",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-vs2022",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed",
+        "VCPKG_CRT_LINKAGE": "static",
+        "VCPKG_PLATFORM_TOOLSET": "v143",
+        "VCPKG_SET_CHARSET_FLAG": "ON",
+        "VCPKG_LINKER_FLAGS": "/manifest:no"
+      }
+    },
+    {
+      "name": "x64-windows asan",
+      "inherits": "windows-msvc",
+      "binaryDir": "${sourceDir}/build/vcpkg-msvc-asan",
+      "displayName": "Windows x64 asan (MSVC)",
+      "description": "Vcpkg debug build for x64 on windows with address sanitizer (MSVC)",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-asan-vs2022",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-windows-static-asan-vs2022",
+        "VCPKG_C_FLAGS": "/fsanitize=address",
+        "VCPKG_CXX_FLAGS": "/fsanitize=address"
+      }
+    },
+    {
+      "name": "arm64-osx",
+      "inherits": "osx-base",
+      "binaryDir": "${sourceDir}/build/vcpkg-arm64-osx",
+      "displayName": "OSX arm64",
+      "description": "Vcpkg build for arm64 on mac",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "arm64-osx",
+        "CMAKE_OSX_ARCHITECTURES": "arm64",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-arm64-osx",
+        "GDX_ENABLE_SIMD": "OFF",
+        "GDX_AVX2": "OFF"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "arm64-osx debug",
+      "inherits": "arm64-osx",
+      "displayName": "macOS arm64 Debug",
+      "description": "Vcpkg debug build for arm64 on macOS",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug"
+      }
+    },
+    {
+      "name": "arm64-osx release",
+      "inherits": "arm64-osx",
+      "displayName": "macOS arm64 Release",
+      "description": "Vcpkg release build for arm64 on macOS",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "name": "x64-osx",
+      "inherits": "osx-base",
+      "displayName": "OSX x64",
+      "description": "Vcpkg build for x64 on mac",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-osx",
+        "CMAKE_OSX_ARCHITECTURES": "x86_64"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64 MSVC [Debug]",
+      "configurePreset": "windows-msvc",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64 MSVC [Release]",
+      "configurePreset": "windows-msvc",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "default",
+      "configurePreset": "x64-windows-intel release",
+      "output": {
+        "outputOnFailure": true
+      },
+      "execution": {
+        "noTestsAction": "error",
+        "stopOnFailure": true
+      }
+    }
+  ]
+}

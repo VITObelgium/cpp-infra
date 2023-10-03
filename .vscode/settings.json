@@ -1,22 +1,6 @@
 // Place your settings in this file to overwrite default and user settings.
 {
     "cmake.buildDirectory": "${workspaceFolder}/build/vscode",
-    "cmake.configureSettings": {
-        "BUILD_UI": "ON",
-        "STATIC_QT": "ON",
-        "VCPKG_ALLOW_SYSTEM_LIBS": "ON",
-        "INFRA_LOGGING": "ON",
-        "INFRA_GDAL": "ON",
-        "INFRA_EMBED_GDAL_DATA": "ON",
-        "INFRA_XML": "ON",
-        "INFRA_NUMERIC": "ON",
-        "INFRA_CHARSET": "ON",
-        "INFRA_PROCESS": "ON",
-        "INFRA_DATABASE": "ON",
-        "INFRA_DATABASE_SQLITE": "ON",
-        "INFRA_ENABLE_TESTS": "ON",
-        "INFRA_ENABLE_TEST_UTILS": "ON"
-    },
     "files.exclude": {
         "**/.git": true,
         "**/.DS_Store": true,
@@ -24,10 +8,8 @@
         "**/deps/vcpkg/buildtrees": true,
         "**/deps/vcpkg/packages": true
     },
-    "python.formatting.provider": "black",
     "editor.formatOnSave": true,
     "cmake.configureOnOpen": true,
     "git.ignoreLimitWarning": true,
-    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
-    "clangd.semanticHighlighting": false
+    "cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json"
 }

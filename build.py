@@ -64,7 +64,7 @@ if __name__ == "__main__":
             "-DINFRA_DATABASE=ON",
             "-DINFRA_DATABASE_SQLITE=ON",
             "-DINFRA_DATABASE_POSTGRES=ON",
-            "-DINFRA_DATABASE_HASHING=ON",
+            "-DINFRA_HASHING=ON",
             "-DINFRA_COMPRESSION=ON",
             "-DINFRA_COMPRESSION_ZSTD=ON",
             "-DINFRA_ENABLE_TESTS=ON",
