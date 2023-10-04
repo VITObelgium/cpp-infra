@@ -66,6 +66,7 @@ if __name__ == "__main__":
         else:
             vcpkg.bootstrap(
                 ports_dir=os.path.join(".", "deps"),
+                clean_after_build=args.clean_after_build,
                 triplet=triplet,
                 additional_ports=extras,
                 build_root=build_root,

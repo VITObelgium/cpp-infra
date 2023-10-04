@@ -15,11 +15,6 @@ jobs:
           - { os: macos-latest, triplet: x64-osx }
 
     steps:
-      - name: Maximize build space
-        uses: easimon/maximize-build-space@master
-        with:
-          remove-dotnet: true
-          remove-haskell: true
       - name: install python
         uses: actions/setup-python@v4
         with:
