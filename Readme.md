@@ -1,3 +1,5 @@
+[![Build](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build.yml/badge.svg?branch=master)](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build.yml)
+
 # C++ infrastructure library
 This library contains the things we use in almost every C++ software project.
 Think of:
