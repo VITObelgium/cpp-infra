@@ -113,6 +113,11 @@ std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock
     return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::gmtime(time));
 }
 
+inline std::string to_string(std::string_view format, chrono::local_time_point tp)
+{
+    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
+}
+
 #ifdef HAVE_CPP20_CHRONO
 std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* choice = nullptr);
 #else
