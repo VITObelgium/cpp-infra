@@ -13,6 +13,8 @@
 #include "infra/log.h"
 #endif
 
+#include "infra/exception.h"
+
 namespace inf::chrono {
 
 #ifdef HAVE_CPP20_CHRONO
@@ -115,7 +117,11 @@ std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock
 
 inline std::string to_string(std::string_view format, chrono::local_time_point tp)
 {
+#ifdef HAVE_CPP20_CHRONO
     return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
+#else
+    throw inf::RuntimeError("local_time_point to_string requires C++20 support");
+#endif
 }
 
 #ifdef HAVE_CPP20_CHRONO
