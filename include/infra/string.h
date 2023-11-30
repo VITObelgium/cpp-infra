@@ -469,9 +469,9 @@ template <typename Container, typename ToStringCb, typename CharT, typename Trai
 std::basic_string<CharT, Traits> join(const Container& items, std::basic_string_view<CharT, Traits> joinString, ToStringCb&& cb)
 {
     std::ostringstream ss;
-    for (auto iter = begin(items); iter != end(items); ++iter) {
+    for (auto iter = std::begin(items); iter != std::end(items); ++iter) {
         ss << cb(*iter);
-        if (std::next(iter) != end(items)) {
+        if (std::next(iter) != std::end(items)) {
             ss << joinString;
         }
     }

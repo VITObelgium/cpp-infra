@@ -103,9 +103,9 @@ bool container_eq(const Container1& c1, const Container2& c2)
 template <typename Container1, typename Container2>
 bool container_near(const Container1& c1, const Container2& c2, double epsilon)
 {
-    REQUIRE_MESSAGE(size(c1) == size(c2), fmt::format("Container sizes do not match: {} vs {}", size(c1), size(c2)));
+    REQUIRE_MESSAGE(std::size(c1) == std::size(c2), fmt::format("Container sizes do not match: {} vs {}", std::size(c1), std::size(c2)));
 
-    return std::equal(begin(c1), end(c1), begin(c2), [epsilon](auto a, auto b) -> bool {
+    return std::equal(std::begin(c1), std::end(c1), std::begin(c2), [epsilon](auto a, auto b) -> bool {
         if constexpr (std::is_floating_point_v<decltype(a)>) {
             if (std::isnan(a)) { return std::isnan(b); }
             if (std::isnan(b)) { return false; }
@@ -118,7 +118,7 @@ bool container_near(const Container1& c1, const Container2& c2, double epsilon)
 template <typename TKey, typename TValue>
 bool container_eq(const std::unordered_map<TKey, TValue>& m1, const std::unordered_map<TKey, TValue>& m2)
 {
-    REQUIRE_MESSAGE(size(m1) == size(m2), fmt::format("Container sizes do not match: {} vs {}", size(m1), size(m2)));
+    REQUIRE_MESSAGE(std::size(m1) == std::size(m2), fmt::format("Container sizes do not match: {} vs {}", std::size(m1), std::size(m2)));
 
     for (auto& [key, value] : m1) {
         if (auto iter = m2.find(key); iter != m2.end()) {
