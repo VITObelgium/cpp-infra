@@ -7,21 +7,24 @@
 
 namespace inf::chrono {
 
-#ifdef HAVE_CPP20_CHRONO
-namespace date = std::chrono;
-#else
-using namespace date;
-#endif
-
 date_point today()
 {
+#ifdef HAVE_CPP20_CHRONO
+    return std::chrono::year_month_day(std::chrono::sys_days(std::chrono::floor<std::chrono::days>(std::chrono::system_clock::now())));
+#else
     return date::year_month_day(date::sys_days(std::chrono::floor<date::days>(std::chrono::system_clock::now())));
+#endif
 }
 
 local_date_point today_local()
 {
+#ifdef HAVE_CPP20_CHRONO
+    const auto now = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now());
+    return std::chrono::floor<std::chrono::days>(now.get_local_time());
+#else
     const auto now = date::zoned_time(date::current_zone(), std::chrono::system_clock::now());
     return std::chrono::floor<date::days>(now.get_local_time());
+#endif
 }
 
 time_point now()
@@ -31,18 +34,31 @@ time_point now()
 
 local_time_point now_local()
 {
+#ifdef HAVE_CPP20_CHRONO
+    const auto now = std::chrono::zoned_time(std::chrono::current_zone(), std::chrono::system_clock::now());
+    return std::chrono::floor<std::chrono::milliseconds>(now.get_local_time());
+#else
     const auto now = date::zoned_time(date::current_zone(), std::chrono::system_clock::now());
     return std::chrono::floor<std::chrono::milliseconds>(now.get_local_time());
+#endif
 }
 
 date_point date_from_time_point(time_point tp)
 {
+#ifdef HAVE_CPP20_CHRONO
+    return std::chrono::floor<std::chrono::days>(tp);
+#else
     return std::chrono::floor<date::days>(tp);
+#endif
 }
 
 local_date_point date_from_time_point(local_time_point tp)
 {
+#ifdef HAVE_CPP20_CHRONO
+    return std::chrono::floor<std::chrono::days>(tp);
+#else
     return std::chrono::floor<date::days>(tp);
+#endif
 }
 
 #ifdef HAVE_CPP20_CHRONO
@@ -117,12 +133,22 @@ template <typename TimeType>
 std::optional<TimeType> time_point_from_string(std::string_view str1, const char* format)
 {
     TimeType tp;
+
+#ifdef HAVE_CPP20_CHRONO
+    std::istringstream ss;
+    ss.str(std::string(str1));
+    ss >> std::chrono::parse(format, tp);
+    if (ss.fail()) {
+        return {};
+    }
+#else
     std::istringstream ss;
     ss.str(std::string(str1));
     ss >> date::parse(format, tp);
     if (ss.fail()) {
         return {};
     }
+#endif
 
     return tp;
 }
@@ -137,7 +163,39 @@ std::optional<local_time_point> local_time_point_from_string(std::string_view st
     return time_point_from_string<local_time_point>(str1, format);
 }
 
-std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)
+#ifdef HAVE_CPP20_CHRONO
+std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* choice)
+{
+    auto ymd = chrono::to_year_month_day(dt);
+    auto tod = chrono::time_of_day(dt); // Yields time_of_day type
+
+    auto tp = std::chrono::local_days{ymd} + tod.hours() + tod.minutes() + tod.seconds();
+    auto z  = std::chrono::current_zone();
+
+    std::optional<time_point> utcTime;
+    auto i = z->get_info(tp);
+    switch (i.result) {
+    case std::chrono::local_info::unique: {
+        std::chrono::zoned_time<std::chrono::seconds> zt(z, tp); //"Europe/Brussels"
+        utcTime = std::optional<time_point>(zt.get_sys_time());
+        break;
+    }
+    case std::chrono::local_info::ambiguous: {
+        if (choice) {
+            std::chrono::zoned_time<std::chrono::seconds> zt(z, tp, *choice);
+            utcTime = std::optional<time_point>(zt.get_sys_time());
+        }
+        break;
+    }
+    case std::chrono::local_info::nonexistent:
+        break;
+    default:
+        break;
+    }
+
+    return utcTime;
+}
+#else
 {
     auto ymd = chrono::to_year_month_day(dt);
     auto tod = chrono::time_of_day(dt); // Yields time_of_day type
@@ -168,5 +226,6 @@ std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)
 
     return utcTime;
 }
+#endif
 
 }
