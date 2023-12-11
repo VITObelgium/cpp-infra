@@ -196,6 +196,7 @@ std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* c
     return utcTime;
 }
 #else
+std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)
 {
     auto ymd = chrono::to_year_month_day(dt);
     auto tod = chrono::time_of_day(dt); // Yields time_of_day type
