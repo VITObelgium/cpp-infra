@@ -1,5 +1,4 @@
 #include "infra/chrono.h"
-#include "infra/exception.h"
 
 #include <sstream>
 
@@ -134,7 +133,7 @@ std::optional<TimeType> time_point_from_string(std::string_view str1, const char
 {
     TimeType tp;
 
-#ifdef HAVE_CPP20_CHRONO
+#if defined(HAVE_CPP20_CHRONO) && !defined(NO_CHRONO_PARSE_SUPPORT)
     std::istringstream ss;
     ss.str(std::string(str1));
     ss >> std::chrono::parse(format, tp);

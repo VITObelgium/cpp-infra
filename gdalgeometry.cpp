@@ -408,7 +408,7 @@ std::optional<Field> Feature::opt_field(int index) const noexcept
 template <typename T>
 T Feature::field_as(int index) const
 {
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
     namespace date = std::chrono;
 #endif
 

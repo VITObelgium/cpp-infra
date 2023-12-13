@@ -84,6 +84,12 @@ namespace fs = std::experimental::filesystem;
 int main() { return 0; }
 " HAVE_EXP_FILESYSTEM_H)
 
+check_cxx_source_compiles("
+#include <string>
+#include <string_view>
+int main() { std::u8string str; std::u8string_view strv = str; return 0; }
+" HAVE_U8STRING)
+
 if(EMSCRIPTEN)
     # emscripten installs the headers but does not support the lib
     set(HAVE_EXP_FILESYSTEM_H OFF)
@@ -111,8 +117,13 @@ message(STATUS "C++ standard: C++${CMAKE_CXX_STANDARD}")
 
 check_cxx_source_compiles("
 #include <chrono>
+#include <sstream>
 using days = std::chrono::days;
-int main() { std::chrono::current_zone(); return 0; }
+using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
+int main() {
+    auto* z = std::chrono::current_zone();
+    time_point tp; std::istringstream ss; ss >> std::chrono::parse(\"\", tp); return 0;
+}
 " HAVE_CPP20_CHRONO)
 
 if(NOT HAVE_CPP20_CHRONO)
@@ -249,15 +260,22 @@ target_compile_definitions(infra
     PUBLIC
     FMT_STRING_ALIAS=1
     $<$<BOOL:${HAVE_CPP20_CHRONO}>:HAVE_CPP20_CHRONO>
+    $<$<BOOL:${HAVE_U8STRING}>:HAVE_CPP20_U8STRING>
     PRIVATE
     $<$<BOOL:${HAVE_CHARCONV_HEADER}>:HAVE_CHARCONV>
 )
 
-target_link_libraries(infra PUBLIC fmt::fmt $<TARGET_NAME_IF_EXISTS:date::date> $<TARGET_NAME_IF_EXISTS:date::date-tz> $<TARGET_NAME_IF_EXISTS:Microsoft.GSL::GSL>)
+target_link_libraries(infra PUBLIC
+    fmt::fmt
+    $<TARGET_NAME_IF_EXISTS:date::date>
+    $<TARGET_NAME_IF_EXISTS:date::date-tz>
+    $<TARGET_NAME_IF_EXISTS:Microsoft.GSL::GSL>
+    $<$<AND:$<CXX_COMPILER_ID:IntelLLVM>,$<BOOL:${UNIX}>>:stdc++fs>
+)
 
 if(HAVE_BOOST_FILESYSTEM)
     target_link_libraries(infra PUBLIC Boost::filesystem)
-elseif(CMAKE_COMPILER_IS_GNUCXX)
+elseif(CMAKE_COMPILER_IS_GNUCXX OR())
     if(HAVE_FILESYSTEM_H OR HAVE_EXP_FILESYSTEM_H)
         # in gcc >= 9.0 the filesystem library is inside libstdc++
         if("${CMAKE_CXX_COMPILER_VERSION}" VERSION_LESS "9.0.0")

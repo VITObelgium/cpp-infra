@@ -1,19 +1,24 @@
 #pragma once
 
-#ifndef HAVE_CPP20_CHRONO
+#include <chrono>
+
+#ifdef __GLIBCXX__
+#if _GLIBCXX_RELEASE <= 13
+#define NO_CHRONO_PARSE_SUPPORT
+#endif
+#endif
+
+#if (!defined(HAVE_CPP20_CHRONO)) || defined(NO_CHRONO_PARSE_SUPPORT)
 #include <date/date.h>
 #include <date/tz.h>
 #endif
 
-#include <chrono>
 #include <fmt/chrono.h>
 #include <optional>
 
 #ifdef INFRA_LOG_ENABLED
 #include "infra/log.h"
 #endif
-
-#include "infra/exception.h"
 
 namespace inf::chrono {
 
@@ -120,7 +125,9 @@ inline std::string to_string(std::string_view format, chrono::local_time_point t
 #ifdef HAVE_CPP20_CHRONO
     return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
 #else
-    throw inf::RuntimeError("local_time_point to_string requires C++20 support");
+    std::ostringstream dateStr;
+    dateStr << date::format(std::string(format).c_str(), tp);
+    return dateStr.str();
 #endif
 }
 

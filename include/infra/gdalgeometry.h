@@ -16,7 +16,7 @@
 #include <ogrsf_frmts.h>
 
 #include <chrono>
-#if __cplusplus <= 201703L
+#ifndef HAVE_CPP20_CHRONO
 #include <date/date.h>
 #endif
 #include <cassert>
@@ -35,7 +35,7 @@ class OGRLinearRing;
 
 namespace inf::gdal {
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_CHRONO
 using days     = std::chrono::days;
 using sys_days = std::chrono::sys_days;
 #else
