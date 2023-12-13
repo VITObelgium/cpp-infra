@@ -293,7 +293,7 @@ bool iequals(std::string_view str1, std::string_view str2)
     return iequals<char>(str1, str2);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool iequals(std::u8string_view str1, std::u8string_view str2)
 {
     return iequals<char8_t>(str1, str2);
@@ -311,7 +311,7 @@ int icompare(std::string_view str1, std::string_view str2)
     return icompare<char>(str1, str2);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 int icompare(std::u8string_view str1, std::u8string_view str2)
 {
     return icompare<char8_t>(str1, str2);
@@ -335,7 +335,7 @@ void replace_in_place(std::string& aString, std::string_view toSearch, std::stri
     return replace_in_place<char>(aString, toSearch, toReplace);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void replace_in_place(std::u8string& aString, std::u8string_view toSearch, std::u8string_view toReplace)
 {
     return replace_in_place<char8_t>(aString, toSearch, toReplace);
@@ -360,7 +360,7 @@ void replace_in_place(std::string& aString, char toSearch, char toReplace)
     return replace_in_place<char>(aString, toSearch, toReplace);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplace)
 {
     return replace_in_place<char8_t>(aString, toSearch, toReplace);
@@ -380,7 +380,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>>
     return replace<char>(aString, toSearch, toReplace);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string replace(std::u8string_view aString, std::u8string_view toSearch, std::u8string_view toReplace)
 {
     return replace<char8_t>(aString, toSearch, toReplace);
@@ -402,7 +402,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>>
     return lowercase<char>(str);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string lowercase(std::u8string_view str)
 {
     return lowercase<char8_t>(str);
@@ -424,7 +424,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>>
     return uppercase<char>(str);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string uppercase(std::u8string_view str)
 {
     return uppercase<char8_t>(str);
@@ -468,7 +468,7 @@ bool starts_with(std::string_view aString, std::string_view search)
     return starts_with<char>(aString, search);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool starts_with(std::u8string_view aString, std::u8string_view search)
 {
     return starts_with<char8_t>(aString, search);
@@ -496,7 +496,7 @@ bool starts_with_ignore_case(std::string_view aString, std::string_view search)
     return starts_with_ignore_case<char>(aString, search);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool starts_with_ignore_case(std::u8string_view aString, std::u8string_view search)
 {
     return starts_with_ignore_case<char8_t>(aString, search);
@@ -540,7 +540,7 @@ bool ends_with_ignore_case(std::string_view aString, std::string_view search)
     return ends_with_ignore_case<char>(aString, search);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool ends_with_ignore_case(std::u8string_view aString, std::u8string_view search)
 {
     return ends_with_ignore_case<char8_t>(aString, search);
@@ -552,7 +552,7 @@ static const char* whitespaces(char)
     return " \t\r\n";
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 static const char8_t* whitespaces(char8_t)
 {
     return u8" \t\r\n";
@@ -585,7 +585,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>>
     return trimmed_view<char>(str);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string_view trimmed_view(std::u8string_view str)
 {
     return trimmed_view<char8_t>(str);
@@ -604,7 +604,7 @@ template <typename CharT, typename Traits = std::char_traits<CharT>>
     return trim<char>(str);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string trim(std::u8string_view str)
 {
     return trim<char8_t>(str);
@@ -628,7 +628,7 @@ void trim_in_place(std::string& str)
     trim_in_place<char>(str);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void trim_in_place(std::u8string& str)
 {
     trim_in_place<char8_t>(str);
@@ -709,7 +709,7 @@ std::vector<std::string_view> split_view(std::string_view str, char delimiter, F
     return split_view<char>(str, delimiter, opt);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string_view> split_view(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt)
 {
     return split_view<char8_t>(str, delimiter, opt);
@@ -807,7 +807,7 @@ std::vector<std::string_view> split_view(std::string_view str, std::string_view 
     return split_view<char>(str, delimiter, opt);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string_view> split_view(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt)
 {
     return split_view<char8_t>(str, delimiter, opt);
@@ -833,7 +833,7 @@ std::vector<std::string> split(std::string_view str, char delimiter, Flags<Split
     return split<char>(str, delimiter, opt);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string> split(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt)
 {
     return split<char8_t>(str, delimiter, opt);
@@ -858,7 +858,7 @@ std::vector<std::string> split(std::string_view str, std::string_view delimiter,
     return split<char>(str, delimiter, opt);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string> split(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt)
 {
     return split<char8_t>(str, delimiter, opt);
@@ -885,7 +885,7 @@ void ellipsize_in_place(std::string& str, int maxLength)
     return ellipsize_in_place<char>(str, maxLength);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void ellipsize_in_place(std::u8string& str, int maxLength)
 {
     return ellipsize_in_place<char8_t>(str, maxLength);
@@ -899,7 +899,7 @@ void ellipsize_in_place(std::u8string& str, int maxLength)
     return result;
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string ellipsize(std::u8string_view str, int maxLength)
 {
     std::u8string result(str);

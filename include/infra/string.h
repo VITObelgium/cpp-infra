@@ -199,7 +199,7 @@ T to_numeric_value(std::string_view str)
  * \return true if the strings are considered equal
  */
 bool iequals(std::string_view str1, std::string_view str2);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool iequals(std::u8string_view str1, std::u8string_view str2);
 #endif
 
@@ -212,7 +212,7 @@ bool iequals(std::u8string_view str1, std::u8string_view str2);
            > 0 str1 is greater than str2
  */
 int icompare(std::string_view str1, std::string_view str2);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 int icompare(std::u8string_view str1, std::u8string_view str2);
 #endif
 
@@ -225,7 +225,7 @@ int icompare(std::u8string_view str1, std::u8string_view str2);
 void replace_in_place(std::string& aString, std::string_view toSearch, std::string_view toReplace);
 void replace_in_place(std::string& aString, char toSearch, char toReplace);
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void replace_in_place(std::u8string& aString, std::u8string_view toSearch, std::u8string_view toReplace);
 void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplace);
 #endif
@@ -238,7 +238,7 @@ void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplac
  * \return resulting string with the replacements
  */
 [[nodiscard]] std::string replace(std::string_view aString, std::string_view toSearch, std::string_view toReplace);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string replace(std::u8string_view aString, std::u8string_view toSearch, std::u8string_view toReplace);
 #endif
 
@@ -248,7 +248,7 @@ void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplac
  * \return lowercased input string
  */
 [[nodiscard]] std::string lowercase(std::string_view str);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string lowercase(std::u8string_view str);
 #endif
 
@@ -258,7 +258,7 @@ void replace_in_place(std::u8string& aString, char8_t toSearch, char8_t toReplac
  * \return uppercased input string
  */
 [[nodiscard]] std::string uppercase(std::string_view str);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string uppercase(std::u8string_view str);
 #endif
 
@@ -281,7 +281,7 @@ void uppercase_in_place(std::string& str);
  * \return true is the input string starts with the search string
  */
 bool starts_with(std::string_view aString, std::string_view search);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool starts_with(std::u8string_view aString, std::u8string_view search);
 #endif
 
@@ -292,7 +292,7 @@ bool starts_with(std::u8string_view aString, std::u8string_view search);
  * \return true is the input string starts with the search string
  */
 bool starts_with_ignore_case(std::string_view aString, std::string_view search);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool starts_with_ignore_case(std::u8string_view aString, std::u8string_view search);
 #endif
 
@@ -303,7 +303,7 @@ bool starts_with_ignore_case(std::u8string_view aString, std::u8string_view sear
  * \return true is the input string ends with the search string
  */
 bool ends_with(std::string_view aString, std::string_view search);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool ends_with(std::u8string_view aString, std::u8string_view search);
 #endif
 
@@ -314,7 +314,7 @@ bool ends_with(std::u8string_view aString, std::u8string_view search);
  * \return true is the input string ends with the search string
  */
 bool ends_with_ignore_case(std::string_view aString, std::string_view search);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 bool ends_with_ignore_case(std::u8string_view aString, std::u8string_view search);
 #endif
 
@@ -325,7 +325,7 @@ bool ends_with_ignore_case(std::u8string_view aString, std::u8string_view search
  * \note it is important that the lifetime of the returned view is shorter than that of the input string
  */
 [[nodiscard]] std::string_view trimmed_view(std::string_view str);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string_view trimmed_view(std::u8string_view str);
 #endif
 
@@ -335,12 +335,12 @@ bool ends_with_ignore_case(std::u8string_view aString, std::u8string_view search
  * \return trimmed copy of the input string
  */
 [[nodiscard]] std::string trim(std::string_view str);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 [[nodiscard]] std::u8string trim(std::u8string_view str);
 #endif
 
 void trim_in_place(std::string& str);
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void trim_in_place(std::u8string& str);
 #endif
 
@@ -429,7 +429,7 @@ std::string join(const Container& items, std::string_view joinString)
     return join<Container, char>(items, joinString);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 template <typename Container>
 std::u8string join(const Container& items, std::u8string_view joinString)
 {
@@ -443,7 +443,7 @@ std::string join(const Container& items, char joinCharacter)
     return join(items, std::string_view(&joinCharacter, 1));
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 template <typename Container>
 std::u8string join(const Container& items, char8_t joinCharacter)
 {
@@ -485,7 +485,7 @@ std::string join(const Container& items, std::string_view joinString, ToStringCb
     return join<Container, ToStringCb, char>(items, joinString, std::forward<ToStringCb>(cb));
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 template <typename Container, typename ToStringCb>
 std::u8string join(const Container& items, std::u8string_view joinString, ToStringCb&& cb)
 {
@@ -494,12 +494,12 @@ std::u8string join(const Container& items, std::u8string_view joinString, ToStri
 #endif
 
 std::vector<std::string_view> split_view(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string_view> split_view(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 #endif
 
 std::vector<std::string_view> split_view(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string_view> split_view(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 #endif
 
@@ -510,13 +510,13 @@ std::vector<std::u8string_view> split_view(std::u8string_view str, std::u8string
  * \details When splitting on a single character, use this overload as it is slightly more efficient then using a string delimiter
  */
 std::vector<std::string> split(std::string_view str, char delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string> split(std::u8string_view str, char8_t delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 #endif
 
 /*! Splits the passed strings into substrings using the delimeter character */
 std::vector<std::string> split(std::string_view str, std::string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 std::vector<std::u8string> split(std::u8string_view str, std::u8string_view delimiter, Flags<SplitOpt> opt = Flags<SplitOpt>());
 #endif
 
@@ -540,7 +540,7 @@ std::vector<ResultType> split_to(std::string_view str, char delimiter, Conversio
     return split_to<ResultType, char>(str, delimiter, convFunc, opt);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> split_to(std::u8string_view str, char8_t delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
@@ -568,7 +568,7 @@ std::vector<ResultType> split_to(std::string_view str, std::string_view delimite
     return split_to<ResultType, char>(str, delimiter, convFunc, opt);
 }
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 template <typename ResultType, typename ConversionFunc>
 std::vector<ResultType> split_to(std::u8string_view str, std::u8string_view delimiter, ConversionFunc convFunc, Flags<SplitOpt> opt = Flags<SplitOpt>())
 {
@@ -576,7 +576,7 @@ std::vector<ResultType> split_to(std::u8string_view str, std::u8string_view deli
 }
 #endif
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 inline std::string from_u8(std::u8string_view str)
 {
     return std::string(str.begin(), str.end());
@@ -629,7 +629,7 @@ private:
 void ellipsize_in_place(std::string& str, int maxLength);
 [[nodiscard]] std::string ellipsize(std::string_view str, int maxLength);
 
-#if __cplusplus > 201703L
+#ifdef HAVE_CPP20_U8STRING
 void ellipsize_in_place(std::u8string& str, int maxLength);
 [[nodiscard]] std::u8string ellipsize(std::u8string_view str, int maxLength);
 #endif
