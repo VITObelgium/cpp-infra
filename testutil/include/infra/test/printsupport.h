@@ -1,10 +1,8 @@
 #pragma once
 
 #include "infra/cell.h"
-#include "infra/chrono.h"
 #include "infra/color.h"
 #include "infra/coordinate.h"
-#include "infra/point.h"
 
 #include <optional>
 #include <ostream>
