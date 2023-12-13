@@ -87,7 +87,11 @@ fs::path absolute_to_relative_path(const fs::path& absPath, const fs::path& root
 fs::path relative_to_absolute_path(const fs::path& relPath, const fs::path& base)
 {
 #ifdef HAVE_FILESYSTEM_H
-    return fs::absolute(base / relPath);
+    if (base.empty()) {
+        return fs::absolute(relPath);
+    } else {
+        return fs::absolute(base / relPath);
+    }
 #elif defined(HAVE_EXP_FILESYSTEM_H) || defined(HAVE_BOOST_FILESYSTEM)
     return fs::absolute(relPath, base);
 #endif
@@ -96,7 +100,9 @@ fs::path relative_to_absolute_path(const fs::path& relPath, const fs::path& base
 fs::path combine_path(const fs::path& base, const fs::path& file)
 {
 #ifdef HAVE_FILESYSTEM_H
-    if (base.is_absolute()) {
+    if (base.empty()) {
+        return fs::path(file).make_preferred();
+    } else if (base.is_absolute()) {
         return (base / file).make_preferred();
     } else {
         return (fs::absolute(base) / file).make_preferred();
