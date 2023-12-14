@@ -6,6 +6,7 @@
 
 namespace inf {
 
+#ifdef INFRA_GDAL_ENABLED
 static double pixel_size_at_zoom_level(uint32_t zoomLevel) noexcept
 {
     const auto tilesPerRow   = std::pow(2, zoomLevel);
@@ -32,6 +33,7 @@ static uint32_t zoom_level_for_pixel_size(double pixelSize, bool preferHigher) n
 
     return zoomLevel;
 }
+#endif
 
 GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent)
 {
