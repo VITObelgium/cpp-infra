@@ -126,9 +126,7 @@ struct GeoMetadata
     double width() const noexcept;
     double height() const noexcept;
 
-    [[deprecated("use geographic_epsg")]] std::optional<int32_t> projection_geo_epsg() const noexcept;
     std::optional<int32_t> geographic_epsg() const noexcept;
-    [[deprecated("use projected_epsg")]] std::optional<int32_t> projection_epsg() const noexcept;
     std::optional<int32_t> projected_epsg() const noexcept;
     std::string projection_frienly_name() const noexcept;
     void set_projection_from_epsg(int32_t epsg);

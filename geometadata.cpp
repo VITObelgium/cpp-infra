@@ -267,11 +267,6 @@ double GeoMetadata::height() const noexcept
     return rows * std::abs(cellSize.y);
 }
 
-std::optional<int32_t> GeoMetadata::projection_geo_epsg() const noexcept
-{
-    return geographic_epsg();
-}
-
 std::optional<int32_t> GeoMetadata::geographic_epsg() const noexcept
 {
     std::optional<int32_t> epsg;
@@ -283,11 +278,6 @@ std::optional<int32_t> GeoMetadata::geographic_epsg() const noexcept
 #endif
 
     return epsg;
-}
-
-std::optional<int32_t> GeoMetadata::projection_epsg() const noexcept
-{
-    return projected_epsg();
 }
 
 std::optional<int32_t> GeoMetadata::projected_epsg() const noexcept
