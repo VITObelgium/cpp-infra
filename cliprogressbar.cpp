@@ -25,11 +25,14 @@ using ProgressBarType = indicators::BlockProgressBar;
 struct ProgressBar::Pimpl
 {
     int width = 0;
+    std::string fill;
+    std::string lead;
+    std::string remainder;
     std::mutex mutex;
     std::unique_ptr<ProgressBarType> bar;
 };
 
-static std::unique_ptr<ProgressBarType> create_progress_bar(int width)
+static std::unique_ptr<ProgressBarType> create_progress_bar(int width, std::string_view fill, std::string_view lead, std::string_view remainder)
 {
     auto bar = std::make_unique<ProgressBarType>(
         option::BarWidth(width),
@@ -38,22 +41,37 @@ static std::unique_ptr<ProgressBarType> create_progress_bar(int width)
         option::FontStyles(std::vector<FontStyle>({FontStyle::bold})));
 
     if constexpr (std::is_same_v<ProgressBarType, indicators::ProgressBar>) {
-        bar->set_option(option::Fill("■"));
-        bar->set_option(option::Lead("■"));
-        bar->set_option(option::Remainder("-"));
+        bar->set_option(option::Fill(fill));
+        bar->set_option(option::Lead(lead));
+        bar->set_option(option::Remainder(remainder));
     }
 
     return bar;
 }
 
 ProgressBar::ProgressBar(int width)
+: ProgressBar(width, "■", "■", "-")
+{
+}
+
+ProgressBar::ProgressBar(int width, std::string_view fill, std::string_view lead, std::string_view remainder)
 : _pimpl(std::make_unique<Pimpl>())
 {
-    _pimpl->width = width;
-    _pimpl->bar   = create_progress_bar(width);
+    _pimpl->width     = width;
+    _pimpl->fill      = fill;
+    _pimpl->lead      = lead;
+    _pimpl->remainder = remainder;
+    _pimpl->bar       = create_progress_bar(width, fill, lead, remainder);
 }
 
 ProgressBar::~ProgressBar() noexcept = default;
+
+void ProgressBar::set_fill_lead_remainder(std::string_view fill, std::string_view lead, std::string_view remainder)
+{
+    _pimpl->bar->set_option(option::Fill(fill));
+    _pimpl->bar->set_option(option::Lead(lead));
+    _pimpl->bar->set_option(option::Remainder(remainder));
+}
 
 void ProgressBar::display(float progress) noexcept
 {
@@ -65,7 +83,7 @@ void ProgressBar::set_progress(float progress) noexcept
     std::scoped_lock lock(_pimpl->mutex);
 
     if (_pimpl->bar->is_completed() && progress < 1.0) {
-        _pimpl->bar = create_progress_bar(_pimpl->width);
+        _pimpl->bar = create_progress_bar(_pimpl->width, _pimpl->fill, _pimpl->lead, _pimpl->remainder);
     }
 
     if (!_pimpl->bar->is_completed()) {
