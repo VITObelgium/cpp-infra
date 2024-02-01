@@ -273,6 +273,17 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
     return std::make_pair(memDataSet.geometadata(), std::move(data));
 }
 
+void rasterize_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options)
+{
+    RasterizeOptionsWrapper gdalOptions(options);
+
+    int errorCode = CE_None;
+    GDALRasterize(path.generic_u8string().c_str(), nullptr, ds.get(), gdalOptions.get(), &errorCode);
+    if (errorCode != CE_None) {
+        throw RuntimeError("Failed to rasterize dataset {}", errorCode);
+    }
+}
+
 class VectorTranslateOptionsWrapper
 {
 public:

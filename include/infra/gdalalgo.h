@@ -91,6 +91,8 @@ VectorDataSet polygonize(std::span<const T> rasterData, const GeoMetadata& meta)
 template <typename T>
 std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options = {});
 
+void rasterize_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options = {});
+
 // convert a vector dataset
 VectorDataSet translate_vector(const VectorDataSet& ds, const std::vector<std::string>& options = {});
 VectorDataSet translate_vector_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options = {});
