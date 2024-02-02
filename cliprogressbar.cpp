@@ -40,11 +40,15 @@ static std::unique_ptr<ProgressBarType> create_progress_bar(int width, std::stri
         option::End("]"),
         option::FontStyles(std::vector<FontStyle>({FontStyle::bold})));
 
-    if constexpr (std::is_same_v<ProgressBarType, indicators::ProgressBar>) {
-        bar->set_option(option::Fill(fill));
-        bar->set_option(option::Lead(lead));
-        bar->set_option(option::Remainder(remainder));
-    }
+#ifdef WIN32
+    bar->set_option(option::Fill(fill));
+    bar->set_option(option::Lead(lead));
+    bar->set_option(option::Remainder(remainder));
+#else
+    (void)fill;
+    (void)lead;
+    (void)remainder;
+#endif
 
     return bar;
 }
@@ -65,13 +69,6 @@ ProgressBar::ProgressBar(int width, std::string_view fill, std::string_view lead
 }
 
 ProgressBar::~ProgressBar() noexcept = default;
-
-void ProgressBar::set_fill_lead_remainder(std::string_view fill, std::string_view lead, std::string_view remainder)
-{
-    _pimpl->bar->set_option(option::Fill(fill));
-    _pimpl->bar->set_option(option::Lead(lead));
-    _pimpl->bar->set_option(option::Remainder(remainder));
-}
 
 void ProgressBar::display(float progress) noexcept
 {

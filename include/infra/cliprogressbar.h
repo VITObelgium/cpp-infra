@@ -14,8 +14,6 @@ public:
     ProgressBar(int width, std::string_view fill, std::string_view lead, std::string_view remainder);
     ~ProgressBar() noexcept;
 
-    void set_fill_lead_remainder(std::string_view fill, std::string_view lead, std::string_view remainder);
-
     void display(float progress) noexcept;
     /*! Progress value in the range [0.0-1.0] */
     void set_progress(float progress) noexcept;
