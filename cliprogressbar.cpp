@@ -121,8 +121,6 @@ void ProgressBar::done() noexcept
     if (_pimpl->bar->current() < 100) {
         _pimpl->bar->set_progress(100);
     }
-
-    _pimpl->bar->mark_as_completed();
 }
 
 }
