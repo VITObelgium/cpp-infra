@@ -16,7 +16,7 @@ jobs:
 
     steps:
       - name: install python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
           python-version: "3.x"
       - name: Clone repository
@@ -31,7 +31,7 @@ jobs:
         run: brew install nasm ninja automake autoconf autoconf-archive
       - name: Cache vcpkg binary
         id: cache-vcpkg-bin
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             deps/vcpkg/vcpkg
@@ -39,7 +39,7 @@ jobs:
           key: ${{ runner.os }}-${{ hashFiles('deps/vcpkg/bootstrap.cmake') }}
       - name: Cache vcpkg packages
         id: cache-vcpkg
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |
             ~/.cache/vcpkg
