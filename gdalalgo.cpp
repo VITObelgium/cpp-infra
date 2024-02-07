@@ -273,15 +273,17 @@ std::pair<GeoMetadata, std::vector<T>> rasterize(const VectorDataSet& ds, const 
     return std::make_pair(memDataSet.geometadata(), std::move(data));
 }
 
-void rasterize_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options)
+RasterDataSet rasterize_to_disk(const VectorDataSet& ds, const fs::path& path, const std::vector<std::string>& options)
 {
     RasterizeOptionsWrapper gdalOptions(options);
 
     int errorCode = CE_None;
-    GDALRasterize(path.generic_u8string().c_str(), nullptr, ds.get(), gdalOptions.get(), &errorCode);
+    RasterDataSet rasterDs(GDALRasterize(path.generic_u8string().c_str(), nullptr, ds.get(), gdalOptions.get(), &errorCode));
     if (errorCode != CE_None) {
         throw RuntimeError("Failed to rasterize dataset {}", errorCode);
     }
+
+    return rasterDs;
 }
 
 class VectorTranslateOptionsWrapper
@@ -516,6 +518,7 @@ gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const fs::path& out
 template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<double>> rasterize<double>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<int16_t>> rasterize<int16_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
 template std::pair<GeoMetadata, std::vector<float>> translate<float>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
