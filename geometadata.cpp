@@ -259,12 +259,12 @@ std::string GeoMetadata::to_string() const
 
 double GeoMetadata::width() const noexcept
 {
-    return cols * cellSize.x;
+    return cellSize.is_valid() ? cols * cellSize.x : 0.0;
 }
 
 double GeoMetadata::height() const noexcept
 {
-    return rows * std::abs(cellSize.y);
+    return cellSize.is_valid() ? rows * std::abs(cellSize.y) : 0.0;
 }
 
 std::optional<int32_t> GeoMetadata::geographic_epsg() const noexcept
