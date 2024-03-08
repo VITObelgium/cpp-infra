@@ -209,3 +209,20 @@ private:
 #endif
 
 }
+
+#ifndef HAVE_CPP_CHRONO
+
+#include <functional>
+
+namespace std {
+template <>
+struct hash<date::year>
+{
+    size_t operator()(const date::year& x) const
+    {
+        return static_cast<int32_t>(x);
+    }
+};
+}
+
+#endif
