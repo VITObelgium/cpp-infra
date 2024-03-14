@@ -17,7 +17,7 @@ public:
     }
 
     // Return the convex hull of two points; the smallest bounds that contains both.
-    static /*constexpr -> MSVC_BUG*/ LatLonBounds hull(const Coordinate& a, const Coordinate& b)
+    static constexpr LatLonBounds hull(const Coordinate& a, const Coordinate& b)
     {
         LatLonBounds bounds(a, a);
         bounds.extend(b);
