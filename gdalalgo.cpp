@@ -278,7 +278,7 @@ RasterDataSet rasterize_to_disk(const VectorDataSet& ds, const fs::path& path, c
     RasterizeOptionsWrapper gdalOptions(options);
 
     int errorCode = CE_None;
-    RasterDataSet rasterDs(GDALRasterize(path.generic_u8string().c_str(), nullptr, ds.get(), gdalOptions.get(), &errorCode));
+    RasterDataSet rasterDs(GDALRasterize(file::generic_u8string(path).c_str(), nullptr, ds.get(), gdalOptions.get(), &errorCode));
     if (errorCode != CE_None) {
         throw RuntimeError("Failed to rasterize dataset {}", errorCode);
     }

@@ -210,7 +210,7 @@ private:
 
 }
 
-#ifndef HAVE_CPP_CHRONO
+#ifndef HAVE_CPP20_CHRONO
 
 #include <functional>
 
