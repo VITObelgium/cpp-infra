@@ -24,18 +24,22 @@ namespace inf::chrono {
 
 #ifdef HAVE_CPP20_CHRONO
 using days       = std::chrono::days;
+using month      = std::chrono::month;
 using year       = std::chrono::year;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
+using local_seconds    = std::chrono::local_seconds;
 using local_date_point = std::chrono::local_days;
 using local_time_point = std::chrono::local_time<std::chrono::milliseconds>;
 #else
 using days       = date::days;
+using month      = date::month;
 using year       = date::year;
 using date_point = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
 
+using local_seconds    = date::local_seconds;
 using local_date_point = date::local_days;
 using local_time_point = date::local_time<std::chrono::milliseconds>;
 #endif
