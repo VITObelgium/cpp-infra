@@ -54,6 +54,7 @@ local_date_point date_from_time_point(local_time_point tp);
 
 #ifdef HAVE_CPP20_CHRONO
 std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
+std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(local_time_point tp);
 std::chrono::year_month_day to_year_month_day(time_point tp);
 std::chrono::year_month_day to_year_month_day(local_time_point tp);
 

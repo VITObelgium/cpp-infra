@@ -67,6 +67,12 @@ std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp)
     return std::chrono::hh_mm_ss(tp - dp); // Yields time_of_day type
 }
 
+std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(local_time_point tp)
+{
+    auto dp = std::chrono::floor<std::chrono::days>(tp);
+    return std::chrono::hh_mm_ss(tp - dp); // Yields time_of_day type
+}
+
 std::chrono::year_month_day to_year_month_day(time_point tp)
 {
     return std::chrono::year_month_day(std::chrono::sys_days(std::chrono::floor<std::chrono::days>(tp)));
