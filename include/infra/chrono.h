@@ -35,6 +35,20 @@ using local_seconds    = std::chrono::local_seconds;
 using local_date_point = std::chrono::local_days;
 using local_time_point = std::chrono::local_time<std::chrono::milliseconds>;
 using choose           = std::chrono::choose;
+
+constexpr auto January   = std::chrono::January;
+constexpr auto February  = std::chrono::February;
+constexpr auto March     = std::chrono::March;
+constexpr auto April     = std::chrono::April;
+constexpr auto May       = std::chrono::May;
+constexpr auto June      = std::chrono::June;
+constexpr auto July      = std::chrono::July;
+constexpr auto August    = std::chrono::August;
+constexpr auto September = std::chrono::September;
+constexpr auto October   = std::chrono::October;
+constexpr auto November  = std::chrono::November;
+constexpr auto December  = std::chrono::December;
+
 #else
 using days           = date::days;
 using month          = date::month;
@@ -48,6 +62,19 @@ using local_seconds    = date::local_seconds;
 using local_date_point = date::local_days;
 using local_time_point = date::local_time<std::chrono::milliseconds>;
 using choose           = date::choose;
+
+constexpr auto January   = date::January;
+constexpr auto February  = date::February;
+constexpr auto March     = date::March;
+constexpr auto April     = date::April;
+constexpr auto May       = date::May;
+constexpr auto June      = date::June;
+constexpr auto July      = date::July;
+constexpr auto August    = date::August;
+constexpr auto September = date::September;
+constexpr auto October   = date::October;
+constexpr auto November  = date::November;
+constexpr auto December  = date::December;
 #endif
 
 date_point today();
