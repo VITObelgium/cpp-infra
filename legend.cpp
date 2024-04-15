@@ -120,7 +120,7 @@ Color Legend::color_for_value(double value, const Color& unmappable, const Color
 
     if (type == Type::Contiguous) {
         assert(entries.size() == 1);
-        if (value >= entries.front().lowerBound && value <= entries.front().upperBound) {
+        if (value >= (entries.front().lowerBound - 1e-4) && value <= (entries.front().upperBound + 1e-4)) {
             return cmap.get_color(linear_map_to_float(value, entries.front().lowerBound, entries.front().upperBound));
         }
     } else {
