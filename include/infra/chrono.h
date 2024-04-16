@@ -249,15 +249,14 @@ private:
 
 }
 
-#ifndef HAVE_CPP20_CHRONO
-
+#if __cplusplus < 202600L
 #include <functional>
 
 namespace std {
 template <>
-struct hash<date::year>
+struct hash<inf::chrono::year>
 {
-    size_t operator()(const date::year& x) const
+    size_t operator()(const inf::chrono::year& x) const
     {
         return static_cast<int32_t>(x);
     }
