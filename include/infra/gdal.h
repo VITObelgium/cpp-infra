@@ -297,6 +297,7 @@ public:
 
     Layer layer(int index);
     Layer layer(const std::string& name);
+    bool layer_exists(const std::string& name) const noexcept;
 
     Layer create_layer(const std::string& name, const std::vector<std::string>& driverOptions = {});
     Layer create_layer(const std::string& name, Geometry::Type type, const std::vector<std::string>& driverOptions = {});

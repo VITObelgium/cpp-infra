@@ -958,6 +958,12 @@ Layer VectorDataSet::layer(const std::string& name)
     return Layer(check_pointer(_ptr->GetLayerByName(name.c_str()), "Invalid layer name"));
 }
 
+bool VectorDataSet::layer_exists(const std::string& name) const noexcept
+{
+    assert(_ptr);
+    return _ptr->GetLayerByName(name.c_str()) != nullptr;
+}
+
 Layer VectorDataSet::create_layer(const std::string& name, const std::vector<std::string>& driverOptions)
 {
     return create_layer(name, Geometry::Type::Unknown, driverOptions);
