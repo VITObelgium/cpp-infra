@@ -12,7 +12,7 @@ jobs:
         cfg:
           - { os: ubuntu-latest, triplet: x64-linux }
           - { os: windows-2022, triplet: x64-windows-static-vs2022 }
-          - { os: macos-latest, triplet: x64-osx }
+          - { os: macos-13, triplet: x64-osx }
 
     steps:
       - name: install python
