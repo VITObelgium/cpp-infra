@@ -186,9 +186,9 @@ std::vector<TVal> container_as_vector(const TContainer& cont)
 }
 
 template <typename TContainer, typename TVal = typename TContainer::value_type>
-std::set<TVal> container_as_set(const TContainer& cont)
+std::set<TVal, std::less<>> container_as_set(const TContainer& cont)
 {
-    return std::set<TVal>(cont.begin(), cont.end());
+    return std::set<TVal, std::less<>>(cont.begin(), cont.end());
 }
 
 template <typename TContainer, typename TVal = typename TContainer::value_type>
