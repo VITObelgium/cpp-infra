@@ -52,7 +52,7 @@ jobs:
         run: python build.py --triplet ${{ matrix.cfg.triplet }} --run-tests
       - name: Archive build logs
         if: ${{ failure() && steps.bootstrap.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: build-logs
           path: |
