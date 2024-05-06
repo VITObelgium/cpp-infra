@@ -139,6 +139,17 @@ auto find_in_map_required(MapType&& m, const typename std::decay_t<MapType>::key
     return iter->second;
 }
 
+template <typename MapType, typename NotFoundMessageCallback>
+auto find_in_map_required(MapType&& m, const typename std::decay_t<MapType>::key_type& key, NotFoundMessageCallback&& cb)
+{
+    auto iter = m.find(key);
+    if (iter == m.end()) {
+        throw RuntimeError(cb(key));
+    }
+
+    return iter->second;
+}
+
 /* Search for an entry in the map that matches the predicate
  * The entry is returned as a pointer (nullptr when not found)
  * This funtion never throws
