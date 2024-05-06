@@ -364,6 +364,11 @@ int Feature::field_index(const std::string& name) const
     return field_index(name.c_str());
 }
 
+std::string_view Feature::field_name(int index) const
+{
+    return field_definition(index).name();
+}
+
 bool Feature::field_is_valid(int index) const noexcept
 {
     return _feature->IsFieldSetAndNotNull(index);

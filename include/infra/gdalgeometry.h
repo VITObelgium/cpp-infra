@@ -23,8 +23,8 @@
 #include <optional>
 #include <type_traits>
 #include <unordered_map>
-#include <variant>
 #include <utility>
+#include <variant>
 
 class OGRSimpleCurve;
 class OGRFieldDefn;
@@ -880,6 +880,7 @@ public:
     int field_count() const;
     int field_index(const char* name) const;
     int field_index(const std::string& name) const;
+    std::string_view field_name(int index) const;
     bool field_is_valid(int index) const noexcept;
 
     FieldDefinitionRef field_definition(int index) const;
