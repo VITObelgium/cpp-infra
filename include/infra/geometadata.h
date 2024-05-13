@@ -60,6 +60,23 @@ struct GeoMetadata
         double y = std::numeric_limits<double>::quiet_NaN();
     };
 
+    static GeoMetadata from_extent(Point<double> topLeft, Point<double> bottomRight, double cellSize)
+    {
+        GeoMetadata meta;
+        meta.xll        = topLeft.x;
+        meta.yll        = bottomRight.y;
+        meta.cellSize.x = cellSize;
+        meta.cellSize.y = cellSize;
+        meta.cols       = static_cast<int32_t>((bottomRight.x - topLeft.x) / cellSize);
+        meta.rows       = static_cast<int32_t>((topLeft.y - bottomRight.y) / cellSize);
+        return meta;
+    }
+
+    static GeoMetadata from_extent(double west, double south, double east, double north, double cellSize)
+    {
+        return GeoMetadata::from_extent(Point(west, north), Point(east, south), cellSize);
+    }
+
     GeoMetadata() = default;
     GeoMetadata(int32_t rows, int32_t cols);
     GeoMetadata(int32_t rows, int32_t cols, std::optional<double> nodatavalue);
