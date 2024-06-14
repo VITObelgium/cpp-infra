@@ -63,12 +63,11 @@ struct GeoMetadata
     static GeoMetadata from_extent(Point<double> topLeft, Point<double> bottomRight, double cellSize)
     {
         GeoMetadata meta;
-        meta.xll        = topLeft.x;
-        meta.yll        = bottomRight.y;
-        meta.cellSize.x = cellSize;
-        meta.cellSize.y = cellSize;
-        meta.cols       = static_cast<int32_t>((bottomRight.x - topLeft.x) / cellSize);
-        meta.rows       = static_cast<int32_t>((topLeft.y - bottomRight.y) / cellSize);
+        meta.xll  = topLeft.x;
+        meta.yll  = bottomRight.y;
+        meta.cols = static_cast<int32_t>((bottomRight.x - topLeft.x) / cellSize);
+        meta.rows = static_cast<int32_t>((topLeft.y - bottomRight.y) / cellSize);
+        meta.set_cell_size(cellSize);
         return meta;
     }
 

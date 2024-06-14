@@ -111,7 +111,7 @@ private:
     GDALWarpAppOptions* _opts = nullptr;
 };
 
-void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions)
+void warp_cli(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions)
 {
     GdalWarpAppOptionsWrapper warpOptions(options);
     for (auto& [key, value] : keyValueOptions) {
@@ -121,6 +121,21 @@ void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std:
     int usageError = 0;
     auto srcHandle = GDALDataset::ToHandle(srcDataSet.get());
     GDALWarp(nullptr, GDALDataset::ToHandle(dstDataSet.get()), 1, &srcHandle, warpOptions, &usageError);
+    if (usageError) {
+        throw RuntimeError("Warp failed");
+    }
+}
+
+void warp_cli(const RasterDataSet& srcDataSet, const fs::path& output, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions)
+{
+    GdalWarpAppOptionsWrapper warpOptions(options);
+    for (auto& [key, value] : keyValueOptions) {
+        warpOptions.set_option(key.c_str(), value.c_str());
+    }
+
+    int usageError = 0;
+    auto srcHandle = GDALDataset::ToHandle(srcDataSet.get());
+    GDALWarp(file::generic_u8string(output).c_str(), nullptr, 1, &srcHandle, warpOptions, &usageError);
     if (usageError) {
         throw RuntimeError("Warp failed");
     }
@@ -519,6 +534,7 @@ template std::pair<GeoMetadata, std::vector<float>> rasterize<float>(const Vecto
 template std::pair<GeoMetadata, std::vector<double>> rasterize<double>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int32_t>> rasterize<int32_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<int16_t>> rasterize<int16_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
+template std::pair<GeoMetadata, std::vector<uint16_t>> rasterize<uint16_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 template std::pair<GeoMetadata, std::vector<uint8_t>> rasterize<uint8_t>(const VectorDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);
 
 template std::pair<GeoMetadata, std::vector<float>> translate<float>(const RasterDataSet& ds, const GeoMetadata& meta, const std::vector<std::string>& options);

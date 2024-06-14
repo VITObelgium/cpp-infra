@@ -39,7 +39,8 @@ void warp_to_disk(const RasterDataSet& srcDataSet, const GeoMetadata& destMeta, 
 }
 
 // This version uses the same options as the command line tool
-void warp(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions);
+void warp_cli(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions);
+void warp_cli(const RasterDataSet& srcDataSet, const fs::path& output, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions);
 
 VectorDataSet warp_vector(const fs::path& vectorPath, const GeoMetadata& destMeta, const std::vector<std::string>& options = {});
 VectorDataSet warp_vector(const fs::path& vectorPath, const std::string& projection, const std::vector<std::string>& options = {});
