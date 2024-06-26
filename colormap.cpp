@@ -8,8 +8,10 @@
 #include "infra/exception.h"
 #include "infra/string.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cmath>
+
 
 #include <unordered_map>
 

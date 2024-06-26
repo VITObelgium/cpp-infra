@@ -2,8 +2,10 @@
 #include "infra/cast.h"
 #include "infra/exception.h"
 
+#include <algorithm>
 #include <cassert>
 #include <cctype>
+
 
 namespace inf::str {
 
