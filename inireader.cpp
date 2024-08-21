@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string>
 
 namespace inf {
 
@@ -114,7 +115,7 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
     char* line;
 #endif
     char section[MAX_SECTION] = "";
-    char prev_name[MAX_NAME]  = "";
+    std::string prev_name;
 
     char* start;
     char* end;
@@ -153,7 +154,7 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
             if (*end == ']') {
                 *end = '\0';
                 strncpy0(section, start + 1, sizeof(section) - 1);
-                *prev_name = '\0';
+                prev_name.clear();
             } else if (!error) {
                 /* No ']' found on section line */
                 error = lineno;
@@ -173,7 +174,7 @@ inline int ini_parse_stream(ini_reader reader, void* stream, ini_handler handler
                 rstrip(value);
 
                 /* Valid name[=:]value pair found, call handler */
-                strncpy0(prev_name, name, sizeof(prev_name) - 1);
+                prev_name = name;
                 if (!handler(user, section, name, value) && !error)
                     error = lineno;
             } else if (!error) {
