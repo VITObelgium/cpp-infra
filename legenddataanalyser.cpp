@@ -223,6 +223,12 @@ static void assign_linear_class_bounds_no_outliers(int numClasses, double minVal
     size_t startIndex = truncate<size_t>(sampleData.size() * lowPercentile);
     size_t endIndex   = truncate<size_t>(sampleData.size() * highPercentile);
 
+    if (sampleData[startIndex] == sampleData[endIndex]) {
+        bounds.resize(2);
+        bounds[1] = maxValue;
+        return;
+    }
+
     minValue = sampleData[startIndex];
     maxValue = sampleData[endIndex];
 
