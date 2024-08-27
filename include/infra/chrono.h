@@ -30,6 +30,8 @@ using year_month_day = std::chrono::year_month_day;
 using sys_days       = std::chrono::sys_days;
 using date_point     = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point     = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
+using zoned_time     = std::chrono::zoned_time<std::chrono::milliseconds>;
+using utc_clock      = std::chrono::utc_clock;
 
 using local_seconds    = std::chrono::local_seconds;
 using local_date_point = std::chrono::local_days;
@@ -57,6 +59,8 @@ using year_month_day = date::year_month_day;
 using sys_days       = date::sys_days;
 using date_point     = std::chrono::time_point<std::chrono::system_clock, days>;
 using time_point     = std::chrono::time_point<std::chrono::system_clock, std::chrono::milliseconds>;
+using zoned_time     = date::zoned_time<std::chrono::milliseconds>;
+using utc_clock      = date::utc_clock;
 
 using local_seconds    = date::local_seconds;
 using local_date_point = date::local_days;
@@ -88,6 +92,7 @@ local_date_point date_from_time_point(local_time_point tp);
 #ifdef HAVE_CPP20_CHRONO
 std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(time_point tp);
 std::chrono::hh_mm_ss<std::chrono::milliseconds> time_of_day(local_time_point tp);
+
 std::chrono::year_month_day to_year_month_day(time_point tp);
 std::chrono::year_month_day to_year_month_day(local_time_point tp);
 
@@ -134,8 +139,13 @@ std::string to_string(local_time_point tp);
 template <typename Clock, typename Duration>
 std::string to_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
-    std::time_t time = Clock::to_time_t(tp);
-    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::localtime(time));
+    if constexpr (std::is_same_v<Clock, utc_clock>) {
+        std::time_t time = std::chrono::system_clock::to_time_t(utc_clock::to_sys(tp));
+        return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
+    } else {
+        std::time_t time = Clock::to_time_t(tp);
+        return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::localtime(time));
+    }
 }
 
 /*! Converts a string to a time point using the provided format specification
@@ -157,8 +167,11 @@ std::string to_utc_string(std::chrono::time_point<Clock, Duration> tp)
 template <typename Clock, typename Duration>
 std::string to_utc_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
-    std::time_t time = Clock::to_time_t(tp);
-    return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::gmtime(time));
+    if constexpr (std::is_same_v<Clock, utc_clock>) {
+        return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
+    } else {
+        return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::gmtime(tp));
+    }
 }
 
 inline std::string to_string(std::string_view format, chrono::local_time_point tp)
@@ -172,11 +185,8 @@ inline std::string to_string(std::string_view format, chrono::local_time_point t
 #endif
 }
 
-#ifdef HAVE_CPP20_CHRONO
-std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* choice = nullptr);
-#else
-std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice = nullptr);
-#endif
+std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<choose> choice);
+std::optional<time_point> localtime_to_utc(zoned_time tp);
 
 class DurationRecorder
 {

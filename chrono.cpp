@@ -175,30 +175,33 @@ std::optional<local_time_point> local_time_point_from_string(std::string_view st
 }
 
 #ifdef HAVE_CPP20_CHRONO
-std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* choice)
+std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<choose> choice)
 {
-    auto ymd = chrono::to_year_month_day(dt);
-    auto tod = chrono::time_of_day(dt); // Yields time_of_day type
+    if (choice.has_value()) {
+        return localtime_to_utc(zoned_time(std::chrono::current_zone(), dt, *choice));
+    } else {
+        return localtime_to_utc(zoned_time(std::chrono::current_zone(), dt));
+    }
+}
 
-    auto tp = std::chrono::local_days{ymd} + tod.hours() + tod.minutes() + tod.seconds();
-    auto z  = std::chrono::current_zone();
+std::optional<time_point> localtime_to_utc(zoned_time zt)
+{
+    auto localTimePoint = zt.get_local_time();
 
     std::optional<time_point> utcTime;
-    auto i = z->get_info(tp);
+    auto i = zt.get_time_zone()->get_info(localTimePoint);
     switch (i.result) {
     case std::chrono::local_info::unique: {
-        std::chrono::zoned_time<std::chrono::seconds> zt(z, tp); //"Europe/Brussels"
         utcTime = std::optional<time_point>(zt.get_sys_time());
         break;
     }
     case std::chrono::local_info::ambiguous: {
-        if (choice) {
-            std::chrono::zoned_time<std::chrono::seconds> zt(z, tp, *choice);
-            utcTime = std::optional<time_point>(zt.get_sys_time());
-        }
+        Log::warn("Ambiguous time point, taking the latest option");
+        utcTime = std::optional<time_point>(i.second.begin);
         break;
     }
     case std::chrono::local_info::nonexistent:
+        Log::error("Non existing timepoint");
         break;
     default:
         break;
@@ -207,7 +210,7 @@ std::optional<time_point> localtime_to_utc(time_point dt, std::chrono::choose* c
     return utcTime;
 }
 #else
-std::optional<time_point> localtime_to_utc(time_point dt, date::choose* choice)
+std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<choose> choice)
 {
     auto ymd = chrono::to_year_month_day(dt);
     auto tod = chrono::time_of_day(dt); // Yields time_of_day type
