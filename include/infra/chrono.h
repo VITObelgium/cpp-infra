@@ -140,11 +140,14 @@ template <typename Clock, typename Duration>
 std::string to_string(std::string_view format, std::chrono::time_point<Clock, Duration> tp)
 {
     if constexpr (std::is_same_v<Clock, utc_clock>) {
-        std::time_t time = std::chrono::system_clock::to_time_t(utc_clock::to_sys(tp));
         return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
     } else {
-        std::time_t time = Clock::to_time_t(tp);
-        return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::localtime(time));
+        if constexpr (std::is_same_v<Clock, utc_clock>) {
+            return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), tp);
+        } else {
+            std::time_t time = Clock::to_time_t(tp);
+            return fmt::format(fmt::runtime(fmt::format("{{:{}}}", format)), fmt::localtime(time));
+        }
     }
 }
 
