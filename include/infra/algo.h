@@ -3,6 +3,7 @@
 #include "infra/exception.h"
 
 #include <algorithm>
+#include <iterator>
 #include <optional>
 #include <set>
 #include <stdexcept>
