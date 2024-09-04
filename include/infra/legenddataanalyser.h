@@ -24,17 +24,18 @@ public:
     float effectiveness() const; // returns an estimate for the effectiveness of the class bounds
 
 private:
+    void cleanup_classbounds();
     double convert_value(LegendScaleType scaleType, const double& value, const double& minValue) const;
 
-    std::vector<float> _sampleData; // must be sorted small to large
-    std::vector<int> _freqNr;       // # of occurrences of the values
-    int _nClasses;
+    std::vector<float> _sampleData;   // must be sorted small to large
+    std::vector<int> _freqNr;         // # of occurrences of the values
     std::vector<double> _classBounds; // size: _nClasses + 1
+    int _nClasses = 0;
 
     // statistics
-    double _msw;        // mean of squared deviations within classes
-    double _msb;        // mean of squared deviations between classes
-    double _varByClass; // proportion of variance accounted for by classification
+    double _msw        = 0.0; // mean of squared deviations within classes
+    double _msb        = 0.0; // mean of squared deviations between classes
+    double _varByClass = 0.0; // proportion of variance accounted for by classification
 };
 
 std::vector<double> calculate_classbounds(LegendScaleType scaleType, int numClasses, double minValue, double maxValue);

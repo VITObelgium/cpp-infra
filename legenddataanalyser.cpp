@@ -24,6 +24,16 @@ void LegendDataAnalyser::set_number_of_classes(int n)
     _nClasses = std::max(0, n);
 }
 
+void LegendDataAnalyser::cleanup_classbounds()
+{
+    _classBounds.erase(std::unique(_classBounds.begin(), _classBounds.end()), _classBounds.end());
+    if (_classBounds.size() == 1) {
+        _classBounds.push_back(_classBounds[0]);
+    }
+
+    _nClasses = truncate<int>(_classBounds.size()) - 1;
+}
+
 void LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double minValue, double maxValue)
 {
     try {
@@ -32,7 +42,7 @@ void LegendDataAnalyser::calculate_classbounds(LegendScaleType scaleType, double
             maxValue = _sampleData[_sampleData.size() - 1];
         }
         _classBounds = inf::calculate_classbounds(scaleType, _nClasses, minValue, maxValue, _sampleData);
-        _nClasses    = truncate<int>(_classBounds.size() - 1);
+        cleanup_classbounds();
     } catch (const std::exception&) {
         _classBounds.clear();
     }
