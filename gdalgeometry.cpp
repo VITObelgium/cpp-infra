@@ -593,7 +593,7 @@ Layer::~Layer()
     }
 }
 
-Layer& Layer::operator=(Layer&& other)
+Layer& Layer::operator=(Layer&& other) noexcept
 {
     _layer       = other._layer;
     other._layer = nullptr;
@@ -622,21 +622,39 @@ std::optional<int32_t> Layer::epsg() const
     return std::optional<int32_t>();
 }
 
-void Layer::set_projection(SpatialReference& srs)
+void Layer::set_active_projection(SpatialReference& srs)
 {
     const int geomCount = _layer->GetLayerDefn()->GetGeomFieldCount();
     for (int i = 0; i < geomCount; ++i) {
-        _layer->GetLayerDefn()->GetGeomFieldDefn(i)->SetSpatialRef(srs.get());
+        check_error(_layer->SetActiveSRS(i, srs.get()), "Failed to set the active projection");
+    }
+}
+
+void Layer::set_active_projection_from_epsg(int32_t epsg)
+{
+    SpatialReference srs(epsg);
+    set_active_projection(srs);
+}
+
+void Layer::set_projection(SpatialReference& srs)
+{
+    const int geomCount = _layer->GetLayerDefn()->GetGeomFieldCount();
+
+    if (_layer->TestCapability(OLCAlterGeomFieldDefn) == 0) {
+        throw RuntimeError("Layer does not support altering geometry field definitions");
+    }
+
+    for (int i = 0; i < geomCount; ++i) {
+        OGRGeomFieldDefn def(_layer->GetLayerDefn()->GetGeomFieldDefn(i));
+        def.SetSpatialRef(srs.get());
+        check_error(_layer->AlterGeomFieldDefn(i, &def, ALTER_GEOM_FIELD_DEFN_SRS_FLAG), "Failed to alter geometry field");
     }
 }
 
 void Layer::set_projection_from_epsg(int32_t epsg)
 {
     SpatialReference srs(epsg);
-    const int geomCount = _layer->GetLayerDefn()->GetGeomFieldCount();
-    for (int i = 0; i < geomCount; ++i) {
-        _layer->GetLayerDefn()->GetGeomFieldDefn(i)->SetSpatialRef(srs.get());
-    }
+    set_projection(srs);
 }
 
 std::optional<SpatialReference> Layer::projection() const

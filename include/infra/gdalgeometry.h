@@ -1032,10 +1032,15 @@ public:
     Layer(Layer&&);
     ~Layer();
 
-    Layer& operator=(Layer&&);
+    Layer& operator=(Layer&&) noexcept;
     Layer& operator=(const Layer&);
 
     std::optional<int32_t> epsg() const;
+
+    // Changes the layers project while working with but will not persist this change after reopening the layer
+    void set_active_projection(SpatialReference& srs);
+    void set_active_projection_from_epsg(int32_t epsg);
+
     //! Make sure the spatial reference stays in scope while using the layer!
     void set_projection(SpatialReference& srs);
     void set_projection_from_epsg(int32_t epsg);
