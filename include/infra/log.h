@@ -53,6 +53,7 @@ public:
 
     static void initialize_console_only(const std::string& name, Colored colored);
     static void initialize(const std::string& name);
+    static void initialize_async(const std::string& name);
     static void uninitialize();
 
     static void add_file_sink(const fs::path& filePath);

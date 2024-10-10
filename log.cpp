@@ -1,6 +1,7 @@
 #include "infra/log.h"
 #include "infra/string.h"
 
+#include <spdlog/async.h>
 #include <spdlog/details/log_msg.h>
 #include <spdlog/sinks/ansicolor_sink.h>
 #include <spdlog/sinks/basic_file_sink.h>
@@ -81,6 +82,20 @@ void Log::initialize(const std::string& name)
     _log = std::make_shared<spdlog::logger>(name, begin(_sinks), end(_sinks));
     _log->set_pattern("%^[%L] %v%$");
     _log->set_level(spdlog::level::warn);
+}
+
+void Log::initialize_async(const std::string& name)
+{
+    if (_sinks.empty()) {
+        throw std::runtime_error("No sinks added before initializing the logging system");
+    }
+
+    spdlog::init_thread_pool(8192, 1);
+
+    _log = std::make_shared<spdlog::async_logger>(name, begin(_sinks), end(_sinks), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
+    _log->set_pattern("%^[%L] %v%$");
+    _log->set_level(spdlog::level::warn);
+    
 }
 
 void Log::uninitialize()

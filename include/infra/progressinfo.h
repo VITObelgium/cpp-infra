@@ -277,7 +277,7 @@ private:
     void throw_on_cancel() const
     {
         if (cancel_requested()) {
-            throw CancelRequested();
+            throw CancelRequested("Cancellation requested by user");
         }
     }
 
