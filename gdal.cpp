@@ -955,7 +955,9 @@ Layer VectorDataSet::layer(int index)
 Layer VectorDataSet::layer(const std::string& name)
 {
     assert(_ptr);
-    return Layer(check_pointer_msg_cb(_ptr->GetLayerByName(name.c_str()), [&]() { return fmt::format("Invalid layer name: {}", name); }));
+    return Layer(check_pointer_msg_cb(_ptr->GetLayerByName(name.c_str()), [&]() {
+        return fmt::format("Invalid layer name: {}", name);
+    }));
 }
 
 bool VectorDataSet::layer_exists(const std::string& name) const noexcept
