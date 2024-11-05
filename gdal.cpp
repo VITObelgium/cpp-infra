@@ -138,6 +138,10 @@ void register_gdal()
 
 void register_gdal(RegistrationConfig cfg)
 {
+    if (cfg.projdbPath.is_relative()) {
+        cfg.projdbPath = fs::absolute(cfg.projdbPath);
+    }
+
 #ifdef EMBED_GDAL_DATA
     create_embedded_data();
 #endif
