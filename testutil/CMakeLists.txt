@@ -5,6 +5,7 @@ set (INFRA_TESTUTIL_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/printsupport.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/reporter.h
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/tempdir.h
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/textcompare.h
 )
 
 add_library(infratestutil
