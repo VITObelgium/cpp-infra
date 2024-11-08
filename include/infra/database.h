@@ -37,8 +37,8 @@ template <typename DbConnectionType>
 class Transaction
 {
 public:
-    Transaction(Transaction&&)      = default;
-    Transaction(const Transaction&) = delete;
+    Transaction(Transaction&&)                 = default;
+    Transaction(const Transaction&)            = delete;
     Transaction& operator=(const Transaction&) = delete;
 
     Transaction(DbConnectionType& db)
@@ -161,7 +161,7 @@ inline auto optional_insert_value(const std::optional<bool>& opt)
     }
 }
 
-inline auto optional_insert_value(const std::optional<chrono::date_point>& opt)
+inline auto optional_insert_value(const std::optional<sqlpp::chrono::day_point>& opt)
 {
     if (opt.has_value()) {
         return sqlpp::value_or_null(opt.value());
@@ -170,7 +170,7 @@ inline auto optional_insert_value(const std::optional<chrono::date_point>& opt)
     }
 }
 
-inline auto optional_insert_value(const std::optional<chrono::time_point>& opt)
+inline auto optional_insert_value(const std::optional<sqlpp::chrono::microsecond_point>& opt)
 {
     if (opt.has_value()) {
         return sqlpp::value_or_null(opt.value());
