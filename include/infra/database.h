@@ -2,6 +2,8 @@
 
 #include "infra/cast.h"
 #include "infra/chrono.h"
+#include "infra/databaseaccessmode.h"
+#include "infra/databasetransaction.h"
 #include "infra/exception.h"
 #include "infra/filesystem.h"
 #include "infra/string.h"
@@ -24,40 +26,6 @@ enum class ConnectionDebug
 {
     Yes,
     No,
-};
-
-enum class AccessMode
-{
-    ReadOnly,
-    ReadWrite,
-    Create,
-};
-
-template <typename DbConnectionType>
-class Transaction
-{
-public:
-    Transaction(Transaction&&)                 = default;
-    Transaction(const Transaction&)            = delete;
-    Transaction& operator=(const Transaction&) = delete;
-
-    Transaction(DbConnectionType& db)
-    : _transaction(start_transaction(db))
-    {
-    }
-
-    void commit()
-    {
-        _transaction.commit();
-    }
-
-    void rollback()
-    {
-        _transaction.rollback();
-    }
-
-private:
-    sqlpp::transaction_t<DbConnectionType> _transaction;
 };
 
 template <typename ResultField>

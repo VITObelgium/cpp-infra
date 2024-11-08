@@ -345,7 +345,11 @@ endif()
 
 if(INFRA_DATABASE)
     find_package(Sqlpp11 CONFIG REQUIRED)
-    list(APPEND INFRA_PUBLIC_HEADERS include/infra/database.h)
+    list(APPEND INFRA_PUBLIC_HEADERS
+        include/infra/database.h
+        include/infra/databasetransaction.h
+        include/infra/databaseaccessmode.h
+    )
     target_sources(infra PRIVATE database.cpp)
     target_link_libraries(infra PUBLIC sqlpp11::sqlpp11)
 
