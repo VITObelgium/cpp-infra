@@ -128,6 +128,8 @@ void warp_cli(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const 
 
 void warp_cli(const RasterDataSet& srcDataSet, const fs::path& output, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions)
 {
+    file::create_directory_for_file(output);
+
     GdalWarpAppOptionsWrapper warpOptions(options);
     for (auto& [key, value] : keyValueOptions) {
         warpOptions.set_option(key.c_str(), value.c_str());
