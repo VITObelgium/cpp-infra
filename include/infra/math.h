@@ -10,7 +10,6 @@
 #include <type_traits>
 #include <vector>
 
-
 namespace inf::math {
 
 static inline constexpr double pi = 3.14159265358979323846;
@@ -102,13 +101,13 @@ double standard_deviation(std::span<const T> values)
 }
 
 template <typename T>
-bool approx_equal(const T& lhs, const T& rhs, T epsilon = std::numeric_limits<T>::epsilon())
+constexpr bool approx_equal(const T& lhs, const T& rhs, T epsilon = std::numeric_limits<T>::epsilon())
 {
     return std::abs(lhs - rhs) <= epsilon;
 }
 
 template <typename T>
-bool approx_equal_opt(const std::optional<T>& lhs, const std::optional<T>& rhs, T epsilon = std::numeric_limits<T>::epsilon())
+constexpr bool approx_equal_opt(const std::optional<T>& lhs, const std::optional<T>& rhs, T epsilon = std::numeric_limits<T>::epsilon())
 {
     if (lhs.has_value() && rhs.has_value()) {
         return approx_equal(*lhs, *rhs, epsilon);

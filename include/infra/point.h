@@ -5,6 +5,8 @@
 #include <fmt/core.h>
 #include <limits>
 
+#include "infra/math.h"
+
 namespace inf {
 
 // Represents a point in the raster using x,y coordinates
@@ -30,6 +32,11 @@ struct Point
     constexpr bool is_valid() const
     {
         return x != std::numeric_limits<T>::max() && y != std::numeric_limits<T>::max();
+    }
+
+    constexpr bool approx_equal(const Point<T>& other, T epsilon = std::numeric_limits<T>::epsilon()) const
+    {
+        return math::approx_equal(x, other.x, epsilon) && math::approx_equal(y, other.y, epsilon);
     }
 
     T x = std::numeric_limits<T>::max();
@@ -102,4 +109,3 @@ struct fmt::formatter<inf::Point<T>>
         }
     }
 };
-
