@@ -73,6 +73,9 @@ std::string read_as_text(const fs::path& filename);
 /*! Check the provided path for illegal characters on the running platform */
 fs::path replace_illegal_path_characters(const fs::path& filename, char replacementChar);
 
+fs::path path_from_argv(char** argv, int index, std::optional<size_t> offset = std::nullopt);
+fs::path application_dir_from_argv0(char** argv0);
+
 inline fs::path u8path(std::string_view pathStr)
 {
 #ifdef HAVE_CPP20_U8STRING

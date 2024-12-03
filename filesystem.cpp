@@ -6,6 +6,10 @@
 #include <istream>
 #include <sstream>
 
+#ifdef WIN32
+#include <Windows.h>
+#endif
+
 namespace inf::file {
 #ifdef INFRA_HAS_FILESYSTEM
 
@@ -156,6 +160,24 @@ fs::path replace_illegal_path_characters(const fs::path& filename, char replacem
 #else
     return file::u8path(pathStr);
 #endif
+}
+
+fs::path path_from_argv(char** const argv, int index, std::optional<size_t> offset)
+{
+#ifdef WIN32
+    (void)argv;
+    // On windows argv0 is not utf-8 encoded, obtain the unicode command line arguments
+    int argc;
+    auto arglist = CommandLineToArgvW(GetCommandLineW(), &argc);
+    return fs::path(&arglist[index][offset.value_or(0)]);
+#else
+    return file::u8path(&argv[index][offset.value_or(0)]);
+#endif
+}
+
+fs::path application_dir_from_argv0(char** const argv)
+{
+    return path_from_argv(argv, 0).parent_path();
 }
 
 #endif
