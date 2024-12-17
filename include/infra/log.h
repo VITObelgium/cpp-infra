@@ -290,4 +290,6 @@ struct LogRegistration
         Log::uninitialize();
     }
 };
+
+Log::Level log_level_from_value(int32_t value);
 }

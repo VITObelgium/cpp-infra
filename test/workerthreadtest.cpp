@@ -3,6 +3,7 @@
 #include <doctest/doctest.h>
 #include <set>
 #include <thread>
+#include <stdexcept>
 
 namespace inf::test {
 

@@ -1,4 +1,5 @@
 #include "infra/log.h"
+#include "infra/exception.h"
 #include "infra/string.h"
 
 #include <spdlog/async.h>
@@ -95,7 +96,6 @@ void Log::initialize_async(const std::string& name)
     _log = std::make_shared<spdlog::async_logger>(name, begin(_sinks), end(_sinks), spdlog::thread_pool(), spdlog::async_overflow_policy::block);
     _log->set_pattern("%^[%L] %v%$");
     _log->set_level(spdlog::level::warn);
-    
 }
 
 void Log::uninitialize()
@@ -142,5 +142,23 @@ void Log::set_level(Level level)
 void Log::set_pattern(std::string_view pattern)
 {
     _log->set_pattern(fmt::format("%^{}%$", pattern));
+}
+
+Log::Level log_level_from_value(int32_t value)
+{
+    switch (value) {
+    case 1:
+        return Log::Level::Debug;
+    case 2:
+        return Log::Level::Info;
+    case 3:
+        return Log::Level::Warning;
+    case 4:
+        return Log::Level::Error;
+    case 5:
+        return Log::Level::Critical;
+    default:
+        throw RuntimeError("Invalid log level specified '{}': value must be in range [1-5]", value);
+    }
 }
 }
