@@ -522,6 +522,8 @@ gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const fs::path& out
     ProgressInfo progress(progressCb);
     TranslateOptionsWrapper gdalOptions(options, progress);
 
+    file::create_directory_for_file(outputPath);
+
     int userError = 0;
     auto resultDs = gdal::RasterDataSet(GDALTranslate(outputPath.empty() ? nullptr : file::generic_u8string(outputPath).c_str(), ds.get(), gdalOptions.get(), &userError));
 
