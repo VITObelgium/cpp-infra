@@ -57,7 +57,6 @@ if(INFRA_IS_TOPLEVEL)
     message(STATUS "Toplevel infra build C++${CMAKE_CXX_STANDARD}")
     set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
 
-    # set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
     if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
         # avoid windows specific warnings
         add_definitions(

@@ -73,7 +73,8 @@
         {
           "name": "gdal",
           "features": [
-            "geos"
+            "geos",
+            "netcdf"
           ]
         }
       ]

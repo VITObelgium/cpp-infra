@@ -11,8 +11,9 @@ jobs:
       matrix:
         cfg:
           - { os: ubuntu-latest, triplet: x64-linux }
-          - { os: windows-2022, triplet: x64-windows-static-vs2022 }
-          - { os: macos-13, triplet: x64-osx }
+          - { os: windows-latest, triplet: x64-windows-static-vs2022 }
+          - { os: macos-latest, triplet: arm64-osx }
+          - { os: macos-latest, triplet: x64-osx }
 
     steps:
       - name: install python
@@ -24,10 +25,10 @@ jobs:
         with:
           submodules: true
       - name: Install linux dependencies
-        if: ${{ matrix.cfg.os == 'ubuntu-latest' }}
+        if: ${{ runner.os == 'Linux' }}
         run: sudo apt-get install nasm openssl ninja-build autoconf-archive
       - name: Install osx dependencies
-        if: ${{ matrix.cfg.os == 'macos-13' }}
+        if: ${{ runner.os == 'macOS' }}
         run: brew install nasm ninja automake autoconf autoconf-archive
       - name: Cache vcpkg binary
         id: cache-vcpkg-bin
