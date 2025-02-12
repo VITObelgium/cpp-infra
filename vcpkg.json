@@ -80,7 +80,8 @@
           "features": [
             "geos",
             "netcdf",
-            "curl"
+            "curl",
+            "hdf5"
           ]
         },
         {

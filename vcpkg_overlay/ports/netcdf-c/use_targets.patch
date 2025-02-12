@@ -1,0 +1,112 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2023-03-14 21:34:25.000000000 +0100
++++ b/CMakeLists.txt	2023-04-06 15:29:51.837601000 +0200
+@@ -485,7 +485,6 @@
+     SET(EXTRA_DEPS ${EXTRA_DEPS} "${${_LIB}_DEP}")
+   ENDFOREACH()
+   MESSAGE("Extra deps: ${EXTRA_DEPS}")
+-  LIST(REMOVE_DUPLICATES EXTRA_DEPS)
+   SET(CMAKE_REQUIRED_LIBRARIES ${CMAKE_REQUIRED_LIBRARIES} ${EXTRA_DEPS})
+ ENDIF()
+ ###
+@@ -721,15 +720,6 @@
+     # we will use a static library.  This can be toggled
+     # by explicitly modifying NC_FIND_SHARED_LIBS.
+     ##
+-    IF(NC_FIND_SHARED_LIBS)
+-      SET(NC_HDF5_LINK_TYPE "shared")
+-      SET(NC_HDF5_LINK_TYPE_UPPER "SHARED")
+-      ADD_DEFINITIONS(-DH5_BUILT_AS_DYNAMIC_LIB)
+-    ELSE(NC_FIND_SHARED_LIBS)
+-      SET(NC_HDF5_LINK_TYPE "static")
+-      SET(NC_HDF5_LINK_TYPE_UPPER "STATIC")
+-      ADD_DEFINITIONS(-DH5_BUILT_AS_STATIC_LIB)
+-    ENDIF(NC_FIND_SHARED_LIBS)
+ 
+     #####
+     # First, find the C and HL libraries.
+@@ -742,7 +732,7 @@
+       SET(SEARCH_PACKAGE_NAME ${HDF5_PACKAGE_NAME})
+       FIND_PACKAGE(HDF5 NAMES ${SEARCH_PACKAGE_NAME} COMPONENTS C HL CONFIG REQUIRED ${NC_HDF5_LINK_TYPE})
+     ELSE(MSVC)
+-      FIND_PACKAGE(HDF5 COMPONENTS C HL REQUIRED)
++      FIND_PACKAGE(HDF5 COMPONENTS C HL CONFIG REQUIRED)
+     ENDIF(MSVC)
+ 
+     ##
+@@ -856,6 +846,19 @@
+     ENDIF()
+ 
+   ENDIF(HDF5_C_LIBRARY AND HDF5_HL_LIBRARY AND HDF5_INCLUDE_DIR)
++  
++  if(TARGET hdf5::hdf5-shared)
++    set(HDF5_C_LIBRARY hdf5::hdf5-shared)
++    set(HDF5_C_LIBRARY_hdf5 hdf5::hdf5-shared)
++    set(HDF5_HL_LIBRARIES hdf5::hdf5_hl-shared)
++    ADD_DEFINITIONS(-DH5_BUILT_AS_DYNAMIC_LIB)
++  else()
++    set(HDF5_C_LIBRARY hdf5::hdf5-static)
++    set(HDF5_C_LIBRARY_hdf5 hdf5::hdf5-static)
++    set(HDF5_HL_LIBRARIES hdf5::hdf5_hl-static)
++    ADD_DEFINITIONS(-DH5_BUILT_AS_STATIC_LIB)
++  endif()
++  list(APPEND CMAKE_REQUIRED_LIBRARIES ${HDF5_C_LIBRARY})
+ 
+   FIND_PACKAGE(Threads)
+ 
+@@ -984,8 +987,7 @@
+ ENDIF(USE_HDF5)
+ 
+ # See if we have libcurl
+-FIND_PACKAGE(CURL)
+-ADD_DEFINITIONS(-DCURL_STATICLIB=1)
++FIND_PACKAGE(CURL CONFIG)
+ INCLUDE_DIRECTORIES(${CURL_INCLUDE_DIRS})
+ 
+ # Define a test flag for have curl library
+@@ -2464,10 +2466,9 @@
+   STRING(REPLACE "-lhdf5::hdf5_hl-static" "-lhdf5_hl" NC_LIBS ${NC_LIBS})
+ ENDIF()
+ 
+-STRING(REPLACE ";" " " LINKFLAGS "${LINKFLAGS}")
+-
+-LIST(REMOVE_DUPLICATES NC_LIBS)
++LIST(REMOVE_ITEM LINKFLAGS "-L")
+ LIST(REMOVE_DUPLICATES LINKFLAGS)
++STRING(REPLACE ";" " " LINKFLAGS "${LINKFLAGS}")
+ 
+ SET(LIBS ${NC_LIBS})
+ SET(NC_LIBS "-lnetcdf")
+diff -Naur a/liblib/CMakeLists.txt b/liblib/CMakeLists.txt
+--- a/liblib/CMakeLists.txt	2023-03-14 21:34:25.000000000 +0100
++++ b/liblib/CMakeLists.txt	2023-04-06 15:30:47.072696500 +0200
+@@ -103,6 +103,12 @@
+ ENDIF()
+ 
+ IF(USE_HDF5)
++  if(TARGET hdf5::hdf5-shared)
++    SET(TLL_LIBS ${TLL_LIBS} hdf5::hdf5-shared hdf5::hdf5_hl-shared)
++  else()
++    SET(TLL_LIBS ${TLL_LIBS} hdf5::hdf5-static hdf5::hdf5_hl-static)
++  endif()
++elseif(0)
+   IF(NOT MSVC)
+     # Some version of cmake define HDF5_hdf5_LIBRARY instead of
+     # HDF5_LIBRARY. Same with HDF5_HL_LIBRARIES
+@@ -123,7 +129,7 @@
+ ENDIF()
+ 
+ IF(FOUND_CURL)
+-  SET(TLL_LIBS ${TLL_LIBS} ${CURL_LIBRARIES})
++  SET(TLL_LIBS ${TLL_LIBS} CURL::libcurl)
+ ENDIF()
+ 
+ IF(USE_HDF4)
+@@ -152,7 +158,6 @@
+ ENDIF()
+ 
+ IF(TLL_LIBS)
+-  LIST(REMOVE_DUPLICATES TLL_LIBS)
+ ENDIF()
+ 
+ TARGET_LINK_LIBRARIES(netcdf ${TLL_LIBS})

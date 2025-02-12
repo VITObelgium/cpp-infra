@@ -8,6 +8,9 @@
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_MANIFEST_INSTALL": "OFF",
         "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
+      },
+      "environment": {
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg_triplets"
       }
     },
     {
@@ -52,7 +55,8 @@
       "inherits": "default",
       "generator": "Visual Studio 17 2022",
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-vs2022",
+        "VCPKG_SET_CHARSET_FLAG": "ON",
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
       }
     },

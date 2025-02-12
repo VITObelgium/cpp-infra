@@ -421,7 +421,7 @@ static GDALDataset* create_data_set(const fs::path& filePath,
     // use generic_u8string otherwise the path contains backslashes on windows
     // In memory file paths like /vsimem/file.asc in memory will then be \\vsimem\\file.asc
     // which is not recognized by gdal
-    const auto path = str::from_u8(filePath.generic_u8string());
+    const auto path = file::generic_u8string(filePath);
     auto options    = create_string_list(driverOpts);
     return reinterpret_cast<GDALDataset*>(GDALOpenEx(
         path.c_str(),

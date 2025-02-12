@@ -1,5 +1,5 @@
 VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
-    "x64-windows-static"
+    "x64-windows-static-vs2022"
 } else if os() == "macos" {
     if arch() == "aarch64" {
         "arm64-osx"
@@ -7,6 +7,7 @@ VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
 } else {
     "x64-linux"
 }
+
 
 cmake_preset := if os_family() == "windows" {
     "windows"
@@ -19,9 +20,13 @@ cmake_preset := if os_family() == "windows" {
 }
 
 export VCPKG_ROOT := env('VCPKG_ROOT', "../vcpkg")
+export VCPKG_OVERLAY_TRIPLETS := join(justfile_directory(), "vcpkg_overlay", "triplets")
+export VCPKG_OVERLAY_PORTS := join(justfile_directory(), "vcpkg_overlay", "ports")
+export VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 
 bootstrap:
-    '{{VCPKG_ROOT}}/vcpkg' install --allow-unsupported --triplet {{VCPKG_DEFAULT_TRIPLET}} \
+    '{{VCPKG_ROOT}}/vcpkg' install --allow-unsupported \
+            --triplet {{VCPKG_DEFAULT_TRIPLET}} \
             --x-feature=cliprogress \
             --x-feature=process \
             --x-feature=hashing \
@@ -34,7 +39,7 @@ bootstrap:
             --x-feature=db \
             --x-feature=testing
 
-configure: bootstrap
+configure:
     cmake --preset {{cmake_preset}}
 
 build_debug: configure

@@ -1,0 +1,36 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2023-03-14 21:34:25.000000000 +0100
++++ b/CMakeLists.txt	2023-04-06 15:34:18.778065200 +0200
+@@ -2472,6 +2472,21 @@
+ SET(LIBS ${NC_LIBS})
+ SET(NC_LIBS "-lnetcdf")
+ 
++set(NC_LIBS_PRIVATE " ${LIBS} ")
++set(NC_REQUIRES_PRIVATE "")
++macro(replace_pkgconfig_module PATTERN MODULE)
++  if(NC_LIBS_PRIVATE MATCHES " ${PATTERN} ")
++    string(REPLACE "${CMAKE_MATCH_0}" " " NC_LIBS_PRIVATE "${NC_LIBS_PRIVATE}")
++    string(APPEND NC_REQUIRES_PRIVATE " ${MODULE}")
++  endif()
++endmacro()
++replace_pkgconfig_module("-lhdf5_hl"   "hdf5_hl")
++replace_pkgconfig_module("-lhdf5"      "hdf5")
++replace_pkgconfig_module("-lmpi"       "ompi-c")
++replace_pkgconfig_module("-lzip"       "libzip")
++replace_pkgconfig_module("-lCURL[^ ]*" "libcurl")
++replace_pkgconfig_module("-lZLIB[^ ]*" "zlib")
++
+ configure_file(
+   ${netCDF_SOURCE_DIR}/netcdf.pc.in
+   ${netCDF_BINARY_DIR}/netcdf.pc @ONLY)
+diff -Naur a/netcdf.pc.in b/netcdf.pc.in
+--- a/netcdf.pc.in	2023-03-14 21:34:25.000000000 +0100
++++ b/netcdf.pc.in	2023-04-06 15:34:41.646930000 +0200
+@@ -9,5 +9,6 @@
+ URL: https://www.unidata.ucar.edu/netcdf
+ Version: @PACKAGE_VERSION@
+ Libs: -L${libdir} @NC_LIBS@
+-Libs.private: @LIBS@
++Libs.private: @NC_LIBS_PRIVATE@
+ Cflags: -I${includedir}
++Requires.private: @NC_REQUIRES_PRIVATE@

@@ -1,0 +1,1 @@
+Older netcdf-c versions fail to open UTF-8 encoded pathnames on windows

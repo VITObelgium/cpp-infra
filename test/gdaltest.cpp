@@ -158,6 +158,7 @@ TEST_CASE("Gdal.utf8Path")
         return;
     }
 
+    // Also make sure hdf5 is enabled for gdal and netcdf otherwise this will still throw an exception
     CHECK_NOTHROW(gdal::RasterDataSet::open(file::u8path("NETCDF:\"" TEST_DATA_DIR "/België/latlon.nc\":lat"), gdal::RasterType::Netcdf));
 
     auto ds          = gdal::RasterDataSet::open(file::u8path(TEST_DATA_DIR "/België/latlon.nc"), gdal::RasterType::Netcdf);
