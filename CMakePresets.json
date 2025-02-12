@@ -1,28 +1,21 @@
 {
-  "version": 5,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 21,
-    "patch": 0
-  },
-  "include": [
-    "deps/vcpkg/scripts/buildtools/CMakePresets.json"
-  ],
+  "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
+  "version": 8,
   "configurePresets": [
     {
-      "name": "multi",
-      "generator": "Ninja Multi-Config",
-      "hidden": true
+      "name": "vcpkg",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_MANIFEST_INSTALL": "OFF",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
+      }
     },
     {
-      "name": "vcpkg-base",
-      "inherits": "multi",
-      "hidden": true,
-      "binaryDir": "${sourceDir}/build/vcpkg",
+      "name": "default",
+      "binaryDir": "${sourceDir}/build",
+      "inherits": "vcpkg",
+      "generator": "Ninja Multi-Config",
       "cacheVariables": {
-        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
-        "VCPKG_APPLOCAL_DEPS": "OFF",
-        "VCPKG_MANIFEST_MODE": "OFF",
         "INFRA_LOGGING": "ON",
         "INFRA_GDAL": "ON",
         "INFRA_XML": "ON",
@@ -41,140 +34,40 @@
       }
     },
     {
-      "name": "msvc",
-      "displayName": "MSVC x64",
-      "description": "64bit MSVC build",
-      "inherits": [
-        "vcpkg-base",
-        "triplet-x64-windows-static-vs2022"
-      ],
-      "binaryDir": "${sourceDir}/build/vcpkg-msvc",
+      "name": "mac-arm",
+      "inherits": "default",
       "cacheVariables": {
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-windows-static-vs2022"
+        "VCPKG_TARGET_TRIPLET": "arm64-osx"
       }
     },
     {
-      "name": "msvc-asan",
-      "displayName": "MSVC x64 ASAN",
-      "description": "Vcpkg build for x64 on windows with address sanitizer (MSVC)",
-      "inherits": [
-        "vcpkg-base",
-        "triplet-x64-windows-static-asan-vs2022"
-      ],
-      "binaryDir": "${sourceDir}/build/vcpkg-msvc-asan",
+      "name": "mac-intel",
+      "inherits": "default",
       "cacheVariables": {
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-windows-static-asan-vs2022"
+        "VCPKG_TARGET_TRIPLET": "x64-osx"
       }
     },
     {
-      "name": "arm64-osx",
-      "inherits": [
-        "vcpkg-base",
-        "triplet-arm64-osx"
-      ],
-      "displayName": "Mac arm64",
-      "description": "Vcpkg build for arm64 on macOS",
+      "name": "windows",
+      "inherits": "default",
+      "generator": "Visual Studio 17 2022",
       "cacheVariables": {
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-arm64-osx",
-        "VCPKG_ALLOW_SYSTEM_LIBS": "ON"
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
       }
     },
     {
-      "name": "x64-osx",
-      "inherits": [
-        "vcpkg-base",
-        "triplet-x64-osx"
-      ],
-      "displayName": "Mac x64",
-      "description": "Vcpkg build for x64 on mac"
-    },
-    {
-      "name": "arm64-linux",
-      "inherits": [
-        "vcpkg-base",
-        "triplet-arm64-linux"
-      ],
-      "displayName": "arm64 Linux Docker",
-      "description": "Vcpkg build for arm64 on macOS",
+      "name": "linux",
+      "inherits": "default",
       "cacheVariables": {
-        "VCPKG_INSTALLED_DIR": "/usr/vcpkgs-arm64-linux"
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
       }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "Debug Win",
-      "displayName": "Debug",
-      "configurePreset": "msvc",
-      "configuration": "Debug",
-      "inherits": [
-        "build-win-only"
-      ]
     },
     {
-      "name": "Release Win",
-      "displayName": "Release",
-      "configurePreset": "msvc",
-      "configuration": "Release",
-      "inherits": [
-        "build-win-only"
-      ]
-    },
-    {
-      "name": "ASAN",
-      "configurePreset": "msvc-asan",
-      "configuration": "Debug",
-      "inherits": [
-        "build-win-only"
-      ]
-    },
-    {
-      "name": "Debug arm OSX",
-      "displayName": "Debug",
-      "configurePreset": "arm64-osx",
-      "configuration": "Debug",
-      "inherits": [
-        "build-mac-only"
-      ]
-    },
-    {
-      "name": "Release arm OSX",
-      "displayName": "Release",
-      "configurePreset": "arm64-osx",
-      "configuration": "Release",
-      "inherits": [
-        "build-mac-only"
-      ]
-    },
-    {
-      "name": "Debug docker arm64",
-      "displayName": "Debug",
-      "configurePreset": "arm64-linux",
-      "configuration": "Debug",
-      "inherits": [
-        "build-linux-only"
-      ]
-    },
-    {
-      "name": "Release docker arm64",
-      "displayName": "Release",
-      "configurePreset": "arm64-linux",
-      "configuration": "Release",
-      "inherits": [
-        "build-linux-only"
-      ]
-    }
-  ],
-  "testPresets": [
-    {
-      "name": "default",
-      "configurePreset": "x64-windows-intel release",
-      "output": {
-        "outputOnFailure": true
-      },
-      "execution": {
-        "noTestsAction": "error",
-        "stopOnFailure": true
+      "name": "mac-arm-local",
+      "inherits": "mac-arm",
+      "environment": {
+        "VCPKG_ROOT": "${sourceDir}/../../vcpkg"
       }
     }
   ]

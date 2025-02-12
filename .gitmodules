@@ -1,3 +1,0 @@
-[submodule "deps/vcpkg"]
-	path = deps/vcpkg
-	url = https://github.com/VITObelgium/vcpkg-ports.git

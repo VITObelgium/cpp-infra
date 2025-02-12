@@ -32,11 +32,9 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui comp
 string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" INFRA_IS_TOPLEVEL)
 
 if(INFRA_IS_TOPLEVEL)
-    cmake_minimum_required(VERSION 3.21)
+    cmake_minimum_required(VERSION 3.28)
 
-    if(NOT CMAKE_CXX_STANDARD)
-        set(CMAKE_CXX_STANDARD 20)
-    endif()
+    set(CMAKE_CXX_STANDARD 20)
 
     if(INFRA_ENABLE_TESTS)
         enable_testing()
@@ -55,7 +53,7 @@ if(INFRA_IS_TOPLEVEL)
     set(EXECUTABLE_OUTPUT_PATH ${CMAKE_BINARY_DIR})
 
     message(STATUS "Toplevel infra build C++${CMAKE_CXX_STANDARD}")
-    set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX17_STANDARD_COMPILE_OPTION})
+    set(CMAKE_REQUIRED_FLAGS ${CMAKE_CXX20_STANDARD_COMPILE_OPTION})
 
     if(MSVC OR(WIN32 AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "IntelLLVM"))
         # avoid windows specific warnings

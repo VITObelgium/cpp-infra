@@ -5,6 +5,10 @@
   "dependencies": [
     "fmt"
   ],
+  "default-features": [
+    "log",
+    "testing"
+  ],
   "features": {
     "log": {
       "description": "logging support",
@@ -72,10 +76,16 @@
       "dependencies": [
         {
           "name": "gdal",
+          "default-features": false,
           "features": [
             "geos",
-            "netcdf"
+            "netcdf",
+            "curl"
           ]
+        },
+        {
+          "name": "proj",
+          "default-features": false
         }
       ]
     },
@@ -85,7 +95,7 @@
         {
           "name": "sqlpp11",
           "features": [
-            "sqlite",
+            "sqlite3",
             "postgresql"
           ]
         }
@@ -104,5 +114,19 @@
         "qt6"
       ]
     }
+  },
+  "vcpkg-configuration": {
+    "default-registry": {
+      "kind": "git",
+      "baseline": "6f29f12e82a8293156836ad81cc9bf5af41fe836",
+      "repository": "https://github.com/microsoft/vcpkg"
+    },
+    "registries": [
+      {
+        "kind": "artifact",
+        "location": "https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip",
+        "name": "microsoft"
+      }
+    ]
   }
 }

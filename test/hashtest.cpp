@@ -6,8 +6,8 @@ namespace inf::test {
 
 TEST_CASE("Hash")
 {
-    const auto filePath = fs::u8path(TEST_DATA_DIR) / "epsg31370.tif";
-    
+    const auto filePath = file::u8path(TEST_DATA_DIR) / "epsg31370.tif";
+
     SUBCASE("MD5 string")
     {
         constexpr std::string_view md5 = "29367e8926f2a126a2e2ab8d13815b69";
