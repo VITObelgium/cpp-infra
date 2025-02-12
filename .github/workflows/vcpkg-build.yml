@@ -50,7 +50,7 @@ jobs:
         id: bootstrap
         run: python bootstrap.py --triplet ${{ matrix.cfg.triplet }} --clean-after-build
       - name: Build the code
-        run: python build.py --triplet ${{ matrix.cfg.triplet }} --run-tests
+        run: python build.py --triplet ${{ matrix.cfg.triplet }} --run-tests --cpp20
       - name: Archive build logs
         if: ${{ failure() && steps.bootstrap.conclusion == 'failure' }}
         uses: actions/upload-artifact@v4
