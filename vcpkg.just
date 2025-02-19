@@ -28,3 +28,11 @@ export VCPKG_OVERLAY_PORTS := join(source_directory(), "vcpkg_overlay", "ports")
 
 git_status_clean:
     git diff --quiet --exit-code
+
+# will invoke just build_dist but first activates the visual studio environment
+[windows]
+dist:
+    cmd.exe /C '{{source_directory()}}/dist.bat' '{{justfile_directory()}}'
+
+[unix]
+dist: build_dist
