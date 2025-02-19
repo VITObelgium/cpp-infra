@@ -1,0 +1,25 @@
+{
+    "name": "maplibregl-native",
+    "version-string": "2.0.1",
+    "port-version": 2,
+    "homepage": "https://github.com/maplibre/maplibre-gl-native",
+    "description": "Interactive, thoroughly customizable maps for native c++",
+    "dependencies": [
+        "zlib",
+        "icu",
+        "libjpeg-turbo",
+        "libpng",
+        "sqlite3",
+        {
+            "name": "qtbase",
+            "features": [
+                "network",
+                "opengl",
+                "png",
+                "widgets",
+                "openssl"
+            ],
+            "default-features": false
+        }
+    ]
+}

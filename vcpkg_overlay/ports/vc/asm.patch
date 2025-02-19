@@ -1,0 +1,46 @@
+From 5ed4be37e5105fd024d29b0d612874dba86ccbfc Mon Sep 17 00:00:00 2001
+From: Guilherme Amadio <amadio@cern.ch>
+Date: Fri, 6 May 2022 09:57:08 +0200
+Subject: [PATCH] Use alternative scatter implementation for Visual Studio 22
+
+Fixes: #308
+Suggested-by: Bruno Manganelli <bruno.manga95@gmail.com>
+---
+ Vc/common/scatterimplementation.h | 17 ++++++++---------
+ 1 file changed, 8 insertions(+), 9 deletions(-)
+
+diff --git a/Vc/common/scatterimplementation.h b/Vc/common/scatterimplementation.h
+index 82d9f848c..dee2f193b 100644
+--- a/Vc/common/scatterimplementation.h
++++ b/Vc/common/scatterimplementation.h
+@@ -73,6 +73,13 @@ Vc_ALWAYS_INLINE void executeScatter(BitScanLoopT,
+                                     typename V::MaskArgument mask)
+ {
+     size_t bits = mask.toInt();
++#ifdef Vc_MSVC
++    while (bits) {
++        const int i = _bit_scan_forward(bits);
++        bits ^= (1 << i); // btr?
++        mem[indexes[i]] = v[i];
++    }
++#else
+     while (Vc_IS_LIKELY(bits > 0)) {
+         size_t i, j;
+         asm("bsf %[bits],%[i]\n\t"
+@@ -83,15 +90,7 @@ Vc_ALWAYS_INLINE void executeScatter(BitScanLoopT,
+         mem[indexes[i]] = v[i];
+         mem[indexes[j]] = v[j];
+     }
+-
+-    /* Alternative from Vc::SSE (0.7)
+-    int bits = mask.toInt();
+-    while (bits) {
+-        const int i = _bit_scan_forward(bits);
+-        bits ^= (1 << i); // btr?
+-        mem[indexes[i]] = v[i];
+-    }
+-    */
++#endif
+ }
+ 
+ template <typename V, typename MT, typename IT>

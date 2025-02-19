@@ -1,0 +1,182 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0ecfa338a6..92f08cd7b9 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,4 +1,4 @@
+-cmake_minimum_required(VERSION 3.10 FATAL_ERROR)
++cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+ 
+ option(MLN_WITH_CORE_ONLY "Build only the core bits, no platform code" OFF)
+ option(MLN_WITH_CLANG_TIDY "Build with clang-tidy checks enabled" OFF)
+@@ -43,7 +43,9 @@ set(
+     "--leak-check=full --gen-suppressions=all --error-exitcode=1 --suppressions=${PROJECT_SOURCE_DIR}/scripts/valgrind.sup"
+ )
+ 
++if(MBGL_OPTIONAL)
+ include(CTest)
++endif()
+ 
+ if(NOT CMAKE_BUILD_TYPE)
+     set(CMAKE_BUILD_TYPE Release)
+@@ -1134,6 +1136,17 @@ else()
+     message(FATAL_ERROR "Unsupported target platform: " ${CMAKE_SYSTEM_NAME})
+ endif()
+ 
++if(MBGL_OPTIONAL)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/benchmark)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/render-test)
++endif()
++
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/platform/default/include/mbgl TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/geojson.hpp/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/extras/expected-lite/include/nonstd TYPE INCLUDE)
++install(FILES ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/optional/optional.hpp TYPE INCLUDE)
++install(TARGETS mbgl-core mbgl-vendor-nunicode mbgl-vendor-parsedate mbgl-vendor-csscolorparser)
+diff --git a/platform/default/src/mbgl/storage/mbtiles_file_source.cpp b/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
+index 6fbcaa2955..5947c6e065 100644
+--- a/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
++++ b/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
+@@ -20,11 +20,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
+-#if defined(__QT__) && (defined(_WIN32) || defined(__EMSCRIPTEN__))
+-#include <QtZlib/zlib.h>
+-#else
+ #include <zlib.h>
+-#endif
+ 
+ namespace {
+ bool acceptsURL(const std::string &url) {
+diff --git a/platform/default/src/mbgl/util/compression.cpp b/platform/default/src/mbgl/util/compression.cpp
+index 0c8d39eb21..10af240aad 100644
+--- a/platform/default/src/mbgl/util/compression.cpp
++++ b/platform/default/src/mbgl/util/compression.cpp
+@@ -1,10 +1,6 @@
+ #include <mbgl/util/compression.hpp>
+ 
+-#if defined(__QT__) && (defined(_WIN32) || defined(__EMSCRIPTEN__))
+-#include <QtZlib/zlib.h>
+-#else
+ #include <zlib.h>
+-#endif
+ 
+ #include <cstdio>
+ #include <cstring>
+diff --git a/platform/qt/qt.cmake b/platform/qt/qt.cmake
+index cd90220129..fb035e6ea7 100644
+--- a/platform/qt/qt.cmake
++++ b/platform/qt/qt.cmake
+@@ -12,6 +12,7 @@ option(MLN_QT_WITH_HEADLESS "Build MapLibre GL Qt with headless support" ON)
+ option(MLN_QT_WITH_INTERNAL_SQLITE "Build MapLibre GL Qt bindings with internal sqlite" OFF)
+ option(MLN_QT_DEPLOYMENT "Autogenerate files necessary for deployment" OFF)
+ 
++find_package(ZLIB REQUIRED)
+ find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+ find_package(Qt${QT_VERSION_MAJOR}
+              COMPONENTS Gui
+@@ -26,10 +27,9 @@ if(NOT MLN_QT_LIBRARY_ONLY)
+ endif()
+ 
+ if(NOT MLN_QT_WITH_INTERNAL_SQLITE)
+-    find_package(Qt${QT_VERSION_MAJOR}Sql REQUIRED)
++    find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Sql REQUIRED)
+ else()
+-    message(STATUS "Using internal sqlite")
+-    include(${PROJECT_SOURCE_DIR}/vendor/sqlite.cmake)
++    find_package(unofficial-sqlite3 CONFIG REQUIRED)
+ endif()
+ 
+ if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+@@ -141,24 +141,11 @@ target_link_libraries(
+         Qt${QT_VERSION_MAJOR}::Core
+         Qt${QT_VERSION_MAJOR}::Gui
+         Qt${QT_VERSION_MAJOR}::Network
+-        $<IF:$<BOOL:${MLN_QT_WITH_INTERNAL_SQLITE}>,mbgl-vendor-sqlite,Qt${QT_VERSION_MAJOR}::Sql>
++        $<IF:$<BOOL:${MLN_QT_WITH_INTERNAL_SQLITE}>,unofficial::sqlite3::sqlite3,Qt${QT_VERSION_MAJOR}::Sql>
+         $<$<PLATFORM_ID:Linux>:$<IF:$<BOOL:${MLN_QT_WITH_INTERNAL_ICU}>,mbgl-vendor-icu,ICU::uc>>
+         mbgl-vendor-nunicode
+ )
+ 
+-set(qmaplibregl_headers
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/QMapLibreGL
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/export.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/map.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/Map
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/settings.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/Settings
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/types.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/Types
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/utils.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/include/QMapLibreGL/Utils
+-)
+-
+ if (MLN_QT_INSIDE_PLUGIN)
+     add_library(qmaplibregl OBJECT)
+ elseif(MLN_QT_STATIC)
+@@ -167,29 +154,6 @@ else()
+     add_library(qmaplibregl SHARED)
+ endif()
+ 
+-target_sources(
+-    qmaplibregl
+-    PRIVATE
+-    ${qmaplibregl_headers}
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/map.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/map_p.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/settings.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/types.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/map_observer.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/map_observer.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/map_renderer.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/map_renderer.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/renderer_backend.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/renderer_backend.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/renderer_observer.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/scheduler.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/scheduler.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/conversion.hpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/geojson.cpp
+-    ${PROJECT_SOURCE_DIR}/platform/qt/src/utils/geojson.hpp
+-)
+-
+ # Linux/Mac: Set framework, version and headers
+ set_target_properties(
+     qmaplibregl PROPERTIES
+@@ -276,9 +240,9 @@ target_link_libraries(
+         Qt${QT_VERSION_MAJOR}::Core
+         Qt${QT_VERSION_MAJOR}::Gui
+         Qt${QT_VERSION_MAJOR}::Network
++        $<BUILD_INTERFACE:mbgl-core>
+     PRIVATE
+         $<BUILD_INTERFACE:mbgl-compiler-options>
+-        $<BUILD_INTERFACE:mbgl-core>
+         $<BUILD_INTERFACE:mbgl-vendor-parsedate>
+         $<BUILD_INTERFACE:mbgl-vendor-nunicode>
+         $<BUILD_INTERFACE:mbgl-vendor-csscolorparser>
+diff --git a/platform/qt/src/mbgl/local_glyph_rasterizer.cpp b/platform/qt/src/mbgl/local_glyph_rasterizer.cpp
+index 3a3e7c278c..a0c0ea5c16 100644
+--- a/platform/qt/src/mbgl/local_glyph_rasterizer.cpp
++++ b/platform/qt/src/mbgl/local_glyph_rasterizer.cpp
+@@ -40,8 +40,7 @@ LocalGlyphRasterizer::LocalGlyphRasterizer(const std::optional<std::string>& fon
+ LocalGlyphRasterizer::~LocalGlyphRasterizer() {}
+ 
+ bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
+-    return impl->isConfigured() && impl->metrics->inFont(glyphID) &&
+-           util::i18n::allowsFixedWidthGlyphGeneration(glyphID);
++    return impl->isConfigured() && impl->metrics->inFont(glyphID);
+ }
+ 
+ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
+diff --git a/platform/windows/vendor/vcpkg b/platform/windows/vendor/vcpkg
+index 501db0f17e..37fce29a26 160000
+--- a/platform/windows/vendor/vcpkg
++++ b/platform/windows/vendor/vcpkg
+@@ -1 +1 @@
+-Subproject commit 501db0f17ef6df184fcdbfbe0f87cde2313b6ab1
++Subproject commit 37fce29a263a1546262eaed6af7ccac53b0094cd
