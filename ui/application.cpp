@@ -19,7 +19,7 @@ Application::Application(int& argc, char* argv[])
 {
     qInstallMessageHandler(loggedMessageOutput);
 
-#ifdef Q_OS_OSX
+#ifdef Q_OS_MACOS
     // workaround for QTBUG-75321 (https://bugreports.qt.io/browse/QTBUG-75321)
     auto pal = palette();
     pal.setColor(QPalette::ButtonText, pal.color(QPalette::WindowText));
