@@ -51,6 +51,10 @@ vcpkg_apply_patches(
     timer-overflow.patch
 )
 
+if(VCPKG_TARGET_IS_OSX)
+    set(ADDITIONAL_ARGS -DCMAKE_CXX_FLAGS=-D_HAS_AUTO_PTR_ETC=0)
+endif()
+
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA
