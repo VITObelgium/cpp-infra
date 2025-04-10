@@ -23,9 +23,6 @@ cmake_preset := if os_family() == "windows" {
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "..", "vcpkg"))
 
-export VCPKG_OVERLAY_TRIPLETS := join(source_directory(), "vcpkg_overlay", "triplets")
-export VCPKG_OVERLAY_PORTS := join(source_directory(), "vcpkg_overlay", "ports")
-
 git_status_clean:
     git diff --quiet --exit-code
 
