@@ -15,6 +15,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         net   ENABLE_CURL
         tiff  ENABLE_TIFF
         tools BUILD_APPS
+        embed-data EMBED_PROJ_DATA_PATH
 )
 
 vcpkg_list(SET TOOL_NAMES cct cs2cs geod gie invgeod invproj proj projinfo projsync)
@@ -35,7 +36,6 @@ vcpkg_cmake_configure(
         -DBUILD_EXAMPLES=OFF
         "-DEXE_SQLITE3=${EXE_SQLITE3}"
         -DPROJ_DATA_ENV_VAR_TRIED_LAST=ON
-        -DEMBED_PROJ_DATA_PATH=OFF
     OPTIONS_DEBUG
         -DBUILD_APPS=OFF
 )

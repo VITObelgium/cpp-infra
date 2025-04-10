@@ -51,6 +51,10 @@
         }
       ]
     },
+    "embed-data": {
+      "description": "Embed the projection data in the library",
+      "dependencies": []
+    },
     "tools": {
       "description": "Build tools"
     }
