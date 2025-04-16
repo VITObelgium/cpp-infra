@@ -8,7 +8,7 @@ vcpkg_find_acquire_program(GIT)
 file(REMOVE_RECURSE ${CURRENT_BUILDTREES_DIR}/src)
 
 set(GIT_URL "https://github.com/maplibre/maplibre-native.git")
-set(GIT_REV "android-v10.1.0")
+set(GIT_REV "android-v11.8.6")
 set(SOURCE_PATH ${CURRENT_BUILDTREES_DIR}/src/${PORT})
 
 if(EXISTS ${SOURCE_PATH})
@@ -47,15 +47,16 @@ vcpkg_execute_required_process(
 vcpkg_apply_patches(
     SOURCE_PATH ${SOURCE_PATH}
     PATCHES
-    cmake-changes.patch
+    sqlite3.patch
+    zlib.patch
     timer-overflow.patch
     boost-numeric.patch
+    cmake-install.patch
 )
 
-if(VCPKG_TARGET_IS_OSX)
-    set(ADDITIONAL_ARGS -DCMAKE_CXX_FLAGS=-D_HAS_AUTO_PTR_ETC=0)
-endif()
-
+# if(VCPKG_TARGET_IS_OSX)
+# set(ADDITIONAL_ARGS -DCMAKE_CXX_FLAGS=-D_HAS_AUTO_PTR_ETC=0)
+# endif()
 vcpkg_configure_cmake(
     SOURCE_PATH ${SOURCE_PATH}
     PREFER_NINJA
@@ -64,14 +65,12 @@ vcpkg_configure_cmake(
     -DMLN_WITH_COVERAGE=OFF
     -DMLN_WITH_WERROR=OFF
     -DMLN_WITH_QT=ON
+    -DMLN_WITH_OPENGL=ON
     -DMLN_QT_LIBRARY_ONLY=ON
-    -DMLN_QT_STATIC=ON
-    -DMLN_QT_WITH_INTERNAL_SQLITE=ON
     ${ADDITIONAL_ARGS}
 )
 
 vcpkg_install_cmake()
-vcpkg_fixup_cmake_targets(CONFIG_PATH lib/cmake/QMapLibreGL TARGET_PATH share/QMapLibreGL)
 
 file(REMOVE_RECURSE ${CURRENT_PACKAGES_DIR}/debug/include)
 

@@ -1,0 +1,31 @@
+diff --git forkSrcPrefix/platform/qt/qt.cmake forkDstPrefix/platform/qt/qt.cmake
+index c6ae2394b986f11a04320913ae3774a5eb7c96fc..e888c58b8655ff1b845e69eb1bf074d1347c8766 100644
+--- forkSrcPrefix/platform/qt/qt.cmake
++++ forkDstPrefix/platform/qt/qt.cmake
+@@ -42,7 +42,7 @@ find_package(Qt${QT_VERSION_MAJOR}
+              REQUIRED)
+ 
+ if(NOT MLN_QT_WITH_INTERNAL_SQLITE)
+-    find_package(Qt${QT_VERSION_MAJOR}Sql REQUIRED)
++    find_package(unofficial-sqlite3 CONFIG REQUIRED)
+ else()
+     message(STATUS "Using internal sqlite")
+     include(${PROJECT_SOURCE_DIR}/vendor/sqlite.cmake)
+@@ -85,7 +85,7 @@ target_sources(
+         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/offline_download.cpp
+         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/online_file_source.cpp
+         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/$<IF:$<BOOL:${MLN_WITH_PMTILES}>,pmtiles_file_source.cpp,pmtiles_file_source_stub.cpp>
+-        ${PROJECT_SOURCE_DIR}/platform/$<IF:$<BOOL:${MLN_QT_WITH_INTERNAL_SQLITE}>,default/src/mbgl/storage/sqlite3.cpp,qt/src/mbgl/sqlite3.cpp>
++        ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/storage/sqlite3.cpp
+         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/compression.cpp
+         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/filesystem.cpp
+         ${PROJECT_SOURCE_DIR}/platform/default/src/mbgl/util/monotonic_timer.cpp
+@@ -141,7 +141,7 @@ target_link_libraries(
+         $<BUILD_INTERFACE:mbgl-vendor-nunicode>
+         $<BUILD_INTERFACE:mbgl-vendor-csscolorparser>
+         $<$<NOT:$<OR:$<PLATFORM_ID:Windows>,$<PLATFORM_ID:Emscripten>>>:z>
+-        $<IF:$<BOOL:${MLN_QT_WITH_INTERNAL_SQLITE}>,$<BUILD_INTERFACE:mbgl-vendor-sqlite>,Qt${QT_VERSION_MAJOR}::Sql>
++        $<IF:$<BOOL:${MLN_QT_WITH_INTERNAL_SQLITE}>,$<BUILD_INTERFACE:mbgl-vendor-sqlite>,unofficial::sqlite3::sqlite3>
+     PRIVATE
+         $<$<PLATFORM_ID:Linux>:${CMAKE_THREAD_LIBS_INIT}>
+         Qt${QT_VERSION_MAJOR}::Core

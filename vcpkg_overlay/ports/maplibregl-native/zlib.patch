@@ -1,0 +1,47 @@
+diff --git forkSrcPrefix/platform/default/src/mbgl/storage/pmtiles_file_source.cpp forkDstPrefix/platform/default/src/mbgl/storage/pmtiles_file_source.cpp
+index daa9e8ba2f1ab1506d754f2da642c59a2e266093..c214a6247d742ef525a1760e9c810d12f99277c0 100644
+--- forkSrcPrefix/platform/default/src/mbgl/storage/pmtiles_file_source.cpp
++++ forkDstPrefix/platform/default/src/mbgl/storage/pmtiles_file_source.cpp
+@@ -23,11 +23,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
+-#if defined(__QT__) && (defined(_WIN32) || defined(__EMSCRIPTEN__))
+-#include <QtZlib/zlib.h>
+-#else
+ #include <zlib.h>
+-#endif
+ 
+ namespace {
+ // https://github.com/protomaps/PMTiles/blob/main/spec/v3/spec.md#3-header
+diff --git forkSrcPrefix/platform/default/src/mbgl/util/compression.cpp forkDstPrefix/platform/default/src/mbgl/util/compression.cpp
+index cad08e1179fcfe8da4e02eefaceb6be7a79976f4..9d9d81323332669f5e062634abc5cb12fb2ed562 100644
+--- forkSrcPrefix/platform/default/src/mbgl/util/compression.cpp
++++ forkDstPrefix/platform/default/src/mbgl/util/compression.cpp
+@@ -1,10 +1,6 @@
+ #include <mbgl/util/compression.hpp>
+ 
+-#if defined(__QT__) && (defined(_WIN32) || defined(__EMSCRIPTEN__))
+-#include <QtZlib/zlib.h>
+-#else
+ #include <zlib.h>
+-#endif
+ 
+ #include <cstdio>
+ #include <cstring>
+diff --git forkSrcPrefix/platform/default/src/mbgl/storage/mbtiles_file_source.cpp forkDstPrefix/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
+index 29b9be2de1d3ee70a47b3795d31174e05a276957..7b1635fa91e04c318fdd6bfc732c63e4599a468d 100644
+--- forkSrcPrefix/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
++++ forkDstPrefix/platform/default/src/mbgl/storage/mbtiles_file_source.cpp
+@@ -21,11 +21,7 @@
+ #include <sys/types.h>
+ #include <sys/stat.h>
+ 
+-#if defined(__QT__) && (defined(_WIN32) || defined(__EMSCRIPTEN__))
+-#include <QtZlib/zlib.h>
+-#else
+ #include <zlib.h>
+-#endif
+ 
+ namespace {
+ bool acceptsURL(const std::string &url) {

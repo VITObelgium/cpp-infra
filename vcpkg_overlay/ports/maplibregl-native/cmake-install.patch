@@ -1,0 +1,53 @@
+diff --git forkSrcPrefix/CMakeLists.txt forkDstPrefix/CMakeLists.txt
+index 0d56e47855ef4187333cb4f1c5cdce73273f7c73..817c915d04b5ac2af6da2357b23d15e0f28603d0 100644
+--- forkSrcPrefix/CMakeLists.txt
++++ forkDstPrefix/CMakeLists.txt
+@@ -140,11 +140,11 @@ set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_MINSIZEREL ON)
+ set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+ set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+ 
+-if(MLN_WITH_QT)
+-    add_library(mbgl-core OBJECT)
+-else()
++# if(MLN_WITH_QT)
++#     add_library(mbgl-core OBJECT)
++# else()
+     add_library(mbgl-core STATIC)
+-endif()
++# endif()
+ 
+ if(MLN_DRAWABLE_RENDERER)
+     list(APPEND INCLUDE_FILES
+@@ -1450,7 +1450,9 @@ target_include_directories(
+ 
+ target_include_directories(
+     mbgl-core
+-    PUBLIC ${PROJECT_SOURCE_DIR}/include
++    PUBLIC
++        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/include>
++        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>
+ )
+ 
+ include(${PROJECT_SOURCE_DIR}/vendor/boost.cmake)
+@@ -1596,8 +1598,20 @@ else()
+     message(FATAL_ERROR "Unsupported target platform: " ${CMAKE_SYSTEM_NAME})
+ endif()
+ 
++if(MBGL_OPTIONAL)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/test)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/benchmark)
+ add_subdirectory(${PROJECT_SOURCE_DIR}/render-test)
++endif()
+ 
+ include(cmake/mbgl-core-deps.cmake)
++
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/include/mbgl TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/platform/default/include/mbgl TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/geometry.hpp/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/variant/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/deps/geojson.hpp/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/include/mapbox TYPE INCLUDE)
++install(DIRECTORY ${PROJECT_SOURCE_DIR}/vendor/mapbox-base/extras/expected-lite/include/nonstd TYPE INCLUDE)
++install(TARGETS mbgl-core)
++#install(EXPORT MlnTargets NAMESPACE Mln:: DESTINATION cmake/maplibre-native)
+\ No newline at end of file
