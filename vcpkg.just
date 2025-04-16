@@ -4,8 +4,8 @@ VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
   windows_triplet
   } else if os() == "macos" {
     if arch() == "aarch64" {
-      "arm64-osx"
-    } else { "x64-osx" }
+      "arm64-osx-homebrew"
+    } else { "x64-osx-homebrew" }
   } else {
     "x64-linux"
   }
