@@ -1,4 +1,4 @@
-#include "infra/legend.h"
+﻿#include "infra/legend.h"
 #include "infra/cast.h"
 #include "infra/exception.h"
 #include "infra/interpolate.h"
@@ -200,6 +200,29 @@ Legend create_categoric_legend(int64_t min, int64_t max, std::string_view cmapNa
     for (int64_t i = min; i <= max; ++i) {
         legend.entries[entryIndex].color      = legend.cmap.get_color(colorPos);
         legend.entries[entryIndex].lowerBound = double(i);
+        legend.entries[entryIndex].upperBound = legend.entries[entryIndex].lowerBound;
+        colorPos += colorOffset;
+        ++entryIndex;
+    }
+
+    return legend;
+}
+
+Legend create_categoric_legend(std::span<const int64_t> values, std::string_view cmapName)
+{
+    Legend legend;
+    legend.type            = Legend::Type::Categoric;
+    legend.numberOfClasses = truncate<int>(values.size());
+    legend.colorMapName    = cmapName;
+    legend.entries.resize(legend.numberOfClasses);
+    legend.cmap = ColorMap::create(cmapName);
+
+    const float colorOffset = legend.numberOfClasses == 1 ? 0.f : 1.f / (legend.numberOfClasses - 1.f);
+    float colorPos          = 0.f;
+    size_t entryIndex       = 0;
+    for (auto value : values) {
+        legend.entries[entryIndex].color      = legend.cmap.get_color(colorPos);
+        legend.entries[entryIndex].lowerBound = double(value);
         legend.entries[entryIndex].upperBound = legend.entries[entryIndex].lowerBound;
         colorPos += colorOffset;
         ++entryIndex;

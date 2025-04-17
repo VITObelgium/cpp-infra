@@ -1,8 +1,9 @@
-#pragma once
+﻿#pragma once
 
 #include "infra/color.h"
 #include "infra/colormap.h"
 #include "infra/legendscaletype.h"
+#include "infra/span.h"
 
 #include <cmath>
 #include <limits>
@@ -81,6 +82,7 @@ private:
 Legend create_numeric_legend(double min, double max, int numberOfClasses, std::string_view cmapName, LegendScaleType method);
 Legend create_numeric_legend(std::vector<float> sampleData, int numberOfClasses, std::string_view cmapName, LegendScaleType method);
 Legend create_categoric_legend(int64_t min, int64_t max, std::string_view cmapName);
+Legend create_categoric_legend(std::span<const int64_t> values, std::string_view cmapName);
 Legend create_legend(std::vector<float> sampleData, Legend::Type type, int numberOfClasses, std::string_view cmapName);
 Legend create_contiguous_legend(std::string_view cmapName, double min, double max);
 
