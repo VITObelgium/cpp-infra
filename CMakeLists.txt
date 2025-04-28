@@ -1,10 +1,11 @@
-include(CMakeDependentOption)
+﻿include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 
 option(INFRA_LOGGING "Enable logging functionality" OFF)
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
+option(INFRA_GDAL_COPY_PROJDB "Copy the proj.db to the build dir" ON)
 cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
@@ -462,13 +463,15 @@ if(INFRA_GDAL)
         )
     elseif("${GDAL_VERSION}" VERSION_GREATER_EQUAL 3 AND NOT SYSTEM_GDAL)
         find_package(PROJ CONFIG REQUIRED)
-        add_custom_command(TARGET infra POST_BUILD
-            COMMENT "Copying proj db to the build directory"
-            COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ::proj>/../../share/proj/proj.db>
-            $<$<NOT:$<CONFIG:Debug>>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
-            "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/")
+        if (INFRA_GDAL_COPY_PROJDB)
+            add_custom_command(TARGET infra POST_BUILD
+                COMMENT "Copying proj db to the build directory"
+                COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/"
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<$<CONFIG:Debug>:$<TARGET_FILE_DIR:PROJ::proj>/../../share/proj/proj.db>
+                $<$<NOT:$<CONFIG:Debug>>:$<TARGET_FILE_DIR:PROJ::proj>/../share/proj/proj.db>
+                "$<TARGET_FILE_DIR:infra>/${INFRA_PROJDB_DIR}/")
+        endif ()
     endif()
 
     if(INFRA_LOGGING)
