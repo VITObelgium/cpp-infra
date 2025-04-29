@@ -1,4 +1,4 @@
-find_package(doctest CONFIG REQUIRED)
+﻿find_package(doctest CONFIG REQUIRED)
 
 set (INFRA_TESTUTIL_PUBLIC_HEADERS
     ${CMAKE_CURRENT_SOURCE_DIR}/include/infra/test/containerasserts.h
@@ -27,7 +27,9 @@ target_link_libraries(infratestutil PUBLIC infra doctest::doctest)
 
 add_library(infratestutilmain testmain.cpp)
 add_library(Infra::infratestutilmain ALIAS infratestutilmain)
-target_compile_definitions(infratestutilmain PRIVATE 
+
+target_compile_definitions(infratestutilmain PRIVATE
+    $<$<BOOL:${INFRA_GDAL_COPY_PROJDB}>:INFRA_COPY_PROJDB="${INFRA_GDAL_COPY_PROJDB}">
     $<$<BOOL:${INFRA_TESTUTIL_MAIN_PROJDB_PATH}>:INFRA_TESTUTIL_MAIN_PROJDB_PATH="${INFRA_TESTUTIL_MAIN_PROJDB_PATH}">
 )
 

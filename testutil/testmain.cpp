@@ -1,4 +1,4 @@
-#define DOCTEST_CONFIG_IMPLEMENT
+﻿#define DOCTEST_CONFIG_IMPLEMENT
 
 #include "infra/test/reporter.h"
 
@@ -49,11 +49,13 @@ int main(int argc, char** argv)
 
 #ifdef INFRA_GDAL_ENABLED
     inf::gdal::RegistrationConfig gdalCfg;
+#ifdef INFRA_COPY_PROJDB
 #ifdef INFRA_TESTUTIL_MAIN_PROJDB_PATH
     gdalCfg.projdbPath = inf::file::u8path(argv[0]).parent_path() / INFRA_TESTUTIL_MAIN_PROJDB_PATH;
 #else
     gdalCfg.projdbPath = inf::file::u8path(argv[0]).parent_path();
 #endif
+#endif //  INFRA_COPY_PROJDB
 
     inf::gdal::Registration reg(gdalCfg);
 
