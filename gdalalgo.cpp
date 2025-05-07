@@ -1,4 +1,4 @@
-#include "infra/gdalalgo.h"
+﻿#include "infra/gdalalgo.h"
 #include "infra/cast.h"
 #include "infra/enumutils.h"
 #include "infra/exception.h"
@@ -137,7 +137,7 @@ void warp_cli(const RasterDataSet& srcDataSet, const fs::path& output, const std
 
     int usageError = 0;
     auto srcHandle = GDALDataset::ToHandle(srcDataSet.get());
-    GDALWarp(file::generic_u8string(output).c_str(), nullptr, 1, &srcHandle, warpOptions, &usageError);
+    RasterDataSet rasterDs(GDALWarp(file::generic_u8string(output).c_str(), nullptr, 1, &srcHandle, warpOptions, &usageError));
     if (usageError) {
         throw RuntimeError("Warp failed");
     }
