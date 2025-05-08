@@ -1,4 +1,4 @@
-#include "uiinfra/aboutdialog.h"
+﻿#include "uiinfra/aboutdialog.h"
 #include "ui_aboutdialog.h"
 
 #include <qfile.h>
@@ -56,7 +56,10 @@ void AboutDialog::setVersion(QString versionString)
 
 void AboutDialog::setLogo(QString resourceId)
 {
-    _ui->logoLabel->setPixmap(QPixmap(resourceId));
+    QPixmap pixmap(resourceId);
+    if (!pixmap.isNull()) {
+        _ui->logoLabel->setPixmap(pixmap.scaled(_ui->logoLabel->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    }
 }
 
 void AboutDialog::setCopyrightInfo(QString copyright)
