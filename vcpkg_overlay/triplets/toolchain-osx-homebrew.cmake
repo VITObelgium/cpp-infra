@@ -4,15 +4,19 @@ if(NOT _VCPKG_OSX_TOOLCHAIN)
     if(POLICY CMP0056)
         cmake_policy(SET CMP0056 NEW)
     endif()
+
     if(POLICY CMP0066)
         cmake_policy(SET CMP0066 NEW)
     endif()
+
     if(POLICY CMP0067)
         cmake_policy(SET CMP0067 NEW)
     endif()
+
     if(POLICY CMP0137)
         cmake_policy(SET CMP0137 NEW)
     endif()
+
     list(APPEND CMAKE_TRY_COMPILE_PLATFORM_VARIABLES
         VCPKG_CRT_LINKAGE VCPKG_TARGET_ARCHITECTURE
         VCPKG_C_FLAGS VCPKG_CXX_FLAGS
@@ -22,12 +26,15 @@ if(NOT _VCPKG_OSX_TOOLCHAIN)
     )
 
     set(CMAKE_SYSTEM_NAME Darwin CACHE STRING "")
-    set(CMAKE_OSX_SYSROOT macosx  CACHE STRING "")
+    set(CMAKE_OSX_SYSROOT macosx CACHE STRING "")
     set(CMAKE_MACOSX_RPATH ON CACHE BOOL "")
 
+    if(VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64")
+        set(LLVM_ROOT_DIR /opt/homebrew/opt/llvm)
+    else()
+        set(LLVM_ROOT_DIR /usr/local/opt/llvm)
+    endif()
 
-    #set(LLVM_ROOT_DIR /opt/homebrew/opt/llvm)
-    set(LLVM_ROOT_DIR /usr/local/opt/llvm)
     set(CMAKE_C_COMPILER "${LLVM_ROOT_DIR}/bin/clang")
     set(CMAKE_ASM_COMPILER "${LLVM_ROOT_DIR}/bin/clang")
     set(CMAKE_CXX_COMPILER "${LLVM_ROOT_DIR}/bin/clang++")
@@ -40,8 +47,7 @@ if(NOT _VCPKG_OSX_TOOLCHAIN)
     set(OpenMP_CXX_LIB_NAMES "omp" CACHE STRING "")
     set(OpenMP_omp_LIBRARY "${LLVM_ROOT_DIR}/lib/libomp.dylib" CACHE STRING "")
 
-    #set(CMAKE_FIND_ROOT_PATH "${LLVM_ROOT_DIR}" CACHE STRING "")
-
+    # set(CMAKE_FIND_ROOT_PATH "${LLVM_ROOT_DIR}" CACHE STRING "")
     if(NOT DEFINED CMAKE_SYSTEM_PROCESSOR)
         if(VCPKG_TARGET_ARCHITECTURE STREQUAL "x64")
             set(CMAKE_SYSTEM_PROCESSOR x86_64 CACHE STRING "")
