@@ -1,4 +1,4 @@
-#include "infra/gdal.h"
+﻿#include "infra/gdal.h"
 #include "infra/cast.h"
 #include "infra/environmentvariable.h"
 #include "infra/exception.h"
@@ -138,7 +138,7 @@ void register_gdal()
 
 void register_gdal(RegistrationConfig cfg)
 {
-    if (cfg.projdbPath.is_relative()) {
+    if ((!cfg.projdbPath.empty()) && cfg.projdbPath.is_relative()) {
         cfg.projdbPath = fs::absolute(cfg.projdbPath);
     }
 
