@@ -10,15 +10,7 @@ VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
     "x64-linux"
 }
 
-cmake_preset := if os_family() == "windows" {
-    "windows"
-} else if os() == "macos" {
-    if arch() == "aarch64" {
-        "mac-arm"
-    } else { "mac-intel" }
-} else {
-    "linux"
-}
+cmake_preset := VCPKG_DEFAULT_TRIPLET
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "..", "vcpkg"))
