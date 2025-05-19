@@ -2,8 +2,6 @@
 
 #include "infra/span.h"
 #include "infra/string.h"
-#include <fmt/core.h>
-#include <fmt/std.h>
 #include <iosfwd>
 #include <string_view>
 #include <vector>
