@@ -256,7 +256,6 @@ endif()
 
 target_compile_definitions(infra
     PUBLIC
-    FMT_STRING_ALIAS=1
     $<$<BOOL:${HAVE_CPP20_CHRONO}>:HAVE_CPP20_CHRONO>
     $<$<BOOL:${HAVE_U8STRING}>:HAVE_CPP20_U8STRING>
     PRIVATE

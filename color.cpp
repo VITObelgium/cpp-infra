@@ -47,12 +47,12 @@ Color::Color(std::string_view hexString)
 
 std::string Color::to_hex_rgb() const noexcept
 {
-    return fmt::format(FMT_STRING("#{:02X}{:02X}{:02X}"), r, g, b);
+    return fmt::format("#{:02X}{:02X}{:02X}", r, g, b);
 }
 
 std::string Color::to_hex_argb() const noexcept
 {
-    return fmt::format(FMT_STRING("#{:02X}{:02X}{:02X}{:02X}"), a, r, g, b);
+    return fmt::format("#{:02X}{:02X}{:02X}{:02X}", a, r, g, b);
 }
 
 }
