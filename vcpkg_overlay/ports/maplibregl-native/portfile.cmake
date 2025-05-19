@@ -49,6 +49,7 @@ vcpkg_apply_patches(
     PATCHES
     cmake-changes.patch
     timer-overflow.patch
+    boost-numeric.patch
 )
 
 if(VCPKG_TARGET_IS_OSX)

@@ -29,7 +29,7 @@ if(NOT _VCPKG_OSX_TOOLCHAIN)
     set(CMAKE_OSX_SYSROOT macosx CACHE STRING "")
     set(CMAKE_MACOSX_RPATH ON CACHE BOOL "")
 
-    if(VCPKG_TARGET_ARCHITECTURE STREQUAL "arm64")
+    if(CMAKE_HOST_SYSTEM_PROCESSOR STREQUAL "arm64")
         set(LLVM_ROOT_DIR /opt/homebrew/opt/llvm)
     else()
         set(LLVM_ROOT_DIR /usr/local/opt/llvm)
