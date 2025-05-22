@@ -29,8 +29,8 @@ clear_cache:
 
 # will invoke just build_dist but first activates the visual studio environment
 [windows]
-dist:
-    cmd.exe /C '{{source_directory()}}/dist.bat' '{{justfile_directory()}}'
+dist triplet=VCPKG_DEFAULT_TRIPLET:
+    cmd.exe /C '{{source_directory()}}/dist.bat' '{{justfile_directory()}}' '{{triplet}}'
 
 [unix]
-dist: build_dist
+dist triplet=VCPKG_DEFAULT_TRIPLET: (build_dist triplet)
