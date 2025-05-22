@@ -7,4 +7,4 @@ SET vspath=%%F
 )
 set VSCMD_START_DIR=%1
 CALL "%vspath%\VC\Auxiliary\Build\vcvarsall.bat" x64
-just build_dist %2
+just build_dist %2 %3

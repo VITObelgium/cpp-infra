@@ -14,9 +14,10 @@ cmake_preset := VCPKG_DEFAULT_TRIPLET
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "..", "vcpkg"))
+in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
 git_status_clean:
-    git diff --quiet --exit-code
+    if {{in_git_repo}}; then git diff --quiet --exit-code; fi
 
 [windows]
 clear_cache_vs:
@@ -29,8 +30,8 @@ clear_cache:
 
 # will invoke just build_dist but first activates the visual studio environment
 [windows]
-dist triplet=VCPKG_DEFAULT_TRIPLET:
-    cmd.exe /C '{{source_directory()}}/dist.bat' '{{justfile_directory()}}' '{{triplet}}'
+dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`:
+    cmd.exe /C '{{source_directory()}}/dist.bat' '{{justfile_directory()}}' '{{triplet}}' {{git_hash}}
 
 [unix]
-dist triplet=VCPKG_DEFAULT_TRIPLET: (build_dist triplet)
+dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`: (build_dist triplet git_hash)
