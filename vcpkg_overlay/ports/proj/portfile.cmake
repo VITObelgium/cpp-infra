@@ -15,7 +15,8 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         net   ENABLE_CURL
         tiff  ENABLE_TIFF
         tools BUILD_APPS
-        embed-data EMBED_PROJ_DATA_PATH
+        embed-data EMBED_RESOURCE_FILES
+        embed-data USE_ONLY_EMBEDDED_RESOURCE_FILES
 )
 
 vcpkg_list(SET TOOL_NAMES cct cs2cs geod gie invgeod invproj proj projinfo projsync)
