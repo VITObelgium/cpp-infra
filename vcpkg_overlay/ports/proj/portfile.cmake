@@ -8,6 +8,7 @@ vcpkg_from_github(
         fix-proj4-targets-cmake.patch
         remove_toolset_restriction.patch
         sqlite.diff
+        embed-data-winfix.patch # included in next release
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
