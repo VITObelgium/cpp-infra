@@ -15,8 +15,6 @@
 
 namespace inf {
 
-constexpr const uint16_t TILE_SIZE = 256;
-
 // An XYZ web mercator tile
 class Tile
 {
@@ -189,26 +187,8 @@ private:
     int32_t _z = 0;
 };
 
-// returns the 0 based index of the tile in the given extent
-// tiles are row major, 0 is the top left tile
-inline std::optional<uint32_t> tile_index(const Tile& tile, const inf::GeoMetadata& meta) noexcept
-{
-    std::optional<uint32_t> result;
-
-    auto upperLeft = crs::lat_lon_to_web_mercator(tile.center());
-
-    if (meta.is_on_map(upperLeft)) {
-        const auto tilesPerRow = inf::truncate<uint32_t>(meta.cols / TILE_SIZE);
-
-        auto cell = meta.convert_point_to_cell(upperLeft);
-        cell.r /= TILE_SIZE;
-        cell.c /= TILE_SIZE;
-        result = cell.r * tilesPerRow + cell.c;
-    }
-
-    return result;
-}
-
 GeoMetadata create_xyz_tile_aligned_extent(const inf::GeoMetadata& extent);
+double pixel_size_at_zoom_level(uint32_t zoomLevel) noexcept;
+uint32_t zoom_level_for_pixel_size(double pixelSize, bool preferHigher) noexcept;
 
 }
