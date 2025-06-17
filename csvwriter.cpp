@@ -42,9 +42,11 @@ CsvWriter::CsvWriter(const fs::path& outputPath)
 }
 
 CsvWriter::CsvWriter(const fs::path& outputPath, Settings settings)
-: _stream(outputPath)
-, _settings(settings)
+: _settings(settings)
 {
+    file::create_directory_for_file(outputPath);
+
+    _stream.open(outputPath);
     if (!_stream.is_open()) {
         throw RuntimeError("Failed to open file for csv writing: {}", outputPath);
     }
