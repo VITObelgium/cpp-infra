@@ -34,4 +34,4 @@ dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`:
     cmd.exe /C '{{source_directory()}}/dist.bat' '{{justfile_directory()}}' '{{triplet}}' {{git_hash}}
 
 [unix]
-dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`: (build_dist triplet git_hash)
+dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`: (build_dist triplet)
