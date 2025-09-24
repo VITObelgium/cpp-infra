@@ -1,5 +1,14 @@
 # detect the vcpkg triplet based on the system information
 windows_triplet := "x64-windows-static"
+vcpkg_version := "2025-09-03"
+vcpkg_tool_url := if os_family() == "windows" {
+    "https://github.com/microsoft/vcpkg-tool/releases/download/" + vcpkg_version + "/vcpkg.exe"
+} else if os() == "macos" {
+    "https://github.com/microsoft/vcpkg-tool/releases/download/" + vcpkg_version + "/vcpkg-macos"
+} else {
+    "https://github.com/microsoft/vcpkg-tool/releases/download/" + vcpkg_version + "/vcpkg-muslc"
+}
+
 VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
     windows_triplet
 } else if os() == "macos" {
@@ -15,6 +24,18 @@ cmake_preset := VCPKG_DEFAULT_TRIPLET
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "..", "vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
+
+[windows]
+download_vcpkg_bin:
+    mkdir '{{join(justfile_directory(), "vcpkg")}}'
+    curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "vcpkg", "vcpkg.exe")}}'
+
+[unix]
+download_vcpkg_bin:
+    rm -r '{{join(justfile_directory(), "vcpkg")}}'
+    git clone https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "vcpkg")}}'
+    curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "vcpkg", "vcpkg")}}'
+    chmod +x '{{join(justfile_directory(), "vcpkg", "vcpkg")}}'
 
 git_status_clean:
     if {{in_git_repo}}; then git diff --quiet --exit-code; fi
