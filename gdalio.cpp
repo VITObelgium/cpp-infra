@@ -4,11 +4,7 @@
 #include "infra/filesystem.h"
 #include "infra/string.h"
 
-#include <array>
 #include <cassert>
-#include <complex>
-#include <fstream>
-#include <memory>
 #include <typeindex>
 
 namespace inf::gdal::io {
