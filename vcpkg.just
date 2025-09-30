@@ -22,7 +22,7 @@ VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
 cmake_preset := VCPKG_DEFAULT_TRIPLET
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
-vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "..", "vcpkg"))
+vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
 [windows]
@@ -32,7 +32,7 @@ download_vcpkg_bin:
 
 [unix]
 download_vcpkg_bin:
-    rm -r '{{join(justfile_directory(), "vcpkg")}}'
+    - rm -r '{{join(justfile_directory(), "vcpkg")}}'
     git clone https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "vcpkg")}}'
     curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "vcpkg", "vcpkg")}}'
     chmod +x '{{join(justfile_directory(), "vcpkg", "vcpkg")}}'
