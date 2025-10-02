@@ -4,5 +4,10 @@
   "port-version": 0,
   "description": "netcdf fortran bindings.",
   "homepage": "https://github.com/Unidata/netcdf-fortran",
-  "dependencies": ["netcdf-c"]
+  "dependencies": [
+    {
+      "name": "netcdf-c",
+      "default-features": false
+    }
+  ]
 }

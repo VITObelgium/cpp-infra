@@ -1,0 +1,345 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/scripts/buildsystems/vcpkg.cmake",
+        "VCPKG_APPLOCAL_DEPS": "OFF",
+        "VCPKG_MANIFEST_MODE": "OFF"
+      }
+    },
+    {
+      "name": "multi",
+      "generator": "Ninja Multi-Config",
+      "hidden": true
+    },
+    {
+      "name": "windows-msvc-common",
+      "hidden": true,
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "host=x64",
+        "strategy": "external"
+      },
+      "vendor": {
+        "microsoft.com/VisualStudioSettings/CMake/1.0": {
+          "hostOS": [
+            "Windows"
+          ]
+        }
+      },
+      "cacheVariables": {
+        "CMAKE_CXX_COMPILER": "cl.exe"
+      }
+    },
+    {
+      "name": "toolchain-osx-appleclang",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "VCPKG_CMAKE_SYSTEM_NAME": "Darwin",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "14.0",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-osx-appleclang.cmake"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "toolchain-osx-homebrew",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "VCPKG_CMAKE_SYSTEM_NAME": "Darwin",
+        "CMAKE_OSX_DEPLOYMENT_TARGET": "14.0",
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-osx-homebrew.cmake"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "toolchain-windows",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/scripts/toolchains/windows.cmake"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "toolchain-linux",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/vcpkg/scripts/toolchains/linux.cmake",
+        "VCPKG_CMAKE_SYSTEM_NAME": "Linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "toolchain-linux-cluster",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-cluster.cmake",
+        "VCPKG_CMAKE_SYSTEM_NAME": "Linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "toolchain-linux-intel",
+      "hidden": true,
+      "inherits": "vcpkg-base",
+      "cacheVariables": {
+        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-intel.cmake",
+        "VCPKG_CMAKE_SYSTEM_NAME": "Linux"
+      },
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    },
+    {
+      "name": "triplet-x64-osx",
+      "inherits": "toolchain-osx-appleclang",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_ALLOW_SYSTEM_LIBS": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-osx",
+        "VCPKG_OSX_ARCHITECTURES": "x86_64",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "static",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_C_FLAGS": "-fvisibility=hidden",
+        "VCPKG_CXX_FLAGS": "-fvisibility=hidden -fvisibility-inlines-hidden"
+      }
+    },
+    {
+      "name": "triplet-arm64-osx",
+      "inherits": "toolchain-osx-appleclang",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_ALLOW_SYSTEM_LIBS": "ON",
+        "VCPKG_TARGET_TRIPLET": "arm64-osx",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-arm64-osx",
+        "VCPKG_OSX_ARCHITECTURES": "arm64",
+        "VCPKG_TARGET_ARCHITECTURE": "arm64",
+        "VCPKG_CRT_LINKAGE": "static",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_C_FLAGS": "-fvisibility=hidden",
+        "VCPKG_CXX_FLAGS": "-fvisibility=hidden -fvisibility-inlines-hidden"
+      }
+    },
+    {
+      "name": "triplet-x64-osx-homebrew",
+      "inherits": "toolchain-osx-homebrew",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-osx-homebrew",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-osx-homebrew",
+        "VCPKG_OSX_ARCHITECTURES": "x64",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "static",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_C_FLAGS": "-fvisibility=hidden",
+        "VCPKG_CXX_FLAGS": "-fvisibility=hidden -fvisibility-inlines-hidden"
+      }
+    },
+    {
+      "name": "triplet-arm64-osx-homebrew",
+      "inherits": "toolchain-osx-homebrew",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_ALLOW_SYSTEM_LIBS": "ON",
+        "VCPKG_TARGET_TRIPLET": "arm64-osx-homebrew",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-arm64-osx-homebrew",
+        "VCPKG_OSX_ARCHITECTURES": "arm64",
+        "VCPKG_TARGET_ARCHITECTURE": "arm64",
+        "VCPKG_CRT_LINKAGE": "static",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_C_FLAGS": "-fvisibility=hidden",
+        "VCPKG_CXX_FLAGS": "-fvisibility=hidden -fvisibility-inlines-hidden"
+      }
+    },
+    {
+      "name": "triplet-x64-windows-static-vs2022",
+      "inherits": [
+        "toolchain-windows",
+        "windows-msvc-common"
+      ],
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-vs2022",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-windows-static-vs2022",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "static",
+        "VCPKG_PLATFORM_TOOLSET": "v143",
+        "VCPKG_SET_CHARSET_FLAG": "ON"
+      }
+    },
+    {
+      "name": "triplet-x64-windows-static-asan-vs2022",
+      "inherits": "triplet-x64-windows-static-vs2022",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-asan-vs2022",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-windows-static-asan-vs2022",
+        "VCPKG_C_FLAGS": "/fsanitize=address",
+        "VCPKG_CXX_FLAGS": "/fsanitize=address"
+      }
+    },
+    {
+      "name": "triplet-x64-windows-static-ltcg-vs2022",
+      "inherits": "triplet-x64-windows-static-vs2022",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static-ltcg-vs2022",
+        "VCPKG_C_FLAGS_RELEASE": "/GL",
+        "VCPKG_CXX_FLAGS_RELEASE": "/GL",
+        "VCPKG_LINKER_FLAGS_RELEASE": "/LTCG"
+      }
+    },
+    {
+      "name": "triplet-x64-windows-intel",
+      "inherits": [
+        "toolchain-windows"
+      ],
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows-intel",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-windows-intel",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_PLATFORM_TOOLSET": "v143",
+        "VCPKG_SET_CHARSET_FLAG": "ON",
+        "VCPKG_INTEL_ONEAPI": "ON",
+        "VCPKG_POLICY_SKIP_ARCHITECTURE_CHECK": "enabled",
+        "VCPKG_ENV_PASSTHROUGH": "LIB;PATH;CPATH;ONEAPI_ROOT;INTEL_TARGET_ARCH;INTEL_TARGET_PLATFORM;USE_INTEL_LLVM;IFORT_COMPILER23;VARSDIR"
+      }
+    },
+    {
+      "name": "triplet-arm64-linux",
+      "inherits": "toolchain-linux",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "arm64-linux",
+        "VCPKG_TARGET_ARCHITECTURE": "arm64",
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "static"
+      }
+    },
+    {
+      "name": "triplet-x64-linux",
+      "inherits": "toolchain-linux",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "static"
+      }
+    },
+    {
+      "name": "triplet-x64-linux-asan",
+      "inherits": "toolchain-linux",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_C_FLAGS": "-fsanitize=address",
+        "VCPKG_CXX_FLAGS": "-fsanitize=address",
+        "VCPKG_LINKER_FLAGS": "-fsanitize=address -static-libasan"
+      }
+    },
+    {
+      "name": "triplet-x64-linux-cluster",
+      "inherits": "toolchain-linux-cluster",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux-cluster",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux-cluster",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc"
+      }
+    },
+    {
+      "name": "triplet-x64-linux-intel",
+      "inherits": "toolchain-linux-intel",
+      "hidden": true,
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux-inteloneapi",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux-inteloneapi",
+        "VCPKG_TARGET_ARCHITECTURE": "x64",
+        "VCPKG_CRT_LINKAGE": "dynamic",
+        "VCPKG_LIBRARY_LINKAGE": "static",
+        "VCPKG_LINKER_FLAGS": "-fuse-ld=lld -static-libstdc++ -static-libgcc",
+        "VCPKG_C_FLAGS": "-fp-model=precise",
+        "VCPKG_CXX_FLAGS": "-fp-model=precise"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-win-only",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Windows"
+      }
+    },
+    {
+      "name": "build-mac-only",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Darwin"
+      }
+    },
+    {
+      "name": "build-linux-only",
+      "hidden": true,
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      }
+    }
+  ]
+}
