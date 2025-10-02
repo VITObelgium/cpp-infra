@@ -27,15 +27,16 @@ in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
 [windows]
 download_vcpkg_bin:
-    - rm -r '{{join(justfile_directory(), "vcpkg")}}'
+    - rm -rf '{{join(justfile_directory(), "vcpkg")}}'
     mkdir '{{join(justfile_directory(), "vcpkg")}}'
-    git clone https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "vcpkg")}}'
+    git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "vcpkg")}}'
     curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "vcpkg", "vcpkg.exe")}}'
+
 
 [unix]
 download_vcpkg_bin:
-    - rm -r '{{join(justfile_directory(), "vcpkg")}}'
-    git clone https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "vcpkg")}}'
+    - rm -rf '{{join(justfile_directory(), "vcpkg")}}'
+    git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "vcpkg")}}'
     curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "vcpkg", "vcpkg")}}'
     chmod +x '{{join(justfile_directory(), "vcpkg", "vcpkg")}}'
 
