@@ -5,7 +5,7 @@ include(CheckCXXSourceCompiles)
 
 option(INFRA_LOGGING "Enable logging functionality" OFF)
 option(INFRA_GDAL "Enable gdal wrapper for reading gis data" OFF)
-option(INFRA_GDAL_COPY_PROJDB "Copy the proj.db to the build dir" ON)
+option(INFRA_GDAL_COPY_PROJDB "Copy the proj.db to the build dir" OFF)
 cmake_dependent_option(INFRA_EMBED_GDAL_DATA "Embed the required gdal data files in the binary" OFF "INFRA_GDAL" OFF)
 option(INFRA_LICENSE_MANAGER "Enable the license management functionality" OFF)
 option(INFRA_XML "Enable xml config reader" OFF)
