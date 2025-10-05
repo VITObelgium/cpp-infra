@@ -1,0 +1,36 @@
+diff --git a/include/mbgl/gfx/shader_registry.hpp b/include/mbgl/gfx/shader_registry.hpp
+index ec3716ceb..816009c5d 100644
+--- a/include/mbgl/gfx/shader_registry.hpp
++++ b/include/mbgl/gfx/shader_registry.hpp
+@@ -5,6 +5,7 @@
+ #include <memory>
+ #include <mutex>
+ #include <shared_mutex>
++#include <string>
+ #include <unordered_map>
+ 
+ namespace mbgl {
+diff --git a/include/mbgl/storage/resource_options.hpp b/include/mbgl/storage/resource_options.hpp
+index bb5619c70..0afe44e0b 100644
+--- a/include/mbgl/storage/resource_options.hpp
++++ b/include/mbgl/storage/resource_options.hpp
+@@ -2,6 +2,7 @@
+ 
+ #include <memory>
+ #include <string>
++#include <cstdint>
+ #include <mbgl/util/tile_server_options.hpp>
+ 
+ namespace mbgl {
+diff --git a/src/mbgl/text/bidi.hpp b/src/mbgl/text/bidi.hpp
+index 1f03ab91d..b24d48531 100644
+--- a/src/mbgl/text/bidi.hpp
++++ b/src/mbgl/text/bidi.hpp
+@@ -4,6 +4,7 @@
+ #include <string>
+ #include <vector>
+ #include <memory>
++#include <cstdint>
+ 
+ #include <mbgl/util/noncopyable.hpp>
+ 

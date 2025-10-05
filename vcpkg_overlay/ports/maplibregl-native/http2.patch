@@ -1,0 +1,70 @@
+From f2eec1201ecd8922535717e3db33e2ffc2bebc13 Mon Sep 17 00:00:00 2001
+From: Dirk Vanden Boer <dirk.vdb@gmail.com>
+Date: Sun, 5 Oct 2025 13:56:39 +0200
+Subject: [PATCH] Qt6 causes HTTP/2 errors
+
+https://github.com/maplibre/maplibre-native/issues/3644
+---
+ platform/qt/src/mbgl/http_file_source.cpp | 35 ++++++++++++++++++-----
+ 1 file changed, 28 insertions(+), 7 deletions(-)
+
+diff --git a/platform/qt/src/mbgl/http_file_source.cpp b/platform/qt/src/mbgl/http_file_source.cpp
+index 43df2470715f..dd3bff2c1fdc 100644
+--- a/platform/qt/src/mbgl/http_file_source.cpp
++++ b/platform/qt/src/mbgl/http_file_source.cpp
+@@ -68,12 +68,21 @@ void HTTPFileSource::Impl::cancel(HTTPRequest* req) {
+ 
+     if (requestsVector.empty()) {
+         m_pending.erase(it);
++#if QT_VERSION >= QT_VERSION_CHECK(5, 9, 4)
++        // Qt 5.9.4 introduced HTTP/2, in the ideal world we would like to know if this reply
++        // is from a HTTP/2 connection. At this point in time we cannot check it. If HTTP/2 is
++        // in use we may not abort the connection.
++        Q_UNUSED(reply);
++#else
++        // Works fine with HTTP/1
+         if (reply) reply->abort();
++#endif
+     }
+ }
+ 
+ void HTTPFileSource::Impl::onReplyFinished() {
+     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
++    if (!reply) return;
+     const QUrl& url = reply->request().url();
+ 
+     auto it = m_pending.find(url);
+@@ -82,14 +91,26 @@ void HTTPFileSource::Impl::onReplyFinished() {
+         return;
+     }
+ 
+-    QByteArray data = reply->readAll();
+-    QVector<HTTPRequest*>& requestsVector = it.value().second;
++    // Error handling
++    if (reply->error() != QNetworkReply::NoError) {
++        qWarning() << "Network error for URL" << url << ":" << reply->errorString();
++
++        QVariant statusCode = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
++        if (!statusCode.isValid()) {
++            qWarning() << "No HTTP status code received; possible connection/protocol failure.";
++        }
++
++        m_manager->clearConnectionCache();
++    } else {
++        QByteArray data = reply->readAll();
++        QVector<HTTPRequest*>& requestsVector = it.value().second;
+ 
+-    // Cannot use the iterator to walk the requestsVector
+-    // because calling handleNetworkReply() might get
+-    // requests added to the requestsVector.
+-    while (!requestsVector.isEmpty()) {
+-        requestsVector.takeFirst()->handleNetworkReply(reply, data);
++        // Cannot use the iterator to walk the requestsVector
++        // because calling handleNetworkReply() might get
++        // requests added to the requestsVector.
++        while (!requestsVector.isEmpty()) {
++            requestsVector.takeFirst()->handleNetworkReply(reply, data);
++        }
+     }
+ 
+     m_pending.erase(it);
