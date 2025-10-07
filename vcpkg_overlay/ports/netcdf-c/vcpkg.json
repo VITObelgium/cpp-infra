@@ -95,14 +95,7 @@
     "szip": {
       "description": "Szip compression plugin",
       "dependencies": [
-        "libaec",
-        {
-          "name": "netcdf-c",
-          "default-features": false,
-          "features": [
-            "plugins"
-          ]
-        }
+        "libaec"
       ]
     },
     "tools": {
@@ -111,13 +104,6 @@
     "zstd": {
       "description": "Zstandard compression plugin",
       "dependencies": [
-        {
-          "name": "netcdf-c",
-          "default-features": false,
-          "features": [
-            "plugins"
-          ]
-        },
         "zstd"
       ]
     }
