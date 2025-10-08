@@ -6,7 +6,26 @@
     "patch": 0
   },
   "configurePresets": [
-     {
+    {
+      "name": "inteloneapi-env",
+      "hidden": true,
+      "environment": {
+        "ONEAPI_ROOT": "/tools/toolchains/intel/oneapi",
+        "ONEAPI_VERSION": "2025.2",
+        "CMAKE_PREFIX_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
+        "CMPLR_ROOT": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
+        "CPATH": "$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/include",
+        "GDB_INFO": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/share/info/",
+        "INFOPATH": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/share/info",
+        "LD_LIBRARY_PATH": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/opt/debugger/lib:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/opt/compiler/lib:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib",
+        "LIBRARY_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib",
+        "OCL_ICD_FILENAMES": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/libintelocl.so",
+        "PATH": "$env{ONEAPI_ROOT}/mpi/2021.16/bin:$env{ONEAPI_ROOT}/dpcpp-ct/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/opt/debugger/bin:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin/compiler:$penv{PATH}",
+        "PKG_CONFIG_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/pkgconfig",
+        "SETVARS_COMPLETED": "1"
+      }
+    },
+    {
       "name": "vcpkg-base",
       "hidden": true,
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
@@ -238,12 +257,15 @@
     },
     {
       "name": "triplet-x64-linux-inteloneapi",
-      "inherits": "vcpkg-base",
+      "inherits": [
+        "vcpkg-base",
+        "inteloneapi-env"
+      ],
       "hidden": true,
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux-inteloneapi",
         "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-inteloneapi.cmake",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux-inteloneapi",
+        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux-inteloneapi",
         "VCPKG_TARGET_ARCHITECTURE": "x64",
         "VCPKG_CRT_LINKAGE": "dynamic",
         "VCPKG_LIBRARY_LINKAGE": "static",
