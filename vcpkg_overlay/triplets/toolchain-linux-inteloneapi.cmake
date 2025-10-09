@@ -21,8 +21,11 @@ if(NOT _VCPKG_LINUX_TOOLCHAIN)
     # endif()
 
     # set(INTEL_PATH ${INTEL_INSTALL_PATH}/bin/)
-    # set(INTEL_LLVM_PATH ${INTEL_INSTALL_PATH}/bin/compiler/)
     # set(ENV{LD_LIBRARY_PATH} "${INTEL_PATH}/compiler/lib/intel64_lin:$ENV{LD_LIBRARY_PATH}")
+
+    message(STATUS "Oneapi: $ENV{ONEAPI_ROOT}")
+    set(INTEL_LLVM_PATH "$ENV{ONEAPI_ROOT}/compiler/$ENV{ONEAPI_VERSION}/bin/compiler/")
+
     set(CMAKE_C_COMPILER ${INTEL_PATH}icx CACHE FILEPATH "")
     set(CMAKE_ASM_COMPILER ${INTEL_PATH}icx CACHE FILEPATH "")
     set(CMAKE_CXX_COMPILER ${INTEL_PATH}icpx CACHE FILEPATH "")

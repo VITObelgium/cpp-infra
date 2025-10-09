@@ -8,6 +8,7 @@ vcpkg_from_github(
         fix-proj4-targets-cmake.patch
         remove_toolset_restriction.patch
         sqlite.diff
+        intel.patch # fixes the way -ffast-math is added to the compiler flags
         embed-data-winfix.patch # included in next release
 )
 

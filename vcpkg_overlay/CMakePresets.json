@@ -74,9 +74,7 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": [
-            "Windows"
-          ]
+          "hostOS": ["Windows"]
         }
       },
       "cacheVariables": {
@@ -257,11 +255,11 @@
     },
     {
       "name": "triplet-x64-linux-inteloneapi",
-      "inherits": [
-        "vcpkg-base",
-        "inteloneapi-env"
-      ],
+      "inherits": ["vcpkg-base", "inteloneapi-env"],
       "hidden": true,
+      "environment": {
+        "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-inteloneapi"
+      },
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux-inteloneapi",
         "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-inteloneapi.cmake",
@@ -269,7 +267,7 @@
         "VCPKG_TARGET_ARCHITECTURE": "x64",
         "VCPKG_CRT_LINKAGE": "dynamic",
         "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_LINKER_FLAGS": "-fuse-ld=lld -static-libstdc++ -static-libgcc",
+        "VCPKG_LINKER_FLAGS": "-fuse-ld=lld",
         "VCPKG_C_FLAGS": "-fp-model=precise",
         "VCPKG_CXX_FLAGS": "-fp-model=precise"
       },
