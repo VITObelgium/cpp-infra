@@ -11,7 +11,8 @@ namespace inf::gdal::io {
 
 const std::type_info& get_raster_type(const fs::path& fileName)
 {
-    auto& type = gdal::RasterDataSet::open(fileName).band_datatype(1);
+    auto ds    = gdal::RasterDataSet::open(fileName);
+    auto& type = ds.band_datatype(1);
     if (type == typeid(void)) {
         throw RuntimeError("Unsupported raster data type");
     }

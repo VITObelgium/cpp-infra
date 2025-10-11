@@ -25,20 +25,11 @@ VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "./deps/vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
-[windows]
-download_vcpkg_bin:
-    - rm -rf '{{join(justfile_directory(), "vcpkg")}}'
-    mkdir '{{join(justfile_directory(), "vcpkg")}}'
-    git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "deps", "vcpkg")}}'
-    curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "deps", "vcpkg", "vcpkg.exe")}}'
+clone_vcpkg:
+    - rm -rf '{{join(justfile_directory(), "build", "vcpkg")}}'
+    mkdir '{{join(justfile_directory(), "build")}}'
+    git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "build", "vcpkg")}}'
 
-
-[unix]
-download_vcpkg_bin:
-    - rm -rf '{{join(justfile_directory(), "vcpkg")}}'
-    git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "deps", "vcpkg")}}'
-    curl -L --fail --show-error '{{vcpkg_tool_url}}' -o '{{join(justfile_directory(), "deps", "vcpkg", "vcpkg")}}'
-    chmod +x '{{join(justfile_directory(), "deps", "vcpkg", "vcpkg")}}'
 
 git_status_clean:
     if {{in_git_repo}}; then git diff --quiet --exit-code; fi
