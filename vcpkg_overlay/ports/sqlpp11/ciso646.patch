@@ -1,0 +1,174 @@
+From 3b8f4092f74f5a501af7082238b865242ca0da44 Mon Sep 17 00:00:00 2001
+From: Roland Bock <rbock@eudoxos.de>
+Date: Sun, 7 Sep 2025 09:10:11 +0200
+Subject: [PATCH] Conditional include for ciso646, #626
+
+---
+ include/sqlpp11/data_types/boolean/operand.h |  4 +++-
+ include/sqlpp11/logic.h                      |  5 ++++-
+ include/sqlpp11/mysql/bind_result.h          | 11 ++++++-----
+ include/sqlpp11/mysql/char_result.h          |  5 ++++-
+ include/sqlpp11/postgresql/bind_result.h     |  5 ++++-
+ include/sqlpp11/sqlite3/bind_result.h        |  5 ++++-
+ include/sqlpp11/sqlite3/prepared_statement.h |  5 ++++-
+ include/sqlpp11/transaction.h                |  6 +++++-
+ 8 files changed, 34 insertions(+), 12 deletions(-)
+
+diff --git a/include/sqlpp11/data_types/boolean/operand.h b/include/sqlpp11/data_types/boolean/operand.h
+index b22c78209..03171ea21 100644
+--- a/include/sqlpp11/data_types/boolean/operand.h
++++ b/include/sqlpp11/data_types/boolean/operand.h
+@@ -26,7 +26,9 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#include <ciso646>  // Required for some compilers to use aliases for boolean operators
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
+ 
+ #include <sqlpp11/type_traits.h>
+ #include <sqlpp11/alias_operators.h>
+diff --git a/include/sqlpp11/logic.h b/include/sqlpp11/logic.h
+index be3ffd332..fa0066455 100644
+--- a/include/sqlpp11/logic.h
++++ b/include/sqlpp11/logic.h
+@@ -26,7 +26,10 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#include <ciso646>  // Required for some compilers to use aliases for boolean operators
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <type_traits>
+ 
+ namespace sqlpp
+diff --git a/include/sqlpp11/mysql/bind_result.h b/include/sqlpp11/mysql/bind_result.h
+index 0a2126720..ac1b2239e 100644
+--- a/include/sqlpp11/mysql/bind_result.h
++++ b/include/sqlpp11/mysql/bind_result.h
+@@ -26,18 +26,19 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <limits>
++#include <iostream>
++#include <memory>
+ 
+ #include <sqlpp11/chrono.h>
+ #include <sqlpp11/exception.h>
+ #include <sqlpp11/mysql/detail/prepared_statement_handle.h>
+ #include <sqlpp11/mysql/sqlpp_mysql.h>
+ 
+-#include <iostream>
+-#ifdef _MSC_VER
+-#include <iso646.h>
+-#endif
+-#include <memory>
+ 
+ namespace sqlpp
+ {
+diff --git a/include/sqlpp11/mysql/char_result.h b/include/sqlpp11/mysql/char_result.h
+index a3cfc6f97..979fd4d5b 100644
+--- a/include/sqlpp11/mysql/char_result.h
++++ b/include/sqlpp11/mysql/char_result.h
+@@ -26,7 +26,10 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
+-#include <ciso646>
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <cstdlib>
+ #include <iostream>
+ #include <memory>
+diff --git a/include/sqlpp11/postgresql/bind_result.h b/include/sqlpp11/postgresql/bind_result.h
+index 9dc7086ef..15c838767 100644
+--- a/include/sqlpp11/postgresql/bind_result.h
++++ b/include/sqlpp11/postgresql/bind_result.h
+@@ -27,6 +27,10 @@
+  * POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <sqlpp11/chrono.h>
+ #include <sqlpp11/data_types.h>
+ #include <sqlpp11/detail/parse_date_time.h>
+@@ -39,7 +43,6 @@
+ #include "detail/prepared_statement_handle.h"
+ 
+ #ifdef _MSC_VER
+-#include <iso646.h>
+ #pragma warning(disable : 4800)  // int to bool
+ #endif
+ namespace sqlpp
+diff --git a/include/sqlpp11/sqlite3/bind_result.h b/include/sqlpp11/sqlite3/bind_result.h
+index 95405f180..f43949808 100644
+--- a/include/sqlpp11/sqlite3/bind_result.h
++++ b/include/sqlpp11/sqlite3/bind_result.h
+@@ -26,6 +26,10 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <sqlpp11/chrono.h>
+ #include <sqlpp11/detail/parse_date_time.h>
+ #include <sqlpp11/exception.h>
+@@ -36,7 +40,6 @@
+ #include <memory>
+ 
+ #ifdef _MSC_VER
+-#include <iso646.h>
+ #pragma warning(push)
+ #pragma warning(disable : 4251)
+ #endif
+diff --git a/include/sqlpp11/sqlite3/prepared_statement.h b/include/sqlpp11/sqlite3/prepared_statement.h
+index 4c84232c1..78a6dc67d 100644
+--- a/include/sqlpp11/sqlite3/prepared_statement.h
++++ b/include/sqlpp11/sqlite3/prepared_statement.h
+@@ -26,8 +26,11 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <memory>
+-#include <ciso646>
+ #include <cmath>
+ #include <string>
+ #include <vector>
+diff --git a/include/sqlpp11/transaction.h b/include/sqlpp11/transaction.h
+index 9635edbd6..0eb9a0c38 100644
+--- a/include/sqlpp11/transaction.h
++++ b/include/sqlpp11/transaction.h
+@@ -26,9 +26,13 @@
+  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  */
+ 
++#ifdef _MSC_VER
++#include <ciso646>  // Required to support boolean operator aliases
++#endif
++
+ #include <stdexcept>
+ #include <string>
+-#include <ciso646>
++
+ 
+ namespace sqlpp
+ {
