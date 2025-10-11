@@ -30,12 +30,7 @@
       "hidden": true,
       "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
       "cacheVariables": {
-        "VCPKG_MANIFEST_INSTALL": "ON",
-        "BUILD_TESTING": "ON",
-        "ENABLE_OPENMP": "OFF",
-        "ENABLE_SYCL": "OFF",
-        "BUILD_BINDINGS": "ON",
-        "BUILD_PYTHON_BINDINGS": "OFF"
+        "VCPKG_MANIFEST_INSTALL": "ON"
       }
     },
     {
@@ -74,7 +69,9 @@
       },
       "vendor": {
         "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": ["Windows"]
+          "hostOS": [
+            "Windows"
+          ]
         }
       },
       "cacheVariables": {
@@ -255,7 +252,10 @@
     },
     {
       "name": "triplet-x64-linux-inteloneapi",
-      "inherits": ["vcpkg-base", "inteloneapi-env"],
+      "inherits": [
+        "vcpkg-base",
+        "inteloneapi-env"
+      ],
       "hidden": true,
       "environment": {
         "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-inteloneapi"
