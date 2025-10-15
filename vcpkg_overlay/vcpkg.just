@@ -1,13 +1,5 @@
 # detect the vcpkg triplet based on the system information
 windows_triplet := "x64-windows-static"
-vcpkg_version := "2025-09-03"
-vcpkg_tool_url := if os_family() == "windows" {
-    "https://github.com/microsoft/vcpkg-tool/releases/download/" + vcpkg_version + "/vcpkg.exe"
-} else if os() == "macos" {
-    "https://github.com/microsoft/vcpkg-tool/releases/download/" + vcpkg_version + "/vcpkg-macos"
-} else {
-    "https://github.com/microsoft/vcpkg-tool/releases/download/" + vcpkg_version + "/vcpkg-muslc"
-}
 
 VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
     windows_triplet
@@ -27,7 +19,7 @@ in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
 clone_vcpkg:
     - rm -rf '{{join(justfile_directory(), "build", "vcpkg")}}'
-    mkdir '{{join(justfile_directory(), "build")}}'
+    mkdir -p '{{join(justfile_directory(), "build")}}'
     git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "build", "vcpkg")}}'
 
 
