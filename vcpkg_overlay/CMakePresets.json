@@ -1,313 +1,314 @@
 {
-  "version": 8,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 28,
-    "patch": 0
-  },
-  "configurePresets": [
-    {
-      "name": "inteloneapi-env",
-      "hidden": true,
-      "environment": {
-        "ONEAPI_ROOT": "/tools/toolchains/intel/oneapi",
-        "ONEAPI_VERSION": "2025.2",
-        "CMAKE_PREFIX_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
-        "CMPLR_ROOT": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
-        "CPATH": "$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/include",
-        "GDB_INFO": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/share/info/",
-        "INFOPATH": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/share/info",
-        "LD_LIBRARY_PATH": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/opt/debugger/lib:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/opt/compiler/lib:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib",
-        "LIBRARY_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib",
-        "OCL_ICD_FILENAMES": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/libintelocl.so",
-        "PATH": "$env{ONEAPI_ROOT}/mpi/2021.16/bin:$env{ONEAPI_ROOT}/dpcpp-ct/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/opt/debugger/bin:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin/compiler:$penv{PATH}",
-        "PKG_CONFIG_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/pkgconfig",
-        "SETVARS_COMPLETED": "1"
-      }
+    "version": 8,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 28,
+        "patch": 0
     },
-    {
-      "name": "vcpkg-base",
-      "hidden": true,
-      "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
-      "cacheVariables": {
-        "VCPKG_MANIFEST_INSTALL": "ON"
-      }
-    },
-    {
-      "name": "build-system-ninja-multi",
-      "hidden": true,
-      "generator": "Ninja Multi-Config",
-      "environment": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
-      }
-    },
-    {
-      "name": "build-system-ninja",
-      "hidden": true,
-      "generator": "Ninja"
-    },
-    {
-      "name": "build-system-visualstudio",
-      "hidden": true,
-      "generator": "Visual Studio 17 2022",
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
-      "name": "windows-msvc-common",
-      "hidden": true,
-      "architecture": {
-        "value": "x64",
-        "strategy": "external"
-      },
-      "toolset": {
-        "value": "host=x64",
-        "strategy": "external"
-      },
-      "vendor": {
-        "microsoft.com/VisualStudioSettings/CMake/1.0": {
-          "hostOS": [
-            "Windows"
-          ]
+    "configurePresets": [
+        {
+            "name": "inteloneapi-env",
+            "hidden": true,
+            "environment": {
+                "ONEAPI_ROOT": "/tools/toolchains/intel/oneapi",
+                "ONEAPI_VERSION": "2025.2",
+                "CMAKE_PREFIX_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
+                "CMPLR_ROOT": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
+                "CPATH": "$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/include",
+                "GDB_INFO": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/share/info/",
+                "INFOPATH": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/share/info",
+                "LD_LIBRARY_PATH": "$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/opt/debugger/lib:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/opt/compiler/lib:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib",
+                "LIBRARY_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib",
+                "OCL_ICD_FILENAMES": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/libintelocl.so",
+                "PATH": "$env{ONEAPI_ROOT}/mpi/2021.16/bin:$env{ONEAPI_ROOT}/dpcpp-ct/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/debugger/$env{ONEAPI_VERSION}/opt/debugger/bin:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin:$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin/compiler:$penv{PATH}",
+                "PKG_CONFIG_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/pkgconfig",
+                "SETVARS_COMPLETED": "1"
+            }
+        },
+        {
+            "name": "vcpkg-base",
+            "hidden": true,
+            "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+        },
+        {
+            "name": "build-system-ninja-multi",
+            "hidden": true,
+            "generator": "Ninja Multi-Config",
+            "environment": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release"
+            },
+            "cacheVariables": {
+                "VCPKG_MANIFEST_INSTALL": "ON"
+            }
+        },
+        {
+            "name": "build-system-ninja",
+            "hidden": true,
+            "generator": "Ninja",
+            "cacheVariables": {
+                "VCPKG_MANIFEST_INSTALL": "ON"
+            }
+        },
+        {
+            "name": "build-system-visualstudio",
+            "hidden": true,
+            "generator": "Visual Studio 17 2022",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "VCPKG_MANIFEST_INSTALL": "OFF"
+            }
+        },
+        {
+            "name": "windows-msvc-common",
+            "hidden": true,
+            "architecture": {
+                "value": "x64",
+                "strategy": "external"
+            },
+            "toolset": {
+                "value": "host=x64",
+                "strategy": "external"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "hostOS": ["Windows"]
+                }
+            },
+            "cacheVariables": {
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "description": "Common settings for all MSVC builds outside of Visual Studio IDE, otherwise the cl compiler cannot be detected"
+        },
+        {
+            "name": "triplet-x64-windows-static",
+            "hidden": true,
+            "inherits": "vcpkg-base",
+            "environment": {
+                "VCPKG_DEFAULT_HOST_TRIPLET": "x64-windows-static"
+            },
+            "cacheVariables": {
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/windows.cmake",
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "static",
+                "VCPKG_LIBRARY_LINKAGE": "static"
+            }
+        },
+        {
+            "name": "triplet-x64-windows-static-asan",
+            "hidden": true,
+            "inherits": "vcpkg-base",
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static-asan",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static-asan",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/windows.cmake",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "static",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_C_FLAGS": "/fsanitize=address",
+                "VCPKG_CXX_FLAGS": "/fsanitize=address"
+            }
+        },
+        {
+            "name": "triplet-x64-windows-static-inteloneapi",
+            "hidden": true,
+            "inherits": "vcpkg-base",
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-windows-static-inteloneapi",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static-inteloneapi",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${fileDir}/triplets/toolchain-windows-inteloneapi.cmake",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "static",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_PLATFORM_TOOLSET": "v143",
+                "VCPKG_ENV_PASSTHROUGH": "LIB;PATH;CPATH;ONEAPI_ROOT;INTEL_TARGET_ARCH;INTEL_TARGET_PLATFORM;USE_INTEL_LLVM;IFORT_COMPILER23;VARSDIR",
+                "VCPKG_POLICY_SKIP_ARCHITECTURE_CHECK": "enabled",
+                "VCPKG_LOAD_VCVARS_ENV": "OFF",
+                "VCPKG_C_FLAGS": "/arch:AVX2",
+                "VCPKG_CXX_FLAGS": "/arch:AVX2",
+                "VCPKG_Fortran_FLAGS": "/arch:AVX2"
+            }
+        },
+        {
+            "name": "triplet-arm64-osx",
+            "hidden": true,
+            "inherits": "vcpkg-base",
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "arm64-osx",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/arm64-osx",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/osx.cmake",
+                "VCPKG_CMAKE_SYSTEM_NAME": "Darwin",
+                "VCPKG_OSX_ARCHITECTURES": "arm64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_OSX_DEPLOYMENT_TARGET": "14.0"
+            }
+        },
+        {
+            "name": "triplet-x64-osx",
+            "hidden": true,
+            "inherits": "vcpkg-base",
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-osx",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-osx",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/osx.cmake",
+                "VCPKG_CMAKE_SYSTEM_NAME": "Darwin",
+                "VCPKG_OSX_ARCHITECTURES": "x86_64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_OSX_DEPLOYMENT_TARGET": "14.0"
+            }
+        },
+        {
+            "name": "triplet-arm64-linux",
+            "inherits": "vcpkg-base",
+            "hidden": true,
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "arm64-linux",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/arm64-linux",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/linux.cmake",
+                "VCPKG_TARGET_ARCHITECTURE": "arm64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static"
+            }
+        },
+        {
+            "name": "triplet-x64-linux",
+            "inherits": "vcpkg-base",
+            "hidden": true,
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-linux",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/linux.cmake",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_LINKER_FLAGS": "-fuse-ld=gold"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "triplet-x64-linux-release",
+            "inherits": "triplet-x64-linux",
+            "hidden": true,
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-linux-release",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux-release"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "triplet-x64-linux-asan",
+            "inherits": "vcpkg-base",
+            "hidden": true,
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-linux",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/linux.cmake",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_C_FLAGS": "-fsanitize=address",
+                "VCPKG_CXX_FLAGS": "-fsanitize=address",
+                "VCPKG_C_FLAGS_RELEASE": "-O1 -fno-omit-frame-pointer -g",
+                "VCPKG_CXX_FLAGS_RELEASE": "-O1 -fno-omit-frame-pointer -g",
+                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold -fsanitize=address"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "triplet-x64-linux-cluster",
+            "inherits": "vcpkg-base",
+            "hidden": true,
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-linux-cluster",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${fileDir}/triplets/toolchain-linux-cluster.cmake",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux-cluster",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
+            "name": "triplet-x64-linux-inteloneapi",
+            "inherits": ["vcpkg-base", "inteloneapi-env"],
+            "hidden": true,
+            "environment": {
+                "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-inteloneapi"
+            },
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-linux-inteloneapi",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-inteloneapi.cmake",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux-inteloneapi",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_LINKER_FLAGS": "-fuse-ld=lld",
+                "VCPKG_C_FLAGS": "-fp-model=precise",
+                "VCPKG_CXX_FLAGS": "-fp-model=precise"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
         }
-      },
-      "cacheVariables": {
-        "CMAKE_CXX_COMPILER": "cl.exe"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      },
-      "description": "Common settings for all MSVC builds outside of Visual Studio IDE, otherwise the cl compiler cannot be detected"
-    },
-    {
-      "name": "triplet-x64-windows-static",
-      "hidden": true,
-      "inherits": "vcpkg-base",
-      "environment": {
-        "VCPKG_DEFAULT_HOST_TRIPLET": "x64-windows-static"
-      },
-      "cacheVariables": {
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/windows.cmake",
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "static",
-        "VCPKG_LIBRARY_LINKAGE": "static"
-      }
-    },
-    {
-      "name": "triplet-x64-windows-static-asan",
-      "hidden": true,
-      "inherits": "vcpkg-base",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static-asan",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static-asan",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/windows.cmake",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "static",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_C_FLAGS": "/fsanitize=address",
-        "VCPKG_CXX_FLAGS": "/fsanitize=address"
-      }
-    },
-    {
-      "name": "triplet-x64-windows-static-inteloneapi",
-      "hidden": true,
-      "inherits": "vcpkg-base",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static-inteloneapi",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static-inteloneapi",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${fileDir}/triplets/toolchain-windows-inteloneapi.cmake",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "static",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_PLATFORM_TOOLSET": "v143",
-        "VCPKG_ENV_PASSTHROUGH": "LIB;PATH;CPATH;ONEAPI_ROOT;INTEL_TARGET_ARCH;INTEL_TARGET_PLATFORM;USE_INTEL_LLVM;IFORT_COMPILER23;VARSDIR",
-        "VCPKG_POLICY_SKIP_ARCHITECTURE_CHECK": "enabled",
-        "VCPKG_LOAD_VCVARS_ENV": "OFF",
-        "VCPKG_C_FLAGS": "/arch:AVX2",
-        "VCPKG_CXX_FLAGS": "/arch:AVX2",
-        "VCPKG_Fortran_FLAGS": "/arch:AVX2"
-      }
-    },
-    {
-      "name": "triplet-arm64-osx",
-      "hidden": true,
-      "inherits": "vcpkg-base",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "arm64-osx",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/arm64-osx",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/osx.cmake",
-        "VCPKG_CMAKE_SYSTEM_NAME": "Darwin",
-        "VCPKG_OSX_ARCHITECTURES": "arm64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_OSX_DEPLOYMENT_TARGET": "14.0"
-      }
-    },
-    {
-      "name": "triplet-x64-osx",
-      "hidden": true,
-      "inherits": "vcpkg-base",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-osx",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-osx",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/osx.cmake",
-        "VCPKG_CMAKE_SYSTEM_NAME": "Darwin",
-        "VCPKG_OSX_ARCHITECTURES": "x86_64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_OSX_DEPLOYMENT_TARGET": "14.0"
-      }
-    },
-    {
-      "name": "triplet-arm64-linux",
-      "inherits": "vcpkg-base",
-      "hidden": true,
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "arm64-linux",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/arm64-linux",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/linux.cmake",
-        "VCPKG_TARGET_ARCHITECTURE": "arm64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static"
-      }
-    },
-    {
-      "name": "triplet-x64-linux",
-      "inherits": "vcpkg-base",
-      "hidden": true,
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/linux.cmake",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_LINKER_FLAGS": "-fuse-ld=gold"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "triplet-x64-linux-release",
-      "inherits": "triplet-x64-linux",
-      "hidden": true,
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux-release",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux-release"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "triplet-x64-linux-asan",
-      "inherits": "vcpkg-base",
-      "hidden": true,
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/linux.cmake",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_C_FLAGS": "-fsanitize=address",
-        "VCPKG_CXX_FLAGS": "-fsanitize=address",
-        "VCPKG_C_FLAGS_RELEASE": "-O1 -fno-omit-frame-pointer -g",
-        "VCPKG_CXX_FLAGS_RELEASE": "-O1 -fno-omit-frame-pointer -g",
-        "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold -fsanitize=address"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "triplet-x64-linux-cluster",
-      "inherits": "vcpkg-base",
-      "hidden": true,
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux-cluster",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${fileDir}/triplets/toolchain-linux-cluster.cmake",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkgs-x64-linux-cluster",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
-      "name": "triplet-x64-linux-inteloneapi",
-      "inherits": [
-        "vcpkg-base",
-        "inteloneapi-env"
-      ],
-      "hidden": true,
-      "environment": {
-        "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-inteloneapi"
-      },
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux-inteloneapi",
-        "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-inteloneapi.cmake",
-        "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux-inteloneapi",
-        "VCPKG_TARGET_ARCHITECTURE": "x64",
-        "VCPKG_CRT_LINKAGE": "dynamic",
-        "VCPKG_LIBRARY_LINKAGE": "static",
-        "VCPKG_LINKER_FLAGS": "-fuse-ld=lld",
-        "VCPKG_C_FLAGS": "-fp-model=precise",
-        "VCPKG_CXX_FLAGS": "-fp-model=precise"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "build-win-only",
-      "hidden": true,
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Windows"
-      }
-    },
-    {
-      "name": "build-mac-only",
-      "hidden": true,
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Darwin"
-      }
-    },
-    {
-      "name": "build-linux-only",
-      "hidden": true,
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    }
-  ]
+    ],
+    "buildPresets": [
+        {
+            "name": "build-win-only",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "build-mac-only",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            }
+        },
+        {
+            "name": "build-linux-only",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        }
+    ]
 }
