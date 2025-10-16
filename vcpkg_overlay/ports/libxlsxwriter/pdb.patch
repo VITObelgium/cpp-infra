@@ -1,0 +1,12 @@
+diff -Naur a/CMakeLists.txt b/CMakeLists.txt
+--- a/CMakeLists.txt	2025-07-01 01:12:54.000000000 +0200
++++ b/CMakeLists.txt	2025-10-16 15:16:13.387344300 +0200
+@@ -244,7 +244,7 @@
+             "${CMAKE_C_FLAGS} -static -static-libgcc -Wno-char-subscripts -Wno-long-long"
+         )
+         list(APPEND LXW_PRIVATE_COMPILE_DEFINITIONS USE_FILE32API)
+-    elseif(MSVC)
++    elseif(FALSE)
+         set(CMAKE_C_FLAGS_DEBUG
+             "${CMAKE_C_FLAGS_DEBUG} /Fd\"${CMAKE_BINARY_DIR}/${PROJECT_NAME}.pdb\""
+         )
