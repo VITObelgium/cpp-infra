@@ -16,8 +16,7 @@
                 "network",
                 "opengl",
                 "png",
-                "widgets",
-                "openssl"
+                "widgets"
             ],
             "default-features": false
         }

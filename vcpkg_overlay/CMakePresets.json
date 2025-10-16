@@ -88,6 +88,9 @@
       "name": "triplet-x64-windows-static",
       "hidden": true,
       "inherits": "vcpkg-base",
+      "environment": {
+        "VCPKG_DEFAULT_HOST_TRIPLET": "x64-windows-static"
+      },
       "cacheVariables": {
         "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static",
         "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/toolchains/windows.cmake",
