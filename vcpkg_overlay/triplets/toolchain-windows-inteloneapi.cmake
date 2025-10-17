@@ -1,5 +1,5 @@
-if(NOT _VCPKG_WINDOWS_TOOLCHAIN)
-    set(_VCPKG_WINDOWS_TOOLCHAIN 1)
+if(NOT _VCPKG_WINDOWS_ONEAPI_TOOLCHAIN)
+    set(_VCPKG_WINDOWS_ONEAPI_TOOLCHAIN 1)
     set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>$<$<STREQUAL:${VCPKG_CRT_LINKAGE},dynamic>:DLL>" CACHE STRING "")
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "")
 
@@ -57,8 +57,10 @@ if(NOT _VCPKG_WINDOWS_TOOLCHAIN)
     endif()
 
     message(STATUS "### INTEL ONEAPI")
-    if(INTEL_ONEAPI_PATH)
-        file(TO_CMAKE_PATH "${INTEL_ONEAPI_PATH}/" _INTEL_PREFIX)
+    if($ENV{ONEAPI_ROOT})
+        file(TO_CMAKE_PATH "$ENV{ONEAPI_ROOT}/compiler/$ENV{ONEAPI_VERSION}/bin/" _INTEL_PREFIX)
+    else()
+        set(_INTEL_PREFIX "C:/Program Files (x86)/Intel/oneAPI/compiler/latest/bin/")
     endif()
 
     set(CMAKE_C_COMPILER ${_INTEL_PREFIX}icx-cl.exe CACHE STRING "")

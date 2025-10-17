@@ -26,6 +26,29 @@
             }
         },
         {
+            "name": "inteloneapi-env-win",
+            "hidden": true,
+            "environment": {
+                "ONEAPI_ROOT": "C:/Program Files (x86)/Intel/oneAPI",
+                "ONEAPI_VERSION": "latest",
+                "CMAKE_PREFIX_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
+                "CMPLR_ROOT": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}",
+                "CPATH": "$env{ONEAPI_ROOT}/dev-utilities/$env{ONEAPI_VERSION}/include",
+                "LIB": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/clang/19/lib/windows;$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/opt/compiler/lib;$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib;C:/Program Files (x86)/Windows Kits/10/lib/10.0.26100.0/ucrt/x64;C:/Program Files (x86)/Windows Kits/10/lib/10.0.26100.0/um/x64;C:/Program Files/Microsoft Visual Studio/2022/Professional/VC/Tools/MSVC/14.44.35207/lib/x64;$penv{LIB}",
+                "C_INCLUDE_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/include",
+                "CPLUS_INCLUDE_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/include",
+                "IFORT_COMPILER23": "$env{ONEAPI_ROOT}/compiler/2023.2.0/windows/",
+                "IFORT_COMPILER24": "$env{ONEAPI_ROOT}/compiler/2024.0/windows/",
+                "IFORT_COMPILER25": "$env{ONEAPI_ROOT}/compiler/2025.2/windows/",
+                "INCLUDE": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/include:$penv{INCLUDE}",
+                "INTEL_TARGET_ARCH": "intel64",
+                "Path": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/bin;$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib;$env{ONEAPI_VERSION}/windows/redist/intel64_win/compiler;$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/windows/redist/ia32_win/compiler;C:/Program Files (x86)/Windows Kits/10/bin/10.0.26100.0/x64;C:/Program Files (x86)/Windows Kits/10/bin/x64;$penv{Path}",
+                "PKG_CONFIG_PATH": "$env{ONEAPI_ROOT}/compiler/$env{ONEAPI_VERSION}/lib/pkgconfig",
+                "SETVARS_COMPLETED": "1",
+                "USE_INTEL_LLVM": "0"
+            }
+        },
+        {
             "name": "vcpkg-base",
             "hidden": true,
             "toolchainFile": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
@@ -75,7 +98,9 @@
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": ["Windows"]
+                    "hostOS": [
+                        "Windows"
+                    ]
                 }
             },
             "cacheVariables": {
@@ -122,16 +147,19 @@
         {
             "name": "triplet-x64-windows-static-inteloneapi",
             "hidden": true,
-            "inherits": "vcpkg-base",
+            "inherits": [
+                "vcpkg-base",
+                "inteloneapi-env-win"
+            ],
             "cacheVariables": {
                 "VCPKG_TARGET_TRIPLET": "x64-windows-static-inteloneapi",
                 "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static-inteloneapi",
-                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${fileDir}/triplets/toolchain-windows-inteloneapi.cmake",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-windows-inteloneapi.cmake",
                 "VCPKG_TARGET_ARCHITECTURE": "x64",
                 "VCPKG_CRT_LINKAGE": "static",
                 "VCPKG_LIBRARY_LINKAGE": "static",
                 "VCPKG_PLATFORM_TOOLSET": "v143",
-                "VCPKG_ENV_PASSTHROUGH": "LIB;PATH;CPATH;ONEAPI_ROOT;INTEL_TARGET_ARCH;INTEL_TARGET_PLATFORM;USE_INTEL_LLVM;IFORT_COMPILER23;VARSDIR",
+                "VCPKG_ENV_PASSTHROUGH": "LIB;PATH;CPATH;ONEAPI_ROOT;INTEL_TARGET_ARCH;INTEL_TARGET_PLATFORM;USE_INTEL_LLVM;IFORT_COMPILER23;IFORT_COMPILER24;IFORT_COMPILER25;VARSDIR",
                 "VCPKG_POLICY_SKIP_ARCHITECTURE_CHECK": "enabled",
                 "VCPKG_LOAD_VCVARS_ENV": "OFF",
                 "VCPKG_C_FLAGS": "/arch:AVX2",
@@ -259,7 +287,10 @@
         },
         {
             "name": "triplet-x64-linux-inteloneapi",
-            "inherits": ["vcpkg-base", "inteloneapi-env"],
+            "inherits": [
+                "vcpkg-base",
+                "inteloneapi-env"
+            ],
             "hidden": true,
             "environment": {
                 "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-inteloneapi"
