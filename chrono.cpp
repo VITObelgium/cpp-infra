@@ -177,14 +177,11 @@ std::optional<local_time_point> local_time_point_from_string(std::string_view st
 #ifdef HAVE_CPP20_CHRONO
 std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<choose> choice)
 {
-    if (choice.has_value()) {
-        return localtime_to_utc(zoned_time(std::chrono::current_zone(), dt, *choice));
-    } else {
-        return localtime_to_utc(zoned_time(std::chrono::current_zone(), dt));
-    }
+    auto choiseVal = choice.value_or(choose::latest);
+    return localtime_to_utc(zoned_time(std::chrono::current_zone(), dt, choiseVal), choiseVal);
 }
 
-std::optional<time_point> localtime_to_utc(zoned_time zt)
+std::optional<time_point> localtime_to_utc(zoned_time zt, choose choice)
 {
     auto localTimePoint = zt.get_local_time();
 
@@ -196,8 +193,12 @@ std::optional<time_point> localtime_to_utc(zoned_time zt)
         break;
     }
     case std::chrono::local_info::ambiguous: {
-        Log::warn("Ambiguous time point, taking the latest option");
-        utcTime = std::optional<time_point>(i.second.begin);
+        if (choice == choose::latest) {
+            utcTime = std::optional<time_point>(i.second.begin - i.second.save);
+        } else {
+            assert(choice == choose::earliest);
+            utcTime = std::optional<time_point>(i.first.end - i.first.save);
+        }
         break;
     }
     case std::chrono::local_info::nonexistent:

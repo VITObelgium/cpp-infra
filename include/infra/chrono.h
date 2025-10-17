@@ -189,7 +189,7 @@ inline std::string to_string(std::string_view format, chrono::local_time_point t
 }
 
 std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<choose> choice);
-std::optional<time_point> localtime_to_utc(zoned_time tp);
+std::optional<time_point> localtime_to_utc(zoned_time tp, choose choice);
 
 class DurationRecorder
 {
