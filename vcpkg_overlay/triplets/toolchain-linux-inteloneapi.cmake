@@ -17,7 +17,6 @@ if(NOT _VCPKG_LINUX_TOOLCHAIN)
 
     # if(NOT INTEL_INSTALL_PATH)
     # set(INTEL_INSTALL_PATH /tools/toolchains/intel/oneapi/compiler/latest)
-    # set(HAVE_LIBM "${INTEL_INSTALL_PATH}/lib/libimf.a" CACHE FILEPATH "")
     # endif()
 
     # set(INTEL_PATH ${INTEL_INSTALL_PATH}/bin/)
@@ -25,6 +24,8 @@ if(NOT _VCPKG_LINUX_TOOLCHAIN)
 
     message(STATUS "Oneapi: $ENV{ONEAPI_ROOT}")
     set(INTEL_LLVM_PATH "$ENV{ONEAPI_ROOT}/compiler/$ENV{ONEAPI_VERSION}/bin/compiler/")
+
+    set(HAVE_LIBM "$ENV{ONEAPI_ROOT}/$ENV{ONEAPI_VERSION}/lib/libimf.a" CACHE FILEPATH "")
 
     set(CMAKE_C_COMPILER ${INTEL_PATH}icx CACHE FILEPATH "")
     set(CMAKE_ASM_COMPILER ${INTEL_PATH}icx CACHE FILEPATH "")
