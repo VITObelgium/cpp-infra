@@ -1,7 +1,7 @@
 # detect the vcpkg triplet based on the system information
 windows_triplet := "x64-windows-static"
 
-VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
+VCPKG_DEFAULT_TRIPLET := env_var_or_default('VCPKG_DEFAULT_TRIPLET', if os_family() == "windows" {
     windows_triplet
 } else if os() == "macos" {
     if arch() == "aarch64" {
@@ -9,12 +9,12 @@ VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
     } else { "x64-osx-homebrew" }
 } else {
     "x64-linux"
-}
+})
 
 cmake_preset := VCPKG_DEFAULT_TRIPLET
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
-vcpkg_root := env('VCPKG_ROOT', join(justfile_directory(), "./deps/vcpkg"))
+vcpkg_root := env_var_or_default('VCPKG_ROOT', join(justfile_directory(), "./deps/vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
 clone_vcpkg:

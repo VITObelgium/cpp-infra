@@ -98,9 +98,7 @@
             },
             "vendor": {
                 "microsoft.com/VisualStudioSettings/CMake/1.0": {
-                    "hostOS": [
-                        "Windows"
-                    ]
+                    "hostOS": ["Windows"]
                 }
             },
             "cacheVariables": {
@@ -147,10 +145,7 @@
         {
             "name": "triplet-x64-windows-static-inteloneapi",
             "hidden": true,
-            "inherits": [
-                "vcpkg-base",
-                "inteloneapi-env-win"
-            ],
+            "inherits": ["vcpkg-base", "inteloneapi-env-win"],
             "cacheVariables": {
                 "VCPKG_TARGET_TRIPLET": "x64-windows-static-inteloneapi",
                 "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-windows-static-inteloneapi",
@@ -267,6 +262,25 @@
             }
         },
         {
+            "name": "triplet-x64-linux-nix",
+            "inherits": "vcpkg-base",
+            "hidden": true,
+            "cacheVariables": {
+                "VCPKG_TARGET_TRIPLET": "x64-linux-nix",
+                "VCPKG_CHAINLOAD_TOOLCHAIN_FILE": "${sourceDir}/deps/infra/vcpkg_overlay/triplets/toolchain-linux-nix.cmake",
+                "VCPKG_INSTALLED_DIR": "${sourceDir}/build/vcpkgs/x64-linux-nix",
+                "VCPKG_TARGET_ARCHITECTURE": "x64",
+                "VCPKG_CRT_LINKAGE": "dynamic",
+                "VCPKG_LIBRARY_LINKAGE": "static",
+                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold"
+            },
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Linux"
+            }
+        },
+        {
             "name": "triplet-x64-linux-cluster",
             "inherits": "vcpkg-base",
             "hidden": true,
@@ -287,10 +301,7 @@
         },
         {
             "name": "triplet-x64-linux-inteloneapi",
-            "inherits": [
-                "vcpkg-base",
-                "inteloneapi-env"
-            ],
+            "inherits": ["vcpkg-base", "inteloneapi-env"],
             "hidden": true,
             "environment": {
                 "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-inteloneapi"
