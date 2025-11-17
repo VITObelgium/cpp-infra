@@ -1,4 +1,4 @@
-﻿include(CMakeDependentOption)
+include(CMakeDependentOption)
 include(CMakePackageConfigHelpers)
 include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
@@ -369,7 +369,14 @@ if(INFRA_DATABASE)
 endif()
 
 if(INFRA_HASHING)
-    find_package(cryptopp CONFIG REQUIRED)
+    if(DEFINED VCPKG_TARGET_TRIPLET)
+        # cryptopp does not have native cmake suppport, but vcpkg uses the github.com/abdes/cryptopp-cmake cmake files
+        find_package(cryptopp CONFIG REQUIRED)
+    else ()
+        find_package(Cryptopp MODULE REQUIRED)
+    endif()
+
+
     target_compile_definitions(infra PRIVATE INFRA_HASH_SUPPORT)
     target_link_libraries(infra PRIVATE cryptopp::cryptopp)
     list(APPEND INFRA_PUBLIC_HEADERS include/infra/crypto.h)
