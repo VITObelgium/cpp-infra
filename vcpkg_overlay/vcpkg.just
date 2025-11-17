@@ -22,6 +22,13 @@ clone_vcpkg:
     mkdir -p '{{join(justfile_directory(), "build")}}'
     git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{join(justfile_directory(), "build", "vcpkg")}}'
 
+[windows]
+bootstrap_vcpkg: clone_vcpkg
+    cd '{{join(justfile_directory(), "build", "vcpkg")}}'; ./bootstrap-vcpkg.bat
+
+[unix]
+bootstrap_vcpkg: clone_vcpkg
+    bash '{{join(justfile_directory(), "build", "vcpkg", "bootstrap-vcpkg.sh")}}'
 
 git_status_clean:
     if {{in_git_repo}}; then git diff --quiet --exit-code; fi
