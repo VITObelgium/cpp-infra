@@ -7,5 +7,6 @@ SET vspath=%%F
 )
 set VSCMD_START_DIR=%1
 set GIT_COMMIT_HASH=%3
+echo "InstallationPath: %vspath%"
 CALL "%vspath%\VC\Auxiliary\Build\vcvarsall.bat" x64
 just build_dist %2
