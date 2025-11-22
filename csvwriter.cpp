@@ -7,7 +7,7 @@
 #include <iomanip>
 #ifdef _WIN32
 #define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 static constexpr std::array<std::uint8_t, 3> utf8Bom{{0xEF, 0xBB, 0xBF}};
