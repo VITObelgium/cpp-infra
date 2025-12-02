@@ -6,7 +6,7 @@
 
 namespace inf::ui {
 
-static auto s_maxUpdateInterval = std::chrono::milliseconds(200);
+static auto s_maxUpdateInterval = std::chrono::milliseconds(1000);
 
 LogView::LogView(QWidget* parent)
 : QWidget(parent)
@@ -15,6 +15,7 @@ LogView::LogView(QWidget* parent)
 {
     _ui->setupUi(this);
 
+    _timer->setSingleShot(true);
     connect(_timer, &QTimer::timeout, this, &LogView::updateView);
 }
 
@@ -26,7 +27,6 @@ void LogView::setModel(QAbstractItemModel* model)
 
     connect(model, &QAbstractItemModel::rowsInserted, this, [this]() {
         if (!_timer->isActive()) {
-            updateView();
             _timer->start(s_maxUpdateInterval);
         }
     });
