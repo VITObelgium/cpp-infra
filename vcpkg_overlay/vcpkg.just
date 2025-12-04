@@ -14,7 +14,7 @@ VCPKG_DEFAULT_TRIPLET := env_var_or_default('VCPKG_DEFAULT_TRIPLET', if os_famil
 cmake_preset := VCPKG_DEFAULT_TRIPLET
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
-vcpkg_root := env_var_or_default('VCPKG_ROOT', join(justfile_directory(), "./deps/vcpkg"))
+vcpkg_root := env_var_or_default('VCPKG_ROOT', join(justfile_directory(), "./build/vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
 clone_vcpkg:
