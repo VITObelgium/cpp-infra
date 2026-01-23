@@ -30,6 +30,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         expat            GDAL_USE_EXPAT
         expat            OGR_ENABLE_DRIVER_XLSX
         freexl           GDAL_USE_FREEXL
+        freexl           OGR_ENABLE_DRIVER_XLS
         geos             GDAL_USE_GEOS
         core             GDAL_USE_GEOTIFF
         gif              GDAL_USE_GIF
@@ -42,7 +43,7 @@ vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
         libkml           GDAL_USE_LIBKML
         lzma             GDAL_USE_LIBLZMA
         libxml2          GDAL_USE_LIBXML2
-        mysql-libmariadb GDAL_USE_MYSQL 
+        mysql-libmariadb GDAL_USE_MYSQL
         netcdf           GDAL_USE_NETCDF
         netcdf           GDAL_ENABLE_DRIVER_NETCDF
         pcraster         GDAL_ENABLE_DRIVER_PCRASTER
