@@ -2,14 +2,13 @@ vcpkg_from_github(
     OUT_SOURCE_PATH SOURCE_PATH
     REPO OSGeo/PROJ
     REF "${VERSION}"
-    SHA512 45d8bfb883431c62c2627cecf583a4374efda7f109c2b43d3fe8ef18136f30cf57682d6e6c44256ba099533754392c87f71e940a41018a577f540310001e0f05
+    SHA512 c5ca62e34612a764cf5cef15e7313ac9e3dccf698e045ac09f8d24e4c109ebf9ee207bcd9d5d698b3f6ecb35d98ec621672f58d130e0eefce74705c3152f374c
     HEAD_REF master
     PATCHES
         fix-proj4-targets-cmake.patch
         remove_toolset_restriction.patch
         sqlite.diff
         intel.patch # fixes the way -ffast-math is added to the compiler flags
-        embed-data-winfix.patch # included in next release
 )
 
 vcpkg_check_features(OUT_FEATURE_OPTIONS FEATURE_OPTIONS
