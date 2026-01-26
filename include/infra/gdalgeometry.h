@@ -323,8 +323,14 @@ public:
 
     std::optional<double> area() const
     {
-        if (auto* surface = _geometry->toSurface(); surface != nullptr) {
-            return surface->get_Area();
+        if (OGR_GT_IsSubClassOf(_geometry->getGeometryType(), wkbSurface)) {
+            if (auto* surface = _geometry->toSurface(); surface != nullptr) {
+                return surface->get_Area();
+            }
+        } else if (OGR_GT_IsSubClassOf(_geometry->getGeometryType(), wkbGeometryCollection)) {
+            if (auto* collection = _geometry->toGeometryCollection(); collection != nullptr) {
+                return collection->get_Area();
+            }
         }
 
         return {};
