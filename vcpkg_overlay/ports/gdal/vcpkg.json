@@ -1,6 +1,6 @@
 {
   "name": "gdal",
-  "version-semver": "3.11.4",
+  "version-semver": "3.12.1",
   "description": "The Geographic Data Abstraction Library for reading and writing geospatial raster and vector data",
   "homepage": "https://gdal.org",
   "license": null,
@@ -15,9 +15,7 @@
     {
       "name": "proj",
       "default-features": false,
-      "features": [
-        "tiff"
-      ]
+      "features": ["tiff"]
     },
     {
       "name": "tiff",
@@ -87,16 +85,12 @@
     },
     "aws-ec2-windows": {
       "description": "Optimized detection of AWS EC2 Windows hosts",
-      "dependencies": [
-        "atl"
-      ]
+      "dependencies": ["atl"]
     },
     "cfitsio": {
       "description": "Enable cfitsio support",
       "supports": "!(android & arm32)",
-      "dependencies": [
-        "cfitsio"
-      ]
+      "dependencies": ["cfitsio"]
     },
     "curl": {
       "description": "Enable CURL network support",
@@ -109,27 +103,19 @@
     },
     "expat": {
       "description": "Use EXPAT library",
-      "dependencies": [
-        "expat"
-      ]
+      "dependencies": ["expat"]
     },
     "freexl": {
       "description": "Enable FREEXL support",
-      "dependencies": [
-        "freexl"
-      ]
+      "dependencies": ["freexl"]
     },
     "geos": {
       "description": "Enable GEOS support",
-      "dependencies": [
-        "geos"
-      ]
+      "dependencies": ["geos"]
     },
     "gif": {
       "description": "Enable GIF support",
-      "dependencies": [
-        "giflib"
-      ]
+      "dependencies": ["giflib"]
     },
     "hdf5": {
       "description": "Enable HDF5 support",
@@ -137,23 +123,17 @@
         {
           "name": "hdf5",
           "default-features": false,
-          "features": [
-            "cpp"
-          ]
+          "features": ["cpp"]
         }
       ]
     },
     "iconv": {
       "description": "Use iconv library",
-      "dependencies": [
-        "libiconv"
-      ]
+      "dependencies": ["libiconv"]
     },
     "jpeg": {
       "description": "Use JPEG compression library",
-      "dependencies": [
-        "libjpeg-turbo"
-      ]
+      "dependencies": ["libjpeg-turbo"]
     },
     "kea": {
       "description": "Enable KEA driver",
@@ -161,24 +141,18 @@
         {
           "name": "gdal",
           "default-features": false,
-          "features": [
-            "hdf5"
-          ]
+          "features": ["hdf5"]
         },
         "kealib"
       ]
     },
     "lerc": {
       "description": "Enable LERC support",
-      "dependencies": [
-        "lerc"
-      ]
+      "dependencies": ["lerc"]
     },
     "libkml": {
       "description": "Enable the LibKML driver",
-      "dependencies": [
-        "libkml"
-      ]
+      "dependencies": ["libkml"]
     },
     "libspatialite": {
       "description": "Create or update SpatiaLite databases using libspatialite",
@@ -200,15 +174,11 @@
     },
     "lzma": {
       "description": "Use LZMA library",
-      "dependencies": [
-        "liblzma"
-      ]
+      "dependencies": ["liblzma"]
     },
     "mysql-libmariadb": {
       "description": "Add mysql support using libmariadb",
-      "dependencies": [
-        "libmariadb"
-      ]
+      "dependencies": ["libmariadb"]
     },
     "netcdf": {
       "description": "Enable NetCDF support",
@@ -221,15 +191,11 @@
     },
     "openjpeg": {
       "description": "Use OpenJPEG library",
-      "dependencies": [
-        "openjpeg"
-      ]
+      "dependencies": ["openjpeg"]
     },
     "openssl": {
       "description": "Use OpenSSL library",
-      "dependencies": [
-        "openssl"
-      ]
+      "dependencies": ["openssl"]
     },
     "parquet": {
       "description": "Enable parquet reading support",
@@ -237,30 +203,22 @@
         {
           "name": "arrow",
           "default-features": false,
-          "features": [
-            "parquet"
-          ]
+          "features": ["parquet"]
         },
         {
           "name": "gdal",
           "default-features": false,
-          "features": [
-            "arrow"
-          ]
+          "features": ["arrow"]
         }
       ]
     },
     "pcre2": {
       "description": "Enable PCRE2 support for sqlite3",
-      "dependencies": [
-        "pcre2"
-      ]
+      "dependencies": ["pcre2"]
     },
     "png": {
       "description": "Use PNG compression library",
-      "dependencies": [
-        "libpng"
-      ]
+      "dependencies": ["libpng"]
     },
     "poppler": {
       "description": "Enable PDF reading support via poppler",
@@ -268,23 +226,17 @@
         {
           "name": "poppler",
           "default-features": false,
-          "features": [
-            "private-api"
-          ]
+          "features": ["private-api"]
         }
       ]
     },
     "postgresql": {
       "description": "Enable PostgreSQL support",
-      "dependencies": [
-        "libpq"
-      ]
+      "dependencies": ["libpq"]
     },
     "qhull": {
       "description": "Use QHULL library",
-      "dependencies": [
-        "qhull"
-      ]
+      "dependencies": ["qhull"]
     },
     "recommended-features": {
       "description": "Features that are explicity marked as recommended by GDAL.",
@@ -310,9 +262,7 @@
       "dependencies": [
         {
           "name": "sqlite3",
-          "features": [
-            "rtree"
-          ]
+          "features": ["rtree"]
         }
       ]
     },
@@ -321,15 +271,11 @@
     },
     "webp": {
       "description": "Enable WEBP support",
-      "dependencies": [
-        "libwebp"
-      ]
+      "dependencies": ["libwebp"]
     },
     "zstd": {
       "description": "Use ZSTD library",
-      "dependencies": [
-        "zstd"
-      ]
+      "dependencies": ["zstd"]
     },
     "pcraster": {
       "description": "Pcraster driver"

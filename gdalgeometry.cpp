@@ -125,49 +125,6 @@ static OGRFieldType field_type_from_type_info(const std::type_info& typeInfo)
     throw InvalidArgument("Invalid field type provided");
 }
 
-FieldDefinitionRef::FieldDefinitionRef(OGRFieldDefn* def)
-: _def(def)
-{
-    assert(def);
-}
-
-const char* FieldDefinitionRef::name() const
-{
-    return _def->GetNameRef();
-}
-
-const std::type_info& FieldDefinitionRef::type() const
-{
-    switch (_def->GetType()) {
-    case OFTInteger:
-        return typeid(int32_t);
-    case OFTReal:
-        return typeid(double);
-    case OFTInteger64:
-        return typeid(int64_t);
-    case OFTString:
-        return typeid(std::string_view);
-    case OFTDate:
-        return typeid(date_point);
-    case OFTDateTime:
-        return typeid(time_point);
-    case OFTTime:
-    case OFTIntegerList:
-    case OFTRealList:
-    case OFTStringList:
-    case OFTWideString:
-    case OFTBinary:
-    case OFTInteger64List:
-    default:
-        throw std::runtime_error("Type not implemented");
-    }
-}
-
-OGRFieldDefn* FieldDefinitionRef::get() noexcept
-{
-    return _def;
-}
-
 FieldDefinition::FieldDefinition(const char* name, const std::type_info& typeInfo)
 : FieldDefinitionRef(new OGRFieldDefn(name, field_type_from_type_info(typeInfo)))
 {
@@ -184,6 +141,11 @@ FieldDefinition::FieldDefinition(OGRFieldDefn* def)
 }
 
 FieldDefinition::FieldDefinition(FieldDefinitionRef def)
+: FieldDefinitionRef(new OGRFieldDefn(def.get()))
+{
+}
+
+FieldDefinition::FieldDefinition(FieldDefinitionCRef def)
 : FieldDefinitionRef(new OGRFieldDefn(def.get()))
 {
 }
@@ -238,6 +200,13 @@ FeatureDefinition::FeatureDefinition(OGRFeatureDefn* def)
     _def->Reference();
 }
 
+FeatureDefinition::FeatureDefinition(const OGRFeatureDefn* def)
+: _def(def->Clone())
+{
+    assert(def);
+    _def->Reference();
+}
+
 FeatureDefinition::~FeatureDefinition()
 {
     if (_def) {
@@ -280,12 +249,12 @@ int FeatureDefinition::required_field_index(const std::string& name) const
     return required_field_index(name.c_str());
 }
 
-FieldDefinitionRef FeatureDefinition::field_definition(int index) const
+FieldDefinitionCRef FeatureDefinition::field_definition(int index) const
 {
-    return FieldDefinitionRef(check_pointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
+    return FieldDefinitionCRef(check_pointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
 }
 
-OGRFeatureDefn* FeatureDefinition::get() noexcept
+const OGRFeatureDefn* FeatureDefinition::get() noexcept
 {
     return _def;
 }
@@ -374,9 +343,9 @@ bool Feature::field_is_valid(int index) const noexcept
     return _feature->IsFieldSetAndNotNull(index);
 }
 
-FieldDefinitionRef Feature::field_definition(int index) const
+FieldDefinitionCRef Feature::field_definition(int index) const
 {
-    return FieldDefinitionRef(check_pointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
+    return FieldDefinitionCRef(check_pointer(_feature->GetFieldDefnRef(index), "Invalid field definition index"));
 }
 
 FeatureDefinition Feature::feature_definition() const
@@ -976,12 +945,12 @@ void FeatureDefinitionIterator::next()
     }
 }
 
-const FieldDefinitionRef& FeatureDefinitionIterator::operator*()
+const FieldDefinitionCRef& FeatureDefinitionIterator::operator*()
 {
     return _currentField;
 }
 
-const FieldDefinitionRef* FeatureDefinitionIterator::operator->()
+const FieldDefinitionCRef* FeatureDefinitionIterator::operator->()
 {
     return &_currentField;
 }

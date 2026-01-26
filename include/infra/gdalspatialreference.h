@@ -23,11 +23,14 @@ public:
     SpatialReference(const char* wkt);
     SpatialReference(const std::string& wkt);
     SpatialReference(OGRSpatialReference* instance);
+    SpatialReference(const OGRSpatialReference* instance);
     ~SpatialReference() noexcept;
 
     SpatialReference& operator=(SpatialReference&&);
 
     SpatialReference(SpatialReference&&) noexcept;
+
+    bool is_same(const SpatialReference& other) const;
 
     SpatialReference clone() const;
     SpatialReference clone_geo_cs() const;

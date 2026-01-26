@@ -95,14 +95,14 @@ public:
     Owner& operator=(const Owner<GeometryType>&) = delete;
 
     // Allow moving
-    Owner(Owner<GeometryType>&& other)
+    Owner(Owner<GeometryType>&& other) noexcept
     : GeometryType(other)
     {
         _owned       = other._owned;
         other._owned = false;
     }
 
-    Owner& operator=(Owner<GeometryType>&& other)
+    Owner& operator=(Owner<GeometryType>&& other) noexcept
     {
         GeometryType::operator=(other);
 
@@ -384,6 +384,15 @@ public:
         Envelope env;
         _geometry->getEnvelope(env.get());
         return env;
+    }
+
+    std::optional<SpatialReference> spatial_reference() const
+    {
+        if (auto sr = _geometry->getSpatialReference(); sr != nullptr) {
+            return SpatialReference(sr);
+        }
+
+        return {};
     }
 
 private:
@@ -778,19 +787,78 @@ using MultiPolygonCRef = MultiPolygonWrapper<const OGRMultiPolygon, const OGRPol
 
 using Field = std::variant<int32_t, int64_t, double, std::string_view, time_point>;
 
-class FieldDefinitionRef
+template <typename TWrapped>
+class FieldDefinitionWrapper
 {
 public:
-    FieldDefinitionRef() = default;
-    FieldDefinitionRef(OGRFieldDefn* def);
-    const char* name() const;
-    const std::type_info& type() const;
+    FieldDefinitionWrapper() noexcept
+    : _def(nullptr)
+    {
+    }
+    FieldDefinitionWrapper(FieldDefinitionWrapper&&) = default;
+    FieldDefinitionWrapper(TWrapped* def)
+    : _def(def)
+    {
+        assert(def);
+    }
 
-    OGRFieldDefn* get() noexcept;
+    FieldDefinitionWrapper& operator=(FieldDefinitionWrapper&&) = default;
+
+    const char* name() const
+    {
+        return _def->GetNameRef();
+    }
+
+    const std::type_info& type() const
+    {
+        switch (_def->GetType()) {
+        case OFTInteger:
+            return typeid(int32_t);
+        case OFTReal:
+            return typeid(double);
+        case OFTInteger64:
+            return typeid(int64_t);
+        case OFTString:
+            return typeid(std::string_view);
+        case OFTDate:
+            return typeid(date_point);
+        case OFTDateTime:
+            return typeid(time_point);
+        case OFTTime:
+        case OFTIntegerList:
+        case OFTRealList:
+        case OFTStringList:
+        case OFTWideString:
+        case OFTBinary:
+        case OFTInteger64List:
+        default:
+            throw std::runtime_error("Type not implemented");
+        }
+    }
+
+    TWrapped* get() noexcept
+    {
+        return _def;
+    }
+
+    /*template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<!is_const, PolygonRef> polygon_at(int index)
+    {
+        return this->geometry(index).template as<PolygonRef>();
+    }
+
+    template <bool is_const = std::is_const_v<TWrapped>>
+    std::enable_if_t<is_const, PolygonCRef> polygon_at(int index)
+    {
+        return this->geometry(index).template as<PolygonCRef>();
+    }*/
 
 protected:
-    OGRFieldDefn* _def = nullptr;
+    TWrapped* _def = nullptr;
 };
+
+using FieldDefinitionRef  = FieldDefinitionWrapper<OGRFieldDefn>;
+using FieldDefinitionCRef = FieldDefinitionWrapper<const OGRFieldDefn>;
 
 class FieldDefinition : public FieldDefinitionRef
 {
@@ -813,6 +881,8 @@ public:
     FieldDefinition(OGRFieldDefn* def);
     //! Create a new field definition by cloning the reference
     explicit FieldDefinition(FieldDefinitionRef def);
+    //! Create a new field definition by cloning the reference
+    explicit FieldDefinition(FieldDefinitionCRef def);
     ~FieldDefinition();
 
     FieldDefinition(const FieldDefinition&)            = delete;
@@ -832,6 +902,7 @@ public:
     FeatureDefinition(const FeatureDefinition&);
     FeatureDefinition(const char* name);
     FeatureDefinition(OGRFeatureDefn* def);
+    FeatureDefinition(const OGRFeatureDefn* def);
     ~FeatureDefinition();
     std::string_view name() const;
 
@@ -842,9 +913,9 @@ public:
     /*! obtain the index of the provided field name, throws RuntimError if field not present */
     int required_field_index(const char* name) const;
     int required_field_index(const std::string& name) const;
-    FieldDefinitionRef field_definition(int index) const;
+    FieldDefinitionCRef field_definition(int index) const;
 
-    OGRFeatureDefn* get() noexcept;
+    const OGRFeatureDefn* get() noexcept;
 
 private:
     OGRFeatureDefn* _def = nullptr;
@@ -889,7 +960,7 @@ public:
     std::string_view field_name(int index) const;
     bool field_is_valid(int index) const noexcept;
 
-    FieldDefinitionRef field_definition(int index) const;
+    FieldDefinitionCRef field_definition(int index) const;
     FeatureDefinition feature_definition() const;
 
     Field field(int index) const noexcept;
@@ -1261,8 +1332,8 @@ public:
     FeatureDefinitionIterator& operator=(FeatureDefinitionIterator&& other) = default;
     bool operator==(const FeatureDefinitionIterator& other) const;
     bool operator!=(const FeatureDefinitionIterator& other) const;
-    const FieldDefinitionRef& operator*();
-    const FieldDefinitionRef* operator->();
+    const FieldDefinitionCRef& operator*();
+    const FieldDefinitionCRef* operator->();
 
 private:
     void next();
@@ -1270,7 +1341,7 @@ private:
     FeatureDefinition _featureDef;
     int _fieldCount        = 0;
     int _currentFieldIndex = 0;
-    FieldDefinitionRef _currentField;
+    FieldDefinitionCRef _currentField;
 };
 
 // support for range based for loops

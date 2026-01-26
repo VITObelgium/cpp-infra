@@ -48,12 +48,26 @@ SpatialReference::SpatialReference(OGRSpatialReference* instance)
 #endif
 }
 
+SpatialReference::SpatialReference(const OGRSpatialReference* instance)
+: _srs(instance->Clone())
+{
+    _srs->Reference();
+#if GDAL_VERSION_MAJOR >= 3
+    _srs->SetAxisMappingStrategy(OAMS_TRADITIONAL_GIS_ORDER);
+#endif
+}
+
 SpatialReference::~SpatialReference() noexcept
 {
     if (_srs) {
         // This does not actually delete if the reference count is still higher than 1
         _srs->Release();
     }
+}
+
+bool SpatialReference::is_same(const SpatialReference& other) const
+{
+    return _srs->IsSame(other._srs);
 }
 
 SpatialReference& SpatialReference::operator=(SpatialReference&& other)
