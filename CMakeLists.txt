@@ -202,7 +202,7 @@ set(INFRA_PUBLIC_HEADERS
     include/infra/workerthread.h
 )
 
-add_library(infra
+add_library(infra STATIC
     charset.cpp
     chrono.cpp
     cpuinfo.cpp
