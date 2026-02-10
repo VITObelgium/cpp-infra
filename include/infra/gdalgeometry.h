@@ -915,7 +915,8 @@ public:
     int required_field_index(const std::string& name) const;
     FieldDefinitionCRef field_definition(int index) const;
 
-    const OGRFeatureDefn* get() noexcept;
+    const OGRFeatureDefn* get() const noexcept;
+    OGRFeatureDefn* get() noexcept;
 
 private:
     OGRFeatureDefn* _def = nullptr;

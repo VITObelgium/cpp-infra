@@ -254,7 +254,12 @@ FieldDefinitionCRef FeatureDefinition::field_definition(int index) const
     return FieldDefinitionCRef(check_pointer(_def->GetFieldDefn(index), "Failed to obtain field definition"));
 }
 
-const OGRFeatureDefn* FeatureDefinition::get() noexcept
+const OGRFeatureDefn* FeatureDefinition::get() const noexcept
+{
+    return _def;
+}
+
+OGRFeatureDefn* FeatureDefinition::get() noexcept
 {
     return _def;
 }
