@@ -486,7 +486,7 @@ if(INFRA_GDAL)
     endif()
 
     target_compile_definitions(infra PUBLIC INFRA_GDAL_ENABLED)
-    target_link_libraries(infra PUBLIC GDAL::GDAL)
+    target_link_libraries(infra PUBLIC GDAL::GDAL $<$<PLATFORM_ID:Darwin>:-liconv>)
     set_target_properties(GDAL::GDAL PROPERTIES MAP_IMPORTED_CONFIG_RELWITHDEBINFO Release)
 endif()
 
