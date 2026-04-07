@@ -17,7 +17,7 @@ TEST_CASE("GdalGeometryTest.fieldDefinition")
 
     FieldDefinition def("Field", typeid(int));
 
-    FieldDefinitionRef defRef(def);
+    FieldDefinitionRef defRef(def.get());
     CHECK("Field"s == defRef.name());
     CHECK(typeid(int) == defRef.type());
 }
