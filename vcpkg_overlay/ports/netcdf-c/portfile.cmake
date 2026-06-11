@@ -14,6 +14,7 @@ vcpkg_from_github(
         fix-dependency-libzip.patch
         fix-dependency-mpi.patch
         fix-pkgconfig.patch
+        fstat.patch
 )
 
 #Remove outdated find modules
