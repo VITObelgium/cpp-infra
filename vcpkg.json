@@ -1,133 +1,94 @@
 {
-  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-  "name": "infra",
-  "version": "0.11.2",
-  "dependencies": [
-    "fmt"
-  ],
-  "default-features": [
-    "log",
-    "testing"
-  ],
-  "features": {
-    "log": {
-      "description": "logging support",
-      "dependencies": [
-        "spdlog"
-      ]
-    },
-    "testing": {
-      "description": "unit test support",
-      "dependencies": [
-        "doctest",
-        "trompeloeil"
-      ]
-    },
-    "cliprogress": {
-      "description": "progress support",
-      "dependencies": [
-        "indicators"
-      ]
-    },
-    "process": {
-      "description": "process support",
-      "dependencies": [
-        "reproc"
-      ]
-    },
-    "hashing": {
-      "description": "hashing support",
-      "dependencies": [
-        "cryptopp"
-      ]
-    },
-    "xml": {
-      "description": "xml support",
-      "dependencies": [
-        "pugixml"
-      ]
-    },
-    "tbb": {
-      "description": "threading building blocks support",
-      "dependencies": [
-        "tbb"
-      ]
-    },
-    "numeric": {
-      "description": "numeric support",
-      "dependencies": [
-        "eigen3"
-      ]
-    },
-    "charset": {
-      "description": "charset conversion/detection support",
-      "dependencies": [
-        "icu"
-      ]
-    },
-    "compression": {
-      "description": "compression support",
-      "dependencies": [
-        "zstd"
-      ]
-    },
-    "gdal": {
-      "description": "gdal support",
-      "dependencies": [
-        {
-          "name": "gdal",
-          "default-features": false,
-          "features": [
-            "geos",
-            "netcdf",
-            "curl",
-            "hdf5"
-          ]
+    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+    "name": "infra",
+    "version": "0.11.2",
+    "dependencies": ["fmt"],
+    "default-features": ["log", "testing"],
+    "features": {
+        "log": {
+            "description": "logging support",
+            "dependencies": ["spdlog"]
         },
-        {
-          "name": "proj",
-          "default-features": false
+        "testing": {
+            "description": "unit test support",
+            "dependencies": ["doctest", "trompeloeil"]
+        },
+        "cliprogress": {
+            "description": "progress support",
+            "dependencies": ["indicators"]
+        },
+        "process": {
+            "description": "process support",
+            "dependencies": ["reproc"]
+        },
+        "hashing": {
+            "description": "hashing support",
+            "dependencies": ["cryptopp"]
+        },
+        "xml": {
+            "description": "xml support",
+            "dependencies": ["pugixml"]
+        },
+        "tbb": {
+            "description": "threading building blocks support",
+            "dependencies": ["tbb"]
+        },
+        "numeric": {
+            "description": "numeric support",
+            "dependencies": ["eigen3"]
+        },
+        "charset": {
+            "description": "charset conversion/detection support",
+            "dependencies": ["icu"]
+        },
+        "compression": {
+            "description": "compression support",
+            "dependencies": ["zstd"]
+        },
+        "gdal": {
+            "description": "gdal support",
+            "dependencies": [
+                {
+                    "name": "gdal",
+                    "default-features": false,
+                    "features": ["geos", "netcdf", "curl", "hdf5"]
+                },
+                {
+                    "name": "proj",
+                    "default-features": false
+                }
+            ]
+        },
+        "db": {
+            "description": "database support",
+            "dependencies": [
+                {
+                    "name": "sqlpp11",
+                    "features": ["sqlite3", "postgresql"]
+                }
+            ]
+        },
+        "cpp17": {
+            "description": "C++17 build",
+            "dependencies": ["date", "gsl"]
+        },
+        "ui": {
+            "description": "ui support",
+            "dependencies": ["qt6"]
         }
-      ]
     },
-    "db": {
-      "description": "database support",
-      "dependencies": [
-        {
-          "name": "sqlpp11",
-          "features": [
-            "sqlite3",
-            "postgresql"
-          ]
-        }
-      ]
-    },
-    "cpp17": {
-      "description": "C++17 build",
-      "dependencies": [
-        "date",
-        "gsl"
-      ]
-    },
-    "ui": {
-      "description": "ui support",
-      "dependencies": [
-        "qt6"
-      ]
+    "vcpkg-configuration": {
+        "default-registry": {
+            "kind": "git",
+            "baseline": "f3e10653cc27d62a37a3763cd84b38bca07c6075",
+            "repository": "https://github.com/microsoft/vcpkg"
+        },
+        "registries": [
+            {
+                "kind": "artifact",
+                "location": "https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip",
+                "name": "microsoft"
+            }
+        ]
     }
-  },
-  "vcpkg-configuration": {
-    "default-registry": {
-      "kind": "git",
-      "baseline": "ce613c41372b23b1f51333815feb3edd87ef8a8b",
-      "repository": "https://github.com/microsoft/vcpkg"
-    },
-    "registries": [
-      {
-        "kind": "artifact",
-        "location": "https://github.com/microsoft/vcpkg-ce-catalog/archive/refs/heads/main.zip",
-        "name": "microsoft"
-      }
-    ]
-  }
 }
