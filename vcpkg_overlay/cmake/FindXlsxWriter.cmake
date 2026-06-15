@@ -10,6 +10,7 @@ if(DEFINED VCPKG_TARGET_TRIPLET)
     find_library(XlsxWriter_LIBRARY NAMES xlsxwriter PATHS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/lib" NO_DEFAULT_PATH)
     find_library(XlsxWriter_LIBRARY_DEBUG NAMES xlsxwriter PATHS "${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/debug/lib" NO_DEFAULT_PATH)
     find_dependency(MINIZIP NAMES unofficial-minizip CONFIG REQUIRED)
+    find_dependency(OpenSSL REQUIRED)
 else ()
     find_library(XlsxWriter_LIBRARY NAMES xlsxwriter)
     find_library(Minizip_LIBRARY NAMES minizip)
@@ -40,11 +41,11 @@ if(XlsxWriter_FOUND AND NOT TARGET XlsxWriter::XlsxWriter)
 
     if(DEFINED VCPKG_TARGET_TRIPLET)
         set_target_properties(XlsxWriter::XlsxWriter PROPERTIES
-            INTERFACE_LINK_LIBRARIES "unofficial::minizip::minizip"
+            INTERFACE_LINK_LIBRARIES "unofficial::minizip::minizip;OpenSSL::Crypto"
         )
     else()
         set_target_properties(XlsxWriter::XlsxWriter PROPERTIES
-            INTERFACE_LINK_LIBRARIES "${Minizip_LIBRARY};$<TARGET_NAME_IF_EXISTS:OpenSSL::SSL>"
+            INTERFACE_LINK_LIBRARIES "${Minizip_LIBRARY};$<TARGET_NAME_IF_EXISTS:OpenSSL::Crypto>"
         )
     endif ()
 
