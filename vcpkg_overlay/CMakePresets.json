@@ -216,7 +216,7 @@
                 "VCPKG_TARGET_ARCHITECTURE": "x64",
                 "VCPKG_CRT_LINKAGE": "dynamic",
                 "VCPKG_LIBRARY_LINKAGE": "static",
-                "VCPKG_LINKER_FLAGS": "-fuse-ld=gold"
+                "VCPKG_LINKER_FLAGS": "-fuse-ld=mold"
             },
             "condition": {
                 "type": "equals",
@@ -256,7 +256,7 @@
                 "VCPKG_CXX_FLAGS": "-fsanitize=address",
                 "VCPKG_C_FLAGS_RELEASE": "-O1 -fno-omit-frame-pointer -g",
                 "VCPKG_CXX_FLAGS_RELEASE": "-O1 -fno-omit-frame-pointer -g",
-                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold -fsanitize=address"
+                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=mold -fsanitize=address"
             },
             "condition": {
                 "type": "equals",
@@ -275,7 +275,7 @@
                 "VCPKG_TARGET_ARCHITECTURE": "x64",
                 "VCPKG_CRT_LINKAGE": "dynamic",
                 "VCPKG_LIBRARY_LINKAGE": "static",
-                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold"
+                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=mold"
             },
             "condition": {
                 "type": "equals",
@@ -294,7 +294,7 @@
                 "VCPKG_TARGET_ARCHITECTURE": "x64",
                 "VCPKG_CRT_LINKAGE": "dynamic",
                 "VCPKG_LIBRARY_LINKAGE": "static",
-                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=gold"
+                "VCPKG_LINKER_FLAGS": "-static-libstdc++ -static-libgcc -fuse-ld=mold"
             },
             "condition": {
                 "type": "equals",
