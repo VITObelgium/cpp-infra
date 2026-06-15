@@ -236,6 +236,9 @@
                 "type": "equals",
                 "lhs": "${hostSystemName}",
                 "rhs": "Linux"
+            },
+            "environment": {
+                "VCPKG_DEFAULT_HOST_TRIPLET": "x64-linux-release"
             }
         },
         {
