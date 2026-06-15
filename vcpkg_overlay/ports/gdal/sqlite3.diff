@@ -1,8 +1,57 @@
 diff --git a/cmake/modules/packages/FindSQLite3.cmake b/cmake/modules/packages/FindSQLite3.cmake
-index 903465b3c9..5d3a067e50 100644
+index 903465b..bcfa945 100644
 --- a/cmake/modules/packages/FindSQLite3.cmake
 +++ b/cmake/modules/packages/FindSQLite3.cmake
-@@ -77,7 +77,7 @@ if(SQLite3_INCLUDE_DIR AND SQLite3_LIBRARY)
+@@ -27,6 +27,48 @@ This module will set the following variables if found:
+   Copyright (c) 2019 Chuck Atkins
+ #]=======================================================================]
+ include (CMakePushCheckState)
++
++# Prefer vcpkg's unofficial-sqlite3 config package when available.
++# This provides an imported target with correct per-configuration (debug/release)
++# library paths, avoiding find_library picking up debug libs in release builds.
++find_package(unofficial-sqlite3 CONFIG QUIET)
++if(TARGET unofficial::sqlite3::sqlite3)
++    if(NOT TARGET SQLite::SQLite3)
++        add_library(SQLite::SQLite3 ALIAS unofficial::sqlite3::sqlite3)
++    endif()
++
++    # Determine include dir from the target for feature detection below
++    get_target_property(_sqlite3_include_dirs unofficial::sqlite3::sqlite3 INTERFACE_INCLUDE_DIRECTORIES)
++    list(GET _sqlite3_include_dirs 0 SQLite3_INCLUDE_DIR)
++    unset(_sqlite3_include_dirs)
++
++    # Extract version from header
++    if(SQLite3_INCLUDE_DIR AND EXISTS "${SQLite3_INCLUDE_DIR}/sqlite3.h")
++        file(STRINGS "${SQLite3_INCLUDE_DIR}/sqlite3.h" _ver_line
++             REGEX "^#define SQLITE_VERSION  *\"[0-9]+\\.[0-9]+\\.[0-9]+\""
++             LIMIT_COUNT 1)
++        string(REGEX MATCH "[0-9]+\\.[0-9]+\\.[0-9]+" SQLite3_VERSION "${_ver_line}")
++        unset(_ver_line)
++    endif()
++
++    # Detect features via symbol checks (needs the library to link against)
++    include(CheckSymbolExists)
++    cmake_push_check_state(RESET)
++    set(CMAKE_REQUIRED_INCLUDES ${SQLite3_INCLUDE_DIR})
++    set(CMAKE_REQUIRED_LIBRARIES unofficial::sqlite3::sqlite3)
++    check_symbol_exists(sqlite3_mutex_alloc sqlite3.h SQLite3_HAS_MUTEX_ALLOC)
++    check_symbol_exists(sqlite3_column_table_name sqlite3.h SQLite3_HAS_COLUMN_METADATA)
++    check_symbol_exists(sqlite3_rtree_query_callback sqlite3.h SQLite3_HAS_RTREE)
++    check_symbol_exists(sqlite3_load_extension sqlite3.h SQLite3_HAS_LOAD_EXTENSION)
++    check_symbol_exists(sqlite3_progress_handler sqlite3.h SQLite3_HAS_PROGRESS_HANDLER)
++    cmake_pop_check_state()
++
++    set(SQLite3_FOUND TRUE)
++    return()
++endif()
++
++# Fallback: use find_library when unofficial-sqlite3 is not available.
++
+ # Accept upper case variant for SQLite3_INCLUDE_DIR
+ if(SQLITE3_INCLUDE_DIR)
+   if(SQLite3_INCLUDE_DIR AND NOT "${SQLite3_INCLUDE_DIR}" STREQUAL "${SQLITE3_INCLUDE_DIR}")
+@@ -77,7 +119,7 @@ if(SQLite3_INCLUDE_DIR AND SQLite3_LIBRARY)
      cmake_push_check_state(RESET)
      # check column metadata
      set(CMAKE_REQUIRED_INCLUDES ${SQLite3_INCLUDE_DIR})
@@ -11,7 +60,7 @@ index 903465b3c9..5d3a067e50 100644
        if(PC_SQLITE3_STATIC_LDFLAGS)
          set(CMAKE_REQUIRED_LIBRARIES ${PC_SQLITE3_STATIC_LDFLAGS})
        else()
-@@ -111,15 +111,10 @@ if(SQLite3_INCLUDE_DIR AND SQLite3_LIBRARY)
+@@ -111,15 +153,10 @@ if(SQLite3_INCLUDE_DIR AND SQLite3_LIBRARY)
        endif()
      else()
          set(CMAKE_REQUIRED_LIBRARIES ${SQLite3_LIBRARY})
@@ -29,21 +78,3 @@ index 903465b3c9..5d3a067e50 100644
      # Invalidate cached variables if SQLite3_LIBRARY changes
      file(TIMESTAMP "${SQLite3_LIBRARY}" SQLite3_LIBRARY_TIMESTAMP)
      if( SQLite3_LIBRARY_TIMESTAMP_OLD_VAL AND
-@@ -179,6 +174,7 @@ if(SQLite3_FOUND)
-                           INTERFACE_INCLUDE_DIRECTORIES "${SQLite3_INCLUDE_DIRS}"
-                           IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-                           IMPORTED_LOCATION "${SQLite3_LIBRARY}")
-+  endif()
-     if(SQLite3_HAS_COLUMN_METADATA)
-         set_property(TARGET SQLite::SQLite3 APPEND PROPERTY
-                      INTERFACE_COMPILE_DEFINITIONS "SQLite3_HAS_COLUMN_METADATA")
-@@ -187,5 +183,9 @@ if(SQLite3_FOUND)
-         set_property(TARGET SQLite::SQLite3 APPEND PROPERTY
-                      INTERFACE_COMPILE_DEFINITIONS "SQLite3_HAS_RTREE")
-     endif()
-+  get_target_property(definitions SQLite::SQLite3 INTERFACE_COMPILE_DEFINITIONS)
-+  if(definitions)
-+    list(REMOVE_DUPLICATES definitions)
-+    set_target_properties(SQLite::SQLite3 PROPERTIES INTERFACE_COMPILE_DEFINITIONS "${definitions}")
-   endif()
- endif()
