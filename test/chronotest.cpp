@@ -6,6 +6,19 @@ namespace inf::test {
 
 using namespace std::chrono_literals;
 
+namespace {
+
+chrono::zoned_time brussels_time(chrono::local_time_point timePoint, chrono::choose choice)
+{
+#ifdef HAVE_CPP20_CHRONO
+    return chrono::zoned_time(std::chrono::locate_zone("Europe/Brussels"), timePoint, choice);
+#else
+    return chrono::zoned_time(date::locate_zone("Europe/Brussels"), timePoint, choice);
+#endif
+}
+
+}
+
 TEST_CASE("ChronoTest.time_point_to_utc_string")
 {
     chrono::date_point date = std::chrono::sys_days(2017y / std::chrono::February / 1);
@@ -19,7 +32,8 @@ TEST_CASE("ChronoTest.time_point_to_utc_string_ambiguous")
     REQUIRE(tp.has_value());
 
     {
-        auto utcTime = chrono::localtime_to_utc(*tp, chrono::choose::latest);
+        auto utcTime = chrono::localtime_to_utc(
+            brussels_time(*tp, chrono::choose::latest), chrono::choose::latest);
         REQUIRE(utcTime.has_value());
 
         chrono::time_point expected = std::chrono::sys_days(2019y / std::chrono::October / 27) + 1h;
@@ -27,7 +41,8 @@ TEST_CASE("ChronoTest.time_point_to_utc_string_ambiguous")
     }
 
     {
-        auto utcTime = chrono::localtime_to_utc(*tp, chrono::choose::earliest);
+        auto utcTime = chrono::localtime_to_utc(
+            brussels_time(*tp, chrono::choose::earliest), chrono::choose::earliest);
         REQUIRE(utcTime.has_value());
 
         chrono::time_point expected = std::chrono::sys_days(2019y / std::chrono::October / 27) + 0h;

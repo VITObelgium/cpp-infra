@@ -242,6 +242,32 @@ std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<ch
 
     return utcTime;
 }
+
+std::optional<time_point> localtime_to_utc(zoned_time zt, choose choice)
+{
+    auto localTimePoint = zt.get_local_time();
+    auto z              = zt.get_time_zone();
+
+    std::optional<time_point> utcTime;
+    auto i = z->get_info(localTimePoint);
+    switch (i.result) {
+    case date::local_info::unique: {
+        utcTime = std::optional<time_point>(zt.get_sys_time());
+        break;
+    }
+    case date::local_info::ambiguous: {
+        date::zoned_time<std::chrono::milliseconds> resolved(z, localTimePoint, choice);
+        utcTime = std::optional<time_point>(resolved.get_sys_time());
+        break;
+    }
+    case date::local_info::nonexistent:
+        break;
+    default:
+        break;
+    }
+
+    return utcTime;
+}
 #endif
 
 }

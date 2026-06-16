@@ -16,6 +16,7 @@
     flex
     bison
     libtool
+    clang-tools
     python314
   ];
 }
