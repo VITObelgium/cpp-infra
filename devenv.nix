@@ -1,6 +1,8 @@
 { pkgs, ... }:
 
 {
+  env.VCPKG_FORCE_DOWNLOADED_BINARIES = "true";
+
   # https://devenv.sh/packages/
   packages = with pkgs; [
     cmake
