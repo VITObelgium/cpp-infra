@@ -185,7 +185,8 @@
       "dependencies": [
         {
           "name": "netcdf-c",
-          "default-features": false
+          "default-features": false,
+          "features": ["hdf5"]
         }
       ]
     },
