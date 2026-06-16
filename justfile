@@ -5,7 +5,11 @@ VCPKG_DEFAULT_TRIPLET := if os_family() == "windows" {
         "arm64-osx"
     } else { "x64-osx" }
 } else {
-    "x64-linux"
+    if arch() == "aarch64" {
+        "arm64-linux"
+    } else {
+        "x64-linux"
+    }
 }
 
 

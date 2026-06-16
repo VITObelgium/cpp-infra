@@ -51,6 +51,9 @@ jobs:
         if: runner.os != 'Windows'
         run: |
           sh ${{ runner.TEMP }}/vcpkg/bootstrap-vcpkg.sh
+      - name: Set macOS SDK root
+        if: runner.os == 'macOS'
+        run: echo "SDKROOT=$(xcrun --show-sdk-path)" >> $GITHUB_ENV
       - name: Bootstrap the ports
         id: bootstrap
         run: ${{ runner.os != 'Windows' && 'devenv shell --' || '' }} just bootstrap
