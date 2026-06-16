@@ -193,12 +193,7 @@ std::optional<time_point> localtime_to_utc(zoned_time zt, choose choice)
         break;
     }
     case std::chrono::local_info::ambiguous: {
-        if (choice == choose::latest) {
-            utcTime = std::optional<time_point>(i.second.begin - i.second.save);
-        } else {
-            assert(choice == choose::earliest);
-            utcTime = std::optional<time_point>(i.first.end - i.first.save);
-        }
+        utcTime = std::optional<time_point>(zt.get_sys_time());
         break;
     }
     case std::chrono::local_info::nonexistent:

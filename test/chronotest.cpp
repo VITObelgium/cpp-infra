@@ -36,7 +36,7 @@ TEST_CASE("ChronoTest.time_point_to_utc_string_ambiguous")
             brussels_time(*tp, chrono::choose::latest), chrono::choose::latest);
         REQUIRE(utcTime.has_value());
 
-        chrono::time_point expected = std::chrono::sys_days(2019y / std::chrono::October / 27) + 1h;
+        chrono::time_point expected = std::chrono::sys_days(2019y / std::chrono::October / 27) + 1h + 20min;
         CHECK(expected == *utcTime);
     }
 
@@ -45,7 +45,7 @@ TEST_CASE("ChronoTest.time_point_to_utc_string_ambiguous")
             brussels_time(*tp, chrono::choose::earliest), chrono::choose::earliest);
         REQUIRE(utcTime.has_value());
 
-        chrono::time_point expected = std::chrono::sys_days(2019y / std::chrono::October / 27) + 0h;
+        chrono::time_point expected = std::chrono::sys_days(2019y / std::chrono::October / 27) + 0h + 20min;
         CHECK(expected == *utcTime);
     }
 }
