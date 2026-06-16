@@ -20,7 +20,11 @@ cmake_preset := if os_family() == "windows" {
         "mac-arm"
     } else { "mac-intel" }
 } else {
-    "linux"
+    if arch() == "aarch64" {
+        "linux-arm"
+    } else {
+        "linux"
+    }
 }
 
 export VCPKG_ROOT := env('VCPKG_ROOT', "../vcpkg")

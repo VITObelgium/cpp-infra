@@ -53,7 +53,6 @@
     {
       "name": "windows",
       "inherits": "default",
-      "generator": "Visual Studio 17 2022",
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-windows-static-vs2022",
         "VCPKG_SET_CHARSET_FLAG": "ON",
@@ -65,6 +64,13 @@
       "inherits": "default",
       "cacheVariables": {
         "VCPKG_TARGET_TRIPLET": "x64-linux"
+      }
+    },
+    {
+      "name": "linux-arm",
+      "inherits": "default",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "arm64-linux"
       }
     },
     {

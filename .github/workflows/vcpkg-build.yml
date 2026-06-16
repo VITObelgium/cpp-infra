@@ -54,6 +54,9 @@ jobs:
       - name: Set macOS SDK root
         if: runner.os == 'macOS'
         run: echo "SDKROOT=$(xcrun --show-sdk-path)" >> $GITHUB_ENV
+      - name: Setup MSVC environment
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
       - name: Bootstrap the ports
         id: bootstrap
         run: ${{ runner.os != 'Windows' && 'devenv shell --' || '' }} just bootstrap
