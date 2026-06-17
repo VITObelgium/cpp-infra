@@ -107,6 +107,20 @@
       "displayName": "Windows x64 Release",
       "description": "Release build",
       "configuration": "Release"
+    },
+    {
+      "name": "x64-windows-static-debug",
+      "configurePreset": "x64-windows-static",
+      "displayName": "Windows x64 Debug",
+      "description": "Debug build",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64-windows-static-release",
+      "configurePreset": "x64-windows-static",
+      "displayName": "Windows x64 Release",
+      "description": "Release build",
+      "configuration": "Release"
     }
   ],
   "testPresets": [
@@ -132,6 +146,14 @@
     },
     {
       "name": "x64-windows-static-release",
+      "description": "Unit tests",
+      "configurePreset": "x64-windows-static",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "x64-windows-static-vs-release",
       "description": "Unit tests",
       "configurePreset": "x64-windows-static-vs",
       "output": {
