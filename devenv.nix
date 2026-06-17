@@ -21,5 +21,6 @@
     clang-tools
     mold
     python314
+    mono
   ];
 }
