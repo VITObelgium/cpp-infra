@@ -39,6 +39,7 @@ build_release_vs: configure_vs
 
 build: build_release
 
+[windows]
 build_vs: build_release_vs
 
 build_dist triplet: build_release
