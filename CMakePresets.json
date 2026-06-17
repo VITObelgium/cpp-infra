@@ -95,6 +95,20 @@
       "configuration": "Release"
     },
     {
+      "name": "arm64-osx-debug",
+      "configurePreset": "arm64-osx",
+      "displayName": "MacOS arm64 Debug",
+      "description": "Debug build",
+      "configuration": "Debug"
+    },
+    {
+      "name": "arm64-osx-release",
+      "configurePreset": "arm64-osx",
+      "displayName": "MacOS arm64 Release",
+      "description": "Release build",
+      "configuration": "Release"
+    },
+    {
       "name": "x64-windows-static-vs-debug",
       "configurePreset": "x64-windows-static-vs",
       "displayName": "Windows x64 Debug",
@@ -133,6 +147,18 @@
     {
       "name": "x64-linux-release",
       "configurePreset": "x64-linux",
+      "description": "Unit tests",
+      "configuration": "Release"
+    },
+    {
+      "name": "arm64-osx-debug",
+      "configurePreset": "arm64-osx",
+      "description": "Unit tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "arm64-osx-release",
+      "configurePreset": "arm64-osx",
       "description": "Unit tests",
       "configuration": "Release"
     },
