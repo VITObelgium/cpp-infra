@@ -18,7 +18,7 @@
     {
       "name": "default",
       "binaryDir": "${sourceDir}/build",
-      "inherits": ["vcpkg-base", "build-system-ninja-multi"],
+      "inherits": ["vcpkg-base"],
       "cacheVariables": {
         "INFRA_LOGGING": "ON",
         "INFRA_GDAL": "ON",
@@ -42,26 +42,41 @@
     },
     {
       "name": "arm64-osx",
-      "inherits": ["default", "triplet-arm64-osx"]
+      "inherits": ["default", "build-system-ninja-multi", "triplet-arm64-osx"]
     },
     {
       "name": "x64-osx",
-      "inherits": ["default", "triplet-x64-osx"]
+      "inherits": ["default", "build-system-ninja-multi", "triplet-x64-osx"]
     },
     {
       "name": "x64-windows-static",
-      "inherits": ["default", "triplet-x64-windows-static"],
+      "inherits": [
+        "default",
+        "build-system-ninja-multi",
+        "triplet-x64-windows-static"
+      ],
+      "cacheVariables": {
+        "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
+      }
+    },
+    {
+      "name": "x64-windows-static-vs",
+      "inherits": [
+        "default",
+        "build-system-visual-studio",
+        "triplet-x64-windows-static"
+      ],
       "cacheVariables": {
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
       }
     },
     {
       "name": "x64-linux",
-      "inherits": ["default", "triplet-x64-linux"]
+      "inherits": ["default", "build-system-ninja-multi", "triplet-x64-linux"]
     },
     {
       "name": "arm64-linux",
-      "inherits": ["default", "triplet-arm64-linux"]
+      "inherits": ["default", "build-system-ninja-multi", "triplet-arm64-linux"]
     }
   ]
 }
