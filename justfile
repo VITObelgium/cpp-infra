@@ -28,10 +28,10 @@ configure_vs:
     cmake --preset {{ cmake_preset }}-vs
 
 build_debug: configure
-    cmake --build --preset {{ cmake_preset }} --config Debug
+    cmake --build --preset {{ cmake_preset }}-debug
 
 build_release: configure
-    cmake --build --preset {{ cmake_preset }} --config Release
+    cmake --build --preset {{ cmake_preset }}-release
 
 [windows]
 build_release_vs: configure_vs
@@ -45,9 +45,9 @@ build_vs: build_release_vs
 build_dist triplet: build_release
 
 test_debug: build
-    ctest --test-dir --preset {{ cmake_preset }} --output-on-failure -C Debug
+    ctest --preset {{ cmake_preset }}-debug --output-on-failure -C Debug
 
 test_release: build
-    ctest --test-dir --preset {{ cmake_preset }} --output-on-failure -C Release
+    ctest --preset {{ cmake_preset }}-release --output-on-failure -C Release
 
 test: test_release

@@ -81,6 +81,20 @@
   ],
   "buildPresets": [
     {
+      "name": "x64-linux-debug",
+      "configurePreset": "x64-linux",
+      "displayName": "Linux x64 Debug",
+      "description": "Debug build",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64-linux-release",
+      "configurePreset": "x64-linux",
+      "displayName": "Linux x64 Release",
+      "description": "Release build",
+      "configuration": "Release"
+    },
+    {
       "name": "x64-windows-static-vs-debug",
       "configurePreset": "x64-windows-static-vs",
       "displayName": "Windows x64 Debug",
@@ -96,6 +110,18 @@
     }
   ],
   "testPresets": [
+    {
+      "name": "x64-linux-debug",
+      "configurePreset": "x64-linux",
+      "description": "Unit tests",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64-linux-release",
+      "configurePreset": "x64-linux",
+      "description": "Unit tests",
+      "configuration": "Release"
+    },
     {
       "name": "x64-windows-static-debug",
       "description": "Unit tests",
