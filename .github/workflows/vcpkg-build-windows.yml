@@ -25,6 +25,8 @@ jobs:
           tool: just
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
+      - name: Fix VCPKG_ROOT
+        run: echo "VCPKG_ROOT=C:\vcpkg" >> $env:GITHUB_ENV
       - name: Add NuGet sources
         shell: pwsh
         run: |
