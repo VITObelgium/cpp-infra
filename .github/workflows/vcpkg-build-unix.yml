@@ -22,9 +22,9 @@ jobs:
 
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install Nix
-        uses: cachix/install-nix-action@v30
+        uses: cachix/install-nix-action@v31
       - name: Install devenv
         run: nix profile install --accept-flake-config nixpkgs#devenv
       - name: Set macOS SDK root
@@ -51,7 +51,7 @@ jobs:
         run: devenv shell -- just test
       - name: Archive build logs
         if: ${{ failure() && steps.build.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.cfg.id }}-build-logs
           path: |

@@ -16,9 +16,9 @@ jobs:
 
     steps:
       - name: Clone repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Install ninja
-        uses: seanmiddleditch/gha-setup-ninja@master
+        uses: seanmiddleditch/gha-setup-ninja@v6
       - name: Install just
         uses: taiki-e/install-action@v2
         with:
@@ -48,7 +48,7 @@ jobs:
         run: just test
       - name: Archive build logs
         if: ${{ failure() && steps.build.conclusion == 'failure' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: windows-build-logs
           path: |
