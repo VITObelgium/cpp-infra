@@ -1,0 +1,48 @@
+name: Vcpkg build (Windows)
+
+on: [push]
+
+jobs:
+  build:
+    name: windows-latest
+    runs-on: windows-latest
+
+    env:
+      VCPKG_TAG: 2026.06.01
+      VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
+
+    steps:
+      - name: Clone repository
+        uses: actions/checkout@v4
+      - name: Export GitHub Actions cache environment variables
+        uses: actions/github-script@v7
+        with:
+          script: |
+            core.exportVariable('ACTIONS_CACHE_URL', process.env.ACTIONS_CACHE_URL || '');
+            core.exportVariable('ACTIONS_RUNTIME_TOKEN', process.env.ACTIONS_RUNTIME_TOKEN || '');
+      - name: Install ninja
+        uses: seanmiddleditch/gha-setup-ninja@master
+      - name: Install just
+        uses: taiki-e/install-action@v2
+        with:
+          tool: just
+      - name: Setup MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+      - name: Bootstrap vcpkg
+        run: just bootstrap_vcpkg
+      - name: Build the code
+        id: build
+        run: just build
+      - name: Run the unit tests
+        run: just test
+      - name: Archive build logs
+        if: ${{ failure() && steps.build.conclusion == 'failure' }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-build-logs
+          path: |
+            ${{ runner.temp }}/vcpkg/buildtrees/**/autoconf*.log
+            ${{ runner.temp }}/vcpkg/buildtrees/**/config*.log
+            ${{ runner.temp }}/vcpkg/buildtrees/**/build*.log
+            ${{ runner.temp }}/vcpkg/buildtrees/**/install*.log
+            ${{ runner.temp }}/vcpkg/buildtrees/**/package*.log

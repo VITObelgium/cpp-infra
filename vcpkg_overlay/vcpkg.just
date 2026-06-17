@@ -1,8 +1,6 @@
 # detect the vcpkg triplet based on the system information
 windows_triplet := "x64-windows-static"
-
-VCPKG_DEFAULT_TRIPLET := env_var_or_default('VCPKG_DEFAULT_TRIPLET', if os_family() == "windows" { windows_triplet } else if os() == "macos" { if arch() == "aarch64" { "arm64-osx-homebrew" } else { "x64-osx-homebrew" } } else { "x64-linux" })
-
+VCPKG_DEFAULT_TRIPLET := env_var_or_default('VCPKG_DEFAULT_TRIPLET', if os_family() == "windows" { "x64-windows-static" } else if os() == "macos" { if arch() == "aarch64" { "arm64-osx" } else { "x64-osx" } } else if arch() == "aarch64" { "arm64-linux" } else { "x64-linux" })
 cmake_preset := VCPKG_DEFAULT_TRIPLET
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET

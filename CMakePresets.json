@@ -1,12 +1,14 @@
 {
   "$schema": "https://cmake.org/cmake/help/latest/_downloads/3e2d73bff478d88a7de0de736ba5e361/schema.json",
-  "version": 8,
+  "version": 10,
+  "include": ["vcpkg_overlay/CMakePresets.json"],
   "configurePresets": [
     {
       "name": "vcpkg",
       "cacheVariables": {
         "CMAKE_TOOLCHAIN_FILE": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
         "VCPKG_MANIFEST_INSTALL": "OFF",
+        "VCPKG_MANIFEST_FEATURES": "cliprogress;process;hashing;xml;tbb;numeric;charset;compression;gdal;db;testing",
         "VCPKG_INSTALLED_DIR": "${sourceDir}/vcpkg_installed"
       },
       "environment": {
@@ -16,8 +18,7 @@
     {
       "name": "default",
       "binaryDir": "${sourceDir}/build",
-      "inherits": "vcpkg",
-      "generator": "Ninja Multi-Config",
+      "inherits": ["vcpkg-base", "build-system-ninja-multi"],
       "cacheVariables": {
         "INFRA_LOGGING": "ON",
         "INFRA_GDAL": "ON",
@@ -33,52 +34,34 @@
         "INFRA_COMPRESSION": "ON",
         "INFRA_COMPRESSION_ZSTD": "ON",
         "INFRA_ENABLE_TESTS": "ON",
-        "INFRA_CLI_PROGRESS": "ON"
+        "INFRA_CLI_PROGRESS": "ON",
+        "VCPKG_MANIFEST_FEATURES": "cliprogress;process;hashing;xml;tbb;numeric;charset;compression;gdal;db;testing",
+        "VCPKG_OVERLAY_PORTS": "${sourceDir}/vcpkg_overlay/ports",
+        "VCPKG_OVERLAY_TRIPLETS": "${sourceDir}/vcpkg_overlay/triplets"
       }
     },
     {
-      "name": "mac-arm",
-      "inherits": "default",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "arm64-osx"
-      }
+      "name": "arm64-osx",
+      "inherits": ["default", "triplet-arm64-osx"]
     },
     {
-      "name": "mac-intel",
-      "inherits": "default",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-osx"
-      }
+      "name": "x64-osx",
+      "inherits": ["default", "triplet-x64-osx"]
     },
     {
-      "name": "windows",
-      "inherits": "default",
+      "name": "x64-windows-static",
+      "inherits": ["default", "triplet-x64-windows-static"],
       "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-windows-static-vs2022",
-        "VCPKG_SET_CHARSET_FLAG": "ON",
         "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded$<$<CONFIG:Debug>:Debug>"
       }
     },
     {
-      "name": "linux",
-      "inherits": "default",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "x64-linux"
-      }
+      "name": "x64-linux",
+      "inherits": ["default", "triplet-x64-linux"]
     },
     {
-      "name": "linux-arm",
-      "inherits": "default",
-      "cacheVariables": {
-        "VCPKG_TARGET_TRIPLET": "arm64-linux"
-      }
-    },
-    {
-      "name": "mac-arm-local",
-      "inherits": "mac-arm",
-      "environment": {
-        "VCPKG_ROOT": "${sourceDir}/../../vcpkg"
-      }
+      "name": "arm64-linux",
+      "inherits": ["default", "triplet-arm64-linux"]
     }
   ]
 }

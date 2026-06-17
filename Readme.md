@@ -1,4 +1,5 @@
-[![Build](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build.yml/badge.svg?branch=master)](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build.yml)
+[![Build nix](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build-unix.yml/badge.svg?branch=master)](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build-unix.yml)
+[![Build msvc](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build-windows.yml/badge.svg?branch=master)](https://github.com/VITObelgium/cpp-infra/actions/workflows/vcpkg-build-windows.yml)
 
 # C++ infrastructure library
 This library contains the things we use in almost every C++ software project.
