@@ -19,6 +19,7 @@
     bison
     libtool
     clang-tools
+    mold
     python314
   ];
 }

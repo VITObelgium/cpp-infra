@@ -12,6 +12,8 @@ jobs:
       VCPKG_BINARY_SOURCES: "clear;x-gha,readwrite"
 
     steps:
+      - name: Set console to UTF-8
+        run: chcp 65001
       - name: Clone repository
         uses: actions/checkout@v4
       - name: Export GitHub Actions cache environment variables
