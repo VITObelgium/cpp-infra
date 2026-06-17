@@ -14,7 +14,7 @@ clone_vcpkg:
 
 [windows]
 bootstrap_vcpkg: clone_vcpkg
-    cd '{{ join(justfile_directory(), "build", "vcpkg") }}'; ./bootstrap-vcpkg.bat
+    cd '{{ join(justfile_directory(), "build", "vcpkg") }}'; ./bootstrap-vcpkg.bat -disableMetrics
 
 [unix]
 bootstrap_vcpkg: clone_vcpkg
