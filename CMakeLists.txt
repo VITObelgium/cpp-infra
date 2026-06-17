@@ -33,17 +33,16 @@ cmake_dependent_option(INFRA_UI_COMPONENTS_LOCATION "Location related qt ui comp
 string(COMPARE EQUAL "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}" INFRA_IS_TOPLEVEL)
 
 if(INFRA_IS_TOPLEVEL)
-    cmake_minimum_required(VERSION 3.28)
+    cmake_minimum_required(VERSION 3.31)
 
     set(CMAKE_CXX_STANDARD 20)
+    set(CMAKE_CXX_EXTENSIONS OFF)
+    set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
+    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
     if(INFRA_ENABLE_TESTS)
         enable_testing()
     endif()
-
-    set(CMAKE_CXX_EXTENSIONS OFF)
-    set(CMAKE_CXX_SCAN_FOR_MODULES OFF)
-    set(CMAKE_EXPORT_COMPILE_COMMANDS 1)
 
     project(Infra
         VERSION 0.11.2

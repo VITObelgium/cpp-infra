@@ -17,7 +17,7 @@
     },
     {
       "name": "default",
-      "binaryDir": "${sourceDir}/build",
+      "binaryDir": "${sourceDir}/build/cpp-infra-${presetName}",
       "inherits": ["vcpkg-base"],
       "cacheVariables": {
         "INFRA_LOGGING": "ON",
@@ -63,7 +63,7 @@
       "name": "x64-windows-static-vs",
       "inherits": [
         "default",
-        "build-system-visual-studio",
+        "build-system-visualstudio",
         "triplet-x64-windows-static"
       ],
       "cacheVariables": {
@@ -77,6 +77,40 @@
     {
       "name": "arm64-linux",
       "inherits": ["default", "build-system-ninja-multi", "triplet-arm64-linux"]
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "x64-windows-static-vs-debug",
+      "configurePreset": "x64-windows-static-vs",
+      "displayName": "Windows x64 Debug",
+      "description": "Debug build",
+      "configuration": "Debug"
+    },
+    {
+      "name": "x64-windows-static-vs-release",
+      "configurePreset": "x64-windows-static-vs",
+      "displayName": "Windows x64 Release",
+      "description": "Release build",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "x64-windows-static-debug",
+      "description": "Unit tests",
+      "configurePreset": "x64-windows-static-vs",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "x64-windows-static-release",
+      "description": "Unit tests",
+      "configurePreset": "x64-windows-static-vs",
+      "output": {
+        "outputOnFailure": true
+      }
     }
   ]
 }
