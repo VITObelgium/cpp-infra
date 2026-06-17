@@ -10,16 +10,11 @@ jobs:
     runs-on: windows-latest
 
     env:
-      VCPKG_TAG: 2026.06.01
       USERNAME: VITObelgium
-      VCPKG_EXE: ${{ github.workspace }}/build/vcpkg/vcpkg.exe
-      VCPKG_ROOT: ${{ github.workspace }}/build/vcpkg
       FEED_URL: https://nuget.pkg.github.com/VITObelgium/index.json
       VCPKG_BINARY_SOURCES: "clear;nuget,https://nuget.pkg.github.com/VITObelgium/index.json,readwrite"
 
     steps:
-      - name: Set console to UTF-8
-        run: chcp 65001
       - name: Clone repository
         uses: actions/checkout@v4
       - name: Export GitHub Actions cache environment variables
@@ -36,21 +31,20 @@ jobs:
           tool: just
       - name: Setup MSVC environment
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Bootstrap vcpkg
-        run: just bootstrap_vcpkg
       - name: Add NuGet sources
         shell: pwsh
         run: |
-          .$(${{ env.VCPKG_EXE }} fetch nuget) `
+          .$(vcpkg fetch nuget) `
             sources add `
             -Source "${{ env.FEED_URL }}" `
             -StorePasswordInClearText `
             -Name GitHubPackages `
             -UserName "${{ env.USERNAME }}" `
             -Password "${{ secrets.VCPKG_PAT_TOKEN }}"
-          .$(${{ env.VCPKG_EXE }} fetch nuget) `
+          .$(vcpkg fetch nuget) `
             setapikey "${{ secrets.VCPKG_PAT_TOKEN }}" `
             -Source "${{ env.FEED_URL }}"
+
       - name: Build the code
         id: build
         run: just build
