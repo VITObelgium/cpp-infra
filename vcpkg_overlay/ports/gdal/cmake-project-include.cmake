@@ -18,3 +18,12 @@ if(GDAL_USE_ARROW)
     set(GDAL_USE_ARROWDATASET "${ARROW_DATASET}" CACHE INTERNAL "")
     set(GDAL_USE_ARROWCOMPUTE "${ARROW_COMPUTE}" CACHE INTERNAL "")
 endif()
+
+if(GDAL_USE_SQLITE3)
+    # CMake find module with vcpkg cmake wrapper
+    find_package(SQLite3 REQUIRED)
+    # .. and inject into GDAL's FindSQLite3.cmake
+    set(SQLite3_LIBRARY "${SQLite3_LIBRARIES}")
+    set(SQLite3_FOUND FALSE)
+    set(SQLITE3_FOUND FALSE)
+endif()
