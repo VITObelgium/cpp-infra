@@ -177,23 +177,44 @@ std::optional<local_time_point> local_time_point_from_string(std::string_view st
 #ifdef HAVE_CPP20_CHRONO
 std::optional<time_point> localtime_to_utc(local_time_point dt, std::optional<choose> choice)
 {
-    auto choiseVal = choice.value_or(choose::latest);
-    return localtime_to_utc(zoned_time(std::chrono::current_zone(), dt, choiseVal), choiseVal);
+    auto z = std::chrono::current_zone();
+    auto i = z->get_info(dt);
+
+    std::optional<time_point> utcTime;
+    switch (i.result) {
+    case std::chrono::local_info::unique:
+        utcTime = std::chrono::zoned_time<std::chrono::milliseconds>(z, dt).get_sys_time();
+        break;
+    case std::chrono::local_info::ambiguous:
+        if (choice) {
+            utcTime = std::chrono::zoned_time<std::chrono::milliseconds>(z, dt, *choice).get_sys_time();
+        }
+        break;
+    case std::chrono::local_info::nonexistent:
+        Log::error("Non existing timepoint");
+        break;
+    default:
+        break;
+    }
+
+    return utcTime;
 }
 
 std::optional<time_point> localtime_to_utc(zoned_time zt, choose choice)
 {
     auto localTimePoint = zt.get_local_time();
+    auto timeZone              = zt.get_time_zone();
 
     std::optional<time_point> utcTime;
-    auto i = zt.get_time_zone()->get_info(localTimePoint);
+    auto i = timeZone->get_info(localTimePoint);
     switch (i.result) {
-    case std::chrono::local_info::unique: {
-        utcTime = std::optional<time_point>(zt.get_sys_time());
+    case std::chrono::local_info::unique:
+        utcTime = zt.get_sys_time();
         break;
-    }
     case std::chrono::local_info::ambiguous: {
-        utcTime = std::optional<time_point>(zt.get_sys_time());
+        // Re-resolve with the supplied choice in case `zt` was constructed without one.
+        std::chrono::zoned_time<time_point::duration> resolved(timeZone, localTimePoint, choice);
+        utcTime = resolved.get_sys_time();
         break;
     }
     case std::chrono::local_info::nonexistent:
