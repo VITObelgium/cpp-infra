@@ -4,7 +4,6 @@
 #include "infra/gdalio.h"
 
 #include <doctest/doctest.h>
-#include <fstream>
 
 namespace inf::test {
 
