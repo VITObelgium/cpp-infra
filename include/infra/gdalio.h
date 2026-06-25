@@ -16,11 +16,14 @@
 #include <limits>
 #include <ogr_spatialref.h>
 #include <string>
-#include <string_view>
 #include <unordered_map>
 #include <vector>
 
 namespace inf::gdal::io {
+
+/// Check if the path is a GDAL virtual filesystem path (e.g. /vsimem/, /vsicurl/, etc.)
+/// These paths should not be passed to std::filesystem operations.
+bool is_vsi_path(const fs::path& path);
 
 GeoMetadata read_metadata(const fs::path& fileName, const std::vector<std::string>& driverOpts = {});
 const std::type_info& get_raster_type(const fs::path& fileName);

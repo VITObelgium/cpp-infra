@@ -9,6 +9,11 @@
 
 namespace inf::gdal::io {
 
+bool is_vsi_path(const fs::path& path)
+{
+    return str::starts_with(path.generic_string(), "/vsi");
+}
+
 const std::type_info& get_raster_type(const fs::path& fileName)
 {
     auto ds    = gdal::RasterDataSet::open(fileName);
@@ -56,8 +61,7 @@ void detail::read_raster_data(int bandNr, CutOut cut, const gdal::RasterDataSet&
 
 void detail::create_output_directory_if_needed(const fs::path& p)
 {
-    if (str::starts_with(p.generic_string(), "/vsi")) {
-        // this is a gdal virtual filesystem path
+    if (is_vsi_path(p)) {
         return;
     }
 

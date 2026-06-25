@@ -128,7 +128,7 @@ void warp_cli(const RasterDataSet& srcDataSet, RasterDataSet& dstDataSet, const 
 
 void warp_cli(const RasterDataSet& srcDataSet, const fs::path& output, const std::vector<std::string>& options, const std::vector<std::pair<std::string, std::string>>& keyValueOptions)
 {
-    file::create_directory_for_file(output);
+    io::detail::create_output_directory_if_needed(output);
 
     GdalWarpAppOptionsWrapper warpOptions(options);
     for (auto& [key, value] : keyValueOptions) {
@@ -522,7 +522,7 @@ gdal::RasterDataSet translate(const gdal::RasterDataSet& ds, const fs::path& out
     ProgressInfo progress(progressCb);
     TranslateOptionsWrapper gdalOptions(options, progress);
 
-    file::create_directory_for_file(outputPath);
+    io::detail::create_output_directory_if_needed(outputPath);
 
     int userError = 0;
     auto resultDs = gdal::RasterDataSet(GDALTranslate(outputPath.empty() ? nullptr : file::generic_u8string(outputPath).c_str(), ds.get(), gdalOptions.get(), &userError));
