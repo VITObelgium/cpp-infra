@@ -11,7 +11,6 @@
 #include "embedgdaldata.h"
 #endif
 
-#include <algorithm>
 #include <array>
 #include <cassert>
 #include <gdal_version.h>
@@ -60,7 +59,7 @@ static const std::unordered_map<std::string, RasterType> s_rasterDriverDescLooku
 }};
 
 static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
-    {VectorType::Memory, "Memory"},
+    {VectorType::Memory, "MEM"},
     {VectorType::Csv, "CSV"},
     {VectorType::Tab, "CSV"},
     {VectorType::ShapeFile, "ESRI Shapefile"},
@@ -73,7 +72,7 @@ static const std::unordered_map<VectorType, const char*> s_vectorDriverLookup{{
 }};
 
 static const std::unordered_map<std::string, VectorType> s_vectorDriverDescLookup{{
-    {"Memory", VectorType::Memory},
+    {"MEM", VectorType::Memory},
     {"CSV", VectorType::Csv},
     {"CSV", VectorType::Tab},
     {"ESRI Shapefile", VectorType::ShapeFile},
