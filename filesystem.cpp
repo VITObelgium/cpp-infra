@@ -7,7 +7,7 @@
 #include <sstream>
 
 #ifdef WIN32
-#include <Windows.h>
+#include <windows.h>
 #endif
 
 namespace inf::file {
