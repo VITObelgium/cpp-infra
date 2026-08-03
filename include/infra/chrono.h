@@ -24,6 +24,7 @@ namespace inf::chrono {
 
 #ifdef HAVE_CPP20_CHRONO
 using days           = std::chrono::days;
+using years          = std::chrono::years;
 using month          = std::chrono::month;
 using year           = std::chrono::year;
 using year_month_day = std::chrono::year_month_day;
@@ -53,6 +54,7 @@ constexpr auto December  = std::chrono::December;
 
 #else
 using days           = date::days;
+using years          = date::years;
 using month          = date::month;
 using year           = date::year;
 using year_month_day = date::year_month_day;
