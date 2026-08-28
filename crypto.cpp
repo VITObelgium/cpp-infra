@@ -1,13 +1,12 @@
 #include "infra/crypto.h"
+#include "infra/enumutils.h"
 #include "infra/exception.h"
 #include "infra/hash.h"
-#include "infra/enumutils.h"
 
 #include <array>
 #include <cryptopp/blowfish.h>
 #include <cryptopp/hex.h>
 #include <cryptopp/modes.h>
-#include <cryptopp/osrng.h>
 
 namespace inf::crypto {
 
@@ -31,7 +30,6 @@ std::vector<uint8_t> encrypt(std::span<const uint8_t> data, std::string_view key
 
     try {
         std::vector<uint8_t> encrypted;
-        AutoSeededRandomPool prng;
 
         std::array<byte, Blowfish::BLOCKSIZE> iv;
         iv.fill(0);
@@ -54,7 +52,6 @@ std::vector<uint8_t> decrypt(std::span<const uint8_t> data, std::string_view key
 
     try {
         std::vector<uint8_t> decrypted;
-        AutoSeededRandomPool prng;
 
         std::array<byte, Blowfish::BLOCKSIZE> iv;
         iv.fill(0);
