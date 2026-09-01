@@ -3,6 +3,8 @@ windows_triplet := "x64-windows-static"
 VCPKG_DEFAULT_TRIPLET := env_var_or_default('VCPKG_DEFAULT_TRIPLET', if os_family() == "windows" { "x64-windows-static" } else if os() == "macos" { if arch() == "aarch64" { "arm64-osx" } else { "x64-osx" } } else if arch() == "aarch64" { "arm64-linux" } else { "x64-linux" })
 cmake_preset := VCPKG_DEFAULT_TRIPLET
 
+set windows-shell := ["cmd.exe", "/C"]
+
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
 vcpkg_root := env_var_or_default('VCPKG_ROOT', join(justfile_directory(), "./build/vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
@@ -20,6 +22,11 @@ bootstrap_vcpkg: clone_vcpkg
 bootstrap_vcpkg: clone_vcpkg
     bash '{{ join(justfile_directory(), "build", "vcpkg", "bootstrap-vcpkg.sh") }}'
 
+[windows]
+git_status_clean:
+    if "{{ in_git_repo }}"=="true" git diff --quiet --exit-code
+
+[unix]
 git_status_clean:
     if {{ in_git_repo }}; then git diff --quiet --exit-code; fi
 
@@ -36,7 +43,7 @@ clear_cache:
 [windows]
 dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`:
     set shell := ["cmd.exe", "/C"]
-    set GIT_COMMIT_HASH={{ git_hash }}&& '{{ source_directory() }}/dist.bat' '{{ justfile_directory() }}' just build_dist {{ triplet }}
+    set "GIT_COMMIT_HASH={{ git_hash }}" && "{{ source_directory() }}/dist.bat" "{{ justfile_directory() }}" just build_dist {{ triplet }}
 
 [unix]
 dist triplet=VCPKG_DEFAULT_TRIPLET git_hash=`git rev-parse HEAD`: (build_dist triplet)
