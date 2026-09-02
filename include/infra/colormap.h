@@ -4,6 +4,7 @@
 
 #include <array>
 #include <functional>
+#include <string_view>
 #include <vector>
 
 namespace inf {

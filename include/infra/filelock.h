@@ -4,6 +4,7 @@
 #include "infra/filesystem.h"
 
 #ifdef _WIN32
+#include <cstring>
 #include <io.h>
 #include <windows.h>
 #else

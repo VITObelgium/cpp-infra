@@ -3,6 +3,7 @@
 #include <cinttypes>
 #include <cmath>
 #include <fmt/core.h>
+#include <functional>
 #include <limits>
 
 #include "infra/math.h"

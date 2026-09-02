@@ -3,6 +3,8 @@
 
 #include <doctest/doctest.h>
 
+#include <cstring>
+
 namespace std {
 
 void PrintTo(const std::string_view& sv, ::std::ostream* os)
