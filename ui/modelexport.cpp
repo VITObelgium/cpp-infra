@@ -142,27 +142,6 @@ void exportModel(const QAbstractItemModel* model, const QModelIndex& rootIndex, 
             }
 
             if (data.isValid()) {
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-                switch (data.type()) {
-                case QVariant::Int:
-                case QVariant::UInt:
-                case QVariant::LongLong:
-                case QVariant::ULongLong:
-                case QVariant::Double:
-                    worksheet_write_number(ws, row, col, data.toDouble(), cellFormat);
-                    break;
-                case QVariant::String:
-                    worksheet_write_string(ws, row, col, data.toString().toUtf8(), cellFormat);
-                    break;
-                default:
-                    if (data.canConvert(QVariant::String)) {
-                        if (data.convert(QVariant::String)) {
-                            worksheet_write_string(ws, row, col, data.toString().toUtf8(), cellFormat);
-                        }
-                    }
-                    break;
-                }
-#else
                 switch (data.metaType().id()) {
                 case QMetaType::Int:
                 case QMetaType::UInt:
@@ -182,7 +161,6 @@ void exportModel(const QAbstractItemModel* model, const QModelIndex& rootIndex, 
                     }
                     break;
                 }
-#endif
             } else if (bgColor.isValid()) {
                 // empty cell with a background
                 worksheet_write_string(ws, row, col, "", cellFormat);

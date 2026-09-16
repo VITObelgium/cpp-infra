@@ -511,11 +511,7 @@ set_target_properties(infra PROPERTIES
 set(INSTALL_CONFIGDIR ${CMAKE_INSTALL_LIBDIR}/cmake/infra)
 
 if(INFRA_UI_COMPONENTS)
-    find_package(Qt6 COMPONENTS Core Gui Widgets Network OpenGL QUIET)
-
-    if(NOT Qt6_FOUND)
-        find_package(Qt5 5.15 COMPONENTS Core Gui Widgets Network OpenGL REQUIRED)
-    endif()
+    find_package(Qt6 COMPONENTS Core Gui Widgets Network OpenGL REQUIRED)
 
     set(AUTOGEN_SOURCE_GROUP moc)
 
@@ -608,11 +604,7 @@ if(INFRA_UI_COMPONENTS)
     )
 
     if(INFRA_UI_COMPONENTS_QML)
-        if(Qt6_FOUND)
-            find_package(Qt6 COMPONENTS Quick)
-        else()
-            find_package(Qt5 5.15 COMPONENTS Quick REQUIRED)
-        endif()
+        find_package(Qt6 COMPONENTS Quick REQUIRED)
 
         target_sources(uiinfra PRIVATE
             ui/pixmapimage.cpp
@@ -630,11 +622,7 @@ if(INFRA_UI_COMPONENTS)
     endif()
 
     if(INFRA_UI_COMPONENTS_LOCATION)
-        if(Qt6_FOUND)
-            find_package(Qt6 COMPONENTS Location QuickCompiler)
-        else()
-            find_package(Qt5 5.15 COMPONENTS Location QuickCompiler REQUIRED)
-        endif()
+        find_package(Qt6 COMPONENTS Location QuickCompiler REQUIRED)
 
         if(NOT INFRA_GDAL)
             message(FATAL_ERROR "INFRA_GDAL needs to be enabled when enabling INFRA_UI_COMPONENTS_LOCATION")

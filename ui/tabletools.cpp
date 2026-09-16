@@ -26,11 +26,7 @@ void itemSelectionToClipboard(const QItemSelectionModel* selectionModel, char do
     for (auto& current : indexes) {
         QVariant data = model->data(current);
 
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-        const bool isDouble = data.type() == QVariant::Double;
-#else
         const bool isDouble = data.metaType().id() == QMetaType::Double;
-#endif
 
         if (isDouble) {
             // make sure to convert to string in the system locale, otherwise tools like excel

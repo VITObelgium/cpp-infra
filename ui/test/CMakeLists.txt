@@ -19,5 +19,5 @@ set_target_properties(uiinfratest PROPERTIES AUTOMOC ON)
 
 add_test(NAME uiinfra COMMAND uiinfratest)
 if (MSVC)
-    set_tests_properties(uiinfra PROPERTIES ENVIRONMENT "PATH=${Qt5_DIR}/../../../bin")
+    set_tests_properties(uiinfra PROPERTIES ENVIRONMENT "PATH=${Qt6_DIR}/../../../bin")
 endif ()

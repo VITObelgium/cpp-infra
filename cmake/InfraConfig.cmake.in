@@ -70,17 +70,17 @@ endif()
 
 if ("ui" IN_LIST Infra_FIND_COMPONENTS)
     if (@INFRA_UI_COMPONENTS@)
-        find_dependency(Qt5Gui REQUIRED)
-        find_dependency(Qt5Widgets REQUIRED)
-        find_dependency(Qt5Core REQUIRED)
-        find_dependency(Qt5Network REQUIRED)
+        find_dependency(Qt6Gui REQUIRED)
+        find_dependency(Qt6Widgets REQUIRED)
+        find_dependency(Qt6Core REQUIRED)
+        find_dependency(Qt6Network REQUIRED)
 
         if (@INFRA_UI_COMPONENTS_QML@)
-            find_dependency(Qt5Quick CONFIG REQUIRED)
+            find_dependency(Qt6Quick CONFIG REQUIRED)
         endif ()
 
         if (@INFRA_UI_COMPONENTS_LOCATION@)
-            find_dependency(Qt5Location CONFIG REQUIRED)
+            find_dependency(Qt6Location CONFIG REQUIRED)
         endif ()
 
         if (@INFRA_UI_COMPONENTS_XLSX_EXPORT@)
