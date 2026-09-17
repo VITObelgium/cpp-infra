@@ -6,17 +6,24 @@ cmake_preset := VCPKG_DEFAULT_TRIPLET
 set windows-shell := ["cmd.exe", "/C"]
 
 VCPKG_DEFAULT_HOST_TRIPLET := VCPKG_DEFAULT_TRIPLET
-vcpkg_root := env_var_or_default('VCPKG_ROOT', join(justfile_directory(), "./build/vcpkg"))
+vcpkg_root := env_var_or_default('VCPKG_ROOT', join(justfile_directory(), "build", "vcpkg"))
 in_git_repo := path_exists(join(justfile_directory(), ".git"))
 
+[windows]
 clone_vcpkg:
-    - rm -rf '{{ join(justfile_directory(), "build", "vcpkg") }}'
+    if exist "{{ join(justfile_directory(), "build", "vcpkg") }}" rmdir /s /q "{{ join(justfile_directory(), "build", "vcpkg") }}"
+    if not exist "{{ join(justfile_directory(), "build") }}" mkdir "{{ join(justfile_directory(), "build") }}"
+    git clone --depth 1 https://github.com/microsoft/vcpkg.git "{{ join(justfile_directory(), "build", "vcpkg") }}"
+
+[unix]
+clone_vcpkg:
+    rm -rf '{{ join(justfile_directory(), "build", "vcpkg") }}'
     mkdir -p '{{ join(justfile_directory(), "build") }}'
     git clone --depth 1 https://github.com/microsoft/vcpkg.git '{{ join(justfile_directory(), "build", "vcpkg") }}'
 
 [windows]
 bootstrap_vcpkg: clone_vcpkg
-    cd '{{ join(justfile_directory(), "build", "vcpkg") }}'; ./bootstrap-vcpkg.bat -disableMetrics
+    cd /d "{{ join(justfile_directory(), "build", "vcpkg") }}" && call bootstrap-vcpkg.bat -disableMetrics
 
 [unix]
 bootstrap_vcpkg: clone_vcpkg
