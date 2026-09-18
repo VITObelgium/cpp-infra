@@ -1,6 +1,6 @@
 #pragma once
 
-#if __has_include(<span>) && (__cplusplus > 201703L)
+#if __has_include(<span>) && (__cplusplus > 201703L || (defined(_MSVC_LANG) && _MSVC_LANG > 201703L))
 #include <span>
 #else
 #include <gsl/span>
