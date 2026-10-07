@@ -866,7 +866,7 @@ std::unordered_map<std::string, std::string> Layer::metadata(const std::string& 
 {
     std::unordered_map<std::string, std::string> result;
 
-    char** data = _layer->GetMetadata(domain.c_str());
+    auto* data = _layer->GetMetadata(domain.c_str());
     if (data != nullptr) {
         int index = 0;
         while (data[index] != nullptr) {

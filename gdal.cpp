@@ -672,7 +672,7 @@ std::unordered_map<std::string, std::string> RasterDataSet::metadata(const std::
 {
     std::unordered_map<std::string, std::string> result;
 
-    char** data = _ptr->GetMetadata(domain.c_str());
+    auto* data = _ptr->GetMetadata(domain.c_str());
     if (data != nullptr) {
         int index = 0;
         while (data[index] != nullptr) {
