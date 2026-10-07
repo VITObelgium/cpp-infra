@@ -5,8 +5,8 @@
 #include "infra/math.h"
 #include "infra/point.h"
 
-#include <cinttypes>
 #include <cmath>
+#include <cstdint>
 #include <fmt/core.h>
 #include <limits>
 
