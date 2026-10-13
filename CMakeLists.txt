@@ -288,8 +288,13 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND NOT CMAKE_HOST_WIN32)
                 target_link_libraries(infra PRIVATE ${CPP_FS_LIB})
             endif()
         elseif(UNIX)
-            # on linux libstdc++ is typically used
-            target_link_libraries(infra PRIVATE stdc++fs)
+            check_cxx_source_compiles("
+                #include <filesystem>
+                int main() { return std::filesystem::exists(std::filesystem::path(\".\")) ? 0 : 1; }
+            " HAVE_FILESYSTEM_WITHOUT_EXTRA_LIBRARY)
+            if(NOT HAVE_FILESYSTEM_WITHOUT_EXTRA_LIBRARY)
+                target_link_libraries(infra PRIVATE stdc++fs)
+            endif()
         endif()
     elseif(HAVE_EXP_FILESYSTEM_H)
         find_library(CPP_EXP_LIB c++experimental)
