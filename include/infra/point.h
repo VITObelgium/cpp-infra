@@ -6,6 +6,10 @@
 #include <functional>
 #include <limits>
 
+#if defined(__cpp_impl_three_way_comparison) && __cpp_impl_three_way_comparison >= 201907L && __has_include(<compare>)
+#include <compare>
+#endif
+
 #include "infra/math.h"
 
 namespace inf {
@@ -29,6 +33,10 @@ struct Point
     {
         return !(*this == other);
     }
+
+#if defined(__cpp_impl_three_way_comparison) && __cpp_impl_three_way_comparison >= 201907L && defined(__cpp_lib_three_way_comparison) && __cpp_lib_three_way_comparison >= 201907L
+    constexpr auto operator<=>(const Point<T>& other) const = default;
+#endif
 
     constexpr bool is_valid() const
     {

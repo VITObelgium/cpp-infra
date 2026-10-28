@@ -2,6 +2,8 @@ find_package(trompeloeil CONFIG REQUIRED)
 
 add_executable(infratest
     casttest.cpp
+    coordinatetest.cpp
+    pointtest.cpp
     colortest.cpp
 	chronotest.cpp
     colormaptest.cpp

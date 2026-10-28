@@ -2,10 +2,13 @@
 
 #include "infra/geoconstants.h"
 
-#include <cinttypes>
 #include <cmath>
 #include <fmt/core.h>
 #include <limits>
+
+#if defined(__cpp_impl_three_way_comparison) && __cpp_impl_three_way_comparison >= 201907L && __has_include(<compare>)
+#include <compare>
+#endif
 
 namespace inf {
 
@@ -28,6 +31,10 @@ struct Coordinate
     {
         return !(*this == other);
     }
+
+#if defined(__cpp_impl_three_way_comparison) && __cpp_impl_three_way_comparison >= 201907L && defined(__cpp_lib_three_way_comparison) && __cpp_lib_three_way_comparison >= 201907L
+    constexpr std::partial_ordering operator<=>(const Coordinate& other) const noexcept = default;
+#endif
 
     bool is_valid() const noexcept
     {
