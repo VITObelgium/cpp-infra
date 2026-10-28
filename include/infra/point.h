@@ -5,6 +5,7 @@
 #include <fmt/core.h>
 #include <functional>
 #include <limits>
+#include <ostream>
 
 #if defined(__cpp_impl_three_way_comparison) && __cpp_impl_three_way_comparison >= 201907L && __has_include(<compare>)
 #include <compare>
